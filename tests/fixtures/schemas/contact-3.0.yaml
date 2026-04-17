@@ -1,0 +1,18 @@
+openapi: 3.0.3
+info:
+  title: Contact (synthetic)
+  version: "1.0.0"
+  description: Tiny fixture used to exercise the BindsFormat attribute.
+paths: {}
+components:
+  schemas:
+    Contact:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        nickname:
+          type: string

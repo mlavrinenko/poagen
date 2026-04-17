@@ -1,0 +1,16 @@
+# Per-language line-count limits. See ADR-004.
+# https://github.com/mlavrinenko/linecop
+
+count_mode: code-comments
+
+limits:
+  PHP: 250
+  Markdown: 300
+
+exclude_dirs:
+  - vendor
+  - build
+  - .devbox
+  - .git
+  - tests/generated
+  - tests/fixtures

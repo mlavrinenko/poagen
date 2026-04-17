@@ -11,19 +11,19 @@
 ])[
 
   #rule("Help")[
-    #scenario("No arguments prints usage and exits 0")[
+    #scenario("No arguments prints usage and exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with no arguments]
       #then[stdout should contain "USAGE"]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
 
-    #scenario("--help prints usage and exits 0")[
+    #scenario("--help prints usage and exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with argument #p((arg: "--help"))]
       #then[stdout should contain "USAGE"]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
 
-    #scenario("help subcommand prints usage and exits 0")[
+    #scenario("help subcommand prints usage and exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with argument #p((arg: "help"))]
       #then[stdout should contain "USAGE"]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
@@ -31,13 +31,13 @@
   ]
 
   #rule("Version")[
-    #scenario("--version prints the paogen version and exits 0")[
+    #scenario("--version prints the paogen version and exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with argument #p((arg: "--version"))]
       #then[stdout should start with #p((prefix: "paogen "))]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
 
-    #scenario("version subcommand prints the paogen version and exits 0")[
+    #scenario("version subcommand prints the paogen version and exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with argument #p((arg: "version"))]
       #then[stdout should start with #p((prefix: "paogen "))]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
@@ -45,7 +45,7 @@
   ]
 
   #rule("Unknown command")[
-    #scenario("Unknown command reports on stderr and exits 2")[
+    #scenario("Unknown command reports on stderr and exits 2", stage: unstable)[
       #when[#the(PaogenCli) is invoked with argument #p((arg: "does-not-exist"))]
       #then[stderr should contain #p((needle: "is not implemented yet"))]
       #and_[#the(PaogenCli) should exit with code #p((code: "2"))]

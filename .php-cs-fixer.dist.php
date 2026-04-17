@@ -3,7 +3,11 @@
 declare(strict_types=1);
 
 $finder = (new PhpCsFixer\Finder())
-    ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/bin']);
+    ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/bin'])
+    // Generated fixtures are nette/php-generator's canonical output (ADR-004).
+    // cs-fixer disagrees with nette on a few stylistic choices (e.g. empty
+    // body collapse); excluding them keeps the generator deterministic.
+    ->exclude(['fixtures/generated']);
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)

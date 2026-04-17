@@ -11,10 +11,14 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen;
 
+use Composer\Autoload\ClassLoader;
+use Mlavrinenko\Paogen\Exception\InvalidProfileException;
+use Mlavrinenko\Paogen\Generator\AttributeScanner;
+use Mlavrinenko\Paogen\Generator\Generator;
+use Mlavrinenko\Paogen\Generator\ProfileLoader;
+
 /**
- * Minimal hand-rolled CLI entry point.
- *
- * See docs/design/cli-tooling.md for why this doesn't use symfony/console.
+ * Minimal hand-rolled CLI entry point. See ADR-006.
  */
 final class Cli
 {
@@ -27,8 +31,7 @@ final class Cli
             paogen <command> [options]
 
         COMMANDS
-            generate <schema>   Generate a PHP client from an OpenAPI 3.x schema
-            validate <schema>   Validate an OpenAPI 3.x schema
+            generate <profile>  Generate code from a profile (PHP file returning a Profile)
             help                Print this message
             version             Print the paogen version
 
@@ -61,9 +64,56 @@ final class Cli
             return 0;
         }
 
+        if ($args[0] === 'generate') {
+            return self::generate(\array_slice($args, 1), $stdout, $stderr);
+        }
+
         $command = $args[0];
         fwrite($stderr, "paogen: command '{$command}' is not implemented yet.\n");
         fwrite($stderr, "See `paogen help`.\n");
         return 2;
+    }
+
+    /**
+     * @param list<string> $args
+     * @param resource     $stdout
+     * @param resource     $stderr
+     */
+    private static function generate(array $args, $stdout, $stderr): int
+    {
+        if ($args === []) {
+            fwrite($stderr, "paogen generate: missing profile path.\n");
+            return 2;
+        }
+
+        $loader = self::composerLoader();
+
+        if (!$loader instanceof \Composer\Autoload\ClassLoader) {
+            fwrite($stderr, "paogen generate: could not locate Composer ClassLoader (needed to scan for #[BindsFormat]).\n");
+            return 1;
+        }
+
+        try {
+            $profile = new ProfileLoader()->load($args[0]);
+        } catch (InvalidProfileException $e) {
+            fwrite($stderr, "paogen generate: {$e->getMessage()}\n");
+            return 2;
+        }
+
+        new Generator(new AttributeScanner($loader))->generate($profile);
+
+        fwrite($stdout, "paogen: generated into {$profile->output}\n");
+        return 0;
+    }
+
+    private static function composerLoader(): ?ClassLoader
+    {
+        foreach (spl_autoload_functions() as $fn) {
+            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+                return $fn[0];
+            }
+        }
+
+        return null;
     }
 }

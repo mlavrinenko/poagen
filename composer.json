@@ -48,7 +48,10 @@
     "autoload-dev": {
         "psr-4": {
             "Mlavrinenko\\Paogen\\Tests\\": "tests/",
-            "Mlavrinenko\\Paogen\\Tests\\Generated\\": "tests/generated/"
+            "Mlavrinenko\\Paogen\\Tests\\Generated\\": "tests/generated/",
+            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject\\": "tests/fixtures/profiles/value-objects/",
+            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
+            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/"
         }
     },
     "config": {

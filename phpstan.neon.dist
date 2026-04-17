@@ -2,6 +2,7 @@ includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon
   - vendor/phpstan/phpstan-deprecation-rules/rules.neon
   - vendor/shipmonk/dead-code-detector/rules.neon
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
 parameters:
   tmpDir: ./build/cache/phpstan
   treatPhpDocTypesAsCertain: false
@@ -10,11 +11,18 @@ parameters:
     - bin
     - src
     - tests
+  excludePaths:
+    # Generated code is checked by a separate config so the consumer's
+    # PHPStan setup is what gates it (ADR-004).
+    - tests/fixtures/generated/*
   ignoreErrors:
-    # Generated steps classes hold $test for access to TestCase assertions.
-    # Not all step methods dereference it, but the property is part of the
-    # generated contract with speconaut-phpunit.
     - identifier: shipmonk.deadProperty.neverRead
       path: tests/generated/*Steps.php
     - identifier: property.onlyWritten
       path: tests/generated/*Steps.php
+    # Fixture VOs exist to prove BindsFormat discovery; their fields are
+    # never read in PHP-land.
+    - identifier: shipmonk.deadProperty.neverRead
+      path: tests/fixtures/profiles/value-objects/*.php
+    - identifier: shipmonk.deadMethod
+      path: tests/fixtures/profiles/value-objects/*.php

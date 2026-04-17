@@ -1,0 +1,15 @@
+# Independent PHPStan config for the generated fixtures (ADR-004).
+# This is the *consumer view* — generated code must pass max as if a user
+# were running phpstan in their own project.
+includes:
+  - vendor/phpstan/phpstan-strict-rules/rules.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+parameters:
+  tmpDir: ./build/cache/phpstan-generated
+  treatPhpDocTypesAsCertain: false
+  level: max
+  paths:
+    - tests/fixtures/generated
+  scanDirectories:
+    - tests/fixtures/profiles/value-objects
