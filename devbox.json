@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": [
+    "php@8.4",
+    "php84Packages.composer@latest",
+    "php84Extensions.pcov@latest",
+    "just@latest",
+    "parallel@latest"
+  ],
+  "env": {
+    "PATH": "$PWD/bin:$PWD/vendor/bin:$PATH"
+  }
+}

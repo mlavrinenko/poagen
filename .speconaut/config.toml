@@ -1,0 +1,8 @@
+[traces]
+source-dirs = ["src", "bin"]
+ignore = [
+    # Shims that delegate to locally-developed speconaut/speconaut-phpunit.
+    # Not part of paogen's behavior — nothing to spec.
+    "bin/speconaut",
+    "bin/speconaut-phpunit",
+]

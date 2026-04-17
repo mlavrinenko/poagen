@@ -1,0 +1,12 @@
+/build/
+/vendor/
+/composer.lock
+
+/.devbox/
+/.direnv/
+
+/.php-cs-fixer.cache
+/.phpunit.result.cache
+/.phpunit.cache/
+
+/.starter-kit-answers

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Local wrapper for the speconaut-phpunit adapter. Points at the user's
+# checkout by default. Override by exporting SPECONAUT_PHPUNIT_ROOT.
+
+set -euo pipefail
+
+SPECONAUT_PHPUNIT_ROOT="${SPECONAUT_PHPUNIT_ROOT:-$HOME/projects/home/speconaut/adapters/speconaut-phpunit}"
+SPECONAUT_PHPUNIT_BIN="$SPECONAUT_PHPUNIT_ROOT/bin/speconaut-phpunit"
+
+if [[ ! -x "$SPECONAUT_PHPUNIT_BIN" ]]; then
+    echo "paogen/bin/speconaut-phpunit: $SPECONAUT_PHPUNIT_BIN is not executable" >&2
+    echo "Did you run 'composer install' in $SPECONAUT_PHPUNIT_ROOT?" >&2
+    exit 1
+fi
+
+exec "$SPECONAUT_PHPUNIT_BIN" "$@"

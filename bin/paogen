@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * This file is part of mlavrinenko/paogen
+ *
+ * @copyright Copyright (c) Maxim Lavrinenko <maxim@lavrinenko.xyz>
+ * @license https://opensource.org/license/mit/ MIT License
+ */
+
+declare(strict_types=1);
+
+// Find the composer autoloader whether we're in vendor/bin or the repo root.
+$autoloaders = [
+    __DIR__ . '/../vendor/autoload.php',         // running from repo root
+    __DIR__ . '/../../../autoload.php',          // installed as a dependency
+];
+
+$autoloader = null;
+foreach ($autoloaders as $candidate) {
+    if (is_file($candidate)) {
+        $autoloader = $candidate;
+        break;
+    }
+}
+
+if ($autoloader === null) {
+    fwrite(STDERR, "paogen: could not locate composer autoloader. Did you run `composer install`?\n");
+    exit(1);
+}
+
+require $autoloader;
+
+exit(Mlavrinenko\Paogen\Cli::run($argv));

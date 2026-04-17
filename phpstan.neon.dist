@@ -1,0 +1,20 @@
+includes:
+  - vendor/phpstan/phpstan-strict-rules/rules.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - vendor/shipmonk/dead-code-detector/rules.neon
+parameters:
+  tmpDir: ./build/cache/phpstan
+  treatPhpDocTypesAsCertain: false
+  level: max
+  paths:
+    - bin
+    - src
+    - tests
+  ignoreErrors:
+    # Generated steps classes hold $test for access to TestCase assertions.
+    # Not all step methods dereference it, but the property is part of the
+    # generated contract with speconaut-phpunit.
+    - identifier: shipmonk.deadProperty.neverRead
+      path: tests/generated/*Steps.php
+    - identifier: property.onlyWritten
+      path: tests/generated/*Steps.php

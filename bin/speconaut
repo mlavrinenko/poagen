@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Local wrapper for speconaut. Points at the user's checkout by default so
+# this project tracks the latest speconaut without a Packagist/cargo-install
+# step. Override by exporting SPECONAUT_ROOT.
+#
+# Mirrors the global speconaut shim: realpath any file-like args before `cd`,
+# then `cargo run` inside the speconaut repo.
+
+set -euo pipefail
+
+SPECONAUT_ROOT="${SPECONAUT_ROOT:-$HOME/projects/home/speconaut}"
+
+if [[ ! -d "$SPECONAUT_ROOT" ]]; then
+    echo "paogen/bin/speconaut: SPECONAUT_ROOT=$SPECONAUT_ROOT is not a directory" >&2
+    exit 1
+fi
+
+args=()
+for arg in "$@"; do
+    if [[ -e "$arg" ]]; then
+        args+=("$(realpath "$arg")")
+    else
+        args+=("$arg")
+    fi
+done
+
+cd "$SPECONAUT_ROOT"
+exec cargo run -q -- "${args[@]}"
