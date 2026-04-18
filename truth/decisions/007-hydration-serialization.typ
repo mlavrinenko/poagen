@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": adr, proposed
+#import "@local/speconaut:0.1.0": adr, accepted
 
 #show: adr.with(
   number: 7,
   title: "Hydration and serialization contract between the Client, Models, and bound VOs",
-  status: proposed,
+  status: accepted,
   date: datetime(year: 2026, month: 4, day: 18),
 )
 

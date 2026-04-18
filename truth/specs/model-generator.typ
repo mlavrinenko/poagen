@@ -74,6 +74,42 @@
     ]
   ]
 
+  #rule("Hydration and serialization contract (ADR-007)")[
+    #scenario(
+      "A list-of-Model property hydrates each item into the declared class",
+      stage: unstable,
+      traces: ("src/Generator/Emit/ClientEmitter.php",),
+    )[
+      #given[#a(Model) `Pet` has a property `tags` whose schema is `type: array, items.$ref: #/components/schemas/Tag`]
+      #when[the generated `ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `tags` is a list of two objects]
+      #then[`$pet->tags[0]` is an instance of `Tag`]
+      #and_[`$pet->tags[1]` is an instance of `Tag`]
+    ]
+
+    #scenario(
+      "A list-of-scalar property hydrates items untouched",
+      stage: unstable,
+      traces: ("src/Generator/Emit/ClientEmitter.php",),
+    )[
+      #given[#a(Model) `Pet` has a property `photoUrls` whose schema is `type: array, items.type: string`]
+      #when[the generated `ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `photoUrls` is a list of plain strings]
+      #then[each `$pet->photoUrls[$i]` is the original string — no object wrapping]
+    ]
+
+    #scenario(
+      "A property with a non-identifier schema key round-trips through PROPERTY_MAP",
+      stage: unstable,
+      traces: ("src/Generator/Emit/ClientEmitter.php",),
+    )[
+      #given[#a(Model) `Contact` declares a required property whose schema key is `display-name` (kebab-case)]
+      #when[the generator emits `Contact.php` and `ApiClient::hydrate` runs against a payload containing the wire key `display-name`]
+      #then[the constructor parameter is emitted as `$displayName` (camelCased PHP identifier)]
+      #and_[`Contact::PROPERTY_MAP` pairs `'displayName'` with wire key `'display-name'`]
+      #and_[hydration populates `$contact->displayName` from the `display-name` payload key]
+      #and_[`json_encode($contact)` emits the key as `display-name`, not `displayName`]
+    ]
+  ]
+
   #rule("User bindings replace generated types")[
     #scenario(
       "A property with a format that has a BindsFormat binding uses the user class",

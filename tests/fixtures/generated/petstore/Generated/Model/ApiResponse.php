@@ -4,12 +4,36 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model;
 
-final readonly class ApiResponse
+use JsonSerializable;
+
+final readonly class ApiResponse implements JsonSerializable
 {
+    /**
+     * Paogen marshal/unmarshal contract. See ADR-007.
+     *
+     * phpName => [wireKey, shape]
+     * shape is one of: null (scalar pass-through), `\FQCN::class` (model ref), ['list', null] (list<scalar>), ['list', \FQCN::class] (list<Model>).
+     *
+     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>
+     */
+    public const array PROPERTY_MAP = ['code' => ['code', null], 'message' => ['message', null], 'type' => ['type', null]];
+
     public function __construct(
         public ?int $code = null,
         public ?string $message = null,
         public ?string $type = null,
     ) {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'code' => $this->code,
+            'message' => $this->message,
+            'type' => $this->type,
+        ];
     }
 }

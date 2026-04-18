@@ -132,6 +132,10 @@ final readonly class ClientEmitter
 
         $method->addComment('Deserialise a JSON-decoded value into an instance of $class.');
         $method->addComment('');
+        $method->addComment('Uses the Model\'s `PROPERTY_MAP` const (ADR-007) to translate');
+        $method->addComment('wire keys into PHP property names and to recurse into nested');
+        $method->addComment('models / list-of-model items.');
+        $method->addComment('');
         $method->addComment('@template T of object');
         $method->addComment('@param class-string<T> $class');
         $method->addComment('@return T');
@@ -144,40 +148,48 @@ final readonly class ClientEmitter
                 throw new \RuntimeException(\sprintf('Cannot hydrate %s from non-array data.', $class));
             }
 
-            $reflection = new \ReflectionClass($class);
-            $constructor = $reflection->getConstructor();
-
-            if ($constructor === null) {
-                /** @var T */
-                return $reflection->newInstance();
-            }
+            /** @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}> $map */
+            $map = $class::PROPERTY_MAP;
 
             $args = [];
 
-            foreach ($constructor->getParameters() as $parameter) {
-                $name = $parameter->getName();
-
-                if (!\array_key_exists($name, $data)) {
-                    if ($parameter->isDefaultValueAvailable()) {
-                        $args[$name] = $parameter->getDefaultValue();
-                    }
+            foreach ($map as $phpName => [$wireKey, $shape]) {
+                if (!\array_key_exists($wireKey, $data)) {
                     continue;
                 }
 
-                $value = $data[$name];
-                $type = $parameter->getType();
+                $value = $data[$wireKey];
 
-                if ($type instanceof \ReflectionNamedType && !$type->isBuiltin() && \is_array($value)) {
-                    /** @var class-string $child */
-                    $child = $type->getName();
-                    $value = self::hydrate($child, $value);
+                if ($shape === null) {
+                    $args[$phpName] = $value;
+                    continue;
                 }
 
-                $args[$name] = $value;
+                if (\is_string($shape)) {
+                    $args[$phpName] = \is_array($value) ? self::hydrate($shape, $value) : $value;
+                    continue;
+                }
+
+                // ['list', null] or ['list', class-string].
+                [, $itemType] = $shape;
+
+                if (!\is_array($value)) {
+                    $args[$phpName] = $value;
+                    continue;
+                }
+
+                if ($itemType === null) {
+                    $args[$phpName] = $value;
+                    continue;
+                }
+
+                $args[$phpName] = \array_values(\array_map(
+                    static fn(mixed $item): mixed => \is_array($item) ? self::hydrate($itemType, $item) : $item,
+                    $value,
+                ));
             }
 
-            /** @var T */
-            return $reflection->newInstanceArgs($args);
+            return new $class(...$args);
             PHP);
     }
 }

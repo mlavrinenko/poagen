@@ -10,9 +10,16 @@ components:
       type: object
       required:
         - email
+        - display-name
       properties:
         email:
           type: string
           format: email
         nickname:
           type: string
+        display-name:
+          type: string
+          description: Kebab-case wire key; emitted as `$displayName` but must round-trip on the wire as `display-name`.
+        org_id:
+          type: integer
+          description: Snake-case wire key, valid PHP identifier — stays `$org_id` in PHP.

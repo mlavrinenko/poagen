@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   YAML or JSON OpenAPI document, runs `OpenApi::validate()`, and reports
   parse / validation / usage errors on stderr. Exit codes: 0 on success,
   1 on file / parse / validation failure, 2 on missing argument.
+- Every generated Model now publishes `public const array PROPERTY_MAP`
+  and implements `\JsonSerializable` per ADR-007. The map pairs each
+  PHP property name with `[wireKey, shape]` where `shape` is `null`
+  (scalar), `\FQCN::class` (model `$ref`), or `['list', null|\FQCN]`
+  (array / array of model). The emitted `jsonSerialize()` returns the
+  array keyed by wire names.
 
 ### Changed
 
@@ -57,7 +63,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Nothing yet.
+- Hydrator no longer silently half-populates Models whose schema keys
+  aren't valid PHP identifiers (e.g. kebab-case `display-name`). The
+  generated `ApiClient::hydrate()` now consults `PROPERTY_MAP` to
+  translate wire keys → PHP property names. Previously, reflection
+  matched by PHP name only and missed every mangled wire key.
+- Hydrator now recurses into `list<Model>` properties via the shape
+  directive in `PROPERTY_MAP`, producing real lists of typed objects
+  instead of raw associative arrays. Previously, reflection saw the
+  builtin `array` type on `?array $tags` and stopped — the declared
+  `@param list<Tag>` phpdoc contract was silently violated at the
+  first `$pet->tags[0]->name`.
 
 ## 0.1.0 - TBD
 

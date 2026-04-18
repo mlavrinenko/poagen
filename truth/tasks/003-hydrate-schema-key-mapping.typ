@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Hydrate Models by original schema key, not camelCased PHP name",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 18),
   priority: "critical",
   spec: "truth/specs/model-generator.typ",
@@ -54,3 +54,34 @@ together they form the "hydrator correctness" pair blocking 0.1.
 - Petstore golden fixture regenerated under
   `tests/fixtures/generated/petstore/`.
 - `just check` green end-to-end.
+
+== Resolution
+
+Landed together with task 002 (same PROPERTY_MAP work).
+
+- The task's original framing — that `ModelEmitter::phpName()`
+  camelCases plain snake_case names such as `photo_urls` → `photoUrls`
+  — turns out not to match current behavior: the name regex
+  `/^[a-zA-Z_]\w*$/` already accepts `photo_urls` as-is, so snake_case
+  names pass through unchanged and the hydrator lookup already
+  matches the wire key. The actual risk is with *non*-PHP-identifier
+  keys (kebab-case, dotted names, etc.), where the camelCase fallback
+  *does* fire and historically produced the documented half-populated
+  Models.
+- `tests/fixtures/schemas/contact-3.0.yaml` grew a kebab-case
+  `display-name` (required string) and a snake_case `org_id`
+  (optional integer). The kebab-case case exercises PHP-name
+  mangling; the snake_case case documents the identity-passthrough.
+- `Contact::PROPERTY_MAP` pairs `'displayName' => ['display-name',
+  null]` and `'org_id' => ['org_id', null]`. `jsonSerialize()` emits
+  them keyed by the wire name, so `json_encode($contact)` round-trips
+  to `display-name` on the wire regardless of the PHP property name.
+- Regression under Model Generator > "Hydration and serialization
+  contract (ADR-007)": `A property with a non-identifier schema key
+  round-trips through PROPERTY_MAP`. Locked.
+- `tests/fixtures/generated/contact/*` regenerated to include the
+  new property and the emitted `PROPERTY_MAP` / `jsonSerialize()`.
+- `BindsFormat` scalar VOs (Email etc.) still do not round-trip
+  correctly — still tracked by task 004. The new regression test
+  pre-constructs an `Email` instance when exercising hydration so it
+  does not depend on task 004's completion.

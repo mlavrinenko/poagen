@@ -29,5 +29,3 @@ parameters:
     # never read in PHP-land.
     - identifier: shipmonk.deadProperty.neverRead
       path: tests/fixtures/profiles/value-objects/*.php
-    - identifier: shipmonk.deadMethod
-      path: tests/fixtures/profiles/value-objects/*.php
