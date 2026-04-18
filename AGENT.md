@@ -52,3 +52,72 @@ hand-editing.
 - speconaut binary expected on `$PATH`. If your install rebuilds on every
   invocation, point at a prebuilt binary directly — see the project
   Justfile for how the recipes invoke it.
+
+## When a dependency is broken, fix the dependency first
+
+paogen depends on speconaut (core + PHPUnit adapter). If a speconaut-
+side bug blocks routine paogen work — `lock` refuses a clean change,
+`status` misreports drift, codegen produces wrong output, an adapter
+emits bad stubs — do *not* route around it inside paogen. Stop paogen
+work before any hand-edit or workaround, then:
+
++ *File a focused task in the owning repo* (see "Task placement"
+  below), with the reproducible example taken from the paogen session
+  that surfaced the problem.
++ *Fix the dependency there.* Switch `cwd` to
+  `~/projects/home/speconaut` (or the relevant adapter path),
+  implement the fix under its own spec-first workflow, land a green
+  build, and commit.
++ *Return to paogen* and re-run the blocked workflow. If it is now
+  green, proceed. If it is not, that is another dependency bug — file
+  again.
+
+This is not optional. A paogen change built on a hacked-around
+dependency is a landmine for the next session.
+
+## Workflow hazards — stop and escalate
+
+Some failure modes signal that the tooling is out of step with reality,
+not that your change is wrong. Do not hack around them.
+
+- *Never hand-edit `.speconaut/state.lock`.* If `speconaut lock --approve`
+  refuses a routine change, stop. Do not compute sha256 / zstd / base64
+  snapshots by hand, and do not `sed` over trace hashes. File a task in
+  the repo that owns the fix (see "Task placement" below), report to the
+  user, and pause until it is resolved.
+- *Never edit generated trees by hand.* Files under `Generated/`, under
+  `tests/generated/*Test.php`, or under any `speconaut`-owned artifact
+  are produced by tooling. If the tool output is wrong, fix the tool,
+  not the output.
+- If `just check`, `just check-drift`, `speconaut lock`, or
+  `speconaut status` fails in a way that seems to *expect* you to patch
+  generated state by hand, that is a workflow abomination. Stop, file
+  upstream, ask.
+
+## Task hygiene
+
+- *One issue per task.* If you identify two problems, write two tasks,
+  even if they were surfaced by the same symptom.
+- *Tasks live in the repo that owns the fix:*
+  - paogen behavior / specs: `~/projects/home/paogen/truth/tasks/`
+  - speconaut core (engine, `lock`, `status`, `check`, CLI):
+    `~/projects/home/speconaut/truth/tasks/`
+  - speconaut adapter behavior (e.g. PHPUnit codegen, Rust codegen):
+    `~/projects/home/speconaut/adapters/<adapter>/truth/tasks/`
+  - Cross-adapter protocol: `~/projects/home/speconaut/adapter-truth/`.
+    Check `ls ~/projects/home/speconaut/` first — the layout evolves.
+- *Every task carries a reproducible example.* The exact commands to
+  run, the observed output (copied, not paraphrased), the expected
+  output, and the file:line references the reader needs. A task a
+  reader has to re-derive to understand is a task that will be
+  deprioritised forever.
+- *Use `~/` paths, not bare relative paths.* `~/projects/home/paogen`
+  is unambiguous across sessions and agents; `the paogen repo` or
+  `./truth/specs/` is not.
+
+## Reporting back
+
+When you finish a chunk of work, say concretely what changed and where.
+Quote file:line references. Do not summarise in the passive voice. If
+something was blocked or worked around, say so explicitly in the same
+breath — do not bury it.
