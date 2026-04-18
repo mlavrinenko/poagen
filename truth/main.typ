@@ -47,3 +47,9 @@
 #include "decisions/005-schema-fixture-policy.typ"
 #pagebreak()
 #include "decisions/006-cli-tooling.typ"
+#pagebreak()
+#include "decisions/007-hydration-serialization.typ"
+#pagebreak()
+#include "decisions/008-openapi-31-strategy.typ"
+#pagebreak()
+#include "decisions/009-error-response-policy.typ"

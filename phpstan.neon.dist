@@ -20,6 +20,11 @@ parameters:
       path: tests/generated/*Steps.php
     - identifier: property.onlyWritten
       path: tests/generated/*Steps.php
+    # Generated PHPUnit stubs call markTestIncomplete on $this for draft
+    # scenarios. PHPUnit allows the pattern idiomatically, and the stubs
+    # are produced by speconaut-phpunit, so we can't rewrite them.
+    - identifier: staticMethod.dynamicCall
+      path: tests/generated/*Test.php
     # Fixture VOs exist to prove BindsFormat discovery; their fields are
     # never read in PHP-land.
     - identifier: shipmonk.deadProperty.neverRead

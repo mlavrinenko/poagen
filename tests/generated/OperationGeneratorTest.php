@@ -194,4 +194,42 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid();
         $this->steps->thenTheMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull();
     }
+
+
+    /**
+     * Rule: Reference resolution and path-level parameters
+     *
+     * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
+     * @source truth/specs/operation-generator.typ:135
+     *
+     * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
+     *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
+     * When Generator runs against Profile
+     * Then the emitted Client has a method getPetById(int $petId): Pet
+     *   And the operation is not silently skipped even though the parameter is declared at the PathItem level via $ref
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testAnOperationWhosePathItemDeclaresARefParameterIsStillEmitted(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Rule: Error responses
+     *
+     * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
+     * @source truth/specs/operation-generator.typ:148
+     *
+     * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
+     * When getPetById(999) is called on Client
+     * Then the call throws Generated\\ApiException
+     *   And the exception's getStatusCode() returns 404
+     *   And the exception's getDecodedBody() returns the decoded error payload
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
 }

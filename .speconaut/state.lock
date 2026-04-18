@@ -239,7 +239,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."--help prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
 
 [features."paogen CLI".scenarios."--version prints the paogen version and exits 0"]
 as-is-hash = "sha256:646ed5f70f37692464ac8a72cd17bcde36bfd3d8d1c07de3629202b7e933d302"
@@ -248,7 +248,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."--version prints the paogen version and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
 
 [features."paogen CLI".scenarios."No arguments prints usage and exits 0"]
 as-is-hash = "sha256:d291fb92286168e9be71710de8adb74dd98ea71277b2ae2715a48deed529d5dc"
@@ -257,7 +257,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."No arguments prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
 
 [features."paogen CLI".scenarios."Unknown command reports on stderr and exits 2"]
 as-is-hash = "sha256:07d419e6b01872f6b74fe45c2c7abb30ce4db1fe1ba278c20f33c114d7c214ec"
@@ -266,7 +266,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."Unknown command reports on stderr and exits 2".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
 
 [features."paogen CLI".scenarios."help subcommand prints usage and exits 0"]
 as-is-hash = "sha256:dc8b047618d04d64ccf1deea9e83e4a08413c4ca126fd969b1ac2640841e5be2"
@@ -275,7 +275,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."help subcommand prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
 
 [features."paogen CLI".scenarios."version subcommand prints the paogen version and exits 0"]
 as-is-hash = "sha256:440601757b5c7e3d81288a301b358e94f9dfef96370ada029bd66e63304f3ba3"
@@ -284,4 +284,4 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."version subcommand prints the paogen version and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:cdc2c9b3bd7ff90c71cf6af376d664c05a205a04a9e5a147c2f997ff0e144e41"
+"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"

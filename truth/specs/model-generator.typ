@@ -50,6 +50,28 @@
       #when[the model is emitted]
       #then[`Order` has a promoted constructor parameter typed as `Pet`]
     ]
+
+    #scenario(
+      "An inline nested object schema becomes a synthesised typed class",
+      stage: draft,
+    )[
+      #given[#a(Model) #p((parent: "Pet")) declares an inline property `shipping` with `type: object` and nested properties #p((props: "address: string, zip: string"))]
+      #when[the model is emitted]
+      #then[a class `Generated/Model/PetShipping.php` is written]
+      #and_[`Pet` has a promoted constructor parameter `PetShipping $shipping`]
+      #and_[the property is *not* typed `array<string, mixed>`]
+    ]
+
+    #scenario(
+      "A schema with enum values becomes a PHP 8.1 backed enum",
+      stage: draft,
+    )[
+      #given[#the(Schema) declares a named component `Status` with `type: string` and #p((enum: "[available, pending, sold]"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Enum/Status.php` is written]
+      #and_[the emitted enum is `enum Status: string` with one case per declared value]
+      #and_[operations and Models that reference `#/components/schemas/Status` are typed with the enum, not `string`]
+    ]
   ]
 
   #rule("User bindings replace generated types")[

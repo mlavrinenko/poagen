@@ -77,10 +77,44 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: An inline nested object schema becomes a synthesised typed class
+     * @source truth/specs/model-generator.typ:54
+     *
+     * Given Model Pet declares an inline property shipping with type: object and nested properties address: string, zip: string
+     * When the model is emitted
+     * Then a class Generated/Model/PetShipping.php is written
+     *   And Pet has a promoted constructor parameter PetShipping $shipping
+     *   And the property is not typed array<string, mixed>
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testAnInlineNestedObjectSchemaBecomesASynthesisedTypedClass(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Scenario: A schema with enum values becomes a PHP 8.1 backed enum
+     * @source truth/specs/model-generator.typ:65
+     *
+     * Given Schema declares a named component Status with type: string and [available, pending, sold]
+     * When Generator runs against Profile
+     * Then a file Generated/Enum/Status.php is written
+     *   And the emitted enum is enum Status: string with one case per declared value
+     *   And operations and Models that reference #/components/schemas/Status are typed with the enum, not string
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testASchemaWithEnumValuesBecomesAPHP81BackedEnum(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:56
+     * @source truth/specs/model-generator.typ:78
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -100,7 +134,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:69
+     * @source truth/specs/model-generator.typ:91
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile

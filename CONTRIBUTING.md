@@ -38,7 +38,6 @@ just test       # run PHPUnit
 | Static analysis   | [PHPStan](https://phpstan.org) at `max` + strict rules  |
 | Refactoring       | [Rector](https://getrector.com)                         |
 | Tests             | [PHPUnit](https://phpunit.de)                           |
-| Mutation testing  | [Infection](https://infection.github.io)                |
 | Code generation   | [nette/php-generator](https://github.com/nette/php-generator) |
 
 ### Commit Messages

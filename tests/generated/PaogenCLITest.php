@@ -122,4 +122,54 @@ final class PaogenCLITest extends TestCase
         $this->steps->thenStderrShouldContainNeedle('is not implemented yet');
         $this->steps->thenPaogenCLIShouldExitWithCodeCode(2);
     }
+
+
+    /**
+     * Rule: Validate subcommand
+     *
+     * Scenario: validate on a syntactically valid OpenAPI document exits 0
+     * @source truth/specs/cli.typ:56
+     *
+     * When paogen CLI is invoked with arguments validate tests/fixtures/schemas/petstore-3.0.yaml
+     * Then paogen CLI should exit with code 0
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testValidateOnASyntacticallyValidOpenAPIDocumentExits0(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Scenario: validate on a malformed document reports on stderr and exits 1
+     * @source truth/specs/cli.typ:61
+     *
+     * Given a file at /tmp/broken.yaml that is not valid YAML
+     * When paogen CLI is invoked with arguments validate /tmp/broken.yaml
+     * Then stderr should contain the underlying parse error
+     *   And paogen CLI should exit with code 1
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testValidateOnAMalformedDocumentReportsOnStderrAndExits1(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Rule: Generate flags
+     *
+     * Scenario: --output redirects the generated tree to the supplied directory
+     * @source truth/specs/cli.typ:70
+     *
+     * Given Profile at tests/fixtures/profiles/petstore.php whose declared output is tests/fixtures/generated/petstore
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=/tmp/paogen-out
+     * Then the generated tree is written under /tmp/paogen-out instead of the profile's declared output
+     *   And paogen CLI should exit with code 0
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testOutputRedirectsTheGeneratedTreeToTheSuppliedDirectory(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
 }

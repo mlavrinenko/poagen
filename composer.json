@@ -29,7 +29,6 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.92",
-        "infection/infection": "^0.31",
         "nyholm/psr7": "^1.8",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -38,7 +37,7 @@
         "rector/rector": "^2.3",
         "shipmonk/dead-code-detector": "^1.0"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "bin": ["bin/paogen"],
     "autoload": {
@@ -57,7 +56,6 @@
     },
     "config": {
         "allow-plugins": {
-            "infection/extension-installer": true,
             "php-http/discovery": true
         },
         "sort-packages": true

@@ -130,4 +130,30 @@
       #and_[the method calls `$request->withHeader('api_key', $api_key)` only when `$api_key` is not `null`]
     ]
   ]
+
+  #rule("Reference resolution and path-level parameters")[
+    #scenario(
+      "An operation whose PathItem declares a `$ref` parameter is still emitted",
+      stage: draft,
+    )[
+      #given[#the(Schema) declares `#/components/parameters/PetId` #p((param: "petId: integer, in: path, required: true"))]
+      #and_[#a(Operation) #p((op: "GET /pet/{petId}")) with #p((id: "operationId: getPetById")) inherits a PathItem-level parameter whose value is #p((ref: "#/components/parameters/PetId"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `getPetById(int $petId): Pet`]
+      #and_[the operation is *not* silently skipped even though the parameter is declared at the PathItem level via `$ref`]
+    ]
+  ]
+
+  #rule("Error responses")[
+    #scenario(
+      "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
+      stage: draft,
+    )[
+      #given[#the(Client) is constructed with a PSR-18 HTTP client that returns status #p((code: "404")) with JSON body #p((body: "{\"message\":\"not found\"}"))]
+      #when[`getPetById(999)` is called on #the(Client)]
+      #then[the call throws `Generated\\ApiException`]
+      #and_[the exception's `getStatusCode()` returns `404`]
+      #and_[the exception's `getDecodedBody()` returns the decoded error payload]
+    ]
+  ]
 ]

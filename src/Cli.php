@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen;
 
 use Composer\Autoload\ClassLoader;
+use Composer\InstalledVersions;
 use Mlavrinenko\Paogen\Exception\InvalidProfileException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
@@ -22,7 +23,7 @@ use Mlavrinenko\Paogen\Generator\ProfileLoader;
  */
 final class Cli
 {
-    private const string VERSION = '0.1.0-dev';
+    private const string PACKAGE = 'mlavrinenko/paogen';
 
     private const string USAGE = <<<HELP
         paogen — OpenAPI-driven PHP client generator
@@ -60,7 +61,7 @@ final class Cli
         }
 
         if (\in_array($args[0], ['-V', '--version', 'version'], true)) {
-            fwrite($stdout, 'paogen ' . self::VERSION . "\n");
+            fwrite($stdout, 'paogen ' . self::version() . "\n");
             return 0;
         }
 
@@ -104,6 +105,22 @@ final class Cli
 
         fwrite($stdout, "paogen: generated into {$profile->output}\n");
         return 0;
+    }
+
+    /**
+     * Resolve the paogen version from Composer's installed metadata so that
+     * consumers who install via Packagist see the real tag, while in-repo
+     * runs still report something meaningful (`dev-<branch>`).
+     */
+    private static function version(): string
+    {
+        try {
+            $version = InstalledVersions::getPrettyVersion(self::PACKAGE);
+        } catch (\OutOfBoundsException) {
+            return 'dev';
+        }
+
+        return $version ?? 'dev';
     }
 
     private static function composerLoader(): ?ClassLoader

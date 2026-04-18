@@ -226,15 +226,7 @@ final class OperationGeneratorSteps
 
     private function runGenerator(Profile $profile): void
     {
-        $loader = $this->composerLoader();
-        $prev = error_reporting();
-        error_reporting($prev & ~E_DEPRECATED & ~E_USER_DEPRECATED);
-
-        try {
-            new Generator(new AttributeScanner($loader))->generate($profile);
-        } finally {
-            error_reporting($prev);
-        }
+        new Generator(new AttributeScanner($this->composerLoader()))->generate($profile);
     }
 
     private function composerLoader(): ClassLoader
