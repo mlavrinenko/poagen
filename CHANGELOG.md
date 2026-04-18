@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   component rename / removal. The walk is strictly scoped to the
   `Generated/` subtree so user files placed alongside it are never
   touched.
+- `paogen validate <schema>` subcommand promised by ADR-006. Parses a
+  YAML or JSON OpenAPI document, runs `OpenApi::validate()`, and reports
+  parse / validation / usage errors on stderr. Exit codes: 0 on success,
+  1 on file / parse / validation failure, 2 on missing argument.
 
 ### Changed
 
@@ -35,6 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tests/bootstrap.php` suppresses `E_DEPRECATED` / `E_USER_DEPRECATED` at
   the PHP level for the same reason; the per-test `error_reporting()`
   dance in `OperationGeneratorSteps` is gone.
+- `bin/paogen` now does the same `E_DEPRECATED` / `E_USER_DEPRECATED`
+  suppression at CLI entry, so `paogen validate` and `paogen generate`
+  no longer print cebe's PHP 8.4 nullable-type deprecations to stderr.
+  Scoped to the CLI process only.
 
 ### Deprecated
 

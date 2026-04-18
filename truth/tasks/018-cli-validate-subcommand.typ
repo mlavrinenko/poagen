@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Ship the paogen validate subcommand promised by ADR-006",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 18),
   priority: "normal",
   spec: "truth/specs/cli.typ",
@@ -54,3 +54,28 @@ will bite early adopters.
 - `bin/paogen validate /nonexistent.yaml` exits non-zero with a
   human-readable error.
 - `just check` green end-to-end.
+
+== Resolution
+
+- `Cli::run()` dispatches `validate` to a new
+  `Cli::validate(array $args, $stdout, $stderr): int`. Exit codes:
+  2 on missing argument (usage error), 1 on missing file, parse
+  failure, or `OpenApi::validate()` returning false, 0 on success.
+  The success line is `paogen: <path> is a valid OpenAPI document`
+  on stdout. The implementation auto-picks JSON vs YAML by file
+  extension and passes `resolveReferences: false` — matching the
+  `Generator` path — because cebe rejects relative paths even with
+  resolution off, so the CLI `realpath()`s the input before
+  handing it to `Reader`.
+- `USAGE` grew a `validate <schema>` row.
+- `bin/paogen` now silences `E_DEPRECATED` / `E_USER_DEPRECATED` at
+  the CLI entry point so users do not see cebe's PHP 8.4 nullable-
+  type deprecations. Scoped to the CLI process, does not affect
+  phpunit (which has its own suppression in `tests/bootstrap.php`)
+  or the library API when consumed as a Composer dep.
+- `truth/specs/cli.typ` rule "Validate subcommand" now has three
+  scenarios (valid / malformed / no-arg), all `stage: unstable`,
+  locked. The malformed scenario uses `<that-path>` as a sentinel
+  substituted at test time with a `tempnam()`-created file, so the
+  suite does not depend on `/tmp/broken.yaml` being available or
+  writable.

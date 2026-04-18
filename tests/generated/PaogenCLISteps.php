@@ -97,4 +97,42 @@ final class PaogenCLISteps
         TestCase::assertNotSame('', $this->resolvedVersion);
     }
 
+
+    private string $brokenYamlPath = '';
+
+    public function whenPaogenCLIIsInvokedWithArgumentsArgs(string $args): void
+    {
+        // The spec uses `<that-path>` as a placeholder for the tempfile
+        // created in the matching `given` step; substitute when present.
+        if ($this->brokenYamlPath !== '') {
+            $args = str_replace('<that-path>', $this->brokenYamlPath, $args);
+        }
+
+        $parts = preg_split('/\s+/', trim($args));
+        \assert(\is_array($parts));
+
+        $this->invokeCli(array_merge(['paogen'], array_values(array_filter($parts, static fn($p) => $p !== ''))));
+    }
+
+
+    public function givenATemporaryFileThatIsNotValidYAML(): void
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-validate-');
+        // Deliberately malformed YAML — unterminated flow sequence with
+        // colons in an unquoted scalar is guaranteed to trip the parser.
+        file_put_contents($path, "not: valid: yaml: [\n");
+
+        $this->brokenYamlPath = $path;
+    }
+
+
+    public function thenStderrShouldContainAParseErrorSignal(): void
+    {
+        TestCase::assertStringContainsString('paogen validate: parse error:', $this->stderr);
+
+        if ($this->brokenYamlPath !== '' && is_file($this->brokenYamlPath)) {
+            unlink($this->brokenYamlPath);
+        }
+    }
+
 }

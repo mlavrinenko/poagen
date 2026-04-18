@@ -62,16 +62,22 @@
   ]
 
   #rule("Validate subcommand")[
-    #scenario("validate on a syntactically valid OpenAPI document exits 0", stage: draft)[
+    #scenario("validate on a syntactically valid OpenAPI document exits 0", stage: unstable)[
       #when[#the(PaogenCli) is invoked with arguments #p((args: "validate tests/fixtures/schemas/petstore-3.0.yaml"))]
       #then[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
 
-    #scenario("validate on a malformed document reports on stderr and exits 1", stage: draft)[
-      #given[a file at #p((path: "/tmp/broken.yaml")) that is not valid YAML]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "validate /tmp/broken.yaml"))]
-      #then[stderr should contain the underlying parse error]
+    #scenario("validate on a malformed document reports on stderr and exits 1", stage: unstable)[
+      #given[a temporary file that is not valid YAML]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "validate <that-path>"))]
+      #then[stderr should contain a parse-error signal]
       #and_[#the(PaogenCli) should exit with code #p((code: "1"))]
+    ]
+
+    #scenario("validate with no argument reports on stderr and exits 2", stage: unstable)[
+      #when[#the(PaogenCli) is invoked with argument #p((arg: "validate"))]
+      #then[stderr should contain #p((needle: "missing schema path"))]
+      #and_[#the(PaogenCli) should exit with code #p((code: "2"))]
     ]
   ]
 

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen;
 
+use cebe\openapi\Reader;
+use cebe\openapi\spec\OpenApi;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use Mlavrinenko\Paogen\Exception\InvalidProfileException;
@@ -33,6 +35,7 @@ final class Cli
 
         COMMANDS
             generate <profile>  Generate code from a profile (PHP file returning a Profile)
+            validate <schema>   Parse and validate an OpenAPI document (YAML or JSON)
             help                Print this message
             version             Print the paogen version
 
@@ -75,6 +78,10 @@ final class Cli
             return self::generate(\array_slice($args, 1), $stdout, $stderr);
         }
 
+        if ($args[0] === 'validate') {
+            return self::validate(\array_slice($args, 1), $stdout, $stderr);
+        }
+
         $command = $args[0];
         fwrite($stderr, "paogen: command '{$command}' is not implemented yet.\n");
         fwrite($stderr, "See `paogen help`.\n");
@@ -110,6 +117,56 @@ final class Cli
         new Generator(new AttributeScanner($loader))->generate($profile);
 
         fwrite($stdout, "paogen: generated into {$profile->output}\n");
+        return 0;
+    }
+
+    /**
+     * @param list<string> $args
+     * @param resource     $stdout
+     * @param resource     $stderr
+     */
+    private static function validate(array $args, $stdout, $stderr): int
+    {
+        if ($args === []) {
+            fwrite($stderr, "paogen validate: missing schema path.\n");
+            fwrite($stderr, "See `paogen help`.\n");
+            return 2;
+        }
+
+        $schemaPath = $args[0];
+
+        if (!is_file($schemaPath)) {
+            fwrite($stderr, "paogen validate: schema file not found: {$schemaPath}\n");
+            return 1;
+        }
+
+        // cebe refuses relative paths when it stashes the file context for
+        // later $ref resolution, even when resolveReferences is off.
+        $absolutePath = realpath($schemaPath);
+
+        if ($absolutePath === false) {
+            fwrite($stderr, "paogen validate: cannot resolve schema path: {$schemaPath}\n");
+            return 1;
+        }
+
+        try {
+            $openApi = str_ends_with(strtolower($absolutePath), '.json')
+                ? Reader::readFromJsonFile($absolutePath, OpenApi::class, false)
+                : Reader::readFromYamlFile($absolutePath, OpenApi::class, false);
+        } catch (\Throwable $e) {
+            fwrite($stderr, "paogen validate: parse error: {$e->getMessage()}\n");
+            return 1;
+        }
+
+        if (!$openApi->validate()) {
+            fwrite($stderr, "paogen validate: {$schemaPath} has validation errors:\n");
+            foreach ($openApi->getErrors() as $error) {
+                fwrite($stderr, "  - {$error}\n");
+            }
+            return 1;
+        }
+
+        fwrite($stdout, "paogen: {$schemaPath} is a valid OpenAPI document\n");
         return 0;
     }
 

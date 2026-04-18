@@ -149,10 +149,10 @@ final class PaogenCLITest extends TestCase
      * When paogen CLI is invoked with arguments validate tests/fixtures/schemas/petstore-3.0.yaml
      * Then paogen CLI should exit with code 0
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testValidateOnASyntacticallyValidOpenAPIDocumentExits0(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('validate tests/fixtures/schemas/petstore-3.0.yaml');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(0);
     }
 
 
@@ -160,15 +160,33 @@ final class PaogenCLITest extends TestCase
      * Scenario: validate on a malformed document reports on stderr and exits 1
      * @source truth/specs/cli.typ:70
      *
-     * Given a file at /tmp/broken.yaml that is not valid YAML
-     * When paogen CLI is invoked with arguments validate /tmp/broken.yaml
-     * Then stderr should contain the underlying parse error
+     * Given a temporary file that is not valid YAML
+     * When paogen CLI is invoked with arguments validate <that-path>
+     * Then stderr should contain a parse-error signal
      *   And paogen CLI should exit with code 1
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testValidateOnAMalformedDocumentReportsOnStderrAndExits1(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->givenATemporaryFileThatIsNotValidYAML();
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('validate <that-path>');
+        $this->steps->thenStderrShouldContainAParseErrorSignal();
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(1);
+    }
+
+
+    /**
+     * Scenario: validate with no argument reports on stderr and exits 2
+     * @source truth/specs/cli.typ:77
+     *
+     * When paogen CLI is invoked with argument validate
+     * Then stderr should contain missing schema path
+     *   And paogen CLI should exit with code 2
+     */
+    public function testValidateWithNoArgumentReportsOnStderrAndExits2(): void
+    {
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentArg('validate');
+        $this->steps->thenStderrShouldContainNeedle('missing schema path');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(2);
     }
 
 
@@ -176,7 +194,7 @@ final class PaogenCLITest extends TestCase
      * Rule: Generate flags
      *
      * Scenario: --output redirects the generated tree to the supplied directory
-     * @source truth/specs/cli.typ:79
+     * @source truth/specs/cli.typ:85
      *
      * Given Profile at tests/fixtures/profiles/petstore.php whose declared output is tests/fixtures/generated/petstore
      * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=/tmp/paogen-out

@@ -31,4 +31,8 @@ if ($autoloader === null) {
 
 require $autoloader;
 
+// Silence E_DEPRECATED from the `cebe/php-openapi` parser on PHP 8.4.
+// Tracked for replacement by truth/tasks/016-cebe-php-openapi-replacement.typ.
+error_reporting(error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 exit(Mlavrinenko\Paogen\Cli::run($argv));
