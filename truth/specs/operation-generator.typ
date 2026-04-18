@@ -60,4 +60,17 @@
       #then[the return value is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
     ]
   ]
+
+  #rule("Query parameters")[
+    #scenario(
+      "Query parameters become typed method parameters and are attached as a query string",
+      stage: unstable,
+      traces: ("src/Generator/Generator.php",),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByStatus")) with #p((id: "operationId: findPetsByStatus")) and a required query parameter #p((param: "status: string"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method with signature `findPetsByStatus(string $status): array`]
+      #and_[calling it with #p((arg: "status: 'available'")) sends a request whose URI ends with #p((query: "?status=available"))]
+    ]
+  ]
 ]

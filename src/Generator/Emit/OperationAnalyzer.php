@@ -30,7 +30,8 @@ final readonly class OperationAnalyzer
 {
     /**
      * @return list<Parameter>|null null if any parameter sits outside the
-     *                              supported subset (path + optional header)
+     *                              supported subset (path + scalar query +
+     *                              optional header)
      */
     public static function pathParameters(Operation $operation): ?array
     {
@@ -45,6 +46,9 @@ final readonly class OperationAnalyzer
                 $out[] = $param;
                 continue;
             }
+            if ($param->in === 'query' && self::isSupportedQueryParam($param)) {
+                continue;
+            }
             if ($param->in === 'header' && !$param->required) {
                 continue;
             }
@@ -53,6 +57,38 @@ final readonly class OperationAnalyzer
         }
 
         return $out;
+    }
+
+    /**
+     * @return list<Parameter> query parameters in declaration order —
+     *                         callers emit required ones first
+     */
+    public static function queryParameters(Operation $operation): array
+    {
+        $out = [];
+
+        /** @var Parameter|Reference $param */
+        foreach ($operation->parameters ?? [] as $param) {
+            if ($param instanceof Reference) {
+                continue;
+            }
+            if ($param->in === 'query' && self::isSupportedQueryParam($param)) {
+                $out[] = $param;
+            }
+        }
+
+        return $out;
+    }
+
+    private static function isSupportedQueryParam(Parameter $param): bool
+    {
+        $schema = $param->schema;
+
+        if (!$schema instanceof Schema) {
+            return false;
+        }
+
+        return \in_array($schema->type, ['string', 'integer', 'number', 'boolean'], true);
     }
 
     /**

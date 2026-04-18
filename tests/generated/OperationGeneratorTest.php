@@ -80,4 +80,24 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->whenGetorderbyid42IsCalledOnClient();
         $this->steps->thenTheReturnValueIsModelOrderWithId42AndStatusPlaced();
     }
+
+
+    /**
+     * Rule: Query parameters
+     *
+     * Scenario: Query parameters become typed method parameters and are attached as a query string
+     * @source truth/specs/operation-generator.typ:65
+     *
+     * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status: string
+     * When Generator runs against Profile
+     * Then the emitted Client has a method with signature findPetsByStatus(string $status): array
+     *   And calling it with status: 'available' sends a request whose URI ends with ?status=available
+     */
+    public function testQueryParametersBecomeTypedMethodParametersAndAreAttachedAsAQueryString(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterParam('GET /pet/findByStatus', 'operationId: findPetsByStatus', 'status: string');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodWithSignatureFindPetsByStatusStringStatusArray();
+        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery('status: \'available\'', '?status=available');
+    }
 }

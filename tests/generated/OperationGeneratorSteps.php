@@ -14,9 +14,6 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Step implementations for OperationGenerator.
@@ -174,6 +171,49 @@ final class OperationGeneratorSteps
         TestCase::assertSame('placed', $this->orderResult->status);
     }
 
+    public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterParam(
+        string $op,
+        string $id,
+        string $param,
+    ): void {
+        TestCase::assertSame('GET /pet/findByStatus', $op);
+        TestCase::assertSame('operationId: findPetsByStatus', $id);
+        TestCase::assertSame('status: string', $param);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+    public function thenTheEmittedClientHasAMethodWithSignatureFindPetsByStatusStringStatusArray(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function findPetsByStatus(string $status): array',
+            $this->source,
+        );
+    }
+
+    public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery(string $arg, string $query): void
+    {
+        TestCase::assertSame("status: 'available'", $arg);
+        TestCase::assertSame('?status=available', $query);
+
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+
+        $client = new ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://petstore.example/api/v3',
+        );
+
+        $client->findPetsByStatus('available');
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertStringEndsWith($query, (string) $http->lastRequest->getUri());
+    }
+
     private function loadProfile(string $name): Profile
     {
         $profile = new ProfileLoader()->load(\dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
@@ -204,22 +244,5 @@ final class OperationGeneratorSteps
         }
 
         TestCase::fail('Composer ClassLoader not found in autoload chain.');
-    }
-}
-
-/**
- * PSR-18 mock that returns a fixed response and records the last request.
- */
-final class RecordingClient implements ClientInterface
-{
-    public ?RequestInterface $lastRequest = null;
-
-    public function __construct(private readonly ResponseInterface $response) {}
-
-    public function sendRequest(RequestInterface $request): ResponseInterface
-    {
-        $this->lastRequest = $request;
-
-        return $this->response;
     }
 }

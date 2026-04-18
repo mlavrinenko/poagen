@@ -47,11 +47,46 @@ final readonly class ApiClient
         return self::hydrate(Pet::class, $data);
     }
 
+    /**
+     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet>
+     */
+    public function findPetsByStatus(string $status): array
+    {
+        $path = '/pet/findByStatus';
+        $query = [];
+        $query['status'] = $status;
+        $path .= '?' . \http_build_query($query);
+        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $response = $this->httpClient->sendRequest($request);
+        /** @var mixed $data */
+        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
+        \assert(\is_array($data));
+        return \array_values(\array_map(
+            static fn(mixed $item): Pet => self::hydrate(Pet::class, $item),
+            $data,
+        ));
+    }
+
     public function getPetById(int $petId): Pet
     {
         $path = '/pet/{petId}';
         $path = \str_replace('{petId}', (string) $petId, $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $response = $this->httpClient->sendRequest($request);
+        /** @var mixed $data */
+        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
+        return self::hydrate(Pet::class, $data);
+    }
+
+    public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet
+    {
+        $path = '/pet/{petId}';
+        $path = \str_replace('{petId}', (string) $petId, $path);
+        $query = [];
+        if ($name !== null) { $query['name'] = $name; }
+        if ($status !== null) { $query['status'] = $status; }
+        if ($query !== []) { $path .= '?' . \http_build_query($query); }
+        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
@@ -116,6 +151,17 @@ final readonly class ApiClient
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(User::class, $data);
+    }
+
+    public function loginUser(?string $username = null, ?string $password = null): void
+    {
+        $path = '/user/login';
+        $query = [];
+        if ($username !== null) { $query['username'] = $username; }
+        if ($password !== null) { $query['password'] = $password; }
+        if ($query !== []) { $path .= '?' . \http_build_query($query); }
+        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $this->httpClient->sendRequest($request);
     }
 
     public function logoutUser(): void
