@@ -14,6 +14,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
+use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
@@ -33,17 +34,20 @@ final readonly class OperationAnalyzer
     /**
      * @return list<Parameter>|null null if any parameter sits outside the
      *                              supported subset (path + scalar/array
-     *                              query + optional scalar header)
+     *                              query + optional scalar header) or a
+     *                              `$ref` could not be resolved
      */
-    public static function pathParameters(Operation $operation): ?array
+    public static function pathParameters(Operation $operation, ?PathItem $pathItem = null): ?array
     {
+        $params = ParameterCollector::collect($operation, $pathItem);
+
+        if ($params === null) {
+            return null;
+        }
+
         $out = [];
 
-        /** @var Parameter|Reference $param */
-        foreach ($operation->parameters ?? [] as $param) {
-            if ($param instanceof Reference) {
-                return null;
-            }
+        foreach ($params as $param) {
             if ($param->in === 'path') {
                 $out[] = $param;
                 continue;
@@ -65,42 +69,24 @@ final readonly class OperationAnalyzer
      * @return list<Parameter> query parameters in declaration order —
      *                         callers emit required ones first
      */
-    public static function queryParameters(Operation $operation): array
+    public static function queryParameters(Operation $operation, ?PathItem $pathItem = null): array
     {
-        $out = [];
-
-        /** @var Parameter|Reference $param */
-        foreach ($operation->parameters ?? [] as $param) {
-            if ($param instanceof Reference) {
-                continue;
-            }
-            if ($param->in === 'query' && self::isSupportedQueryParam($param)) {
-                $out[] = $param;
-            }
-        }
-
-        return $out;
+        return array_values(array_filter(
+            ParameterCollector::collect($operation, $pathItem) ?? [],
+            static fn(Parameter $p): bool => $p->in === 'query' && self::isSupportedQueryParam($p),
+        ));
     }
 
     /**
      * @return list<Parameter> optional scalar header parameters in
      *                         declaration order
      */
-    public static function headerParameters(Operation $operation): array
+    public static function headerParameters(Operation $operation, ?PathItem $pathItem = null): array
     {
-        $out = [];
-
-        /** @var Parameter|Reference $param */
-        foreach ($operation->parameters ?? [] as $param) {
-            if ($param instanceof Reference) {
-                continue;
-            }
-            if ($param->in === 'header' && self::isSupportedHeaderParam($param)) {
-                $out[] = $param;
-            }
-        }
-
-        return $out;
+        return array_values(array_filter(
+            ParameterCollector::collect($operation, $pathItem) ?? [],
+            static fn(Parameter $p): bool => $p->in === 'header' && self::isSupportedHeaderParam($p),
+        ));
     }
 
     public static function isArrayQueryParam(Parameter $param): bool
@@ -150,6 +136,11 @@ final readonly class OperationAnalyzer
      */
     public static function requestBody(RequestBody|Reference|null $body): ?BodySpec
     {
+        if ($body instanceof Reference) {
+            $resolved = $body->resolve();
+            $body = $resolved instanceof RequestBody ? $resolved : null;
+        }
+
         if (!$body instanceof RequestBody) {
             return null;
         }

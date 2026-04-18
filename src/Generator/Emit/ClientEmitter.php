@@ -71,8 +71,8 @@ final readonly class ClientEmitter
 
         $emitted = 0;
 
-        foreach ($operations as [$httpMethod, $pathUri, $operation]) {
-            if ($this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings)) {
+        foreach ($operations as [$httpMethod, $pathUri, $operation, $pathItem]) {
+            if ($this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings, $pathItem)) {
                 ++$emitted;
             }
         }
@@ -87,7 +87,7 @@ final readonly class ClientEmitter
     }
 
     /**
-     * @return list<array{0:string,1:string,2:Operation}>
+     * @return list<array{0:string,1:string,2:Operation,3:PathItem}>
      */
     private function collectOperations(OpenApi $openApi): array
     {
@@ -115,8 +115,10 @@ final readonly class ClientEmitter
         $out = [];
 
         foreach ($uris as $pathUri) {
-            foreach ($items[$pathUri]->getOperations() as $httpMethod => $operation) {
-                $out[] = [(string) $httpMethod, $pathUri, $operation];
+            $pathItem = $items[$pathUri];
+
+            foreach ($pathItem->getOperations() as $httpMethod => $operation) {
+                $out[] = [(string) $httpMethod, $pathUri, $operation, $pathItem];
             }
         }
 

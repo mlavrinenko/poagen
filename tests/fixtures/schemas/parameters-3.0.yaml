@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: Parameters Fixture
+  version: 1.0.0
+  description: >
+    Exercises $ref-to-Parameter resolution (task 005) and PathItem-level
+    parameter inheritance (task 006) in isolation from the Petstore
+    golden tree.
+servers:
+  - url: https://parameters.example/api/v1
+
+paths:
+  /pet/{petId}:
+    parameters:
+      - $ref: '#/components/parameters/PetId'
+    get:
+      operationId: getPetById
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+
+  /order:
+    get:
+      operationId: listOrders
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/ApiKey'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      operationId: placeOrder
+      requestBody:
+        $ref: '#/components/requestBodies/CreateOrder'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /store/{storeId}/items:
+    parameters:
+      - name: storeId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      operationId: listStoreItems
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    delete:
+      operationId: clearStore
+      responses:
+        '204':
+          description: cleared
+
+components:
+  requestBodies:
+    CreateOrder:
+      description: order to place
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Order'
+  parameters:
+    PetId:
+      name: petId
+      in: path
+      required: true
+      schema:
+        type: integer
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+    ApiKey:
+      name: api_key
+      in: header
+      required: false
+      schema:
+        type: string
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Order:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        status:
+          type: string

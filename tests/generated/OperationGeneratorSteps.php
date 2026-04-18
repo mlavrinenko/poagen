@@ -425,4 +425,162 @@ final class OperationGeneratorSteps
             ? substr($this->source, $start)
             : substr($this->source, $start, $next - $start);
     }
+
+    public function givenSchemaDeclaresComponentsParametersLimitParam(string $param): void
+    {
+        TestCase::assertSame('limit: integer, in: query, required: false', $param);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenOperationOpWithIdListsAParameterWhoseValueIsRef(string $op, string $id, string $ref): void
+    {
+        TestCase::assertSame('GET /order', $op);
+        TestCase::assertSame('operationId: listOrders', $id);
+        TestCase::assertContains($ref, [
+            '#/components/parameters/Limit',
+            '#/components/parameters/ApiKey',
+        ]);
+    }
+
+
+    public function thenTheEmittedClientHasAMethodListOrdersIntLimitNullArray(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function listOrders(?int $limit = null, ?string $api_key = null): array',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef(): void
+    {
+        TestCase::assertStringContainsString('public function listOrders(', $this->source);
+    }
+
+
+    public function givenSchemaDeclaresComponentsParametersApiKeyParam(string $param): void
+    {
+        TestCase::assertSame('api_key: string, in: header, required: false', $param);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function thenTheEmittedMethodSignatureIncludesStringApiKeyNull(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function listOrders(?int $limit = null, ?string $api_key = null): array',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull(): void
+    {
+        $body = $this->methodSlice('listOrders');
+        TestCase::assertStringContainsString(
+            "if (\$api_key !== null) { \$request = \$request->withHeader('api_key', \$api_key); }",
+            $body,
+        );
+    }
+
+
+    public function givenSchemaDeclaresComponentsRequestBodiesCreateOrderWithApplicationJsonSchemaRef(
+        string $ref,
+    ): void {
+        TestCase::assertSame('#/components/schemas/Order', $ref);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenOperationOpWithIdWhoseRequestBodyIsARef(string $op, string $id, string $ref): void
+    {
+        TestCase::assertSame('POST /order', $op);
+        TestCase::assertSame('operationId: placeOrder', $id);
+        TestCase::assertSame('#/components/requestBodies/CreateOrder', $ref);
+    }
+
+
+    public function thenTheEmittedClientHasAMethodPlaceOrderOrderBodyOrder(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function placeOrder(Order $body): Order',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef(): void
+    {
+        TestCase::assertStringContainsString('public function placeOrder(', $this->source);
+    }
+
+
+    public function givenSchemaDeclaresAPathItemStoreStoreIdItemsWithASinglePathItemLevelParameterParam(
+        string $param,
+    ): void {
+        TestCase::assertSame('storeId: integer, in: path, required: true', $param);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenTwoOperationsUnderItIdAndIdDoNotRestateTheParameter(string $idA, string $idB): void
+    {
+        TestCase::assertSame('operationId: listStoreItems', $idA);
+        TestCase::assertSame('operationId: clearStore', $idB);
+    }
+
+
+    public function thenTheEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function listStoreItems(int $storeId): array',
+            $this->source,
+        );
+        TestCase::assertStringContainsString(
+            'public function clearStore(int $storeId): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenNeitherOperationIsSilentlySkippedEvenThoughTheParameterLivesOnlyOnThePathItem(): void
+    {
+        TestCase::assertStringContainsString('public function listStoreItems(', $this->source);
+        TestCase::assertStringContainsString('public function clearStore(', $this->source);
+    }
+
+
+    public function givenSchemaDeclaresComponentsParametersPetIdParam(string $param): void
+    {
+        TestCase::assertSame('petId: integer, in: path, required: true', $param);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenOperationOpWithIdInheritsAPathItemLevelParameterWhoseValueIsRef(
+        string $op,
+        string $id,
+        string $ref,
+    ): void {
+        TestCase::assertSame('GET /pet/{petId}', $op);
+        TestCase::assertSame('operationId: getPetById', $id);
+        TestCase::assertSame('#/components/parameters/PetId', $ref);
+    }
+
+
+    public function thenTheEmittedClientHasAMethodGetPetByIdIntPetIdPet(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function getPetById(int $petId): Pet',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef(
+    ): void {
+        TestCase::assertStringContainsString('public function getPetById(', $this->source);
+    }
+
 }

@@ -26,7 +26,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Emitting operations as client methods
      *
      * Scenario: A GET operation with a path parameter becomes a typed client method
-     * @source truth/specs/operation-generator.typ:33
+     * @source truth/specs/operation-generator.typ:34
      *
      * Given Schema declares Operation GET /store/order/{orderId} with operationId: getOrderById and path parameter orderId: integer
      * When Generator runs against Profile
@@ -46,7 +46,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A POST operation with a JSON body takes a typed Model parameter
-     * @source truth/specs/operation-generator.typ:44
+     * @source truth/specs/operation-generator.typ:45
      *
      * Given Schema declares Operation POST /pet with operationId: addPet
      *   And the request body is application/json with schema #/components/schemas/Pet
@@ -66,7 +66,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A JSON body whose schema is a list of $ref becomes a typed list parameter
-     * @source truth/specs/operation-generator.typ:56
+     * @source truth/specs/operation-generator.typ:57
      *
      * Given Schema declares Operation POST /user/createWithList with operationId: createUsersWithListInput
      *   And the request body is application/json with schema type: array and items #/components/schemas/User
@@ -88,7 +88,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Response deserialization
      *
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
-     * @source truth/specs/operation-generator.typ:70
+     * @source truth/specs/operation-generator.typ:71
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
@@ -104,7 +104,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A scalar 2xx JSON response is returned as the scalar PHP type without hydration
-     * @source truth/specs/operation-generator.typ:79
+     * @source truth/specs/operation-generator.typ:80
      *
      * Given Schema declares Operation GET /user/login with operationId: loginUser whose 200 response schema is type: string
      * When Generator runs against Profile
@@ -122,7 +122,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A 2xx JSON response with `additionalProperties` is returned as a typed associative array
-     * @source truth/specs/operation-generator.typ:89
+     * @source truth/specs/operation-generator.typ:90
      *
      * Given Schema declares Operation GET /store/inventory with operationId: getInventory whose 200 response schema is type: object with additionalProperties: integer
      * When Generator runs against Profile
@@ -142,7 +142,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Query parameters
      *
      * Scenario: Query parameters become typed method parameters and are attached as a query string
-     * @source truth/specs/operation-generator.typ:101
+     * @source truth/specs/operation-generator.typ:102
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status: string
      * When Generator runs against Profile
@@ -160,7 +160,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
-     * @source truth/specs/operation-generator.typ:111
+     * @source truth/specs/operation-generator.typ:112
      *
      * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
      * When Generator runs against Profile
@@ -180,7 +180,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Header parameters
      *
      * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
-     * @source truth/specs/operation-generator.typ:123
+     * @source truth/specs/operation-generator.typ:124
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
@@ -199,8 +199,88 @@ final class OperationGeneratorTest extends TestCase
     /**
      * Rule: Reference resolution and path-level parameters
      *
+     * Scenario: An operation-level `$ref` to a component parameter is resolved to a typed method argument
+     * @source truth/specs/operation-generator.typ:136
+     *
+     * Given Schema declares #/components/parameters/Limit limit: integer, in: query, required: false
+     *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/Limit
+     * When Generator runs against Profile
+     * Then the emitted Client has a method listOrders(?int $limit = null): array
+     *   And the operation is not silently skipped even though the parameter is a $ref
+     */
+    public function testAnOperationLevelRefToAComponentParameterIsResolvedToATypedMethodArgument(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsParametersLimitParam('limit: integer, in: query, required: false');
+        $this->steps->givenOperationOpWithIdListsAParameterWhoseValueIsRef('GET /order', 'operationId: listOrders', '#/components/parameters/Limit');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodListOrdersIntLimitNullArray();
+        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef();
+    }
+
+
+    /**
+     * Scenario: An operation-level `$ref` to a header component parameter becomes an optional typed header argument
+     * @source truth/specs/operation-generator.typ:147
+     *
+     * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
+     *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
+     * When Generator runs against Profile
+     * Then the emitted method signature includes ?string $api_key = null
+     *   And the method body attaches the api_key header only when $api_key is not null
+     */
+    public function testAnOperationLevelRefToAHeaderComponentParameterBecomesAnOptionalTypedHeaderArgument(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsParametersApiKeyParam('api_key: string, in: header, required: false');
+        $this->steps->givenOperationOpWithIdListsAParameterWhoseValueIsRef('GET /order', 'operationId: listOrders', '#/components/parameters/ApiKey');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedMethodSignatureIncludesStringApiKeyNull();
+        $this->steps->thenTheMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull();
+    }
+
+
+    /**
+     * Scenario: A `$ref` to a component requestBody is resolved to the expected Model body parameter
+     * @source truth/specs/operation-generator.typ:158
+     *
+     * Given Schema declares #/components/requestBodies/CreateOrder with application/json schema #/components/schemas/Order
+     *   And Operation POST /order with operationId: placeOrder whose requestBody is a #/components/requestBodies/CreateOrder
+     * When Generator runs against Profile
+     * Then the emitted Client has a method placeOrder(Order $body): Order
+     *   And the operation is not silently skipped even though the request body is declared via $ref
+     */
+    public function testARefToAComponentRequestBodyIsResolvedToTheExpectedModelBodyParameter(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsRequestBodiesCreateOrderWithApplicationJsonSchemaRef('#/components/schemas/Order');
+        $this->steps->givenOperationOpWithIdWhoseRequestBodyIsARef('POST /order', 'operationId: placeOrder', '#/components/requestBodies/CreateOrder');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodPlaceOrderOrderBodyOrder();
+        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef();
+    }
+
+
+    /**
+     * Scenario: A PathItem-level inline parameter is inherited by every operation under that path
+     * @source truth/specs/operation-generator.typ:170
+     *
+     * Given Schema declares a PathItem /store/{storeId}/items with a single PathItem-level parameter storeId: integer, in: path, required: true
+     *   And two operations under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
+     * When Generator runs against Profile
+     * Then the emitted Client has listStoreItems(int $storeId): array and clearStore(int $storeId): void
+     *   And neither operation is silently skipped even though the parameter lives only on the PathItem
+     */
+    public function testAPathItemLevelInlineParameterIsInheritedByEveryOperationUnderThatPath(): void
+    {
+        $this->steps->givenSchemaDeclaresAPathItemStoreStoreIdItemsWithASinglePathItemLevelParameterParam('storeId: integer, in: path, required: true');
+        $this->steps->givenTwoOperationsUnderItIdAndIdDoNotRestateTheParameter('operationId: listStoreItems', 'operationId: clearStore');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid();
+        $this->steps->thenNeitherOperationIsSilentlySkippedEvenThoughTheParameterLivesOnlyOnThePathItem();
+    }
+
+
+    /**
      * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
-     * @source truth/specs/operation-generator.typ:135
+     * @source truth/specs/operation-generator.typ:181
      *
      * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
      *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
@@ -208,10 +288,13 @@ final class OperationGeneratorTest extends TestCase
      * Then the emitted Client has a method getPetById(int $petId): Pet
      *   And the operation is not silently skipped even though the parameter is declared at the PathItem level via $ref
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testAnOperationWhosePathItemDeclaresARefParameterIsStillEmitted(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->givenSchemaDeclaresComponentsParametersPetIdParam('petId: integer, in: path, required: true');
+        $this->steps->givenOperationOpWithIdInheritsAPathItemLevelParameterWhoseValueIsRef('GET /pet/{petId}', 'operationId: getPetById', '#/components/parameters/PetId');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodGetPetByIdIntPetIdPet();
+        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef();
     }
 
 
@@ -219,7 +302,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.typ:148
+     * @source truth/specs/operation-generator.typ:194
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client

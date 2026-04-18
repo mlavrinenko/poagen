@@ -13,6 +13,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
+use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Nette\PhpGenerator\ClassType;
@@ -47,6 +48,7 @@ final readonly class OperationEmitter
         string $pathUri,
         Operation $operation,
         Bindings $bindings,
+        ?PathItem $pathItem = null,
     ): bool {
         $operationId = (string) ($operation->operationId ?? '');
 
@@ -54,7 +56,7 @@ final readonly class OperationEmitter
             return false;
         }
 
-        $pathParams = OperationAnalyzer::pathParameters($operation);
+        $pathParams = OperationAnalyzer::pathParameters($operation, $pathItem);
 
         if ($pathParams === null) {
             return false;
@@ -66,8 +68,8 @@ final readonly class OperationEmitter
             return false;
         }
 
-        $queryParams = OperationAnalyzer::queryParameters($operation);
-        $headerParams = OperationAnalyzer::headerParameters($operation);
+        $queryParams = OperationAnalyzer::queryParameters($operation, $pathItem);
+        $headerParams = OperationAnalyzer::headerParameters($operation, $pathItem);
         $requiredQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => $p->required));
         $optionalQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => !$p->required));
 

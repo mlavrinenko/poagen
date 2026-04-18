@@ -13,6 +13,7 @@
     "src/Generator/Emit/ClientEmitter.php",
     "src/Generator/Emit/OperationAnalyzer.php",
     "src/Generator/Emit/OperationEmitter.php",
+    "src/Generator/Emit/ParameterCollector.php",
     "src/Generator/Emit/RequestAssembler.php",
     "src/Generator/Emit/ResponseHandler.php",
     "src/Generator/Emit/ReturnSpec.php",
@@ -133,8 +134,53 @@
 
   #rule("Reference resolution and path-level parameters")[
     #scenario(
+      "An operation-level `$ref` to a component parameter is resolved to a typed method argument",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares `#/components/parameters/Limit` #p((param: "limit: integer, in: query, required: false"))]
+      #and_[#a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) lists a parameter whose value is #p((ref: "#/components/parameters/Limit"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `listOrders(?int $limit = null): array`]
+      #and_[the operation is *not* silently skipped even though the parameter is a `$ref`]
+    ]
+
+    #scenario(
+      "An operation-level `$ref` to a header component parameter becomes an optional typed header argument",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares `#/components/parameters/ApiKey` #p((param: "api_key: string, in: header, required: false"))]
+      #and_[#a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) lists a parameter whose value is #p((ref: "#/components/parameters/ApiKey"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted method signature includes `?string $api_key = null`]
+      #and_[the method body attaches the `api_key` header only when `$api_key` is not `null`]
+    ]
+
+    #scenario(
+      "A `$ref` to a component requestBody is resolved to the expected Model body parameter",
+      stage: unstable,
+      traces: ("src/Generator/Emit/BodySpec.php",),
+    )[
+      #given[#the(Schema) declares `#/components/requestBodies/CreateOrder` with `application/json` schema #p((ref: "#/components/schemas/Order"))]
+      #and_[#a(Operation) #p((op: "POST /order")) with #p((id: "operationId: placeOrder")) whose `requestBody` is a #p((ref: "#/components/requestBodies/CreateOrder"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `placeOrder(Order $body): Order`]
+      #and_[the operation is *not* silently skipped even though the request body is declared via `$ref`]
+    ]
+
+    #scenario(
+      "A PathItem-level inline parameter is inherited by every operation under that path",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares a PathItem `/store/{storeId}/items` with a single PathItem-level parameter #p((param: "storeId: integer, in: path, required: true"))]
+      #and_[two operations under it — #p((id: "operationId: listStoreItems")) and #p((id: "operationId: clearStore")) — do not restate the parameter]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has `listStoreItems(int $storeId): array` and `clearStore(int $storeId): void`]
+      #and_[neither operation is silently skipped even though the parameter lives only on the PathItem]
+    ]
+
+    #scenario(
       "An operation whose PathItem declares a `$ref` parameter is still emitted",
-      stage: draft,
+      stage: unstable,
     )[
       #given[#the(Schema) declares `#/components/parameters/PetId` #p((param: "petId: integer, in: path, required: true"))]
       #and_[#a(Operation) #p((op: "GET /pet/{petId}")) with #p((id: "operationId: getPetById")) inherits a PathItem-level parameter whose value is #p((ref: "#/components/parameters/PetId"))]
