@@ -1,5 +1,25 @@
 # Agent guide for paogen
 
+## Release sequencing — read ROADMAP.md first
+
+[`ROADMAP.md`](ROADMAP.md) at the repo root is the **ordered queue of
+work until paogen ships v0.1**. Before starting any task, check the
+roadmap:
+
+- Pick up the next `[ ]` item in the earliest unfinished phase. Do
+  *not* skip ahead unless the roadmap explicitly permits it.
+- When a task completes (status `done` in the truth tree), tick its
+  checkbox in `ROADMAP.md` **in the same commit** that flips the
+  status.
+- New tasks, withdrawn tasks, and re-sequencing all go through
+  `ROADMAP.md` edits — see the "How to update this roadmap" section
+  of that file for the rules.
+- The roadmap retires on the `0.1.0` tag. Post-v0.1 follow-ups live
+  in its "Post-v0.1 follow-ups" section until then.
+
+Drift between `ROADMAP.md` and `speconaut status` is a bug. Fix
+whichever is wrong, do not paper over it.
+
 ## Workflow
 
 - **Spec-first.** Use the `speconaut-workflow` skill before any change to

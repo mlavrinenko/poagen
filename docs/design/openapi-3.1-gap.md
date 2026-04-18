@@ -46,6 +46,17 @@ and decouples the generator from whatever replaces it later.
 
 ## Tracking
 
-This document is the tracking issue. When 3.1 becomes required, spin this up
-into a proper task/ADR under `truth/` (once speconaut is wired up) and link
-back here.
+The v0.1 release explicitly **defers** OpenAPI 3.1 support — see
+[`truth/decisions/008-openapi-31-strategy.typ`](../../truth/decisions/008-openapi-31-strategy.typ)
+(ADR-008, *accepted*). The three paths forward (parser swap, translator
+shim, fork) are catalogued there; this document stays as the user-facing
+"known limitation" note and the option analysis that feeds the
+post-v0.1 ADR that will supersede ADR-008 when 3.1 becomes a priority.
+
+Post-v0.1 workflow:
+
+1. Re-open with a prototype under a new task (`017` or later) that
+   picks one of options 1/2/3 below, gathers fixture evidence, and
+   proposes a superseding ADR.
+2. Supersede ADR-008 with the chosen path.
+3. Remove this limitation note from `README.md`.

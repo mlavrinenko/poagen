@@ -1,10 +1,10 @@
-#import "@local/speconaut:0.1.0": adr, proposed
+#import "@local/speconaut:0.1.0": adr, accepted
 
 #show: adr.with(
   number: 8,
   title: "Strategy for OpenAPI 3.1 support",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: accepted,
+  date: datetime(year: 2026, month: 4, day: 19),
 )
 
 == Context
@@ -15,8 +15,8 @@ flag that most modern real-world schemas (GitHub, Stripe, Kubernetes)
 have moved to 3.1. The 2026-04-18 review also calls out (P2 #15) that
 `cebe/php-openapi` 1.8.0 (May 2025) still emits 8 PHP 8.4 deprecations
 from `SpecBaseObject::resolveReferences(): Implicitly marking parameter
-$context as nullable`, so the parser question and the 3.1 question are
-entangled.
+$context as nullable`, so the parser question and the 3.1 question were
+originally entangled.
 
 === Options considered
 
@@ -39,50 +39,61 @@ entangled.
    own pace],
   [We own a parser forever; maintenance burden incompatible with a
    single-maintainer project],
+
+  [(d) Defer 3.1 support entirely],
+  [Unblocks a credible v0.1 release on the schemas we already support;
+   keeps the generator's scope honest; avoids a load-bearing parser
+   decision under pre-release pressure],
+  [Users with 3.1-only schemas remain blocked until post-v0.1; GitHub /
+   Kubernetes validation-tier coverage slips past the first tag],
 )
 
 == Decision
 
-*Tentative — awaiting human confirmation. Recommended: (b) translator
-shim, with (c) as fallback.*
+*Defer OpenAPI 3.1 support to post-v0.1. Ship the first tagged release
+on the current `cebe/php-openapi` 3.0 pipeline.*
 
-Reasoning:
+Rationale:
 
-- The 3.1 → 3.0 gap is largely a syntactic lowering problem (nullable,
-  `type: [a, b]`, `exclusiveMinimum` as a number). A shim that runs
-  before the parser keeps paogen's own pipeline untouched.
-- The shim is testable in isolation: feed it 3.1 YAML, diff against a
-  hand-written 3.0 equivalent, and gate it with a golden-fixture test
-  along the lines of ADR-005.
-- If the shim proves too lossy for schemas we care about, falling back
-  to (c) is mechanical: fork `cebe/php-openapi`, retarget autoload,
-  merge the Composer deprecation patch, done.
-- (a) is deliberately the *last* preference: we'd be betting that an
-  alternative single-maintainer fork outlives the original. The review
-  notes `devizzent/cebe-php-openapi` is healthier *right now*, but that
-  is not a load-bearing signal.
-
-This ADR stays `proposed` until a task picks one and a working
-prototype lands. The shim's feature coverage (nullable, type-arrays,
-`webhooks`, `const`, `examples`) is left for the implementing task to
-enumerate.
+- The review's correctness / coverage P0 and P1 items (hydrator bugs,
+  enums, composition, nested inline objects, error responses,
+  security) all land *on the existing 3.0 pipeline*. None of them need
+  3.1 to be valuable.
+- The 3.1 question is load-bearing — picking (a), (b), or (c) wrong
+  costs months. Making that decision under release pressure is worse
+  than shipping without it.
+- ADR-005's validation-tier schemas that are 3.1-only (Kubernetes,
+  modern GitHub bundles) can be reached via an external 3.1 → 3.0
+  pre-processor (e.g. `redocly bundle --ext`) until in-tree support
+  lands. This is documented as a *known limitation* in the README and
+  in `docs/design/openapi-3.1-gap.md`.
+- The deprecation-noise problem (P2 #15) is decoupled from 3.1 by this
+  decision. Task 016 is rescoped to silence the deprecations on the
+  current 3.0 parser (composer patch / upstream PR) without picking a
+  3.1 strategy.
 
 == Consequences
 
-- The 3.1 task (`truth/tasks/015-openapi-31-path-forward.typ`)
-  references this ADR and, as part of its acceptance, either confirms
-  or supersedes the recommendation with the chosen path.
-- If (b) lands, `cebe/php-openapi` stays pinned *and* needs its
-  deprecation noise handled separately — see P2 #15 and
-  `truth/tasks/016-cebe-php-openapi-replacement.typ`.
-- If (c) is chosen, the fork's coordinates are added to
-  `composer.json` via a `repositories` entry and this ADR is updated to
-  `accepted`.
+- Task 015 is withdrawn; `docs/design/openapi-3.1-gap.md` remains as
+  the canonical tracking note and points at this ADR.
+- Task 016 is rescoped (see its file) to silence cebe's PHP 8.4
+  deprecations *only*; it is no longer a vehicle for the 3.1
+  decision.
+- `ROADMAP.md` lists "OpenAPI 3.1" under explicit *post-v0.1*
+  follow-ups.
+- The README keeps its "known limitation: OpenAPI 3.1 not yet
+  supported" note; no user-facing surprise at release.
+- When 3.1 becomes a priority (post-v0.1), this ADR is *superseded*
+  by a new ADR that picks (a), (b), or (c) with the prototype
+  evidence the deferred task was supposed to produce.
 
 == Alternatives rejected
 
 - *Wait for upstream 3.1 support.* There has been no public movement
-  since 2023; indefinite blocking is worse than any of (a)/(b)/(c).
-- *Drop paogen's 3.0-only claim and call it a feature.* Unacceptable:
-  ADR-005's validation tier already calls out GitHub and Kubernetes,
-  both of which are 3.1-only today.
+  since 2023; indefinite blocking on upstream is not a strategy.
+- *Drop paogen's 3.0 support and call 3.1 the baseline.* Inverts the
+  same problem and invalidates every schema we ship fixtures for
+  today.
+- *Silently pick (a), (b), or (c) without the prototype evidence
+  task 015 was meant to collect.* Load-bearing decision without the
+  data to back it.
