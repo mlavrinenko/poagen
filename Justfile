@@ -64,16 +64,16 @@ clean:
 
 # Check specs via speconaut
 check-specs:
-    speconaut --root {{ justfile_directory() }} check truth/
+    speconaut check truth/
 
 # Verify no spec/source drift (lockfile current with traces)
 check-drift:
     #!/usr/bin/env bash
     set -euo pipefail
-    n=$(speconaut --root {{ justfile_directory() }} status --format json \
+    n=$(speconaut status --format json \
         | php -r 'echo count(json_decode(stream_get_contents(STDIN), true)["content_mismatches"] ?? []);')
     if [[ "$n" -ne 0 ]]; then
-        speconaut --root {{ justfile_directory() }} status >&2
+        speconaut status >&2
         exit 1
     fi
     echo "speconaut: no drift (0 content_mismatches)"
@@ -82,17 +82,17 @@ check-drift:
 generate-tests:
     #!/usr/bin/env bash
     set -euo pipefail
-    speconaut --root {{ justfile_directory() }} interop extract --format json \
+    speconaut interop extract --format json \
         | speconaut-phpunit \
-            --output {{ justfile_directory() }}/tests/generated \
+            --output tests/generated \
             --namespace 'Mlavrinenko\Paogen\Tests\Generated'
 
 # Verify generated tests are up to date (CI-friendly drift check)
 check-generated-tests:
     #!/usr/bin/env bash
     set -euo pipefail
-    speconaut --root {{ justfile_directory() }} interop extract --format json \
+    speconaut interop extract --format json \
         | speconaut-phpunit \
-            --output {{ justfile_directory() }}/tests/generated \
+            --output tests/generated \
             --namespace 'Mlavrinenko\Paogen\Tests\Generated' \
             --check --strict
