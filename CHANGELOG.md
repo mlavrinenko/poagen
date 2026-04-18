@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing.
+- Generator now prunes stale files under `Generated/` at the end of every
+  run. Any `.php` emitted on a prior run but absent from the current
+  emitted set is `unlink`-ed, restoring the byte-stability promise on
+  component rename / removal. The walk is strictly scoped to the
+  `Generated/` subtree so user files placed alongside it are never
+  touched.
 
 ### Changed
 
@@ -19,7 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI version string now resolves from Composer's installed metadata
   (`Composer\InstalledVersions`) rather than a hardcoded constant, so releases
   installed via Packagist report the real tag and in-repo runs report
-  `dev-<branch>`.
+  `dev-<branch>`. `Cli::version()` is public and accepts an optional package
+  name so the `dev` fallback path can be regression-tested. The
+  `paogen --help` `USAGE` block gained a `NOTES` section documenting that
+  the printed version reflects the installed package, not the working copy.
 - PHPUnit configuration scopes deprecation tracking to `src/`
   (`ignoreIndirectDeprecations="true"`). PHP 8.4 deprecations triggered from
   `cebe/php-openapi` no longer clutter test output. Tracking a replacement

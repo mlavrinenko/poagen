@@ -107,10 +107,26 @@ final class PaogenCLITest extends TestCase
 
 
     /**
+     * Scenario: Version falls back to a non-empty sentinel when Composer metadata is missing
+     * @source truth/specs/cli.typ:46
+     *
+     * Given Composer has no installed-version record for a queried package
+     * When the CLI resolves a version for a package does-not-exist/nothing
+     * Then the returned version token is non-empty
+     */
+    public function testVersionFallsBackToANonEmptySentinelWhenComposerMetadataIsMissing(): void
+    {
+        $this->steps->givenComposerHasNoInstalledVersionRecordForAQueriedPackage();
+        $this->steps->whenTheCLIResolvesAVersionForAPackagePackage('does-not-exist/nothing');
+        $this->steps->thenTheReturnedVersionTokenIsNonEmpty();
+    }
+
+
+    /**
      * Rule: Unknown command
      *
      * Scenario: Unknown command reports on stderr and exits 2
-     * @source truth/specs/cli.typ:48
+     * @source truth/specs/cli.typ:57
      *
      * When paogen CLI is invoked with argument does-not-exist
      * Then stderr should contain is not implemented yet
@@ -128,7 +144,7 @@ final class PaogenCLITest extends TestCase
      * Rule: Validate subcommand
      *
      * Scenario: validate on a syntactically valid OpenAPI document exits 0
-     * @source truth/specs/cli.typ:56
+     * @source truth/specs/cli.typ:65
      *
      * When paogen CLI is invoked with arguments validate tests/fixtures/schemas/petstore-3.0.yaml
      * Then paogen CLI should exit with code 0
@@ -142,7 +158,7 @@ final class PaogenCLITest extends TestCase
 
     /**
      * Scenario: validate on a malformed document reports on stderr and exits 1
-     * @source truth/specs/cli.typ:61
+     * @source truth/specs/cli.typ:70
      *
      * Given a file at /tmp/broken.yaml that is not valid YAML
      * When paogen CLI is invoked with arguments validate /tmp/broken.yaml
@@ -160,7 +176,7 @@ final class PaogenCLITest extends TestCase
      * Rule: Generate flags
      *
      * Scenario: --output redirects the generated tree to the supplied directory
-     * @source truth/specs/cli.typ:70
+     * @source truth/specs/cli.typ:79
      *
      * Given Profile at tests/fixtures/profiles/petstore.php whose declared output is tests/fixtures/generated/petstore
      * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=/tmp/paogen-out

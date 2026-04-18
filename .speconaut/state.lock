@@ -17,6 +17,16 @@ stage = "unstable"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:d0c10d79b971ce8782fdda1b80421ba1187611a888ce462d33244a742a00bb04"
 "src/Generator/Emit/TypeResolver.php" = "sha256:a60c1e59d9f26fd378de7e8e466ea741369ac062b5ecee4e93f47a8f983529e4"
 
+[features."Model Generator".scenarios."A component removed from the schema is pruned from Generated/ on the next run"]
+as-is-hash = "sha256:8845d41f66662576fc9d3e7ebbda6e907326bb30a2e7629947bb3985888ba5e6"
+as-is = "KLUv/WC0ANUHANbQLh1wN20DEd+71FusQiOLKZSm0PIGAZ04yAlKf70xASUAKAAnAEdMH/c1Pd6AS5PVsSU3RflmnaQqfF9kcvXiMVOSxQUT8qjhCyJmNY8mWzIJYH840C8Djvu9rEsz1sQvjsE2jhK2CpcJR2wRtoFLvQYBBOqcHsFETrQ6AraBf8KUYwrMZk+B8RhiVrjUDNjG/mDzXQ2Vn9cCd1NWLi5fzQeaW67nvCvtSj8xpT9cPu6/o8xQsjo6Ch8WbCMWAAgTp2SIjMbFtmASGyTLJtgiEoh9FDIBlDiAtlOxtXCJd61xdKDtoDCysWEsHSoSDlpY0bPU/dXEhAI="
+stage = "unstable"
+
+[features."Model Generator".scenarios."A component removed from the schema is pruned from Generated/ on the next run".traces]
+"src/Generator/Emit/ModelEmitter.php" = "sha256:d0c10d79b971ce8782fdda1b80421ba1187611a888ce462d33244a742a00bb04"
+"src/Generator/Emit/TypeResolver.php" = "sha256:a60c1e59d9f26fd378de7e8e466ea741369ac062b5ecee4e93f47a8f983529e4"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
+
 [features."Model Generator".scenarios."A property with a format that has a BindsFormat binding uses the user class"]
 as-is-hash = "sha256:7c147a987c2494322749d5477c3da3dfc7564ca4fc4ff96ba43406e5531d3230"
 as-is = "KLUv/QBYxQcAdhAxIUBt0wZM7ZQwo+1iqY1NhGK05dLSD1Z7qYpQCY0dHSJwASYAKQAoAPfePlYSVeLjYFVigc1ri2/LfWt0Odi8HCU8cT1nqeOFk4VqeYkRZtAaA4QQcpyFn+7hoeB7GGNwXgQi2MgxD/vm4+QUO8NGdo1J1tvHtwSJ+nXyZM+V1Ck+EKfMqZVglQsbcRDobw07BBQMWnOKgAaAuttXpnkxSqJ+/ZUeQMiL1vX06DdX0stT0OdMfMFG1P3YnBebvKXBRpwoARIABbYuphEaZ5SFC/BD+uBd9DfDhkC/jWCOUeG246LJ/qB1+RExiMFMcwCpeQ3pMPc="
@@ -35,7 +45,7 @@ stage = "unstable"
 [features."Model Generator".scenarios."Each named schema component becomes a final readonly class".traces]
 "src/Generator/Emit/ModelEmitter.php" = "sha256:d0c10d79b971ce8782fdda1b80421ba1187611a888ce462d33244a742a00bb04"
 "src/Generator/Emit/TypeResolver.php" = "sha256:a60c1e59d9f26fd378de7e8e466ea741369ac062b5ecee4e93f47a8f983529e4"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Model Generator".scenarios."Property types follow OpenAPI scalars and required-ness"]
 as-is-hash = "sha256:5ef3eefab62a5613e45dfea5f7a566eca28f65d5331b6c66b6dc5db66cbf912e"
@@ -54,7 +64,7 @@ stage = "unstable"
 [features."Model Generator".scenarios."Running the generator twice with the same inputs produces identical files".traces]
 "src/Generator/Emit/ModelEmitter.php" = "sha256:d0c10d79b971ce8782fdda1b80421ba1187611a888ce462d33244a742a00bb04"
 "src/Generator/Emit/TypeResolver.php" = "sha256:a60c1e59d9f26fd378de7e8e466ea741369ac062b5ecee4e93f47a8f983529e4"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.typ"
@@ -72,7 +82,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."A 2xx JSON response with `additionalProperties` is returned as a typed associative array"]
 as-is-hash = "sha256:0ed3f98a88a0fd22c4c0ea47bd8667319d8f71fb57e24a394053c57e596723a1"
@@ -86,7 +96,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."A GET operation with a path parameter becomes a typed client method"]
 as-is-hash = "sha256:146defe7afe59bb748f272b428518eb00ece56198a8b2b8b0931d6a4bcab7236"
@@ -100,7 +110,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."A JSON body whose schema is a list of $ref becomes a typed list parameter"]
 as-is-hash = "sha256:6b000b05c3bddf3e353c42de464279ec8ba0cececa55b5bb211932c51e0f0e02"
@@ -115,7 +125,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."A POST operation with a JSON body takes a typed Model parameter"]
 as-is-hash = "sha256:56705adc0dfad1dc748b6665f085bfb3184a55686e7f510c8fd69e91503e8f8c"
@@ -130,7 +140,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."A scalar 2xx JSON response is returned as the scalar PHP type without hydration"]
 as-is-hash = "sha256:05fc931deefd229feda5f9af36da1ad4c655af0cae215f0d27dad2fd8094c488"
@@ -144,7 +154,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."An `explode: true` array query parameter is serialised as repeated `name=value` pairs"]
 as-is-hash = "sha256:79982da2352d08ea419d04340331adf7077c11aa56d51c0961365b5c152477c5"
@@ -158,7 +168,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."An optional header parameter becomes a nullable typed argument and is attached only when non-null"]
 as-is-hash = "sha256:f70f1ad4bd36252acab914742bdc79a7e6a804e3623f339f591343820cec07f7"
@@ -172,7 +182,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features."Operation Generator".scenarios."Query parameters become typed method parameters and are attached as a query string"]
 as-is-hash = "sha256:5401b18e6de03d373eb9a8a207e19fd18dc12731f63f0b232faae5d11f93c10d"
@@ -186,7 +196,7 @@ stage = "unstable"
 "src/Generator/Emit/RequestAssembler.php" = "sha256:c6c5242c8dbac8357cc7a97ac397935613826a97ce6e76fb42c0967d2ee2cbcf"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:d00ca4eb62cd71903549d9aeb130d94d17619d19484580ce32ea128cdcbdb909"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:552eaf243536f0ebf3cf27dbb167112cb6307d227385e5b454932ac737d4dbd0"
-"src/Generator/Generator.php" = "sha256:336136502e3dcd8bed86da70c36211d5924b198cbd31a4871d81a89a5d2aca81"
+"src/Generator/Generator.php" = "sha256:0e8616ec6113067ad10f8ed06cf225a7e0b0943a7bc7bba8e01e8ee739ba6082"
 
 [features.Profile]
 spec = "truth/specs/profile.typ"
@@ -239,7 +249,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."--help prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
 
 [features."paogen CLI".scenarios."--version prints the paogen version and exits 0"]
 as-is-hash = "sha256:646ed5f70f37692464ac8a72cd17bcde36bfd3d8d1c07de3629202b7e933d302"
@@ -248,7 +258,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."--version prints the paogen version and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
 
 [features."paogen CLI".scenarios."No arguments prints usage and exits 0"]
 as-is-hash = "sha256:d291fb92286168e9be71710de8adb74dd98ea71277b2ae2715a48deed529d5dc"
@@ -257,7 +267,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."No arguments prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
 
 [features."paogen CLI".scenarios."Unknown command reports on stderr and exits 2"]
 as-is-hash = "sha256:07d419e6b01872f6b74fe45c2c7abb30ce4db1fe1ba278c20f33c114d7c214ec"
@@ -266,7 +276,16 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."Unknown command reports on stderr and exits 2".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
+
+[features."paogen CLI".scenarios."Version falls back to a non-empty sentinel when Composer metadata is missing"]
+as-is-hash = "sha256:05d66b6124942e44b9797a58f1246ba18859566ab44742f60ff405b406f20dc1"
+as-is = "KLUv/WBGACUGAHKNJh5gSdQGm9nuTovs37aGQn5S9ahjuoqMW1NVR0GHIA73BRf90tlngW0kBCA4OVMWD2DVGH4s3qFHZJf1T0J9eoAA4St7kNSCVGN0yzsKLicujBKR53Ogp2TGs5bymIBtPClq9RwfntQmbCM5UzXGaq4tVHvGecWGQYTvyoLTz/aubtiG+XF4LuN6QUphTakWPjTNG/iAlnVHEgEOAB5bIG5Bl1H4GggFijVUxqnybh22EBQAFmIlwiCYhERZ0dWcigI="
+stage = "unstable"
+
+[features."paogen CLI".scenarios."Version falls back to a non-empty sentinel when Composer metadata is missing".traces]
+"bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
 
 [features."paogen CLI".scenarios."help subcommand prints usage and exits 0"]
 as-is-hash = "sha256:dc8b047618d04d64ccf1deea9e83e4a08413c4ca126fd969b1ac2640841e5be2"
@@ -275,7 +294,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."help subcommand prints usage and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"
 
 [features."paogen CLI".scenarios."version subcommand prints the paogen version and exits 0"]
 as-is-hash = "sha256:440601757b5c7e3d81288a301b358e94f9dfef96370ada029bd66e63304f3ba3"
@@ -284,4 +303,4 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."version subcommand prints the paogen version and exits 0".traces]
 "bin/paogen" = "sha256:e0c5537c663077d4a7a0eab75080f04eec0ab21ec512970b71b684c2b8024c1a"
-"src/Cli.php" = "sha256:275ade773caf40555b54646408f5eb8a31801a841fb57fe027929ef95b26858a"
+"src/Cli.php" = "sha256:4aa0433b020e38b72be0b1a8fcb00e4e2e340284ca53076a4fa1c74b4328b1cb"

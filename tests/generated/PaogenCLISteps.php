@@ -18,6 +18,7 @@ final class PaogenCLISteps
     private string $stdout = '';
     private string $stderr = '';
     private int $exitCode = 0;
+    private string $resolvedVersion = '';
 
     public function __construct(TestCase $test)
     {
@@ -76,4 +77,24 @@ final class PaogenCLISteps
     {
         TestCase::assertStringContainsString($needle, $this->stderr);
     }
+
+    public function givenComposerHasNoInstalledVersionRecordForAQueriedPackage(): void
+    {
+        // Precondition marker: the `when` step passes a deliberately unknown
+        // package name, so Composer's InstalledVersions cannot resolve it.
+        // No runtime setup is required.
+    }
+
+
+    public function whenTheCLIResolvesAVersionForAPackagePackage(string $package): void
+    {
+        $this->resolvedVersion = Cli::version($package);
+    }
+
+
+    public function thenTheReturnedVersionTokenIsNonEmpty(): void
+    {
+        TestCase::assertNotSame('', $this->resolvedVersion);
+    }
+
 }

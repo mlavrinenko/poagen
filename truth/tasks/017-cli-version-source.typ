@@ -2,7 +2,7 @@
 
 #show: task.with(
   title: "Read the CLI version from Composer metadata instead of a hard-coded const",
-  status: accepted,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 18),
   priority: "normal",
   spec: "truth/specs/cli.typ",
@@ -51,19 +51,19 @@ duplicate if so.
   returns a non-empty string and exits 0.
 - `just check` green end-to-end.
 
-== Progress
+== Resolution
 
-The core code change has landed: `Cli::VERSION` is replaced by a
-`Cli::version()` helper that calls
-`Composer\InstalledVersions::getPrettyVersion('mlavrinenko/paogen')`
-and falls back to `"dev"` on `\OutOfBoundsException` or a `null`
-return. `paogen --version` reports `dev-main` in an in-repo run and
-will report the real tag once installed via Packagist.
-
-Still to do before this task can close:
-
-+ Add a new scenario to `truth/specs/cli.typ` that exercises the
-  fallback path (e.g. "version line is non-empty when Composer
-  metadata is unavailable") and a matching step / test fixture.
-+ Expand the `USAGE` block in `src/Cli.php` to note that the printed
-  version reflects the installed package, not the working copy.
+- `Cli::VERSION` is replaced by a `Cli::version(string $package =
+  self::PACKAGE)` helper that calls
+  `Composer\InstalledVersions::getPrettyVersion($package)` and falls
+  back to `"dev"` on `\OutOfBoundsException` or a `null` return. The
+  optional `$package` argument exists so the fallback path can be
+  regression-tested with a deliberately unknown package.
+- `truth/specs/cli.typ` grows a "Version falls back to a non-empty
+  sentinel when Composer metadata is missing" scenario under the
+  Version rule; the generated PHPUnit test calls
+  `Cli::version('does-not-exist/nothing')` and asserts the returned
+  token is non-empty.
+- The `USAGE` block gained a `NOTES` section explaining that the
+  printed version reflects the installed package (not the working
+  copy) and documenting the `dev` fallback.

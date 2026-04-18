@@ -40,6 +40,12 @@ final class Cli
             -h, --help          Print help for a command
             -V, --version       Print the paogen version
 
+        NOTES
+            The printed version reflects the installed paogen package, not the
+            working copy. In-repo runs report `dev-<branch>`; installs via
+            Packagist report the tagged release. When Composer metadata is not
+            available the fallback sentinel `dev` is used instead.
+
         HELP;
 
     /**
@@ -108,14 +114,19 @@ final class Cli
     }
 
     /**
-     * Resolve the paogen version from Composer's installed metadata so that
+     * Resolve a package's version from Composer's installed metadata so that
      * consumers who install via Packagist see the real tag, while in-repo
-     * runs still report something meaningful (`dev-<branch>`).
+     * runs still report something meaningful (`dev-<branch>`). Packagers
+     * that strip Composer's `installed.php` (phar, vendored) hit the
+     * fallback sentinel `dev`.
+     *
+     * Exposed so the fallback path can be regression-tested with a known-
+     * missing package name.
      */
-    private static function version(): string
+    public static function version(string $package = self::PACKAGE): string
     {
         try {
-            $version = InstalledVersions::getPrettyVersion(self::PACKAGE);
+            $version = InstalledVersions::getPrettyVersion($package);
         } catch (\OutOfBoundsException) {
             return 'dev';
         }

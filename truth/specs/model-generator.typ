@@ -97,5 +97,16 @@
       #when[#the(Generator) runs again with the same #the(Schema) and #the(Profile)]
       #then[every file under #the(Profile)'s `output` is byte-for-byte identical to the previous run]
     ]
+
+    #scenario(
+      "A component removed from the schema is pruned from Generated/ on the next run",
+      stage: unstable,
+      traces: ("src/Generator/Generator.php",),
+    )[
+      #given[#the(Generator) has produced `Generated/Model/Pet.php` from a prior schema that declared a `Pet` component]
+      #when[#the(Generator) runs again with a schema from which the `Pet` component has been removed]
+      #then[`Generated/Model/Pet.php` is no longer on disk]
+      #and_[files placed alongside `Generated/` under the same `output` directory are untouched]
+    ]
   ]
 ]

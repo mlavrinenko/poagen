@@ -42,6 +42,15 @@
       #then[stdout should start with #p((prefix: "paogen "))]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
+
+    #scenario(
+      "Version falls back to a non-empty sentinel when Composer metadata is missing",
+      stage: unstable,
+    )[
+      #given[Composer has no installed-version record for a queried package]
+      #when[the CLI resolves a version for a package #p((package: "does-not-exist/nothing"))]
+      #then[the returned version token is non-empty]
+    ]
   ]
 
   #rule("Unknown command")[

@@ -44,12 +44,18 @@ final readonly class Generator
 
         $this->ensureDir($modelDir);
 
-        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings);
-        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings);
+        /** @var array<string,true> $emitted */
+        $emitted = [];
+
+        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $emitted);
+        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $emitted);
+
+        $this->pruneStale($rootDir, $emitted);
     }
 
     /**
      * @param array<string,string> $renames
+     * @param array<string,true>   $emitted
      */
     private function emitModels(
         OpenApi $openApi,
@@ -57,6 +63,7 @@ final readonly class Generator
         string $modelDir,
         array $renames,
         Bindings $bindings,
+        array &$emitted,
     ): void {
         $components = $openApi->components;
 
@@ -85,15 +92,20 @@ final readonly class Generator
 
             $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
             file_put_contents($path, $code);
+            $emitted[$path] = true;
         }
     }
 
+    /**
+     * @param array<string,true> $emitted
+     */
     private function emitClient(
         OpenApi $openApi,
         string $rootNamespace,
         string $rootDir,
         string $modelNamespace,
         Bindings $bindings,
+        array &$emitted,
     ): void {
         if ($openApi->paths === null) {
             return;
@@ -105,16 +117,47 @@ final readonly class Generator
         $path = $rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php';
 
         if ($code === null) {
-            if (is_file($path)) {
-                unlink($path);
-            }
-
             return;
         }
 
         $this->ensureDir($rootDir);
 
         file_put_contents($path, $code);
+        $emitted[$path] = true;
+    }
+
+    /**
+     * Delete any file under `Generated/` that the current run did not emit.
+     *
+     * Guarded strictly to the `Generated/` subtree so user code alongside
+     * it is never touched. Silently skipped if the root does not yet
+     * exist (first-ever run).
+     *
+     * @param array<string,true> $emitted
+     */
+    private function pruneStale(string $rootDir, array $emitted): void
+    {
+        if (!is_dir($rootDir)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($rootDir, \FilesystemIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $entry) {
+            \assert($entry instanceof \SplFileInfo);
+
+            if (!$entry->isFile()) {
+                continue;
+            }
+
+            $path = $entry->getPathname();
+
+            if (!isset($emitted[$path])) {
+                unlink($path);
+            }
+        }
     }
 
     private function ensureDir(string $dir): void

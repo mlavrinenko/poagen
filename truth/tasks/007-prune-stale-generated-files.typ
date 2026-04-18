@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Prune stale files from Generated/ so byte-stability holds on rename",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 18),
   priority: "critical",
   spec: "truth/specs/model-generator.typ",
@@ -53,3 +53,23 @@ is a silent half-migration.
 - Existing byte-stability scenario still passes (re-running with the
   same schema still writes byte-identical files; no directory churn).
 - `just check` green end-to-end.
+
+== Resolution
+
+`Generator::generate()` now records every emitted path in a local
+`$emitted` set and calls a new `pruneStale($rootDir, $emitted)` after
+the model and client passes. The prune walks `Generated/` recursively
+via `RecursiveDirectoryIterator` and `unlink`s any file not in the
+emitted set. The walk is strictly scoped to the `Generated/` subtree,
+so user files placed alongside it under the same `output` root are
+never touched. The previous ad-hoc ApiClient deletion inside
+`emitClient()` is gone — that case now falls out of the generic
+prune.
+
+The Model Generator byte-stability rule grew an
+"A component removed from the schema is pruned from Generated/ on the
+next run" scenario. Its regression test generates a petstore tree
+into a temp dir, plants a sibling `user-kept.txt`, re-runs the
+generator with a minimal schema that declares only `Tag`, and then
+asserts (a) `Generated/Model/Pet.php` is gone, (b) `Tag.php` is
+present, and (c) `user-kept.txt` is intact.
