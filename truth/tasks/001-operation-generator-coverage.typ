@@ -56,7 +56,7 @@ Each bullet gets its own scenario under
 == Acceptance
 
 - Every bullet above has a dedicated scenario in the Operation
-  Generator feature, confirmed via `speconaut implemented -s …`.
+  Generator feature, locked via `speconaut lock`.
 - Petstore golden fixture at
   `tests/fixtures/generated/petstore/Generated/ApiClient.php`
   regenerated with every previously-skipped operation now emitted.

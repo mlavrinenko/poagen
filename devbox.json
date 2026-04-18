@@ -5,7 +5,8 @@
     "php84Packages.composer@latest",
     "php84Extensions.pcov@latest",
     "just@latest",
-    "parallel@latest"
+    "parallel@latest",
+    "github:mlavrinenko/linecop/v0.2.0"
   ],
   "env": {
     "PATH": "$PWD/bin:$PWD/vendor/bin:$PATH"
