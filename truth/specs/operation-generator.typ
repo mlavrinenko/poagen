@@ -11,6 +11,10 @@
   "Operation Generator",
   traces: (
     "src/Generator/Emit/ClientEmitter.php",
+    "src/Generator/Emit/OperationAnalyzer.php",
+    "src/Generator/Emit/OperationEmitter.php",
+    "src/Generator/Emit/ReturnSpec.php",
+    "src/Generator/Generator.php",
   ),
   description: [
     Walks #the(Schema)'s `paths` and emits one method per OpenAPI
@@ -27,7 +31,6 @@
     #scenario(
       "A GET operation with a path parameter becomes a typed client method",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /store/order/{orderId}")) with #p((id: "operationId: getOrderById")) and path parameter #p((param: "orderId: integer"))]
       #when[#the(Generator) runs against #the(Profile)]
@@ -39,7 +42,6 @@
     #scenario(
       "A POST operation with a JSON body takes a typed Model parameter",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet")) with #p((id: "operationId: addPet"))]
       #and_[the request body is `application/json` with schema #p((ref: "#/components/schemas/Pet"))]
@@ -53,7 +55,6 @@
     #scenario(
       "A 2xx JSON response body is deserialized into the typed Model",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
     )[
       #given[#the(Client) is constructed with a PSR-18 HTTP client that returns status #p((code: "200")) with JSON body #p((body: "{\"id\":42,\"status\":\"placed\"}"))]
       #when[`getOrderById(42)` is called on #the(Client)]
@@ -65,7 +66,6 @@
     #scenario(
       "Query parameters become typed method parameters and are attached as a query string",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByStatus")) with #p((id: "operationId: findPetsByStatus")) and a required query parameter #p((param: "status: string"))]
       #when[#the(Generator) runs against #the(Profile)]

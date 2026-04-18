@@ -26,7 +26,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Emitting operations as client methods
      *
      * Scenario: A GET operation with a path parameter becomes a typed client method
-     * @source truth/specs/operation-generator.typ:27
+     * @source truth/specs/operation-generator.typ:31
      *
      * Given Schema declares Operation GET /store/order/{orderId} with operationId: getOrderById and path parameter orderId: integer
      * When Generator runs against Profile
@@ -46,7 +46,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A POST operation with a JSON body takes a typed Model parameter
-     * @source truth/specs/operation-generator.typ:39
+     * @source truth/specs/operation-generator.typ:42
      *
      * Given Schema declares Operation POST /pet with operationId: addPet
      *   And the request body is application/json with schema #/components/schemas/Pet
@@ -68,7 +68,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Response deserialization
      *
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
-     * @source truth/specs/operation-generator.typ:53
+     * @source truth/specs/operation-generator.typ:55
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
@@ -86,7 +86,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Query parameters
      *
      * Scenario: Query parameters become typed method parameters and are attached as a query string
-     * @source truth/specs/operation-generator.typ:65
+     * @source truth/specs/operation-generator.typ:66
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status: string
      * When Generator runs against Profile
