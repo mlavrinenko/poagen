@@ -29,6 +29,7 @@
 #include "specs/cli.typ"
 #include "specs/profile.typ"
 #include "specs/model-generator.typ"
+#include "specs/operation-generator.typ"
 
 // --- Architectural Decisions ---
 
