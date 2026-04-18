@@ -13,6 +13,8 @@
     "src/Generator/Emit/ClientEmitter.php",
     "src/Generator/Emit/OperationAnalyzer.php",
     "src/Generator/Emit/OperationEmitter.php",
+    "src/Generator/Emit/RequestAssembler.php",
+    "src/Generator/Emit/ResponseHandler.php",
     "src/Generator/Emit/ReturnSpec.php",
     "src/Generator/Generator.php",
   ),
@@ -42,11 +44,24 @@
     #scenario(
       "A POST operation with a JSON body takes a typed Model parameter",
       stage: unstable,
+      traces: ("src/Generator/Emit/BodySpec.php",),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet")) with #p((id: "operationId: addPet"))]
       #and_[the request body is `application/json` with schema #p((ref: "#/components/schemas/Pet"))]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `addPet(Pet $body): Pet`]
+      #and_[the method JSON-encodes `$body` and attaches it as the request body]
+    ]
+
+    #scenario(
+      "A JSON body whose schema is a list of $ref becomes a typed list parameter",
+      stage: unstable,
+      traces: ("src/Generator/Emit/BodySpec.php",),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /user/createWithList")) with #p((id: "operationId: createUsersWithListInput"))]
+      #and_[the request body is `application/json` with schema `type: array` and items #p((ref: "#/components/schemas/User"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `createUsersWithListInput(array $body)` whose `$body` parameter is annotated `@param list<User> $body`]
       #and_[the method JSON-encodes `$body` and attaches it as the request body]
     ]
   ]
@@ -60,6 +75,26 @@
       #when[`getOrderById(42)` is called on #the(Client)]
       #then[the return value is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
     ]
+
+    #scenario(
+      "A scalar 2xx JSON response is returned as the scalar PHP type without hydration",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /user/login")) with #p((id: "operationId: loginUser")) whose 200 response schema is `type: string`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method whose return type is `string`]
+      #and_[the method body returns `(string) $response->getBody()` and never invokes `self::hydrate`]
+    ]
+
+    #scenario(
+      "A 2xx JSON response with `additionalProperties` is returned as a typed associative array",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /store/inventory")) with #p((id: "operationId: getInventory")) whose 200 response schema is `type: object` with #p((map: "additionalProperties: integer"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method whose return type is `array` annotated `@return array<string, int>`]
+      #and_[the method body returns the `json_decode`d payload directly without invoking `self::hydrate`]
+    ]
   ]
 
   #rule("Query parameters")[
@@ -71,6 +106,28 @@
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method with signature `findPetsByStatus(string $status): array`]
       #and_[calling it with #p((arg: "status: 'available'")) sends a request whose URI ends with #p((query: "?status=available"))]
+    ]
+
+    #scenario(
+      "An `explode: true` array query parameter is serialised as repeated `name=value` pairs",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByTags")) with #p((id: "operationId: findPetsByTags")) and a required query parameter `tags` #p((schema: "type: array, items.type: string, explode: true"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `findPetsByTags(array $tags): array` annotated `@param list<string> $tags`]
+      #and_[calling it with #p((arg: "tags: ['a', 'b']")) sends a request whose URI ends with #p((query: "?tags=a&tags=b")) instead of `tags%5B0%5D=a&tags%5B1%5D=b`]
+    ]
+  ]
+
+  #rule("Header parameters")[
+    #scenario(
+      "An optional header parameter becomes a nullable typed argument and is attached only when non-null",
+      stage: unstable,
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "DELETE /pet/{petId}")) with #p((id: "operationId: deletePet")) and an optional header parameter `api_key: string`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $api_key = null): void`]
+      #and_[the method calls `$request->withHeader('api_key', $api_key)` only when `$api_key` is not `null`]
     ]
   ]
 ]

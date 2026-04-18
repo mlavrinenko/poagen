@@ -26,7 +26,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Emitting operations as client methods
      *
      * Scenario: A GET operation with a path parameter becomes a typed client method
-     * @source truth/specs/operation-generator.typ:31
+     * @source truth/specs/operation-generator.typ:33
      *
      * Given Schema declares Operation GET /store/order/{orderId} with operationId: getOrderById and path parameter orderId: integer
      * When Generator runs against Profile
@@ -46,7 +46,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A POST operation with a JSON body takes a typed Model parameter
-     * @source truth/specs/operation-generator.typ:42
+     * @source truth/specs/operation-generator.typ:44
      *
      * Given Schema declares Operation POST /pet with operationId: addPet
      *   And the request body is application/json with schema #/components/schemas/Pet
@@ -65,10 +65,30 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A JSON body whose schema is a list of $ref becomes a typed list parameter
+     * @source truth/specs/operation-generator.typ:56
+     *
+     * Given Schema declares Operation POST /user/createWithList with operationId: createUsersWithListInput
+     *   And the request body is application/json with schema type: array and items #/components/schemas/User
+     * When Generator runs against Profile
+     * Then the emitted Client has a method createUsersWithListInput(array $body) whose $body parameter is annotated @param list<User> $body
+     *   And the method JSON-encodes $body and attaches it as the request body
+     */
+    public function testAJSONBodyWhoseSchemaIsAListOfRefBecomesATypedListParameter(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithId('POST /user/createWithList', 'operationId: createUsersWithListInput');
+        $this->steps->givenTheRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef('#/components/schemas/User');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody();
+        $this->steps->thenTheMethodJSONEncodesBodyAndAttachesItAsTheRequestBody();
+    }
+
+
+    /**
      * Rule: Response deserialization
      *
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
-     * @source truth/specs/operation-generator.typ:55
+     * @source truth/specs/operation-generator.typ:70
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
@@ -83,10 +103,46 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A scalar 2xx JSON response is returned as the scalar PHP type without hydration
+     * @source truth/specs/operation-generator.typ:79
+     *
+     * Given Schema declares Operation GET /user/login with operationId: loginUser whose 200 response schema is type: string
+     * When Generator runs against Profile
+     * Then the emitted Client has a method whose return type is string
+     *   And the method body returns (string) $response->getBody() and never invokes self::hydrate
+     */
+    public function testAScalar2xxJSONResponseIsReturnedAsTheScalarPHPTypeWithoutHydration(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeString('GET /user/login', 'operationId: loginUser');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodWhoseReturnTypeIsString();
+        $this->steps->thenTheMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate();
+    }
+
+
+    /**
+     * Scenario: A 2xx JSON response with `additionalProperties` is returned as a typed associative array
+     * @source truth/specs/operation-generator.typ:89
+     *
+     * Given Schema declares Operation GET /store/inventory with operationId: getInventory whose 200 response schema is type: object with additionalProperties: integer
+     * When Generator runs against Profile
+     * Then the emitted Client has a method whose return type is array annotated @return array<string, int>
+     *   And the method body returns the json_decoded payload directly without invoking self::hydrate
+     */
+    public function testA2xxJSONResponseWithAdditionalPropertiesIsReturnedAsATypedAssociativeArray(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeObjectWithMap('GET /store/inventory', 'operationId: getInventory', 'additionalProperties: integer');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt();
+        $this->steps->thenTheMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate();
+    }
+
+
+    /**
      * Rule: Query parameters
      *
      * Scenario: Query parameters become typed method parameters and are attached as a query string
-     * @source truth/specs/operation-generator.typ:66
+     * @source truth/specs/operation-generator.typ:101
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status: string
      * When Generator runs against Profile
@@ -99,5 +155,43 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenTheEmittedClientHasAMethodWithSignatureFindPetsByStatusStringStatusArray();
         $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery('status: \'available\'', '?status=available');
+    }
+
+
+    /**
+     * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
+     * @source truth/specs/operation-generator.typ:111
+     *
+     * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
+     * When Generator runs against Profile
+     * Then the emitted Client has a method findPetsByTags(array $tags): array annotated @param list<string> $tags
+     *   And calling it with tags: ['a', 'b'] sends a request whose URI ends with ?tags=a&tags=b instead of tags%5B0%5D=a&tags%5B1%5D=b
+     */
+    public function testAnExplodeTrueArrayQueryParameterIsSerialisedAsRepeatedNameValuePairs(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterTagsSchema('GET /pet/findByTags', 'operationId: findPetsByTags', 'type: array, items.type: string, explode: true');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags();
+        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB('tags: [\'a\', \'b\']', '?tags=a&tags=b');
+    }
+
+
+    /**
+     * Rule: Header parameters
+     *
+     * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
+     * @source truth/specs/operation-generator.typ:123
+     *
+     * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
+     * When Generator runs against Profile
+     * Then the emitted Client has a method deletePet(int $petId, ?string $api_key = null): void
+     *   And the method calls $request->withHeader('api_key', $api_key) only when $api_key is not null
+     */
+    public function testAnOptionalHeaderParameterBecomesANullableTypedArgumentAndIsAttachedOnlyWhenNonNull(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdAndAnOptionalHeaderParameterApiKeyString('DELETE /pet/{petId}', 'operationId: deletePet');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid();
+        $this->steps->thenTheMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull();
     }
 }

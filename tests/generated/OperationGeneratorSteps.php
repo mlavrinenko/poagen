@@ -93,8 +93,10 @@ final class OperationGeneratorSteps
 
     public function givenSchemaDeclaresOperationOpWithId(string $op, string $id): void
     {
-        TestCase::assertSame('POST /pet', $op);
-        TestCase::assertSame('operationId: addPet', $id);
+        // Reused by both the single-Model body scenario (POST /pet) and
+        // the list-of-Model body scenario (POST /user/createWithList).
+        TestCase::assertContains($op, ['POST /pet', 'POST /user/createWithList']);
+        TestCase::assertContains($id, ['operationId: addPet', 'operationId: createUsersWithListInput']);
 
         $this->profile = $this->loadProfile('petstore');
     }
@@ -244,5 +246,191 @@ final class OperationGeneratorSteps
         }
 
         TestCase::fail('Composer ClassLoader not found in autoload chain.');
+    }
+
+    public function givenTheRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef(string $ref): void
+    {
+        TestCase::assertSame('#/components/schemas/User', $ref);
+    }
+
+
+    public function thenTheEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody(
+    ): void {
+        $body = $this->methodSlice('createUsersWithListInput');
+        TestCase::assertStringContainsString('public function createUsersWithListInput(array $body)', $body);
+        TestCase::assertStringContainsString(
+            '@param list<\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\User> $body',
+            $body,
+        );
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeString(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('GET /user/login', $op);
+        TestCase::assertSame('operationId: loginUser', $id);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodWhoseReturnTypeIsString(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function loginUser(?string $username = null, ?string $password = null): string',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate(): void
+    {
+        $body = $this->methodSlice('loginUser');
+        TestCase::assertStringContainsString('return (string) $response->getBody();', $body);
+        TestCase::assertStringNotContainsString('self::hydrate', $body);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeObjectWithMap(
+        string $op,
+        string $id,
+        string $map,
+    ): void {
+        TestCase::assertSame('GET /store/inventory', $op);
+        TestCase::assertSame('operationId: getInventory', $id);
+        TestCase::assertSame('additionalProperties: integer', $map);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt(): void
+    {
+        $body = $this->methodSlice('getInventory');
+        TestCase::assertStringContainsString('public function getInventory(): array', $body);
+        TestCase::assertStringContainsString('@return array<string, int>', $body);
+    }
+
+
+    public function thenTheMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate(): void
+    {
+        $body = $this->methodSlice('getInventory');
+        TestCase::assertStringContainsString('\\json_decode((string) $response->getBody()', $body);
+        TestCase::assertStringContainsString('return $data;', $body);
+        TestCase::assertStringNotContainsString('self::hydrate', $body);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterTagsSchema(
+        string $op,
+        string $id,
+        string $schema,
+    ): void {
+        TestCase::assertSame('GET /pet/findByTags', $op);
+        TestCase::assertSame('operationId: findPetsByTags', $id);
+        TestCase::assertSame('type: array, items.type: string, explode: true', $schema);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags(): void
+    {
+        $body = $this->methodSlice('findPetsByTags');
+        TestCase::assertStringContainsString('public function findPetsByTags(array $tags): array', $body);
+        TestCase::assertStringContainsString('@param list<string> $tags', $body);
+    }
+
+
+    public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB(
+        string $arg,
+        string $query,
+    ): void {
+        TestCase::assertSame("tags: ['a', 'b']", $arg);
+        TestCase::assertSame('?tags=a&tags=b', $query);
+
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+
+        $client = new ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://petstore.example/api/v3',
+        );
+
+        $client->findPetsByTags(['a', 'b']);
+
+        TestCase::assertNotNull($http->lastRequest);
+        $uri = (string) $http->lastRequest->getUri();
+        TestCase::assertStringEndsWith($query, $uri);
+        TestCase::assertStringNotContainsString('tags%5B', $uri);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdAndAnOptionalHeaderParameterApiKeyString(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('DELETE /pet/{petId}', $op);
+        TestCase::assertSame('operationId: deletePet', $id);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function deletePet(int $petId, ?string $api_key = null): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull(): void
+    {
+        $body = $this->methodSlice('deletePet');
+        TestCase::assertStringContainsString(
+            "if (\$api_key !== null) { \$request = \$request->withHeader('api_key', \$api_key); }",
+            $body,
+        );
+    }
+
+    /**
+     * Slice the source covering one public method, including any
+     * preceding `@param`/`@return` PHPDoc block. Lets per-method
+     * assertions stay scoped — e.g. "no `self::hydrate` in this method"
+     * — without being fooled by other methods on the same generated
+     * class.
+     */
+    private function methodSlice(string $name): string
+    {
+        $needle = 'public function ' . $name;
+        $methodStart = strpos($this->source, $needle);
+        TestCase::assertNotFalse($methodStart, "Method {$name} not found in generated source");
+
+        // Pull in the preceding PHPDoc block when it sits directly above
+        // the method (whitespace only between `*/` and `public function`).
+        $start = $methodStart;
+        $docStart = strrpos(substr($this->source, 0, $methodStart), '/**');
+
+        if ($docStart !== false) {
+            $between = substr($this->source, $docStart, $methodStart - $docStart);
+
+            if (preg_match('#^\s*/\*\*[\s\S]*?\*/\s*$#', $between) === 1) {
+                $start = $docStart;
+            }
+        }
+
+        $next = strpos($this->source, "\n    public function ", $methodStart + \strlen($needle));
+
+        return $next === false
+            ? substr($this->source, $start)
+            : substr($this->source, $start, $next - $start);
     }
 }
