@@ -47,8 +47,16 @@ paogen generate path/to/paogen.php
 ```
 
 Where `paogen.php` returns a typed `Profile` describing the schema, output
-dir, namespace, and any user value objects to wire in. Example profiles
-under [`tests/fixtures/profiles/`](tests/fixtures/profiles/).
+dir, namespace, and any user value objects to wire in.
+
+See [`examples/`](examples/) for end-to-end demonstrations on real
+schemas (Petstore passes; DigitalOcean and GitHub are scaffolded as
+tracked follow-ups — see [ROADMAP.md](ROADMAP.md)). The example
+profiles and committed `generated/` trees are the shortest path to
+"what does paogen's output look like on *my* kind of schema?".
+
+A minimal sample profile also lives at
+[`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).
 
 ## Development
 
@@ -57,8 +65,9 @@ under [`tests/fixtures/profiles/`](tests/fixtures/profiles/).
 devbox shell
 
 composer install
-just check     # lint + test
-just format    # auto-fix code style
+just check            # lint + test (release gate)
+just check-examples   # exercise examples/*/ against the current generator
+just format           # auto-fix code style
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).

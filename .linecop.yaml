@@ -14,3 +14,4 @@ exclude_dirs:
   - .git
   - tests/generated
   - tests/fixtures
+  - examples

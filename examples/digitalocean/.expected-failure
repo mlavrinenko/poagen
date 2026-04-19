@@ -1,0 +1,12 @@
+Blocked on T-023 — pluggable OpenAPI → PHP name-normalisation strategies.
+
+The DigitalOcean schema exposes two components whose names are not
+valid PHP identifiers:
+
+  - version-2
+  - urn-2
+
+The Profile's `renames` field (see paogen.php) is the intended escape
+hatch per ADR-003, but is only consulted at `Generator::emitModels()`
+and not in the other five ref-resolution sites. Once T-023 lands this
+file gets deleted, the generator runs, and `generated/` is committed.

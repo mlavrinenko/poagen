@@ -1,0 +1,37 @@
+{
+    "name": "acme/paogen-petstore-example",
+    "description": "Example consumer project that generates a typed Petstore client via paogen.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "mlavrinenko/paogen": "@dev",
+        "nyholm/psr7": "^1.8",
+        "php-http/discovery": "^1.20",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.1"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../..",
+            "options": {"symlink": true}
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Acme\\Petstore\\Generated\\": "generated/Generated/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "cweagans/composer-patches": true,
+            "php-http/discovery": true
+        }
+    },
+    "scripts": {
+        "generate": "paogen generate paogen.php"
+    }
+}

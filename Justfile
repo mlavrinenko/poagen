@@ -96,3 +96,42 @@ check-generated-tests:
             --output tests/generated \
             --namespace 'Mlavrinenko\Paogen\Tests\Generated' \
             --check --strict
+
+# Run each examples/*/ profile through paogen; report pass / drift /
+# expected-failure. Deliberately NOT wired into `just check` — broken
+# examples are committed as targets for upcoming work (see T-024).
+check-examples:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    fails=0
+    stale=0
+    for profile in examples/*/paogen.php; do
+        dir=$(dirname "$profile")
+        name=$(basename "$dir")
+        if [[ -f "$dir/.expected-failure" ]]; then
+            if php -d memory_limit=2G bin/paogen generate --dry-run "$profile" >/dev/null 2>&1; then
+                echo "❌ $name: marked expected-failure but generator now succeeds"
+                echo "   → delete $dir/.expected-failure and commit the generated/ tree"
+                stale=$((stale + 1))
+            else
+                reason=$(head -n 1 "$dir/.expected-failure")
+                echo "⚠️  $name: expected-failure — $reason"
+            fi
+        else
+            if php bin/paogen generate --diff "$profile" > /tmp/paogen-examples-diff.$$ 2>&1; then
+                echo "✅ $name: no drift"
+            else
+                echo "❌ $name: drift or error"
+                cat /tmp/paogen-examples-diff.$$
+                fails=$((fails + 1))
+            fi
+            rm -f /tmp/paogen-examples-diff.$$
+        fi
+    done
+    if [[ $fails -gt 0 || $stale -gt 0 ]]; then
+        echo ""
+        echo "check-examples: $fails unexpected failure(s), $stale stale marker(s)"
+        exit 1
+    fi
+    echo ""
+    echo "check-examples: all examples in expected state"

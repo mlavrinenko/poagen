@@ -43,6 +43,19 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 - [x] **T-019** — `paogen generate` grows `--output`, `--dry-run`, `--diff` flags.
 - [x] **T-020** — Dropped codecov entirely (no meaningful threshold on a codegen project whose logic is exercised through generated fixtures). ADR-004 updated.
 
+## Phase 5 — Real-world schema shakedown (emerged 2026-04-19)
+
+Landing [`examples/`](examples/) made one pre-release-review item
+concrete: the ADR-005 validation-tier schemas (DigitalOcean, GitHub)
+currently abort at code emission because the generator uses raw
+OpenAPI component names as PHP class identifiers. The release-path
+question — "is this a v0.1 blocker or a post-v0.1 follow-up?" — is
+explicitly open; this phase sits above "v0.1 exit criteria" so its
+scheduling decision is taken before the tag is cut.
+
+- [x] **T-024** — `examples/` folder with petstore (passing) plus digitalocean and github (expected-failure), and a `just check-examples` recipe that reports drift and stale markers.
+- [ ] **T-023** — Pluggable OpenAPI → PHP name-normalisation strategies. Unblocks the DO and GitHub examples' golden trees. *Re-sequence into the post-v0.1 list if the validation-tier schemas do not gate 0.1.0.*
+
 ## v0.1 exit criteria
 
 All of the above checked, plus:
