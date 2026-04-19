@@ -597,7 +597,7 @@ stage = "unstable"
 
 [features."paogen CLI".scenarios."generate emits no PHP deprecation notices on 8.4".traces]
 "bin/paogen" = "sha256:7fdb709135b09899454234d841ebda1362332590594eb3aafb60c422699f3f8b"
-"composer.json" = "sha256:2860f5a6adc855a35b6b53b882a8e3d577720f8e6218bdc6cde262bdf58ff260"
+"composer.json" = "sha256:87eadb14772bc7a430cd1e89bd4323e86cbb405c96b0ddddd54e13e01128ae14"
 "patches/cebe-php-openapi-php84-nullable.patch" = "sha256:546a20354216cd010e70c70f14b8e80f50861675f99a2aa774b14dc843759bb5"
 "src/Cli.php" = "sha256:828faa3dfd498e81608da72bbaf8297b9354b401e6ca46b6ae7f1b7ab8513ee3"
 
