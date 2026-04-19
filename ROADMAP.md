@@ -25,7 +25,7 @@ Land 004 first; 010 is the first in-tree consumer.
 All P1-high, all independent, each closes a `mixed`-fallback branch in
 `TypeResolver::resolve()`. Land one at a time, smallest surface first.
 
-- [ ] **T-009** — Emit OpenAPI enums as PHP 8.1 backed enums.
+- [x] **T-009** — Emit OpenAPI enums as PHP 8.1 backed enums.
 - [ ] **T-013** — Emit inline nested object schemas as typed maps or synthesized `Generated/Model/*` classes.
 - [ ] **T-008** — Emit typed PHP for `oneOf` / `anyOf` / `allOf` composition.
 

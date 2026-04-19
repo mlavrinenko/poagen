@@ -16,8 +16,10 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
+use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 
 /**
  * Orchestrates a single generation run: schema + profile + bindings → files.
@@ -27,6 +29,7 @@ final readonly class Generator
     public function __construct(
         private AttributeScanner $scanner,
         private ModelEmitter $modelEmitter = new ModelEmitter(),
+        private EnumEmitter $enumEmitter = new EnumEmitter(),
     ) {}
 
     public function generate(Profile $profile): void
@@ -39,18 +42,71 @@ final readonly class Generator
 
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';
+        $enumNamespace = $rootNamespace . '\\Enum';
         $rootDir = rtrim($profile->output, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . 'Generated';
         $modelDir = $rootDir . \DIRECTORY_SEPARATOR . 'Model';
+        $enumDir = $rootDir . \DIRECTORY_SEPARATOR . 'Enum';
 
         $this->ensureDir($modelDir);
+
+        $enums = new EnumCatalog($enumNamespace);
+        $this->collectComponentEnums($openApi, $enums);
 
         /** @var array<string,true> $emitted */
         $emitted = [];
 
-        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $emitted);
-        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $emitted);
+        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $enums, $emitted);
+        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $enums, $emitted);
+        $this->emitEnums($enums, $enumDir, $emitted);
 
         $this->pruneStale($rootDir, $emitted);
+    }
+
+    private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums): void
+    {
+        $components = $openApi->components;
+
+        if ($components === null) {
+            return;
+        }
+
+        /** @var array<string,Schema|Reference> $schemas */
+        $schemas = $components->schemas ?? [];
+
+        foreach ($schemas as $name => $schema) {
+            if (!$schema instanceof Schema) {
+                continue;
+            }
+
+            $spec = EnumCatalog::specFromSchema($name, $schema);
+
+            if (!$spec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
+                continue;
+            }
+
+            $enums->registerComponent($name, $spec);
+        }
+    }
+
+    /**
+     * @param array<string,true> $emitted
+     */
+    private function emitEnums(EnumCatalog $enums, string $enumDir, array &$emitted): void
+    {
+        $specs = $enums->all();
+
+        if ($specs === []) {
+            return;
+        }
+
+        $this->ensureDir($enumDir);
+
+        foreach ($specs as $spec) {
+            $code = $this->enumEmitter->emit($enums->enumNamespace, $spec);
+            $path = $enumDir . \DIRECTORY_SEPARATOR . $spec->name . '.php';
+            file_put_contents($path, $code);
+            $emitted[$path] = true;
+        }
     }
 
     /**
@@ -63,6 +119,7 @@ final readonly class Generator
         string $modelDir,
         array $renames,
         Bindings $bindings,
+        EnumCatalog $enums,
         array &$emitted,
     ): void {
         $components = $openApi->components;
@@ -88,7 +145,7 @@ final readonly class Generator
             }
 
             $className = $renames[$rawName] ?? $rawName;
-            $code = $this->modelEmitter->emit($modelNamespace, $className, $schema, $bindings);
+            $code = $this->modelEmitter->emit($modelNamespace, $className, $schema, $bindings, $enums);
 
             $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
             file_put_contents($path, $code);
@@ -105,13 +162,14 @@ final readonly class Generator
         string $rootDir,
         string $modelNamespace,
         Bindings $bindings,
+        EnumCatalog $enums,
         array &$emitted,
     ): void {
         if ($openApi->paths === null) {
             return;
         }
 
-        $emitter = new ClientEmitter(new OperationEmitter($modelNamespace));
+        $emitter = new ClientEmitter(new OperationEmitter($modelNamespace, $enums));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 
         $path = $rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php';

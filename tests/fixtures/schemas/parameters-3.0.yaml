@@ -121,4 +121,10 @@ components:
         id:
           type: integer
         status:
-          type: string
+          $ref: '#/components/schemas/Status'
+    Status:
+      type: string
+      enum:
+        - placed
+        - approved
+        - delivered

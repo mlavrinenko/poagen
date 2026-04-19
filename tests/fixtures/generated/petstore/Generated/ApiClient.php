@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated;
 
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\User;
@@ -50,11 +51,11 @@ final readonly class ApiClient
     /**
      * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet>
      */
-    public function findPetsByStatus(string $status): array
+    public function findPetsByStatus(FindPetsByStatusStatus $status): array
     {
         $path = '/pet/findByStatus';
         $query = [];
-        $query[] = 'status=' . \urlencode($status);
+        $query[] = 'status=' . \urlencode($status->value);
         $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
@@ -318,6 +319,15 @@ final readonly class ApiClient
                     ));
                 }
                 $args[$phpName] = new \DateTimeImmutable($value);
+                continue;
+            }
+
+            if ($kind === 'enum' && $itemType !== null) {
+                if ($value === null || $value instanceof $itemType) {
+                    $args[$phpName] = $value;
+                    continue;
+                }
+                $args[$phpName] = $itemType::from($value);
                 continue;
             }
 

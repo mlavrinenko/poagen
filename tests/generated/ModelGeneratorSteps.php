@@ -568,4 +568,39 @@ final class ModelGeneratorSteps
         TestCase::assertStringNotContainsString('"value"', $this->orderEncoded);
     }
 
+
+    public function givenSchemaDeclaresANamedComponentStatusWithTypeStringAndEnum(string $enum): void
+    {
+        TestCase::assertSame('[placed, approved, delivered]', $enum);
+
+        // The parameters fixture declares `#/components/schemas/Status` with
+        // exactly those values, and its `Order` model $ref's it.
+        $this->profile = $this->loadProfile('parameters');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenAFileGeneratedEnumStatusPhpIsWritten(): void
+    {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Enum/Status.php');
+    }
+
+
+    public function thenTheEmittedEnumIsEnumStatusStringWithOnePascalCasedCasePerDeclaredValue(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Enum/Status.php');
+        TestCase::assertStringContainsString('enum Status: string', $source);
+        TestCase::assertStringContainsString("case Placed = 'placed';", $source);
+        TestCase::assertStringContainsString("case Approved = 'approved';", $source);
+        TestCase::assertStringContainsString("case Delivered = 'delivered';", $source);
+    }
+
+
+    public function thenModelThatReferencesComponentsSchemasStatusIsTypedWithTheEnumNotString(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
+        TestCase::assertStringContainsString('public ?Status $status', $source);
+        TestCase::assertStringNotContainsString('public ?string $status', $source);
+    }
+
 }

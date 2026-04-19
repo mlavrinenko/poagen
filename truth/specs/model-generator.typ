@@ -10,6 +10,7 @@
   "Model Generator",
   traces: (
     "src/Generator/Emit/ModelEmitter.php",
+    "src/Generator/Emit/PropertyShape.php",
     "src/Generator/Emit/TypeResolver.php",
   ),
   description: [
@@ -64,13 +65,19 @@
 
     #scenario(
       "A schema with enum values becomes a PHP 8.1 backed enum",
-      stage: draft,
+      stage: unstable,
+      traces: (
+        "src/Generator/Enum/EnumCatalog.php",
+        "src/Generator/Enum/EnumSpec.php",
+        "src/Generator/Emit/EnumEmitter.php",
+        "src/Generator/Generator.php",
+      ),
     )[
-      #given[#the(Schema) declares a named component `Status` with `type: string` and #p((enum: "[available, pending, sold]"))]
+      #given[#the(Schema) declares a named component `Status` with `type: string` and #p((enum: "[placed, approved, delivered]"))]
       #when[#the(Generator) runs against #the(Profile)]
       #then[a file `Generated/Enum/Status.php` is written]
-      #and_[the emitted enum is `enum Status: string` with one case per declared value]
-      #and_[operations and Models that reference `#/components/schemas/Status` are typed with the enum, not `string`]
+      #and_[the emitted enum is `enum Status: string` with one PascalCased case per declared value]
+      #and_[#a(Model) that references `#/components/schemas/Status` is typed with the enum, not `string`]
     ]
   ]
 

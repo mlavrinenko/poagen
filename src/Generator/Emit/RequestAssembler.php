@@ -163,12 +163,15 @@ final readonly class RequestAssembler
     /**
      * Build the smallest expression that produces a `string` for use in the
      * URL: avoid the `(string)` cast when the parameter is already typed as
-     * `string` so PHPStan doesn't flag a useless cast on the generated
-     * client. When the parameter is a built-in scalar format (e.g.
-     * `date-time` → `\DateTimeImmutable`), serialise via `format()` instead.
+     * `string`; route through `format()` for built-in datetime scalar
+     * formats; unwrap backed enums via `->value`.
      */
     private function stringExpr(string $varName, ?Schema $schema, Bindings $bindings): Literal
     {
+        if ($schema instanceof Schema && $this->isEnumSchema($schema)) {
+            return new Literal('$' . $varName . '->value');
+        }
+
         if ($schema instanceof Schema && \is_string($schema->format)) {
             $scalarFormat = $bindings->scalarFormat($schema->format);
 
@@ -191,5 +194,14 @@ final readonly class RequestAssembler
         return $alreadyString
             ? new Literal('$' . $varName)
             : new Literal('(string) $' . $varName);
+    }
+
+    private function isEnumSchema(Schema $schema): bool
+    {
+        if (\is_array($schema->enum) && $schema->enum !== []) {
+            return \in_array($schema->type, ['string', 'integer'], true);
+        }
+
+        return false;
     }
 }

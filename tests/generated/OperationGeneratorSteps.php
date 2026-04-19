@@ -173,29 +173,9 @@ final class OperationGeneratorSteps
         TestCase::assertSame('placed', $this->orderResult->status);
     }
 
-    public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterParam(
-        string $op,
-        string $id,
-        string $param,
-    ): void {
-        TestCase::assertSame('GET /pet/findByStatus', $op);
-        TestCase::assertSame('operationId: findPetsByStatus', $id);
-        TestCase::assertSame('status: string', $param);
-
-        $this->profile = $this->loadProfile('petstore');
-    }
-
-    public function thenTheEmittedClientHasAMethodWithSignatureFindPetsByStatusStringStatusArray(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function findPetsByStatus(string $status): array',
-            $this->source,
-        );
-    }
-
     public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery(string $arg, string $query): void
     {
-        TestCase::assertSame("status: 'available'", $arg);
+        TestCase::assertSame('status: FindPetsByStatusStatus::Available', $arg);
         TestCase::assertSame('?status=available', $query);
 
         $factory = new Psr17Factory();
@@ -210,7 +190,9 @@ final class OperationGeneratorSteps
             baseUri: 'https://petstore.example/api/v3',
         );
 
-        $client->findPetsByStatus('available');
+        $client->findPetsByStatus(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus::Available,
+        );
 
         TestCase::assertNotNull($http->lastRequest);
         TestCase::assertStringEndsWith($query, (string) $http->lastRequest->getUri());
@@ -581,6 +563,40 @@ final class OperationGeneratorSteps
     public function thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef(
     ): void {
         TestCase::assertStringContainsString('public function getPetById(', $this->source);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterStatusWhoseSchemaIsTypeStringWithEnum(
+        string $op,
+        string $id,
+        string $enum,
+    ): void {
+        TestCase::assertSame('GET /pet/findByStatus', $op);
+        TestCase::assertSame('operationId: findPetsByStatus', $id);
+        TestCase::assertSame('[available, pending, sold]', $enum);
+
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+        $this->source = (string) file_get_contents($this->outputDir . '/Generated/ApiClient.php');
+    }
+
+
+    public function thenAFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray(
+    ): void {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php');
+
+        $enumSource = (string) file_get_contents(
+            $this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php',
+        );
+        TestCase::assertStringContainsString('enum FindPetsByStatusStatus: string', $enumSource);
+        TestCase::assertStringContainsString("case Available = 'available';", $enumSource);
+        TestCase::assertStringContainsString("case Pending = 'pending';", $enumSource);
+        TestCase::assertStringContainsString("case Sold = 'sold';", $enumSource);
+
+        TestCase::assertStringContainsString(
+            'public function findPetsByStatus(FindPetsByStatusStatus $status): array',
+            $this->source,
+        );
     }
 
 }

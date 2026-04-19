@@ -141,26 +141,26 @@ final class OperationGeneratorTest extends TestCase
     /**
      * Rule: Query parameters
      *
-     * Scenario: Query parameters become typed method parameters and are attached as a query string
+     * Scenario: An inline enum query parameter becomes a synthesised backed enum method argument
      * @source truth/specs/operation-generator.typ:102
      *
-     * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status: string
+     * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status whose schema is type: string with [available, pending, sold]
      * When Generator runs against Profile
-     * Then the emitted Client has a method with signature findPetsByStatus(string $status): array
-     *   And calling it with status: 'available' sends a request whose URI ends with ?status=available
+     * Then a file Generated/Enum/FindPetsByStatusStatus.php is written and the emitted Client has a method findPetsByStatus(FindPetsByStatusStatus $status): array
+     *   And calling it with status: FindPetsByStatusStatus::Available sends a request whose URI ends with ?status=available
      */
-    public function testQueryParametersBecomeTypedMethodParametersAndAreAttachedAsAQueryString(): void
+    public function testAnInlineEnumQueryParameterBecomesASynthesisedBackedEnumMethodArgument(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterParam('GET /pet/findByStatus', 'operationId: findPetsByStatus', 'status: string');
+        $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterStatusWhoseSchemaIsTypeStringWithEnum('GET /pet/findByStatus', 'operationId: findPetsByStatus', '[available, pending, sold]');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodWithSignatureFindPetsByStatusStringStatusArray();
-        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery('status: \'available\'', '?status=available');
+        $this->steps->thenAFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray();
+        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery('status: FindPetsByStatusStatus::Available', '?status=available');
     }
 
 
     /**
      * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
-     * @source truth/specs/operation-generator.typ:112
+     * @source truth/specs/operation-generator.typ:116
      *
      * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
      * When Generator runs against Profile
@@ -180,7 +180,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Header parameters
      *
      * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
-     * @source truth/specs/operation-generator.typ:124
+     * @source truth/specs/operation-generator.typ:128
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
@@ -200,7 +200,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Reference resolution and path-level parameters
      *
      * Scenario: An operation-level `$ref` to a component parameter is resolved to a typed method argument
-     * @source truth/specs/operation-generator.typ:136
+     * @source truth/specs/operation-generator.typ:140
      *
      * Given Schema declares #/components/parameters/Limit limit: integer, in: query, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/Limit
@@ -220,7 +220,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation-level `$ref` to a header component parameter becomes an optional typed header argument
-     * @source truth/specs/operation-generator.typ:147
+     * @source truth/specs/operation-generator.typ:151
      *
      * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
@@ -240,7 +240,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A `$ref` to a component requestBody is resolved to the expected Model body parameter
-     * @source truth/specs/operation-generator.typ:158
+     * @source truth/specs/operation-generator.typ:162
      *
      * Given Schema declares #/components/requestBodies/CreateOrder with application/json schema #/components/schemas/Order
      *   And Operation POST /order with operationId: placeOrder whose requestBody is a #/components/requestBodies/CreateOrder
@@ -260,7 +260,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A PathItem-level inline parameter is inherited by every operation under that path
-     * @source truth/specs/operation-generator.typ:170
+     * @source truth/specs/operation-generator.typ:174
      *
      * Given Schema declares a PathItem /store/{storeId}/items with a single PathItem-level parameter storeId: integer, in: path, required: true
      *   And two operations under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
@@ -280,7 +280,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
-     * @source truth/specs/operation-generator.typ:181
+     * @source truth/specs/operation-generator.typ:185
      *
      * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
      *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
@@ -302,7 +302,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.typ:194
+     * @source truth/specs/operation-generator.typ:198
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client

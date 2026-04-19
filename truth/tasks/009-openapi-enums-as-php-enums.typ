@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Emit OpenAPI enums as PHP 8.1 backed enums",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: done,
+  date: datetime(year: 2026, month: 4, day: 19),
   priority: "high",
   spec: "truth/specs/model-generator.typ",
 )
@@ -56,3 +56,30 @@ high-value.
   golden output committed.
 - `just check` green end-to-end, including PHPStan max on the
   generated enum.
+
+== Implementation notes
+
+- New subpackage `src/Generator/Enum/` hosts the catalog + spec;
+  `src/Generator/Emit/EnumEmitter.php` renders one backed-enum file
+  via Nette's PhpGenerator. The existing `Generated/Model/` layout
+  is extended with `Generated/Enum/` alongside it.
+- Case names are PascalCased (`available` → `Available`); rejected
+  alternatives were `UPPER_SNAKE` (noisier) and raw-value-as-case
+  (breaks on non-identifier values). Collisions within a single
+  enum fall back to a positional suffix.
+- Inline enums on operation parameters are synthesised:
+  `<PascalCase(operationId)><PascalCase(paramName)>`
+  (e.g. `FindPetsByStatusStatus`). The call site uses
+  `$status->value` when building the query string.
+- Inline enums on *model properties* (Petstore's `Pet.status`,
+  `Order.status`) are intentionally left as `?string` — promoting
+  them would change the Petstore golden surface beyond this task's
+  scope. Promote in a follow-up if the need arises.
+- Named enum components (tested via a new `Status` component on the
+  `parameters` fixture) become `Generated/Enum/Status.php` and are
+  referenced via a typed `?Status` property whose PROPERTY_MAP shape
+  is `['enum', Status::class]`. `ApiClient::hydrate` gains a branch
+  that calls `Status::from($value)`.
+- Non-ScalarBinding user `#[BindsFormat]` VOs still beat the
+  built-in enum resolution when the component $ref is present —
+  consistency with ADR-003's user-wins lookup order.

@@ -14,6 +14,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 
 /**
  * Maps an OpenAPI Schema/Reference to a PHP type plus optional PHPDoc.
@@ -27,10 +28,22 @@ final readonly class TypeResolver
         public bool $nullable,
     ) {}
 
-    public static function resolve(Schema|Reference $node, Bindings $bindings, string $modelNamespace): self
-    {
+    public static function resolve(
+        Schema|Reference $node,
+        Bindings $bindings,
+        string $modelNamespace,
+        ?EnumCatalog $enums = null,
+    ): self {
         if ($node instanceof Reference) {
             $component = self::componentNameFromRef($node->getReference());
+
+            if ($enums instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumCatalog && $enums->isEnumComponent($component)) {
+                $fqcn = $enums->componentFqcn($component);
+                \assert(\is_string($fqcn));
+
+                return new self($fqcn, null, null, false);
+            }
+
             $fqcn = '\\' . trim($modelNamespace, '\\') . '\\' . $component;
 
             return new self($fqcn, null, null, false);
@@ -59,14 +72,18 @@ final readonly class TypeResolver
             'integer' => new self('int', null, null, $nullable),
             'number' => new self('float', null, null, $nullable),
             'boolean' => new self('bool', null, null, $nullable),
-            'array' => self::resolveArray($node, $bindings, $modelNamespace),
+            'array' => self::resolveArray($node, $bindings, $modelNamespace, $enums),
             'object' => new self('array', 'array<string,mixed>', null, $nullable),
             default => new self(null, 'mixed', null, $nullable),
         };
     }
 
-    private static function resolveArray(Schema $node, Bindings $bindings, string $modelNamespace): self
-    {
+    private static function resolveArray(
+        Schema $node,
+        Bindings $bindings,
+        string $modelNamespace,
+        ?EnumCatalog $enums,
+    ): self {
         /** @var Schema|Reference|null $items */
         $items = $node->items;
 
@@ -74,7 +91,7 @@ final readonly class TypeResolver
             return new self('array', 'list<mixed>', null, (bool) $node->nullable);
         }
 
-        $itemResolved = self::resolve($items, $bindings, $modelNamespace);
+        $itemResolved = self::resolve($items, $bindings, $modelNamespace, $enums);
         $itemType = $itemResolved->phpType ?? 'mixed';
         $docItem = $itemResolved->phpDoc ?? $itemType;
 

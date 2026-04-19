@@ -16,6 +16,7 @@ use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
@@ -37,6 +38,7 @@ final readonly class OperationEmitter
 {
     public function __construct(
         private string $modelNamespace,
+        private ?EnumCatalog $enums = null,
         private RequestAssembler $requestAssembler = new RequestAssembler(),
         private ResponseHandler $responseHandler = new ResponseHandler(),
     ) {}
@@ -77,15 +79,15 @@ final readonly class OperationEmitter
 
         $method = $class->addMethod($operationId)->setPublic();
 
-        $this->addPathParams($method, $pathParams, $bindings);
-        $this->addQueryParams($method, $requiredQuery, $bindings, required: true);
+        $this->addPathParams($method, $namespace, $pathParams, $bindings, $operationId);
+        $this->addQueryParams($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $operationId);
 
         if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
             $this->addBodyParam($method, $namespace, $body);
         }
 
-        $this->addQueryParams($method, $optionalQuery, $bindings, required: false);
-        $this->addHeaderParams($method, $headerParams, $bindings);
+        $this->addQueryParams($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $operationId);
+        $this->addHeaderParams($method, $namespace, $headerParams, $bindings, $operationId);
 
         $this->applyReturnType($method, $namespace, $return);
         $this->requestAssembler->emitRequest(
@@ -106,10 +108,11 @@ final readonly class OperationEmitter
     /**
      * @param list<Parameter> $params
      */
-    private function addPathParams(Method $method, array $params, Bindings $bindings): void
+    private function addPathParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
     {
         foreach ($params as $param) {
-            $resolved = TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace);
+            $resolved = $this->resolveParamType($param, $bindings, $operationId);
+            $this->importParamType($namespace, $resolved);
             $phpParam = $method->addParameter($param->name);
 
             if ($resolved->phpType !== null) {
@@ -121,10 +124,11 @@ final readonly class OperationEmitter
     /**
      * @param list<Parameter> $params
      */
-    private function addQueryParams(Method $method, array $params, Bindings $bindings, bool $required): void
+    private function addQueryParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, bool $required, string $operationId): void
     {
         foreach ($params as $param) {
-            $resolved = TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace);
+            $resolved = $this->resolveParamType($param, $bindings, $operationId);
+            $this->importParamType($namespace, $resolved);
             $phpParam = $method->addParameter($param->name);
 
             if ($resolved->phpType !== null) {
@@ -144,10 +148,11 @@ final readonly class OperationEmitter
     /**
      * @param list<Parameter> $params
      */
-    private function addHeaderParams(Method $method, array $params, Bindings $bindings): void
+    private function addHeaderParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
     {
         foreach ($params as $param) {
-            $resolved = TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace);
+            $resolved = $this->resolveParamType($param, $bindings, $operationId);
+            $this->importParamType($namespace, $resolved);
             $phpParam = $method->addParameter($param->name);
 
             if ($resolved->phpType !== null) {
@@ -156,6 +161,50 @@ final readonly class OperationEmitter
 
             $phpParam->setNullable()->setDefaultValue(null);
         }
+    }
+
+    private function importParamType(PhpNamespace $namespace, TypeResolver $resolved): void
+    {
+        $type = $resolved->phpType;
+        if ($type === null || !str_contains($type, '\\')) {
+            return;
+        }
+        $namespace->addUse(ltrim($type, '\\'));
+    }
+
+    /**
+     * Resolve the PHP type for one parameter. If the parameter's schema is
+     * an inline enum, synthesise a backed enum named after the operation +
+     * parameter and use its FQCN as the type.
+     */
+    private function resolveParamType(Parameter $param, Bindings $bindings, string $operationId): TypeResolver
+    {
+        $schema = $param->schema instanceof Schema ? $param->schema : null;
+        $synthFqcn = $this->synthesizeParamEnum($schema, $operationId, $param->name);
+
+        if ($synthFqcn !== null) {
+            return new TypeResolver($synthFqcn, null, null, false);
+        }
+
+        return TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace, $this->enums);
+    }
+
+    private function synthesizeParamEnum(?Schema $schema, string $operationId, string $paramName): ?string
+    {
+        if (!$schema instanceof \cebe\openapi\spec\Schema || !$this->enums instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumCatalog) {
+            return null;
+        }
+
+        $synthName = EnumCatalog::pascalize($operationId) . EnumCatalog::pascalize($paramName);
+        $spec = EnumCatalog::specFromSchema($synthName, $schema);
+
+        if (!$spec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
+            return null;
+        }
+
+        $this->enums->synthesize($synthName, $spec);
+
+        return $this->enums->synthesizedFqcn($synthName);
     }
 
     private function addBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body): void

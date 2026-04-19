@@ -14,9 +14,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Nette\PhpGenerator\ClassType;
-use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
@@ -35,8 +34,13 @@ final readonly class ModelEmitter
         $this->printer = new PsrPrinter();
     }
 
-    public function emit(string $modelNamespace, string $className, Schema $schema, Bindings $bindings): string
-    {
+    public function emit(
+        string $modelNamespace,
+        string $className,
+        Schema $schema,
+        Bindings $bindings,
+        ?EnumCatalog $enums = null,
+    ): string {
         $modelNamespace = trim($modelNamespace, '\\');
 
         $file = new PhpFile();
@@ -70,7 +74,7 @@ final readonly class ModelEmitter
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
             $isRequired = \in_array($propName, $required, true);
-            $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace);
+            $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $enums);
             $isNullable = !$isRequired || $resolved->nullable;
 
             $phpName = $this->phpName($propName);
@@ -79,7 +83,7 @@ final readonly class ModelEmitter
             $propertyMap[] = [
                 'wire' => $propName,
                 'php' => $phpName,
-                'shape' => $this->shapeFor($propSchema, $bindings, $modelNamespace),
+                'shape' => PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $enums),
                 'nullable' => $isNullable,
             ];
         }
@@ -139,7 +143,7 @@ final readonly class ModelEmitter
         $value = [];
 
         foreach ($propertyMap as $entry) {
-            $value[$entry['php']] = [$entry['wire'], $this->shapeLiteral($entry['shape'])];
+            $value[$entry['php']] = [$entry['wire'], PropertyShape::shapeLiteral($entry['shape'])];
         }
 
         $const = $class->addConstant('PROPERTY_MAP', $value)->setPublic()->setType('array');
@@ -151,37 +155,11 @@ final readonly class ModelEmitter
             . ' [\'list\', null] (list<scalar>), [\'list\', \\FQCN::class] (list<Model>),'
             . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO),'
             . ' [\'datetime\', null] (format: date-time → \\DateTimeImmutable),'
-            . ' [\'date\', null] (format: date → \\DateTimeImmutable).',
+            . ' [\'date\', null] (format: date → \\DateTimeImmutable),'
+            . ' [\'enum\', \\FQCN::class] (named enum component → backed enum).',
         );
         $const->addComment('');
         $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>');
-    }
-
-    /**
-     * Convert a shape directive into a value that Nette's PhpGenerator will
-     * render as a constant literal. Model-refs are printed as
-     * `Category::class`; the `Literal` wrapper is what unlocks that.
-     *
-     * @param null|string|array{0:string,1:?string} $shape
-     *
-     * @return null|Literal|array{0:string,1:null|Literal}
-     */
-    private function shapeLiteral(null|string|array $shape): null|Literal|array
-    {
-        if ($shape === null) {
-            return null;
-        }
-
-        if (\is_string($shape)) {
-            return new Literal('\\' . ltrim($shape, '\\') . '::class');
-        }
-
-        [$kind, $itemType] = $shape;
-
-        return [
-            $kind,
-            $itemType === null ? null : new Literal('\\' . ltrim($itemType, '\\') . '::class'),
-        ];
     }
 
     /**
@@ -229,52 +207,6 @@ final readonly class ModelEmitter
             'date' => $base . $op . "format('Y-m-d')",
             default => $base,
         };
-    }
-
-    /**
-     * Describe the runtime shape used by the hydrator + serializer for one
-     * property: null for scalars, a model FQCN for `$ref` targets,
-     * `['list', ?itemFqcn]` for `type: array`, or `['scalar', VO::class]`
-     * for a format bound to a `ScalarBinding` VO (ADR-007). Anything more
-     * exotic (inline nested objects, oneOf/anyOf, maps via
-     * `additionalProperties`) is left as null and handled by follow-up
-     * tasks 008 / 013.
-     *
-     * @return null|string|array{0:string,1:?string}
-     */
-    private function shapeFor(Schema|Reference $schema, Bindings $bindings, string $modelNamespace): null|string|array
-    {
-        if ($schema instanceof Reference) {
-            return $this->fqcnFromRef($schema->getReference(), $modelNamespace);
-        }
-
-        if ($schema->type === 'array') {
-            $items = $schema->items;
-            $item = $items instanceof Reference ? $this->fqcnFromRef($items->getReference(), $modelNamespace) : null;
-
-            return ['list', $item];
-        }
-
-        $format = \is_string($schema->format) ? $bindings->scalarFormat($schema->format) : null;
-
-        if (!$format instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
-            return null;
-        }
-
-        return match ($format->kind) {
-            ScalarFormat::KIND_SCALAR => ['scalar', $format->bindingClass],
-            ScalarFormat::KIND_DATETIME => ['datetime', null],
-            ScalarFormat::KIND_DATE => ['date', null],
-            default => null,
-        };
-    }
-
-    private function fqcnFromRef(string $ref, string $modelNamespace): string
-    {
-        $parts = explode('/', $ref);
-        $component = end($parts);
-
-        return '\\' . trim($modelNamespace, '\\') . '\\' . $component;
     }
 
     private function phpName(string $openApiName): string

@@ -100,13 +100,17 @@
 
   #rule("Query parameters")[
     #scenario(
-      "Query parameters become typed method parameters and are attached as a query string",
+      "An inline enum query parameter becomes a synthesised backed enum method argument",
       stage: unstable,
+      traces: (
+        "src/Generator/Enum/EnumCatalog.php",
+        "src/Generator/Emit/EnumEmitter.php",
+      ),
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByStatus")) with #p((id: "operationId: findPetsByStatus")) and a required query parameter #p((param: "status: string"))]
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByStatus")) with #p((id: "operationId: findPetsByStatus")) and a required query parameter `status` whose schema is `type: string` with #p((enum: "[available, pending, sold]"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method with signature `findPetsByStatus(string $status): array`]
-      #and_[calling it with #p((arg: "status: 'available'")) sends a request whose URI ends with #p((query: "?status=available"))]
+      #then[a file `Generated/Enum/FindPetsByStatusStatus.php` is written and the emitted #the(Client) has a method `findPetsByStatus(FindPetsByStatusStatus $status): array`]
+      #and_[calling it with #p((arg: "status: FindPetsByStatusStatus::Available")) sends a request whose URI ends with #p((query: "?status=available"))]
     ]
 
     #scenario(

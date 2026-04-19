@@ -200,6 +200,15 @@ final readonly class ClientEmitter
                     continue;
                 }
 
+                if ($kind === 'enum' && $itemType !== null) {
+                    if ($value === null || $value instanceof $itemType) {
+                        $args[$phpName] = $value;
+                        continue;
+                    }
+                    $args[$phpName] = $itemType::from($value);
+                    continue;
+                }
+
                 // ['list', null] or ['list', class-string].
                 if (!\is_array($value)) {
                     $args[$phpName] = $value;
