@@ -54,3 +54,12 @@ the world. Tunable by editing `.linecop.yaml`.
   include the regenerated fixtures.
 - We *do not* set a separate phpstan baseline for generated code —
   generated code that fails PHPStan max is a generator bug.
+- *Test coverage is not a v0.1 gate.* codecov was wired with no
+  threshold, which is worse than no coverage report at all: it
+  implied a bar that did not exist. The `codecov.yml` config and the
+  `code-coverage` CI job were removed (task 020). Much of paogen's
+  logic is exercised via generated fixtures under
+  `tests/fixtures/generated/`, so a line-coverage number on `src/`
+  alone would be both noisy and misleading. When the code surface
+  stabilises, a new ADR may re-introduce a coverage threshold
+  alongside mutation testing (also deferred per `ROADMAP.md`).

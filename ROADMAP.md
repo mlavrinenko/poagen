@@ -41,7 +41,7 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 - [x] **T-016** — Silence `cebe/php-openapi` PHP 8.4 deprecation noise (composer-patch or upstream pin). *Decoupled from 3.1 by ADR-008.*
 - [x] **T-022** — Byte-stability integration test against Petstore (runs generator twice; asserts identical output and match against the golden tree).
 - [x] **T-019** — `paogen generate` grows `--output`, `--dry-run`, `--diff` flags.
-- [ ] **T-020** — Enforce a coverage threshold in CI (80% for `src/`) *or* drop codecov entirely. Pick one and update ADR-004.
+- [x] **T-020** — Dropped codecov entirely (no meaningful threshold on a codegen project whose logic is exercised through generated fixtures). ADR-004 updated.
 
 ## v0.1 exit criteria
 

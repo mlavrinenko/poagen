@@ -47,26 +47,9 @@ jobs:
       - uses: "ramsey/composer-install@v3"
       - run: "composer lint:phpstan"
 
-  code-coverage:
-    name: "Code coverage"
-    needs: ["lint", "static-analysis"]
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: "actions/checkout@v4"
-      - uses: "shivammathur/setup-php@v2"
-        with:
-          php-version: "8.4"
-          coverage: "pcov"
-          ini-values: "memory_limit=-1"
-      - uses: "ramsey/composer-install@v3"
-      - run: "composer test:coverage"
-      - uses: "codecov/codecov-action@v5"
-        with:
-          files: "./build/logs/clover.xml"
-
   unit-tests:
     name: "Unit tests"
-    needs: ["code-coverage"]
+    needs: ["lint", "static-analysis"]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

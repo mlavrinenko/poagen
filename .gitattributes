@@ -9,7 +9,6 @@
 /bin/                       export-ignore
 /build/                     export-ignore
 /CHANGELOG.md               export-ignore
-/codecov.yml                export-ignore
 /CODE_OF_CONDUCT.md         export-ignore
 /CONTRIBUTING.md            export-ignore
 /devbox.d/                  export-ignore

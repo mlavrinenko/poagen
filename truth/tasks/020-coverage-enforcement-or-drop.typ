@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Enforce a coverage threshold in CI or drop the codecov pretence",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: done,
+  date: datetime(year: 2026, month: 4, day: 19),
   priority: "normal",
   decision: "truth/decisions/004-quality-gates.typ",
 )
