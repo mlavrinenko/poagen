@@ -4,7 +4,7 @@ This file is the **single source of truth for release-path sequencing**
 until paogen ships its first tagged version. It is *derived* from the
 truth tree (`truth/specs/*.typ`, `truth/decisions/*.typ`,
 `truth/tasks/*.typ`) and the 2026-04-18 pre-release review at
-[`docs/reviews/2026-04-18-pre-release-review.md`](docs/reviews/2026-04-18-pre-release-review.md).
+[`truth/reviews/2026-04-18-pre-release-review.md`](truth/reviews/2026-04-18-pre-release-review.md).
 
 **Scope policy.** v0.1 is the first consumable release, not feature
 parity with mature generators. We ship what makes the existing
@@ -58,6 +58,27 @@ both filed as follow-up tasks the release cut must now sequence.
 - [ ] **T-025** — Parameter-name and operationId normalisation. Today the generator skips ops whose raw param/operationId names aren't valid PHP identifiers (DO's `Content-Type` header, `monitoring_get_*.yml`). Needed for DO and GitHub to expose every op they declare.
 - [ ] **T-026** — Named scalar + top-level composition components resolve to real PHP types. The `examples/digitalocean/generated` tree references classes like `\Model\Urn` that are never emitted because the component is `type: string`; downstream PHPStan flags the dangling refs. Same with `oneOf`-only top-level components (`floating_ip_create`). Needed for the examples to be PHPStan-clean under `phpstan-generated.neon`.
 
+## Phase 6 — Clean model output (emerged 2026-04-20)
+
+A 2026-04-20 design review with the project owner concluded the
+current Model output (`PROPERTY_MAP` const + `JsonSerializable`) is
+*ugly* and must be replaced before v0.1 ships. ADR-010 supersedes
+ADR-007's representation choice: phpdoc becomes authoritative for
+structural types, attributes carry non-structural metadata, and a
+new runtime `Marshaller`/`Hydrator` drives (de)serialisation via
+`phpstan/phpdoc-parser`. Runtime performance is explicitly
+deprioritised — see ADR-010 "Scope + priority policy".
+
+- [ ] **T-027** — Audit `truth/specs/**` and `truth/decisions/**` for
+  performance-flavoured passages superseded by ADR-010; revise
+  wording. Supersede-mark ADR-007's representation section. No code
+  changes.
+- [ ] **T-028** — Implement ADR-010 end-to-end: runtime attribute
+  classes, `Marshaller`, `Hydrator`, ModelEmitter rewrite,
+  ClientEmitter rewrite, `phpstan/phpdoc-parser` added to runtime
+  composer require, golden trees regenerated, specs updated.
+  Prereq: T-027.
+
 ## v0.1 exit criteria
 
 All of the above checked, plus:
@@ -65,7 +86,7 @@ All of the above checked, plus:
 - [ ] `just check` green on PHP 8.4 with **zero** deprecation notices.
 - [ ] Petstore golden fixture regenerated and committed after every scope change above.
 - [ ] `speconaut status` shows **no** pending tasks listed in this document.
-- [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `docs/design/openapi-3.1-gap.md` and ADR-008.
+- [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `truth/notes/openapi-3.1-gap.md` and ADR-008.
 - [ ] `CHANGELOG.md` gains a `0.1.0` section.
 - [ ] `composer.json` stability flipped to `stable`.
 
@@ -77,7 +98,7 @@ v0.1's critical path.
 
 - **OpenAPI 3.1 support** — ADR-008 (`accepted`) defers the decision;
   the three options (swap parser, write 3.1→3.0 shim, fork) are
-  catalogued at [`docs/design/openapi-3.1-gap.md`](docs/design/openapi-3.1-gap.md).
+  catalogued at [`truth/notes/openapi-3.1-gap.md`](truth/notes/openapi-3.1-gap.md).
   When revisited, produce a prototype task, supersede ADR-008, then
   remove the README limitation note.
 - **Mutation testing** — task 021 was retired as `done` without

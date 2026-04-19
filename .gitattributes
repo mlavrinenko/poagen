@@ -14,7 +14,6 @@
 /devbox.d/                  export-ignore
 /devbox.json                export-ignore
 /devbox.lock                export-ignore
-/docs/                      export-ignore
 /Justfile                   export-ignore
 /phpstan.neon.dist          export-ignore
 /phpunit.xml.dist           export-ignore

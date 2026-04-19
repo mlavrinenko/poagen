@@ -53,3 +53,17 @@
 #include "decisions/008-openapi-31-strategy.typ"
 #pagebreak()
 #include "decisions/009-error-response-policy.typ"
+#pagebreak()
+#include "decisions/010-attribute-and-phpdoc-driven-serialization.typ"
+
+// --- Supplementary artefacts ---
+//
+// Markdown notes and historical reviews stored under truth/ for
+// portability. They are referenced here so speconaut's orphan
+// detector sees them as reachable. See AGENT.md "Where things live".
+
+#pagebreak()
+#text(size: 16pt, weight: "bold", fill: rgb("#0F766E"))[= Supplementary artefacts]
+
+- Design notes: #link("notes/openapi-3.1-gap.md")[notes/openapi-3.1-gap.md], #link("notes/runtime-type-reflection.md")[notes/runtime-type-reflection.md].
+- Review archives: #link("reviews/2026-04-18-pre-release-review.md")[reviews/2026-04-18-pre-release-review.md].

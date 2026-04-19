@@ -10,7 +10,7 @@
 == Context
 
 paogen currently consumes OpenAPI 3.0 via `cebe/php-openapi`. The
-pre-release review (P1 #14) and `docs/design/openapi-3.1-gap.md` both
+pre-release review (P1 #14) and `truth/notes/openapi-3.1-gap.md` both
 flag that most modern real-world schemas (GitHub, Stripe, Kubernetes)
 have moved to 3.1. The 2026-04-18 review also calls out (P2 #15) that
 `cebe/php-openapi` 1.8.0 (May 2025) still emits 8 PHP 8.4 deprecations
@@ -66,7 +66,7 @@ Rationale:
   modern GitHub bundles) can be reached via an external 3.1 → 3.0
   pre-processor (e.g. `redocly bundle --ext`) until in-tree support
   lands. This is documented as a *known limitation* in the README and
-  in `docs/design/openapi-3.1-gap.md`.
+  in `truth/notes/openapi-3.1-gap.md`.
 - The deprecation-noise problem (P2 #15) is decoupled from 3.1 by this
   decision. Task 016 is rescoped to silence the deprecations on the
   current 3.0 parser (composer patch / upstream PR) without picking a
@@ -74,7 +74,7 @@ Rationale:
 
 == Consequences
 
-- Task 015 is withdrawn; `docs/design/openapi-3.1-gap.md` remains as
+- Task 015 is withdrawn; `truth/notes/openapi-3.1-gap.md` remains as
   the canonical tracking note and points at this ADR.
 - Task 016 is rescoped (see its file) to silence cebe's PHP 8.4
   deprecations *only*; it is no longer a vehicle for the 3.1

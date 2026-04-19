@@ -61,7 +61,8 @@ hand-editing.
 | Architectural decisions | `truth/decisions/*.typ` |
 | Domain entities | `truth/domain/*.typ` |
 | Implementation tasks | `truth/tasks/*.typ` (when present) |
-| Long-form notes | `docs/design/*.md` (limitations only — decisions belong in `truth/decisions/`) |
+| Long-form notes | `truth/notes/*.md` (limitations and design-exploration write-ups — decisions belong in `truth/decisions/`) |
+| Review archives | `truth/reviews/*.md` (historical review passes preserved verbatim) |
 | Real-world OpenAPI fixtures | `tests/fixtures/schemas/` |
 | Sample profiles | `tests/fixtures/profiles/` |
 | Golden generated trees | `tests/fixtures/generated/<vendor>/` |
