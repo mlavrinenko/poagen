@@ -194,6 +194,41 @@
     ]
   ]
 
+  #rule("Non-JSON request bodies")[
+    #scenario(
+      "A form-urlencoded body becomes typed params serialised with http_build_query",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/BodySpec.php",
+        "src/Generator/Emit/FormField.php",
+        "src/Generator/Emit/RequestBodyAnalyzer.php",
+        "src/Generator/Emit/RequestBodyParameterEmitter.php",
+        "tests/fixtures/schemas/parameters-3.0.yaml",
+      ),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /token")) with #p((id: "operationId: issueToken")) whose sole request-body content type is `application/x-www-form-urlencoded` and whose schema is `type: object` with #p((props: "grantType: string, clientId: string, scope: string")) and #p((required: "[grantType, clientId]"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `issueToken(string $grantType, string $clientId, ?string $scope = null): void` with one method parameter per declared property]
+      #and_[the method body assembles the request body with `http_build_query([...])` and sends `Content-Type: application/x-www-form-urlencoded`]
+      #and_[calling it through a PSR-18 recording client records a request whose body contains `grantType=password` and `clientId=my-app` pairs]
+    ]
+
+    #scenario(
+      "An unsupported multipart or octet-stream body produces a throwing stub",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/BodySpec.php",
+        "src/Generator/Emit/RequestBodyAnalyzer.php",
+        "src/Generator/Emit/RequestBodyParameterEmitter.php",
+      ),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `uploadFile(int $petId, ?string $additionalMetadata = null)` that is *not* silently skipped]
+      #and_[the method body throws a `\RuntimeException` whose message mentions the operationId and the unsupported content type]
+    ]
+  ]
+
   #rule("Error responses")[
     #scenario(
       "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",

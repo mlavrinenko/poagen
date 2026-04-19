@@ -34,7 +34,7 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 - [x] **ADR-009 confirm** — Accepted: single generic `Generated\ApiException` shape. See `truth/decisions/009-error-response-policy.typ` (status: accepted).
 - [x] **T-012** — Throw typed `ApiException` on non-2xx responses.
 - [x] **T-014** — Surface `securitySchemes` (`apiKey`, `http bearer`) as constructor / method arguments; leave `basic`, `oauth2`, `openIdConnect` as `draft`.
-- [ ] **T-011** — Support `application/x-www-form-urlencoded` request bodies; stub `multipart/form-data` with a throwing placeholder rather than silent skip.
+- [x] **T-011** — Support `application/x-www-form-urlencoded` request bodies; stub `multipart/form-data` with a throwing placeholder rather than silent skip.
 
 ## Phase 4 — Packaging / DX
 

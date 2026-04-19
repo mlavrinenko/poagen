@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Support application/x-www-form-urlencoded and stub multipart/form-data",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 18),
   priority: "high",
   spec: "truth/specs/operation-generator.typ",

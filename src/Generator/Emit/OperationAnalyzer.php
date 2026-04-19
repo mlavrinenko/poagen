@@ -122,47 +122,12 @@ final readonly class OperationAnalyzer
     }
 
     /**
-     * Resolve the `application/json` request body, if any, into a
-     * `BodySpec`. Returns `null` either when the operation has no body or
-     * when the body cannot be expressed as a single `$ref` or a list of
-     * `$ref`s — those operations are skipped.
+     * Resolve a request body into a {@see BodySpec}. See
+     * {@see RequestBodyAnalyzer::resolve()} for the preference order.
      */
     public static function requestBody(RequestBody|Reference|null $body): ?BodySpec
     {
-        if ($body instanceof Reference) {
-            $resolved = $body->resolve();
-            $body = $resolved instanceof RequestBody ? $resolved : null;
-        }
-
-        if (!$body instanceof RequestBody) {
-            return null;
-        }
-
-        $json = $body->content['application/json'] ?? null;
-
-        if (!$json instanceof MediaType) {
-            return null;
-        }
-
-        $schema = $json->schema;
-
-        if ($schema instanceof Reference) {
-            $name = self::componentNameFromRef($schema->getReference());
-
-            return $name === '' ? null : new BodySpec($name, false);
-        }
-
-        if ($schema instanceof Schema && $schema->type === 'array') {
-            $items = $schema->items;
-
-            if ($items instanceof Reference) {
-                $name = self::componentNameFromRef($items->getReference());
-
-                return $name === '' ? null : new BodySpec($name, true);
-            }
-        }
-
-        return null;
+        return RequestBodyAnalyzer::resolve($body);
     }
 
     /**

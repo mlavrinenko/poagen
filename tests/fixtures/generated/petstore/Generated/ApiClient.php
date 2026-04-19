@@ -157,6 +157,17 @@ final readonly class ApiClient
     }
 
     /**
+     * @psalm-return never
+     *
+     * TODO(multipart): see task 011 — unsupported body content type
+     * Body content-type: application/octet-stream
+     */
+    public function uploadFile(int $petId, ?string $additionalMetadata = null): never
+    {
+        throw new \RuntimeException('application/octet-stream not yet supported: operationId \'uploadFile\'');
+    }
+
+    /**
      * @return array<string, int>
      */
     public function getInventory(): array

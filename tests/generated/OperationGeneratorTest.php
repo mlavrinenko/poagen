@@ -299,10 +299,50 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
+     * Rule: Non-JSON request bodies
+     *
+     * Scenario: A form-urlencoded body becomes typed params serialised with http_build_query
+     * @source truth/specs/operation-generator.typ:198
+     *
+     * Given Schema declares Operation POST /token with operationId: issueToken whose sole request-body content type is application/x-www-form-urlencoded and whose schema is type: object with grantType: string, clientId: string, scope: string and [grantType, clientId]
+     * When Generator runs against Profile
+     * Then the emitted Client has a method issueToken(string $grantType, string $clientId, ?string $scope = null): void with one method parameter per declared property
+     *   And the method body assembles the request body with http_build_query([...]) and sends Content-Type: application/x-www-form-urlencoded
+     *   And calling it through a PSR-18 recording client records a request whose body contains grantType=password and clientId=my-app pairs
+     */
+    public function testAFormUrlencodedBodyBecomesTypedParamsSerialisedWithHttpBuildQuery(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseSoleRequestBodyContentTypeIsApplicationXWwwFormUrlencodedAndWhoseSchemaIsTypeObjectWithPropsAndRequired('POST /token', 'operationId: issueToken', 'grantType: string, clientId: string, scope: string', '[grantType, clientId]');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty();
+        $this->steps->thenTheMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded();
+        $this->steps->thenCallingItThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs();
+    }
+
+
+    /**
+     * Scenario: An unsupported multipart or octet-stream body produces a throwing stub
+     * @source truth/specs/operation-generator.typ:216
+     *
+     * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
+     * When Generator runs against Profile
+     * Then the emitted Client has a method uploadFile(int $petId, ?string $additionalMetadata = null) that is not silently skipped
+     *   And the method body throws a \RuntimeException whose message mentions the operationId and the unsupported content type
+     */
+    public function testAnUnsupportedMultipartOrOctetStreamBodyProducesAThrowingStub(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedClientHasAMethodUploadFileIntPetIdStringAdditionalMetadataNullThatIsNotSilentlySkipped();
+        $this->steps->thenTheMethodBodyThrowsARuntimeExceptionWhoseMessageMentionsTheOperationIdAndTheUnsupportedContentType();
+    }
+
+
+    /**
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.typ:198
+     * @source truth/specs/operation-generator.typ:233
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client
@@ -324,7 +364,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Security schemes
      *
      * Scenario: An apiKey header scheme becomes a constructor arg attached as a header on secured ops
-     * @source truth/specs/operation-generator.typ:214
+     * @source truth/specs/operation-generator.typ:249
      *
      * Given Schema declares #/components/securitySchemes/apiKey with type: apiKey, in: header, name: X-API-Key
      *   And a top-level security: [{ apiKey: [] }] makes every operation secured by default
@@ -344,7 +384,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization
-     * @source truth/specs/operation-generator.typ:229
+     * @source truth/specs/operation-generator.typ:264
      *
      * Given Schema declares #/components/securitySchemes/bearerAuth with type: http, scheme: bearer
      *   And an operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
@@ -364,7 +404,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:244
+     * @source truth/specs/operation-generator.typ:279
      *
      * Given Schema declares a scheme with type: http, scheme: basic
      * When Generator runs against Profile
@@ -379,7 +419,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:253
+     * @source truth/specs/operation-generator.typ:288
      *
      * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
      * When Generator runs against Profile

@@ -56,6 +56,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
 
+  /token:
+    post:
+      operationId: issueToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grantType
+                - clientId
+              properties:
+                grantType:
+                  type: string
+                clientId:
+                  type: string
+                scope:
+                  type: string
+      responses:
+        '204':
+          description: ok
+
   /store/{storeId}/items:
     parameters:
       - name: storeId

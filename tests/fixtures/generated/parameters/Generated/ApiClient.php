@@ -119,6 +119,24 @@ final readonly class ApiClient
         }
     }
 
+    public function issueToken(string $grantType, string $clientId, ?string $scope = null): void
+    {
+        $path = '/token';
+        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $__form = [];
+        $__form['grantType'] = $grantType;
+        $__form['clientId'] = $clientId;
+        if ($scope !== null) { $__form['scope'] = $scope; }
+        $request = $request
+            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+            ->withBody($this->streamFactory->createStream(\http_build_query($__form, '', '&', \PHP_QUERY_RFC1738)));
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
+    }
+
     /**
      * Deserialise a JSON-decoded value into an instance of $class.
      *

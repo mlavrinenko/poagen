@@ -20,8 +20,11 @@ use Nette\PhpGenerator\PhpNamespace;
  * Scope:
  *   - parameters may be `path` (required), scalar/array `query`, or
  *     optional scalar `header`;
- *   - request body may be absent or `application/json` whose schema is
- *     either `$ref`-to-Model or `list<$ref>`;
+ *   - request body may be absent, `application/json` (`$ref`-to-Model or
+ *     `list<$ref>`), `application/x-www-form-urlencoded` with declared
+ *     properties, or an unsupported `multipart/form-data` /
+ *     `application/octet-stream` body which is emitted as a throwing stub
+ *     (T-011);
  *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`,
  *     a scalar, or an `additionalProperties` map.
  *
@@ -29,12 +32,16 @@ use Nette\PhpGenerator\PhpNamespace;
  */
 final readonly class OperationEmitter
 {
+    private RequestBodyParameterEmitter $bodyParamEmitter;
+
     public function __construct(
         private string $modelNamespace,
         private ?EnumCatalog $enums = null,
         private RequestAssembler $requestAssembler = new RequestAssembler(),
         private ResponseHandler $responseHandler = new ResponseHandler(),
-    ) {}
+    ) {
+        $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums);
+    }
 
     public function emit(
         ClassType $class,
@@ -77,11 +84,17 @@ final readonly class OperationEmitter
         $this->addQueryParams($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $operationId);
 
         if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
-            $this->addBodyParam($method, $namespace, $body);
+            $this->bodyParamEmitter->addBodyParams($method, $namespace, $body, $bindings);
         }
 
         $this->addQueryParams($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $operationId);
         $this->addHeaderParams($method, $namespace, $headerParams, $bindings, $operationId);
+
+        if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec && $body->kind === BodySpec::KIND_UNSUPPORTED) {
+            $this->bodyParamEmitter->emitUnsupportedStub($method, $body, $operationId);
+
+            return true;
+        }
 
         $this->applyReturnType($method, $namespace, $return);
 
@@ -205,23 +218,6 @@ final readonly class OperationEmitter
         $this->enums->synthesize($synthName, $spec);
 
         return $this->enums->synthesizedFqcn($synthName);
-    }
-
-    private function addBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body): void
-    {
-        $fqcn = '\\' . trim($this->modelNamespace, '\\') . '\\' . $body->model;
-        $namespace->addUse(ltrim($fqcn, '\\'));
-
-        $phpParam = $method->addParameter('body');
-
-        if ($body->isList) {
-            $phpParam->setType('array');
-            $method->addComment('@param list<' . $fqcn . '> $body');
-
-            return;
-        }
-
-        $phpParam->setType($fqcn);
     }
 
     private function applyReturnType(Method $method, PhpNamespace $namespace, ReturnSpec $return): void

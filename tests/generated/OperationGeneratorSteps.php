@@ -768,4 +768,133 @@ final class OperationGeneratorSteps
         TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
     }
 
+
+    public function givenSchemaDeclaresOperationOpWithIdWhoseSoleRequestBodyContentTypeIsApplicationXWwwFormUrlencodedAndWhoseSchemaIsTypeObjectWithPropsAndRequired(
+        string $op,
+        string $id,
+        string $props,
+        string $required,
+    ): void {
+        TestCase::assertSame('POST /token', $op);
+        TestCase::assertSame('operationId: issueToken', $id);
+        TestCase::assertSame('grantType: string, clientId: string, scope: string', $props);
+        TestCase::assertSame('[grantType, clientId]', $required);
+
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty(
+    ): void {
+        TestCase::assertStringContainsString(
+            'public function issueToken(string $grantType, string $clientId, ?string $scope = null): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded(
+    ): void {
+        $body = $this->methodSlice('issueToken');
+        TestCase::assertStringContainsString(
+            "->withHeader('Content-Type', 'application/x-www-form-urlencoded')",
+            $body,
+        );
+        TestCase::assertStringContainsString('\\http_build_query(', $body);
+        TestCase::assertStringContainsString('\\PHP_QUERY_RFC1738', $body);
+    }
+
+
+    public function thenCallingItThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs(
+    ): void {
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(204, [], ''),
+        );
+        $client = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://parameters.example/api/v1',
+            apiKey: 'unused-here',
+            bearerToken: 'unused-here',
+        );
+
+        $client->issueToken(grantType: 'password', clientId: 'my-app');
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame(
+            'application/x-www-form-urlencoded',
+            $http->lastRequest->getHeaderLine('Content-Type'),
+        );
+
+        // Tolerant assertion: `http_build_query` ordering is stable but
+        // key order in the emitted array could shift with future
+        // refactors. Parse the pairs back out and match as a set.
+        $raw = (string) $http->lastRequest->getBody();
+        parse_str($raw, $parsed);
+        TestCase::assertSame('password', $parsed['grantType'] ?? null);
+        TestCase::assertSame('my-app', $parsed['clientId'] ?? null);
+        // Optional field omitted: not in the body at all.
+        TestCase::assertArrayNotHasKey('scope', $parsed);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('POST /pet/{petId}/uploadImage', $op);
+        TestCase::assertSame('operationId: uploadFile', $id);
+
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenTheEmittedClientHasAMethodUploadFileIntPetIdStringAdditionalMetadataNullThatIsNotSilentlySkipped(
+    ): void {
+        // The whole point of T-011: the op is no longer silently dropped.
+        TestCase::assertStringContainsString(
+            'public function uploadFile(int $petId, ?string $additionalMetadata = null):',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodBodyThrowsARuntimeExceptionWhoseMessageMentionsTheOperationIdAndTheUnsupportedContentType(
+    ): void {
+        $body = $this->methodSlice('uploadFile');
+        TestCase::assertStringContainsString('throw new \\RuntimeException(', $body);
+        TestCase::assertStringContainsString('uploadFile', $body);
+        TestCase::assertStringContainsString('application/octet-stream', $body);
+
+        // Round-trip: calling the generated stub raises the expected
+        // RuntimeException rather than executing a (wrong) request.
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{}'),
+        );
+        $client = new ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://petstore.example/api/v3',
+        );
+
+        // Method has `: never` return, so a RuntimeException must fire.
+        $caught = null;
+        try {
+            $client->uploadFile(123);
+        } catch (\RuntimeException $e) {
+            $caught = $e;
+        }
+
+        TestCase::assertInstanceOf(\RuntimeException::class, $caught);
+        TestCase::assertStringContainsString('uploadFile', $caught->getMessage());
+        TestCase::assertStringContainsString('application/octet-stream', $caught->getMessage());
+
+        // Stub must not touch the transport.
+        TestCase::assertNull($http->lastRequest);
+    }
+
 }
