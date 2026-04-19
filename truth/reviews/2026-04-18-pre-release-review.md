@@ -116,7 +116,7 @@ for auth — fine as a philosophy (ADR-002) but the generator should at least re
 headers/parameters out of the schema so they appear as method/constructor arguments.
 
 ### 14. OpenAPI 3.1 gap documented but open
-`docs/design/openapi-3.1-gap.md` is thorough. This is explicitly a known limitation, but it
+`truth/notes/openapi-3.1-gap.md` is thorough. This is explicitly a known limitation, but it
 needs a decision (translator shim vs. parser swap) before most modern schemas are usable.
 
 ---

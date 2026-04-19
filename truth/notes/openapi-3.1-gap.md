@@ -47,7 +47,7 @@ and decouples the generator from whatever replaces it later.
 ## Tracking
 
 The v0.1 release explicitly **defers** OpenAPI 3.1 support — see
-[`truth/decisions/008-openapi-31-strategy.typ`](../../truth/decisions/008-openapi-31-strategy.typ)
+[`truth/decisions/008-openapi-31-strategy.typ`](../decisions/008-openapi-31-strategy.typ)
 (ADR-008, *accepted*). The three paths forward (parser swap, translator
 shim, fork) are catalogued there; this document stays as the user-facing
 "known limitation" note and the option analysis that feeds the
