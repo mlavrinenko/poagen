@@ -206,4 +206,24 @@ final class PaogenCLITest extends TestCase
     {
         $this->markTestIncomplete('Scenario is draft');
     }
+
+
+    /**
+     * Rule: PHP 8.4 deprecation noise
+     *
+     * Scenario: generate emits no PHP deprecation notices on 8.4
+     * @source truth/specs/cli.typ:94
+     *
+     * Given Profile at tests/fixtures/profiles/petstore.php
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php
+     * Then neither stdout nor stderr contains Deprecated:
+     *   And paogen CLI should exit with code 0
+     */
+    public function testGenerateEmitsNoPHPDeprecationNoticesOn84(): void
+    {
+        $this->steps->givenProfileAtPath('tests/fixtures/profiles/petstore.php');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php');
+        $this->steps->thenNeitherStdoutNorStderrContainsNeedle('Deprecated:');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(0);
+    }
 }

@@ -89,4 +89,17 @@
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
   ]
+
+  #rule("PHP 8.4 deprecation noise")[
+    #scenario(
+      "generate emits no PHP deprecation notices on 8.4",
+      stage: unstable,
+      traces: ("patches/cebe-php-openapi-php84-nullable.patch", "composer.json"),
+    )[
+      #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php"))]
+      #then[neither stdout nor stderr contains #p((needle: "Deprecated:"))]
+      #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
+    ]
+  ]
 ]

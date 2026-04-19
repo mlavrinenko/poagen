@@ -99,6 +99,7 @@ final class PaogenCLISteps
 
 
     private string $brokenYamlPath = '';
+    private bool $spawnBinary = false;
 
     public function whenPaogenCLIIsInvokedWithArgumentsArgs(string $args): void
     {
@@ -110,8 +111,15 @@ final class PaogenCLISteps
 
         $parts = preg_split('/\s+/', trim($args));
         \assert(\is_array($parts));
+        $parts = array_values(array_filter($parts, static fn($p) => $p !== ''));
 
-        $this->invokeCli(array_merge(['paogen'], array_values(array_filter($parts, static fn($p) => $p !== ''))));
+        if ($this->spawnBinary) {
+            $this->invokeBinary($parts);
+
+            return;
+        }
+
+        $this->invokeCli(array_merge(['paogen'], $parts));
     }
 
 
@@ -133,6 +141,55 @@ final class PaogenCLISteps
         if ($this->brokenYamlPath !== '' && is_file($this->brokenYamlPath)) {
             unlink($this->brokenYamlPath);
         }
+    }
+
+
+    public function givenProfileAtPath(string $path): void
+    {
+        // Precondition marker. The matching `when` step runs the CLI and
+        // the downstream `then` steps assert on its stdout / stderr /
+        // exit code. For scenarios that assert on the *process-level*
+        // stderr (PHP deprecation notices, which go to the engine's real
+        // stderr, not any in-process captured stream), switch the step
+        // to spawn `bin/paogen` as a subprocess.
+        TestCase::assertFileExists(\dirname(__DIR__, 2) . '/' . $path);
+        $this->spawnBinary = true;
+    }
+
+
+    public function thenNeitherStdoutNorStderrContainsNeedle(string $needle): void
+    {
+        TestCase::assertStringNotContainsString($needle, $this->stdout);
+        TestCase::assertStringNotContainsString($needle, $this->stderr);
+    }
+
+
+    /**
+     * @param list<string> $args
+     */
+    private function invokeBinary(array $args): void
+    {
+        $root = \dirname(__DIR__, 2);
+        $bin = $root . '/bin/paogen';
+        TestCase::assertFileExists($bin);
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $cmd = array_merge([\PHP_BINARY, $bin], $args);
+        $process = proc_open($cmd, $descriptors, $pipes, $root);
+        \assert(\is_resource($process));
+        fclose($pipes[0]);
+
+        $this->stdout = (string) stream_get_contents($pipes[1]);
+        $this->stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        $this->exitCode = proc_close($process);
     }
 
 }
