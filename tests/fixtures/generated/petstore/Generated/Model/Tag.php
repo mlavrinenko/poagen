@@ -12,7 +12,7 @@ final readonly class Tag implements JsonSerializable
      * Paogen marshal/unmarshal contract. See ADR-007.
      *
      * phpName => [wireKey, shape]
-     * shape is one of: null (scalar pass-through), `\FQCN::class` (model ref), ['list', null] (list<scalar>), ['list', \FQCN::class] (list<Model>).
+     * shape is one of: null (scalar pass-through), `\FQCN::class` (model ref), ['list', null] (list<scalar>), ['list', \FQCN::class] (list<Model>), ['scalar', \FQCN::class] (ScalarBinding VO).
      *
      * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>
      */

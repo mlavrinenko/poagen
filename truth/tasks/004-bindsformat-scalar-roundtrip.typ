@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Round-trip BindsFormat scalar value objects on both send and receive",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: done,
+  date: datetime(year: 2026, month: 4, day: 19),
   priority: "critical",
   spec: "truth/specs/model-generator.typ",
   decision: "truth/decisions/007-hydration-serialization.typ",

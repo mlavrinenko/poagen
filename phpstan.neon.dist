@@ -25,7 +25,9 @@ parameters:
     # are produced by speconaut-phpunit, so we can't rewrite them.
     - identifier: staticMethod.dynamicCall
       path: tests/generated/*Test.php
-    # Fixture VOs exist to prove BindsFormat discovery; their fields are
-    # never read in PHP-land.
-    - identifier: shipmonk.deadProperty.neverRead
-      path: tests/fixtures/profiles/value-objects/*.php
+    # ScalarBinding is dispatched by class-string from the generated
+    # hydrator, which lives under tests/fixtures/generated (excluded above).
+    # Shipmonk sees the interface's methods as dead; the round-trip test
+    # step exercises them through the concrete Email fixture.
+    - identifier: shipmonk.deadMethod
+      path: src/Runtime/ScalarBinding.php

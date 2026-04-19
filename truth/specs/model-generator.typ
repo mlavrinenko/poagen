@@ -121,6 +121,21 @@
       #when[the model is emitted]
       #then[the property type in the generated constructor is `\\App\\ValueObject\\Email`, not `string`]
     ]
+
+    #scenario(
+      "A BindsFormat scalar value object round-trips through ScalarBinding",
+      stage: unstable,
+      traces: (
+        "src/Runtime/ScalarBinding.php",
+        "src/Generator/Emit/ClientEmitter.php",
+      ),
+    )[
+      #given[#a(ValueObject) `App\\ValueObject\\Email` is annotated with #p((attr: "#[BindsFormat('email')]")) and implements `ScalarBinding` with a `string $value`]
+      #and_[#a(Model) `Contact` declares a required property `email` with `format: email`]
+      #when[`json_encode($contact)` runs against a `Contact` whose `email` is an `Email('team@example')`]
+      #then[the emitted JSON contains `"email":"team@example"`, not a nested object]
+      #and_[`ApiClient::hydrate(Contact::class, ['email' => 'team@example', ...])` produces a `Contact` whose `email` is an `Email` instance with `$value === 'team@example'`]
+    ]
   ]
 
   #rule("Re-running the generator is byte-stable")[

@@ -63,27 +63,24 @@ final readonly class ModelEmitter
             array_values(array_filter($names, static fn(string $n): bool => !\in_array($n, $required, true))),
         );
 
-        /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}}> $propertyMap */
+        /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap */
         $propertyMap = [];
 
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
             $isRequired = \in_array($propName, $required, true);
+            $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace);
+            $isNullable = !$isRequired || $resolved->nullable;
 
             $phpName = $this->phpName($propName);
-            $shape = $this->shapeFor($propSchema, $modelNamespace);
+            $this->addProperty($namespace, $constructor, $phpName, $resolved, $isNullable);
 
-            $this->addProperty(
-                $namespace,
-                $constructor,
-                $phpName,
-                $propSchema,
-                $isRequired,
-                $bindings,
-                $modelNamespace,
-            );
-
-            $propertyMap[] = ['wire' => $propName, 'php' => $phpName, 'shape' => $shape];
+            $propertyMap[] = [
+                'wire' => $propName,
+                'php' => $phpName,
+                'shape' => $this->shapeFor($propSchema, $bindings, $modelNamespace),
+                'nullable' => $isNullable,
+            ];
         }
 
         $this->emitPropertyMap($class, $propertyMap);
@@ -96,21 +93,14 @@ final readonly class ModelEmitter
         PhpNamespace $namespace,
         \Nette\PhpGenerator\Method $constructor,
         string $phpName,
-        Schema|Reference $propSchema,
-        bool $isRequired,
-        Bindings $bindings,
-        string $modelNamespace,
+        TypeResolver $resolved,
+        bool $isNullable,
     ): void {
-        $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace);
         $type = $resolved->phpType;
-        $isNullable = !$isRequired || $resolved->nullable;
-
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
 
-        $useType = $type;
-
-        if ($useType !== null) {
-            $param->setType($useType);
+        if ($type !== null) {
+            $param->setType($type);
         }
 
         if ($isNullable) {
@@ -127,9 +117,9 @@ final readonly class ModelEmitter
             ));
         }
 
-        // Hint use-statements for fully qualified names so the printed file uses short forms.
-        if ($useType !== null && str_contains($useType, '\\')) {
-            $namespace->addUse(ltrim($useType, '\\'));
+        // Hint use-statements for FQNs so the printed file uses short forms.
+        if ($type !== null && str_contains($type, '\\')) {
+            $namespace->addUse(ltrim($type, '\\'));
         }
 
         if ($resolved->phpDocUse !== null) {
@@ -141,7 +131,7 @@ final readonly class ModelEmitter
      * Emit the `PROPERTY_MAP` class constant that pairs each PHP property
      * name with (a) its original schema key and (b) its runtime shape.
      *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}}> $propertyMap
+     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap
      */
     private function emitPropertyMap(ClassType $class, array $propertyMap): void
     {
@@ -157,7 +147,8 @@ final readonly class ModelEmitter
         $const->addComment('phpName => [wireKey, shape]');
         $const->addComment(
             'shape is one of: null (scalar pass-through), `\\FQCN::class` (model ref),'
-            . ' [\'list\', null] (list<scalar>), [\'list\', \\FQCN::class] (list<Model>).',
+            . ' [\'list\', null] (list<scalar>), [\'list\', \\FQCN::class] (list<Model>),'
+            . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO).',
         );
         $const->addComment('');
         $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>');
@@ -192,9 +183,11 @@ final readonly class ModelEmitter
 
     /**
      * Emit `jsonSerialize()` that renames PHP property names back to their
-     * original schema keys for on-the-wire transmission.
+     * original schema keys for on-the-wire transmission. ScalarBinding VOs
+     * are unwrapped via `toScalar()`; all other values pass through
+     * unchanged.
      *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}}> $propertyMap
+     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap
      */
     private function emitJsonSerialize(ClassType $class, array $propertyMap): void
     {
@@ -207,6 +200,19 @@ final readonly class ModelEmitter
         $method->addBody('return [');
 
         foreach ($propertyMap as $entry) {
+            $shape = $entry['shape'];
+
+            if (\is_array($shape) && $shape[0] === 'scalar') {
+                $op = $entry['nullable'] ? '?->' : '->';
+                $method->addBody(\sprintf(
+                    '    %s => $this->%s%stoScalar(),',
+                    var_export($entry['wire'], true),
+                    $entry['php'],
+                    $op,
+                ));
+                continue;
+            }
+
             $method->addBody(\sprintf(
                 '    %s => $this->%s,',
                 var_export($entry['wire'], true),
@@ -219,14 +225,16 @@ final readonly class ModelEmitter
 
     /**
      * Describe the runtime shape used by the hydrator + serializer for one
-     * property: null for scalars, a model FQCN for `$ref` targets, or
-     * `['list', ?itemFqcn]` for `type: array`. Anything more exotic (inline
-     * nested objects, oneOf/anyOf, maps via `additionalProperties`) is left
-     * as null and handled by follow-up tasks 008 / 013.
+     * property: null for scalars, a model FQCN for `$ref` targets,
+     * `['list', ?itemFqcn]` for `type: array`, or `['scalar', VO::class]`
+     * for a format bound to a `ScalarBinding` VO (ADR-007). Anything more
+     * exotic (inline nested objects, oneOf/anyOf, maps via
+     * `additionalProperties`) is left as null and handled by follow-up
+     * tasks 008 / 013.
      *
      * @return null|string|array{0:string,1:?string}
      */
-    private function shapeFor(Schema|Reference $schema, string $modelNamespace): null|string|array
+    private function shapeFor(Schema|Reference $schema, Bindings $bindings, string $modelNamespace): null|string|array
     {
         if ($schema instanceof Reference) {
             return $this->fqcnFromRef($schema->getReference(), $modelNamespace);
@@ -241,6 +249,16 @@ final readonly class ModelEmitter
             }
 
             return ['list', null];
+        }
+
+        $format = \is_string($schema->format) ? $schema->format : null;
+
+        if ($format !== null) {
+            $bound = $bindings->scalarBindingType($format);
+
+            if ($bound !== null) {
+                return ['scalar', $bound];
+            }
         }
 
         return null;

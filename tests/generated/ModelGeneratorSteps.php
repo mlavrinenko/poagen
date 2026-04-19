@@ -391,13 +391,13 @@ final class ModelGeneratorSteps
     public function whenTheGeneratorEmitsContactPhpAndApiClientHydrateRunsAgainstAPayloadContainingTheWireKeyDisplayName(
     ): void {
         // Hydration uses the (class-agnostic) hydrator in petstore's ApiClient.
-        // The hydrator reads Contact::PROPERTY_MAP and instantiates Contact.
-        // Email is a BindsFormat scalar VO (task 004); the current hydrator
-        // passes a string through as-is, so we pass a pre-built Email here.
+        // The hydrator reads Contact::PROPERTY_MAP and instantiates Contact;
+        // Email is a ScalarBinding VO (ADR-007) so the wire value is a bare
+        // string — the hydrator wraps it via `Email::fromScalar()`.
         $this->hydratedContact = $this->invokeHydrate(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
             [
-                'email' => new \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email('team@example'),
+                'email' => 'team@example',
                 'display-name' => 'Team',
                 'nickname' => 'teamy',
                 'org_id' => 42,
@@ -434,6 +434,65 @@ final class ModelGeneratorSteps
         $encoded = (string) json_encode($this->hydratedContact);
         TestCase::assertStringContainsString('"display-name":"Team"', $encoded);
         TestCase::assertStringNotContainsString('"displayName"', $encoded);
+    }
+
+
+    private string $scalarEncoded = '';
+
+
+    public function givenValueObjectAppValueObjectEmailIsAnnotatedWithAttrAndImplementsScalarBindingWithAStringValue(
+        string $attr,
+    ): void {
+        // Exercise the interface at the VO level so a regression that drops
+        // `implements ScalarBinding` from the fixture is caught here as well
+        // as by phpstan's static check.
+        $vo = \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email::fromScalar('probe@example');
+        TestCase::assertInstanceOf(\Mlavrinenko\Paogen\Runtime\ScalarBinding::class, $vo);
+        TestCase::assertSame('probe@example', $vo->toScalar());
+    }
+
+
+    public function givenModelContactDeclaresARequiredPropertyEmailWithFormatEmail(): void
+    {
+        $this->profile = $this->loadProfile('contact');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function whenJsonEncodeContactRunsAgainstAContactWhoseEmailIsAnEmailTeamExample(): void
+    {
+        $contact = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact(
+            displayName: 'Team',
+            email: new \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email('team@example'),
+        );
+
+        $this->scalarEncoded = (string) json_encode($contact);
+
+        $this->hydratedContact = $this->invokeHydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
+            [
+                'email' => 'team@example',
+                'display-name' => 'Team',
+            ],
+        );
+    }
+
+
+    public function thenTheEmittedJSONContainsEmailTeamExampleNotANestedObject(): void
+    {
+        TestCase::assertStringContainsString('"email":"team@example"', $this->scalarEncoded);
+        TestCase::assertStringNotContainsString('"value"', $this->scalarEncoded);
+    }
+
+
+    public function thenApiclientHydrateContactClassEmailTeamExampleProducesAContactWhoseEmailIsAnEmailInstanceWithValueTeamExample(
+    ): void {
+        \assert($this->hydratedContact instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact);
+        TestCase::assertInstanceOf(
+            \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email::class,
+            $this->hydratedContact->email,
+        );
+        TestCase::assertSame('team@example', $this->hydratedContact->email->value);
     }
 
 }

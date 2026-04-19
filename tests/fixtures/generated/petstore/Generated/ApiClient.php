@@ -293,9 +293,18 @@ final readonly class ApiClient
                 continue;
             }
 
-            // ['list', null] or ['list', class-string].
-            [, $itemType] = $shape;
+            [$kind, $itemType] = $shape;
 
+            if ($kind === 'scalar' && $itemType !== null) {
+                if ($value === null || $value instanceof $itemType) {
+                    $args[$phpName] = $value;
+                    continue;
+                }
+                $args[$phpName] = $itemType::fromScalar($value);
+                continue;
+            }
+
+            // ['list', null] or ['list', class-string].
             if (!\is_array($value)) {
                 $args[$phpName] = $value;
                 continue;

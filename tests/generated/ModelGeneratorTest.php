@@ -189,10 +189,30 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
+     * @source truth/specs/model-generator.typ:125
+     *
+     * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
+     *   And Model Contact declares a required property email with format: email
+     * When json_encode($contact) runs against a Contact whose email is an Email('team@example')
+     * Then the emitted JSON contains "email":"team@example", not a nested object
+     *   And ApiClient::hydrate(Contact::class, ['email' => 'team@example', ...]) produces a Contact whose email is an Email instance with $value === 'team@example'
+     */
+    public function testABindsFormatScalarValueObjectRoundTripsThroughScalarBinding(): void
+    {
+        $this->steps->givenValueObjectAppValueObjectEmailIsAnnotatedWithAttrAndImplementsScalarBindingWithAStringValue('#[BindsFormat(\'email\')]');
+        $this->steps->givenModelContactDeclaresARequiredPropertyEmailWithFormatEmail();
+        $this->steps->whenJsonEncodeContactRunsAgainstAContactWhoseEmailIsAnEmailTeamExample();
+        $this->steps->thenTheEmittedJSONContainsEmailTeamExampleNotANestedObject();
+        $this->steps->thenApiclientHydrateContactClassEmailTeamExampleProducesAContactWhoseEmailIsAnEmailInstanceWithValueTeamExample();
+    }
+
+
+    /**
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:127
+     * @source truth/specs/model-generator.typ:142
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -208,7 +228,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:137
+     * @source truth/specs/model-generator.typ:152
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed
