@@ -96,6 +96,7 @@ final readonly class OperationEmitter
             $queryParams,
             $headerParams,
             $body,
+            $bindings,
         );
         $this->responseHandler->emit($method, $return);
 

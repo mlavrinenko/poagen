@@ -14,6 +14,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpFile;
@@ -148,7 +149,9 @@ final readonly class ModelEmitter
         $const->addComment(
             'shape is one of: null (scalar pass-through), `\\FQCN::class` (model ref),'
             . ' [\'list\', null] (list<scalar>), [\'list\', \\FQCN::class] (list<Model>),'
-            . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO).',
+            . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO),'
+            . ' [\'datetime\', null] (format: date-time → \\DateTimeImmutable),'
+            . ' [\'date\', null] (format: date → \\DateTimeImmutable).',
         );
         $const->addComment('');
         $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>');
@@ -183,44 +186,49 @@ final readonly class ModelEmitter
 
     /**
      * Emit `jsonSerialize()` that renames PHP property names back to their
-     * original schema keys for on-the-wire transmission. ScalarBinding VOs
-     * are unwrapped via `toScalar()`; all other values pass through
-     * unchanged.
+     * original schema keys. ScalarBinding VOs route through `toScalar()`;
+     * built-in datetime/date shapes route through `format()`; everything
+     * else passes through unchanged.
      *
      * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap
      */
     private function emitJsonSerialize(ClassType $class, array $propertyMap): void
     {
-        $method = $class->addMethod('jsonSerialize')
-            ->setPublic()
-            ->setReturnType('array');
-
+        $method = $class->addMethod('jsonSerialize')->setPublic()->setReturnType('array');
         $method->addComment('@return array<string, mixed>');
-
         $method->addBody('return [');
 
         foreach ($propertyMap as $entry) {
-            $shape = $entry['shape'];
-
-            if (\is_array($shape) && $shape[0] === 'scalar') {
-                $op = $entry['nullable'] ? '?->' : '->';
-                $method->addBody(\sprintf(
-                    '    %s => $this->%s%stoScalar(),',
-                    var_export($entry['wire'], true),
-                    $entry['php'],
-                    $op,
-                ));
-                continue;
-            }
-
             $method->addBody(\sprintf(
-                '    %s => $this->%s,',
+                '    %s => %s,',
                 var_export($entry['wire'], true),
-                $entry['php'],
+                $this->serializeExpr($entry),
             ));
         }
 
         $method->addBody('];');
+    }
+
+    /**
+     * @param array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool} $entry
+     */
+    private function serializeExpr(array $entry): string
+    {
+        $base = '$this->' . $entry['php'];
+        $shape = $entry['shape'];
+
+        if (!\is_array($shape)) {
+            return $base;
+        }
+
+        $op = $entry['nullable'] ? '?->' : '->';
+
+        return match ($shape[0]) {
+            'scalar' => $base . $op . 'toScalar()',
+            'datetime' => $base . $op . 'format(\\DateTimeInterface::RFC3339)',
+            'date' => $base . $op . "format('Y-m-d')",
+            default => $base,
+        };
     }
 
     /**
@@ -241,27 +249,24 @@ final readonly class ModelEmitter
         }
 
         if ($schema->type === 'array') {
-            /** @var Schema|Reference|null $items */
             $items = $schema->items;
+            $item = $items instanceof Reference ? $this->fqcnFromRef($items->getReference(), $modelNamespace) : null;
 
-            if ($items instanceof Reference) {
-                return ['list', $this->fqcnFromRef($items->getReference(), $modelNamespace)];
-            }
-
-            return ['list', null];
+            return ['list', $item];
         }
 
-        $format = \is_string($schema->format) ? $schema->format : null;
+        $format = \is_string($schema->format) ? $bindings->scalarFormat($schema->format) : null;
 
-        if ($format !== null) {
-            $bound = $bindings->scalarBindingType($format);
-
-            if ($bound !== null) {
-                return ['scalar', $bound];
-            }
+        if (!$format instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
+            return null;
         }
 
-        return null;
+        return match ($format->kind) {
+            ScalarFormat::KIND_SCALAR => ['scalar', $format->bindingClass],
+            ScalarFormat::KIND_DATETIME => ['datetime', null],
+            ScalarFormat::KIND_DATE => ['date', null],
+            default => null,
+        };
     }
 
     private function fqcnFromRef(string $ref, string $modelNamespace): string

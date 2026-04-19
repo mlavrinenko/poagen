@@ -13,6 +13,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 
@@ -40,11 +42,12 @@ final readonly class RequestAssembler
         array $queryParams,
         array $headerParams,
         ?BodySpec $body,
+        Bindings $bindings,
     ): void {
         $method->addBody('$path = ?;', [$pathUri]);
 
-        $this->emitPathInterpolation($method, $pathParams);
-        $this->emitQueryAssembly($method, $queryParams);
+        $this->emitPathInterpolation($method, $pathParams, $bindings);
+        $this->emitQueryAssembly($method, $queryParams, $bindings);
 
         $method->addBody(
             '$request = $this->requestFactory->createRequest(?, \rtrim($this->baseUri, \'/\') . $path);',
@@ -58,10 +61,12 @@ final readonly class RequestAssembler
         }
 
         foreach ($headerParams as $param) {
-            $var = new Literal('$' . $param->name);
+            $schema = $param->schema instanceof Schema ? $param->schema : null;
+            $check = new Literal('$' . $param->name);
+            $value = $this->stringExpr($param->name, $schema, $bindings);
             $method->addBody(
                 'if (? !== null) { $request = $request->withHeader(?, ?); }',
-                [$var, $param->name, $var],
+                [$check, $param->name, $value],
             );
         }
     }
@@ -69,11 +74,11 @@ final readonly class RequestAssembler
     /**
      * @param list<Parameter> $pathParams
      */
-    private function emitPathInterpolation(Method $method, array $pathParams): void
+    private function emitPathInterpolation(Method $method, array $pathParams, Bindings $bindings): void
     {
         foreach ($pathParams as $param) {
             $schema = $param->schema instanceof Schema ? $param->schema : null;
-            $valueExpr = $this->stringExpr($param->name, $schema);
+            $valueExpr = $this->stringExpr($param->name, $schema, $bindings);
             $method->addBody(
                 '$path = \str_replace(?, ?, $path);',
                 ['{' . $param->name . '}', $valueExpr],
@@ -88,7 +93,7 @@ final readonly class RequestAssembler
      *
      * @param list<Parameter> $queryParams
      */
-    private function emitQueryAssembly(Method $method, array $queryParams): void
+    private function emitQueryAssembly(Method $method, array $queryParams, Bindings $bindings): void
     {
         if ($queryParams === []) {
             return;
@@ -102,18 +107,18 @@ final readonly class RequestAssembler
             $isArray = OperationAnalyzer::isArrayQueryParam($param);
 
             if ($isArray) {
-                $this->emitArrayQueryPush($method, $param);
+                $this->emitArrayQueryPush($method, $param, $bindings);
                 continue;
             }
 
             if ($param->required) {
-                $this->emitScalarQueryPush($method, $param, indent: '');
+                $this->emitScalarQueryPush($method, $param, indent: '', bindings: $bindings);
                 $hasUnconditionalPush = true;
                 continue;
             }
 
             $method->addBody('if ($' . $param->name . ' !== null) {');
-            $this->emitScalarQueryPush($method, $param, indent: '    ');
+            $this->emitScalarQueryPush($method, $param, indent: '    ', bindings: $bindings);
             $method->addBody('}');
         }
 
@@ -126,20 +131,20 @@ final readonly class RequestAssembler
         $method->addBody('if ($query !== []) { $path .= \'?\' . \implode(\'&\', $query); }');
     }
 
-    private function emitScalarQueryPush(Method $method, Parameter $param, string $indent): void
+    private function emitScalarQueryPush(Method $method, Parameter $param, string $indent, Bindings $bindings): void
     {
         $schema = $param->schema instanceof Schema ? $param->schema : null;
-        $valueExpr = $this->stringExpr($param->name, $schema);
+        $valueExpr = $this->stringExpr($param->name, $schema, $bindings);
         $method->addBody(
             $indent . '$query[] = ? . \urlencode(?);',
             [$param->name . '=', $valueExpr],
         );
     }
 
-    private function emitArrayQueryPush(Method $method, Parameter $param): void
+    private function emitArrayQueryPush(Method $method, Parameter $param, Bindings $bindings): void
     {
         $itemSchema = $param->schema instanceof Schema ? $param->schema->items : null;
-        $itemExpr = $this->stringExpr('__v', $itemSchema instanceof Schema ? $itemSchema : null);
+        $itemExpr = $this->stringExpr('__v', $itemSchema instanceof Schema ? $itemSchema : null, $bindings);
 
         $loop = 'foreach ($' . $param->name . ' as $__v) { $query[] = ? . \urlencode(?); }';
 
@@ -159,10 +164,28 @@ final readonly class RequestAssembler
      * Build the smallest expression that produces a `string` for use in the
      * URL: avoid the `(string)` cast when the parameter is already typed as
      * `string` so PHPStan doesn't flag a useless cast on the generated
-     * client.
+     * client. When the parameter is a built-in scalar format (e.g.
+     * `date-time` → `\DateTimeImmutable`), serialise via `format()` instead.
      */
-    private function stringExpr(string $varName, ?Schema $schema): Literal
+    private function stringExpr(string $varName, ?Schema $schema, Bindings $bindings): Literal
     {
+        if ($schema instanceof Schema && \is_string($schema->format)) {
+            $scalarFormat = $bindings->scalarFormat($schema->format);
+
+            if ($scalarFormat instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
+                $expr = match ($scalarFormat->kind) {
+                    ScalarFormat::KIND_DATETIME => '$' . $varName . '->format(\DateTimeInterface::RFC3339)',
+                    ScalarFormat::KIND_DATE => '$' . $varName . '->format(\'Y-m-d\')',
+                    ScalarFormat::KIND_SCALAR => '$' . $varName . '->toScalar()',
+                    default => null,
+                };
+
+                if ($expr !== null) {
+                    return new Literal($expr);
+                }
+            }
+        }
+
         $alreadyString = $schema instanceof Schema && $schema->type === 'string';
 
         return $alreadyString

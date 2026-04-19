@@ -49,4 +49,31 @@ final readonly class Bindings
         /** @var class-string<ScalarBinding> $fqcn */
         return $fqcn;
     }
+
+    /**
+     * Resolve a `format` to a scalar-boundary binding: a user VO implementing
+     * {@see ScalarBinding} if one is registered, otherwise a paogen built-in
+     * (currently `date-time` and `date` → `\DateTimeImmutable`). User bindings
+     * always win so consumers can swap in Carbon, Chronos, etc.
+     */
+    public function scalarFormat(string $format): ?ScalarFormat
+    {
+        $userBinding = $this->scalarBindingType($format);
+
+        if ($userBinding !== null) {
+            return ScalarFormat::userScalar($userBinding);
+        }
+
+        // User-registered non-ScalarBinding VO (object binding) stays on the
+        // whole-object path — not a scalar format.
+        if (isset($this->formats[$format])) {
+            return null;
+        }
+
+        return match ($format) {
+            'date-time' => ScalarFormat::dateTime(),
+            'date' => ScalarFormat::date(),
+            default => null,
+        };
+    }
 }

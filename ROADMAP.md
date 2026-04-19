@@ -18,7 +18,7 @@ Both tasks touch `src/Runtime/ScalarBinding` (introduced by task 004).
 Land 004 first; 010 is the first in-tree consumer.
 
 - [x] **T-004** — Round-trip `BindsFormat` scalar value objects on send *and* receive. *(critical release blocker; `#[BindsFormat]` is unusable without it.)*
-- [ ] **T-010** — Built-in `\DateTimeImmutable` mapping for `format: date-time` and `format: date`.
+- [x] **T-010** — Built-in `\DateTimeImmutable` mapping for `format: date-time` and `format: date`.
 
 ## Phase 2 — Model Generator coverage holes
 

@@ -304,6 +304,23 @@ final readonly class ApiClient
                 continue;
             }
 
+            if ($kind === 'datetime' || $kind === 'date') {
+                if ($value === null || $value instanceof \DateTimeImmutable) {
+                    $args[$phpName] = $value;
+                    continue;
+                }
+                if (!\is_string($value)) {
+                    throw new \RuntimeException(\sprintf(
+                        'Expected string for %s::$%s, got %s.',
+                        $class,
+                        $phpName,
+                        \get_debug_type($value),
+                    ));
+                }
+                $args[$phpName] = new \DateTimeImmutable($value);
+                continue;
+            }
+
             // ['list', null] or ['list', class-string].
             if (!\is_array($value)) {
                 $args[$phpName] = $value;

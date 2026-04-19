@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Built-in DateTimeImmutable mapping for format: date-time (and date)",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: done,
+  date: datetime(year: 2026, month: 4, day: 19),
   priority: "high",
   spec: "truth/specs/model-generator.typ",
   decision: "truth/decisions/007-hydration-serialization.typ",
@@ -56,3 +56,29 @@ Pre-release review P1 #9 — coverage gap. Listed in the review's
 - A fixture schema (Petstore or synthetic) exercises a `date-time`
   property in round-trip, with a regression test.
 - `just check` green end-to-end.
+
+== Implementation notes
+
+- Hydration uses `new \\DateTimeImmutable($raw)` — permissive ISO-8601
+  / RFC-3339 parsing, no explicit format pinning. `createFromFormat`
+  was rejected because OpenAPI `format: date-time` vendors emit
+  slightly different RFC-3339 profiles (trailing `Z`, fractional
+  seconds, numeric offset) and we want all of them to round-trip.
+- Serialisation pins a canonical form on the way *out*: `date-time`
+  serialises via `\\DateTimeInterface::RFC3339` (`Y-m-d\\TH:i:sP`),
+  `date` serialises via `'Y-m-d'`. Input with fractional seconds is
+  preserved by the in-memory `\\DateTimeImmutable` but normalised to
+  second precision when re-emitted on the wire — acceptable for v0.1.
+- The Petstore fixture already exercises the round-trip via
+  `Order.shipDate` (lines 686–688 of the 3.0 YAML); no synthetic
+  fixture was needed.
+- Composition with `#[BindsFormat]`: built-ins and user bindings flow
+  through a single `Bindings::scalarFormat($format)` lookup. A user
+  `BindsFormat('date-time')` VO implementing `ScalarBinding` wins
+  over the built-in; a non-`ScalarBinding` user VO stays on the
+  object-binding path.
+- Parameter support: path / query / header parameters with
+  `format: date-time` or `format: date` serialise via `format()` in
+  the generated `RequestAssembler` output. No petstore operation
+  currently exercises this in a parameter slot, so it is covered by
+  unit path only, not by a golden-fixture diff.

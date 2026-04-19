@@ -495,4 +495,77 @@ final class ModelGeneratorSteps
         TestCase::assertSame('team@example', $this->hydratedContact->email->value);
     }
 
+
+    private string $dateTimeWire = '';
+    private ?object $hydratedOrder = null;
+    private string $orderEncoded = '';
+
+    public function givenModelOrderDeclaresAnOptionalPropertyShipDateWithTypeStringAndFormatDateTime(): void
+    {
+        // Petstore's Order.shipDate is the fixture: an optional string property
+        // with format: date-time. Run the generator and load the emitted Order.
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
+        TestCase::assertStringContainsString('shipDate', $source);
+        TestCase::assertStringContainsString("'shipDate' => ['shipDate', ['datetime', null]]", $source);
+    }
+
+
+    public function givenNoUserBindsFormatDateTimeBindingIsRegistered(): void
+    {
+        // No user VO under `discoverIn` binds `date-time`. Observable proof:
+        // the emitted PROPERTY_MAP entry for `shipDate` is the built-in
+        // `['datetime', null]`, not a `['scalar', VoClass::class]` form.
+        \assert($this->profile !== null);
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
+        TestCase::assertStringContainsString("'shipDate' => ['shipDate', ['datetime', null]]", $source);
+        TestCase::assertStringNotContainsString("'shipDate' => ['shipDate', ['scalar'", $source);
+    }
+
+
+    public function whenTheModelIsEmittedAndTheGeneratedApiClientHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire(
+        string $wire,
+    ): void {
+        $this->dateTimeWire = trim($wire, "'\"");
+        $this->hydratedOrder = $this->invokeHydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order::class,
+            ['shipDate' => $this->dateTimeWire],
+        );
+    }
+
+
+    public function thenTheConstructorParameterIsTypedDateTimeImmutable(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
+        TestCase::assertStringContainsString('public ?DateTimeImmutable $shipDate', $source);
+    }
+
+
+    public function thenTheHydratedOrderShipDateIsAnInstanceOfDateTimeImmutableWhoseTimestampMatchesTheParsedRFC3339String(
+    ): void {
+        \assert($this->hydratedOrder instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order);
+        TestCase::assertInstanceOf(\DateTimeImmutable::class, $this->hydratedOrder->shipDate);
+        TestCase::assertSame(
+            new \DateTimeImmutable($this->dateTimeWire)->getTimestamp(),
+            $this->hydratedOrder->shipDate->getTimestamp(),
+        );
+    }
+
+
+    public function thenJsonEncodeOrderWithThatShipDateEmitsShipDate20260418T1234560000OnTheWireNotANestedObject(
+    ): void {
+        $order = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order(
+            shipDate: new \DateTimeImmutable($this->dateTimeWire),
+        );
+
+        $this->orderEncoded = (string) json_encode($order);
+        TestCase::assertStringContainsString(
+            '"shipDate":"2026-04-18T12:34:56+00:00"',
+            $this->orderEncoded,
+        );
+        TestCase::assertStringNotContainsString('"value"', $this->orderEncoded);
+    }
+
 }

@@ -41,6 +41,12 @@ final readonly class TypeResolver
         $nullable = (bool) $node->nullable;
 
         if (\is_string($type) && \is_string($format)) {
+            $scalarFormat = $bindings->scalarFormat($format);
+
+            if ($scalarFormat instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
+                return new self($scalarFormat->phpType, null, null, $nullable);
+            }
+
             $bound = $bindings->formatType($format);
 
             if ($bound !== null) {

@@ -136,6 +136,23 @@
       #then[the emitted JSON contains `"email":"team@example"`, not a nested object]
       #and_[`ApiClient::hydrate(Contact::class, ['email' => 'team@example', ...])` produces a `Contact` whose `email` is an `Email` instance with `$value === 'team@example'`]
     ]
+
+    #scenario(
+      "A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string",
+      stage: unstable,
+      traces: (
+        "src/Generator/Bindings.php",
+        "src/Generator/ScalarFormat.php",
+        "src/Generator/Emit/ClientEmitter.php",
+      ),
+    )[
+      #given[#a(Model) `Order` declares an optional property `shipDate` with `type: string` and `format: date-time`]
+      #and_[no user `#[BindsFormat('date-time')]` binding is registered]
+      #when[the model is emitted and the generated `ApiClient::hydrate(Order::class, ...)` runs against a payload whose `shipDate` is #p((wire: "'2026-04-18T12:34:56+00:00'"))]
+      #then[the constructor parameter is typed `?\\DateTimeImmutable`]
+      #and_[the hydrated `Order::$shipDate` is an instance of `\\DateTimeImmutable` whose timestamp matches the parsed RFC-3339 string]
+      #and_[`json_encode($order)` with that `shipDate` emits `"shipDate":"2026-04-18T12:34:56+00:00"` on the wire, not a nested object]
+    ]
   ]
 
   #rule("Re-running the generator is byte-stable")[

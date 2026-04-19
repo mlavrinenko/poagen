@@ -209,10 +209,32 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
+     * @source truth/specs/model-generator.typ:140
+     *
+     * Given Model Order declares an optional property shipDate with type: string and format: date-time
+     *   And no user #[BindsFormat('date-time')] binding is registered
+     * When the model is emitted and the generated ApiClient::hydrate(Order::class, ...) runs against a payload whose shipDate is '2026-04-18T12:34:56+00:00'
+     * Then the constructor parameter is typed ?\\DateTimeImmutable
+     *   And the hydrated Order::$shipDate is an instance of \\DateTimeImmutable whose timestamp matches the parsed RFC-3339 string
+     *   And json_encode($order) with that shipDate emits "shipDate":"2026-04-18T12:34:56+00:00" on the wire, not a nested object
+     */
+    public function testAFormatDateTimePropertyIsEmittedAsDateTimeImmutableAndRoundTripsThroughTheWireString(): void
+    {
+        $this->steps->givenModelOrderDeclaresAnOptionalPropertyShipDateWithTypeStringAndFormatDateTime();
+        $this->steps->givenNoUserBindsFormatDateTimeBindingIsRegistered();
+        $this->steps->whenTheModelIsEmittedAndTheGeneratedApiClientHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire('\'2026-04-18T12:34:56+00:00\'');
+        $this->steps->thenTheConstructorParameterIsTypedDateTimeImmutable();
+        $this->steps->thenTheHydratedOrderShipDateIsAnInstanceOfDateTimeImmutableWhoseTimestampMatchesTheParsedRFC3339String();
+        $this->steps->thenJsonEncodeOrderWithThatShipDateEmitsShipDate20260418T1234560000OnTheWireNotANestedObject();
+    }
+
+
+    /**
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:142
+     * @source truth/specs/model-generator.typ:159
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -228,7 +250,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:152
+     * @source truth/specs/model-generator.typ:169
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed
