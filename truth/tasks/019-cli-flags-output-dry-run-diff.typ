@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Add --output, --dry-run, and --diff flags to paogen generate",
-  status: proposed,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: done,
+  date: datetime(year: 2026, month: 4, day: 19),
   priority: "normal",
   spec: "truth/specs/cli.typ",
   decision: "truth/decisions/006-cli-tooling.typ",

@@ -213,7 +213,11 @@
     #scenario(
       "Running the generator twice with the same inputs produces identical files",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
+      traces: (
+        "src/Generator/Generator.php",
+        "src/Generator/GenerationPlan.php",
+        "src/Generator/PlanApplier.php",
+      ),
     )[
       #given[#the(Generator) has run once and produced #the(GeneratedFile) tree]
       #when[#the(Generator) runs again with the same #the(Schema) and #the(Profile)]
@@ -223,7 +227,11 @@
     #scenario(
       "A component removed from the schema is pruned from Generated/ on the next run",
       stage: unstable,
-      traces: ("src/Generator/Generator.php",),
+      traces: (
+        "src/Generator/Generator.php",
+        "src/Generator/GenerationPlan.php",
+        "src/Generator/PlanApplier.php",
+      ),
     )[
       #given[#the(Generator) has produced `Generated/Model/Pet.php` from a prior schema that declared a `Pet` component]
       #when[#the(Generator) runs again with a schema from which the `Pet` component has been removed]

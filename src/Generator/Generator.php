@@ -26,9 +26,20 @@ final readonly class Generator
         private ModelEmitter $modelEmitter = new ModelEmitter(),
         private EnumEmitter $enumEmitter = new EnumEmitter(),
         private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
+        private PlanApplier $applier = new PlanApplier(),
     ) {}
 
     public function generate(Profile $profile): void
+    {
+        $this->applier->apply($this->plan($profile));
+    }
+
+    /**
+     * Build the complete set of would-be writes and prunes without
+     * touching disk. Called by {@see generate} and by the CLI
+     * `--dry-run` / `--diff` flags.
+     */
+    public function plan(Profile $profile): GenerationPlan
     {
         $bindings = $this->scanner->scan($profile);
 
@@ -43,20 +54,20 @@ final readonly class Generator
         $modelDir = $rootDir . \DIRECTORY_SEPARATOR . 'Model';
         $enumDir = $rootDir . \DIRECTORY_SEPARATOR . 'Enum';
 
-        $this->ensureDir($modelDir);
-
         $enums = new EnumCatalog($enumNamespace);
         $this->collectComponentEnums($openApi, $enums);
 
-        /** @var array<string,true> $emitted */
-        $emitted = [];
+        /** @var array<string,string> $writes */
+        $writes = [];
 
-        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $enums, $emitted);
-        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $enums, $emitted);
-        $this->emitApiException($rootNamespace, $rootDir, $emitted);
-        $this->emitEnums($enums, $enumDir, $emitted);
+        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $enums, $writes);
+        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $enums, $writes);
+        $this->emitApiException($rootNamespace, $rootDir, $writes);
+        $this->emitEnums($enums, $enumDir, $writes);
 
-        $this->pruneStale($rootDir, $emitted);
+        $prunes = $this->planPrunes($rootDir, $writes);
+
+        return new GenerationPlan($writes, $prunes);
     }
 
     private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums): void
@@ -86,9 +97,9 @@ final readonly class Generator
     }
 
     /**
-     * @param array<string,true> $emitted
+     * @param array<string,string> $writes
      */
-    private function emitEnums(EnumCatalog $enums, string $enumDir, array &$emitted): void
+    private function emitEnums(EnumCatalog $enums, string $enumDir, array &$writes): void
     {
         $specs = $enums->all();
 
@@ -96,19 +107,16 @@ final readonly class Generator
             return;
         }
 
-        $this->ensureDir($enumDir);
-
         foreach ($specs as $spec) {
             $code = $this->enumEmitter->emit($enums->enumNamespace, $spec);
             $path = $enumDir . \DIRECTORY_SEPARATOR . $spec->name . '.php';
-            file_put_contents($path, $code);
-            $emitted[$path] = true;
+            $writes[$path] = $code;
         }
     }
 
     /**
      * @param array<string,string> $renames
-     * @param array<string,true>   $emitted
+     * @param array<string,string> $writes
      */
     private function emitModels(
         OpenApi $openApi,
@@ -117,7 +125,7 @@ final readonly class Generator
         array $renames,
         Bindings $bindings,
         EnumCatalog $enums,
-        array &$emitted,
+        array &$writes,
     ): void {
         $components = $openApi->components;
 
@@ -150,15 +158,14 @@ final readonly class Generator
             $emission = $this->modelEmitter->emit($modelNamespace, $className, $effective, $bindings, $enums);
 
             $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
-            file_put_contents($path, $emission->source);
-            $emitted[$path] = true;
+            $writes[$path] = $emission->source;
 
             foreach ($emission->children as $child) {
                 $pending[] = $child;
             }
         }
 
-        $this->drainSynthesisedChildren($pending, $modelNamespace, $modelDir, $bindings, $enums, $emitted);
+        $this->drainSynthesisedChildren($pending, $modelNamespace, $modelDir, $bindings, $enums, $writes);
     }
 
     /**
@@ -185,7 +192,7 @@ final readonly class Generator
      * across runs regardless of the order children were discovered.
      *
      * @param list<\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel> $pending
-     * @param array<string,true> $emitted
+     * @param array<string,string> $writes
      */
     private function drainSynthesisedChildren(
         array $pending,
@@ -193,7 +200,7 @@ final readonly class Generator
         string $modelDir,
         Bindings $bindings,
         EnumCatalog $enums,
-        array &$emitted,
+        array &$writes,
     ): void {
         while ($pending !== []) {
             usort(
@@ -207,8 +214,7 @@ final readonly class Generator
             foreach ($batch as $child) {
                 $emission = $this->modelEmitter->emit($modelNamespace, $child->name, $child->schema, $bindings, $enums);
                 $path = $modelDir . \DIRECTORY_SEPARATOR . $child->name . '.php';
-                file_put_contents($path, $emission->source);
-                $emitted[$path] = true;
+                $writes[$path] = $emission->source;
 
                 foreach ($emission->children as $grand) {
                     $pending[] = $grand;
@@ -218,7 +224,7 @@ final readonly class Generator
     }
 
     /**
-     * @param array<string,true> $emitted
+     * @param array<string,string> $writes
      */
     private function emitClient(
         OpenApi $openApi,
@@ -227,7 +233,7 @@ final readonly class Generator
         string $modelNamespace,
         Bindings $bindings,
         EnumCatalog $enums,
-        array &$emitted,
+        array &$writes,
     ): void {
         if ($openApi->paths === null) {
             return;
@@ -236,49 +242,45 @@ final readonly class Generator
         $emitter = new ClientEmitter(new OperationEmitter($modelNamespace, $enums));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 
-        $path = $rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php';
-
         if ($code === null) {
             return;
         }
 
-        $this->ensureDir($rootDir);
-
-        file_put_contents($path, $code);
-        $emitted[$path] = true;
+        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'] = $code;
     }
 
-    /** @param array<string,true> $emitted */
-    private function emitApiException(string $rootNamespace, string $rootDir, array &$emitted): void
+    /** @param array<string,string> $writes */
+    private function emitApiException(string $rootNamespace, string $rootDir, array &$writes): void
     {
         // Only emit when ApiClient was emitted: the exception has no
         // referent without at least one operation that throws it.
-        if (!isset($emitted[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
+        if (!isset($writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
             return;
         }
-        $path = $rootDir . \DIRECTORY_SEPARATOR . 'ApiException.php';
-        file_put_contents($path, $this->apiExceptionEmitter->emit($rootNamespace));
-        $emitted[$path] = true;
+        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiException.php'] = $this->apiExceptionEmitter->emit($rootNamespace);
     }
 
     /**
-     * Delete any file under `Generated/` that the current run did not emit.
+     * List every file under `Generated/` that the current run did not
+     * emit. Guarded strictly to the `Generated/` subtree so user code
+     * alongside it is never touched. Returns an empty list if the root
+     * does not yet exist (first-ever run).
      *
-     * Guarded strictly to the `Generated/` subtree so user code alongside
-     * it is never touched. Silently skipped if the root does not yet
-     * exist (first-ever run).
-     *
-     * @param array<string,true> $emitted
+     * @param  array<string,string> $writes
+     * @return list<string>
      */
-    private function pruneStale(string $rootDir, array $emitted): void
+    private function planPrunes(string $rootDir, array $writes): array
     {
         if (!is_dir($rootDir)) {
-            return;
+            return [];
         }
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($rootDir, \FilesystemIterator::SKIP_DOTS),
         );
+
+        /** @var list<string> $prunes */
+        $prunes = [];
 
         foreach ($iterator as $entry) {
             \assert($entry instanceof \SplFileInfo);
@@ -289,16 +291,11 @@ final readonly class Generator
 
             $path = $entry->getPathname();
 
-            if (!isset($emitted[$path])) {
-                unlink($path);
+            if (!isset($writes[$path])) {
+                $prunes[] = $path;
             }
         }
-    }
 
-    private function ensureDir(string $dir): void
-    {
-        if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
-            throw new \RuntimeException("Could not create output dir: {$dir}");
-        }
+        return $prunes;
     }
 }

@@ -8,10 +8,6 @@ use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
-use Mlavrinenko\Paogen\Exception\InvalidProfileException;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\ProfileLoader;
 
 /**
  * Minimal hand-rolled CLI entry point. See ADR-006.
@@ -31,6 +27,14 @@ final class Cli
             validate <schema>   Parse and validate an OpenAPI document (YAML or JSON)
             help                Print this message
             version             Print the paogen version
+
+        GENERATE OPTIONS
+            --output=<dir>      Write the generated tree under <dir> (resolved relative to CWD),
+                                overriding the profile's `output` setting.
+            --dry-run           Print a tree-shaped summary of would-be-written and would-be-deleted
+                                files; write nothing; exit 0.
+            --diff              Print a unified diff between each planned write and the file on disk.
+                                Exit 0 if no diffs, 1 if any, 2 on usage error.
 
         GLOBAL OPTIONS
             -h, --help          Print help for a command
@@ -68,7 +72,14 @@ final class Cli
         }
 
         if ($args[0] === 'generate') {
-            return self::generate(\array_slice($args, 1), $stdout, $stderr);
+            $loader = self::composerLoader();
+
+            if (!$loader instanceof ClassLoader) {
+                fwrite($stderr, "paogen generate: could not locate Composer ClassLoader (needed to scan for #[BindsFormat]).\n");
+                return 1;
+            }
+
+            return GenerateCommand::run(\array_slice($args, 1), $loader, $stdout, $stderr);
         }
 
         if ($args[0] === 'validate') {
@@ -79,38 +90,6 @@ final class Cli
         fwrite($stderr, "paogen: command '{$command}' is not implemented yet.\n");
         fwrite($stderr, "See `paogen help`.\n");
         return 2;
-    }
-
-    /**
-     * @param list<string> $args
-     * @param resource     $stdout
-     * @param resource     $stderr
-     */
-    private static function generate(array $args, $stdout, $stderr): int
-    {
-        if ($args === []) {
-            fwrite($stderr, "paogen generate: missing profile path.\n");
-            return 2;
-        }
-
-        $loader = self::composerLoader();
-
-        if (!$loader instanceof \Composer\Autoload\ClassLoader) {
-            fwrite($stderr, "paogen generate: could not locate Composer ClassLoader (needed to scan for #[BindsFormat]).\n");
-            return 1;
-        }
-
-        try {
-            $profile = new ProfileLoader()->load($args[0]);
-        } catch (InvalidProfileException $e) {
-            fwrite($stderr, "paogen generate: {$e->getMessage()}\n");
-            return 2;
-        }
-
-        new Generator(new AttributeScanner($loader))->generate($profile);
-
-        fwrite($stdout, "paogen: generated into {$profile->output}\n");
-        return 0;
     }
 
     /**

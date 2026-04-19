@@ -197,14 +197,90 @@ final class PaogenCLITest extends TestCase
      * @source truth/specs/cli.typ:85
      *
      * Given Profile at tests/fixtures/profiles/petstore.php whose declared output is tests/fixtures/generated/petstore
-     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=/tmp/paogen-out
-     * Then the generated tree is written under /tmp/paogen-out instead of the profile's declared output
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=<tmp-dir>
+     * Then the generated tree is written under <tmp-dir> instead of the profile's declared output
      *   And paogen CLI should exit with code 0
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testOutputRedirectsTheGeneratedTreeToTheSuppliedDirectory(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->givenProfileAtPathWhoseDeclaredOutputIsTestsFixturesGeneratedPetstore('tests/fixtures/profiles/petstore.php');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php --output=<tmp-dir>');
+        $this->steps->thenTheGeneratedTreeIsWrittenUnderPathInsteadOfTheProfilesDeclaredOutput('<tmp-dir>');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(0);
+    }
+
+
+    /**
+     * Scenario: --dry-run prints a tree summary and writes nothing
+     * @source truth/specs/cli.typ:96
+     *
+     * Given Profile at tests/fixtures/profiles/petstore.php
+     *   And a fresh output directory at <tmp-dir>
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --dry-run
+     * Then stdout should contain would write
+     *   And the directory <tmp-dir> contains no files
+     *   And paogen CLI should exit with code 0
+     */
+    public function testDryRunPrintsATreeSummaryAndWritesNothing(): void
+    {
+        $this->steps->givenProfileAtPath('tests/fixtures/profiles/petstore.php');
+        $this->steps->givenAFreshOutputDirectoryAtPath('<tmp-dir>');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --dry-run');
+        $this->steps->thenStdoutShouldContainNeedle('would write');
+        $this->steps->thenTheDirectoryPathContainsNoFiles('<tmp-dir>');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(0);
+    }
+
+
+    /**
+     * Scenario: --diff against a matching golden tree exits 0 with no output
+     * @source truth/specs/cli.typ:109
+     *
+     * Given a temporary copy of tests/fixtures/generated/petstore at <tmp-dir>
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff
+     * Then stdout is empty
+     *   And paogen CLI should exit with code 0
+     */
+    public function testDiffAgainstAMatchingGoldenTreeExits0WithNoOutput(): void
+    {
+        $this->steps->givenATemporaryCopyOfPathAtPath('tests/fixtures/generated/petstore', '<tmp-dir>');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff');
+        $this->steps->thenStdoutIsEmpty();
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(0);
+    }
+
+
+    /**
+     * Scenario: --diff against a corrupted golden tree prints unified diff and exits 1
+     * @source truth/specs/cli.typ:120
+     *
+     * Given a temporary copy of tests/fixtures/generated/petstore at <tmp-dir> with one file truncated
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff
+     * Then stdout should contain @@
+     *   And paogen CLI should exit with code 1
+     */
+    public function testDiffAgainstACorruptedGoldenTreePrintsUnifiedDiffAndExits1(): void
+    {
+        $this->steps->givenATemporaryCopyOfPathAtPathWithOneFileTruncated('tests/fixtures/generated/petstore', '<tmp-dir>');
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff');
+        $this->steps->thenStdoutShouldContainNeedle('@@');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(1);
+    }
+
+
+    /**
+     * Scenario: --dry-run combined with --diff is a usage error
+     * @source truth/specs/cli.typ:131
+     *
+     * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php --dry-run --diff
+     * Then stderr should contain mutually exclusive
+     *   And paogen CLI should exit with code 2
+     */
+    public function testDryRunCombinedWithDiffIsAUsageError(): void
+    {
+        $this->steps->whenPaogenCLIIsInvokedWithArgumentsArgs('generate tests/fixtures/profiles/petstore.php --dry-run --diff');
+        $this->steps->thenStderrShouldContainNeedle('mutually exclusive');
+        $this->steps->thenPaogenCLIShouldExitWithCodeCode(2);
     }
 
 
@@ -212,7 +288,7 @@ final class PaogenCLITest extends TestCase
      * Rule: PHP 8.4 deprecation noise
      *
      * Scenario: generate emits no PHP deprecation notices on 8.4
-     * @source truth/specs/cli.typ:94
+     * @source truth/specs/cli.typ:143
      *
      * Given Profile at tests/fixtures/profiles/petstore.php
      * When paogen CLI is invoked with arguments generate tests/fixtures/profiles/petstore.php

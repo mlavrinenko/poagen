@@ -308,7 +308,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:223
+     * @source truth/specs/model-generator.typ:227
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

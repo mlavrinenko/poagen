@@ -82,11 +82,60 @@
   ]
 
   #rule("Generate flags")[
-    #scenario("--output redirects the generated tree to the supplied directory", stage: draft)[
+    #scenario(
+      "--output redirects the generated tree to the supplied directory",
+      stage: unstable,
+      traces: ("src/GenerateCommand.php",),
+    )[
       #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php")) whose declared `output` is `tests/fixtures/generated/petstore`]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=/tmp/paogen-out"))]
-      #then[the generated tree is written under #p((path: "/tmp/paogen-out")) instead of the profile's declared `output`]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir>"))]
+      #then[the generated tree is written under #p((path: "<tmp-dir>")) instead of the profile's declared `output`]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
+    ]
+
+    #scenario(
+      "--dry-run prints a tree summary and writes nothing",
+      stage: unstable,
+      traces: ("src/GenerateCommand.php", "src/Generator/PlanReporter.php"),
+    )[
+      #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php"))]
+      #and_[a fresh output directory at #p((path: "<tmp-dir>"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --dry-run"))]
+      #then[stdout should contain #p((needle: "would write"))]
+      #and_[the directory #p((path: "<tmp-dir>")) contains no files]
+      #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
+    ]
+
+    #scenario(
+      "--diff against a matching golden tree exits 0 with no output",
+      stage: unstable,
+      traces: ("src/GenerateCommand.php", "src/Generator/PlanReporter.php"),
+    )[
+      #given[a temporary copy of #p((path: "tests/fixtures/generated/petstore")) at #p((path: "<tmp-dir>"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff"))]
+      #then[stdout is empty]
+      #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
+    ]
+
+    #scenario(
+      "--diff against a corrupted golden tree prints unified diff and exits 1",
+      stage: unstable,
+      traces: ("src/GenerateCommand.php", "src/Generator/PlanReporter.php"),
+    )[
+      #given[a temporary copy of #p((path: "tests/fixtures/generated/petstore")) at #p((path: "<tmp-dir>")) with one file truncated]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff"))]
+      #then[stdout should contain #p((needle: "@@"))]
+      #and_[#the(PaogenCli) should exit with code #p((code: "1"))]
+    ]
+
+    #scenario(
+      "--dry-run combined with --diff is a usage error",
+      stage: unstable,
+      traces: ("src/GenerateCommand.php",),
+    )[
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --dry-run --diff"))]
+      #then[stderr should contain #p((needle: "mutually exclusive"))]
+      #and_[#the(PaogenCli) should exit with code #p((code: "2"))]
     ]
   ]
 
