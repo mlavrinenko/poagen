@@ -27,7 +27,8 @@ Pre-alpha. Generator emits *models only* (PoC). Specs and decisions live
 under [`truth/`](truth/).
 
 Known limitation: OpenAPI **3.1** is not yet supported — see
-[docs/design/openapi-3.1-gap.md](docs/design/openapi-3.1-gap.md).
+[docs/design/openapi-3.1-gap.md](docs/design/openapi-3.1-gap.md) and
+[ADR-008](truth/decisions/008-openapi-31-strategy.typ).
 
 ## Installation
 
