@@ -792,6 +792,15 @@ components:
             - available
             - pending
             - sold
+        shipping:
+          type: object
+          required:
+            - address
+          properties:
+            address:
+              type: string
+            zip:
+              type: string
       xml:
         name: pet
     ApiResponse:

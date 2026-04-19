@@ -86,16 +86,19 @@ final class ModelGeneratorTest extends TestCase
      *   And Pet has a promoted constructor parameter PetShipping $shipping
      *   And the property is not typed array<string, mixed>
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testAnInlineNestedObjectSchemaBecomesASynthesisedTypedClass(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->givenModelParentDeclaresAnInlinePropertyShippingWithTypeObjectAndNestedPropertiesProps('Pet', 'address: string, zip: string');
+        $this->steps->whenTheModelIsEmitted();
+        $this->steps->thenAClassGeneratedModelPetShippingPhpIsWritten();
+        $this->steps->thenPetHasAPromotedConstructorParameterPetShippingShipping();
+        $this->steps->thenThePropertyIsNotTypedArrayStringMixed();
     }
 
 
     /**
      * Scenario: A schema with enum values becomes a PHP 8.1 backed enum
-     * @source truth/specs/model-generator.typ:66
+     * @source truth/specs/model-generator.typ:72
      *
      * Given Schema declares a named component Status with type: string and [placed, approved, delivered]
      * When Generator runs against Profile
@@ -117,7 +120,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Hydration and serialization contract (ADR-007)
      *
      * Scenario: A list-of-Model property hydrates each item into the declared class
-     * @source truth/specs/model-generator.typ:85
+     * @source truth/specs/model-generator.typ:91
      *
      * Given Model Pet has a property tags whose schema is type: array, items.$ref: #/components/schemas/Tag
      * When the generated ApiClient::hydrate(Pet::class, $data) runs against a payload whose tags is a list of two objects
@@ -135,7 +138,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A list-of-scalar property hydrates items untouched
-     * @source truth/specs/model-generator.typ:96
+     * @source truth/specs/model-generator.typ:102
      *
      * Given Model Pet has a property photoUrls whose schema is type: array, items.type: string
      * When the generated ApiClient::hydrate(Pet::class, $data) runs against a payload whose photoUrls is a list of plain strings
@@ -151,7 +154,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A property with a non-identifier schema key round-trips through PROPERTY_MAP
-     * @source truth/specs/model-generator.typ:106
+     * @source truth/specs/model-generator.typ:112
      *
      * Given Model Contact declares a required property whose schema key is display-name (kebab-case)
      * When the generator emits Contact.php and ApiClient::hydrate runs against a payload containing the wire key display-name
@@ -175,7 +178,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:121
+     * @source truth/specs/model-generator.typ:127
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -193,7 +196,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.typ:132
+     * @source truth/specs/model-generator.typ:138
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
@@ -213,7 +216,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.typ:147
+     * @source truth/specs/model-generator.typ:153
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user #[BindsFormat('date-time')] binding is registered
@@ -237,7 +240,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:166
+     * @source truth/specs/model-generator.typ:172
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -253,7 +256,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:176
+     * @source truth/specs/model-generator.typ:182
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

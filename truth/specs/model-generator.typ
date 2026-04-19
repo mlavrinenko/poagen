@@ -54,7 +54,13 @@
 
     #scenario(
       "An inline nested object schema becomes a synthesised typed class",
-      stage: draft,
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/InlineObjectResolver.php",
+        "src/Generator/Emit/ModelEmission.php",
+        "src/Generator/Emit/SynthesisedModel.php",
+        "src/Generator/Generator.php",
+      ),
     )[
       #given[#a(Model) #p((parent: "Pet")) declares an inline property `shipping` with `type: object` and nested properties #p((props: "address: string, zip: string"))]
       #when[the model is emitted]

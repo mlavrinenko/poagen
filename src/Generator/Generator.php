@@ -126,6 +126,9 @@ final readonly class Generator
         $names = array_keys($schemas);
         sort($names, \SORT_STRING);
 
+        /** @var list<\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel> $pending */
+        $pending = [];
+
         foreach ($names as $rawName) {
             $schema = $schemas[$rawName];
 
@@ -138,11 +141,57 @@ final readonly class Generator
             }
 
             $className = $renames[$rawName] ?? $rawName;
-            $code = $this->modelEmitter->emit($modelNamespace, $className, $schema, $bindings, $enums);
+            $emission = $this->modelEmitter->emit($modelNamespace, $className, $schema, $bindings, $enums);
 
             $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
-            file_put_contents($path, $code);
+            file_put_contents($path, $emission->source);
             $emitted[$path] = true;
+
+            foreach ($emission->children as $child) {
+                $pending[] = $child;
+            }
+        }
+
+        $this->drainSynthesisedChildren($pending, $modelNamespace, $modelDir, $bindings, $enums, $emitted);
+    }
+
+    /**
+     * Drain the FIFO queue of synthesised inline-object classes (T-013).
+     *
+     * Each emission may itself queue grandchildren; keep going until the
+     * queue is empty. Sorting by name at each batch keeps byte-stability
+     * across runs regardless of the order children were discovered.
+     *
+     * @param list<\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel> $pending
+     * @param array<string,true> $emitted
+     */
+    private function drainSynthesisedChildren(
+        array $pending,
+        string $modelNamespace,
+        string $modelDir,
+        Bindings $bindings,
+        EnumCatalog $enums,
+        array &$emitted,
+    ): void {
+        while ($pending !== []) {
+            usort(
+                $pending,
+                static fn(\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel $a, \Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel $b): int => strcmp($a->name, $b->name),
+            );
+
+            $batch = $pending;
+            $pending = [];
+
+            foreach ($batch as $child) {
+                $emission = $this->modelEmitter->emit($modelNamespace, $child->name, $child->schema, $bindings, $enums);
+                $path = $modelDir . \DIRECTORY_SEPARATOR . $child->name . '.php';
+                file_put_contents($path, $emission->source);
+                $emitted[$path] = true;
+
+                foreach ($emission->children as $grand) {
+                    $pending[] = $grand;
+                }
+            }
         }
     }
 

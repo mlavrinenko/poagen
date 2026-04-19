@@ -603,4 +603,53 @@ final class ModelGeneratorSteps
         TestCase::assertStringNotContainsString('public ?string $status', $source);
     }
 
+
+    public function givenModelParentDeclaresAnInlinePropertyShippingWithTypeObjectAndNestedPropertiesProps(
+        string $parent,
+        string $props,
+    ): void {
+        TestCase::assertSame('Pet', $parent, 'spec is parameterised on Pet');
+        TestCase::assertStringContainsString('address', $props);
+
+        // Petstore's Pet component now declares an inline `shipping` object
+        // with required `address: string` and optional `zip: string`.
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function thenAClassGeneratedModelPetShippingPhpIsWritten(): void
+    {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Model/PetShipping.php');
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/PetShipping.php');
+        TestCase::assertStringContainsString('final readonly class PetShipping', $source);
+        TestCase::assertStringContainsString('public string $address', $source);
+        TestCase::assertStringContainsString('public ?string $zip', $source);
+    }
+
+
+    public function thenPetHasAPromotedConstructorParameterPetShippingShipping(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
+        TestCase::assertStringContainsString('?PetShipping $shipping', $source);
+        // The PROPERTY_MAP entry shape is `'shipping' => ['shipping', <FQCN>::class]`
+        // — Nette's printer may wrap the line when it is long, so assert the
+        // fragments rather than the whole one-liner.
+        TestCase::assertStringContainsString("'shipping'", $source);
+        TestCase::assertStringContainsString(
+            '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\PetShipping::class',
+            $source,
+        );
+    }
+
+
+    public function thenThePropertyIsNotTypedArrayStringMixed(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
+        // Ensure the `shipping` property block never mentions the fallback doc type.
+        TestCase::assertStringNotContainsString('array<string, mixed> $shipping', $source);
+        TestCase::assertStringNotContainsString('array<string,mixed> $shipping', $source);
+        // Also: Pet must not expose `?array $shipping` (the pre-T-013 shape).
+        TestCase::assertStringNotContainsString('?array $shipping', $source);
+    }
+
 }

@@ -21,6 +21,10 @@ final readonly class Pet implements JsonSerializable
         'photoUrls' => ['photoUrls', ['list', null]],
         'category' => ['category', \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Category::class],
         'id' => ['id', null],
+        'shipping' => [
+            'shipping',
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\PetShipping::class,
+        ],
         'status' => ['status', null],
         'tags' => ['tags', ['list', \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag::class]],
     ];
@@ -34,6 +38,7 @@ final readonly class Pet implements JsonSerializable
         public array $photoUrls,
         public ?Category $category = null,
         public ?int $id = null,
+        public ?PetShipping $shipping = null,
         public ?string $status = null,
         public ?array $tags = null,
     ) {
@@ -49,6 +54,7 @@ final readonly class Pet implements JsonSerializable
             'photoUrls' => $this->photoUrls,
             'category' => $this->category,
             'id' => $this->id,
+            'shipping' => $this->shipping,
             'status' => $this->status,
             'tags' => $this->tags,
         ];

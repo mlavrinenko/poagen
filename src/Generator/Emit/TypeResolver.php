@@ -66,7 +66,7 @@ final readonly class TypeResolver
             'number' => new self('float', null, null, $nullable),
             'boolean' => new self('bool', null, null, $nullable),
             'array' => self::resolveArray($node, $bindings, $modelNamespace, $enums),
-            'object' => new self('array', 'array<string,mixed>', null, $nullable),
+            'object' => InlineObjectResolver::resolve($node, $bindings, $modelNamespace, $enums),
             default => new self(null, 'mixed', null, $nullable),
         };
     }

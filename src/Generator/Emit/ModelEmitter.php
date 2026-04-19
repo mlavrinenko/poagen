@@ -16,7 +16,9 @@ use Nette\PhpGenerator\PsrPrinter;
 /**
  * Emits a single `final readonly` PHP class for one OpenAPI named schema.
  *
- * No I/O — given (name, schema, bindings) returns the printed PHP source.
+ * No I/O — given (name, schema, bindings) returns the printed PHP source
+ * wrapped in a {@see ModelEmission} that also lists any synthesised
+ * nested-object classes the caller must emit next (T-013).
  */
 final readonly class ModelEmitter
 {
@@ -33,7 +35,7 @@ final readonly class ModelEmitter
         Schema $schema,
         Bindings $bindings,
         ?EnumCatalog $enums = null,
-    ): string {
+    ): ModelEmission {
         $modelNamespace = trim($modelNamespace, '\\');
 
         $file = new PhpFile();
@@ -63,20 +65,38 @@ final readonly class ModelEmitter
 
         /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap */
         $propertyMap = [];
+        /** @var list<SynthesisedModel> $children */
+        $children = [];
 
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
             $isRequired = \in_array($propName, $required, true);
-            $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $enums);
+            $phpName = $this->phpName($propName);
+            $synthFqcn = $this->synthesiseChildIfNeeded($className, $phpName, $propSchema, $children, $modelNamespace);
+
+            if ($synthFqcn !== null) {
+                $resolved = new TypeResolver($synthFqcn, null, null, false);
+                $shape = ltrim($synthFqcn, '\\');
+            } else {
+                $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $enums);
+                $shape = PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $enums);
+            }
+
             $isNullable = !$isRequired || $resolved->nullable;
 
-            $phpName = $this->phpName($propName);
-            $this->addProperty($namespace, $constructor, $phpName, $resolved, $isNullable);
+            $this->addProperty(
+                $namespace,
+                $constructor,
+                $phpName,
+                $resolved,
+                $isNullable,
+                $this->todoFor($propSchema),
+            );
 
             $propertyMap[] = [
                 'wire' => $propName,
                 'php' => $phpName,
-                'shape' => PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $enums),
+                'shape' => $shape,
                 'nullable' => $isNullable,
             ];
         }
@@ -84,7 +104,54 @@ final readonly class ModelEmitter
         $this->emitPropertyMap($class, $propertyMap);
         $this->emitJsonSerialize($class, $propertyMap);
 
-        return $this->printer->printFile($file);
+        return new ModelEmission($this->printer->printFile($file), $children);
+    }
+
+    /**
+     * Detect an inline `type: object` property with declared `properties`
+     * and queue it as a synthesised child class (T-013). Returns the child
+     * FQCN, or null when the property is not eligible for synthesis.
+     *
+     * @param list<SynthesisedModel> $children
+     */
+    private function synthesiseChildIfNeeded(
+        string $ownerClassName,
+        string $phpPropName,
+        Schema|Reference $propSchema,
+        array &$children,
+        string $modelNamespace,
+    ): ?string {
+        if (!$propSchema instanceof Schema || $propSchema->type !== 'object') {
+            return null;
+        }
+
+        if (InlineObjectResolver::classify($propSchema) !== 'synthesise') {
+            return null;
+        }
+
+        $childName = $ownerClassName . ucfirst($phpPropName);
+        $children[] = new SynthesisedModel($childName, $propSchema);
+
+        return '\\' . $modelNamespace . '\\' . $childName;
+    }
+
+    /**
+     * Build the `@todo` comment for a property whose inline-object schema
+     * mixes declared properties with non-trivial `additionalProperties`
+     * (T-013 case 3; out of scope). Returns null when no todo applies.
+     */
+    private function todoFor(Schema|Reference $propSchema): ?string
+    {
+        if (!$propSchema instanceof Schema || $propSchema->type !== 'object') {
+            return null;
+        }
+
+        if (InlineObjectResolver::classify($propSchema) !== 'map-todo') {
+            return null;
+        }
+
+        return '@todo Inline object mixes declared properties with additionalProperties'
+            . '; emitted as array<string, mixed>. See T-013 out-of-scope.';
     }
 
     private function addProperty(
@@ -93,6 +160,7 @@ final readonly class ModelEmitter
         string $phpName,
         TypeResolver $resolved,
         bool $isNullable,
+        ?string $todo = null,
     ): void {
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
@@ -113,6 +181,10 @@ final readonly class ModelEmitter
                 $resolved->phpDoc,
                 $phpName,
             ));
+        }
+
+        if ($todo !== null) {
+            $constructor->addComment($todo);
         }
 
         // Hint use-statements for FQNs so the printed file uses short forms.
