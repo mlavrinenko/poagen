@@ -25,7 +25,7 @@ new design territory — `getopt()` already supports long options.
 == In scope
 
 + Promote the draft `--output` scenario under
-  `truth/specs/cli.typ` to `stage: unstable` on implementation.
+  #link("../specs/cli.typ") to `stage: unstable` on implementation.
 + Add scenarios for:
   - `--output=<dir>`: writes the generated tree under `<dir>`
     instead of the profile's `output`. The profile's `output` is

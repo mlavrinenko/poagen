@@ -25,7 +25,7 @@ the generated client and is a small, self-contained spec-first slice.
 == In scope
 
 Each bullet gets its own scenario under
-`truth/specs/operation-generator.typ`:
+#link("../specs/operation-generator.typ"):
 
 + *Header parameters.* Emit typed method parameters; attach via
   `withHeader` only when non-null. Cover `deletePet`'s optional

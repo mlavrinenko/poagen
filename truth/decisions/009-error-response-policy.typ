@@ -69,7 +69,7 @@ Specifically:
   consumers want to catch structurally (not by status code).
 
 The implementing task is
-`truth/tasks/012-non-2xx-error-handling.typ`; a concrete alternative
+#link("../tasks/012-non-2xx-error-handling.typ"); a concrete alternative
 would have to supersede this ADR with a new one.
 
 == Consequences
