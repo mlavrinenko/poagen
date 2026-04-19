@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Composition Fixture
+  version: "1.0.0"
+  description: >
+    Exercises oneOf / anyOf / allOf handling (T-008). Minimal on purpose:
+    three branches for union tests (Dog/Cat via Animal) plus a
+    discriminator-bearing Pet, and an allOf merge (BaseThing + ExtraThing
+    → MergedThing).
+paths: {}
+components:
+  schemas:
+    Dog:
+      type: object
+      required:
+        - bark
+      properties:
+        bark:
+          type: string
+    Cat:
+      type: object
+      required:
+        - meow
+      properties:
+        meow:
+          type: string
+    Animal:
+      type: object
+      required:
+        - creature
+      properties:
+        creature:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Cat'
+    Pet:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Cat'
+          discriminator:
+            propertyName: petType
+    BaseThing:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+    ExtraThing:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+    MergedThing:
+      allOf:
+        - $ref: '#/components/schemas/BaseThing'
+        - $ref: '#/components/schemas/ExtraThing'

@@ -9,6 +9,7 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
@@ -136,12 +137,14 @@ final readonly class Generator
                 continue;
             }
 
-            if ($schema->type !== 'object') {
+            $effective = $this->materialiseAllOf($schema, $openApi);
+
+            if ($effective->type !== 'object') {
                 continue;
             }
 
             $className = $renames[$rawName] ?? $rawName;
-            $emission = $this->modelEmitter->emit($modelNamespace, $className, $schema, $bindings, $enums);
+            $emission = $this->modelEmitter->emit($modelNamespace, $className, $effective, $bindings, $enums);
 
             $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
             file_put_contents($path, $emission->source);
@@ -153,6 +156,22 @@ final readonly class Generator
         }
 
         $this->drainSynthesisedChildren($pending, $modelNamespace, $modelDir, $bindings, $enums, $emitted);
+    }
+
+    /**
+     * Flatten a top-level `allOf` schema into a single object-type Schema
+     * whose `properties`/`required` are the union of its branches (T-008).
+     * Non-`allOf` schemas pass through untouched.
+     */
+    private function materialiseAllOf(Schema $schema, OpenApi $openApi): Schema
+    {
+        if (!\is_array($schema->allOf) || $schema->allOf === []) {
+            return $schema;
+        }
+
+        $flattened = CompositionResolver::flattenAllOf($schema, $openApi);
+
+        return $flattened ?? $schema;
     }
 
     /**

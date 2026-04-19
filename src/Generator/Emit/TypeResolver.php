@@ -60,6 +60,12 @@ final readonly class TypeResolver
             }
         }
 
+        $union = CompositionResolver::resolveUnion($node, $modelNamespace);
+
+        if ($union instanceof self) {
+            return $union;
+        }
+
         return match ($type) {
             'string' => new self('string', null, null, $nullable),
             'integer' => new self('int', null, null, $nullable),

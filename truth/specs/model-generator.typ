@@ -85,6 +85,47 @@
       #and_[the emitted enum is `enum Status: string` with one PascalCased case per declared value]
       #and_[#a(Model) that references `#/components/schemas/Status` is typed with the enum, not `string`]
     ]
+
+    #scenario(
+      "A `oneOf` of `$ref`-ed components becomes a PHP union type",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/CompositionResolver.php",
+        "src/Generator/Emit/ClientEmitter.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Animal` with a required property `creature` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
+      #when[the model is emitted and `ApiClient::hydrate(Animal::class, $data)` runs against a payload whose `creature` structurally matches the `Dog` branch]
+      #then[`Animal` has a promoted constructor parameter typed `Dog|Cat`]
+      #and_[`$animal->creature` is an instance of `Dog`, not `Cat`]
+    ]
+
+    #scenario(
+      "A `oneOf` with a `discriminator.propertyName` picks the branch by wire value",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/CompositionResolver.php",
+        "src/Generator/Emit/ClientEmitter.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
+      #when[`ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
+      #then[`$pet->kind` is an instance of `Cat`, independent of whether the payload's keys structurally match `Dog`]
+    ]
+
+    #scenario(
+      "An `allOf` that merges two object schemas becomes a single Model with the union of properties",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/CompositionResolver.php",
+        "src/Generator/Generator.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `BaseThing` (required `id: integer`) and `ExtraThing` (required `label: string`) and #a(Model) `MergedThing` whose schema is `allOf: [$ref BaseThing, $ref ExtraThing]`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/MergedThing.php` is written]
+      #and_[`MergedThing` has promoted constructor parameters `int $id` and `string $label`]
+    ]
   ]
 
   #rule("Hydration and serialization contract (ADR-007)")[

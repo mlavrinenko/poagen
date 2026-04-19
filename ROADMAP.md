@@ -27,7 +27,7 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 
 - [x] **T-009** — Emit OpenAPI enums as PHP 8.1 backed enums.
 - [x] **T-013** — Emit inline nested object schemas as typed maps or synthesized `Generated/Model/*` classes.
-- [ ] **T-008** — Emit typed PHP for `oneOf` / `anyOf` / `allOf` composition.
+- [x] **T-008** — Emit typed PHP for `oneOf` / `anyOf` / `allOf` composition.
 
 ## Phase 3 — Operation Generator coverage
 

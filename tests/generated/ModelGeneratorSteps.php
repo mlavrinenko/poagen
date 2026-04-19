@@ -652,4 +652,132 @@ final class ModelGeneratorSteps
         TestCase::assertStringNotContainsString('?array $shipping', $source);
     }
 
+
+    /** @var object|null */
+    private ?object $hydratedAnimal = null;
+    /** @var object|null */
+    private ?object $hydratedCompositionPet = null;
+
+    /**
+     * Invoke the (class-agnostic) hydrator on any class using the petstore
+     * ApiClient as host. Mirrors {@see self::invokeHydrate} but targets the
+     * composition fixture's namespace.
+     *
+     * @param class-string $target
+     * @param array<mixed> $payload
+     */
+    private function invokeCompositionHydrate(string $target, array $payload): object
+    {
+        // Make sure the composition fixture is regenerated and loadable.
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+
+        // Also regenerate petstore so its ApiClient (our host) is current.
+        $petstore = $this->loadProfile('petstore');
+        $this->runGenerator($petstore);
+        $this->outputDir = $petstore->output;
+
+        $reflection = new \ReflectionMethod(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient::class,
+            'hydrate',
+        );
+
+        $result = $reflection->invoke(null, $target, $payload);
+        \assert(\is_object($result));
+
+        return $result;
+    }
+
+    public function givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator(
+    ): void {
+        // The composition fixture declares Dog/Cat components and Animal
+        // with a required `creature` property that is a non-discriminated
+        // oneOf: [$ref Dog, $ref Cat].
+        $this->profile = $this->loadProfile('composition');
+    }
+
+
+    public function whenTheModelIsEmittedAndApiClientHydrateAnimalClassDataRunsAgainstAPayloadWhoseCreatureStructurallyMatchesTheDogBranch(
+    ): void {
+        $this->hydratedAnimal = $this->invokeCompositionHydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Animal::class,
+            ['creature' => ['bark' => 'woof']],
+        );
+    }
+
+
+    public function thenAnimalHasAPromotedConstructorParameterTypedDogCat(): void
+    {
+        TestCase::assertNotNull($this->profile);
+        $source = (string) file_get_contents(
+            \dirname(__DIR__, 2)
+            . '/tests/fixtures/generated/composition/Generated/Model/Animal.php',
+        );
+        TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
+    }
+
+
+    public function thenAnimalCreatureIsAnInstanceOfDogNotCat(): void
+    {
+        \assert($this->hydratedAnimal instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Animal);
+        TestCase::assertInstanceOf(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Dog::class,
+            $this->hydratedAnimal->creature,
+        );
+        TestCase::assertNotInstanceOf(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
+            $this->hydratedAnimal->creature,
+        );
+    }
+
+
+    public function givenSchemaDeclaresComponentsDogAndCatAndModelPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
+    ): void {
+        $this->profile = $this->loadProfile('composition');
+    }
+
+
+    public function whenApiclientHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire(string $wire): void
+    {
+        $tag = trim($wire, "'\"");
+        // Payload has both `bark` (so a bare structural match would prefer Dog)
+        // and `meow` (Cat's required field) — petType='Cat' must break the tie
+        // and select Cat regardless of the structural overlap.
+        $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
+        );
+    }
+
+
+    public function thenPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog(): void
+    {
+        \assert($this->hydratedCompositionPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
+        TestCase::assertInstanceOf(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
+            $this->hydratedCompositionPet->kind,
+        );
+    }
+
+
+    public function givenSchemaDeclaresComponentsBaseThingRequiredIdIntegerAndExtraThingRequiredLabelStringAndModelMergedThingWhoseSchemaIsAllOfRefBaseThingRefExtraThing(
+    ): void {
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenAFileGeneratedModelMergedThingPhpIsWritten(): void
+    {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Model/MergedThing.php');
+    }
+
+
+    public function thenMergedthingHasPromotedConstructorParametersIntIdAndStringLabel(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/MergedThing.php');
+        TestCase::assertStringContainsString('public int $id', $source);
+        TestCase::assertStringContainsString('public string $label', $source);
+    }
+
 }

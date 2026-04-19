@@ -63,7 +63,7 @@ final readonly class ModelEmitter
             array_values(array_filter($names, static fn(string $n): bool => !\in_array($n, $required, true))),
         );
 
-        /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap */
+        /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap */
         $propertyMap = [];
         /** @var list<SynthesisedModel> $children */
         $children = [];
@@ -168,30 +168,22 @@ final readonly class ModelEmitter
         if ($type !== null) {
             $param->setType($type);
         }
-
         if ($isNullable) {
-            $param->setNullable();
-            $param->setDefaultValue(null);
+            $param->setNullable()->setDefaultValue(null);
         }
-
         if ($resolved->phpDoc !== null) {
-            $constructor->addComment(\sprintf(
-                '@param %s%s $%s',
-                $isNullable ? '?' : '',
-                $resolved->phpDoc,
-                $phpName,
-            ));
+            $constructor->addComment(\sprintf('@param %s%s $%s', $isNullable ? '?' : '', $resolved->phpDoc, $phpName));
         }
-
         if ($todo !== null) {
             $constructor->addComment($todo);
         }
 
         // Hint use-statements for FQNs so the printed file uses short forms.
-        if ($type !== null && str_contains($type, '\\')) {
-            $namespace->addUse(ltrim($type, '\\'));
+        foreach ($type !== null ? explode('|', $type) : [] as $part) {
+            if (str_contains($part, '\\')) {
+                $namespace->addUse(ltrim($part, '\\'));
+            }
         }
-
         if ($resolved->phpDocUse !== null) {
             $namespace->addUse(ltrim($resolved->phpDocUse, '\\'));
         }
@@ -201,7 +193,7 @@ final readonly class ModelEmitter
      * Emit the `PROPERTY_MAP` class constant that pairs each PHP property
      * name with (a) its original schema key and (b) its runtime shape.
      *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap
+     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap
      */
     private function emitPropertyMap(ClassType $class, array $propertyMap): void
     {
@@ -221,10 +213,12 @@ final readonly class ModelEmitter
             . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO),'
             . ' [\'datetime\', null] (format: date-time → \\DateTimeImmutable),'
             . ' [\'date\', null] (format: date → \\DateTimeImmutable),'
-            . ' [\'enum\', \\FQCN::class] (named enum component → backed enum).',
+            . ' [\'enum\', \\FQCN::class] (named enum component → backed enum),'
+            . ' [\'union\', [\\A::class, \\B::class, ...], \'propertyName\'|null]'
+            . ' (oneOf/anyOf of refs; third slot is the discriminator property name or null).',
         );
         $const->addComment('');
-        $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}}>');
+        $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>');
     }
 
     /**
@@ -233,7 +227,7 @@ final readonly class ModelEmitter
      * built-in datetime/date shapes route through `format()`; everything
      * else passes through unchanged.
      *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool}> $propertyMap
+     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap
      */
     private function emitJsonSerialize(ClassType $class, array $propertyMap): void
     {
@@ -253,7 +247,7 @@ final readonly class ModelEmitter
     }
 
     /**
-     * @param array{wire: string, php: string, shape: null|string|array{0:string,1:?string}, nullable: bool} $entry
+     * @param array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool} $entry
      */
     private function serializeExpr(array $entry): string
     {
@@ -273,6 +267,7 @@ final readonly class ModelEmitter
             default => $base,
         };
     }
+
 
     private function phpName(string $openApiName): string
     {

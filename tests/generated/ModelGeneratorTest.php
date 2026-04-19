@@ -117,10 +117,62 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A `oneOf` of `$ref`-ed components becomes a PHP union type
+     * @source truth/specs/model-generator.typ:89
+     *
+     * Given Schema declares components Dog and Cat and Model Animal with a required property creature whose schema is oneOf: [$ref Dog, $ref Cat] with no discriminator
+     * When the model is emitted and ApiClient::hydrate(Animal::class, $data) runs against a payload whose creature structurally matches the Dog branch
+     * Then Animal has a promoted constructor parameter typed Dog|Cat
+     *   And $animal->creature is an instance of Dog, not Cat
+     */
+    public function testAOneOfOfRefEdComponentsBecomesAPHPUnionType(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator();
+        $this->steps->whenTheModelIsEmittedAndApiClientHydrateAnimalClassDataRunsAgainstAPayloadWhoseCreatureStructurallyMatchesTheDogBranch();
+        $this->steps->thenAnimalHasAPromotedConstructorParameterTypedDogCat();
+        $this->steps->thenAnimalCreatureIsAnInstanceOfDogNotCat();
+    }
+
+
+    /**
+     * Scenario: A `oneOf` with a `discriminator.propertyName` picks the branch by wire value
+     * @source truth/specs/model-generator.typ:103
+     *
+     * Given Schema declares components Dog and Cat and Model Pet with a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
+     * When ApiClient::hydrate(Pet::class, $data) runs against a payload whose kind.petType is 'Cat'
+     * Then $pet->kind is an instance of Cat, independent of whether the payload's keys structurally match Dog
+     */
+    public function testAOneOfWithADiscriminatorPropertyNamePicksTheBranchByWireValue(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsDogAndCatAndModelPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType();
+        $this->steps->whenApiclientHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
+        $this->steps->thenPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog();
+    }
+
+
+    /**
+     * Scenario: An `allOf` that merges two object schemas becomes a single Model with the union of properties
+     * @source truth/specs/model-generator.typ:116
+     *
+     * Given Schema declares components BaseThing (required id: integer) and ExtraThing (required label: string) and Model MergedThing whose schema is allOf: [$ref BaseThing, $ref ExtraThing]
+     * When Generator runs against Profile
+     * Then a file Generated/Model/MergedThing.php is written
+     *   And MergedThing has promoted constructor parameters int $id and string $label
+     */
+    public function testAnAllOfThatMergesTwoObjectSchemasBecomesASingleModelWithTheUnionOfProperties(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsBaseThingRequiredIdIntegerAndExtraThingRequiredLabelStringAndModelMergedThingWhoseSchemaIsAllOfRefBaseThingRefExtraThing();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenAFileGeneratedModelMergedThingPhpIsWritten();
+        $this->steps->thenMergedthingHasPromotedConstructorParametersIntIdAndStringLabel();
+    }
+
+
+    /**
      * Rule: Hydration and serialization contract (ADR-007)
      *
      * Scenario: A list-of-Model property hydrates each item into the declared class
-     * @source truth/specs/model-generator.typ:91
+     * @source truth/specs/model-generator.typ:132
      *
      * Given Model Pet has a property tags whose schema is type: array, items.$ref: #/components/schemas/Tag
      * When the generated ApiClient::hydrate(Pet::class, $data) runs against a payload whose tags is a list of two objects
@@ -138,7 +190,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A list-of-scalar property hydrates items untouched
-     * @source truth/specs/model-generator.typ:102
+     * @source truth/specs/model-generator.typ:143
      *
      * Given Model Pet has a property photoUrls whose schema is type: array, items.type: string
      * When the generated ApiClient::hydrate(Pet::class, $data) runs against a payload whose photoUrls is a list of plain strings
@@ -154,7 +206,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A property with a non-identifier schema key round-trips through PROPERTY_MAP
-     * @source truth/specs/model-generator.typ:112
+     * @source truth/specs/model-generator.typ:153
      *
      * Given Model Contact declares a required property whose schema key is display-name (kebab-case)
      * When the generator emits Contact.php and ApiClient::hydrate runs against a payload containing the wire key display-name
@@ -178,7 +230,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:127
+     * @source truth/specs/model-generator.typ:168
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -196,7 +248,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.typ:138
+     * @source truth/specs/model-generator.typ:179
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
@@ -216,7 +268,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.typ:153
+     * @source truth/specs/model-generator.typ:194
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user #[BindsFormat('date-time')] binding is registered
@@ -240,7 +292,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:172
+     * @source truth/specs/model-generator.typ:213
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -256,7 +308,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:182
+     * @source truth/specs/model-generator.typ:223
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed
