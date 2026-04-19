@@ -8,6 +8,7 @@ use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
@@ -24,6 +25,7 @@ final readonly class Generator
         private AttributeScanner $scanner,
         private ModelEmitter $modelEmitter = new ModelEmitter(),
         private EnumEmitter $enumEmitter = new EnumEmitter(),
+        private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
     ) {}
 
     public function generate(Profile $profile): void
@@ -51,6 +53,7 @@ final readonly class Generator
 
         $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $enums, $emitted);
         $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $enums, $emitted);
+        $this->emitApiException($rootNamespace, $rootDir, $emitted);
         $this->emitEnums($enums, $enumDir, $emitted);
 
         $this->pruneStale($rootDir, $emitted);
@@ -242,6 +245,19 @@ final readonly class Generator
         $this->ensureDir($rootDir);
 
         file_put_contents($path, $code);
+        $emitted[$path] = true;
+    }
+
+    /** @param array<string,true> $emitted */
+    private function emitApiException(string $rootNamespace, string $rootDir, array &$emitted): void
+    {
+        // Only emit when ApiClient was emitted: the exception has no
+        // referent without at least one operation that throws it.
+        if (!isset($emitted[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
+            return;
+        }
+        $path = $rootDir . \DIRECTORY_SEPARATOR . 'ApiException.php';
+        file_put_contents($path, $this->apiExceptionEmitter->emit($rootNamespace));
         $emitted[$path] = true;
     }
 

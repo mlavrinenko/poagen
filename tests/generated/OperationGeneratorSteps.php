@@ -10,6 +10,7 @@ use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
@@ -38,6 +39,7 @@ final class OperationGeneratorSteps
     private ?ApiClient $client = null;
     private ?RecordingClient $http = null;
     private ?Order $orderResult = null;
+    private ?ApiException $caught = null;
 
     public function __construct(TestCase $test)
     {
@@ -133,8 +135,10 @@ final class OperationGeneratorSteps
     ): void {
         // PHPUnit's argument pipeline strips outer quotes; re-unescape the
         // spec's raw JSON so it becomes valid for the mock response.
+        // Same step services both the happy path (200) and the
+        // non-2xx ApiException scenario (404).
         $normalized = str_replace('\\"', '"', $body);
-        TestCase::assertSame(200, $code);
+        TestCase::assertContains($code, [200, 404]);
 
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
@@ -597,6 +601,52 @@ final class OperationGeneratorSteps
             'public function findPetsByStatus(FindPetsByStatusStatus $status): array',
             $this->source,
         );
+    }
+
+
+    public function whenGetpetbyid999IsCalledOnClient(): void
+    {
+        TestCase::assertNotNull($this->client);
+
+        try {
+            $this->client->getPetById(999);
+            TestCase::fail('Expected ApiException to be thrown.');
+        } catch (ApiException $e) {
+            $this->caught = $e;
+        }
+    }
+
+
+    public function thenTheCallThrowsGeneratedApiException(): void
+    {
+        TestCase::assertInstanceOf(ApiException::class, $this->caught);
+    }
+
+
+    public function thenTheExceptionsGetStatusCodeReturns404(): void
+    {
+        TestCase::assertNotNull($this->caught);
+        TestCase::assertSame(404, $this->caught->getStatusCode());
+    }
+
+
+    public function thenTheExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload(): void
+    {
+        TestCase::assertNotNull($this->caught);
+        // Raw decoded array — never a Model instance, even if the schema
+        // declared a 4xx $ref-to-Model body (T-012 acceptance). The
+        // exact-shape `assertSame` itself proves the value is `array`,
+        // not an instance of `Pet` or any other Model class.
+        $decoded = $this->caught->getDecodedBody();
+        TestCase::assertSame(['message' => 'not found'], $decoded);
+
+        // Round-trips: cached after first call, same value on every call.
+        TestCase::assertSame($decoded, $this->caught->getDecodedBody());
+
+        // Request and response are the originals carried into the exception.
+        TestCase::assertNotNull($this->http);
+        TestCase::assertSame($this->http->lastRequest, $this->caught->getRequest());
+        TestCase::assertSame(404, $this->caught->getResponse()->getStatusCode());
     }
 
 }

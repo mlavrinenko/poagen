@@ -53,6 +53,8 @@ final readonly class ClientEmitter
         $namespace->addUse(ClientInterface::class);
         $namespace->addUse(RequestFactoryInterface::class);
         $namespace->addUse(StreamFactoryInterface::class);
+        // Same-namespace use so the per-profile ApiException prints short.
+        $namespace->addUse($clientNamespace . '\\ApiException');
 
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
 

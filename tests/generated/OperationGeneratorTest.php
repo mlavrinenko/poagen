@@ -310,9 +310,12 @@ final class OperationGeneratorTest extends TestCase
      *   And the exception's getStatusCode() returns 404
      *   And the exception's getDecodedBody() returns the decoded error payload
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        $this->steps->givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(404, '{\"message\":\"not found\"}');
+        $this->steps->whenGetpetbyid999IsCalledOnClient();
+        $this->steps->thenTheCallThrowsGeneratedApiException();
+        $this->steps->thenTheExceptionsGetStatusCodeReturns404();
+        $this->steps->thenTheExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload();
     }
 }

@@ -197,7 +197,10 @@
   #rule("Error responses")[
     #scenario(
       "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
-      stage: draft,
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ApiExceptionEmitter.php",
+      ),
     )[
       #given[#the(Client) is constructed with a PSR-18 HTTP client that returns status #p((code: "404")) with JSON body #p((body: "{\"message\":\"not found\"}"))]
       #when[`getPetById(999)` is called on #the(Client)]

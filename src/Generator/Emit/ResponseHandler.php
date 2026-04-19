@@ -9,9 +9,12 @@ use Nette\PhpGenerator\Method;
 /**
  * Emits the body lines that send the request and decode the response.
  *
- * Five shapes (mirrored on {@see ReturnSpec::KIND_*}): void, single Model,
- * list-of-Model, scalar (returned via cast on the raw body), and map
- * (decoded `additionalProperties`, returned as the typed associative array).
+ * Every method first branches on the HTTP status: anything outside 2xx
+ * throws the per-profile `ApiException` (T-012, ADR-009). Successful
+ * responses then flow into one of five shapes (mirrored on
+ * {@see ReturnSpec::KIND_*}): void, single Model, list-of-Model, scalar
+ * (returned via cast on the raw body), and map (decoded
+ * `additionalProperties`, returned as the typed associative array).
  *
  * @internal
  */
@@ -19,13 +22,19 @@ final readonly class ResponseHandler
 {
     public function emit(Method $method, ReturnSpec $return): void
     {
-        if ($return->kind === ReturnSpec::KIND_VOID) {
-            $method->addBody('$this->httpClient->sendRequest($request);');
+        // Use a `$__status` local to avoid colliding with method parameters
+        // named `$status` (e.g. `findPetsByStatus`).
+        $method->addBody('$response = $this->httpClient->sendRequest($request);');
+        $method->addBody('$__status = $response->getStatusCode();');
+        $method->addBody('if ($__status < 200 || $__status >= 300) {');
+        $method->addBody('    throw new ApiException($__status, $request, $response);');
+        $method->addBody('}');
 
+        if ($return->kind === ReturnSpec::KIND_VOID) {
+            // Implicit `return;` at the end of a `void` method; emitting an
+            // explicit one would make rector flag it as dead.
             return;
         }
-
-        $method->addBody('$response = $this->httpClient->sendRequest($request);');
 
         if ($return->kind === ReturnSpec::KIND_SCALAR) {
             $cast = $return->scalarPhpType ?? 'string';

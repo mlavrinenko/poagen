@@ -30,6 +30,10 @@ final readonly class ApiClient
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Pet::class, $data);
@@ -43,6 +47,10 @@ final readonly class ApiClient
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Pet::class, $data);
@@ -59,6 +67,10 @@ final readonly class ApiClient
         $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         \assert(\is_array($data));
@@ -80,6 +92,10 @@ final readonly class ApiClient
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         \assert(\is_array($data));
@@ -95,6 +111,10 @@ final readonly class ApiClient
         $path = \str_replace('{petId}', (string) $petId, $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Pet::class, $data);
@@ -114,6 +134,10 @@ final readonly class ApiClient
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Pet::class, $data);
@@ -125,7 +149,11 @@ final readonly class ApiClient
         $path = \str_replace('{petId}', (string) $petId, $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         if ($api_key !== null) { $request = $request->withHeader('api_key', $api_key); }
-        $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     /**
@@ -136,6 +164,10 @@ final readonly class ApiClient
         $path = '/store/inventory';
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var array<string, int> $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return $data;
@@ -149,6 +181,10 @@ final readonly class ApiClient
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Order::class, $data);
@@ -160,6 +196,10 @@ final readonly class ApiClient
         $path = \str_replace('{orderId}', (string) $orderId, $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(Order::class, $data);
@@ -170,7 +210,11 @@ final readonly class ApiClient
         $path = '/store/order/{orderId}';
         $path = \str_replace('{orderId}', (string) $orderId, $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
-        $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     public function createUser(User $body): User
@@ -181,6 +225,10 @@ final readonly class ApiClient
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(User::class, $data);
@@ -197,6 +245,10 @@ final readonly class ApiClient
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(User::class, $data);
@@ -215,6 +267,10 @@ final readonly class ApiClient
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         return (string) $response->getBody();
     }
 
@@ -222,7 +278,11 @@ final readonly class ApiClient
     {
         $path = '/user/logout';
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
-        $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     public function getUserByName(string $username): User
@@ -231,6 +291,10 @@ final readonly class ApiClient
         $path = \str_replace('{username}', $username, $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
         return self::hydrate(User::class, $data);
@@ -244,7 +308,11 @@ final readonly class ApiClient
         $request = $request
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
-        $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     public function deleteUser(string $username): void
@@ -252,7 +320,11 @@ final readonly class ApiClient
         $path = '/user/{username}';
         $path = \str_replace('{username}', $username, $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
-        $this->httpClient->sendRequest($request);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     /**
