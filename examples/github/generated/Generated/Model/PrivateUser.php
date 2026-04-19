@@ -1,0 +1,160 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\GitHub\Generated\Model;
+
+use DateTimeImmutable;
+use JsonSerializable;
+
+final readonly class PrivateUser implements JsonSerializable
+{
+    /**
+     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
+     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
+     */
+    public const array PROPERTY_MAP = [
+        'avatar_url' => ['avatar_url', null],
+        'bio' => ['bio', null],
+        'blog' => ['blog', null],
+        'collaborators' => ['collaborators', null],
+        'company' => ['company', null],
+        'created_at' => ['created_at', ['datetime', null]],
+        'disk_usage' => ['disk_usage', null],
+        'email' => ['email', null],
+        'events_url' => ['events_url', null],
+        'followers' => ['followers', null],
+        'followers_url' => ['followers_url', null],
+        'following' => ['following', null],
+        'following_url' => ['following_url', null],
+        'gists_url' => ['gists_url', null],
+        'gravatar_id' => ['gravatar_id', null],
+        'hireable' => ['hireable', null],
+        'html_url' => ['html_url', null],
+        'id' => ['id', null],
+        'location' => ['location', null],
+        'login' => ['login', null],
+        'name' => ['name', null],
+        'node_id' => ['node_id', null],
+        'organizations_url' => ['organizations_url', null],
+        'owned_private_repos' => ['owned_private_repos', null],
+        'private_gists' => ['private_gists', null],
+        'public_gists' => ['public_gists', null],
+        'public_repos' => ['public_repos', null],
+        'received_events_url' => ['received_events_url', null],
+        'repos_url' => ['repos_url', null],
+        'site_admin' => ['site_admin', null],
+        'starred_url' => ['starred_url', null],
+        'subscriptions_url' => ['subscriptions_url', null],
+        'total_private_repos' => ['total_private_repos', null],
+        'two_factor_authentication' => ['two_factor_authentication', null],
+        'type' => ['type', null],
+        'updated_at' => ['updated_at', ['datetime', null]],
+        'url' => ['url', null],
+        'business_plus' => ['business_plus', null],
+        'ldap_dn' => ['ldap_dn', null],
+        'notification_email' => ['notification_email', null],
+        'plan' => ['plan', \Acme\GitHub\Generated\Model\PrivateUserPlan::class],
+        'twitter_username' => ['twitter_username', null],
+        'user_view_type' => ['user_view_type', null],
+    ];
+
+    public function __construct(
+        public string $avatar_url,
+        public ?string $bio = null,
+        public ?string $blog = null,
+        public int $collaborators,
+        public ?string $company = null,
+        public DateTimeImmutable $created_at,
+        public int $disk_usage,
+        public ?string $email = null,
+        public string $events_url,
+        public int $followers,
+        public string $followers_url,
+        public int $following,
+        public string $following_url,
+        public string $gists_url,
+        public ?string $gravatar_id = null,
+        public ?bool $hireable = null,
+        public string $html_url,
+        public int $id,
+        public ?string $location = null,
+        public string $login,
+        public ?string $name = null,
+        public string $node_id,
+        public string $organizations_url,
+        public int $owned_private_repos,
+        public int $private_gists,
+        public int $public_gists,
+        public int $public_repos,
+        public string $received_events_url,
+        public string $repos_url,
+        public bool $site_admin,
+        public string $starred_url,
+        public string $subscriptions_url,
+        public int $total_private_repos,
+        public bool $two_factor_authentication,
+        public string $type,
+        public DateTimeImmutable $updated_at,
+        public string $url,
+        public ?bool $business_plus = null,
+        public ?string $ldap_dn = null,
+        public ?string $notification_email = null,
+        public ?PrivateUserPlan $plan = null,
+        public ?string $twitter_username = null,
+        public ?string $user_view_type = null,
+    ) {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'avatar_url' => $this->avatar_url,
+            'bio' => $this->bio,
+            'blog' => $this->blog,
+            'collaborators' => $this->collaborators,
+            'company' => $this->company,
+            'created_at' => $this->created_at->format(\DateTimeInterface::RFC3339),
+            'disk_usage' => $this->disk_usage,
+            'email' => $this->email,
+            'events_url' => $this->events_url,
+            'followers' => $this->followers,
+            'followers_url' => $this->followers_url,
+            'following' => $this->following,
+            'following_url' => $this->following_url,
+            'gists_url' => $this->gists_url,
+            'gravatar_id' => $this->gravatar_id,
+            'hireable' => $this->hireable,
+            'html_url' => $this->html_url,
+            'id' => $this->id,
+            'location' => $this->location,
+            'login' => $this->login,
+            'name' => $this->name,
+            'node_id' => $this->node_id,
+            'organizations_url' => $this->organizations_url,
+            'owned_private_repos' => $this->owned_private_repos,
+            'private_gists' => $this->private_gists,
+            'public_gists' => $this->public_gists,
+            'public_repos' => $this->public_repos,
+            'received_events_url' => $this->received_events_url,
+            'repos_url' => $this->repos_url,
+            'site_admin' => $this->site_admin,
+            'starred_url' => $this->starred_url,
+            'subscriptions_url' => $this->subscriptions_url,
+            'total_private_repos' => $this->total_private_repos,
+            'two_factor_authentication' => $this->two_factor_authentication,
+            'type' => $this->type,
+            'updated_at' => $this->updated_at->format(\DateTimeInterface::RFC3339),
+            'url' => $this->url,
+            'business_plus' => $this->business_plus,
+            'ldap_dn' => $this->ldap_dn,
+            'notification_email' => $this->notification_email,
+            'plan' => $this->plan,
+            'twitter_username' => $this->twitter_username,
+            'user_view_type' => $this->user_view_type,
+        ];
+    }
+}

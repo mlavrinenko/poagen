@@ -118,7 +118,7 @@ check-examples:
                 echo "⚠️  $name: expected-failure — $reason"
             fi
         else
-            if php bin/paogen generate --diff "$profile" > /tmp/paogen-examples-diff.$$ 2>&1; then
+            if php -d memory_limit=4G bin/paogen generate --diff "$profile" > /tmp/paogen-examples-diff.$$ 2>&1; then
                 echo "✅ $name: no drift"
             else
                 echo "❌ $name: drift or error"

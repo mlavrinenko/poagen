@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\DigitalOcean\Generated\Enum;
+
+enum ApiBatchJobPhase: string
+{
+    case BatchJobPhaseUnknown = 'BATCH_JOB_PHASE_UNKNOWN';
+    case BatchJobPhasePending = 'BATCH_JOB_PHASE_PENDING';
+    case BatchJobPhaseRunning = 'BATCH_JOB_PHASE_RUNNING';
+    case BatchJobPhaseSucceeded = 'BATCH_JOB_PHASE_SUCCEEDED';
+    case BatchJobPhaseFailed = 'BATCH_JOB_PHASE_FAILED';
+    case BatchJobPhaseError = 'BATCH_JOB_PHASE_ERROR';
+    case BatchJobPhaseCancelled = 'BATCH_JOB_PHASE_CANCELLED';
+}

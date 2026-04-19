@@ -3,29 +3,32 @@
 The [DigitalOcean public API](https://docs.digitalocean.com/reference/api/)
 OpenAPI 3.0 document — 722 schema components, hundreds of endpoints.
 
-> **Status: expected-failure.** The generator aborts part-way through.
-> See [the limitation section below](#known-limitation--blocked-on-t-023)
-> for the exact error and the tracking task.
+> **Status: generates successfully.** The `generated/` tree is
+> committed. Some ops are currently skipped and the output still has
+> PHPStan warnings tracked by [T-025](../../truth/tasks/025-parameter-and-operation-name-normalisation.typ)
+> and [T-026](../../truth/tasks/026-scalar-and-composition-components.typ).
 
-## What this is meant to demonstrate
+## What this demonstrates
 
-- paogen on a mid-sized production schema (2.7 MB bundled YAML).
-- The `renames` escape hatch in Profile — DigitalOcean uses two
-  component names that aren't valid PHP identifiers (`version-2`,
-  `urn-2`), and a user would reach for `renames` to resolve them.
+- paogen on a mid-sized production schema (2.7 MB bundled YAML, 722
+  schema components).
+- The default `nameNormaliser` pipeline (T-023) handling kebab-case
+  and snake_case component names out of the box: `app_alert`
+  → `AppAlert`, `ssh_key_identifier` → `SshKeyIdentifier`. No
+  `renames` entries are needed; the profile is three lines of
+  config.
 
 ## Files
 
 ```
 digitalocean/
-├── .expected-failure          — marker read by `just check-examples`
 ├── composer.json              — consumer-style project manifest
 ├── paogen.php                 — the Profile object paogen reads
-└── schemas/
-    └── DigitalOcean-public.v2.yaml   — vendored bundled schema
+├── schemas/
+│   └── DigitalOcean-public.v2.yaml   — vendored bundled schema
+└── generated/
+    └── Generated/             — committed golden tree
 ```
-
-No `generated/` directory is committed because generation aborts.
 
 ## Running it
 
@@ -36,13 +39,8 @@ composer install
 composer generate
 ```
 
-You will currently see:
-
-```
-Fatal error: Uncaught Nette\InvalidArgumentException:
-  Value '\Acme\DigitalOcean\Generated\Model\urn-2' is not valid type.
-  at vendor/nette/php-generator/src/PhpGenerator/Helpers.php:146
-```
+The output lands in `./generated/`. Re-running against an unchanged
+schema is byte-stable (ADR-001).
 
 ## Source of the schema
 
@@ -55,24 +53,24 @@ https://api-engineering.nyc3.cdn.digitaloceanspaces.com/spec-ci/DigitalOcean-pub
 
 Refreshing the vendored file is a straight `curl -o` — no build step.
 
-## Known limitation — blocked on T-023
+## Known limitations
 
-DigitalOcean has 2 of 722 schema components whose raw names are not
-legal PHP identifiers: `version-2`, `urn-2`. paogen's documented
-workaround, `Profile::$renames`, *partially* applies — the top-level
-class for the renamed component is emitted correctly, but every
-other component that `$ref`s it still resolves against the raw name
-and the run aborts inside `nette/php-generator`.
+Two follow-up tasks track gaps exposed by this fixture.
 
-The fix (tracked in `truth/tasks/023-component-name-normalization.typ`)
-introduces pluggable name-normalisation strategies:
+- [`truth/tasks/025-parameter-and-operation-name-normalisation.typ`](../../truth/tasks/025-parameter-and-operation-name-normalisation.typ)
+  — some ops are skipped because their raw param names
+  (`Content-Type`) or operationId (`monitoring_get_…​.yml`) are not
+  valid PHP identifiers. Today's output is missing those endpoints;
+  T-025 brings them back by normalising the identifiers while keeping
+  the raw names on the wire.
+- [`truth/tasks/026-scalar-and-composition-components.typ`](../../truth/tasks/026-scalar-and-composition-components.typ)
+  — DigitalOcean declares `urn`, `ssh_key_id`,
+  `ssh_key_fingerprint`, and `floating_ip_create` as top-level
+  scalar or top-level-composition components. The generator
+  references them by class name without emitting a file, so
+  downstream PHPStan flags dangling class references. T-026 picks a
+  strategy per shape (probably `ScalarBinding`-style VOs + a union
+  type for `oneOf`).
 
-- Explicit `renames` entry, if any, wins.
-- Otherwise run the Profile-configured strategy (default: `Raw`, with
-  a bundled `PascalCaseSanitiser` opt-in and user-supplied strategies
-  accepted).
-
-When T-023 lands, the Profile in this example either keeps its
-two-entry `renames` (under the default `Raw` strategy) or drops them
-entirely (under `PascalCaseSanitiser`). Either path produces a clean
-end-to-end run and the `generated/` tree is committed.
+Both tasks block this example from being fully PHPStan-clean under
+`phpstan-generated.neon`; neither blocks the schema from generating.

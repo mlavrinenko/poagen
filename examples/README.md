@@ -9,8 +9,8 @@ own repo, minus `vendor/`.
 ```
 examples/
 ├── petstore/          ✅ passes — small textbook schema
-├── digitalocean/      ⚠️  expected-failure — blocked on T-023
-└── github/            ⚠️  expected-failure — blocked on T-023
+├── digitalocean/      ✅ passes (golden tree has T-025 / T-026 follow-ups)
+└── github/            ✅ passes (golden tree has T-025 / T-026 follow-ups)
 ```
 
 ## Running an example
@@ -34,16 +34,15 @@ Packagist round-trip. `composer generate` is a one-line alias for
   known-good end-to-end generation path: models, enums, an inline
   synthesised class, a small `ApiClient`, a `jsonSerialize` round-trip.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
-  (2.7 MB, 722 components). Exercises the `Profile::$renames` escape
-  hatch for two invalid-PHP component names (`version-2`, `urn-2`).
-  Currently `expected-failure` because renames are not threaded
-  through to cross-references — see
-  [`truth/tasks/023-component-name-normalization.typ`](../truth/tasks/023-component-name-normalization.typ).
+  (2.7 MB, 722 components). Every kebab-case and snake_case
+  component is auto-normalised by T-023's default pipeline. Two
+  follow-up tasks ([T-025](../truth/tasks/025-parameter-and-operation-name-normalisation.typ),
+  [T-026](../truth/tasks/026-scalar-and-composition-components.typ))
+  track ops the generator currently skips and scalar/composition
+  components that emit dangling class references.
 - **`github/`** — the GitHub REST API 3.0.3 bundle (8.8 MB, ~918
-  components). 818 components use kebab-case names. Currently
-  `expected-failure` until pluggable name-normalisation strategies
-  land (same T-023). The bundled `PascalCaseSanitiser` will be the
-  opt-in used here.
+  components, ~1000 endpoints). Same default pipeline; same
+  T-025 / T-026 follow-ups; same `just check-examples` green.
 
 ## `just check-examples`
 

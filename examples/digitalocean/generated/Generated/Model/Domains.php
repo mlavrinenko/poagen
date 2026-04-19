@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\DigitalOcean\Generated\Model;
+
+use JsonSerializable;
+
+final readonly class Domains implements JsonSerializable
+{
+    /**
+     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
+     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
+     */
+    public const array PROPERTY_MAP = [
+        'certificate_id' => ['certificate_id', null],
+        'is_managed' => ['is_managed', null],
+        'name' => ['name', null],
+    ];
+
+    public function __construct(
+        public ?string $certificate_id = null,
+        public ?bool $is_managed = null,
+        public ?string $name = null,
+    ) {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'certificate_id' => $this->certificate_id,
+            'is_managed' => $this->is_managed,
+            'name' => $this->name,
+        ];
+    }
+}

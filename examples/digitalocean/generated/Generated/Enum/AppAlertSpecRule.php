@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\DigitalOcean\Generated\Enum;
+
+enum AppAlertSpecRule: string
+{
+    case UnspecifiedRule = 'UNSPECIFIED_RULE';
+    case CpuUtilization = 'CPU_UTILIZATION';
+    case MemUtilization = 'MEM_UTILIZATION';
+    case RestartCount = 'RESTART_COUNT';
+    case DeploymentFailed = 'DEPLOYMENT_FAILED';
+    case DeploymentLive = 'DEPLOYMENT_LIVE';
+    case DomainFailed = 'DOMAIN_FAILED';
+    case DomainLive = 'DOMAIN_LIVE';
+    case AutoscaleFailed = 'AUTOSCALE_FAILED';
+    case AutoscaleSucceeded = 'AUTOSCALE_SUCCEEDED';
+    case FunctionsActivationCount = 'FUNCTIONS_ACTIVATION_COUNT';
+    case FunctionsAverageDurationMs = 'FUNCTIONS_AVERAGE_DURATION_MS';
+    case FunctionsErrorRatePerMinute = 'FUNCTIONS_ERROR_RATE_PER_MINUTE';
+    case FunctionsAverageWaitTimeMs = 'FUNCTIONS_AVERAGE_WAIT_TIME_MS';
+    case FunctionsErrorCount = 'FUNCTIONS_ERROR_COUNT';
+    case FunctionsGbRatePerSecond = 'FUNCTIONS_GB_RATE_PER_SECOND';
+}
