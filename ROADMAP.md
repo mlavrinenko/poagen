@@ -47,14 +47,16 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 
 Landing [`examples/`](examples/) made one pre-release-review item
 concrete: the ADR-005 validation-tier schemas (DigitalOcean, GitHub)
-currently abort at code emission because the generator uses raw
-OpenAPI component names as PHP class identifiers. The release-path
-question — "is this a v0.1 blocker or a post-v0.1 follow-up?" — is
-explicitly open; this phase sits above "v0.1 exit criteria" so its
-scheduling decision is taken before the tag is cut.
+aborted at code emission because the generator used raw OpenAPI
+component names as PHP class identifiers. Phase 5 replaced the
+hard-coded name handling with a pluggable pipeline (T-023) and then
+exposed two further gaps surfaced while exercising DO and GitHub —
+both filed as follow-up tasks the release cut must now sequence.
 
-- [x] **T-024** — `examples/` folder with petstore (passing) plus digitalocean and github (expected-failure), and a `just check-examples` recipe that reports drift and stale markers.
-- [ ] **T-023** — Pluggable OpenAPI → PHP name-normalisation strategies. Unblocks the DO and GitHub examples' golden trees. *Re-sequence into the post-v0.1 list if the validation-tier schemas do not gate 0.1.0.*
+- [x] **T-024** — `examples/` folder with petstore, digitalocean, github, and the `just check-examples` recipe.
+- [x] **T-023** — Pluggable OpenAPI → PHP name-normalisation strategies. Default pipeline (`RenamesNormaliser` → `PascalCaseSanitiser`) handles every DO and GitHub component; users compose their own strategies for anything exotic. All three examples pass `just check-examples`.
+- [ ] **T-025** — Parameter-name and operationId normalisation. Today the generator skips ops whose raw param/operationId names aren't valid PHP identifiers (DO's `Content-Type` header, `monitoring_get_*.yml`). Needed for DO and GitHub to expose every op they declare.
+- [ ] **T-026** — Named scalar + top-level composition components resolve to real PHP types. The `examples/digitalocean/generated` tree references classes like `\Model\Urn` that are never emitted because the component is `type: string`; downstream PHPStan flags the dangling refs. Same with `oneOf`-only top-level components (`floating_ip_create`). Needed for the examples to be PHPStan-clean under `phpstan-generated.neon`.
 
 ## v0.1 exit criteria
 
