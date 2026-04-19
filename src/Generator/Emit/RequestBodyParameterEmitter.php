@@ -6,6 +6,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -24,7 +25,10 @@ final readonly class RequestBodyParameterEmitter
     public function __construct(
         private string $modelNamespace,
         private ?EnumCatalog $enums = null,
-    ) {}
+        private ?NameRegistry $registry = null,
+    ) {
+        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+    }
 
     public function addBodyParams(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
     {
@@ -109,7 +113,8 @@ final readonly class RequestBodyParameterEmitter
         Bindings $bindings,
         bool $required,
     ): void {
-        $resolved = TypeResolver::resolve($field->schema, $bindings, $this->modelNamespace, $this->enums);
+        \assert($this->registry instanceof NameRegistry);
+        $resolved = TypeResolver::resolve($field->schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
         $type = $resolved->phpType;
 
         if ($type !== null && str_contains($type, '\\')) {

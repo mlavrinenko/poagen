@@ -8,6 +8,7 @@ use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Resolves the `requestBody` of an OpenAPI Operation into a {@see BodySpec}.
@@ -34,7 +35,7 @@ use cebe\openapi\spec\Schema;
  */
 final readonly class RequestBodyAnalyzer
 {
-    public static function resolve(RequestBody|Reference|null $body): ?BodySpec
+    public static function resolve(RequestBody|Reference|null $body, NameRegistry $registry): ?BodySpec
     {
         if ($body instanceof Reference) {
             $resolved = $body->resolve();
@@ -45,7 +46,7 @@ final readonly class RequestBodyAnalyzer
             return null;
         }
 
-        $jsonSpec = self::jsonBody($body);
+        $jsonSpec = self::jsonBody($body, $registry);
 
         if ($jsonSpec instanceof BodySpec) {
             return $jsonSpec;
@@ -60,7 +61,7 @@ final readonly class RequestBodyAnalyzer
         return self::unsupportedBody($body);
     }
 
-    private static function jsonBody(RequestBody $body): ?BodySpec
+    private static function jsonBody(RequestBody $body, NameRegistry $registry): ?BodySpec
     {
         $json = $body->content['application/json'] ?? null;
 
@@ -71,18 +72,20 @@ final readonly class RequestBodyAnalyzer
         $schema = $json->schema;
 
         if ($schema instanceof Reference) {
-            $name = self::componentNameFromRef($schema->getReference());
+            $ref = $schema->getReference();
+            $raw = ComponentName::rawFromRef($ref);
 
-            return $name === '' ? null : BodySpec::json($name);
+            return $raw === '' ? null : BodySpec::json(ComponentName::phpFromRef($ref, $registry));
         }
 
         if ($schema instanceof Schema && $schema->type === 'array') {
             $items = $schema->items;
 
             if ($items instanceof Reference) {
-                $name = self::componentNameFromRef($items->getReference());
+                $ref = $items->getReference();
+                $raw = ComponentName::rawFromRef($ref);
 
-                return $name === '' ? null : BodySpec::jsonList($name);
+                return $raw === '' ? null : BodySpec::jsonList(ComponentName::phpFromRef($ref, $registry));
             }
         }
 
@@ -161,10 +164,4 @@ final readonly class RequestBodyAnalyzer
         return null;
     }
 
-    private static function componentNameFromRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return end($parts);
-    }
 }

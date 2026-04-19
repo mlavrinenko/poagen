@@ -10,6 +10,7 @@ use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
@@ -37,10 +38,12 @@ final readonly class OperationEmitter
     public function __construct(
         private string $modelNamespace,
         private ?EnumCatalog $enums = null,
+        private ?NameRegistry $registry = null,
         private RequestAssembler $requestAssembler = new RequestAssembler(),
         private ResponseHandler $responseHandler = new ResponseHandler(),
     ) {
-        $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums);
+        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums, $registry);
     }
 
     public function emit(
@@ -59,13 +62,23 @@ final readonly class OperationEmitter
             return false;
         }
 
+        // An operationId carrying characters invalid in a PHP method name
+        // (DigitalOcean uses `monitoring_get_xyz.yml` in a handful of
+        // cases) would abort emission inside Nette\PhpGenerator. Skipping
+        // the op is the conservative move until the parameter-name
+        // normalisation follow-up decides how to canonicalise names.
+        if (preg_match('/^[A-Za-z_]\w*$/', $operationId) !== 1) {
+            return false;
+        }
+
         $pathParams = OperationAnalyzer::pathParameters($operation, $pathItem);
 
         if ($pathParams === null) {
             return false;
         }
 
-        $body = OperationAnalyzer::requestBody($operation->requestBody);
+        \assert($this->registry instanceof NameRegistry);
+        $body = OperationAnalyzer::requestBody($operation->requestBody, $this->registry);
 
         if ($operation->requestBody !== null && !$body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
             return false;
@@ -76,7 +89,7 @@ final readonly class OperationEmitter
         $requiredQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => $p->required));
         $optionalQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => !$p->required));
 
-        $return = OperationAnalyzer::returnType($operation->responses);
+        $return = OperationAnalyzer::returnType($operation->responses, $this->registry);
 
         $method = $class->addMethod($operationId)->setPublic();
 
@@ -179,10 +192,18 @@ final readonly class OperationEmitter
     private function importParamType(PhpNamespace $namespace, TypeResolver $resolved): void
     {
         $type = $resolved->phpType;
-        if ($type === null || !str_contains($type, '\\')) {
+        if ($type === null) {
             return;
         }
-        $namespace->addUse(ltrim($type, '\\'));
+        // A composition resolver may hand us a `Foo|Bar` union — addUse
+        // accepts one FQCN at a time, so split before importing.
+        foreach (explode('|', $type) as $part) {
+            $part = ltrim($part, '\\');
+            if (!str_contains($part, '\\')) {
+                continue;
+            }
+            $namespace->addUse($part);
+        }
     }
 
     /**
@@ -199,7 +220,9 @@ final readonly class OperationEmitter
             return new TypeResolver($synthFqcn, null, null, false);
         }
 
-        return TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace, $this->enums);
+        \assert($this->registry instanceof NameRegistry);
+
+        return TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace, $this->registry, $this->enums);
     }
 
     private function synthesizeParamEnum(?Schema $schema, string $operationId, string $paramName): ?string

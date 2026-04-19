@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
+
 /**
  * User-supplied generation guidance. See ADR-001 / ADR-003.
  *
@@ -12,11 +14,16 @@ namespace Mlavrinenko\Paogen\Generator;
 final readonly class Profile
 {
     /**
-     * @param string             $schema     Path to the OpenAPI YAML/JSON file.
-     * @param string             $output     Output directory for generated PHP.
-     * @param string             $namespace  Root namespace for generated classes (no trailing backslash).
-     * @param list<string>       $discoverIn Namespace prefixes to scan for #[Binds*] attributes.
-     * @param array<string,string> $renames  Map of schema-component name → desired PHP class name.
+     * @param string                $schema         Path to the OpenAPI YAML/JSON file.
+     * @param string                $output         Output directory for generated PHP.
+     * @param string                $namespace      Root namespace for generated classes (no trailing backslash).
+     * @param list<string>          $discoverIn     Namespace prefixes to scan for #[Binds*] attributes.
+     * @param array<string,string>  $renames        Map of schema-component name → desired PHP class name.
+     *                                              Always honoured before the auto-sanitiser.
+     * @param NameNormaliser|null   $nameNormaliser Custom normalisation pipeline. When null, paogen
+     *                                              composes RenamesNormaliser($renames) + PascalCaseSanitiser.
+     *                                              When set, paogen uses it verbatim — `$renames` is *not*
+     *                                              merged in automatically. See ADR-003 (T-023).
      */
     public function __construct(
         public string $schema,
@@ -24,5 +31,6 @@ final readonly class Profile
         public string $namespace,
         public array $discoverIn = [],
         public array $renames = [],
+        public ?NameNormaliser $nameNormaliser = null,
     ) {}
 }

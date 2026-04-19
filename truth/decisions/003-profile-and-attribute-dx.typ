@@ -77,6 +77,40 @@ The PoC ships only:
 `#[BindsSchema]`, `#[BindsPattern]`, `excludes`, `discriminators`, `group`
 are *designed* but unimplemented until a real schema needs them.
 
+== Name normalisation — `nameNormaliser` (T-023)
+
+Real-world schemas use kebab-case / snake_case / digit-prefixed
+component names that are not valid PHP identifiers. A single
+hard-coded sanitiser would be opinionated in ways different teams
+disagree about. `Profile` gains an optional `nameNormaliser` field
+that holds a `NameNormaliser` (interface under
+`Mlavrinenko\Paogen\Generator\Naming`). The pipeline is:
+
+```
+normalise(raw) → CompositeNormaliser([
+    RenamesNormaliser($profile->renames),   // explicit overrides win
+    PascalCaseSanitiser,                    // catch-all auto-convert
+])
+```
+
+Each strategy has a `normalise(raw, ctx): ?string` method: non-null
+is "I handled it", null is "pass to the next". Composites throw if
+*every* strategy returns null, with a diagnostic naming the offending
+raw input. Strategies may be pattern-gated with an optional PHP-regex
+constructor argument so users can scope them to names they care
+about.
+
+The default (null `nameNormaliser`) is the two-step pipeline above.
+A user who sets `nameNormaliser` to their own `NameNormaliser`
+replaces the whole pipeline — `renames` stops being applied
+automatically and the user composes it in themselves if they want it.
+That explicit handoff keeps simple profiles simple and advanced
+profiles fully in control.
+
+Collisions are never silently resolved: if two raw names land on the
+same PHP identifier, generation aborts with both raw keys named.
+Users disambiguate via `renames`.
+
 == Consequences
 
 - Adding a value object is a one-file change for the user (the VO itself,
@@ -86,3 +120,8 @@ are *designed* but unimplemented until a real schema needs them.
 - Adding a *new attribute* (`#[BindsSchema]`, etc.) is a code change in
   paogen — it's not extensible by users without a paogen release. This is
   the explicit cost of keeping the surface declarative.
+- The `nameNormaliser` field is the user's extension point for
+  anything renaming-adjacent that escapes `renames`'s static-map
+  form (pattern-based conventions, external lookup tables, etc.) —
+  without it, name normalisation would have to grow into paogen-core
+  on every new convention.

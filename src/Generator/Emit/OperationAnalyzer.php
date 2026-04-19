@@ -13,6 +13,7 @@ use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Summary of an operation used by the emitter, with `null` meaning the
@@ -27,8 +28,10 @@ final readonly class OperationAnalyzer
     /**
      * @return list<Parameter>|null null if any parameter sits outside the
      *                              supported subset (path + scalar/array
-     *                              query + optional scalar header) or a
-     *                              `$ref` could not be resolved
+     *                              query + optional scalar header), a
+     *                              `$ref` could not be resolved, or the
+     *                              parameter name is not a valid PHP
+     *                              identifier (see follow-up task)
      */
     public static function pathParameters(Operation $operation, ?PathItem $pathItem = null): ?array
     {
@@ -41,6 +44,16 @@ final readonly class OperationAnalyzer
         $out = [];
 
         foreach ($params as $param) {
+            // PHP method param identifiers are taken from the OpenAPI
+            // parameter name verbatim. Any name that isn't a legal PHP
+            // identifier (e.g. header `Content-Type`) currently aborts
+            // emission inside Nette\PhpGenerator. Skipping the whole op
+            // is loud enough — see the parameter-name normalisation
+            // follow-up task tracked alongside T-023.
+            if (preg_match('/^[A-Za-z_]\w*$/', $param->name) !== 1) {
+                return null;
+            }
+
             if ($param->in === 'path') {
                 $out[] = $param;
                 continue;
@@ -125,15 +138,15 @@ final readonly class OperationAnalyzer
      * Resolve a request body into a {@see BodySpec}. See
      * {@see RequestBodyAnalyzer::resolve()} for the preference order.
      */
-    public static function requestBody(RequestBody|Reference|null $body): ?BodySpec
+    public static function requestBody(RequestBody|Reference|null $body, NameRegistry $registry): ?BodySpec
     {
-        return RequestBodyAnalyzer::resolve($body);
+        return RequestBodyAnalyzer::resolve($body, $registry);
     }
 
     /**
      * @param Responses<Response|Reference>|null $responses
      */
-    public static function returnType(?Responses $responses): ReturnSpec
+    public static function returnType(?Responses $responses, NameRegistry $registry): ReturnSpec
     {
         if (!$responses instanceof \cebe\openapi\spec\Responses) {
             return ReturnSpec::void();
@@ -147,13 +160,13 @@ final readonly class OperationAnalyzer
                 continue;
             }
 
-            return self::responseReturn($response);
+            return self::responseReturn($response, $registry);
         }
 
         return ReturnSpec::void();
     }
 
-    private static function responseReturn(Response $response): ReturnSpec
+    private static function responseReturn(Response $response, NameRegistry $registry): ReturnSpec
     {
         $json = $response->content['application/json'] ?? null;
 
@@ -164,9 +177,10 @@ final readonly class OperationAnalyzer
         $schema = $json->schema;
 
         if ($schema instanceof Reference) {
-            $name = self::componentNameFromRef($schema->getReference());
+            $ref = $schema->getReference();
+            $raw = ComponentName::rawFromRef($ref);
 
-            return $name === '' ? ReturnSpec::void() : ReturnSpec::model($name);
+            return $raw === '' ? ReturnSpec::void() : ReturnSpec::model(ComponentName::phpFromRef($ref, $registry));
         }
 
         if (!$schema instanceof Schema) {
@@ -177,9 +191,10 @@ final readonly class OperationAnalyzer
             $items = $schema->items;
 
             if ($items instanceof Reference) {
-                $name = self::componentNameFromRef($items->getReference());
+                $ref = $items->getReference();
+                $raw = ComponentName::rawFromRef($ref);
 
-                return $name === '' ? ReturnSpec::void() : ReturnSpec::listOf($name);
+                return $raw === '' ? ReturnSpec::void() : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
             }
 
             return ReturnSpec::void();
@@ -213,10 +228,4 @@ final readonly class OperationAnalyzer
         };
     }
 
-    private static function componentNameFromRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return end($parts);
-    }
 }

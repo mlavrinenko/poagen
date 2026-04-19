@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Pluggable OpenAPI → PHP name-normalisation strategies",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 19),
   priority: "high",
   spec: "truth/specs/model-generator.typ",
@@ -93,93 +93,161 @@ targeting those sanitised names.
 
 == Design intent
 
-Manually enumerating 818 kebab-case names in `renames` is not a
-plausible user experience, and a single hard-coded auto-sanitiser is
-opinionated in ways different teams disagree about (PascalCase vs
-UPPER_SNAKE, prefix handling, acronym preservation). Treat name
-normalisation as a *strategy* the Profile selects, bundle the common
-cases, and let users bring their own.
+Treat name normalisation as a *pipeline of small, pattern-matchable
+strategies* the Profile configures. Each strategy decides whether to
+act on a given raw name, and if it does, returns the resulting PHP
+identifier. Nothing is released, so the default pipeline ships the
+useful behaviour — kebab/snake/dot names automatically become PHP
+identifiers — and `renames` keeps its role as the explicit-override
+slot.
 
-Precedence order, top to bottom:
+=== Pipeline shape
 
-+ Explicit `Profile::$renames` entry for a given raw name.
-+ A `#[BindsName(...)]`-style attribute if one lands in a later
-  task (left out of scope here; file if needed).
-+ The Profile's configured normalisation strategy.
-+ A built-in `Raw` strategy that returns the name unchanged — this
-  is the *only* default we can ship without breaking existing
-  fixtures. Users explicitly opt in to sanitisation.
+A single `NameNormaliser` interface:
 
-Bundled strategies shipped in-tree:
+```php
+interface NameNormaliser {
+    /**
+     * @return string|null PHP identifier when this strategy handles
+     *         the name, or null to pass through to the next strategy.
+     */
+    public function normalise(string $raw, NormalisationContext $ctx): ?string;
+}
+```
 
-+ `Raw` — identity; throws on an invalid identifier *only* when the
-  name actually reaches code-emission (today's behaviour,
-  clarified).
-+ `PascalCaseSanitiser` — split on `[^A-Za-z0-9]+`, PascalCase each
-  segment, prefix an underscore if the result starts with a digit,
-  suffix `_N` on collision with an already-claimed name.
-+ One more candidate to evaluate when the PoC lands: a `SnakeCase`
-  variant for projects that prefer `Security_Advisory` style. Land
-  if any of the validation-tier fixtures benefit; skip otherwise.
+`NormalisationContext` carries the symbol kind (start with just
+`SchemaComponent`) and the raw name. Enum cases and operation IDs get
+their own kinds only when a fixture needs them — not in this pass.
 
-User-supplied strategy:
+A `CompositeNormaliser` holds an ordered list and invokes each until
+one returns non-null. If *none* match, the composite throws with a
+diagnostic pointing at the offending name and the configured strategy
+list. No silent identity fallback.
 
-+ A `NameNormaliser` interface (exact name TBD during
-  implementation) with one method
-  `normalise(string $raw, NormalisationContext $ctx): string`.
-  Context carries the kind of symbol (schema component, operation
-  id, enum case, future kinds), the raw name, and whatever prior
-  results the run has seen (for collision handling).
-+ Profile grows a typed field (likely `nameNormaliser: ?object`)
-  accepting any class that implements the interface. The field
-  stays `?` and defaults to `null` → `Raw`, to preserve existing
-  behaviour for schemas that don't need it.
+=== Pattern gating
+
+Any strategy can optionally be constructed with a PHP-regex pattern:
+
+- Pattern null → strategy considers every raw name.
+- Pattern set → strategy only considers names where `preg_match` is
+  truthy.
+
+Gating is independent of the strategy's own "do I handle this input?"
+logic. A pattern-gated strategy can still return null from
+`normalise()` (e.g., "only apply to kebab-case" — pattern matches, but
+the strategy might still decline if the name was already valid).
+Composing pattern + decline keeps each strategy single-purpose.
+
+=== Precedence
+
+The default composite built from `Profile` is:
+
++ `RenamesNormaliser` built from `$profile->renames` (if non-empty).
++ `PascalCaseSanitiser` (catch-all, no pattern).
+
+Users who supply a custom `$profile->nameNormaliser` take over the
+whole pipeline; if they want renames, they compose a
+`RenamesNormaliser` themselves. The two-field split keeps the 80%
+case ergonomic (just set `renames`) without forcing the 20% case to
+inherit behaviour they may not want.
+
+=== Collisions
+
+Two raw names that land on the same normalised output
+(e.g. `foo-bar` and `foo_bar` → `FooBar`) → generator aborts with a
+pointed error naming both raw keys and the shared result. The user
+must disambiguate via `renames`. Silent suffixing (`_N`) was rejected
+— two classes with near-identical names is a landmine.
+
+=== Bundled strategies
+
++ `RenamesNormaliser(array<string,string> $map, ?string $pattern = null)`
+  — returns `$map[$raw]` or null. Almost always used without a
+  pattern.
++ `PascalCaseSanitiser(?string $pattern = null)` — splits the input
+  on `/[^A-Za-z0-9]+/`, PascalCases each segment, prefixes `_` when
+  the result starts with a digit. Returns null when the input is
+  *already* a valid PHP identifier and unchanged by the transform
+  (so an upstream strategy can opt not to touch already-clean names
+  via pattern gating and still compose).
++ `CompositeNormaliser(list<NameNormaliser> $strategies)` — the
+  ordered pipeline described above. First non-null wins; all-null →
+  throw.
+
+A snake-case-preserving variant (`Security_Advisory` style) is *not*
+shipped here; file a follow-up if any fixture benefits.
+
+=== Profile shape
+
+```php
+return new Profile(
+    schema: ...,
+    output: ...,
+    namespace: ...,
+    renames: ['version-2' => 'Version2'],              // sugar
+    nameNormaliser: null,                              // default pipeline
+);
+```
+
+The `renames` field stays. If `nameNormaliser` is null, paogen builds
+the default pipeline from `renames`. If `nameNormaliser` is non-null,
+paogen uses it *verbatim* — `renames` becomes advisory unless the
+user composes a `RenamesNormaliser` themselves. Explicit tradeoff:
+the user who writes a custom pipeline takes full responsibility.
 
 == In scope
 
-+ Add the `NameNormaliser` interface and the two (or three) bundled
-  strategies above.
-+ Add a `Mlavrinenko\Paogen\Generator\Emit\ComponentName` (or
-  equivalent) *resolver* that threads the Profile's
-  renames + strategy + the collision ledger through a single call
-  site, returning a guaranteed-valid PHP class name.
-+ Rewire every location that today uses a private
-  `componentNameFromRef` to go through the resolver:
-  - `src/Generator/Generator.php:157` — the authoritative class
-    name.
++ Add a new namespace `Mlavrinenko\Paogen\Generator\Naming` with:
+  - `NameNormaliser` interface.
+  - `NormalisationContext` value object (just `kind` for now; one
+    enum case, `SchemaComponent`).
+  - `RenamesNormaliser`, `PascalCaseSanitiser`,
+    `CompositeNormaliser` classes.
+  - `NameRegistry` — collects `$raw → $php` decisions as they happen
+    and raises on collision.
++ Add `Mlavrinenko\Paogen\Generator\Emit\ComponentName` — the single
+  resolver every ref site calls. Takes the `NameRegistry` + the raw
+  ref target, returns `(rawName, phpName, modelNamespace)`.
++ Rewire every call site that today uses a private
+  `componentNameFromRef`:
+  - `src/Generator/Generator.php:157`.
   - `src/Generator/Emit/TypeResolver.php:31,40`.
   - `src/Generator/Emit/PropertyShape.php:43,52,63,139`.
   - `src/Generator/Emit/CompositionResolver.php:176,189`.
   - `src/Generator/Emit/RequestBodyAnalyzer.php:74,83`.
   - `src/Generator/Emit/OperationAnalyzer.php:167,180`.
-+ Profile gains the `nameNormaliser` field with a sensible type hint
-  and a short docblock pointing at ADR-003. Default `null` → `Raw`.
++ `Profile` gains a `nameNormaliser: ?NameNormaliser` field. When
+  null, `Generator` builds the default pipeline
+  (`RenamesNormaliser($profile->renames)` + `PascalCaseSanitiser`).
 + Promote Model Generator scenarios that lock:
-  - Default (`Raw`): `security-advisory-ecosystems` reaches code
-    emission and the run aborts with a clear diagnostic pointing at
-    the field to set.
-  - `PascalCaseSanitiser`: same input → `SecurityAdvisoryEcosystems`,
-    cross-refs updated.
-  - Renames precedence: `renames: ['version-2' => 'Version2']`
-    wins over the strategy.
-  - User strategy: a tiny fixture normaliser implementing the
-    interface returns a canned mapping, end-to-end.
-+ A new dedicated fixture under `tests/fixtures/schemas/` exercising
-  kebab-case + digit-suffix names + cross-refs. Commit its golden
-  tree twice: once under `Raw` (expected to fail emission → use a
-  different approach, or cover via a failure-path scenario) and
-  once under `PascalCaseSanitiser`.
-+ Regenerate any already-committed fixture trees affected by the
-  resolver refactor. `petstore`, `composition`, `contact`,
-  `parameters` use valid identifiers already — output must stay
-  byte-identical.
-+ Update ADR-003 to document the strategy field and the precedence
-  ladder. Supersede if the section grows large; most likely fits
-  as an amendment.
-+ Unblock the `examples/digitalocean` and `examples/github`
-  demonstrations (see T-024). Their `.expected-failure` markers
-  flip to `pass` and their golden trees land in a follow-up
-  commit.
+  - Default pipeline turns `security-advisory-ecosystems` into
+    `SecurityAdvisoryEcosystems` and updates every cross-ref.
+  - `renames: ['version-2' => 'Version2']` takes precedence over
+    the auto-sanitiser.
+  - A user-supplied pipeline that is an *empty*
+    `CompositeNormaliser` (no strategies) fails the run with a
+    useful error naming the first unhandled component.
+  - A pattern-gated strategy only applies to names it matches
+    (demonstrate via a tiny fixture strategy that upper-cases
+    names starting with `legacy_`, composed before
+    `PascalCaseSanitiser`).
+  - Two raw names normalising to the same PHP class abort the run
+    with both raw names listed.
++ A new fixture under `tests/fixtures/schemas/` named e.g.
+  `naming-3.0.yaml` that exercises kebab-case, snake_case,
+  digit-suffix, and cross-refs between them. Commit the golden
+  tree under `tests/fixtures/generated/naming/`.
++ Regenerate existing golden trees (`petstore`, `composition`,
+  `contact`, `parameters`). All their component names are already
+  valid PascalCase identifiers and the default pipeline is
+  idempotent on those, so the diffs should be empty. If anything
+  shifts, investigate before committing.
++ ADR-003 amendment section documenting the `nameNormaliser` field
+  and precedence. If the amendment grows past a few paragraphs,
+  supersede with a dedicated ADR.
++ Unblock `examples/digitalocean` and `examples/github`: delete
+  their `.expected-failure` markers, commit their
+  `generated/` trees under the default pipeline.
 
 == Out of scope
 
@@ -199,18 +267,21 @@ User-supplied strategy:
 == Acceptance
 
 - `devbox run php bin/paogen generate examples/digitalocean/paogen.php`
-  completes under the default strategy with a two-entry `renames`
-  map, and under `PascalCaseSanitiser` with no `renames` at all.
-- `devbox run php -d memory_limit=2G bin/paogen generate examples/github/paogen.php`
-  completes under `PascalCaseSanitiser` with no `renames` entries.
-- Both generated trees pass `phpstan analyse -c phpstan-generated.neon`
-  once the examples/ golden trees land.
-- New Model Generator scenarios cover: default `Raw` failure mode,
-  bundled `PascalCaseSanitiser` success path, renames precedence,
-  and user-supplied normaliser.
-- `just check` green end-to-end.
-- `just check-examples` flips the DigitalOcean and GitHub examples
-  from `expected-failure` to `pass` (see T-024).
-- ROADMAP.md adds this task to the appropriate phase (likely a new
-  Phase 5 — "validation-tier unblock" — given both v0.1 exit-criteria
-  candidates depend on it).
+  and `… examples/github/paogen.php` both complete with the default
+  pipeline (GitHub needs `-d memory_limit=2G`).
+- Both `examples/*/generated/` trees pass `phpstan analyse -c
+  phpstan-generated.neon`.
+- The existing petstore / composition / contact / parameters golden
+  trees are byte-identical after regeneration under the new
+  pipeline.
+- New Model Generator scenarios cover the five behaviours in the
+  "In scope" list above, each with its own `@scenario` and traces
+  scoped to the relevant Naming + Emit files.
+- `just check` green; `just check-examples` reports all three
+  examples as passing.
+- ROADMAP Phase 5's T-023 checkbox flips. If T-023 ships before
+  tagging, the phase folds into "done" and the `.expected-failure`
+  markers are gone. If the release cut decides to defer, move T-023
+  and the two marker deletions into the post-v0.1 section
+  instead — this task file still reflects the final design either
+  way.

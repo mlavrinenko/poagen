@@ -10,24 +10,31 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
+use Mlavrinenko\Paogen\Generator\Naming\NormaliserFactory;
+use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
 /**
  * Orchestrates a single generation run: schema + profile + bindings → files.
  */
 final readonly class Generator
 {
+    private ModelPlanner $modelPlanner;
+
     public function __construct(
         private AttributeScanner $scanner,
-        private ModelEmitter $modelEmitter = new ModelEmitter(),
+        ModelEmitter $modelEmitter = new ModelEmitter(),
         private EnumEmitter $enumEmitter = new EnumEmitter(),
         private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
         private PlanApplier $applier = new PlanApplier(),
-    ) {}
+    ) {
+        $this->modelPlanner = new ModelPlanner($modelEmitter);
+    }
 
     public function generate(Profile $profile): void
     {
@@ -54,14 +61,22 @@ final readonly class Generator
         $modelDir = $rootDir . \DIRECTORY_SEPARATOR . 'Model';
         $enumDir = $rootDir . \DIRECTORY_SEPARATOR . 'Enum';
 
+        $normaliser = NormaliserFactory::fromProfile($profile);
         $enums = new EnumCatalog($enumNamespace);
-        $this->collectComponentEnums($openApi, $enums);
+        $enumRegistry = new NameRegistry($normaliser);
+        $this->collectComponentEnums($openApi, $enums, $enumRegistry);
+
+        // Lazy-populated: every ref-resolution site routes through here
+        // so each raw name is normalised exactly once and collisions are
+        // caught the moment a second raw key tries to claim the same PHP
+        // class.
+        $registry = new NameRegistry($normaliser);
 
         /** @var array<string,string> $writes */
         $writes = [];
 
-        $this->emitModels($openApi, $modelNamespace, $modelDir, $profile->renames, $bindings, $enums, $writes);
-        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $bindings, $enums, $writes);
+        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes);
+        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $bindings, $enums, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
@@ -70,7 +85,7 @@ final readonly class Generator
         return new GenerationPlan($writes, $prunes);
     }
 
-    private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums): void
+    private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums, NameRegistry $enumRegistry): void
     {
         $components = $openApi->components;
 
@@ -80,17 +95,22 @@ final readonly class Generator
 
         /** @var array<string,Schema|Reference> $schemas */
         $schemas = $components->schemas ?? [];
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
 
         foreach ($schemas as $name => $schema) {
             if (!$schema instanceof Schema) {
                 continue;
             }
 
-            $spec = EnumCatalog::specFromSchema($name, $schema);
+            $phpName = null;
+            $rawSpec = EnumCatalog::specFromSchema($name, $schema);
 
-            if (!$spec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
+            if (!$rawSpec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
                 continue;
             }
+
+            $phpName = $enumRegistry->resolve($name, $context);
+            $spec = new \Mlavrinenko\Paogen\Generator\Enum\EnumSpec($phpName, $rawSpec->backingType, $rawSpec->cases);
 
             $enums->registerComponent($name, $spec);
         }
@@ -115,115 +135,6 @@ final readonly class Generator
     }
 
     /**
-     * @param array<string,string> $renames
-     * @param array<string,string> $writes
-     */
-    private function emitModels(
-        OpenApi $openApi,
-        string $modelNamespace,
-        string $modelDir,
-        array $renames,
-        Bindings $bindings,
-        EnumCatalog $enums,
-        array &$writes,
-    ): void {
-        $components = $openApi->components;
-
-        if ($components === null) {
-            return;
-        }
-
-        /** @var array<string,Schema|Reference> $schemas */
-        $schemas = $components->schemas ?? [];
-        $names = array_keys($schemas);
-        sort($names, \SORT_STRING);
-
-        /** @var list<\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel> $pending */
-        $pending = [];
-
-        foreach ($names as $rawName) {
-            $schema = $schemas[$rawName];
-
-            if (!$schema instanceof Schema) {
-                continue;
-            }
-
-            $effective = $this->materialiseAllOf($schema, $openApi);
-
-            if ($effective->type !== 'object') {
-                continue;
-            }
-
-            $className = $renames[$rawName] ?? $rawName;
-            $emission = $this->modelEmitter->emit($modelNamespace, $className, $effective, $bindings, $enums);
-
-            $path = $modelDir . \DIRECTORY_SEPARATOR . $className . '.php';
-            $writes[$path] = $emission->source;
-
-            foreach ($emission->children as $child) {
-                $pending[] = $child;
-            }
-        }
-
-        $this->drainSynthesisedChildren($pending, $modelNamespace, $modelDir, $bindings, $enums, $writes);
-    }
-
-    /**
-     * Flatten a top-level `allOf` schema into a single object-type Schema
-     * whose `properties`/`required` are the union of its branches (T-008).
-     * Non-`allOf` schemas pass through untouched.
-     */
-    private function materialiseAllOf(Schema $schema, OpenApi $openApi): Schema
-    {
-        if (!\is_array($schema->allOf) || $schema->allOf === []) {
-            return $schema;
-        }
-
-        $flattened = CompositionResolver::flattenAllOf($schema, $openApi);
-
-        return $flattened ?? $schema;
-    }
-
-    /**
-     * Drain the FIFO queue of synthesised inline-object classes (T-013).
-     *
-     * Each emission may itself queue grandchildren; keep going until the
-     * queue is empty. Sorting by name at each batch keeps byte-stability
-     * across runs regardless of the order children were discovered.
-     *
-     * @param list<\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel> $pending
-     * @param array<string,string> $writes
-     */
-    private function drainSynthesisedChildren(
-        array $pending,
-        string $modelNamespace,
-        string $modelDir,
-        Bindings $bindings,
-        EnumCatalog $enums,
-        array &$writes,
-    ): void {
-        while ($pending !== []) {
-            usort(
-                $pending,
-                static fn(\Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel $a, \Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel $b): int => strcmp($a->name, $b->name),
-            );
-
-            $batch = $pending;
-            $pending = [];
-
-            foreach ($batch as $child) {
-                $emission = $this->modelEmitter->emit($modelNamespace, $child->name, $child->schema, $bindings, $enums);
-                $path = $modelDir . \DIRECTORY_SEPARATOR . $child->name . '.php';
-                $writes[$path] = $emission->source;
-
-                foreach ($emission->children as $grand) {
-                    $pending[] = $grand;
-                }
-            }
-        }
-    }
-
-    /**
      * @param array<string,string> $writes
      */
     private function emitClient(
@@ -231,6 +142,7 @@ final readonly class Generator
         string $rootNamespace,
         string $rootDir,
         string $modelNamespace,
+        NameRegistry $registry,
         Bindings $bindings,
         EnumCatalog $enums,
         array &$writes,
@@ -239,7 +151,7 @@ final readonly class Generator
             return;
         }
 
-        $emitter = new ClientEmitter(new OperationEmitter($modelNamespace, $enums));
+        $emitter = new ClientEmitter(new OperationEmitter($modelNamespace, $enums, $registry));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 
         if ($code === null) {

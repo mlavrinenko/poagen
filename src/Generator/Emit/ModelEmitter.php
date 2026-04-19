@@ -8,6 +8,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
@@ -35,12 +36,12 @@ final readonly class ModelEmitter
         Schema $schema,
         Bindings $bindings,
         ?EnumCatalog $enums = null,
+        ?NameRegistry $registry = null,
     ): ModelEmission {
+        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         $modelNamespace = trim($modelNamespace, '\\');
-
         $file = new PhpFile();
         $file->setStrictTypes();
-
         $namespace = $file->addNamespace($modelNamespace);
         $namespace->addUse(\JsonSerializable::class);
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
@@ -53,7 +54,13 @@ final readonly class ModelEmitter
         /** @var list<string> $required */
         $required = $schema->required ?? [];
 
-        $names = array_keys($properties);
+        // YAML parses a purely numeric key (e.g. `-1:`) as an int; coerce
+        // every key to a string so the downstream name normalisers have
+        // a uniform input shape.
+        $names = [];
+        foreach (array_keys($properties) as $k) {
+            $names[] = \is_int($k) ? (string) $k : $k;
+        }
         sort($names, \SORT_STRING);
 
         // Required first (in sorted order), then optional. PHP forbids
@@ -78,8 +85,8 @@ final readonly class ModelEmitter
                 $resolved = new TypeResolver($synthFqcn, null, null, false);
                 $shape = ltrim($synthFqcn, '\\');
             } else {
-                $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $enums);
-                $shape = PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $enums);
+                $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
+                $shape = PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $registry, $enums);
             }
 
             $isNullable = !$isRequired || $resolved->nullable;
@@ -204,20 +211,7 @@ final readonly class ModelEmitter
         }
 
         $const = $class->addConstant('PROPERTY_MAP', $value)->setPublic()->setType('array');
-        $const->addComment('Paogen marshal/unmarshal contract. See ADR-007.');
-        $const->addComment('');
-        $const->addComment('phpName => [wireKey, shape]');
-        $const->addComment(
-            'shape is one of: null (scalar pass-through), `\\FQCN::class` (model ref),'
-            . ' [\'list\', null] (list<scalar>), [\'list\', \\FQCN::class] (list<Model>),'
-            . ' [\'scalar\', \\FQCN::class] (ScalarBinding VO),'
-            . ' [\'datetime\', null] (format: date-time → \\DateTimeImmutable),'
-            . ' [\'date\', null] (format: date → \\DateTimeImmutable),'
-            . ' [\'enum\', \\FQCN::class] (named enum component → backed enum),'
-            . ' [\'union\', [\\A::class, \\B::class, ...], \'propertyName\'|null]'
-            . ' (oneOf/anyOf of refs; third slot is the discriminator property name or null).',
-        );
-        $const->addComment('');
+        $const->addComment('Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.');
         $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>');
     }
 
@@ -274,17 +268,15 @@ final readonly class ModelEmitter
         if (preg_match('/^[a-zA-Z_]\w*$/', $openApiName) === 1) {
             return $openApiName;
         }
-
-        // Snake_case kebab-case → camelCase fallback.
         $parts = preg_split('/[^a-zA-Z0-9]+/', $openApiName);
-
         if ($parts === false || $parts === []) {
             return 'value';
         }
-
         $head = strtolower($parts[0]);
         $tail = array_map(static fn(string $p): string => ucfirst(strtolower($p)), \array_slice($parts, 1));
+        $name = $head . implode('', $tail);
 
-        return $head . implode('', $tail);
+        // `'1'`, `'-'`, etc. still yield an invalid PHP identifier — prefix `_`.
+        return ($name === '' || preg_match('/^\d/', $name) === 1) ? '_' . $name : $name;
     }
 }

@@ -289,10 +289,114 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Rule: Component names are normalised through a configurable pipeline (ADR-003, T-023)
+     *
+     * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
+     * @source truth/specs/model-generator.typ:213
+     *
+     * Given Schema declares a component named security-advisory-ecosystems
+     *   And Profile does not override nameNormaliser
+     * When Generator runs against Profile
+     * Then a file Generated/Model/SecurityAdvisoryEcosystems.php is written
+     *   And every other component that $refs #/components/schemas/security-advisory-ecosystems resolves to the same PHP class
+     */
+    public function testAKebabCaseComponentNameBecomesAPascalCasePHPClassUnderTheDefaultPipeline(): void
+    {
+        $this->steps->givenSchemaDeclaresAComponentNamedRaw('security-advisory-ecosystems');
+        $this->steps->givenProfileDoesNotOverrideNameNormaliser();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenAFileGeneratedModelSecurityAdvisoryEcosystemsPhpIsWritten();
+        $this->steps->thenEveryOtherComponentThatRefsComponentsSchemasSecurityAdvisoryEcosystemsResolvesToTheSamePHPClass();
+    }
+
+
+    /**
+     * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
+     * @source truth/specs/model-generator.typ:235
+     *
+     * Given Schema declares a component named version-2
+     *   And Profile sets 'version-2' => 'Legacy_V2'
+     * When Generator runs against Profile
+     * Then a file Generated/Model/Legacy_V2.php is written
+     *   And the file Generated/Model/Version2.php is not written
+     *   And every $ref to #/components/schemas/version-2 resolves to Legacy_V2
+     */
+    public function testAnExplicitRenamesEntryTakesPrecedenceOverTheAutoSanitiser(): void
+    {
+        $this->steps->givenSchemaDeclaresAComponentNamedRaw('version-2');
+        $this->steps->givenProfileSetsRenames('\'version-2\' => \'Legacy_V2\'');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenAFileGeneratedModelLegacyV2PhpIsWritten();
+        $this->steps->thenTheFileGeneratedModelVersion2PhpIsNotWritten();
+        $this->steps->thenEveryRefToComponentsSchemasVersion2ResolvesToLegacyV2();
+    }
+
+
+    /**
+     * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
+     * @source truth/specs/model-generator.typ:252
+     *
+     * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
+     *   And Schema declares components legacy_thing and modern-thing
+     * When Generator runs against Profile
+     * Then legacy_thing is emitted as LEGACY_THING by the first strategy
+     *   And modern-thing falls through to PascalCaseSanitiser and is emitted as ModernThing
+     */
+    public function testAPatternGatedStrategyOnlyHandlesNamesMatchingItsPatternAndFallsThroughOtherwise(): void
+    {
+        $this->steps->givenProfilesNameNormaliserIsNormaliser('CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])');
+        $this->steps->givenSchemaDeclaresComponentsFirstAndSecond('legacy_thing', 'modern-thing');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenLegacyThingIsEmittedAsLEGACYTHINGByTheFirstStrategy();
+        $this->steps->thenModernThingFallsThroughToPascalCaseSanitiserAndIsEmittedAsModernThing();
+    }
+
+
+    /**
+     * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
+     * @source truth/specs/model-generator.typ:268
+     *
+     * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
+     *   And Schema declares any component, e.g. anything
+     * When Generator runs against Profile
+     * Then the run aborts with an error naming anything and pointing at the empty normaliser pipeline
+     *   And no files are written under Profile's output
+     */
+    public function testACustomPipelineThatReturnsNullForEveryNameAbortsWithAPointedDiagnostic(): void
+    {
+        $this->steps->givenProfilesNameNormaliserIsAnEmptyCompositeNormaliserNoStrategies();
+        $this->steps->givenSchemaDeclaresAnyComponentEGRaw('anything');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheRunAbortsWithAnErrorNamingAnythingAndPointingAtTheEmptyNormaliserPipeline();
+        $this->steps->thenNoFilesAreWrittenUnderProfilesOutput();
+    }
+
+
+    /**
+     * Scenario: Two raw component names that normalise to the same PHP class abort the run
+     * @source truth/specs/model-generator.typ:284
+     *
+     * Given Schema declares components named foo-bar and foo_bar
+     *   And Profile does not override nameNormaliser
+     * When Generator runs against Profile
+     * Then the run aborts with an error naming both raw keys and the shared PHP class FooBar
+     *   And no files are written under Profile's output
+     */
+    public function testTwoRawComponentNamesThatNormaliseToTheSamePHPClassAbortTheRun(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsNamedFirstAndSecond('foo-bar', 'foo_bar');
+        $this->steps->givenProfileDoesNotOverrideNameNormaliser();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheRunAbortsWithAnErrorNamingBothRawKeysAndTheSharedPHPClassFooBar();
+        $this->steps->thenNoFilesAreWrittenUnderProfilesOutput();
+    }
+
+
+    /**
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:213
+     * @source truth/specs/model-generator.typ:301
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -308,7 +412,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:227
+     * @source truth/specs/model-generator.typ:315
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

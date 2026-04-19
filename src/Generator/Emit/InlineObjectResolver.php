@@ -8,6 +8,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Resolution strategy for an inline `type: object` schema (T-013).
@@ -38,10 +39,11 @@ final class InlineObjectResolver
         Schema $node,
         Bindings $bindings,
         string $modelNamespace,
+        NameRegistry $registry,
         ?EnumCatalog $enums,
     ): TypeResolver {
         $nullable = (bool) $node->nullable;
-        $phpDoc = self::additionalPropertiesDoc($node, $bindings, $modelNamespace, $enums);
+        $phpDoc = self::additionalPropertiesDoc($node, $bindings, $modelNamespace, $registry, $enums);
 
         return new TypeResolver('array', $phpDoc, null, $nullable);
     }
@@ -78,6 +80,7 @@ final class InlineObjectResolver
         Schema $node,
         Bindings $bindings,
         string $modelNamespace,
+        NameRegistry $registry,
         ?EnumCatalog $enums,
     ): string {
         $additional = $node->additionalProperties;
@@ -86,7 +89,7 @@ final class InlineObjectResolver
             return 'array<string, mixed>';
         }
 
-        $resolved = TypeResolver::resolve($additional, $bindings, $modelNamespace, $enums);
+        $resolved = TypeResolver::resolve($additional, $bindings, $modelNamespace, $registry, $enums);
         $docItem = $resolved->phpDoc ?? ($resolved->phpType ?? 'mixed');
 
         return 'array<string, ' . $docItem . '>';

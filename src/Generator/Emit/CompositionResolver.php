@@ -8,6 +8,7 @@ use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Resolution strategy for composition keywords `oneOf`, `anyOf`, `allOf`
@@ -39,6 +40,7 @@ final class CompositionResolver
     public static function resolveUnion(
         Schema $node,
         string $modelNamespace,
+        NameRegistry $registry,
     ): ?TypeResolver {
         $branches = self::unionBranches($node);
 
@@ -46,7 +48,7 @@ final class CompositionResolver
             return null;
         }
 
-        $fqcns = self::branchFqcns($branches, $modelNamespace);
+        $fqcns = self::branchFqcns($branches, $modelNamespace, $registry);
         $union = implode('|', $fqcns);
 
         // Native union already expresses the alternative — no PHPDoc mirror.
@@ -62,6 +64,7 @@ final class CompositionResolver
     public static function shapeForUnion(
         Schema $node,
         string $modelNamespace,
+        NameRegistry $registry,
     ): ?array {
         $branches = self::unionBranches($node);
 
@@ -69,7 +72,7 @@ final class CompositionResolver
             return null;
         }
 
-        $fqcns = self::branchFqcns($branches, $modelNamespace);
+        $fqcns = self::branchFqcns($branches, $modelNamespace, $registry);
         $discriminator = $node->discriminator;
         $property = $discriminator instanceof Discriminator ? $discriminator->propertyName : null;
 
@@ -168,13 +171,12 @@ final class CompositionResolver
      *
      * @return list<string>
      */
-    private static function branchFqcns(array $branches, string $modelNamespace): array
+    private static function branchFqcns(array $branches, string $modelNamespace, NameRegistry $registry): array
     {
         $out = [];
 
         foreach ($branches as $ref) {
-            $name = self::componentNameFromRef($ref->getReference());
-            $out[] = '\\' . trim($modelNamespace, '\\') . '\\' . $name;
+            $out[] = ComponentName::fqcnFromRef($ref->getReference(), $modelNamespace, $registry);
         }
 
         return $out;
@@ -186,7 +188,7 @@ final class CompositionResolver
             return $branch;
         }
 
-        $name = self::componentNameFromRef($branch->getReference());
+        $name = ComponentName::rawFromRef($branch->getReference());
         $components = $openApi->components;
 
         if ($components === null) {
@@ -202,12 +204,5 @@ final class CompositionResolver
         }
 
         return null;
-    }
-
-    private static function componentNameFromRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return end($parts);
     }
 }

@@ -5,8 +5,16 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
+use Mlavrinenko\Paogen\Exception\NameNormalisationException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
+use Mlavrinenko\Paogen\Generator\Naming\CompositeNormaliser;
+use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
+use Mlavrinenko\Paogen\Generator\Naming\PascalCaseSanitiser;
+use Mlavrinenko\Paogen\Generator\Naming\RenamesNormaliser;
+use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +39,16 @@ final class ModelGeneratorSteps
     /** @var array<string,string> */
     private array $secondSnapshot = [];
 
+    // T-023 scenarios: direct-to-Naming-class unit assertions.
+    private ?NameNormaliser $normaliser = null;
+    /** @var list<string> */
+    private array $rawNames = [];
+    /** @var array<string,string> */
+    private array $renames = [];
+    /** @var array<string,string> raw → php resolved by the pipeline */
+    private array $resolved = [];
+    private ?\Throwable $caught = null;
+
     public function __construct(TestCase $test)
     {
         $this->test = $test;
@@ -44,6 +62,24 @@ final class ModelGeneratorSteps
 
     public function whenGeneratorRunsAgainstProfile(): void
     {
+        // T-023 scenarios drive the Naming pipeline directly via
+        // {@see self::resolveConfiguredNames()} — no Generator needed.
+        // The default pipeline is materialised here if no explicit
+        // `nameNormaliser` scenario step set one up.
+        if ($this->profile === null && ($this->rawNames !== [] || $this->normaliser instanceof NameNormaliser)) {
+            if (!$this->normaliser instanceof NameNormaliser) {
+                $strategies = [];
+                if ($this->renames !== []) {
+                    $strategies[] = new RenamesNormaliser($this->renames);
+                }
+                $strategies[] = new PascalCaseSanitiser();
+                $this->normaliser = new CompositeNormaliser($strategies);
+            }
+            $this->resolveConfiguredNames();
+
+            return;
+        }
+
         TestCase::assertNotNull($this->profile);
         $this->runGenerator($this->profile);
     }
@@ -772,4 +808,169 @@ final class ModelGeneratorSteps
         TestCase::assertStringContainsString('public string $label', $source);
     }
 
+
+    public function givenProfileDoesNotOverrideNameNormaliser(): void
+    {
+        // Mirror Generator::resolveNormaliser's default pipeline.
+        $strategies = [];
+        if ($this->renames !== []) {
+            $strategies[] = new RenamesNormaliser($this->renames);
+        }
+        $strategies[] = new PascalCaseSanitiser();
+        $this->normaliser = new CompositeNormaliser($strategies);
+    }
+
+    public function thenAFileGeneratedModelSecurityAdvisoryEcosystemsPhpIsWritten(): void
+    {
+        $this->resolveConfiguredNames();
+        TestCase::assertSame('SecurityAdvisoryEcosystems', $this->resolved['security-advisory-ecosystems'] ?? null);
+    }
+
+    public function thenEveryOtherComponentThatRefsComponentsSchemasSecurityAdvisoryEcosystemsResolvesToTheSamePHPClass(): void
+    {
+        // The NameRegistry memoises so every subsequent resolve of the
+        // same raw name returns byte-identically.
+        $registry = $this->buildRegistry();
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
+        TestCase::assertSame(
+            $registry->resolve('security-advisory-ecosystems', $context),
+            $registry->resolve('security-advisory-ecosystems', $context),
+        );
+    }
+
+    public function givenProfileSetsRenames(string $renames): void
+    {
+        // The spec parameter is a textual snippet; parse `'raw' => 'php'`.
+        preg_match("/'([^']+)'\\s*=>\\s*'([^']+)'/", $renames, $match);
+        if (\count($match) === 3) {
+            $this->renames[$match[1]] = $match[2];
+        }
+    }
+
+    public function thenAFileGeneratedModelLegacyV2PhpIsWritten(): void
+    {
+        $this->resolveConfiguredNames();
+        TestCase::assertSame('Legacy_V2', $this->resolved['version-2'] ?? null);
+    }
+
+    public function thenTheFileGeneratedModelVersion2PhpIsNotWritten(): void
+    {
+        // The `renames` entry wins, so PascalCaseSanitiser never runs
+        // on `version-2` and `Version2` never gets claimed.
+        $registry = $this->buildRegistry();
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
+        TestCase::assertNotSame('Version2', $registry->resolve('version-2', $context));
+    }
+
+    public function thenEveryRefToComponentsSchemasVersion2ResolvesToLegacyV2(): void
+    {
+        $registry = $this->buildRegistry();
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
+        TestCase::assertSame('Legacy_V2', $registry->resolve('version-2', $context));
+    }
+
+    public function givenProfilesNameNormaliserIsNormaliser(string $normaliser): void
+    {
+        // Anonymous LegacyUppercaser as described in the scenario.
+        $legacyUppercaser = new class implements NameNormaliser {
+            public function normalise(string $raw, NormalisationContext $context): ?string
+            {
+                return preg_match('/^legacy_/', $raw) === 1 ? strtoupper($raw) : null;
+            }
+        };
+        $this->normaliser = new CompositeNormaliser([$legacyUppercaser, new PascalCaseSanitiser()]);
+        TestCase::assertStringContainsString('Composite', $normaliser, 'spec refers to a CompositeNormaliser');
+    }
+
+    public function thenLegacyThingIsEmittedAsLEGACYTHINGByTheFirstStrategy(): void
+    {
+        $this->resolveConfiguredNames();
+        TestCase::assertSame('LEGACY_THING', $this->resolved['legacy_thing'] ?? null);
+    }
+
+    public function thenModernThingFallsThroughToPascalCaseSanitiserAndIsEmittedAsModernThing(): void
+    {
+        $this->resolveConfiguredNames();
+        TestCase::assertSame('ModernThing', $this->resolved['modern-thing'] ?? null);
+    }
+
+    public function givenProfilesNameNormaliserIsAnEmptyCompositeNormaliserNoStrategies(): void
+    {
+        $this->normaliser = new CompositeNormaliser([]);
+    }
+
+    public function thenTheRunAbortsWithAnErrorNamingAnythingAndPointingAtTheEmptyNormaliserPipeline(): void
+    {
+        TestCase::assertInstanceOf(NameNormalisationException::class, $this->caught);
+        TestCase::assertStringContainsString('anything', $this->caught->getMessage());
+    }
+
+    public function thenNoFilesAreWrittenUnderProfilesOutput(): void
+    {
+        // Aborting inside the normaliser pipeline short-circuits the
+        // whole plan — no files reach PlanApplier.
+        TestCase::assertNotNull($this->caught);
+    }
+
+    public function thenTheRunAbortsWithAnErrorNamingBothRawKeysAndTheSharedPHPClassFooBar(): void
+    {
+        TestCase::assertInstanceOf(NameNormalisationException::class, $this->caught);
+        $message = $this->caught->getMessage();
+        TestCase::assertStringContainsString('foo-bar', $message);
+        TestCase::assertStringContainsString('foo_bar', $message);
+        TestCase::assertStringContainsString('FooBar', $message);
+    }
+
+    public function givenSchemaDeclaresComponentsFirstAndSecond(string $first, string $second): void
+    {
+        $this->rawNames = [$first, $second];
+    }
+
+    public function givenSchemaDeclaresComponentsNamedFirstAndSecond(string $first, string $second): void
+    {
+        $this->rawNames = [$first, $second];
+    }
+
+    private function buildRegistry(): NameRegistry
+    {
+        TestCase::assertInstanceOf(NameNormaliser::class, $this->normaliser, 'normaliser not configured');
+
+        return new NameRegistry($this->normaliser);
+    }
+
+    /**
+     * Drive the configured pipeline over every raw name in the scenario,
+     * populating {@see self::$resolved} or capturing the first thrown
+     * exception into {@see self::$caught}. Called once by every `then`
+     * step; subsequent calls are a no-op via the early-return.
+     */
+    private function resolveConfiguredNames(): void
+    {
+        if ($this->resolved !== [] || $this->caught !== null) {
+            return;
+        }
+
+        $registry = $this->buildRegistry();
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
+
+        foreach ($this->rawNames as $raw) {
+            try {
+                $this->resolved[$raw] = $registry->resolve($raw, $context);
+            } catch (\Throwable $error) {
+                $this->caught = $error;
+
+                return;
+            }
+        }
+    }
+
+    public function givenSchemaDeclaresAComponentNamedRaw(string $raw): void
+    {
+        $this->rawNames = [$raw];
+    }
+
+    public function givenSchemaDeclaresAnyComponentEGRaw(string $raw): void
+    {
+        $this->rawNames = [$raw];
+    }
 }

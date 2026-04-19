@@ -8,6 +8,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Maps an OpenAPI Schema/Reference to a PHP type plus optional PHPDoc.
@@ -25,19 +26,20 @@ final readonly class TypeResolver
         Schema|Reference $node,
         Bindings $bindings,
         string $modelNamespace,
+        NameRegistry $registry,
         ?EnumCatalog $enums = null,
     ): self {
         if ($node instanceof Reference) {
-            $component = self::componentNameFromRef($node->getReference());
+            $component = ComponentName::rawFromRef($node->getReference());
 
-            if ($enums instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumCatalog && $enums->isEnumComponent($component)) {
+            if ($enums instanceof EnumCatalog && $enums->isEnumComponent($component)) {
                 $fqcn = $enums->componentFqcn($component);
                 \assert(\is_string($fqcn));
 
                 return new self($fqcn, null, null, false);
             }
 
-            $fqcn = '\\' . trim($modelNamespace, '\\') . '\\' . $component;
+            $fqcn = ComponentName::fqcnFromRef($node->getReference(), $modelNamespace, $registry);
 
             return new self($fqcn, null, null, false);
         }
@@ -60,7 +62,7 @@ final readonly class TypeResolver
             }
         }
 
-        $union = CompositionResolver::resolveUnion($node, $modelNamespace);
+        $union = CompositionResolver::resolveUnion($node, $modelNamespace, $registry);
 
         if ($union instanceof self) {
             return $union;
@@ -71,8 +73,8 @@ final readonly class TypeResolver
             'integer' => new self('int', null, null, $nullable),
             'number' => new self('float', null, null, $nullable),
             'boolean' => new self('bool', null, null, $nullable),
-            'array' => self::resolveArray($node, $bindings, $modelNamespace, $enums),
-            'object' => InlineObjectResolver::resolve($node, $bindings, $modelNamespace, $enums),
+            'array' => self::resolveArray($node, $bindings, $modelNamespace, $registry, $enums),
+            'object' => InlineObjectResolver::resolve($node, $bindings, $modelNamespace, $registry, $enums),
             default => new self(null, 'mixed', null, $nullable),
         };
     }
@@ -81,6 +83,7 @@ final readonly class TypeResolver
         Schema $node,
         Bindings $bindings,
         string $modelNamespace,
+        NameRegistry $registry,
         ?EnumCatalog $enums,
     ): self {
         /** @var Schema|Reference|null $items */
@@ -90,17 +93,10 @@ final readonly class TypeResolver
             return new self('array', 'list<mixed>', null, (bool) $node->nullable);
         }
 
-        $itemResolved = self::resolve($items, $bindings, $modelNamespace, $enums);
+        $itemResolved = self::resolve($items, $bindings, $modelNamespace, $registry, $enums);
         $itemType = $itemResolved->phpType ?? 'mixed';
         $docItem = $itemResolved->phpDoc ?? $itemType;
 
         return new self('array', 'list<' . $docItem . '>', $itemResolved->phpDocUse, (bool) $node->nullable);
-    }
-
-    private static function componentNameFromRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return end($parts);
     }
 }

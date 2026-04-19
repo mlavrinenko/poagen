@@ -8,6 +8,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\Literal;
 
@@ -37,10 +38,11 @@ final class PropertyShape
         Schema|Reference $schema,
         Bindings $bindings,
         string $modelNamespace,
+        NameRegistry $registry,
         ?EnumCatalog $enums,
     ): null|string|array {
         if ($schema instanceof Reference) {
-            $component = self::componentNameFromRef($schema->getReference());
+            $component = ComponentName::rawFromRef($schema->getReference());
 
             if ($enums instanceof EnumCatalog && $enums->isEnumComponent($component)) {
                 $fqcn = $enums->componentFqcn($component);
@@ -49,10 +51,10 @@ final class PropertyShape
                 return ['enum', $fqcn];
             }
 
-            return self::fqcnFromRef($schema->getReference(), $modelNamespace);
+            return ComponentName::fqcnFromRef($schema->getReference(), $modelNamespace, $registry);
         }
 
-        $union = CompositionResolver::shapeForUnion($schema, $modelNamespace);
+        $union = CompositionResolver::shapeForUnion($schema, $modelNamespace, $registry);
 
         if ($union !== null) {
             return $union;
@@ -60,7 +62,9 @@ final class PropertyShape
 
         if ($schema->type === 'array') {
             $items = $schema->items;
-            $item = $items instanceof Reference ? self::fqcnFromRef($items->getReference(), $modelNamespace) : null;
+            $item = $items instanceof Reference
+                ? ComponentName::fqcnFromRef($items->getReference(), $modelNamespace, $registry)
+                : null;
 
             return ['list', $item];
         }
@@ -127,15 +131,4 @@ final class PropertyShape
         ];
     }
 
-    private static function componentNameFromRef(string $ref): string
-    {
-        $parts = explode('/', $ref);
-
-        return end($parts);
-    }
-
-    private static function fqcnFromRef(string $ref, string $modelNamespace): string
-    {
-        return '\\' . trim($modelNamespace, '\\') . '\\' . self::componentNameFromRef($ref);
-    }
 }

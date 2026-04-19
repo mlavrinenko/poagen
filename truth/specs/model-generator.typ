@@ -209,6 +209,94 @@
     ]
   ]
 
+  #rule("Component names are normalised through a configurable pipeline (ADR-003, T-023)")[
+    #scenario(
+      "A kebab-case component name becomes a PascalCase PHP class under the default pipeline",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/PascalCaseSanitiser.php",
+        "src/Generator/Naming/CompositeNormaliser.php",
+        "src/Generator/Naming/NameRegistry.php",
+        "src/Generator/Naming/NormaliserFactory.php",
+        "src/Generator/Naming/NormalisationContext.php",
+        "src/Generator/Naming/SymbolKind.php",
+        "src/Generator/Emit/ComponentName.php",
+        "src/Generator/ModelPlanner.php",
+        "src/Generator/Generator.php",
+      ),
+    )[
+      #given[#the(Schema) declares a component named #p((raw: "security-advisory-ecosystems"))]
+      #and_[#the(Profile) does not override `nameNormaliser`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/SecurityAdvisoryEcosystems.php` is written]
+      #and_[every other component that `$ref`s `#/components/schemas/security-advisory-ecosystems` resolves to the same PHP class]
+    ]
+
+    #scenario(
+      "An explicit `renames` entry takes precedence over the auto-sanitiser",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/RenamesNormaliser.php",
+        "src/Generator/Naming/CompositeNormaliser.php",
+        "src/Generator/Emit/ComponentName.php",
+      ),
+    )[
+      #given[#the(Schema) declares a component named #p((raw: "version-2"))]
+      #and_[#the(Profile) sets #p((renames: "'version-2' => 'Legacy_V2'"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/Legacy_V2.php` is written]
+      #and_[the file `Generated/Model/Version2.php` is *not* written]
+      #and_[every `$ref` to `#/components/schemas/version-2` resolves to `Legacy_V2`]
+    ]
+
+    #scenario(
+      "A pattern-gated strategy only handles names matching its pattern and falls through otherwise",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/NameNormaliser.php",
+        "src/Generator/Naming/CompositeNormaliser.php",
+        "src/Generator/Emit/ComponentName.php",
+      ),
+    )[
+      #given[#the(Profile)'s `nameNormaliser` is #p((normaliser: "CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])"))]
+      #and_[#the(Schema) declares components #p((first: "legacy_thing")) and #p((second: "modern-thing"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[`legacy_thing` is emitted as `LEGACY_THING` by the first strategy]
+      #and_[`modern-thing` falls through to `PascalCaseSanitiser` and is emitted as `ModernThing`]
+    ]
+
+    #scenario(
+      "A custom pipeline that returns null for every name aborts with a pointed diagnostic",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/CompositeNormaliser.php",
+        "src/Exception/NameNormalisationException.php",
+        "src/Generator/Emit/ComponentName.php",
+      ),
+    )[
+      #given[#the(Profile)'s `nameNormaliser` is an empty `CompositeNormaliser` (no strategies)]
+      #and_[#the(Schema) declares any component, e.g. #p((raw: "anything"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the run aborts with an error naming `anything` and pointing at the empty normaliser pipeline]
+      #and_[no files are written under #the(Profile)'s `output`]
+    ]
+
+    #scenario(
+      "Two raw component names that normalise to the same PHP class abort the run",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/NameRegistry.php",
+        "src/Generator/Emit/ComponentName.php",
+      ),
+    )[
+      #given[#the(Schema) declares components named #p((first: "foo-bar")) and #p((second: "foo_bar"))]
+      #and_[#the(Profile) does not override `nameNormaliser`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the run aborts with an error naming both raw keys and the shared PHP class `FooBar`]
+      #and_[no files are written under #the(Profile)'s `output`]
+    ]
+  ]
+
   #rule("Re-running the generator is byte-stable")[
     #scenario(
       "Running the generator twice with the same inputs produces identical files",
