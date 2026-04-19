@@ -1,9 +1,9 @@
-#import "@local/speconaut:0.1.0": adr, proposed
+#import "@local/speconaut:0.1.0": adr, accepted
 
 #show: adr.with(
   number: 9,
   title: "Error response policy: non-2xx handling in the generated client",
-  status: proposed,
+  status: accepted,
   date: datetime(year: 2026, month: 4, day: 18),
 )
 
@@ -43,9 +43,8 @@ mapping.
 
 == Decision
 
-*Tentative — awaiting human confirmation. Recommended: (b) single
-generic `ApiException` for the PoC and v0.1, with an explicit upgrade
-path to (a) when a real schema justifies it.*
+*Accepted: (b) single generic `ApiException` for the PoC and v0.1,
+with an explicit upgrade path to (a) when a real schema justifies it.*
 
 Specifically:
 
@@ -69,9 +68,9 @@ Specifically:
   one validation-tier schema (ADR-005) has a typed error body that
   consumers want to catch structurally (not by status code).
 
-This ADR stays `proposed` until the task that implements it
-(`truth/tasks/012-non-2xx-error-handling.typ`) either confirms the
-shape or supersedes it with a concrete alternative.
+The implementing task is
+`truth/tasks/012-non-2xx-error-handling.typ`; a concrete alternative
+would have to supersede this ADR with a new one.
 
 == Consequences
 
