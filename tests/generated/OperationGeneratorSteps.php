@@ -649,4 +649,123 @@ final class OperationGeneratorSteps
         TestCase::assertSame(404, $this->caught->getResponse()->getStatusCode());
     }
 
+
+    public function givenSchemaDeclaresComponentsSecuritySchemesApiKeyWithScheme(string $scheme): void
+    {
+        TestCase::assertSame('type: apiKey, in: header, name: X-API-Key', $scheme);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenATopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault(): void
+    {
+        // The parameters fixture carries `security: [{ apiKey: [] }]` at
+        // schema root. No-op: recorded here for scenario readability.
+        TestCase::assertNotNull($this->profile);
+    }
+
+
+    public function thenTheEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterBaseUri(
+    ): void {
+        // Signature ordering: security args come AFTER baseUri, in
+        // scheme-name sort order. Regex is tight: literal apiKey first,
+        // literal bearerToken second — no room for wrong insertion.
+        TestCase::assertMatchesRegularExpression(
+            '/private string \$baseUri,\s+private string \$apiKey,\s+private string \$bearerToken,/',
+            $this->source,
+        );
+    }
+
+
+    public function thenEachSecuredOperationsMethodBodyCallsRequestRequestWithHeaderXAPIKeyThisApiKeyBeforeSendRequest(
+    ): void {
+        // `listOrders` inherits the schema-level requirement and carries
+        // the apiKey header; `getPetById` explicitly opts out via
+        // `security: []` and must NOT carry it — proves per-op override
+        // honours OpenAPI 3.0.3 §4.8.20.
+        $listOrders = $this->methodSlice('listOrders');
+        TestCase::assertStringContainsString(
+            "\$request = \$request->withHeader('X-API-Key', \$this->apiKey);",
+            $listOrders,
+        );
+
+        $getPetById = $this->methodSlice('getPetById');
+        TestCase::assertStringNotContainsString('X-API-Key', $getPetById);
+        TestCase::assertStringNotContainsString('$this->apiKey', $getPetById);
+
+        // Live round-trip proof via RecordingClient: the generated client
+        // really attaches the header when `sendRequest` runs.
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+        $client = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://parameters.example/api/v1',
+            apiKey: 'secret-key',
+            bearerToken: 'unused-here',
+        );
+
+        $client->listOrders();
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('secret-key', $http->lastRequest->getHeaderLine('X-API-Key'));
+    }
+
+
+    public function givenSchemaDeclaresComponentsSecuritySchemesBearerAuthWithScheme(string $scheme): void
+    {
+        TestCase::assertSame('type: http, scheme: bearer', $scheme);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenAnOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth(string $id): void
+    {
+        TestCase::assertSame('operationId: placeOrder', $id);
+    }
+
+
+    public function thenTheEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument(): void
+    {
+        TestCase::assertStringContainsString(
+            'private string $bearerToken,',
+            $this->source,
+        );
+    }
+
+
+    public function thenPlaceordersMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest(
+    ): void {
+        $body = $this->methodSlice('placeOrder');
+        TestCase::assertStringContainsString(
+            "\$request = \$request->withHeader('Authorization', 'Bearer ' . \$this->bearerToken);",
+            $body,
+        );
+        // Bearer replaces (not augments) the inherited apiKey on placeOrder.
+        TestCase::assertStringNotContainsString('X-API-Key', $body);
+
+        // Round-trip via RecordingClient: Authorization header actually
+        // reaches the transport, prefixed with the literal "Bearer ".
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"id":1}'),
+        );
+        $client = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient(
+            httpClient: $http,
+            requestFactory: $factory,
+            streamFactory: $factory,
+            baseUri: 'https://parameters.example/api/v1',
+            apiKey: 'unused-here',
+            bearerToken: 'tok-abc',
+        );
+
+        $order = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order(id: 1);
+        $client->placeOrder($order);
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
+    }
+
 }

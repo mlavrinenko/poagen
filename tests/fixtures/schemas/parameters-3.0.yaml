@@ -9,12 +9,16 @@ info:
 servers:
   - url: https://parameters.example/api/v1
 
+security:
+  - apiKey: []
+
 paths:
   /pet/{petId}:
     parameters:
       - $ref: '#/components/parameters/PetId'
     get:
       operationId: getPetById
+      security: []
       responses:
         '200':
           description: ok
@@ -40,6 +44,8 @@ paths:
                   $ref: '#/components/schemas/Order'
     post:
       operationId: placeOrder
+      security:
+        - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/CreateOrder'
       responses:
@@ -75,6 +81,14 @@ paths:
           description: cleared
 
 components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    bearerAuth:
+      type: http
+      scheme: bearer
   requestBodies:
     CreateOrder:
       description: order to place

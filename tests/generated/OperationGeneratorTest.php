@@ -318,4 +318,76 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->thenTheExceptionsGetStatusCodeReturns404();
         $this->steps->thenTheExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload();
     }
+
+
+    /**
+     * Rule: Security schemes
+     *
+     * Scenario: An apiKey header scheme becomes a constructor arg attached as a header on secured ops
+     * @source truth/specs/operation-generator.typ:214
+     *
+     * Given Schema declares #/components/securitySchemes/apiKey with type: apiKey, in: header, name: X-API-Key
+     *   And a top-level security: [{ apiKey: [] }] makes every operation secured by default
+     * When Generator runs against Profile
+     * Then the emitted ApiClient constructor has a required string $apiKey promoted private argument placed after $baseUri
+     *   And each secured operation's method body calls $request = $request->withHeader('X-API-Key', $this->apiKey); before sendRequest
+     */
+    public function testAnApiKeyHeaderSchemeBecomesAConstructorArgAttachedAsAHeaderOnSecuredOps(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsSecuritySchemesApiKeyWithScheme('type: apiKey, in: header, name: X-API-Key');
+        $this->steps->givenATopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterBaseUri();
+        $this->steps->thenEachSecuredOperationsMethodBodyCallsRequestRequestWithHeaderXAPIKeyThisApiKeyBeforeSendRequest();
+    }
+
+
+    /**
+     * Scenario: An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization
+     * @source truth/specs/operation-generator.typ:229
+     *
+     * Given Schema declares #/components/securitySchemes/bearerAuth with type: http, scheme: bearer
+     *   And an operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
+     * When Generator runs against Profile
+     * Then the emitted ApiClient constructor has a required string $bearerToken promoted private argument
+     *   And placeOrder's method body calls $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken); before sendRequest
+     */
+    public function testAnHttpBearerSchemeBecomesABearerTokenCtorArgAttachedAsAuthorization(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsSecuritySchemesBearerAuthWithScheme('type: http, scheme: bearer');
+        $this->steps->givenAnOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth('operationId: placeOrder');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument();
+        $this->steps->thenPlaceordersMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest();
+    }
+
+
+    /**
+     * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
+     * @source truth/specs/operation-generator.typ:244
+     *
+     * Given Schema declares a scheme with type: http, scheme: basic
+     * When Generator runs against Profile
+     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
+     * @source truth/specs/operation-generator.typ:253
+     *
+     * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
+     * When Generator runs against Profile
+     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
+     */
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
+    {
+        $this->markTestIncomplete('Scenario is draft');
+    }
 }

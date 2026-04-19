@@ -44,6 +44,8 @@ final readonly class ClientEmitter
             return null;
         }
 
+        $securityCatalog = new SecuritySchemeCatalog($openApi);
+
         $clientNamespace = trim($clientNamespace, '\\');
 
         $file = new PhpFile();
@@ -64,10 +66,16 @@ final readonly class ClientEmitter
         $ctor->addPromotedParameter('streamFactory')->setType(StreamFactoryInterface::class)->setPrivate();
         $ctor->addPromotedParameter('baseUri')->setType('string')->setPrivate();
 
+        // Security scheme args sit AFTER the transport args so unchanged
+        // schemas keep their existing constructor signature.
+        foreach ($securityCatalog->constructorSchemes() as $scheme) {
+            $ctor->addPromotedParameter($scheme->ctorArg)->setType('string')->setPrivate();
+        }
+
         $emitted = 0;
 
         foreach ($operations as [$httpMethod, $pathUri, $operation, $pathItem]) {
-            if ($this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings, $pathItem)) {
+            if ($this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings, $pathItem, $securityCatalog)) {
                 ++$emitted;
             }
         }

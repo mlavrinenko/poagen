@@ -44,6 +44,7 @@ final readonly class OperationEmitter
         Operation $operation,
         Bindings $bindings,
         ?PathItem $pathItem = null,
+        ?SecuritySchemeCatalog $securityCatalog = null,
     ): bool {
         $operationId = (string) ($operation->operationId ?? '');
 
@@ -83,6 +84,11 @@ final readonly class OperationEmitter
         $this->addHeaderParams($method, $namespace, $headerParams, $bindings, $operationId);
 
         $this->applyReturnType($method, $namespace, $return);
+
+        $activeSchemes = $securityCatalog instanceof SecuritySchemeCatalog
+            ? $securityCatalog->activeSchemesFor($operation)
+            : [];
+
         $this->requestAssembler->emitRequest(
             $method,
             $httpMethod,
@@ -92,6 +98,7 @@ final readonly class OperationEmitter
             $headerParams,
             $body,
             $bindings,
+            $activeSchemes,
         );
         $this->responseHandler->emit($method, $return);
 

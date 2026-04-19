@@ -17,6 +17,8 @@ final readonly class ApiClient
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $apiKey,
+        private string $bearerToken,
     ) {
     }
 
@@ -33,6 +35,7 @@ final readonly class ApiClient
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         if ($api_key !== null) { $request = $request->withHeader('api_key', $api_key); }
+        $request = $request->withHeader('X-API-Key', $this->apiKey);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -54,6 +57,7 @@ final readonly class ApiClient
         $request = $request
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+        $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -87,6 +91,7 @@ final readonly class ApiClient
         $path = '/store/{storeId}/items';
         $path = \str_replace('{storeId}', (string) $storeId, $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $request = $request->withHeader('X-API-Key', $this->apiKey);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -106,6 +111,7 @@ final readonly class ApiClient
         $path = '/store/{storeId}/items';
         $path = \str_replace('{storeId}', (string) $storeId, $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
+        $request = $request->withHeader('X-API-Key', $this->apiKey);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {

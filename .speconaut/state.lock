@@ -14,7 +14,7 @@ as-is = "KLUv/QBYvQsAthhIJBCPtg0Pm6yPSHS+/1uazkHhM043e7CNrysexdE6NCIAAFV3Az0APgA
 stage = "unstable"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
 "src/Generator/Emit/TypeResolver.php" = "sha256:b06aa02daa3f194c3a893bd8c3f5bf25697fa00b9d2852952da0142333a47c8d"
@@ -37,7 +37,7 @@ stage = "unstable"
 
 [features."Model Generator".scenarios."A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string".traces]
 "src/Generator/Bindings.php" = "sha256:67fb7d20bbe65f77f5fa40736b4a65806c8e56d0949331f8ee9353f20e1eebea"
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
 "src/Generator/Emit/TypeResolver.php" = "sha256:b06aa02daa3f194c3a893bd8c3f5bf25697fa00b9d2852952da0142333a47c8d"
@@ -49,7 +49,7 @@ as-is = "KLUv/QBYTQoAxlhEIVBr0wZQcvRqw/bKtWRoEyEf0M8Yaii7Q1ZVGTolM7HDGj0AOgA5AKc
 stage = "unstable"
 
 [features."Model Generator".scenarios."A `oneOf` of `$ref`-ed components becomes a PHP union type".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/CompositionResolver.php" = "sha256:e1cc503a9aef3733db74dabaa8c17a616afba534981b6d548b16c5115f2e0082"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
@@ -61,7 +61,7 @@ as-is = "KLUv/QBY9QkAVthEIkCN0wFgJVLL2kr/IttQ2g3l94ylsLsw4GhfWLTojOHCHAg8ADoAPAA
 stage = "unstable"
 
 [features."Model Generator".scenarios."A `oneOf` with a `discriminator.propertyName` picks the branch by wire value".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/CompositionResolver.php" = "sha256:e1cc503a9aef3733db74dabaa8c17a616afba534981b6d548b16c5115f2e0082"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
@@ -84,7 +84,7 @@ as-is = "KLUv/QBYDQgAdpI1IVCLmgPYsGJvU2yV7NZJwi+oi16jI3ETmA8A2IlTNbi1BioAKgAuAAw
 stage = "unstable"
 
 [features."Model Generator".scenarios."A list-of-Model property hydrates each item into the declared class".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
 "src/Generator/Emit/TypeResolver.php" = "sha256:b06aa02daa3f194c3a893bd8c3f5bf25697fa00b9d2852952da0142333a47c8d"
@@ -95,7 +95,7 @@ as-is = "KLUv/QBY/QcAVhI3KZA1SQf///8/f3uLRPtEkmFLufzLTZokmzDV+lcOb1pSORWfeYVfXw5
 stage = "unstable"
 
 [features."Model Generator".scenarios."A list-of-scalar property hydrates items untouched".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
 "src/Generator/Emit/TypeResolver.php" = "sha256:b06aa02daa3f194c3a893bd8c3f5bf25697fa00b9d2852952da0142333a47c8d"
@@ -117,7 +117,7 @@ as-is = "KLUv/QBYdQsAxthFITBv0wZM9GoPiZh/tvebiESfMWs7PbFSOaoyMblKGspEqT4AOwA4AJz
 stage = "unstable"
 
 [features."Model Generator".scenarios."A property with a non-identifier schema key round-trips through PROPERTY_MAP".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/ModelEmitter.php" = "sha256:6e6746a6d4f7f0b4f61ff3c64346b0a92532ee5ac1ae9795c9e3a2679ff06c11"
 "src/Generator/Emit/PropertyShape.php" = "sha256:11322b6baca4c3e48c6933a98d4ecbb154895fc4e629e252f4654276d97f68bf"
 "src/Generator/Emit/TypeResolver.php" = "sha256:b06aa02daa3f194c3a893bd8c3f5bf25697fa00b9d2852952da0142333a47c8d"
@@ -196,7 +196,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.typ"
-spec-hash = "sha256:ac1ebe59d4517f354def0e506c635947d2bf55b6a9bdb1e57fbebfd54470a69c"
+spec-hash = "sha256:649a8fb3362a1a37eda615205ca6185469b70979ec65287110fb7b1f36ed2ba0"
 
 [features."Operation Generator".scenarios."A 2xx JSON response body is deserialized into the typed Model"]
 as-is-hash = "sha256:27912a52cf34ed52857f7de3297effd662739e07c079534240b8d5b1ceb65a04"
@@ -204,11 +204,11 @@ as-is = "KLUv/QBY7QcAplA0JDCNmwNMA/4tFszGWeilEGasWNJPdtvbwXdHtNqLp/tgYYUBFSkAKQA
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A 2xx JSON response body is deserialized into the typed Model".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -219,11 +219,11 @@ as-is = "KLUv/QBYnQoAxtdCISCP0wZbxN6zXayzWZ/s6CBCIwxPBpw1iwCyBXUCpCRQEDgAOgA4AGZ
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A 2xx JSON response with `additionalProperties` is returned as a typed associative array".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -234,11 +234,11 @@ as-is = "KLUv/QBYlQoA5pZAI1CL0wFjBWtyUu+VZkIWoRzhO0bF5m94KWiPwnAkfMZMVAwMNAA7ADU
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A GET operation with a path parameter becomes a typed client method".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -250,11 +250,11 @@ stage = "unstable"
 
 [features."Operation Generator".scenarios."A JSON body whose schema is a list of $ref becomes a typed list parameter".traces]
 "src/Generator/Emit/BodySpec.php" = "sha256:95e9333986f21fe5f82af3dc638c2e5b438eb94ea58348d1772dd31b6bcbc7f9"
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -266,11 +266,11 @@ stage = "unstable"
 
 [features."Operation Generator".scenarios."A POST operation with a JSON body takes a typed Model parameter".traces]
 "src/Generator/Emit/BodySpec.php" = "sha256:95e9333986f21fe5f82af3dc638c2e5b438eb94ea58348d1772dd31b6bcbc7f9"
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -281,11 +281,11 @@ as-is = "KLUv/QBYfQsAplhFK5AnSQf///8/92O8T6IlRIr8ZEuKjFzy024Ey6hayYiJGA57x+IV4/p
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A PathItem-level inline parameter is inherited by every operation under that path".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -297,11 +297,11 @@ stage = "unstable"
 
 [features."Operation Generator".scenarios."A `$ref` to a component requestBody is resolved to the expected Model body parameter".traces]
 "src/Generator/Emit/BodySpec.php" = "sha256:95e9333986f21fe5f82af3dc638c2e5b438eb94ea58348d1772dd31b6bcbc7f9"
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -313,11 +313,11 @@ stage = "unstable"
 
 [features."Operation Generator".scenarios."A non-2xx response throws a typed ApiException instead of a generic RuntimeException".traces]
 "src/Generator/Emit/ApiExceptionEmitter.php" = "sha256:2616566552720ab83fb6bdba024295448ea43814a175e7ecd8604011c7b0e452"
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -328,11 +328,11 @@ as-is = "KLUv/QBYJQkAptM5IkDLpANAiEhSbTK175GYoYqpMTYopuj6sniFHuCH3wwvx+QvADAAMAB
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A scalar 2xx JSON response is returned as the scalar PHP type without hydration".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -343,13 +343,47 @@ as-is = "KLUv/QBYPQwABptNJACxqAPvNOkmoeQqJTGLN+l5SB7wiYd5zv5PHTuogUn/v+8CDz8AQwB
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An `explode: true` array query parameter is serialised as repeated `name=value` pairs".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
+"src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
+
+[features."Operation Generator".scenarios."An apiKey header scheme becomes a constructor arg attached as a header on secured ops"]
+as-is-hash = "sha256:5c04c80c6fb74d7897a2d1a87b5f60f2d59e7ed5a01e9ef4c61aa524f1d7cbbf"
+as-is = "KLUv/QBY3QsA9ltOJDCP0wEDKNSkZLSVerOLUNrNhOq3PHFby1GhNODBqTBw0MoCAz8ASABBAL+wA5vxhnKrCJm55XZiM/RpVk8oXY3trGf1lW73bMlztk1QrmJLPuudlk7xna+kzqv7cnQF9pxRYqaxPHyaBJdbP3GOJS4sEWHGIsKMm1/eQJ62PiuU2AwJgghHV4AkLEggEGbuHPrBIPOD+ROt17KKiD5aFtHFY3ucliIA1uc16crnfKWJMflYfZvT8mnYgixXrZ4MoniuxbPGgD0Sq+8y5/5a41cDq7Rc8Cqys5wVoXS2vTz+wPj1YDO2ga5y5YjC9vJPc5QPq4cozqDw6mernOIBgQKIsrUNPxyOAIS1rKIAQuDVQxTPhrVpLjlSjWLV1t6xOla6s3S4HqXh/FbO6umax4t3IEuev3dhARYAHxuocAsvrmt2FYdaAT4r5HbLJcomoNtWCLg33LFXL7AG55EzhyFYVXgbbQQ/8ntZ7h2TA2kbwwjCJJlQUQ=="
+stage = "unstable"
+
+[features."Operation Generator".scenarios."An apiKey header scheme becomes a constructor arg attached as a header on secured ops".traces]
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
+"src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
+"src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
+"src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
+"src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
+"src/Generator/Emit/SecurityScheme.php" = "sha256:141ea6055994ff98a33d84c0adf54457e7cd17e70a0749e38c4224b4d047183a"
+"src/Generator/Emit/SecuritySchemeCatalog.php" = "sha256:d57f56c8006da7a220c02f9b2d1dde13eedce60c1fd7afbfa5b5b0c18c3fc6a6"
+"src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
+
+[features."Operation Generator".scenarios."An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization"]
+as-is-hash = "sha256:fab92b7cb009e2cab0112331bf19c7865fe9c32c422c81e55bb78271f7455d2a"
+as-is = "KLUv/QBYDQwApltNJDCtNAcMNpYkJTYie4xEmCRM8FV7KJof3mDGIpw2LOJBQwnUCUAAQwBCABHnMSzBXvyh4Lp8bm7BjdiLbGxxgmlb+xw7tPpKuIu2KFrbJucj2gPDaHeopVN86Cs56xVPcbS7nI6bxhTzKRKPY5+HlSt/rd0VUz2mWa+U4QmfyI1a0EfNiVbp2IsJRNIMNI8y67VMwmuf83DPLNOX7h5u89kiqKUHgN0Vn3RlhL5SyXSd1ZW9y9Voh+vpumzJm2cPAoscq+8y6Pn1wCpNG7wuGVrQLp9a26I+n+D8grAXE4hiEk8qPJG4WfscCokbP8c86/4ud1B552urnOICAQOHY2sZJnDDBw0PNBoBeoVXWMskDBwQr/u7XBl2z4PJGdUoVm3tIbvG5qFnUfQXMUwjq2+DmkaWGgASs1SxLm2BOGpX8YPdoJDNRuCVN8wV3LDL/dn20yABq3pFLBOcIWa1ACLM+NYCLNNWo1Zuhs9mhJ0shZa1mgd0KFItjrFZBg=="
+stage = "unstable"
+
+[features."Operation Generator".scenarios."An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization".traces]
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
+"src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
+"src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
+"src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
+"src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
+"src/Generator/Emit/SecurityScheme.php" = "sha256:141ea6055994ff98a33d84c0adf54457e7cd17e70a0749e38c4224b4d047183a"
+"src/Generator/Emit/SecuritySchemeCatalog.php" = "sha256:d57f56c8006da7a220c02f9b2d1dde13eedce60c1fd7afbfa5b5b0c18c3fc6a6"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
 
 [features."Operation Generator".scenarios."An inline enum query parameter becomes a synthesised backed enum method argument"]
@@ -358,12 +392,12 @@ as-is = "KLUv/QBYvQsARplGIjCN0waM9mrZetcAoY3hb6KjdqnJfM0v/Ea6r5U7WNgoAAM6ADwAPQB
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An inline enum query parameter becomes a synthesised backed enum method argument".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/EnumEmitter.php" = "sha256:3e523b0519b7e578a95a30ed6fe00be2602d3f13e8e838994f5ae74ec3bdf9c9"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Enum/EnumCatalog.php" = "sha256:2316908abaafb07e1f3e52c75d91c44db4081c419692d99ec89010fd4bab960c"
@@ -375,11 +409,11 @@ as-is = "KLUv/QBY3QoA9hdDIlBt0wGLIiFywtrKHk+2/ZylCYXA48TgNvzWKgy+GaoGq4Y3ADwAOgD
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation whose PathItem declares a `$ref` parameter is still emitted".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -390,11 +424,11 @@ as-is = "KLUv/QBYlQoAphhEITBv0wYw3aIdRjsO27YlWBc885YHFGdVpVDMlcTIjEKAJzkAPAA7ALY
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation-level `$ref` to a component parameter is resolved to a typed method argument".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -405,11 +439,11 @@ as-is = "KLUv/QBYrQoAllhEITCN0waYaMu67TYGQhSTHaEd8qouX/4CeuXaj9fCQScKDDgAPgA8AG+
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation-level `$ref` to a header component parameter becomes an optional typed header argument".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"
@@ -420,11 +454,11 @@ as-is = "KLUv/QBY1QkAhhZBJCDLNgc7Ipps3a54PQ15rpWukMgdIo2QhpeBOraP3idAigDlATMAOAA
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An optional header parameter becomes a nullable typed argument and is attached only when non-null".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:bda30b8a96ca04c11062480f2167aa7b4e0befd01bbe1bf8114ac488d3f2cbe7"
+"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
 "src/Generator/Emit/OperationAnalyzer.php" = "sha256:e675d09b88a61cc52a545686d8d6e18bcac59106b0a55120151ba1cdfa7e67b1"
-"src/Generator/Emit/OperationEmitter.php" = "sha256:a11134353f55fb76bd928f746f41651b18c28c688c6fbd615165fdc8700677ea"
+"src/Generator/Emit/OperationEmitter.php" = "sha256:6cb47f3bbb1d2d28fc6572986eff8d3846bf56b897e882c6b4eec5888e589eb8"
 "src/Generator/Emit/ParameterCollector.php" = "sha256:636d0d1e0fd37e43ad2c1779e957c01340bba473ebd47c9a37f1406f034b1dc1"
-"src/Generator/Emit/RequestAssembler.php" = "sha256:d1cda5e0c3f168e92fade38b8ec8666d20a5026bb256523150d67f16354a2124"
+"src/Generator/Emit/RequestAssembler.php" = "sha256:a3610513cddb176908c1c0f197b3d932eddbe0528849b8722277b15078be58ce"
 "src/Generator/Emit/ResponseHandler.php" = "sha256:7104567265addfa606874f4a8882afc4bf6cc521e1af075d7b589b779f8ad23c"
 "src/Generator/Emit/ReturnSpec.php" = "sha256:a3b0d78567432d42af747161f96140e018ddc015d2941a9dbf6a5862e0199287"
 "src/Generator/Generator.php" = "sha256:2800f38001b2e6e9df971974286d1bef6cc70d9229f90932adf087be7f0eac6e"

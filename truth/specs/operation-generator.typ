@@ -209,4 +209,54 @@
       #and_[the exception's `getDecodedBody()` returns the decoded error payload]
     ]
   ]
+
+  #rule("Security schemes")[
+    #scenario(
+      "An apiKey header scheme becomes a constructor arg attached as a header on secured ops",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/SecurityScheme.php",
+        "src/Generator/Emit/SecuritySchemeCatalog.php",
+      ),
+    )[
+      #given[#the(Schema) declares `#/components/securitySchemes/apiKey` with #p((scheme: "type: apiKey, in: header, name: X-API-Key"))]
+      #and_[a top-level `security: [{ apiKey: [] }]` makes every operation secured by default]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted `ApiClient` constructor has a required `string $apiKey` promoted private argument placed after `$baseUri`]
+      #and_[each secured operation's method body calls `$request = $request->withHeader('X-API-Key', $this->apiKey);` before `sendRequest`]
+    ]
+
+    #scenario(
+      "An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/SecurityScheme.php",
+        "src/Generator/Emit/SecuritySchemeCatalog.php",
+      ),
+    )[
+      #given[#the(Schema) declares `#/components/securitySchemes/bearerAuth` with #p((scheme: "type: http, scheme: bearer"))]
+      #and_[an operation #p((id: "operationId: placeOrder")) overrides the default with operation-level `security: [{ bearerAuth: [] }]`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted `ApiClient` constructor has a required `string $bearerToken` promoted private argument]
+      #and_[`placeOrder`'s method body calls `$request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);` before `sendRequest`]
+    ]
+
+    #scenario(
+      "An http basic scheme is left as a placeholder pending ADR-002 runtime design",
+      stage: draft,
+    )[
+      #given[#the(Schema) declares a scheme with #p((scheme: "type: http, scheme: basic"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002]
+    ]
+
+    #scenario(
+      "An oauth2 scheme is left as a placeholder pending ADR-002 runtime design",
+      stage: draft,
+    )[
+      #given[#the(Schema) declares a scheme with #p((scheme: "type: oauth2, flows: { clientCredentials: ... }"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002]
+    ]
+  ]
 ]

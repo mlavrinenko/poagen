@@ -23,9 +23,10 @@ use Nette\PhpGenerator\Method;
 final readonly class RequestAssembler
 {
     /**
-     * @param list<Parameter> $pathParams
-     * @param list<Parameter> $queryParams
-     * @param list<Parameter> $headerParams
+     * @param list<Parameter>      $pathParams
+     * @param list<Parameter>      $queryParams
+     * @param list<Parameter>      $headerParams
+     * @param list<SecurityScheme> $activeSchemes
      */
     public function emitRequest(
         Method $method,
@@ -36,6 +37,7 @@ final readonly class RequestAssembler
         array $headerParams,
         ?BodySpec $body,
         Bindings $bindings,
+        array $activeSchemes = [],
     ): void {
         $method->addBody('$path = ?;', [$pathUri]);
 
@@ -61,6 +63,37 @@ final readonly class RequestAssembler
                 'if (? !== null) { $request = $request->withHeader(?, ?); }',
                 [$check, $param->name, $value],
             );
+        }
+
+        $this->emitSecurityHeaders($method, $activeSchemes);
+    }
+
+    /**
+     * Attach each active security scheme as a header. Runs after the
+     * per-parameter header loop so auth headers consistently land last
+     * in the emitted method body — makes request diffs predictable and
+     * matches the "auth is transport policy" framing of ADR-002.
+     *
+     * @param list<SecurityScheme> $activeSchemes
+     */
+    private function emitSecurityHeaders(Method $method, array $activeSchemes): void
+    {
+        foreach ($activeSchemes as $scheme) {
+            switch ($scheme->kind) {
+                case SecurityScheme::KIND_API_KEY_HEADER:
+                    $method->addBody(
+                        '$request = $request->withHeader(?, $this->' . $scheme->ctorArg . ');',
+                        [$scheme->headerName],
+                    );
+                    break;
+
+                case SecurityScheme::KIND_BEARER:
+                    $method->addBody(
+                        '$request = $request->withHeader(?, ? . $this->' . $scheme->ctorArg . ');',
+                        [$scheme->headerName, 'Bearer '],
+                    );
+                    break;
+            }
         }
     }
 
