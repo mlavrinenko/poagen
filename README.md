@@ -23,8 +23,39 @@ paogen reads an OpenAPI 3.0.x schema and emits a PHP 8.4 HTTP client:
 
 ## Status
 
-Pre-alpha. Generator emits *models only* (PoC). Specs and decisions live
-under [`truth/`](truth/).
+First consumable release (v0.1): OpenAPI 3.0 pipeline is correct,
+type-safe, and pleasant on real schemas. The generator emits:
+
+* **Models** — typed `readonly` classes for `components.schemas`, PHP 8.1
+  backed enums for `enum`, synthesised classes for inline `type: object`
+  properties, PHP union types for `oneOf` / `anyOf` (driven by
+  `discriminator.propertyName`), merged models for `allOf`. Top-level
+  composition components become marker interfaces their branches
+  implement.
+* **`ApiClient`** — one method per operation, typed path / query / header
+  / cookie parameters, `application/json` and
+  `application/x-www-form-urlencoded` request bodies. `multipart/form-data`
+  and `application/octet-stream` methods are emitted with a `: never`
+  return type that throws until a full story ships.
+* **Security** — `apiKey` (header) and `http bearer` become required
+  `ApiClient` constructor arguments; `http basic`, `oauth2`, and
+  `openIdConnect` remain placeholders per
+  [ADR-002](truth/decisions/002-no-inheritance-no-protected-regions.typ).
+* **Errors** — non-2xx responses throw a generated
+  `Generated\ApiException` with status code, request, response, and a
+  best-effort decoded body narrowable via `instanceof` when an error
+  schema is declared (see
+  [ADR-009](truth/decisions/009-error-response-policy.typ)).
+* **Runtime (de)serialisation** — a shared
+  [`Marshaller`](src/Runtime/Marshal/Marshaller.php) /
+  [`Hydrator`](src/Runtime/Marshal/Hydrator.php) pair drives every
+  (de)serialisation via phpdoc types and a small set of runtime
+  attributes (`#[WireName]`, `#[Discriminator]`, …). Model classes carry
+  no generator boilerplate (see
+  [ADR-010](truth/decisions/010-attribute-and-phpdoc-driven-serialization.typ)).
+
+Specs and decisions live under [`truth/`](truth/); the release queue is
+in [`ROADMAP.md`](ROADMAP.md) until the `0.1.0` tag.
 
 Known limitation: OpenAPI **3.1** is not yet supported — see
 [truth/notes/openapi-3.1-gap.md](truth/notes/openapi-3.1-gap.md) and
@@ -40,10 +71,14 @@ cd paogen
 composer install
 ```
 
-## Usage (planned)
+## Usage
 
 ```bash
 paogen generate path/to/paogen.php
+paogen generate path/to/paogen.php --dry-run   # preview writes / deletes
+paogen generate path/to/paogen.php --diff      # unified diff vs disk
+paogen generate path/to/paogen.php --output=/tmp/out
+paogen validate path/to/schema.yaml            # parse + validate only
 ```
 
 Where `paogen.php` returns a typed `Profile` describing the schema, output
