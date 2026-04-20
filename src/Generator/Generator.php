@@ -36,9 +36,12 @@ final readonly class Generator
         $this->modelPlanner = new ModelPlanner($modelEmitter);
     }
 
-    public function generate(Profile $profile): void
+    public function generate(Profile $profile): GenerationPlan
     {
-        $this->applier->apply($this->plan($profile));
+        $plan = $this->plan($profile);
+        $this->applier->apply($plan);
+
+        return $plan;
     }
 
     /**
@@ -71,18 +74,22 @@ final readonly class Generator
         // caught the moment a second raw key tries to claim the same PHP
         // class.
         $registry = new NameRegistry($normaliser);
+        // Sibling registry scoped to the ApiClient — operationIds form
+        // their own collision space (PHP method names on one class)
+        // separate from schema-component class names.
+        $operationIdRegistry = new NameRegistry($normaliser);
 
         /** @var array<string,string> $writes */
         $writes = [];
 
         $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes);
-        $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $bindings, $enums, $writes);
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
 
-        return new GenerationPlan($writes, $prunes);
+        return new GenerationPlan($writes, $prunes, $skipped);
     }
 
     private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums, NameRegistry $enumRegistry): void
@@ -135,7 +142,8 @@ final readonly class Generator
     }
 
     /**
-     * @param array<string,string> $writes
+     * @param  array<string,string>                                $writes
+     * @return list<\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation>
      */
     private function emitClient(
         OpenApi $openApi,
@@ -143,22 +151,32 @@ final readonly class Generator
         string $rootDir,
         string $modelNamespace,
         NameRegistry $registry,
+        NameRegistry $operationIdRegistry,
+        \Mlavrinenko\Paogen\Generator\Naming\NameNormaliser $normaliser,
         Bindings $bindings,
         EnumCatalog $enums,
         array &$writes,
-    ): void {
+    ): array {
         if ($openApi->paths === null) {
-            return;
+            return [];
         }
 
-        $emitter = new ClientEmitter(new OperationEmitter($modelNamespace, $enums, $registry));
+        $emitter = new ClientEmitter(new OperationEmitter(
+            $modelNamespace,
+            $enums,
+            $registry,
+            $operationIdRegistry,
+            $normaliser,
+        ));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 
         if ($code === null) {
-            return;
+            return $emitter->drainSkipped();
         }
 
         $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'] = $code;
+
+        return $emitter->drainSkipped();
     }
 
     /** @param array<string,string> $writes */

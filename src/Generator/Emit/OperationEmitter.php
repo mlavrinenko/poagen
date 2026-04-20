@@ -7,10 +7,12 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
-use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
+use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
@@ -29,21 +31,29 @@ use Nette\PhpGenerator\PhpNamespace;
  *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`,
  *     a scalar, or an `additionalProperties` map.
  *
- * Anything else is skipped: the op is simply not emitted.
+ * Anything else returns an {@see EmitOutcome::skipped()} carrying a
+ * {@see SkippedOperation} so the user learns *which* endpoint did not
+ * make it into the client (T-025).
  */
 final readonly class OperationEmitter
 {
     private RequestBodyParameterEmitter $bodyParamEmitter;
+    private ParameterAdder $paramAdder;
 
     public function __construct(
         private string $modelNamespace,
-        private ?EnumCatalog $enums = null,
+        ?EnumCatalog $enums = null,
         private ?NameRegistry $registry = null,
+        private ?NameRegistry $operationIdRegistry = null,
+        private ?NameNormaliser $paramNormaliser = null,
         private RequestAssembler $requestAssembler = new RequestAssembler(),
         private ResponseHandler $responseHandler = new ResponseHandler(),
     ) {
         \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        \assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
+        \assert($paramNormaliser instanceof NameNormaliser, 'paramNormaliser is required (T-025).');
         $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums, $registry);
+        $this->paramAdder = new ParameterAdder($modelNamespace, $enums, $registry);
     }
 
     public function emit(
@@ -55,58 +65,77 @@ final readonly class OperationEmitter
         Bindings $bindings,
         ?PathItem $pathItem = null,
         ?SecuritySchemeCatalog $securityCatalog = null,
-    ): bool {
-        $operationId = (string) ($operation->operationId ?? '');
+    ): EmitOutcome {
+        $rawOperationId = (string) ($operation->operationId ?? '');
 
-        if ($operationId === '') {
-            return false;
+        if ($rawOperationId === '') {
+            return EmitOutcome::skipped(new SkippedOperation(
+                $httpMethod,
+                $pathUri,
+                $rawOperationId,
+                SkippedOperation::REASON_MISSING_OPERATION_ID,
+            ));
         }
 
-        // An operationId carrying characters invalid in a PHP method name
-        // (DigitalOcean uses `monitoring_get_xyz.yml` in a handful of
-        // cases) would abort emission inside Nette\PhpGenerator. Skipping
-        // the op is the conservative move until the parameter-name
-        // normalisation follow-up decides how to canonicalise names.
-        if (preg_match('/^[A-Za-z_]\w*$/', $operationId) !== 1) {
-            return false;
-        }
+        \assert($this->operationIdRegistry instanceof NameRegistry);
+        $operationId = $this->operationIdRegistry->resolve(
+            $rawOperationId,
+            new NormalisationContext(SymbolKind::OperationId),
+        );
 
-        $pathParams = OperationAnalyzer::pathParameters($operation, $pathItem);
+        $rawPathParams = OperationAnalyzer::pathParameters($operation, $pathItem);
 
-        if ($pathParams === null) {
-            return false;
+        if ($rawPathParams === null) {
+            return EmitOutcome::skipped(new SkippedOperation(
+                $httpMethod,
+                $pathUri,
+                $rawOperationId,
+                SkippedOperation::REASON_UNRESOLVABLE_PARAMETER,
+            ));
         }
 
         \assert($this->registry instanceof NameRegistry);
         $body = OperationAnalyzer::requestBody($operation->requestBody, $this->registry);
 
         if ($operation->requestBody !== null && !$body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
-            return false;
+            return EmitOutcome::skipped(new SkippedOperation(
+                $httpMethod,
+                $pathUri,
+                $rawOperationId,
+                SkippedOperation::REASON_UNSUPPORTED_BODY,
+            ));
         }
 
-        $queryParams = OperationAnalyzer::queryParameters($operation, $pathItem);
-        $headerParams = OperationAnalyzer::headerParameters($operation, $pathItem);
-        $requiredQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => $p->required));
-        $optionalQuery = array_values(array_filter($queryParams, static fn(Parameter $p): bool => !$p->required));
+        // Per-op registry: parameter-name uniqueness only matters within
+        // a single PHP method signature, so each emit call gets a fresh
+        // scope rather than aliasing across ops.
+        \assert($this->paramNormaliser instanceof NameNormaliser);
+        $paramRegistry = new NameRegistry($this->paramNormaliser);
+
+        $pathParams = $this->resolveParameters($rawPathParams, $paramRegistry);
+        $queryParams = $this->resolveParameters(OperationAnalyzer::queryParameters($operation, $pathItem), $paramRegistry);
+        $headerParams = $this->resolveParameters(OperationAnalyzer::headerParameters($operation, $pathItem), $paramRegistry);
+        $requiredQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => $p->param->required));
+        $optionalQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
         $return = OperationAnalyzer::returnType($operation->responses, $this->registry);
 
         $method = $class->addMethod($operationId)->setPublic();
 
-        $this->addPathParams($method, $namespace, $pathParams, $bindings, $operationId);
-        $this->addQueryParams($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $operationId);
+        $this->paramAdder->addPath($method, $namespace, $pathParams, $bindings, $rawOperationId);
+        $this->paramAdder->addQuery($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $rawOperationId);
 
         if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
             $this->bodyParamEmitter->addBodyParams($method, $namespace, $body, $bindings);
         }
 
-        $this->addQueryParams($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $operationId);
-        $this->addHeaderParams($method, $namespace, $headerParams, $bindings, $operationId);
+        $this->paramAdder->addQuery($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $rawOperationId);
+        $this->paramAdder->addHeader($method, $namespace, $headerParams, $bindings, $rawOperationId);
 
         if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec && $body->kind === BodySpec::KIND_UNSUPPORTED) {
-            $this->bodyParamEmitter->emitUnsupportedStub($method, $body, $operationId);
+            $this->bodyParamEmitter->emitUnsupportedStub($method, $body, $rawOperationId);
 
-            return true;
+            return EmitOutcome::emitted();
         }
 
         $this->applyReturnType($method, $namespace, $return);
@@ -128,119 +157,23 @@ final readonly class OperationEmitter
         );
         $this->responseHandler->emit($method, $return);
 
-        return true;
+        return EmitOutcome::emitted();
     }
 
     /**
-     * @param list<Parameter> $params
+     * @param  list<Parameter>         $params
+     * @return list<ResolvedParameter>
      */
-    private function addPathParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
+    private function resolveParameters(array $params, NameRegistry $paramRegistry): array
     {
+        $context = new NormalisationContext(SymbolKind::ParameterName);
+        $out = [];
+
         foreach ($params as $param) {
-            $resolved = $this->resolveParamType($param, $bindings, $operationId);
-            $this->importParamType($namespace, $resolved);
-            $phpParam = $method->addParameter($param->name);
-
-            if ($resolved->phpType !== null) {
-                $phpParam->setType($resolved->phpType);
-            }
-        }
-    }
-
-    /**
-     * @param list<Parameter> $params
-     */
-    private function addQueryParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, bool $required, string $operationId): void
-    {
-        foreach ($params as $param) {
-            $resolved = $this->resolveParamType($param, $bindings, $operationId);
-            $this->importParamType($namespace, $resolved);
-            $phpParam = $method->addParameter($param->name);
-
-            if ($resolved->phpType !== null) {
-                $phpParam->setType($resolved->phpType);
-            }
-
-            if ($resolved->phpDoc !== null) {
-                $method->addComment('@param ' . $resolved->phpDoc . ' $' . $param->name);
-            }
-
-            if (!$required) {
-                $phpParam->setNullable()->setDefaultValue(null);
-            }
-        }
-    }
-
-    /**
-     * @param list<Parameter> $params
-     */
-    private function addHeaderParams(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
-    {
-        foreach ($params as $param) {
-            $resolved = $this->resolveParamType($param, $bindings, $operationId);
-            $this->importParamType($namespace, $resolved);
-            $phpParam = $method->addParameter($param->name);
-
-            if ($resolved->phpType !== null) {
-                $phpParam->setType($resolved->phpType);
-            }
-
-            $phpParam->setNullable()->setDefaultValue(null);
-        }
-    }
-
-    private function importParamType(PhpNamespace $namespace, TypeResolver $resolved): void
-    {
-        $type = $resolved->phpType;
-        if ($type === null) {
-            return;
-        }
-        // A composition resolver may hand us a `Foo|Bar` union — addUse
-        // accepts one FQCN at a time, so split before importing.
-        foreach (explode('|', $type) as $part) {
-            $part = ltrim($part, '\\');
-            if (!str_contains($part, '\\')) {
-                continue;
-            }
-            $namespace->addUse($part);
-        }
-    }
-
-    /**
-     * Resolve the PHP type for one parameter. If the parameter's schema is
-     * an inline enum, synthesise a backed enum named after the operation +
-     * parameter and use its FQCN as the type.
-     */
-    private function resolveParamType(Parameter $param, Bindings $bindings, string $operationId): TypeResolver
-    {
-        $schema = $param->schema instanceof Schema ? $param->schema : null;
-        $synthFqcn = $this->synthesizeParamEnum($schema, $operationId, $param->name);
-
-        if ($synthFqcn !== null) {
-            return new TypeResolver($synthFqcn, null, null, false);
+            $out[] = new ResolvedParameter($param, $paramRegistry->resolve($param->name, $context));
         }
 
-        \assert($this->registry instanceof NameRegistry);
-
-        return TypeResolver::resolve($param->schema ?? new Schema([]), $bindings, $this->modelNamespace, $this->registry, $this->enums);
-    }
-
-    private function synthesizeParamEnum(?Schema $schema, string $operationId, string $paramName): ?string
-    {
-        if (!$schema instanceof \cebe\openapi\spec\Schema || !$this->enums instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumCatalog) {
-            return null;
-        }
-
-        $synthName = EnumCatalog::pascalize($operationId) . EnumCatalog::pascalize($paramName);
-        $spec = EnumCatalog::specFromSchema($synthName, $schema);
-
-        if (!$spec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
-            return null;
-        }
-
-        $this->enums->synthesize($synthName, $spec);
-
-        return $this->enums->synthesizedFqcn($synthName);
+        return $out;
     }
 
     private function applyReturnType(Method $method, PhpNamespace $namespace, ReturnSpec $return): void

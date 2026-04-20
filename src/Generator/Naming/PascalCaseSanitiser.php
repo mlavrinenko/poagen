@@ -35,6 +35,13 @@ final readonly class PascalCaseSanitiser implements NameNormaliser
 
     public function normalise(string $raw, NormalisationContext $context): ?string
     {
+        // OperationId and ParameterName route through CamelCaseSanitiser
+        // — PHP method and parameter names are conventionally camelCase
+        // (`findPetsByStatus`, `$petId`), never PascalCase.
+        if ($context->kind !== SymbolKind::SchemaComponent) {
+            return null;
+        }
+
         if ($this->pattern !== null && preg_match($this->pattern, $raw) !== 1) {
             return null;
         }

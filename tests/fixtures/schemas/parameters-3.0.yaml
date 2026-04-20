@@ -56,6 +56,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
 
+  /proxy:
+    post:
+      # The dot in the raw operationId mirrors the DigitalOcean
+      # `monitoring_get_appRestartCountMetrics.yml` shape — both the
+      # method name and the kebab-case header parameter must be
+      # normalised to PHP identifiers without losing the wire keys.
+      operationId: monitoring_get_foo.yml
+      security: []
+      parameters:
+        - name: Content-Type
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: X-Trace-ID
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+
+  /inline-body:
+    post:
+      # Used by the skip-diagnostic scenario: the requestBody schema is
+      # an inline object rather than a $ref-to-Model. The generator does
+      # not (yet) synthesise an anonymous Model for inline bodies, so
+      # the operation is skipped — but the skip must be reported instead
+      # of being dropped silently.
+      operationId: postInlineBody
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '204':
+          description: ok
+
   /token:
     post:
       operationId: issueToken

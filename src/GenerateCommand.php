@@ -81,12 +81,16 @@ final class GenerateCommand
         $generator = new Generator(new AttributeScanner($loader));
 
         if ($dryRun) {
-            fwrite($stdout, new PlanReporter()->summary($generator->plan($profile)));
+            $plan = $generator->plan($profile);
+            fwrite($stdout, new PlanReporter()->summary($plan));
+            self::reportSkipped($plan->skippedOperations, $stderr);
             return 0;
         }
 
         if ($diff) {
-            $rendered = new PlanReporter()->diff($generator->plan($profile));
+            $plan = $generator->plan($profile);
+            $rendered = new PlanReporter()->diff($plan);
+            self::reportSkipped($plan->skippedOperations, $stderr);
 
             if ($rendered === '') {
                 return 0;
@@ -96,9 +100,28 @@ final class GenerateCommand
             return 1;
         }
 
-        $generator->generate($profile);
+        $plan = $generator->generate($profile);
         fwrite($stdout, "paogen: generated into {$profile->output}\n");
+        self::reportSkipped($plan->skippedOperations, $stderr);
         return 0;
+    }
+
+    /**
+     * @param list<\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation> $skipped
+     * @param resource                                                  $stderr
+     */
+    private static function reportSkipped(array $skipped, $stderr): void
+    {
+        if ($skipped === []) {
+            return;
+        }
+
+        $count = \count($skipped);
+        fwrite($stderr, "paogen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
+
+        foreach ($skipped as $entry) {
+            fwrite($stderr, $entry->format() . "\n");
+        }
     }
 
     private static function withOutput(Profile $profile, string $output): Profile

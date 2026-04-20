@@ -11,13 +11,16 @@
   "Operation Generator",
   traces: (
     "src/Generator/Emit/ClientEmitter.php",
+    "src/Generator/Emit/EmitOutcome.php",
     "src/Generator/Emit/OperationAnalyzer.php",
     "src/Generator/Emit/OperationEmitter.php",
+    "src/Generator/Emit/ParameterAdder.php",
     "src/Generator/Emit/ParameterCollector.php",
     "src/Generator/Emit/RequestAssembler.php",
     "src/Generator/Emit/ResponseHandler.php",
     "src/Generator/Emit/ReturnSpec.php",
     "src/Generator/Generator.php",
+    "src/Generator/Naming/CamelCaseSanitiser.php",
   ),
   description: [
     Walks #the(Schema)'s `paths` and emits one method per OpenAPI
@@ -133,6 +136,65 @@
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $api_key = null): void`]
       #and_[the method calls `$request->withHeader('api_key', $api_key)` only when `$api_key` is not `null`]
+    ]
+  ]
+
+  #rule("Identifier normalisation")[
+    #scenario(
+      "A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ResolvedParameter.php",
+        "src/Generator/Naming/SymbolKind.php",
+        "tests/fixtures/schemas/parameters-3.0.yaml",
+      ),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /proxy")) with an optional header parameter named `Content-Type`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted method takes a `?string $contentType = null` argument]
+      #and_[the method body attaches the header with the original wire key `Content-Type` (not `contentType`)]
+    ]
+
+    #scenario(
+      "An operationId with non-identifier characters is camelCased into a PHP method name",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/SymbolKind.php",
+        "tests/fixtures/schemas/parameters-3.0.yaml",
+      ),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /proxy")) with #p((id: "operationId: monitoring_get_foo.yml"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `monitoringGetFooYml(...)`]
+      #and_[the operation is *not* silently skipped even though the raw operationId contains a `.`]
+    ]
+
+    #scenario(
+      "Profile.renames overrides an operationId verbatim",
+      stage: unstable,
+      traces: (
+        "src/Generator/Naming/RenamesNormaliser.php",
+        "tests/fixtures/profiles/parameters.php",
+      ),
+    )[
+      #given[a #the(Profile) whose `renames` map carries `'monitoring_get_foo.yml' => 'forwardProxyRequest'`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) has a method `forwardProxyRequest(...)` instead of the auto-sanitised `monitoringGetFooYml`]
+    ]
+
+    #scenario(
+      "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
+      stage: unstable,
+      traces: (
+        "src/Generator/GenerationPlan.php",
+        "src/Generator/Emit/SkippedOperation.php",
+        "src/GenerateCommand.php",
+      ),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: postInlineBody")) whose `application/json` request body is an inline `type: object` (not a `$ref`) — a shape paogen does not yet synthesise]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the resulting `GenerationPlan` carries a `skippedOperations` entry naming the HTTP method, path, operationId and the reason for the skip]
+      #and_[`paogen generate` prints the same list to stderr so the user knows which ops did not make it into the client]
     ]
   ]
 

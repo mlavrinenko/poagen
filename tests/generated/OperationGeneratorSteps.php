@@ -95,12 +95,19 @@ final class OperationGeneratorSteps
 
     public function givenSchemaDeclaresOperationOpWithId(string $op, string $id): void
     {
-        // Reused by both the single-Model body scenario (POST /pet) and
-        // the list-of-Model body scenario (POST /user/createWithList).
-        TestCase::assertContains($op, ['POST /pet', 'POST /user/createWithList']);
-        TestCase::assertContains($id, ['operationId: addPet', 'operationId: createUsersWithListInput']);
+        // Reused by the JSON body scenarios (POST /pet, POST /user/createWithList)
+        // *and* the operationId-normalisation scenario (POST /proxy with the
+        // dotted DigitalOcean-style operationId on the parameters fixture).
+        TestCase::assertContains($op, ['POST /pet', 'POST /user/createWithList', 'POST /proxy']);
+        TestCase::assertContains($id, [
+            'operationId: addPet',
+            'operationId: createUsersWithListInput',
+            'operationId: monitoring_get_foo.yml',
+        ]);
 
-        $this->profile = $this->loadProfile('petstore');
+        $this->profile = $op === 'POST /proxy'
+            ? $this->loadProfile('parameters')
+            : $this->loadProfile('petstore');
     }
 
     public function givenTheRequestBodyIsApplicationJsonWithSchemaRef(string $ref): void
@@ -898,6 +905,134 @@ final class OperationGeneratorSteps
 
         // Stub must not touch the transport.
         TestCase::assertNull($http->lastRequest);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithAnOptionalHeaderParameterNamedContentType(string $op): void
+    {
+        TestCase::assertSame('POST /proxy', $op);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function thenTheEmittedMethodTakesAStringContentTypeNullArgument(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenTheMethodBodyAttachesTheHeaderWithTheOriginalWireKeyContentTypeNotContentType(): void
+    {
+        $body = $this->methodSlice('monitoringGetFooYml');
+        // Wire key `Content-Type` survives verbatim; PHP variable was
+        // sanitised to `$contentType` by the CamelCaseSanitiser.
+        TestCase::assertStringContainsString(
+            "if (\$contentType !== null) { \$request = \$request->withHeader('Content-Type', \$contentType); }",
+            $body,
+        );
+        TestCase::assertStringContainsString(
+            "if (\$xTraceId !== null) { \$request = \$request->withHeader('X-Trace-ID', \$xTraceId); }",
+            $body,
+        );
+    }
+
+
+    public function thenTheEmittedClientHasAMethodMonitoringGetFooYml(): void
+    {
+        TestCase::assertStringContainsString('public function monitoringGetFooYml(', $this->source);
+    }
+
+
+    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA(): void
+    {
+        // Pre-T-025 the dot in `monitoring_get_foo.yml` made the emitter
+        // skip the op outright. After T-025 the op exists under its
+        // sanitised PHP name and the raw form does not leak into the source.
+        TestCase::assertStringContainsString('public function monitoringGetFooYml', $this->source);
+        TestCase::assertStringNotContainsString('monitoring_get_foo.yml', $this->source);
+    }
+
+
+    public function givenAProfileWhoseRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest(): void
+    {
+        $base = $this->loadProfile('parameters');
+        // Reuse the parameters fixture wiring but override the
+        // operationId via Profile::$renames — the same map that
+        // overrides schema-component class names (T-023, T-025).
+        $this->profile = new Profile(
+            schema: $base->schema,
+            output: $base->output,
+            namespace: $base->namespace,
+            discoverIn: $base->discoverIn,
+            renames: ['monitoring_get_foo.yml' => 'forwardProxyRequest'],
+        );
+    }
+
+
+    public function thenTheEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml(
+    ): void {
+        TestCase::assertStringContainsString('public function forwardProxyRequest(', $this->source);
+        TestCase::assertStringNotContainsString('public function monitoringGetFooYml(', $this->source);
+    }
+
+
+    public function givenSchemaDeclaresOperationIdWhoseApplicationJsonRequestBodyIsAnInlineTypeObjectNotARefAShapePaogenDoesNotYetSynthesise(
+        string $id,
+    ): void {
+        TestCase::assertSame('operationId: postInlineBody', $id);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function thenTheResultingGenerationPlanCarriesASkippedOperationsEntryNamingTheHTTPMethodPathOperationIdAndTheReasonForTheSkip(
+    ): void {
+        TestCase::assertNotNull($this->profile);
+        $plan = new Generator(new AttributeScanner($this->composerLoader()))->plan($this->profile);
+
+        $matches = array_values(array_filter(
+            $plan->skippedOperations,
+            static fn(\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation $s): bool
+                => $s->operationId === 'postInlineBody',
+        ));
+
+        TestCase::assertCount(1, $matches, 'expected exactly one skip for postInlineBody');
+        TestCase::assertSame('post', $matches[0]->httpMethod);
+        TestCase::assertSame('/inline-body', $matches[0]->pathUri);
+        TestCase::assertSame(
+            \Mlavrinenko\Paogen\Generator\Emit\SkippedOperation::REASON_UNSUPPORTED_BODY,
+            $matches[0]->reason,
+        );
+    }
+
+
+    public function thenPaogenGeneratePrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient(): void
+    {
+        // Drive the real CLI binary so the round-trip exercises
+        // GenerateCommand::reportSkipped() exactly as the user sees it.
+        $profilePath = \dirname(__DIR__, 2) . '/tests/fixtures/profiles/parameters.php';
+
+        $stdout = tmpfile();
+        $stderr = tmpfile();
+        TestCase::assertNotFalse($stdout);
+        TestCase::assertNotFalse($stderr);
+
+        $exit = \Mlavrinenko\Paogen\GenerateCommand::run(
+            [$profilePath, '--dry-run'],
+            $this->composerLoader(),
+            $stdout,
+            $stderr,
+        );
+
+        TestCase::assertSame(0, $exit);
+
+        rewind($stderr);
+        $stderrContents = (string) stream_get_contents($stderr);
+        TestCase::assertStringContainsString('postInlineBody', $stderrContents);
+        TestCase::assertStringContainsString('/inline-body', $stderrContents);
+        TestCase::assertStringContainsString('skipped', $stderrContents);
     }
 
 }

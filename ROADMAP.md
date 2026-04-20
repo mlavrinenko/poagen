@@ -55,7 +55,7 @@ both filed as follow-up tasks the release cut must now sequence.
 
 - [x] **T-024** — `examples/` folder with petstore, digitalocean, github, and the `just check-examples` recipe.
 - [x] **T-023** — Pluggable OpenAPI → PHP name-normalisation strategies. Default pipeline (`RenamesNormaliser` → `PascalCaseSanitiser`) handles every DO and GitHub component; users compose their own strategies for anything exotic. All three examples pass `just check-examples`.
-- [ ] **T-025** — Parameter-name and operationId normalisation. Today the generator skips ops whose raw param/operationId names aren't valid PHP identifiers (DO's `Content-Type` header, `monitoring_get_*.yml`). Needed for DO and GitHub to expose every op they declare.
+- [x] **T-025** — Parameter-name and operationId normalisation. `OperationId` and `ParameterName` join the `SymbolKind` registry (camelCased via the new `CamelCaseSanitiser`), `ResolvedParameter` keeps the raw wire key alongside the sanitised PHP identifier, the T-023 early-skip guards are gone, and `GenerationPlan::$skippedOperations` surfaces the residual skips on stderr. GitHub now generates 827 ops (was 0); DigitalOcean 525 (was 522).
 - [ ] **T-026** — Named scalar + top-level composition components resolve to real PHP types. The `examples/digitalocean/generated` tree references classes like `\Model\Urn` that are never emitted because the component is `type: string`; downstream PHPStan flags the dangling refs. Same with `oneOf`-only top-level components (`floating_ip_create`). Needed for the examples to be PHPStan-clean under `phpstan-generated.neon`.
 
 ## Phase 6 — Clean model output (emerged 2026-04-20)

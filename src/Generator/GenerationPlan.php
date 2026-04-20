@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
+
 /**
  * The outcome of planning a generation run without touching disk.
  *
@@ -14,11 +16,15 @@ namespace Mlavrinenko\Paogen\Generator;
 final readonly class GenerationPlan
 {
     /**
-     * @param array<string,string> $writes Absolute paths mapped to their would-be file contents.
-     * @param list<string>         $prunes Absolute paths that would be deleted by the prune step.
+     * @param array<string,string>   $writes              Absolute paths mapped to their would-be file contents.
+     * @param list<string>           $prunes              Absolute paths that would be deleted by the prune step.
+     * @param list<SkippedOperation> $skippedOperations   Operations the generator chose not to emit. T-025
+     *                                                    surfaces them so the user knows what is missing
+     *                                                    rather than silently losing endpoints.
      */
     public function __construct(
         public array $writes,
         public array $prunes,
+        public array $skippedOperations = [],
     ) {}
 }

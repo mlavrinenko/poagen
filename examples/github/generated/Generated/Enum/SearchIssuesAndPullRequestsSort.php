@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\GitHub\Generated\Enum;
+
+enum SearchIssuesAndPullRequestsSort: string
+{
+    case Comments = 'comments';
+    case Reactions = 'reactions';
+    case Reactions1 = 'reactions-+1';
+    case Reactions14 = 'reactions--1';
+    case ReactionsSmile = 'reactions-smile';
+    case ReactionsThinkingFace = 'reactions-thinking_face';
+    case ReactionsHeart = 'reactions-heart';
+    case ReactionsTada = 'reactions-tada';
+    case Interactions = 'interactions';
+    case Created = 'created';
+    case Updated = 'updated';
+}

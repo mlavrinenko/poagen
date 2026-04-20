@@ -23,14 +23,19 @@ use Psr\Http\Message\StreamFactoryInterface;
  * Produces one method per supported OpenAPI operation. ADR-010: response
  * hydration and request marshalling are delegated to the runtime
  * {@see Hydrator} / {@see Marshaller}, which the generated constructor
- * injects with sensible defaults.
+ * injects with sensible defaults. Skipped operations are appended to
+ * an internal log and surfaced via {@see drainSkipped()} so the
+ * generator can carry them out to the {@see GenerationPlan} (T-025).
  */
-final readonly class ClientEmitter
+final class ClientEmitter
 {
-    private PsrPrinter $printer;
+    private readonly PsrPrinter $printer;
+
+    /** @var list<SkippedOperation> */
+    private array $skipped = [];
 
     public function __construct(
-        private OperationEmitter $operationEmitter,
+        private readonly OperationEmitter $operationEmitter,
     ) {
         $this->printer = new PsrPrinter();
     }
@@ -89,12 +94,34 @@ final readonly class ClientEmitter
         $emitted = 0;
 
         foreach ($operations as [$httpMethod, $pathUri, $operation, $pathItem]) {
-            if ($this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings, $pathItem, $securityCatalog)) {
+            $outcome = $this->operationEmitter->emit($class, $namespace, $httpMethod, $pathUri, $operation, $bindings, $pathItem, $securityCatalog);
+
+            if ($outcome->wasEmitted) {
                 ++$emitted;
+                continue;
+            }
+
+            if ($outcome->skip instanceof SkippedOperation) {
+                $this->skipped[] = $outcome->skip;
             }
         }
 
         return $emitted === 0 ? null : $this->printer->printFile($file);
+    }
+
+    /**
+     * @return list<SkippedOperation> the skipped operations from the
+     *                                most recent {@see emit()} call,
+     *                                in pipeline order. Resets the
+     *                                internal log so the next run does
+     *                                not double-count entries.
+     */
+    public function drainSkipped(): array
+    {
+        $out = $this->skipped;
+        $this->skipped = [];
+
+        return $out;
     }
 
     /**

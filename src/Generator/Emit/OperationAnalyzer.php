@@ -28,10 +28,11 @@ final readonly class OperationAnalyzer
     /**
      * @return list<Parameter>|null null if any parameter sits outside the
      *                              supported subset (path + scalar/array
-     *                              query + optional scalar header), a
-     *                              `$ref` could not be resolved, or the
-     *                              parameter name is not a valid PHP
-     *                              identifier (see follow-up task)
+     *                              query + optional scalar header) or a
+     *                              `$ref` could not be resolved.
+     *                              Parameter-name normalisation lives in
+     *                              the emitter (T-025) — analyser no
+     *                              longer drops ops on identifier shape.
      */
     public static function pathParameters(Operation $operation, ?PathItem $pathItem = null): ?array
     {
@@ -44,16 +45,6 @@ final readonly class OperationAnalyzer
         $out = [];
 
         foreach ($params as $param) {
-            // PHP method param identifiers are taken from the OpenAPI
-            // parameter name verbatim. Any name that isn't a legal PHP
-            // identifier (e.g. header `Content-Type`) currently aborts
-            // emission inside Nette\PhpGenerator. Skipping the whole op
-            // is loud enough — see the parameter-name normalisation
-            // follow-up task tracked alongside T-023.
-            if (preg_match('/^[A-Za-z_]\w*$/', $param->name) !== 1) {
-                return null;
-            }
-
             if ($param->in === 'path') {
                 $out[] = $param;
                 continue;

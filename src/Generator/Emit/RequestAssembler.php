@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
@@ -15,6 +14,12 @@ use Nette\PhpGenerator\Method;
  * Emits the body lines that build the PSR-7 request: path interpolation,
  * query-string assembly, body attachment and optional header pinning.
  *
+ * Always uses the *raw* OpenAPI parameter name for wire keys (path
+ * template tokens, query/header keys) and the *PHP* parameter name for
+ * variable references. {@see ResolvedParameter} carries both halves so
+ * a header named `Content-Type` lands on the wire as `Content-Type`
+ * while the PHP method takes a `$contentType` argument (T-025).
+ *
  * Kept separate from {@see OperationEmitter} so the latter can stay under
  * ADR-004's 250-line limit while still owning the method-signature shape.
  *
@@ -23,10 +28,10 @@ use Nette\PhpGenerator\Method;
 final readonly class RequestAssembler
 {
     /**
-     * @param list<Parameter>      $pathParams
-     * @param list<Parameter>      $queryParams
-     * @param list<Parameter>      $headerParams
-     * @param list<SecurityScheme> $activeSchemes
+     * @param list<ResolvedParameter> $pathParams
+     * @param list<ResolvedParameter> $queryParams
+     * @param list<ResolvedParameter> $headerParams
+     * @param list<SecurityScheme>    $activeSchemes
      */
     public function emitRequest(
         Method $method,
@@ -53,13 +58,13 @@ final readonly class RequestAssembler
             $this->emitBodyAttachment($method, $body);
         }
 
-        foreach ($headerParams as $param) {
-            $schema = $param->schema instanceof Schema ? $param->schema : null;
-            $check = new Literal('$' . $param->name);
-            $value = $this->stringExpr($param->name, $schema, $bindings);
+        foreach ($headerParams as $resolved) {
+            $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
+            $check = new Literal('$' . $resolved->phpName);
+            $value = $this->stringExpr($resolved->phpName, $schema, $bindings);
             $method->addBody(
                 'if (? !== null) { $request = $request->withHeader(?, ?); }',
-                [$check, $param->name, $value],
+                [$check, $resolved->rawName(), $value],
             );
         }
 
@@ -139,16 +144,16 @@ final readonly class RequestAssembler
     }
 
     /**
-     * @param list<Parameter> $pathParams
+     * @param list<ResolvedParameter> $pathParams
      */
     private function emitPathInterpolation(Method $method, array $pathParams, Bindings $bindings): void
     {
-        foreach ($pathParams as $param) {
-            $schema = $param->schema instanceof Schema ? $param->schema : null;
-            $valueExpr = $this->stringExpr($param->name, $schema, $bindings);
+        foreach ($pathParams as $resolved) {
+            $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
+            $valueExpr = $this->stringExpr($resolved->phpName, $schema, $bindings);
             $method->addBody(
                 '$path = \str_replace(?, ?, $path);',
-                ['{' . $param->name . '}', $valueExpr],
+                ['{' . $resolved->rawName() . '}', $valueExpr],
             );
         }
     }
@@ -158,7 +163,7 @@ final readonly class RequestAssembler
      * parameter is serialised as `tags=a&tags=b` rather than
      * `http_build_query`'s `tags%5B0%5D=a` syntax.
      *
-     * @param list<Parameter> $queryParams
+     * @param list<ResolvedParameter> $queryParams
      */
     private function emitQueryAssembly(Method $method, array $queryParams, Bindings $bindings): void
     {
@@ -170,22 +175,22 @@ final readonly class RequestAssembler
 
         $hasUnconditionalPush = false;
 
-        foreach ($queryParams as $param) {
-            $isArray = OperationAnalyzer::isArrayQueryParam($param);
+        foreach ($queryParams as $resolved) {
+            $isArray = OperationAnalyzer::isArrayQueryParam($resolved->param);
 
             if ($isArray) {
-                $this->emitArrayQueryPush($method, $param, $bindings);
+                $this->emitArrayQueryPush($method, $resolved, $bindings);
                 continue;
             }
 
-            if ($param->required) {
-                $this->emitScalarQueryPush($method, $param, indent: '', bindings: $bindings);
+            if ($resolved->param->required) {
+                $this->emitScalarQueryPush($method, $resolved, indent: '', bindings: $bindings);
                 $hasUnconditionalPush = true;
                 continue;
             }
 
-            $method->addBody('if ($' . $param->name . ' !== null) {');
-            $this->emitScalarQueryPush($method, $param, indent: '    ', bindings: $bindings);
+            $method->addBody('if ($' . $resolved->phpName . ' !== null) {');
+            $this->emitScalarQueryPush($method, $resolved, indent: '    ', bindings: $bindings);
             $method->addBody('}');
         }
 
@@ -198,32 +203,32 @@ final readonly class RequestAssembler
         $method->addBody('if ($query !== []) { $path .= \'?\' . \implode(\'&\', $query); }');
     }
 
-    private function emitScalarQueryPush(Method $method, Parameter $param, string $indent, Bindings $bindings): void
+    private function emitScalarQueryPush(Method $method, ResolvedParameter $resolved, string $indent, Bindings $bindings): void
     {
-        $schema = $param->schema instanceof Schema ? $param->schema : null;
-        $valueExpr = $this->stringExpr($param->name, $schema, $bindings);
+        $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
+        $valueExpr = $this->stringExpr($resolved->phpName, $schema, $bindings);
         $method->addBody(
             $indent . '$query[] = ? . \urlencode(?);',
-            [$param->name . '=', $valueExpr],
+            [$resolved->rawName() . '=', $valueExpr],
         );
     }
 
-    private function emitArrayQueryPush(Method $method, Parameter $param, Bindings $bindings): void
+    private function emitArrayQueryPush(Method $method, ResolvedParameter $resolved, Bindings $bindings): void
     {
-        $itemSchema = $param->schema instanceof Schema ? $param->schema->items : null;
+        $itemSchema = $resolved->param->schema instanceof Schema ? $resolved->param->schema->items : null;
         $itemExpr = $this->stringExpr('__v', $itemSchema instanceof Schema ? $itemSchema : null, $bindings);
 
-        $loop = 'foreach ($' . $param->name . ' as $__v) { $query[] = ? . \urlencode(?); }';
+        $loop = 'foreach ($' . $resolved->phpName . ' as $__v) { $query[] = ? . \urlencode(?); }';
 
-        if ($param->required) {
-            $method->addBody($loop, [$param->name . '=', $itemExpr]);
+        if ($resolved->param->required) {
+            $method->addBody($loop, [$resolved->rawName() . '=', $itemExpr]);
 
             return;
         }
 
         $method->addBody(
-            'if ($' . $param->name . ' !== null) { ' . $loop . ' }',
-            [$param->name . '=', $itemExpr],
+            'if ($' . $resolved->phpName . ' !== null) { ' . $loop . ' }',
+            [$resolved->rawName() . '=', $itemExpr],
         );
     }
 

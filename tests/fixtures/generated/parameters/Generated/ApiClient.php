@@ -89,6 +89,19 @@ final readonly class ApiClient
         return $this->hydrator->hydrate(Pet::class, $data);
     }
 
+    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void
+    {
+        $path = '/proxy';
+        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        if ($contentType !== null) { $request = $request->withHeader('Content-Type', $contentType); }
+        if ($xTraceId !== null) { $request = $request->withHeader('X-Trace-ID', $xTraceId); }
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
+    }
+
     /**
      * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
      */

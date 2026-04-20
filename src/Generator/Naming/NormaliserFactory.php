@@ -25,7 +25,11 @@ final readonly class NormaliserFactory
         if ($profile->renames !== []) {
             $strategies[] = new RenamesNormaliser($profile->renames);
         }
+        // Both sanitisers self-filter on `SymbolKind`. The composite walks
+        // them in order, the matching one returns the normalised name,
+        // the other returns `null` and falls through.
         $strategies[] = new PascalCaseSanitiser();
+        $strategies[] = new CamelCaseSanitiser();
 
         return new CompositeNormaliser($strategies);
     }

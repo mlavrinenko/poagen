@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Enum\AppsCreateAccept;
+use Acme\DigitalOcean\Generated\Enum\AppsCreateContentType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetEventLogsType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetJobInvocationLogsType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsActiveDeploymentAggregateType;
@@ -153,6 +155,7 @@ use Acme\DigitalOcean\Generated\Model\ApiUpdateWorkspaceOutput;
 use Acme\DigitalOcean\Generated\Model\AppMetricsBandwidthUsageRequest;
 use Acme\DigitalOcean\Generated\Model\AppPropose;
 use Acme\DigitalOcean\Generated\Model\AppsAssignAppAlertDestinationsRequest;
+use Acme\DigitalOcean\Generated\Model\AppsCreateAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsCreateDeploymentRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRestartRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRollbackAppRequest;
@@ -584,6 +587,26 @@ final readonly class ApiClient
         }
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
+    }
+
+    public function apps_create(
+        AppsCreateAppRequest $body,
+        ?AppsCreateAccept $accept = null,
+        ?AppsCreateContentType $contentType = null,
+    ): void {
+        $path = '/v2/apps';
+        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $request = $request
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+        if ($accept !== null) { $request = $request->withHeader('Accept', $accept->value); }
+        if ($contentType !== null) { $request = $request->withHeader('Content-Type', $contentType->value); }
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -6180,6 +6203,30 @@ final readonly class ApiClient
         }
     }
 
+    public function monitoringGetAppRestartCountMetricsYml(
+        string $app_id,
+        string $start,
+        string $end,
+        ?string $app_component = null,
+    ): void {
+        $path = '/v2/monitoring/metrics/apps/restart_count';
+        $query = [];
+        $query[] = 'app_id=' . \urlencode($app_id);
+        if ($app_component !== null) {
+            $query[] = 'app_component=' . \urlencode($app_component);
+        }
+        $query[] = 'start=' . \urlencode($start);
+        $query[] = 'end=' . \urlencode($end);
+        $path .= '?' . \implode('&', $query);
+        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
+    }
+
     public function monitoring_get_database_mysql_cpu_usage(
         string $db_id,
         MonitoringGetDatabaseMysqlCpuUsageAggregate $aggregate,
@@ -6596,6 +6643,26 @@ final readonly class ApiClient
         $path = '/v2/monitoring/metrics/droplet/memory_total';
         $query = [];
         $query[] = 'host_id=' . \urlencode($host_id);
+        $query[] = 'start=' . \urlencode($start);
+        $query[] = 'end=' . \urlencode($end);
+        $path .= '?' . \implode('&', $query);
+        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
+    }
+
+    public function monitoringGetDropletAutoscaleCurrentCpuUtilizationYml(
+        string $autoscale_pool_id,
+        string $start,
+        string $end,
+    ): void {
+        $path = '/v2/monitoring/metrics/droplet_autoscale/current_cpu_utilization';
+        $query = [];
+        $query[] = 'autoscale_pool_id=' . \urlencode($autoscale_pool_id);
         $query[] = 'start=' . \urlencode($start);
         $query[] = 'end=' . \urlencode($end);
         $path .= '?' . \implode('&', $query);

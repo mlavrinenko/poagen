@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Generator\Emit;
+
+use cebe\openapi\spec\Parameter;
+
+/**
+ * One OpenAPI parameter paired with the PHP identifier the emitter
+ * uses for it inside a method signature and body.
+ *
+ * The OpenAPI name (`Content-Type`, `X-Trace-ID`) is what the wire
+ * needs — the path template token, the header key, the query key.
+ * The PHP name (`contentType`, `xTraceId`) is what `Method::addParameter`
+ * accepts and what `$path = \str_replace('{Content-Type}', ...)` would
+ * never produce. T-025 routes both through the registry so paogen no
+ * longer skips an op just because its raw parameter is `Content-Type`.
+ *
+ * @internal
+ */
+final readonly class ResolvedParameter
+{
+    public function __construct(
+        public Parameter $param,
+        public string $phpName,
+    ) {}
+
+    public function rawName(): string
+    {
+        return $this->param->name;
+    }
+}
