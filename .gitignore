@@ -10,3 +10,6 @@
 /.phpunit.cache/
 
 /.starter-kit-answers
+
+# Ad-hoc scratch scripts (debug / one-off analysis)
+/tmp_*.php
