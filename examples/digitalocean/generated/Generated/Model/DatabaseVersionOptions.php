@@ -4,31 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class DatabaseVersionOptions implements JsonSerializable
+final readonly class DatabaseVersionOptions
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['versions' => ['versions', ['list', null]]];
-
     /**
      * @param ?list<string> $versions
      */
     public function __construct(
         public ?array $versions = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'versions' => $this->versions,
-        ];
     }
 }

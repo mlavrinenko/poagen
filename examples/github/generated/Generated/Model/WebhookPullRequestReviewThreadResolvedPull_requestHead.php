@@ -4,22 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookPullRequestReviewThreadResolvedPull_requestHead implements JsonSerializable
+final readonly class WebhookPullRequestReviewThreadResolvedPull_requestHead
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'label' => ['label', null],
-        'ref' => ['ref', null],
-        'repo' => ['repo', \Acme\GitHub\Generated\Model\WebhookPullRequestReviewThreadResolvedPull_requestHeadRepo::class],
-        'sha' => ['sha', null],
-        'user' => ['user', \Acme\GitHub\Generated\Model\WebhookPullRequestReviewThreadResolvedPull_requestHeadUser::class],
-    ];
-
     public function __construct(
         public ?string $label = null,
         public string $ref,
@@ -27,19 +13,5 @@ final readonly class WebhookPullRequestReviewThreadResolvedPull_requestHead impl
         public string $sha,
         public WebhookPullRequestReviewThreadResolvedPull_requestHeadUser $user,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'label' => $this->label,
-            'ref' => $this->ref,
-            'repo' => $this->repo,
-            'sha' => $this->sha,
-            'user' => $this->user,
-        ];
     }
 }

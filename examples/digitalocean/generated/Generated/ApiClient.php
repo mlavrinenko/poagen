@@ -233,6 +233,8 @@ use Acme\DigitalOcean\Generated\Model\ValidateRegistry;
 use Acme\DigitalOcean\Generated\Model\Version2;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayCreate;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayUpdate;
+use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
+use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -245,6 +247,8 @@ final readonly class ApiClient
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
         private string $bearerToken,
+        private Hydrator $hydrator = new Hydrator(),
+        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
@@ -259,7 +263,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -268,7 +272,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ChatCompletionResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ChatCompletionResponse::class, $data);
     }
 
     public function inference_create_async_invoke(AsyncInvokeRequest $body): AsyncInvokeResponse
@@ -277,7 +282,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -286,7 +291,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(AsyncInvokeResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(AsyncInvokeResponse::class, $data);
     }
 
     public function inference_create_chat_completion(ChatCompletionRequest $body): ChatCompletionResponse
@@ -295,7 +301,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -304,7 +310,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ChatCompletionResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ChatCompletionResponse::class, $data);
     }
 
     public function inference_create_image(CreateImageRequest $body): ImagesResponse
@@ -313,7 +320,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -322,7 +329,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ImagesResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ImagesResponse::class, $data);
     }
 
     public function inference_list_models(): ListModelsResponse
@@ -337,7 +345,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ListModelsResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ListModelsResponse::class, $data);
     }
 
     public function inference_create_response(CreateResponseRequest $body): CreateResponseResponse
@@ -346,7 +355,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -355,7 +364,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(CreateResponseResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(CreateResponseResponse::class, $data);
     }
 
     public function oneClicks_list(?OneClicksListType $type = null): void
@@ -381,7 +391,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -428,7 +438,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -588,7 +598,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -603,7 +613,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -673,7 +683,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -768,7 +778,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1128,7 +1138,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1144,7 +1154,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1186,7 +1196,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1220,7 +1230,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1296,7 +1306,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1338,7 +1348,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1397,7 +1407,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1426,7 +1436,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1455,7 +1465,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1704,7 +1714,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1759,7 +1769,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1788,7 +1798,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1942,7 +1952,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -1974,7 +1984,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2003,7 +2013,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2046,7 +2056,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2080,7 +2090,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2165,7 +2175,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2282,7 +2292,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2339,7 +2349,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2421,7 +2431,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2442,7 +2452,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(DedicatedInferenceGpuModelConfigsResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(DedicatedInferenceGpuModelConfigsResponse::class, $data);
     }
 
     public function dedicatedInferences_list_sizes(): DedicatedInferenceSizesResponse
@@ -2457,7 +2468,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(DedicatedInferenceSizesResponse::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(DedicatedInferenceSizesResponse::class, $data);
     }
 
     public function dedicatedInferences_get(string $dedicated_inference_id): void
@@ -2495,7 +2507,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2548,7 +2560,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(DedicatedInferenceAccelerator::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(DedicatedInferenceAccelerator::class, $data);
     }
 
     public function dedicatedInferences_get_ca(string $dedicated_inference_id): void
@@ -2597,7 +2610,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2646,7 +2659,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2735,7 +2748,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2766,7 +2779,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2853,7 +2866,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -2882,7 +2895,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3114,7 +3127,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3284,7 +3297,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3364,7 +3377,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3419,7 +3432,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3462,7 +3475,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3493,7 +3506,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3542,7 +3555,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentsOutputPublic::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentsOutputPublic::class, $data);
     }
 
     public function genai_create_agent(ApiCreateAgentInputPublic $body): ApiCreateAgentOutput
@@ -3551,7 +3565,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3560,7 +3574,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateAgentOutput::class, $data);
     }
 
     public function genai_list_agent_api_keys(
@@ -3587,7 +3602,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentApikeysOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentApikeysOutput::class, $data);
     }
 
     public function genai_create_agent_api_key(
@@ -3599,7 +3615,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3608,7 +3624,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateAgentApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateAgentApikeyOutput::class, $data);
     }
 
     public function genai_update_agent_api_key(
@@ -3622,7 +3639,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3631,7 +3648,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateAgentApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateAgentApikeyOutput::class, $data);
     }
 
     public function genai_delete_agent_api_key(string $agent_uuid, string $api_key_uuid): ApiDeleteAgentApikeyOutput
@@ -3648,7 +3666,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteAgentApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteAgentApikeyOutput::class, $data);
     }
 
     public function genai_regenerate_agent_api_key(
@@ -3667,7 +3686,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiRegenerateAgentApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiRegenerateAgentApikeyOutput::class, $data);
     }
 
     public function genai_attach_agent_function(
@@ -3679,7 +3699,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3688,7 +3708,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiLinkAgentFunctionOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiLinkAgentFunctionOutput::class, $data);
     }
 
     public function genai_update_agent_function(
@@ -3702,7 +3723,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3711,7 +3732,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateAgentFunctionOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateAgentFunctionOutput::class, $data);
     }
 
     public function genai_detach_agent_function(
@@ -3730,7 +3752,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUnlinkAgentFunctionOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUnlinkAgentFunctionOutput::class, $data);
     }
 
     public function genai_attach_agent_guardrails(
@@ -3742,7 +3765,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3751,7 +3774,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiLinkAgentGuardrailOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiLinkAgentGuardrailOutput::class, $data);
     }
 
     public function genai_detach_agent_guardrail(
@@ -3770,7 +3794,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUnlinkAgentGuardrailOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUnlinkAgentGuardrailOutput::class, $data);
     }
 
     public function genai_attach_knowledge_bases(string $agent_uuid): ApiLinkKnowledgeBaseOutput
@@ -3786,7 +3811,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiLinkKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiLinkKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_attach_knowledge_base(
@@ -3805,7 +3831,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiLinkKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiLinkKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_detach_knowledge_base(
@@ -3824,7 +3851,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUnlinkKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUnlinkKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_update_attached_agent(
@@ -3838,7 +3866,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3847,7 +3875,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateLinkedAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateLinkedAgentOutput::class, $data);
     }
 
     public function genai_attach_agent(
@@ -3861,7 +3890,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3870,7 +3899,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiLinkAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiLinkAgentOutput::class, $data);
     }
 
     public function genai_detach_agent(string $parent_agent_uuid, string $child_agent_uuid): ApiUnlinkAgentOutput
@@ -3887,7 +3917,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUnlinkAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUnlinkAgentOutput::class, $data);
     }
 
     public function genai_get_agent(string $uuid): ApiGetAgentOutput
@@ -3903,7 +3934,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetAgentOutput::class, $data);
     }
 
     public function genai_update_agent(string $uuid, ApiUpdateAgentInputPublic $body): ApiUpdateAgentOutput
@@ -3913,7 +3945,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3922,7 +3954,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateAgentOutput::class, $data);
     }
 
     public function genai_delete_agent(string $uuid): ApiDeleteAgentOutput
@@ -3938,7 +3971,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteAgentOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteAgentOutput::class, $data);
     }
 
     public function genai_get_agent_children(string $uuid): ApiGetChildrenOutput
@@ -3954,7 +3988,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetChildrenOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetChildrenOutput::class, $data);
     }
 
     public function genai_update_agent_deployment_visibility(
@@ -3966,7 +4001,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -3975,7 +4010,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateAgentDeploymentVisbilityOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateAgentDeploymentVisbilityOutput::class, $data);
     }
 
     public function genai_get_agent_usage(
@@ -4002,7 +4038,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetAgentUsageOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetAgentUsageOutput::class, $data);
     }
 
     public function genai_list_agent_versions(
@@ -4029,7 +4066,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentVersionsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentVersionsOutput::class, $data);
     }
 
     public function genai_rollback_to_agent_version(
@@ -4041,7 +4079,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4050,7 +4088,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiRollbackToAgentVersionOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiRollbackToAgentVersionOutput::class, $data);
     }
 
     public function genai_list_anthropic_api_keys(
@@ -4075,7 +4114,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAnthropicApikeysOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAnthropicApikeysOutput::class, $data);
     }
 
     public function genai_create_anthropic_api_key(
@@ -4085,7 +4125,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4094,7 +4134,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateAnthropicApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateAnthropicApikeyOutput::class, $data);
     }
 
     public function genai_get_anthropic_api_key(string $api_key_uuid): ApiGetAnthropicApikeyOutput
@@ -4110,7 +4151,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetAnthropicApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetAnthropicApikeyOutput::class, $data);
     }
 
     public function genai_update_anthropic_api_key(
@@ -4122,7 +4164,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4131,7 +4173,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateAnthropicApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateAnthropicApikeyOutput::class, $data);
     }
 
     public function genai_delete_anthropic_api_key(string $api_key_uuid): ApiDeleteAnthropicApikeyOutput
@@ -4147,7 +4190,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteAnthropicApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteAnthropicApikeyOutput::class, $data);
     }
 
     public function genai_list_agents_by_anthropic_key(
@@ -4174,7 +4218,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentsByAnthropicKeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentsByAnthropicKeyOutput::class, $data);
     }
 
     public function genai_create_evaluation_dataset(
@@ -4184,7 +4229,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4193,7 +4238,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateEvaluationDatasetOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateEvaluationDatasetOutput::class, $data);
     }
 
     public function genai_create_evaluation_dataset_file_upload_presigned_urls(
@@ -4203,7 +4249,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4212,7 +4258,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class, $data);
     }
 
     public function genai_list_evaluation_metrics(): ApiListEvaluationMetricsOutput
@@ -4227,7 +4274,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListEvaluationMetricsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListEvaluationMetricsOutput::class, $data);
     }
 
     public function genai_run_evaluation_test_case(
@@ -4237,7 +4285,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4246,7 +4294,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiRunEvaluationTestCaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiRunEvaluationTestCaseOutput::class, $data);
     }
 
     public function genai_get_evaluation_run(string $evaluation_run_uuid): ApiGetEvaluationRunOutput
@@ -4262,7 +4311,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetEvaluationRunOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetEvaluationRunOutput::class, $data);
     }
 
     public function genai_get_evaluation_run_results(
@@ -4289,7 +4339,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetEvaluationRunResultsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetEvaluationRunResultsOutput::class, $data);
     }
 
     public function genai_get_evaluation_run_prompt_results(
@@ -4308,7 +4359,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetEvaluationRunPromptResultsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetEvaluationRunPromptResultsOutput::class, $data);
     }
 
     public function genai_list_evaluation_test_cases(): ApiListEvaluationTestCasesOutput
@@ -4323,7 +4375,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListEvaluationTestCasesOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListEvaluationTestCasesOutput::class, $data);
     }
 
     public function genai_create_evaluation_test_case(
@@ -4333,7 +4386,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4342,7 +4395,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateEvaluationTestCaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateEvaluationTestCaseOutput::class, $data);
     }
 
     public function genai_list_evaluation_runs_by_test_case(
@@ -4365,7 +4419,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListEvaluationRunsByTestCaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListEvaluationRunsByTestCaseOutput::class, $data);
     }
 
     public function genai_get_evaluation_test_case(
@@ -4388,7 +4443,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetEvaluationTestCaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetEvaluationTestCaseOutput::class, $data);
     }
 
     public function genai_update_evaluation_test_case(
@@ -4400,7 +4456,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4409,7 +4465,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateEvaluationTestCaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateEvaluationTestCaseOutput::class, $data);
     }
 
     public function genai_list_indexing_jobs(
@@ -4434,7 +4491,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListKnowledgeBaseIndexingJobsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListKnowledgeBaseIndexingJobsOutput::class, $data);
     }
 
     public function genai_create_indexing_job(
@@ -4444,7 +4502,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4453,7 +4511,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiStartKnowledgeBaseIndexingJobOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiStartKnowledgeBaseIndexingJobOutput::class, $data);
     }
 
     public function genai_list_indexing_job_data_sources(
@@ -4470,7 +4529,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListIndexingJobDataSourcesOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListIndexingJobDataSourcesOutput::class, $data);
     }
 
     public function genai_get_indexing_job_details_signed_url(
@@ -4487,7 +4547,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetIndexingJobDetailsSignedUrloutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetIndexingJobDetailsSignedUrloutput::class, $data);
     }
 
     public function genai_get_indexing_job(string $uuid): ApiGetKnowledgeBaseIndexingJobOutput
@@ -4503,7 +4564,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetKnowledgeBaseIndexingJobOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetKnowledgeBaseIndexingJobOutput::class, $data);
     }
 
     public function genai_cancel_indexing_job(
@@ -4515,7 +4577,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4524,7 +4586,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCancelKnowledgeBaseIndexingJobOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCancelKnowledgeBaseIndexingJobOutput::class, $data);
     }
 
     public function genai_list_knowledge_bases(?int $page = null, ?int $per_page = null): ApiListKnowledgeBasesOutput
@@ -4547,7 +4610,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListKnowledgeBasesOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListKnowledgeBasesOutput::class, $data);
     }
 
     public function genai_create_knowledge_base(ApiCreateKnowledgeBaseInputPublic $body): ApiCreateKnowledgeBaseOutput
@@ -4556,7 +4620,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4565,7 +4629,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_create_data_source_file_upload_presigned_urls(
@@ -4575,7 +4640,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4584,7 +4649,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class, $data);
     }
 
     public function genai_list_knowledge_base_data_sources(
@@ -4611,7 +4677,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListKnowledgeBaseDataSourcesOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListKnowledgeBaseDataSourcesOutput::class, $data);
     }
 
     public function genai_create_knowledge_base_data_source(
@@ -4623,7 +4690,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4632,7 +4699,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateKnowledgeBaseDataSourceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateKnowledgeBaseDataSourceOutput::class, $data);
     }
 
     public function genai_update_knowledge_base_data_source(
@@ -4646,7 +4714,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4655,7 +4723,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateKnowledgeBaseDataSourceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateKnowledgeBaseDataSourceOutput::class, $data);
     }
 
     public function genai_delete_knowledge_base_data_source(
@@ -4674,7 +4743,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteKnowledgeBaseDataSourceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteKnowledgeBaseDataSourceOutput::class, $data);
     }
 
     public function genai_list_indexing_jobs_by_knowledge_base(
@@ -4691,7 +4761,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListKnowledgeBaseIndexingJobsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListKnowledgeBaseIndexingJobsOutput::class, $data);
     }
 
     public function genai_get_knowledge_base(string $uuid): ApiGetKnowledgeBaseOutput
@@ -4707,7 +4778,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_update_knowledge_base(
@@ -4719,7 +4791,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4728,7 +4800,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateKnowledgeBaseOutput::class, $data);
     }
 
     public function genai_delete_knowledge_base(string $uuid): ApiDeleteKnowledgeBaseOutput
@@ -4744,7 +4817,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteKnowledgeBaseOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteKnowledgeBaseOutput::class, $data);
     }
 
     /**
@@ -4778,7 +4852,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListModelsOutputPublic::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListModelsOutputPublic::class, $data);
     }
 
     public function genai_list_model_api_keys(?int $page = null, ?int $per_page = null): ApiListModelApikeysOutput
@@ -4801,7 +4876,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListModelApikeysOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListModelApikeysOutput::class, $data);
     }
 
     public function genai_create_model_api_key(ApiCreateModelApikeyInputPublic $body): ApiCreateModelApikeyOutput
@@ -4810,7 +4886,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4819,7 +4895,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateModelApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateModelApikeyOutput::class, $data);
     }
 
     public function genai_update_model_api_key(
@@ -4831,7 +4908,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4840,7 +4917,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateModelApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateModelApikeyOutput::class, $data);
     }
 
     public function genai_delete_model_api_key(string $api_key_uuid): ApiDeleteModelApikeyOutput
@@ -4856,7 +4934,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteModelApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteModelApikeyOutput::class, $data);
     }
 
     public function genai_regenerate_model_api_key(string $api_key_uuid): ApiRegenerateModelApikeyOutput
@@ -4872,7 +4951,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiRegenerateModelApikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiRegenerateModelApikeyOutput::class, $data);
     }
 
     public function genai_create_oauth2_dropbox_tokens(
@@ -4882,7 +4962,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4891,7 +4971,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDropboxOauth2GetTokensOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDropboxOauth2GetTokensOutput::class, $data);
     }
 
     public function genai_get_oauth2_url(
@@ -4916,7 +4997,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGenerateOauth2Urloutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGenerateOauth2Urloutput::class, $data);
     }
 
     public function genai_list_openai_api_keys(?int $page = null, ?int $per_page = null): ApiListOpenAiapikeysOutput
@@ -4939,7 +5021,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListOpenAiapikeysOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListOpenAiapikeysOutput::class, $data);
     }
 
     public function genai_create_openai_api_key(ApiCreateOpenAiapikeyInputPublic $body): ApiCreateOpenAiapikeyOutput
@@ -4948,7 +5031,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4957,7 +5040,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateOpenAiapikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateOpenAiapikeyOutput::class, $data);
     }
 
     public function genai_get_openai_api_key(string $api_key_uuid): ApiGetOpenAiapikeyOutput
@@ -4973,7 +5057,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetOpenAiapikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetOpenAiapikeyOutput::class, $data);
     }
 
     public function genai_update_openai_api_key(
@@ -4985,7 +5070,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -4994,7 +5079,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateOpenAiapikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateOpenAiapikeyOutput::class, $data);
     }
 
     public function genai_delete_openai_api_key(string $api_key_uuid): ApiDeleteOpenAiapikeyOutput
@@ -5010,7 +5096,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteOpenAiapikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteOpenAiapikeyOutput::class, $data);
     }
 
     public function genai_list_agents_by_openai_key(
@@ -5037,7 +5124,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentsByOpenAikeyOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentsByOpenAikeyOutput::class, $data);
     }
 
     public function genai_list_datacenter_regions(
@@ -5062,7 +5150,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListRegionsOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListRegionsOutput::class, $data);
     }
 
     public function genai_create_scheduled_indexing(
@@ -5072,7 +5161,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5081,7 +5170,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateScheduledIndexingOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateScheduledIndexingOutput::class, $data);
     }
 
     public function genai_get_scheduled_indexing(string $knowledge_base_uuid): ApiGetScheduledIndexingOutput
@@ -5097,7 +5187,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetScheduledIndexingOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetScheduledIndexingOutput::class, $data);
     }
 
     public function genai_delete_scheduled_indexing(string $uuid): ApiDeleteScheduledIndexingOutput
@@ -5113,7 +5204,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteScheduledIndexingOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteScheduledIndexingOutput::class, $data);
     }
 
     public function genai_list_workspaces(): ApiListWorkspacesOutput
@@ -5128,7 +5220,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListWorkspacesOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListWorkspacesOutput::class, $data);
     }
 
     public function genai_create_workspace(ApiCreateWorkspaceInputPublic $body): ApiCreateWorkspaceOutput
@@ -5137,7 +5230,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5146,7 +5239,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiCreateWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiCreateWorkspaceOutput::class, $data);
     }
 
     public function genai_get_workspace(string $workspace_uuid): ApiGetWorkspaceOutput
@@ -5162,7 +5256,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiGetWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiGetWorkspaceOutput::class, $data);
     }
 
     public function genai_update_workspace(
@@ -5174,7 +5269,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5183,7 +5278,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiUpdateWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiUpdateWorkspaceOutput::class, $data);
     }
 
     public function genai_delete_workspace(string $workspace_uuid): ApiDeleteWorkspaceOutput
@@ -5199,7 +5295,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiDeleteWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiDeleteWorkspaceOutput::class, $data);
     }
 
     public function genai_list_agents_by_workspace(
@@ -5230,7 +5327,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListAgentsByWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListAgentsByWorkspaceOutput::class, $data);
     }
 
     public function genai_update_agents_workspace(
@@ -5242,7 +5340,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5251,7 +5349,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiMoveAgentsToWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiMoveAgentsToWorkspaceOutput::class, $data);
     }
 
     public function genai_list_evaluation_test_cases_by_workspace(
@@ -5268,7 +5367,8 @@ final readonly class ApiClient
         }
         /** @var mixed $data */
         $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        return self::hydrate(ApiListEvaluationTestCasesByWorkspaceOutput::class, $data);
+        \assert(\is_array($data));
+        return $this->hydrator->hydrate(ApiListEvaluationTestCasesByWorkspaceOutput::class, $data);
     }
 
     public function images_list(
@@ -5311,7 +5411,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5340,7 +5440,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5369,7 +5469,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5385,7 +5485,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5401,7 +5501,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5417,7 +5517,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5479,7 +5579,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5508,7 +5608,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5555,7 +5655,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5617,7 +5717,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5664,7 +5764,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5698,7 +5798,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5811,7 +5911,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5826,7 +5926,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5841,7 +5941,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5856,7 +5956,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5891,7 +5991,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5920,7 +6020,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -5981,7 +6081,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -6010,7 +6110,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7115,7 +7215,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7144,7 +7244,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7215,7 +7315,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7342,7 +7442,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7384,7 +7484,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7494,7 +7594,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7521,7 +7621,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7563,7 +7663,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7600,7 +7700,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7647,7 +7747,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7686,7 +7786,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7771,7 +7871,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -7952,7 +8052,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8023,7 +8123,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8052,7 +8152,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8072,7 +8172,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8280,7 +8380,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8368,7 +8468,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8676,7 +8776,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8705,7 +8805,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8734,7 +8834,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PATCH', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8769,7 +8869,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8811,7 +8911,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -8827,7 +8927,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -9108,7 +9208,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -9137,7 +9237,7 @@ final readonly class ApiClient
         $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -9278,161 +9378,5 @@ final readonly class ApiClient
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
-    }
-
-    /**
-     * Deserialise a JSON-decoded value into an instance of $class.
-     *
-     * Uses the Model's `PROPERTY_MAP` const (ADR-007) to translate
-     * wire keys into PHP property names and to recurse into nested
-     * models / list-of-model items.
-     *
-     * @template T of object
-     * @param class-string<T> $class
-     * @return T
-     */
-    private static function hydrate(string $class, mixed $data): object
-    {
-        if (!\is_array($data)) {
-            throw new \RuntimeException(\sprintf('Cannot hydrate %s from non-array data.', $class));
-        }
-
-        /** @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: 'union', 1: list<class-string>, 2: ?string}}> $map */
-        $map = $class::PROPERTY_MAP;
-
-        $args = [];
-
-        foreach ($map as $phpName => [$wireKey, $shape]) {
-            if (!\array_key_exists($wireKey, $data)) {
-                continue;
-            }
-
-            $value = $data[$wireKey];
-
-            if ($shape === null) {
-                $args[$phpName] = $value;
-                continue;
-            }
-
-            if (\is_string($shape)) {
-                $args[$phpName] = \is_array($value) ? self::hydrate($shape, $value) : $value;
-                continue;
-            }
-
-            $kind = $shape[0];
-
-            if ($kind === 'union' && \is_array($shape[1])) {
-                $args[$phpName] = self::hydrateUnion($shape[1], $shape[2] ?? null, $value);
-                continue;
-            }
-
-            $itemType = \is_array($shape[1]) ? null : $shape[1];
-
-            if ($kind === 'scalar' && $itemType !== null) {
-                if ($value === null || $value instanceof $itemType) {
-                    $args[$phpName] = $value;
-                    continue;
-                }
-                $args[$phpName] = $itemType::fromScalar($value);
-                continue;
-            }
-
-            if ($kind === 'datetime' || $kind === 'date') {
-                if ($value === null || $value instanceof \DateTimeImmutable) {
-                    $args[$phpName] = $value;
-                    continue;
-                }
-                if (!\is_string($value)) {
-                    throw new \RuntimeException(\sprintf(
-                        'Expected string for %s::$%s, got %s.',
-                        $class,
-                        $phpName,
-                        \get_debug_type($value),
-                    ));
-                }
-                $args[$phpName] = new \DateTimeImmutable($value);
-                continue;
-            }
-
-            if ($kind === 'enum' && $itemType !== null) {
-                if ($value === null || $value instanceof $itemType) {
-                    $args[$phpName] = $value;
-                    continue;
-                }
-                $args[$phpName] = $itemType::from($value);
-                continue;
-            }
-
-            // ['list', null] or ['list', class-string].
-            if (!\is_array($value)) {
-                $args[$phpName] = $value;
-                continue;
-            }
-
-            if ($itemType === null) {
-                $args[$phpName] = $value;
-                continue;
-            }
-
-            $args[$phpName] = \array_values(\array_map(
-                static fn(mixed $item): mixed => \is_array($item) ? self::hydrate($itemType, $item) : $item,
-                $value,
-            ));
-        }
-
-        return new $class(...$args);
-    }
-
-    /**
-     * Pick the right branch of a oneOf/anyOf union.
-     *
-     * Strategy:
-     *   1. If a discriminator property name is given and the payload carries it,
-     *      match its wire value against each branch's short class name (the
-     *      component name, case-sensitive). First match wins.
-     *   2. Otherwise, pick the first branch whose required-key set is a subset of
-     *      the payload's keys.
-     *   3. Fall back to the first branch.
-     *
-     * @param list<class-string> $branches
-     */
-    private static function hydrateUnion(array $branches, ?string $discriminator, mixed $value): mixed
-    {
-        if (!\is_array($value)) {
-            return $value;
-        }
-
-        if ($discriminator !== null && \array_key_exists($discriminator, $value)) {
-            $tag = $value[$discriminator];
-
-            if (\is_string($tag)) {
-                foreach ($branches as $branch) {
-                    $short = \substr((string) \strrchr('\\' . $branch, '\\'), 1);
-
-                    if ($short === $tag) {
-                        return self::hydrate($branch, $value);
-                    }
-                }
-            }
-        }
-
-        $payloadKeys = \array_keys($value);
-
-        foreach ($branches as $branch) {
-            /** @var array<string, array{0: string, 1: mixed}> $map */
-            $map = $branch::PROPERTY_MAP;
-            $wireKeys = [];
-
-            foreach ($map as [$wire]) {
-                $wireKeys[] = $wire;
-            }
-
-            // Structural match: all payload keys are explained by this branch.
-            if (\array_diff($payloadKeys, $wireKeys) === []) {
-                return self::hydrate($branch, $value);
-            }
-        }
-
-        return self::hydrate($branches[0], $value);
     }
 }

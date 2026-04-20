@@ -4,39 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class DeploymentBranchPolicy implements JsonSerializable
+final readonly class DeploymentBranchPolicy
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'id' => ['id', null],
-        'name' => ['name', null],
-        'node_id' => ['node_id', null],
-        'type' => ['type', null],
-    ];
-
     public function __construct(
         public ?int $id = null,
         public ?string $name = null,
         public ?string $node_id = null,
         public ?string $type = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'node_id' => $this->node_id,
-            'type' => $this->type,
-        ];
     }
 }

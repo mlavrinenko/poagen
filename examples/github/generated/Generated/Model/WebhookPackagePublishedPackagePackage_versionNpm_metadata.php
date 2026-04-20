@@ -4,54 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookPackagePublishedPackagePackage_versionNpm_metadata implements JsonSerializable
+final readonly class WebhookPackagePublishedPackagePackage_versionNpm_metadata
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'author' => ['author', null],
-        'bin' => ['bin', null],
-        'bugs' => ['bugs', null],
-        'commit_oid' => ['commit_oid', null],
-        'contributors' => ['contributors', ['list', null]],
-        'cpu' => ['cpu', ['list', null]],
-        'deleted_by_id' => ['deleted_by_id', null],
-        'dependencies' => ['dependencies', null],
-        'description' => ['description', null],
-        'dev_dependencies' => ['dev_dependencies', null],
-        'directories' => ['directories', null],
-        'dist' => ['dist', null],
-        'engines' => ['engines', null],
-        'files' => ['files', ['list', null]],
-        'git_head' => ['git_head', null],
-        'has_shrinkwrap' => ['has_shrinkwrap', null],
-        'homepage' => ['homepage', null],
-        'id' => ['id', null],
-        'installation_command' => ['installation_command', null],
-        'keywords' => ['keywords', ['list', null]],
-        'license' => ['license', null],
-        'main' => ['main', null],
-        'maintainers' => ['maintainers', ['list', null]],
-        'man' => ['man', null],
-        'name' => ['name', null],
-        'node_version' => ['node_version', null],
-        'npm_user' => ['npm_user', null],
-        'npm_version' => ['npm_version', null],
-        'optional_dependencies' => ['optional_dependencies', null],
-        'os' => ['os', ['list', null]],
-        'peer_dependencies' => ['peer_dependencies', null],
-        'published_via_actions' => ['published_via_actions', null],
-        'readme' => ['readme', null],
-        'release_id' => ['release_id', null],
-        'repository' => ['repository', null],
-        'scripts' => ['scripts', null],
-        'version' => ['version', null],
-    ];
-
     /**
      * @param ?array<string, mixed> $author
      * @param ?array<string, mixed> $bin
@@ -112,51 +66,5 @@ final readonly class WebhookPackagePublishedPackagePackage_versionNpm_metadata i
         public ?array $scripts = null,
         public ?string $version = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'author' => $this->author,
-            'bin' => $this->bin,
-            'bugs' => $this->bugs,
-            'commit_oid' => $this->commit_oid,
-            'contributors' => $this->contributors,
-            'cpu' => $this->cpu,
-            'deleted_by_id' => $this->deleted_by_id,
-            'dependencies' => $this->dependencies,
-            'description' => $this->description,
-            'dev_dependencies' => $this->dev_dependencies,
-            'directories' => $this->directories,
-            'dist' => $this->dist,
-            'engines' => $this->engines,
-            'files' => $this->files,
-            'git_head' => $this->git_head,
-            'has_shrinkwrap' => $this->has_shrinkwrap,
-            'homepage' => $this->homepage,
-            'id' => $this->id,
-            'installation_command' => $this->installation_command,
-            'keywords' => $this->keywords,
-            'license' => $this->license,
-            'main' => $this->main,
-            'maintainers' => $this->maintainers,
-            'man' => $this->man,
-            'name' => $this->name,
-            'node_version' => $this->node_version,
-            'npm_user' => $this->npm_user,
-            'npm_version' => $this->npm_version,
-            'optional_dependencies' => $this->optional_dependencies,
-            'os' => $this->os,
-            'peer_dependencies' => $this->peer_dependencies,
-            'published_via_actions' => $this->published_via_actions,
-            'readme' => $this->readme,
-            'release_id' => $this->release_id,
-            'repository' => $this->repository,
-            'scripts' => $this->scripts,
-            'version' => $this->version,
-        ];
     }
 }

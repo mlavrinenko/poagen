@@ -4,66 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookWorkflowRunRequestedWorkflow_runHead_repository implements JsonSerializable
+final readonly class WebhookWorkflowRunRequestedWorkflow_runHead_repository
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'archive_url' => ['archive_url', null],
-        'assignees_url' => ['assignees_url', null],
-        'blobs_url' => ['blobs_url', null],
-        'branches_url' => ['branches_url', null],
-        'collaborators_url' => ['collaborators_url', null],
-        'comments_url' => ['comments_url', null],
-        'commits_url' => ['commits_url', null],
-        'compare_url' => ['compare_url', null],
-        'contents_url' => ['contents_url', null],
-        'contributors_url' => ['contributors_url', null],
-        'deployments_url' => ['deployments_url', null],
-        'description' => ['description', null],
-        'downloads_url' => ['downloads_url', null],
-        'events_url' => ['events_url', null],
-        'fork' => ['fork', null],
-        'forks_url' => ['forks_url', null],
-        'full_name' => ['full_name', null],
-        'git_commits_url' => ['git_commits_url', null],
-        'git_refs_url' => ['git_refs_url', null],
-        'git_tags_url' => ['git_tags_url', null],
-        'hooks_url' => ['hooks_url', null],
-        'html_url' => ['html_url', null],
-        'id' => ['id', null],
-        'issue_comment_url' => ['issue_comment_url', null],
-        'issue_events_url' => ['issue_events_url', null],
-        'issues_url' => ['issues_url', null],
-        'keys_url' => ['keys_url', null],
-        'labels_url' => ['labels_url', null],
-        'languages_url' => ['languages_url', null],
-        'merges_url' => ['merges_url', null],
-        'milestones_url' => ['milestones_url', null],
-        'name' => ['name', null],
-        'node_id' => ['node_id', null],
-        'notifications_url' => ['notifications_url', null],
-        'owner' => [
-            'owner',
-            \Acme\GitHub\Generated\Model\WebhookWorkflowRunRequestedWorkflow_runHead_repositoryOwner::class,
-        ],
-        'private' => ['private', null],
-        'pulls_url' => ['pulls_url', null],
-        'releases_url' => ['releases_url', null],
-        'stargazers_url' => ['stargazers_url', null],
-        'statuses_url' => ['statuses_url', null],
-        'subscribers_url' => ['subscribers_url', null],
-        'subscription_url' => ['subscription_url', null],
-        'tags_url' => ['tags_url', null],
-        'teams_url' => ['teams_url', null],
-        'trees_url' => ['trees_url', null],
-        'url' => ['url', null],
-    ];
-
     public function __construct(
         public string $archive_url,
         public string $assignees_url,
@@ -112,60 +54,5 @@ final readonly class WebhookWorkflowRunRequestedWorkflow_runHead_repository impl
         public string $trees_url,
         public string $url,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'archive_url' => $this->archive_url,
-            'assignees_url' => $this->assignees_url,
-            'blobs_url' => $this->blobs_url,
-            'branches_url' => $this->branches_url,
-            'collaborators_url' => $this->collaborators_url,
-            'comments_url' => $this->comments_url,
-            'commits_url' => $this->commits_url,
-            'compare_url' => $this->compare_url,
-            'contents_url' => $this->contents_url,
-            'contributors_url' => $this->contributors_url,
-            'deployments_url' => $this->deployments_url,
-            'description' => $this->description,
-            'downloads_url' => $this->downloads_url,
-            'events_url' => $this->events_url,
-            'fork' => $this->fork,
-            'forks_url' => $this->forks_url,
-            'full_name' => $this->full_name,
-            'git_commits_url' => $this->git_commits_url,
-            'git_refs_url' => $this->git_refs_url,
-            'git_tags_url' => $this->git_tags_url,
-            'hooks_url' => $this->hooks_url,
-            'html_url' => $this->html_url,
-            'id' => $this->id,
-            'issue_comment_url' => $this->issue_comment_url,
-            'issue_events_url' => $this->issue_events_url,
-            'issues_url' => $this->issues_url,
-            'keys_url' => $this->keys_url,
-            'labels_url' => $this->labels_url,
-            'languages_url' => $this->languages_url,
-            'merges_url' => $this->merges_url,
-            'milestones_url' => $this->milestones_url,
-            'name' => $this->name,
-            'node_id' => $this->node_id,
-            'notifications_url' => $this->notifications_url,
-            'owner' => $this->owner,
-            'private' => $this->private,
-            'pulls_url' => $this->pulls_url,
-            'releases_url' => $this->releases_url,
-            'stargazers_url' => $this->stargazers_url,
-            'statuses_url' => $this->statuses_url,
-            'subscribers_url' => $this->subscribers_url,
-            'subscription_url' => $this->subscription_url,
-            'tags_url' => $this->tags_url,
-            'teams_url' => $this->teams_url,
-            'trees_url' => $this->trees_url,
-            'url' => $this->url,
-        ];
     }
 }

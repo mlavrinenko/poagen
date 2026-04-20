@@ -4,29 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookWorkflowRunInProgressWorkflow_runHead_commit implements JsonSerializable
+final readonly class WebhookWorkflowRunInProgressWorkflow_runHead_commit
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'author' => [
-            'author',
-            \Acme\GitHub\Generated\Model\WebhookWorkflowRunInProgressWorkflow_runHead_commitAuthor::class,
-        ],
-        'committer' => [
-            'committer',
-            \Acme\GitHub\Generated\Model\WebhookWorkflowRunInProgressWorkflow_runHead_commitCommitter::class,
-        ],
-        'id' => ['id', null],
-        'message' => ['message', null],
-        'timestamp' => ['timestamp', null],
-        'tree_id' => ['tree_id', null],
-    ];
-
     public function __construct(
         public WebhookWorkflowRunInProgressWorkflow_runHead_commitAuthor $author,
         public WebhookWorkflowRunInProgressWorkflow_runHead_commitCommitter $committer,
@@ -35,20 +14,5 @@ final readonly class WebhookWorkflowRunInProgressWorkflow_runHead_commit impleme
         public string $timestamp,
         public string $tree_id,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'author' => $this->author,
-            'committer' => $this->committer,
-            'id' => $this->id,
-            'message' => $this->message,
-            'timestamp' => $this->timestamp,
-            'tree_id' => $this->tree_id,
-        ];
     }
 }

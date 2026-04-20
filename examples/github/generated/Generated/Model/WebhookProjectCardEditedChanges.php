@@ -4,30 +4,10 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookProjectCardEditedChanges implements JsonSerializable
+final readonly class WebhookProjectCardEditedChanges
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'note' => ['note', \Acme\GitHub\Generated\Model\WebhookProjectCardEditedChangesNote::class],
-    ];
-
     public function __construct(
         public WebhookProjectCardEditedChangesNote $note,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'note' => $this->note,
-        ];
     }
 }

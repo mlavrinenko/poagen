@@ -4,28 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class RepositoryAdvisoryUpdate implements JsonSerializable
+final readonly class RepositoryAdvisoryUpdate
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'collaborating_teams' => ['collaborating_teams', ['list', null]],
-        'collaborating_users' => ['collaborating_users', ['list', null]],
-        'credits' => ['credits', ['list', null]],
-        'cve_id' => ['cve_id', null],
-        'cvss_vector_string' => ['cvss_vector_string', null],
-        'cwe_ids' => ['cwe_ids', ['list', null]],
-        'description' => ['description', null],
-        'severity' => ['severity', null],
-        'state' => ['state', null],
-        'summary' => ['summary', null],
-        'vulnerabilities' => ['vulnerabilities', ['list', null]],
-    ];
-
     /**
      * @param ?list<string> $collaborating_teams
      * @param ?list<string> $collaborating_users
@@ -46,25 +26,5 @@ final readonly class RepositoryAdvisoryUpdate implements JsonSerializable
         public ?string $summary = null,
         public ?array $vulnerabilities = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'collaborating_teams' => $this->collaborating_teams,
-            'collaborating_users' => $this->collaborating_users,
-            'credits' => $this->credits,
-            'cve_id' => $this->cve_id,
-            'cvss_vector_string' => $this->cvss_vector_string,
-            'cwe_ids' => $this->cwe_ids,
-            'description' => $this->description,
-            'severity' => $this->severity,
-            'state' => $this->state,
-            'summary' => $this->summary,
-            'vulnerabilities' => $this->vulnerabilities,
-        ];
     }
 }

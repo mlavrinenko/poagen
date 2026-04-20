@@ -4,28 +4,10 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class NodeStatus implements JsonSerializable
+final readonly class NodeStatus
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['state' => ['state', null]];
-
     public function __construct(
         public ?string $state = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'state' => $this->state,
-        ];
     }
 }

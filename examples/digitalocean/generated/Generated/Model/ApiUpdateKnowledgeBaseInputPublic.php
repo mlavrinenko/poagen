@@ -4,23 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class ApiUpdateKnowledgeBaseInputPublic implements JsonSerializable
+final readonly class ApiUpdateKnowledgeBaseInputPublic
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'database_id' => ['database_id', null],
-        'embedding_model_uuid' => ['embedding_model_uuid', null],
-        'name' => ['name', null],
-        'project_id' => ['project_id', null],
-        'tags' => ['tags', ['list', null]],
-        'uuid' => ['uuid', null],
-    ];
-
     /**
      * @param ?list<string> $tags
      */
@@ -32,20 +17,5 @@ final readonly class ApiUpdateKnowledgeBaseInputPublic implements JsonSerializab
         public ?array $tags = null,
         public ?string $uuid = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'database_id' => $this->database_id,
-            'embedding_model_uuid' => $this->embedding_model_uuid,
-            'name' => $this->name,
-            'project_id' => $this->project_id,
-            'tags' => $this->tags,
-            'uuid' => $this->uuid,
-        ];
     }
 }

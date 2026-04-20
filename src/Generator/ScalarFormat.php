@@ -25,13 +25,9 @@ final readonly class ScalarFormat
     public const string KIND_DATETIME = 'datetime';
     public const string KIND_DATE = 'date';
 
-    /**
-     * @param class-string<ScalarBinding>|null $bindingClass Class-string for the user VO when `kind === KIND_SCALAR`, null for built-ins.
-     */
     public function __construct(
         public string $phpType,
         public string $kind,
-        public ?string $bindingClass,
     ) {}
 
     /**
@@ -39,16 +35,16 @@ final readonly class ScalarFormat
      */
     public static function userScalar(string $fqcn): self
     {
-        return new self('\\' . ltrim($fqcn, '\\'), self::KIND_SCALAR, $fqcn);
+        return new self('\\' . ltrim($fqcn, '\\'), self::KIND_SCALAR);
     }
 
     public static function dateTime(): self
     {
-        return new self('\DateTimeImmutable', self::KIND_DATETIME, null);
+        return new self('\DateTimeImmutable', self::KIND_DATETIME);
     }
 
     public static function date(): self
     {
-        return new self('\DateTimeImmutable', self::KIND_DATE, null);
+        return new self('\DateTimeImmutable', self::KIND_DATE);
     }
 }

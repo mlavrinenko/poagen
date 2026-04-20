@@ -4,21 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class RuleSuitePullRequestPull_request implements JsonSerializable
+final readonly class RuleSuitePullRequestPull_request
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'id' => ['id', null],
-        'number' => ['number', null],
-        'reviews' => ['reviews', ['list', null]],
-        'user' => ['user', \Acme\GitHub\Generated\Model\RuleSuitePullRequestPull_requestUser::class],
-    ];
-
     /**
      * @param ?list<array<string, mixed>> $reviews
      */
@@ -28,18 +15,5 @@ final readonly class RuleSuitePullRequestPull_request implements JsonSerializabl
         public ?array $reviews = null,
         public ?RuleSuitePullRequestPull_requestUser $user = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'number' => $this->number,
-            'reviews' => $this->reviews,
-            'user' => $this->user,
-        ];
     }
 }

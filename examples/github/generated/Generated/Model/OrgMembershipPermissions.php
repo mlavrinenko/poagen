@@ -4,28 +4,10 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class OrgMembershipPermissions implements JsonSerializable
+final readonly class OrgMembershipPermissions
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['can_create_repository' => ['can_create_repository', null]];
-
     public function __construct(
         public bool $can_create_repository,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'can_create_repository' => $this->can_create_repository,
-        ];
     }
 }

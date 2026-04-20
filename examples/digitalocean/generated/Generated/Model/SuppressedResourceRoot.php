@@ -4,20 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class SuppressedResourceRoot implements JsonSerializable
+final readonly class SuppressedResourceRoot
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'links' => ['links', \Acme\DigitalOcean\Generated\Model\SuppressedResourceRootLinks::class],
-        'meta' => ['meta', \Acme\DigitalOcean\Generated\Model\SuppressedResourceRootMeta::class],
-        'resources' => ['resources', ['list', \Acme\DigitalOcean\Generated\Model\SuppressedResource::class]],
-    ];
-
     /**
      * @param ?list<\Acme\DigitalOcean\Generated\Model\SuppressedResource> $resources
      */
@@ -26,17 +14,5 @@ final readonly class SuppressedResourceRoot implements JsonSerializable
         public ?SuppressedResourceRootMeta $meta = null,
         public ?array $resources = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'links' => $this->links,
-            'meta' => $this->meta,
-            'resources' => $this->resources,
-        ];
     }
 }

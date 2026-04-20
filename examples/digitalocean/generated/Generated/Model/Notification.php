@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class Notification implements JsonSerializable
+final readonly class Notification
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['email' => ['email', ['list', null]], 'slack' => ['slack', ['list', null]]];
-
     /**
      * @param list<string> $email
      * @param list<array<string, mixed>> $slack
@@ -22,16 +14,5 @@ final readonly class Notification implements JsonSerializable
         public array $email,
         public array $slack,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'email' => $this->email,
-            'slack' => $this->slack,
-        ];
     }
 }

@@ -100,9 +100,13 @@ final readonly class RequestAssembler
             return;
         }
 
+        $payload = $body->isList()
+            ? '\\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)'
+            : '$this->marshaller->marshal($body)';
+
         $method->addBody('$request = $request');
         $method->addBody("    ->withHeader('Content-Type', 'application/json')");
-        $method->addBody('    ->withBody($this->streamFactory->createStream(\\json_encode($body, \\JSON_THROW_ON_ERROR)));');
+        $method->addBody('    ->withBody($this->streamFactory->createStream(\\json_encode(' . $payload . ', \\JSON_THROW_ON_ERROR)));');
     }
 
     /**

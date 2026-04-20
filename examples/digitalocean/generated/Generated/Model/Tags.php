@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class Tags implements JsonSerializable
+final readonly class Tags
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['name' => ['name', null], 'resources' => ['resources', null]];
-
     /**
      * @param ?array<string, mixed> $resources
      */
@@ -21,16 +13,5 @@ final readonly class Tags implements JsonSerializable
         public ?string $name = null,
         public ?array $resources = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'name' => $this->name,
-            'resources' => $this->resources,
-        ];
     }
 }

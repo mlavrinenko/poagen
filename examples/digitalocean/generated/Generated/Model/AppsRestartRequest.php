@@ -4,31 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class AppsRestartRequest implements JsonSerializable
+final readonly class AppsRestartRequest
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['components' => ['components', ['list', null]]];
-
     /**
      * @param ?list<string> $components
      */
     public function __construct(
         public ?array $components = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'components' => $this->components,
-        ];
     }
 }

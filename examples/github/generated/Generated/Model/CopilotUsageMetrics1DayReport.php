@@ -5,36 +5,17 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated\Model;
 
 use DateTimeImmutable;
-use JsonSerializable;
+use Mlavrinenko\Paogen\Runtime\Attribute\Format;
 
-final readonly class CopilotUsageMetrics1DayReport implements JsonSerializable
+final readonly class CopilotUsageMetrics1DayReport
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'download_links' => ['download_links', ['list', null]],
-        'report_day' => ['report_day', ['date', null]],
-    ];
-
     /**
      * @param list<string> $download_links
      */
     public function __construct(
         public array $download_links,
+        #[Format('date')]
         public DateTimeImmutable $report_day,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'download_links' => $this->download_links,
-            'report_day' => $this->report_day->format('Y-m-d'),
-        ];
     }
 }

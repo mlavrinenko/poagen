@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class UserSettingsMongo_user_settings implements JsonSerializable
+final readonly class UserSettingsMongo_user_settings
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['databases' => ['databases', ['list', null]], 'role' => ['role', null]];
-
     /**
      * @param ?list<string> $databases
      */
@@ -21,16 +13,5 @@ final readonly class UserSettingsMongo_user_settings implements JsonSerializable
         public ?array $databases = null,
         public ?string $role = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'databases' => $this->databases,
-            'role' => $this->role,
-        ];
     }
 }

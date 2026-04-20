@@ -4,26 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class WebhookCodeScanningAlertReopenedByUser implements JsonSerializable
+final readonly class WebhookCodeScanningAlertReopenedByUser
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'action' => ['action', null],
-        'alert' => ['alert', \Acme\GitHub\Generated\Model\WebhookCodeScanningAlertReopenedByUserAlert::class],
-        'commit_oid' => ['commit_oid', \Acme\GitHub\Generated\Model\WebhooksCodeScanningCommitOid::class],
-        'ref' => ['ref', \Acme\GitHub\Generated\Model\WebhooksCodeScanningRef::class],
-        'repository' => ['repository', \Acme\GitHub\Generated\Model\RepositoryWebhooks::class],
-        'sender' => ['sender', \Acme\GitHub\Generated\Model\SimpleUser::class],
-        'enterprise' => ['enterprise', \Acme\GitHub\Generated\Model\EnterpriseWebhooks::class],
-        'installation' => ['installation', \Acme\GitHub\Generated\Model\SimpleInstallation::class],
-        'organization' => ['organization', \Acme\GitHub\Generated\Model\OrganizationSimpleWebhooks::class],
-    ];
-
     public function __construct(
         public string $action,
         public WebhookCodeScanningAlertReopenedByUserAlert $alert,
@@ -35,23 +17,5 @@ final readonly class WebhookCodeScanningAlertReopenedByUser implements JsonSeria
         public ?SimpleInstallation $installation = null,
         public ?OrganizationSimpleWebhooks $organization = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'action' => $this->action,
-            'alert' => $this->alert,
-            'commit_oid' => $this->commit_oid,
-            'ref' => $this->ref,
-            'repository' => $this->repository,
-            'sender' => $this->sender,
-            'enterprise' => $this->enterprise,
-            'installation' => $this->installation,
-            'organization' => $this->organization,
-        ];
     }
 }

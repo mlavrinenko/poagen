@@ -6,25 +6,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 use Acme\DigitalOcean\Generated\Enum\ApiModelProvider;
 use DateTimeImmutable;
-use JsonSerializable;
 
-final readonly class ApiModelProviderKeyInfo implements JsonSerializable
+final readonly class ApiModelProviderKeyInfo
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'api_key_uuid' => ['api_key_uuid', null],
-        'created_at' => ['created_at', ['datetime', null]],
-        'created_by' => ['created_by', null],
-        'deleted_at' => ['deleted_at', ['datetime', null]],
-        'models' => ['models', ['list', \Acme\DigitalOcean\Generated\Model\ApiModel::class]],
-        'name' => ['name', null],
-        'provider' => ['provider', ['enum', \Acme\DigitalOcean\Generated\Enum\ApiModelProvider::class]],
-        'updated_at' => ['updated_at', ['datetime', null]],
-    ];
-
     /**
      * @param ?list<\Acme\DigitalOcean\Generated\Model\ApiModel> $models
      */
@@ -38,22 +22,5 @@ final readonly class ApiModelProviderKeyInfo implements JsonSerializable
         public ?ApiModelProvider $provider = null,
         public ?DateTimeImmutable $updated_at = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'api_key_uuid' => $this->api_key_uuid,
-            'created_at' => $this->created_at?->format(\DateTimeInterface::RFC3339),
-            'created_by' => $this->created_by,
-            'deleted_at' => $this->deleted_at?->format(\DateTimeInterface::RFC3339),
-            'models' => $this->models,
-            'name' => $this->name,
-            'provider' => $this->provider,
-            'updated_at' => $this->updated_at?->format(\DateTimeInterface::RFC3339),
-        ];
     }
 }

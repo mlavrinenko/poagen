@@ -123,8 +123,11 @@ final class OperationGeneratorSteps
             "->withHeader('Content-Type', 'application/json')",
             $this->source,
         );
+        // ADR-010: bodies route through the runtime Marshaller before
+        // json_encode so wire keys, ScalarBindings, and date formats
+        // are normalised at the boundary instead of inside Model::jsonSerialize.
         TestCase::assertStringContainsString(
-            '\\json_encode($body, \\JSON_THROW_ON_ERROR)',
+            '\\json_encode($this->marshaller->marshal($body), \\JSON_THROW_ON_ERROR)',
             $this->source,
         );
     }

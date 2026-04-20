@@ -4,19 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class BudgetBudget_alerting implements JsonSerializable
+final readonly class BudgetBudget_alerting
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'alert_recipients' => ['alert_recipients', ['list', null]],
-        'will_alert' => ['will_alert', null],
-    ];
-
     /**
      * @param list<string> $alert_recipients
      */
@@ -24,16 +13,5 @@ final readonly class BudgetBudget_alerting implements JsonSerializable
         public array $alert_recipients,
         public bool $will_alert,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'alert_recipients' => $this->alert_recipients,
-            'will_alert' => $this->will_alert,
-        ];
     }
 }

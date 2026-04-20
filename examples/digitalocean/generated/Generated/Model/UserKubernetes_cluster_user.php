@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class UserKubernetes_cluster_user implements JsonSerializable
+final readonly class UserKubernetes_cluster_user
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['groups' => ['groups', ['list', null]], 'username' => ['username', null]];
-
     /**
      * @param ?list<string> $groups
      */
@@ -21,16 +13,5 @@ final readonly class UserKubernetes_cluster_user implements JsonSerializable
         public ?array $groups = null,
         public ?string $username = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'groups' => $this->groups,
-            'username' => $this->username,
-        ];
     }
 }

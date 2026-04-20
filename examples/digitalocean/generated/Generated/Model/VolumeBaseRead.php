@@ -4,24 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class VolumeBaseRead implements JsonSerializable
+final readonly class VolumeBaseRead
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'created_at' => ['created_at', null],
-        'description' => ['description', null],
-        'droplet_ids' => ['droplet_ids', ['list', null]],
-        'id' => ['id', null],
-        'name' => ['name', null],
-        'size_gigabytes' => ['size_gigabytes', null],
-        'tags' => ['tags', \Acme\DigitalOcean\Generated\Model\TagsArrayRead::class],
-    ];
-
     /**
      * @param ?list<int> $droplet_ids
      */
@@ -34,21 +18,5 @@ final readonly class VolumeBaseRead implements JsonSerializable
         public ?int $size_gigabytes = null,
         public ?TagsArrayRead $tags = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'created_at' => $this->created_at,
-            'description' => $this->description,
-            'droplet_ids' => $this->droplet_ids,
-            'id' => $this->id,
-            'name' => $this->name,
-            'size_gigabytes' => $this->size_gigabytes,
-            'tags' => $this->tags,
-        ];
     }
 }

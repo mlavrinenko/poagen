@@ -4,24 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class MarketplaceAccount implements JsonSerializable
+final readonly class MarketplaceAccount
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'id' => ['id', null],
-        'login' => ['login', null],
-        'type' => ['type', null],
-        'url' => ['url', null],
-        'email' => ['email', null],
-        'node_id' => ['node_id', null],
-        'organization_billing_email' => ['organization_billing_email', null],
-    ];
-
     public function __construct(
         public int $id,
         public string $login,
@@ -31,21 +15,5 @@ final readonly class MarketplaceAccount implements JsonSerializable
         public ?string $node_id = null,
         public ?string $organization_billing_email = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'login' => $this->login,
-            'type' => $this->type,
-            'url' => $this->url,
-            'email' => $this->email,
-            'node_id' => $this->node_id,
-            'organization_billing_email' => $this->organization_billing_email,
-        ];
     }
 }

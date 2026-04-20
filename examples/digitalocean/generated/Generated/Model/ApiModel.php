@@ -6,35 +6,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 use Acme\DigitalOcean\Generated\Enum\ApiModelProvider;
 use DateTimeImmutable;
-use JsonSerializable;
 
-final readonly class ApiModel implements JsonSerializable
+final readonly class ApiModel
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'agreement' => ['agreement', \Acme\DigitalOcean\Generated\Model\ApiAgreement::class],
-        'created_at' => ['created_at', ['datetime', null]],
-        'inference_name' => ['inference_name', null],
-        'inference_version' => ['inference_version', null],
-        'is_foundational' => ['is_foundational', null],
-        'kb_default_chunk_size' => ['kb_default_chunk_size', null],
-        'kb_max_chunk_size' => ['kb_max_chunk_size', null],
-        'kb_min_chunk_size' => ['kb_min_chunk_size', null],
-        'metadata' => ['metadata', null],
-        'name' => ['name', null],
-        'parent_uuid' => ['parent_uuid', null],
-        'provider' => ['provider', ['enum', \Acme\DigitalOcean\Generated\Enum\ApiModelProvider::class]],
-        'updated_at' => ['updated_at', ['datetime', null]],
-        'upload_complete' => ['upload_complete', null],
-        'url' => ['url', null],
-        'usecases' => ['usecases', ['list', \Acme\DigitalOcean\Generated\Model\ApiModelUsecase::class]],
-        'uuid' => ['uuid', null],
-        'version' => ['version', \Acme\DigitalOcean\Generated\Model\ApiModelVersion::class],
-    ];
-
     /**
      * @param ?array<string, mixed> $metadata
      * @param ?list<\Acme\DigitalOcean\Generated\Enum\ApiModelUsecase> $usecases
@@ -59,32 +33,5 @@ final readonly class ApiModel implements JsonSerializable
         public ?string $uuid = null,
         public ?ApiModelVersion $version = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'agreement' => $this->agreement,
-            'created_at' => $this->created_at?->format(\DateTimeInterface::RFC3339),
-            'inference_name' => $this->inference_name,
-            'inference_version' => $this->inference_version,
-            'is_foundational' => $this->is_foundational,
-            'kb_default_chunk_size' => $this->kb_default_chunk_size,
-            'kb_max_chunk_size' => $this->kb_max_chunk_size,
-            'kb_min_chunk_size' => $this->kb_min_chunk_size,
-            'metadata' => $this->metadata,
-            'name' => $this->name,
-            'parent_uuid' => $this->parent_uuid,
-            'provider' => $this->provider,
-            'updated_at' => $this->updated_at?->format(\DateTimeInterface::RFC3339),
-            'upload_complete' => $this->upload_complete,
-            'url' => $this->url,
-            'usecases' => $this->usecases,
-            'uuid' => $this->uuid,
-            'version' => $this->version,
-        ];
     }
 }

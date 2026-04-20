@@ -4,31 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class CodeSecurityConfigurationSecret_scanning_delegated_bypass_options implements JsonSerializable
+final readonly class CodeSecurityConfigurationSecret_scanning_delegated_bypass_options
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['reviewers' => ['reviewers', ['list', null]]];
-
     /**
      * @param ?list<array<string, mixed>> $reviewers
      */
     public function __construct(
         public ?array $reviewers = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'reviewers' => $this->reviewers,
-        ];
     }
 }

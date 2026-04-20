@@ -34,6 +34,7 @@ final class ModelGeneratorSteps
 
     private ?Profile $profile = null;
     private string $outputDir = '';
+    private string $source = '';
     /** @var array<string,string> */
     private array $firstSnapshot = [];
     /** @var array<string,string> */
@@ -308,12 +309,11 @@ final class ModelGeneratorSteps
     private ?object $hydratedContact = null;
 
     /**
-     * Invoke the petstore ApiClient's private static `hydrate` against the
-     * supplied class + payload. The hydrator is class-agnostic; it reads
-     * PROPERTY_MAP from whatever class is passed, so we use petstore's
-     * ApiClient as the host for all hydration tests (including Contact,
-     * whose fixture declares no operations and therefore emits no
-     * ApiClient of its own).
+     * Hydrate a payload into the supplied class via the runtime
+     * {@see \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator}. Per ADR-010 this
+     * is a free function — the generated `ApiClient` no longer carries
+     * a private `hydrate()` helper. Regenerates the petstore fixture so
+     * its models are on disk before invoking the hydrator on Petstore types.
      *
      * @param class-string $target
      * @param array<mixed> $payload
@@ -323,15 +323,7 @@ final class ModelGeneratorSteps
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
 
-        $reflection = new \ReflectionMethod(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient::class,
-            'hydrate',
-        );
-
-        $result = $reflection->invoke(null, $target, $payload);
-        \assert(\is_object($result));
-
-        return $result;
+        return new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate($target, $payload);
     }
 
     public function givenModelPetHasAPropertyTagsWhoseSchemaIsTypeArrayItemsRefComponentsSchemasTag(): void
@@ -340,8 +332,8 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenTheGeneratedApiClientHydratePetClassDataRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(
-    ): void {
+    public function whenTheRuntimeHydratorADR010RunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(): void
+    {
         $this->hydratedPet = $this->invokeHydrate(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet::class,
             [
@@ -388,8 +380,8 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenTheGeneratedApiClientHydratePetClassDataRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(
-    ): void {
+    public function whenTheRuntimeHydratorADR010RunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(): void
+    {
         $this->hydratedPet = $this->invokeHydrate(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet::class,
             [
@@ -436,7 +428,9 @@ final class ModelGeneratorSteps
             email: new \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email('team@example'),
         );
 
-        $this->scalarEncoded = (string) json_encode($contact);
+        $this->scalarEncoded = (string) json_encode(
+            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($contact),
+        );
 
         $this->hydratedContact = $this->invokeHydrate(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
@@ -478,20 +472,22 @@ final class ModelGeneratorSteps
         $this->runGenerator($this->profile);
 
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
-        TestCase::assertStringContainsString('shipDate', $source);
-        TestCase::assertStringContainsString("'shipDate' => ['shipDate', ['datetime', null]]", $source);
+        TestCase::assertStringContainsString('?DateTimeImmutable $shipDate', $source);
     }
 
 
     public function givenNoUserBindsFormatDateTimeBindingIsRegistered(): void
     {
         // No user VO under `discoverIn` binds `date-time`. Observable proof:
-        // the emitted PROPERTY_MAP entry for `shipDate` is the built-in
-        // `['datetime', null]`, not a `['scalar', VoClass::class]` form.
+        // the emitted constructor types `shipDate` as the bare
+        // `?DateTimeImmutable` (the runtime default for a bare DateTime
+        // property is RFC3339), with no `#[Format]` override and no
+        // ScalarBinding wrapper class anywhere in the file.
         \assert($this->profile !== null);
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
-        TestCase::assertStringContainsString("'shipDate' => ['shipDate', ['datetime', null]]", $source);
-        TestCase::assertStringNotContainsString("'shipDate' => ['shipDate', ['scalar'", $source);
+        TestCase::assertStringContainsString('?DateTimeImmutable $shipDate', $source);
+        TestCase::assertStringNotContainsString('#[Format', $source);
+        TestCase::assertStringNotContainsString('ScalarBinding', $source);
     }
 
 
@@ -530,7 +526,9 @@ final class ModelGeneratorSteps
             shipDate: new \DateTimeImmutable($this->dateTimeWire),
         );
 
-        $this->orderEncoded = (string) json_encode($order);
+        $this->orderEncoded = (string) json_encode(
+            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($order),
+        );
         TestCase::assertStringContainsString(
             '"shipDate":"2026-04-18T12:34:56+00:00"',
             $this->orderEncoded,
@@ -601,14 +599,10 @@ final class ModelGeneratorSteps
     {
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
         TestCase::assertStringContainsString('?PetShipping $shipping', $source);
-        // The PROPERTY_MAP entry shape is `'shipping' => ['shipping', <FQCN>::class]`
-        // — Nette's printer may wrap the line when it is long, so assert the
-        // fragments rather than the whole one-liner.
-        TestCase::assertStringContainsString("'shipping'", $source);
-        TestCase::assertStringContainsString(
-            '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\PetShipping::class',
-            $source,
-        );
+        // ADR-010: synthesised child reference is carried by the native
+        // type only — no PROPERTY_MAP, no JsonSerializable in the file.
+        TestCase::assertStringNotContainsString('PROPERTY_MAP', $source);
+        TestCase::assertStringNotContainsString('JsonSerializable', $source);
     }
 
 
@@ -629,33 +623,22 @@ final class ModelGeneratorSteps
     private ?object $hydratedCompositionPet = null;
 
     /**
-     * Invoke the (class-agnostic) hydrator on any class using the petstore
-     * ApiClient as host. Mirrors {@see self::invokeHydrate} but targets the
-     * composition fixture's namespace.
+     * Hydrate a composition-fixture payload via the runtime
+     * {@see \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator} (ADR-010).
      *
      * @param class-string $target
      * @param array<mixed> $payload
      */
     private function invokeCompositionHydrate(string $target, array $payload): object
     {
-        // Make sure the composition fixture is regenerated and loadable.
         $this->profile = $this->loadProfile('composition');
         $this->runGenerator($this->profile);
 
-        // Also regenerate petstore so its ApiClient (our host) is current.
         $petstore = $this->loadProfile('petstore');
         $this->runGenerator($petstore);
         $this->outputDir = $petstore->output;
 
-        $reflection = new \ReflectionMethod(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient::class,
-            'hydrate',
-        );
-
-        $result = $reflection->invoke(null, $target, $payload);
-        \assert(\is_object($result));
-
-        return $result;
+        return new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate($target, $payload);
     }
 
     public function givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator(
@@ -915,4 +898,144 @@ final class ModelGeneratorSteps
     {
         $this->rawNames = [$raw];
     }
+
+    private ?\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact $hydratedKebabContact = null;
+    private string $kebabMarshalled = '';
+
+    public function givenModelContactDeclaresARequiredPropertyWhoseSchemaKeyIsDisplayNameKebabCase(): void
+    {
+        $this->profile = $this->loadProfile('contact');
+        $this->runGenerator($this->profile);
+    }
+
+    public function whenTheGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorADR010ProcessAPayloadContainingTheWireKeyDisplayName(
+    ): void {
+        $hydrator = new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator();
+        $this->hydratedKebabContact = $hydrator->hydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
+            [
+                'display-name' => 'Ada',
+                'email' => 'ada@example',
+            ],
+        );
+
+        $this->kebabMarshalled = (string) json_encode(
+            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($this->hydratedKebabContact),
+        );
+    }
+
+    public function thenTheConstructorParameterIsEmittedAsDisplayNameCamelCasedPHPIdentifier(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Contact.php');
+        TestCase::assertStringContainsString('public string $displayName', $source);
+    }
+
+    public function thenThePropertyCarriesWireNameDisplayNameAndTheClassHasNoPROPERTYMAPConstant(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Contact.php');
+        TestCase::assertStringContainsString("#[WireName('display-name')]", $source);
+        TestCase::assertStringNotContainsString('PROPERTY_MAP', $source);
+        TestCase::assertStringNotContainsString('JsonSerializable', $source);
+    }
+
+    public function thenNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda(): void
+    {
+        \assert($this->hydratedKebabContact !== null);
+        TestCase::assertSame('Ada', $this->hydratedKebabContact->displayName);
+    }
+
+    public function thenNewMarshallerMarshalContactEmitsTheKeyAsDisplayNameNotDisplayName(): void
+    {
+        TestCase::assertStringContainsString('"display-name":"Ada"', $this->kebabMarshalled);
+        TestCase::assertStringNotContainsString('"displayName"', $this->kebabMarshalled);
+    }
+
+
+    public function givenModelOrderIsEmittedByGeneratorUnderADR010(): void
+    {
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+    }
+
+    public function whenGeneratedModelOrderPhpIsRead(): void
+    {
+        \assert($this->profile !== null);
+        $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
+    }
+
+    public function thenTheFileContainsNoPROPERTYMAPClassConstantAndNoImplementsJsonSerializable(): void
+    {
+        TestCase::assertStringNotContainsString('PROPERTY_MAP', $this->source);
+        TestCase::assertStringNotContainsString('JsonSerializable', $this->source);
+        TestCase::assertStringNotContainsString('jsonSerialize', $this->source);
+    }
+
+    public function thenTheClassIsFinalReadonlyWithConstructorPromotedPropertiesOnly(): void
+    {
+        TestCase::assertStringContainsString('final readonly class Order', $this->source);
+        // Constructor-promoted parameters use `public ?Type $name = ...`. Petstore
+        // Order is all-optional, so every parameter has `public ` + a default.
+        TestCase::assertMatchesRegularExpression('/public function __construct\(\s+public/', $this->source);
+    }
+
+    public function thenWireMetadataWhenNeededIsCarriedByTheSmallADR010AttributeSetOnEachParameter(): void
+    {
+        // Petstore Order has no kebab-case keys and no non-default formats,
+        // so no attributes appear. Probe Contact (kebab-case) for proof
+        // that the WireName attribute is emitted when the schema demands it.
+        $contactProfile = $this->loadProfile('contact');
+        $this->runGenerator($contactProfile);
+        $contactSource = (string) file_get_contents(
+            $contactProfile->output . '/Generated/Model/Contact.php',
+        );
+        TestCase::assertStringContainsString(
+            'use Mlavrinenko\\Paogen\\Runtime\\Attribute\\WireName;',
+            $contactSource,
+        );
+        TestCase::assertStringContainsString("#[WireName('display-name')]", $contactSource);
+    }
+
+
+    private ?\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet $hydratedDiscriminatedPet = null;
+
+    public function givenModelPetDeclaresARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
+    ): void {
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+    public function whenTheGeneratedPetPhpIsReadAndTheRuntimeHydratorADR010RunsAgainstAPayloadWhoseKindPetTypeIsWire(
+        string $wire,
+    ): void {
+        $tag = trim($wire, "'\"");
+        $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
+        $this->hydratedDiscriminatedPet = new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
+        );
+    }
+
+    public function thenTheKindParameterCarriesDiscriminatorFieldPetTypeMapDogDogClassCatCatClass(): void
+    {
+        TestCase::assertStringContainsString('#[Discriminator(', $this->source);
+        TestCase::assertStringContainsString("field: 'petType'", $this->source);
+        TestCase::assertStringContainsString(
+            "'Dog' => \\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model\\Dog::class",
+            $this->source,
+        );
+        TestCase::assertStringContainsString(
+            "'Cat' => \\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model\\Cat::class",
+            $this->source,
+        );
+    }
+
+    public function thenPetKindIsAnInstanceOfCatIndependentOfStructuralOverlapWithDog(): void
+    {
+        \assert($this->hydratedDiscriminatedPet !== null);
+        TestCase::assertInstanceOf(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
+            $this->hydratedDiscriminatedPet->kind,
+        );
+    }
+
 }

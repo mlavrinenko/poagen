@@ -10,8 +10,10 @@
   "Model Generator",
   traces: (
     "src/Generator/Emit/ModelEmitter.php",
-    "src/Generator/Emit/PropertyShape.php",
     "src/Generator/Emit/TypeResolver.php",
+    "src/Runtime/Marshal/Marshaller.php",
+    "src/Runtime/Marshal/Hydrator.php",
+    "src/Runtime/Marshal/DescriptorParser.php",
   ),
   description: [
     Walks #the(Schema)'s `components.schemas` and emits one #a(Model) per
@@ -128,14 +130,17 @@
     ]
   ]
 
-  #rule("Hydration and serialization contract (ADR-007)")[
+  #rule("Hydration and serialization contract (ADR-010)")[
     #scenario(
       "A list-of-Model property hydrates each item into the declared class",
       stage: unstable,
-      traces: ("src/Generator/Emit/ClientEmitter.php",),
+      traces: (
+        "src/Runtime/Marshal/PropertyDescriptor.php",
+        "src/Runtime/Marshal/PropertyType.php",
+      ),
     )[
       #given[#a(Model) `Pet` has a property `tags` whose schema is `type: array, items.$ref: #/components/schemas/Tag`]
-      #when[the generated `ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `tags` is a list of two objects]
+      #when[the runtime `Hydrator` (ADR-010) runs against a payload whose `tags` is a list of two objects]
       #then[`$pet->tags[0]` is an instance of `Tag`]
       #and_[`$pet->tags[1]` is an instance of `Tag`]
     ]
@@ -143,16 +148,16 @@
     #scenario(
       "A list-of-scalar property hydrates items untouched",
       stage: unstable,
-      traces: ("src/Generator/Emit/ClientEmitter.php",),
     )[
       #given[#a(Model) `Pet` has a property `photoUrls` whose schema is `type: array, items.type: string`]
-      #when[the generated `ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `photoUrls` is a list of plain strings]
+      #when[the runtime `Hydrator` (ADR-010) runs against a payload whose `photoUrls` is a list of plain strings]
       #then[each `$pet->photoUrls[$i]` is the original string — no object wrapping]
     ]
 
     #scenario(
       "A property with a non-identifier schema key round-trips via #[WireName]",
-      stage: draft,
+      stage: unstable,
+      traces: ("src/Runtime/Attribute/WireName.php",),
     )[
       #given[#a(Model) `Contact` declares a required property whose schema key is `display-name` (kebab-case)]
       #when[the generator emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (ADR-010) process a payload containing the wire key `display-name`]
@@ -160,6 +165,34 @@
       #and_[the property carries `#[WireName('display-name')]`, and the class has no `PROPERTY_MAP` constant]
       #and_[`(new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada'])` populates `$contact->displayName === 'Ada'`]
       #and_[`(new Marshaller())->marshal($contact)` emits the key as `display-name`, not `displayName`]
+    ]
+
+    #scenario(
+      "Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable",
+      stage: unstable,
+      traces: (
+        "src/Runtime/Attribute/Format.php",
+        "src/Runtime/Attribute/Schema.php",
+        "src/Runtime/Attribute/AdditionalProperties.php",
+        "src/Runtime/Attribute/Deprecated.php",
+      ),
+    )[
+      #given[#a(Model) `Order` is emitted by #the(Generator) under ADR-010]
+      #when[`Generated/Model/Order.php` is read]
+      #then[the file contains no `PROPERTY_MAP` class constant and no `implements JsonSerializable`]
+      #and_[the class is `final readonly` with constructor-promoted properties only]
+      #and_[wire metadata (when needed) is carried by the small ADR-010 attribute set on each parameter]
+    ]
+
+    #scenario(
+      "A discriminated `oneOf` hydrates to the branch named by the wire tag via #[Discriminator]",
+      stage: unstable,
+      traces: ("src/Runtime/Attribute/Discriminator.php",),
+    )[
+      #given[#a(Model) `Pet` declares a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
+      #when[the generated `Pet.php` is read and the runtime `Hydrator` (ADR-010) runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
+      #then[the `kind` parameter carries `#[Discriminator(field: 'petType', map: ['Dog' => Dog::class, 'Cat' => Cat::class])]`]
+      #and_[`$pet->kind` is an instance of `Cat`, independent of structural overlap with `Dog`]
     ]
   ]
 

@@ -25,9 +25,16 @@ parameters:
     # are produced by speconaut-phpunit, so we can't rewrite them.
     - identifier: staticMethod.dynamicCall
       path: tests/generated/*Test.php
-    # ScalarBinding is dispatched by class-string from the generated
-    # hydrator, which lives under tests/fixtures/generated (excluded above).
-    # Shipmonk sees the interface's methods as dead; the round-trip test
-    # step exercises them through the concrete Email fixture.
-    - identifier: shipmonk.deadMethod
-      path: src/Runtime/ScalarBinding.php
+    # Runtime attribute classes are a public ABI: their public properties
+    # are read by user code (and future runtime registries) via
+    # reflection on the attribute instance. Shipmonk's static analysis
+    # cannot see those reflection reads, so the dead-property warning
+    # does not apply. See ADR-010.
+    - identifier: shipmonk.deadProperty.neverRead
+      path: src/Runtime/Attribute/*
+    # Marshaller/Hydrator round-trip fixtures hold properties that are
+    # only read via reflection — same blind spot as above.
+    - identifier: shipmonk.deadProperty.neverRead
+      path: tests/Unit/Runtime/Fixtures/*
+    - identifier: shipmonk.deadEnumCase
+      path: tests/Unit/Runtime/Fixtures/*

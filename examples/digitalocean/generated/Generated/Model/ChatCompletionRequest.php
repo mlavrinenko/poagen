@@ -4,41 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class ChatCompletionRequest implements JsonSerializable
+final readonly class ChatCompletionRequest
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'messages' => ['messages', ['list', \Acme\DigitalOcean\Generated\Model\ChatMessage::class]],
-        'model' => ['model', null],
-        'frequency_penalty' => ['frequency_penalty', null],
-        'logit_bias' => ['logit_bias', null],
-        'logprobs' => ['logprobs', null],
-        'max_completion_tokens' => ['max_completion_tokens', null],
-        'max_tokens' => ['max_tokens', null],
-        'metadata' => ['metadata', null],
-        'n' => ['n', null],
-        'presence_penalty' => ['presence_penalty', null],
-        'reasoning_effort' => ['reasoning_effort', null],
-        'seed' => ['seed', null],
-        'stop' => ['stop', null],
-        'stream' => ['stream', null],
-        'stream_options' => [
-            'stream_options',
-            \Acme\DigitalOcean\Generated\Model\ChatCompletionRequestStream_options::class,
-        ],
-        'temperature' => ['temperature', null],
-        'tool_choice' => ['tool_choice', null],
-        'tools' => ['tools', ['list', \Acme\DigitalOcean\Generated\Model\ChatCompletionTool::class]],
-        'top_logprobs' => ['top_logprobs', null],
-        'top_p' => ['top_p', null],
-        'user' => ['user', null],
-    ];
-
     /**
      * @param list<\Acme\DigitalOcean\Generated\Model\ChatMessage> $messages
      * @param ?array<string, int> $logit_bias
@@ -70,35 +37,5 @@ final readonly class ChatCompletionRequest implements JsonSerializable
         public ?float $top_p = null,
         public ?string $user = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'messages' => $this->messages,
-            'model' => $this->model,
-            'frequency_penalty' => $this->frequency_penalty,
-            'logit_bias' => $this->logit_bias,
-            'logprobs' => $this->logprobs,
-            'max_completion_tokens' => $this->max_completion_tokens,
-            'max_tokens' => $this->max_tokens,
-            'metadata' => $this->metadata,
-            'n' => $this->n,
-            'presence_penalty' => $this->presence_penalty,
-            'reasoning_effort' => $this->reasoning_effort,
-            'seed' => $this->seed,
-            'stop' => $this->stop,
-            'stream' => $this->stream,
-            'stream_options' => $this->stream_options,
-            'temperature' => $this->temperature,
-            'tool_choice' => $this->tool_choice,
-            'tools' => $this->tools,
-            'top_logprobs' => $this->top_logprobs,
-            'top_p' => $this->top_p,
-            'user' => $this->user,
-        ];
     }
 }

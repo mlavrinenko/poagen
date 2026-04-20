@@ -4,40 +4,17 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model;
 
-use JsonSerializable;
+use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 
-final readonly class Contact implements JsonSerializable
+final readonly class Contact
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'displayName' => ['display-name', null],
-        'email' => ['email', ['scalar', \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email::class]],
-        'nickname' => ['nickname', null],
-        'org_id' => ['org_id', null],
-    ];
-
     public function __construct(
+        #[WireName('display-name')]
         public string $displayName,
         public Email $email,
         public ?string $nickname = null,
         public ?int $org_id = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'display-name' => $this->displayName,
-            'email' => $this->email->toScalar(),
-            'nickname' => $this->nickname,
-            'org_id' => $this->org_id,
-        ];
     }
 }

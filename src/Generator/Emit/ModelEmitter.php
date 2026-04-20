@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Nette\PhpGenerator\ClassType;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Mlavrinenko\Paogen\Runtime\Attribute\Format;
+use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
+use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
@@ -17,9 +22,14 @@ use Nette\PhpGenerator\PsrPrinter;
 /**
  * Emits a single `final readonly` PHP class for one OpenAPI named schema.
  *
+ * Per ADR-010, generated Models are lean DTOs. Wire metadata moves out:
+ *   - phpdoc carries structural type information (`@param list<Tag>`);
+ *   - `#[WireName] / #[Format] / #[Discriminator]` carry non-structural
+ *     facts. The runtime `Marshaller` / `Hydrator` read both.
+ *
  * No I/O — given (name, schema, bindings) returns the printed PHP source
  * wrapped in a {@see ModelEmission} that also lists any synthesised
- * nested-object classes the caller must emit next (T-013).
+ * nested-object classes the caller must emit next.
  */
 final readonly class ModelEmitter
 {
@@ -43,9 +53,7 @@ final readonly class ModelEmitter
         $file = new PhpFile();
         $file->setStrictTypes();
         $namespace = $file->addNamespace($modelNamespace);
-        $namespace->addUse(\JsonSerializable::class);
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
-        $class->addImplement(\JsonSerializable::class);
 
         $constructor = $class->addMethod('__construct');
 
@@ -70,8 +78,6 @@ final readonly class ModelEmitter
             array_values(array_filter($names, static fn(string $n): bool => !\in_array($n, $required, true))),
         );
 
-        /** @var list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap */
-        $propertyMap = [];
         /** @var list<SynthesisedModel> $children */
         $children = [];
 
@@ -81,35 +87,26 @@ final readonly class ModelEmitter
             $phpName = $this->phpName($propName);
             $synthFqcn = $this->synthesiseChildIfNeeded($className, $phpName, $propSchema, $children, $modelNamespace);
 
-            if ($synthFqcn !== null) {
-                $resolved = new TypeResolver($synthFqcn, null, null, false);
-                $shape = ltrim($synthFqcn, '\\');
-            } else {
-                $resolved = TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
-                $shape = PropertyShape::shapeFor($propSchema, $bindings, $modelNamespace, $registry, $enums);
-            }
+            $resolved = $synthFqcn !== null
+                ? new TypeResolver($synthFqcn, null, null, false)
+                : TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
 
             $isNullable = !$isRequired || $resolved->nullable;
 
             $this->addProperty(
                 $namespace,
                 $constructor,
+                $propName,
                 $phpName,
                 $resolved,
                 $isNullable,
+                $propSchema,
+                $bindings,
+                $modelNamespace,
+                $registry,
                 $this->todoFor($propSchema),
             );
-
-            $propertyMap[] = [
-                'wire' => $propName,
-                'php' => $phpName,
-                'shape' => $shape,
-                'nullable' => $isNullable,
-            ];
         }
-
-        $this->emitPropertyMap($class, $propertyMap);
-        $this->emitJsonSerialize($class, $propertyMap);
 
         return new ModelEmission($this->printer->printFile($file), $children);
     }
@@ -163,10 +160,15 @@ final readonly class ModelEmitter
 
     private function addProperty(
         PhpNamespace $namespace,
-        \Nette\PhpGenerator\Method $constructor,
+        Method $constructor,
+        string $wireName,
         string $phpName,
         TypeResolver $resolved,
         bool $isNullable,
+        Schema|Reference $propSchema,
+        Bindings $bindings,
+        string $modelNamespace,
+        NameRegistry $registry,
         ?string $todo = null,
     ): void {
         $type = $resolved->phpType;
@@ -194,74 +196,77 @@ final readonly class ModelEmitter
         if ($resolved->phpDocUse !== null) {
             $namespace->addUse(ltrim($resolved->phpDocUse, '\\'));
         }
+
+        $this->applyRuntimeAttributes($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
     }
 
     /**
-     * Emit the `PROPERTY_MAP` class constant that pairs each PHP property
-     * name with (a) its original schema key and (b) its runtime shape.
-     *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap
+     * Attach `#[WireName]` / `#[Format]` / `#[Discriminator]` to the promoted
+     * constructor parameter when the schema demands them. ADR-010 keeps the
+     * attribute set small: each attribute encodes one non-structural fact.
      */
-    private function emitPropertyMap(ClassType $class, array $propertyMap): void
-    {
-        $value = [];
-
-        foreach ($propertyMap as $entry) {
-            $value[$entry['php']] = [$entry['wire'], PropertyShape::shapeLiteral($entry['shape'])];
+    private function applyRuntimeAttributes(
+        PhpNamespace $namespace,
+        \Nette\PhpGenerator\PromotedParameter $param,
+        string $wireName,
+        string $phpName,
+        Schema|Reference $propSchema,
+        Bindings $bindings,
+        string $modelNamespace,
+        NameRegistry $registry,
+    ): void {
+        if ($wireName !== $phpName) {
+            $namespace->addUse(WireName::class);
+            $param->addAttribute(WireName::class, [$wireName]);
         }
 
-        $const = $class->addConstant('PROPERTY_MAP', $value)->setPublic()->setType('array');
-        $const->addComment('Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.');
-        $const->addComment('@var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>');
-    }
+        if ($propSchema instanceof Schema && \is_string($propSchema->format)) {
+            $scalarFormat = $bindings->scalarFormat($propSchema->format);
 
-    /**
-     * Emit `jsonSerialize()` that renames PHP property names back to their
-     * original schema keys. ScalarBinding VOs route through `toScalar()`;
-     * built-in datetime/date shapes route through `format()`; everything
-     * else passes through unchanged.
-     *
-     * @param list<array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool}> $propertyMap
-     */
-    private function emitJsonSerialize(ClassType $class, array $propertyMap): void
-    {
-        $method = $class->addMethod('jsonSerialize')->setPublic()->setReturnType('array');
-        $method->addComment('@return array<string, mixed>');
-        $method->addBody('return [');
-
-        foreach ($propertyMap as $entry) {
-            $method->addBody(\sprintf(
-                '    %s => %s,',
-                var_export($entry['wire'], true),
-                $this->serializeExpr($entry),
-            ));
+            if ($scalarFormat instanceof ScalarFormat && $scalarFormat->kind === ScalarFormat::KIND_DATE) {
+                $namespace->addUse(Format::class);
+                $param->addAttribute(Format::class, [$propSchema->format]);
+            }
         }
 
-        $method->addBody('];');
+        $this->applyDiscriminator($namespace, $param, $propSchema, $modelNamespace, $registry);
     }
 
-    /**
-     * @param array{wire: string, php: string, shape: null|string|array{0:string,1:?string}|array{0:'union',1:list<string>,2:?string}, nullable: bool} $entry
-     */
-    private function serializeExpr(array $entry): string
-    {
-        $base = '$this->' . $entry['php'];
-        $shape = $entry['shape'];
-
-        if (!\is_array($shape)) {
-            return $base;
+    private function applyDiscriminator(
+        PhpNamespace $namespace,
+        \Nette\PhpGenerator\PromotedParameter $param,
+        Schema|Reference $propSchema,
+        string $modelNamespace,
+        NameRegistry $registry,
+    ): void {
+        if (!$propSchema instanceof Schema) {
+            return;
+        }
+        $discriminator = $propSchema->discriminator;
+        if (!$discriminator instanceof Discriminator) {
+            return;
         }
 
-        $op = $entry['nullable'] ? '?->' : '->';
+        $shape = CompositionResolver::shapeForUnion($propSchema, $modelNamespace, $registry);
+        if ($shape === null) {
+            return;
+        }
 
-        return match ($shape[0]) {
-            'scalar' => $base . $op . 'toScalar()',
-            'datetime' => $base . $op . 'format(\\DateTimeInterface::RFC3339)',
-            'date' => $base . $op . "format('Y-m-d')",
-            default => $base,
-        };
+        /** @var list<string> $branches */
+        $branches = $shape[1];
+        $map = [];
+
+        foreach ($branches as $fqcn) {
+            $short = substr((string) strrchr('\\' . $fqcn, '\\'), 1);
+            $map[$short] = new Literal('\\' . ltrim($fqcn, '\\') . '::class');
+        }
+
+        $namespace->addUse(\Mlavrinenko\Paogen\Runtime\Attribute\Discriminator::class);
+        $param->addAttribute(\Mlavrinenko\Paogen\Runtime\Attribute\Discriminator::class, [
+            'field' => $discriminator->propertyName,
+            'map' => $map,
+        ]);
     }
-
 
     private function phpName(string $openApiName): string
     {

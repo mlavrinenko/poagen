@@ -73,11 +73,20 @@ deprioritised — see ADR-010 "Scope + priority policy".
   performance-flavoured passages superseded by ADR-010; revise
   wording. Supersede-mark ADR-007's representation section. No code
   changes.
-- [ ] **T-028** — Implement ADR-010 end-to-end: runtime attribute
+- [x] **T-028** — Implement ADR-010 end-to-end: runtime attribute
   classes, `Marshaller`, `Hydrator`, ModelEmitter rewrite,
   ClientEmitter rewrite, `phpstan/phpdoc-parser` added to runtime
   composer require, golden trees regenerated, specs updated.
   Prereq: T-027.
+- [ ] **T-029** — Marshaller/Hydrator `token_get_all` phpdoc fallback
+  for environments where opcache strips comments
+  (`opcache.save_comments=0`). Filed as the documented dirty-fix
+  follow-up from T-028.
+- [ ] **T-030** — Generator-time error for `oneOf` without
+  `discriminator` (per ADR-010), with a profile-level discriminator
+  override. Filed as the deferred ADR-010 enforcement from T-028;
+  removes `Hydrator::branchFromStructure()` and updates the
+  composition fixture.
 
 ## v0.1 exit criteria
 

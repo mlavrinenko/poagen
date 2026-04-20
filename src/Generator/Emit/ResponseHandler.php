@@ -58,7 +58,7 @@ final readonly class ResponseHandler
             $model = (string) $return->model;
             $method->addBody('\assert(\is_array($data));');
             $method->addBody('return \array_values(\array_map(');
-            $method->addBody('    static fn(mixed $item): ' . $model . ' => self::hydrate(' . $model . '::class, $item),');
+            $method->addBody('    fn(mixed $item): ' . $model . ' => $this->hydrator->hydrate(' . $model . '::class, (array) $item),');
             $method->addBody('    $data,');
             $method->addBody('));');
 
@@ -66,6 +66,7 @@ final readonly class ResponseHandler
         }
 
         $model = (string) $return->model;
-        $method->addBody('return self::hydrate(' . $model . '::class, $data);');
+        $method->addBody('\assert(\is_array($data));');
+        $method->addBody('return $this->hydrator->hydrate(' . $model . '::class, $data);');
     }
 }

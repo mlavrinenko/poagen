@@ -4,30 +4,11 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class CodeScanningAutofixCommitsResponse implements JsonSerializable
+final readonly class CodeScanningAutofixCommitsResponse
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['sha' => ['sha', null], 'target_ref' => ['target_ref', null]];
-
     public function __construct(
         public ?string $sha = null,
         public ?string $target_ref = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'sha' => $this->sha,
-            'target_ref' => $this->target_ref,
-        ];
     }
 }

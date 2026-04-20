@@ -4,30 +4,11 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class CheckImmutableReleases implements JsonSerializable
+final readonly class CheckImmutableReleases
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['enabled' => ['enabled', null], 'enforced_by_owner' => ['enforced_by_owner', null]];
-
     public function __construct(
         public bool $enabled,
         public bool $enforced_by_owner,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'enabled' => $this->enabled,
-            'enforced_by_owner' => $this->enforced_by_owner,
-        ];
     }
 }

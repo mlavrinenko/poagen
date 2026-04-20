@@ -6,25 +6,9 @@ namespace Acme\GitHub\Generated\Model;
 
 use Acme\GitHub\Generated\Enum\AuthorAssociation;
 use DateTimeImmutable;
-use JsonSerializable;
 
-final readonly class GistComment implements JsonSerializable
+final readonly class GistComment
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'author_association' => ['author_association', ['enum', \Acme\GitHub\Generated\Enum\AuthorAssociation::class]],
-        'body' => ['body', null],
-        'created_at' => ['created_at', ['datetime', null]],
-        'id' => ['id', null],
-        'node_id' => ['node_id', null],
-        'updated_at' => ['updated_at', ['datetime', null]],
-        'url' => ['url', null],
-        'user' => ['user', \Acme\GitHub\Generated\Model\NullableSimpleUser::class],
-    ];
-
     public function __construct(
         public AuthorAssociation $author_association,
         public string $body,
@@ -35,22 +19,5 @@ final readonly class GistComment implements JsonSerializable
         public string $url,
         public NullableSimpleUser $user,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'author_association' => $this->author_association,
-            'body' => $this->body,
-            'created_at' => $this->created_at->format(\DateTimeInterface::RFC3339),
-            'id' => $this->id,
-            'node_id' => $this->node_id,
-            'updated_at' => $this->updated_at->format(\DateTimeInterface::RFC3339),
-            'url' => $this->url,
-            'user' => $this->user,
-        ];
     }
 }

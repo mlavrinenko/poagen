@@ -4,31 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class ApiEvaluationTestCaseMetricList implements JsonSerializable
+final readonly class ApiEvaluationTestCaseMetricList
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = ['metric_uuids' => ['metric_uuids', ['list', null]]];
-
     /**
      * @param ?list<string> $metric_uuids
      */
     public function __construct(
         public ?array $metric_uuids = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'metric_uuids' => $this->metric_uuids,
-        ];
     }
 }

@@ -4,71 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-use JsonSerializable;
-
-final readonly class AppPermissions implements JsonSerializable
+final readonly class AppPermissions
 {
-    /**
-     * Paogen marshal/unmarshal contract — phpName => [wireKey, shape]. See ADR-007.
-     * @var array<string, array{0: string, 1: null|class-string|array{0: string, 1: null|class-string}|array{0: string, 1: list<class-string>, 2: ?string}}>
-     */
-    public const array PROPERTY_MAP = [
-        'actions' => ['actions', null],
-        'administration' => ['administration', null],
-        'artifact_metadata' => ['artifact_metadata', null],
-        'attestations' => ['attestations', null],
-        'checks' => ['checks', null],
-        'codespaces' => ['codespaces', null],
-        'contents' => ['contents', null],
-        'custom_properties_for_organizations' => ['custom_properties_for_organizations', null],
-        'dependabot_secrets' => ['dependabot_secrets', null],
-        'deployments' => ['deployments', null],
-        'discussions' => ['discussions', null],
-        'email_addresses' => ['email_addresses', null],
-        'enterprise_custom_properties_for_organizations' => ['enterprise_custom_properties_for_organizations', null],
-        'environments' => ['environments', null],
-        'followers' => ['followers', null],
-        'git_ssh_keys' => ['git_ssh_keys', null],
-        'gpg_keys' => ['gpg_keys', null],
-        'interaction_limits' => ['interaction_limits', null],
-        'issues' => ['issues', null],
-        'members' => ['members', null],
-        'merge_queues' => ['merge_queues', null],
-        'metadata' => ['metadata', null],
-        'organization_administration' => ['organization_administration', null],
-        'organization_announcement_banners' => ['organization_announcement_banners', null],
-        'organization_copilot_agent_settings' => ['organization_copilot_agent_settings', null],
-        'organization_copilot_seat_management' => ['organization_copilot_seat_management', null],
-        'organization_custom_org_roles' => ['organization_custom_org_roles', null],
-        'organization_custom_properties' => ['organization_custom_properties', null],
-        'organization_custom_roles' => ['organization_custom_roles', null],
-        'organization_events' => ['organization_events', null],
-        'organization_hooks' => ['organization_hooks', null],
-        'organization_packages' => ['organization_packages', null],
-        'organization_personal_access_token_requests' => ['organization_personal_access_token_requests', null],
-        'organization_personal_access_tokens' => ['organization_personal_access_tokens', null],
-        'organization_plan' => ['organization_plan', null],
-        'organization_projects' => ['organization_projects', null],
-        'organization_secrets' => ['organization_secrets', null],
-        'organization_self_hosted_runners' => ['organization_self_hosted_runners', null],
-        'organization_user_blocking' => ['organization_user_blocking', null],
-        'packages' => ['packages', null],
-        'pages' => ['pages', null],
-        'profile' => ['profile', null],
-        'pull_requests' => ['pull_requests', null],
-        'repository_custom_properties' => ['repository_custom_properties', null],
-        'repository_hooks' => ['repository_hooks', null],
-        'repository_projects' => ['repository_projects', null],
-        'secret_scanning_alerts' => ['secret_scanning_alerts', null],
-        'secrets' => ['secrets', null],
-        'security_events' => ['security_events', null],
-        'single_file' => ['single_file', null],
-        'starring' => ['starring', null],
-        'statuses' => ['statuses', null],
-        'vulnerability_alerts' => ['vulnerability_alerts', null],
-        'workflows' => ['workflows', null],
-    ];
-
     public function __construct(
         public ?string $actions = null,
         public ?string $administration = null,
@@ -125,68 +62,5 @@ final readonly class AppPermissions implements JsonSerializable
         public ?string $vulnerability_alerts = null,
         public ?string $workflows = null,
     ) {
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'actions' => $this->actions,
-            'administration' => $this->administration,
-            'artifact_metadata' => $this->artifact_metadata,
-            'attestations' => $this->attestations,
-            'checks' => $this->checks,
-            'codespaces' => $this->codespaces,
-            'contents' => $this->contents,
-            'custom_properties_for_organizations' => $this->custom_properties_for_organizations,
-            'dependabot_secrets' => $this->dependabot_secrets,
-            'deployments' => $this->deployments,
-            'discussions' => $this->discussions,
-            'email_addresses' => $this->email_addresses,
-            'enterprise_custom_properties_for_organizations' => $this->enterprise_custom_properties_for_organizations,
-            'environments' => $this->environments,
-            'followers' => $this->followers,
-            'git_ssh_keys' => $this->git_ssh_keys,
-            'gpg_keys' => $this->gpg_keys,
-            'interaction_limits' => $this->interaction_limits,
-            'issues' => $this->issues,
-            'members' => $this->members,
-            'merge_queues' => $this->merge_queues,
-            'metadata' => $this->metadata,
-            'organization_administration' => $this->organization_administration,
-            'organization_announcement_banners' => $this->organization_announcement_banners,
-            'organization_copilot_agent_settings' => $this->organization_copilot_agent_settings,
-            'organization_copilot_seat_management' => $this->organization_copilot_seat_management,
-            'organization_custom_org_roles' => $this->organization_custom_org_roles,
-            'organization_custom_properties' => $this->organization_custom_properties,
-            'organization_custom_roles' => $this->organization_custom_roles,
-            'organization_events' => $this->organization_events,
-            'organization_hooks' => $this->organization_hooks,
-            'organization_packages' => $this->organization_packages,
-            'organization_personal_access_token_requests' => $this->organization_personal_access_token_requests,
-            'organization_personal_access_tokens' => $this->organization_personal_access_tokens,
-            'organization_plan' => $this->organization_plan,
-            'organization_projects' => $this->organization_projects,
-            'organization_secrets' => $this->organization_secrets,
-            'organization_self_hosted_runners' => $this->organization_self_hosted_runners,
-            'organization_user_blocking' => $this->organization_user_blocking,
-            'packages' => $this->packages,
-            'pages' => $this->pages,
-            'profile' => $this->profile,
-            'pull_requests' => $this->pull_requests,
-            'repository_custom_properties' => $this->repository_custom_properties,
-            'repository_hooks' => $this->repository_hooks,
-            'repository_projects' => $this->repository_projects,
-            'secret_scanning_alerts' => $this->secret_scanning_alerts,
-            'secrets' => $this->secrets,
-            'security_events' => $this->security_events,
-            'single_file' => $this->single_file,
-            'starring' => $this->starring,
-            'statuses' => $this->statuses,
-            'vulnerability_alerts' => $this->vulnerability_alerts,
-            'workflows' => $this->workflows,
-        ];
     }
 }
