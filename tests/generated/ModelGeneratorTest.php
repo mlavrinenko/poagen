@@ -265,10 +265,28 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: Hydration recovers phpdoc types when opcache strips comments (ADR-010)
+     * @source truth/specs/model-generator.typ:201
+     *
+     * Given Model Pet declares a property tags with phpdoc @param list<Tag>|null $tags
+     *   And PHP is running under opcache.save_comments=0, so ReflectionMethod::getDocComment() returns false
+     * When (new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]]) runs
+     * Then the runtime re-tokenises Pet.php via token_get_all, recovers the constructor's doc comment, and $pet->tags[0] is an instance of Tag — not a raw array
+     */
+    public function testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsADR010(): void
+    {
+        $this->steps->givenModelPetDeclaresAPropertyTagsWithPhpdocParamListTagNullTags();
+        $this->steps->givenPhpIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse();
+        $this->steps->whenNewHydratorHydratePetClassTagsId1NameARuns();
+        $this->steps->thenTheRuntimeReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray();
+    }
+
+
+    /**
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:203
+     * @source truth/specs/model-generator.typ:214
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -286,7 +304,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.typ:214
+     * @source truth/specs/model-generator.typ:225
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
@@ -306,7 +324,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.typ:229
+     * @source truth/specs/model-generator.typ:240
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user #[BindsFormat('date-time')] binding is registered
@@ -330,7 +348,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Component names are normalised through a configurable pipeline (ADR-003, T-023)
      *
      * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
-     * @source truth/specs/model-generator.typ:248
+     * @source truth/specs/model-generator.typ:259
      *
      * Given Schema declares a component named security-advisory-ecosystems
      *   And Profile does not override nameNormaliser
@@ -350,7 +368,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
-     * @source truth/specs/model-generator.typ:270
+     * @source truth/specs/model-generator.typ:281
      *
      * Given Schema declares a component named version-2
      *   And Profile sets 'version-2' => 'Legacy_V2'
@@ -372,7 +390,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
-     * @source truth/specs/model-generator.typ:287
+     * @source truth/specs/model-generator.typ:298
      *
      * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
      *   And Schema declares components legacy_thing and modern-thing
@@ -392,7 +410,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
-     * @source truth/specs/model-generator.typ:303
+     * @source truth/specs/model-generator.typ:314
      *
      * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
      *   And Schema declares any component, e.g. anything
@@ -412,7 +430,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two raw component names that normalise to the same PHP class abort the run
-     * @source truth/specs/model-generator.typ:319
+     * @source truth/specs/model-generator.typ:330
      *
      * Given Schema declares components named foo-bar and foo_bar
      *   And Profile does not override nameNormaliser
@@ -434,7 +452,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Top-level components beyond `type: object` (T-026)
      *
      * Scenario: A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar
-     * @source truth/specs/model-generator.typ:336
+     * @source truth/specs/model-generator.typ:347
      *
      * Given Schema declares a component urn with string (no enum, no properties)
      * When Generator runs against Profile
@@ -454,7 +472,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with inline object branches emits an interface and one Model per branch
-     * @source truth/specs/model-generator.typ:354
+     * @source truth/specs/model-generator.typ:365
      *
      * Given Schema declares a component floating_ip_create whose schema is oneOf: [<inline object A with title "Assign to Droplet">, <inline object B with title "Reserve to Region">]
      * When Generator runs against Profile
@@ -474,7 +492,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`
-     * @source truth/specs/model-generator.typ:370
+     * @source truth/specs/model-generator.typ:381
      *
      * Given Schema declares components LabeledIssueEvent and UnlabeledIssueEvent (both type: object) and a component issue_event_for_issue whose schema is anyOf: [$ref LabeledIssueEvent, $ref UnlabeledIssueEvent]
      * When Generator runs against Profile
@@ -492,7 +510,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `type: array` component emits a typed wrapper class
-     * @source truth/specs/model-generator.typ:384
+     * @source truth/specs/model-generator.typ:395
      *
      * Given Schema declares a component tags_array whose schema is type: array, items.type: string
      * When Generator runs against Profile
@@ -512,7 +530,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:401
+     * @source truth/specs/model-generator.typ:412
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -528,7 +546,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:415
+     * @source truth/specs/model-generator.typ:426
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

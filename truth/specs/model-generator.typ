@@ -197,6 +197,17 @@
       #then[the `kind` parameter carries `#[Discriminator(field: 'petType', map: ['Dog' => Dog::class, 'Cat' => Cat::class])]`]
       #and_[`$pet->kind` is an instance of `Cat`, independent of structural overlap with `Dog`]
     ]
+
+    #scenario(
+      "Hydration recovers phpdoc types when opcache strips comments (ADR-010)",
+      stage: unstable,
+      traces: ("src/Runtime/Marshal/MethodDocScanner.php",),
+    )[
+      #given[#a(Model) `Pet` declares a property `tags` with phpdoc `@param list<Tag>|null $tags`]
+      #and_[PHP is running under `opcache.save_comments=0`, so `ReflectionMethod::getDocComment()` returns `false`]
+      #when[`(new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]])` runs]
+      #then[the runtime re-tokenises `Pet.php` via `token_get_all`, recovers the constructor's doc comment, and `$pet->tags[0]` is an instance of `Tag` — not a raw array]
+    ]
   ]
 
   #rule("User bindings replace generated types")[

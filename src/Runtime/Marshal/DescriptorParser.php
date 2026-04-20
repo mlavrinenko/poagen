@@ -71,6 +71,10 @@ final class DescriptorParser
         $doc = $constructor->getDocComment();
 
         if ($doc === false) {
+            $doc = MethodDocScanner::docFor($constructor);
+        }
+
+        if ($doc === false) {
             return [];
         }
 

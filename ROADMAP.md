@@ -78,7 +78,7 @@ deprioritised — see ADR-010 "Scope + priority policy".
   ClientEmitter rewrite, `phpstan/phpdoc-parser` added to runtime
   composer require, golden trees regenerated, specs updated.
   Prereq: T-027.
-- [ ] **T-029** — Marshaller/Hydrator `token_get_all` phpdoc fallback
+- [x] **T-029** — Marshaller/Hydrator `token_get_all` phpdoc fallback
   for environments where opcache strips comments
   (`opcache.save_comments=0`). Filed as the documented dirty-fix
   follow-up from T-028.

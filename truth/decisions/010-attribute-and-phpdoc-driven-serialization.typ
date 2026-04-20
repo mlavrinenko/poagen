@@ -112,7 +112,9 @@ property they describe:*
   each obtain property metadata via `phpstan/phpdoc-parser` against
   `ReflectionProperty::getDocComment()`. When `getDocComment()`
   returns `false` because opcache stripped comments, the runtime
-  reads the class file from disk and re-tokenises. *There is no
+  reads the class file from disk and re-tokenises via
+  `token_get_all` (`MethodDocScanner::docFor()`; per-file cache so
+  each class pays at most one rescan per process). *There is no
   build-time precompilation step to avoid this cost.*
 
 == Scope + priority policy

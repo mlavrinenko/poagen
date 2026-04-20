@@ -1171,4 +1171,73 @@ final class ModelGeneratorSteps
         TestCase::assertStringContainsString('@param list<string> $items', $source);
     }
 
+
+    private string $opcacheSubprocessOutput = '';
+
+    public function givenModelPetDeclaresAPropertyTagsWithPhpdocParamListTagNullTags(): void
+    {
+        // Pet already has `@param list<Tag>|null $tags` in the petstore
+        // fixture; regenerate to make sure the file is on disk before the
+        // subprocess reads it.
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function givenPhpIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse(): void
+    {
+        if (!\extension_loaded('Zend OPcache')) {
+            TestCase::markTestSkipped('Zend OPcache not loaded in CLI.');
+        }
+    }
+
+
+    public function whenNewHydratorHydratePetClassTagsId1NameARuns(): void
+    {
+        $projectRoot = \dirname(__DIR__, 2);
+        $autoload = $projectRoot . '/vendor/autoload.php';
+        $petClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
+        $tagClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
+        // The scenario requires `getDocComment()` to actually return `false`
+        // under opcache. Since the petstore fixture is regenerated in the
+        // given-step, we pass `file_update_protection=0` — without it, opcache
+        // refuses to cache a file younger than 2 seconds (opcache default),
+        // the file is read from disk, and the fallback never fires.
+        $script = \sprintf(
+            '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Mlavrinenko\\Paogen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
+            var_export($autoload, true),
+            $petClass,
+            $petClass,
+            $tagClass,
+        );
+
+        $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
+
+        if (!is_dir(\dirname($scriptPath))) {
+            mkdir(\dirname($scriptPath), 0o755, true);
+        }
+        file_put_contents($scriptPath, $script);
+
+        try {
+            $cmd = \sprintf(
+                '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
+                escapeshellarg(\PHP_BINARY),
+                escapeshellarg($scriptPath),
+            );
+            $this->opcacheSubprocessOutput = trim((string) shell_exec($cmd));
+        } finally {
+            @unlink($scriptPath);
+        }
+    }
+
+
+    public function thenTheRuntimeReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray(
+    ): void {
+        TestCase::assertSame(
+            'stripped:tag',
+            $this->opcacheSubprocessOutput,
+            "Subprocess output: {$this->opcacheSubprocessOutput}",
+        );
+    }
+
 }
