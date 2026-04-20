@@ -10123,7 +10123,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -10144,7 +10144,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -10165,7 +10165,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -10187,7 +10187,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix/commits';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -11299,7 +11299,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/dependabot/alerts/{alert_number}';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -15110,7 +15110,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $query = [];
         if ($hide_secret !== null) {
             $query[] = 'hide_secret=' . \urlencode((string) $hide_secret);
@@ -15141,7 +15141,7 @@ final readonly class ApiClient
         $path = '/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations';
         $path = \str_replace('{owner}', $owner, $path);
         $path = \str_replace('{repo}', $repo, $path);
-        $path = \str_replace('{alert_number}', (string) $alert_number, $path);
+        $path = \str_replace('{alert_number}', (string) $alert_number->toScalar(), $path);
         $query = [];
         if ($page !== null) {
             $query[] = 'page=' . \urlencode((string) $page);

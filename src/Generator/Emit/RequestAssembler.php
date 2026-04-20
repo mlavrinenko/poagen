@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 
@@ -27,6 +27,14 @@ use Nette\PhpGenerator\Method;
  */
 final readonly class RequestAssembler
 {
+    private ParameterStringExpr $stringExprBuilder;
+
+    public function __construct(
+        ?ComponentCatalog $components = null,
+    ) {
+        $this->stringExprBuilder = new ParameterStringExpr($components);
+    }
+
     /**
      * @param list<ResolvedParameter> $pathParams
      * @param list<ResolvedParameter> $queryParams
@@ -59,9 +67,9 @@ final readonly class RequestAssembler
         }
 
         foreach ($headerParams as $resolved) {
-            $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
+            $schemaNode = $resolved->param->schema;
             $check = new Literal('$' . $resolved->phpName);
-            $value = $this->stringExpr($resolved->phpName, $schema, $bindings);
+            $value = $this->stringExpr($resolved->phpName, $schemaNode, $bindings);
             $method->addBody(
                 'if (? !== null) { $request = $request->withHeader(?, ?); }',
                 [$check, $resolved->rawName(), $value],
@@ -149,8 +157,7 @@ final readonly class RequestAssembler
     private function emitPathInterpolation(Method $method, array $pathParams, Bindings $bindings): void
     {
         foreach ($pathParams as $resolved) {
-            $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
-            $valueExpr = $this->stringExpr($resolved->phpName, $schema, $bindings);
+            $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings);
             $method->addBody(
                 '$path = \str_replace(?, ?, $path);',
                 ['{' . $resolved->rawName() . '}', $valueExpr],
@@ -205,8 +212,7 @@ final readonly class RequestAssembler
 
     private function emitScalarQueryPush(Method $method, ResolvedParameter $resolved, string $indent, Bindings $bindings): void
     {
-        $schema = $resolved->param->schema instanceof Schema ? $resolved->param->schema : null;
-        $valueExpr = $this->stringExpr($resolved->phpName, $schema, $bindings);
+        $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings);
         $method->addBody(
             $indent . '$query[] = ? . \urlencode(?);',
             [$resolved->rawName() . '=', $valueExpr],
@@ -216,7 +222,7 @@ final readonly class RequestAssembler
     private function emitArrayQueryPush(Method $method, ResolvedParameter $resolved, Bindings $bindings): void
     {
         $itemSchema = $resolved->param->schema instanceof Schema ? $resolved->param->schema->items : null;
-        $itemExpr = $this->stringExpr('__v', $itemSchema instanceof Schema ? $itemSchema : null, $bindings);
+        $itemExpr = $this->stringExpr('__v', $itemSchema, $bindings);
 
         $loop = 'foreach ($' . $resolved->phpName . ' as $__v) { $query[] = ? . \urlencode(?); }';
 
@@ -232,48 +238,8 @@ final readonly class RequestAssembler
         );
     }
 
-    /**
-     * Build the smallest expression that produces a `string` for use in the
-     * URL: avoid the `(string)` cast when the parameter is already typed as
-     * `string`; route through `format()` for built-in datetime scalar
-     * formats; unwrap backed enums via `->value`.
-     */
-    private function stringExpr(string $varName, ?Schema $schema, Bindings $bindings): Literal
+    private function stringExpr(string $varName, Schema|Reference|null $node, Bindings $bindings): Literal
     {
-        if ($schema instanceof Schema && $this->isEnumSchema($schema)) {
-            return new Literal('$' . $varName . '->value');
-        }
-
-        if ($schema instanceof Schema && \is_string($schema->format)) {
-            $scalarFormat = $bindings->scalarFormat($schema->format);
-
-            if ($scalarFormat instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
-                $expr = match ($scalarFormat->kind) {
-                    ScalarFormat::KIND_DATETIME => '$' . $varName . '->format(\DateTimeInterface::RFC3339)',
-                    ScalarFormat::KIND_DATE => '$' . $varName . '->format(\'Y-m-d\')',
-                    ScalarFormat::KIND_SCALAR => '$' . $varName . '->toScalar()',
-                    default => null,
-                };
-
-                if ($expr !== null) {
-                    return new Literal($expr);
-                }
-            }
-        }
-
-        $alreadyString = $schema instanceof Schema && $schema->type === 'string';
-
-        return $alreadyString
-            ? new Literal('$' . $varName)
-            : new Literal('(string) $' . $varName);
-    }
-
-    private function isEnumSchema(Schema $schema): bool
-    {
-        if (\is_array($schema->enum) && $schema->enum !== []) {
-            return \in_array($schema->type, ['string', 'integer'], true);
-        }
-
-        return false;
+        return $this->stringExprBuilder->build($varName, $node, $bindings);
     }
 }

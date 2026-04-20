@@ -40,13 +40,16 @@ final readonly class OperationEmitter
     private RequestBodyParameterEmitter $bodyParamEmitter;
     private ParameterAdder $paramAdder;
 
+    private RequestAssembler $requestAssembler;
+
     public function __construct(
         private string $modelNamespace,
         ?EnumCatalog $enums = null,
         private ?NameRegistry $registry = null,
         private ?NameRegistry $operationIdRegistry = null,
         private ?NameNormaliser $paramNormaliser = null,
-        private RequestAssembler $requestAssembler = new RequestAssembler(),
+        ?ComponentCatalog $components = null,
+        ?RequestAssembler $requestAssembler = null,
         private ResponseHandler $responseHandler = new ResponseHandler(),
     ) {
         \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
@@ -54,6 +57,7 @@ final readonly class OperationEmitter
         \assert($paramNormaliser instanceof NameNormaliser, 'paramNormaliser is required (T-025).');
         $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums, $registry);
         $this->paramAdder = new ParameterAdder($modelNamespace, $enums, $registry);
+        $this->requestAssembler = $requestAssembler ?? new RequestAssembler($components);
     }
 
     public function emit(

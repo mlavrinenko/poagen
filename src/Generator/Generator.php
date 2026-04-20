@@ -85,7 +85,7 @@ final readonly class Generator
 
         $components = ComponentCatalog::build($openApi, $registry, $enums);
         $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $components);
-        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $writes);
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
@@ -157,6 +157,7 @@ final readonly class Generator
         \Mlavrinenko\Paogen\Generator\Naming\NameNormaliser $normaliser,
         Bindings $bindings,
         EnumCatalog $enums,
+        ComponentCatalog $components,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
@@ -169,6 +170,7 @@ final readonly class Generator
             $registry,
             $operationIdRegistry,
             $normaliser,
+            components: $components,
         ));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 

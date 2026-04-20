@@ -101,11 +101,14 @@ All of the above checked, plus:
 
 ## Phase 7 — T-026 downstream residual (emerged 2026-04-20)
 
-- [ ] **T-031** — ClientEmitter must route scalar-VO / ScalarBinding
-  path parameters through `toScalar()` instead of `(string) $var`.
-  Surfaced by T-026 now emitting real classes for DO / GitHub
-  top-level scalars. Closes the remaining `cast.string`
-  `identifier=cast.string]` errors under `phpstan-generated.neon`.
+- [x] **T-031** — ClientEmitter routes scalar-VO / ScalarBinding path
+  (and matching `oneOf`/`anyOf`) parameters through `toScalar()`.
+  `RequestAssembler` consults the `ComponentCatalog` via the new
+  `ParameterStringExpr` helper. The DigitalOcean and GitHub example
+  trees no longer emit `cast.string` errors against `Model\*`
+  classes; the residual `cast.string` wave is `mixed → string` from
+  parameters whose schema resolved to `mixed` and belongs to a
+  separate follow-up.
 
 ## Post-v0.1 follow-ups (not release-gating)
 

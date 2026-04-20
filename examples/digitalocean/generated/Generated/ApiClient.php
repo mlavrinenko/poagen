@@ -453,7 +453,7 @@ final readonly class ApiClient
     public function sshKeys_get(SshKeyId|SshKeyFingerprint $ssh_key_identifier): void
     {
         $path = '/v2/account/keys/{ssh_key_identifier}';
-        $path = \str_replace('{ssh_key_identifier}', (string) $ssh_key_identifier, $path);
+        $path = \str_replace('{ssh_key_identifier}', (string) $ssh_key_identifier->toScalar(), $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);
@@ -466,7 +466,7 @@ final readonly class ApiClient
     public function sshKeys_delete(SshKeyId|SshKeyFingerprint $ssh_key_identifier): void
     {
         $path = '/v2/account/keys/{ssh_key_identifier}';
-        $path = \str_replace('{ssh_key_identifier}', (string) $ssh_key_identifier, $path);
+        $path = \str_replace('{ssh_key_identifier}', (string) $ssh_key_identifier->toScalar(), $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
         $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
         $response = $this->httpClient->sendRequest($request);

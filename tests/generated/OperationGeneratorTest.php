@@ -26,7 +26,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Emitting operations as client methods
      *
      * Scenario: A GET operation with a path parameter becomes a typed client method
-     * @source truth/specs/operation-generator.typ:37
+     * @source truth/specs/operation-generator.typ:38
      *
      * Given Schema declares Operation GET /store/order/{orderId} with operationId: getOrderById and path parameter orderId: integer
      * When Generator runs against Profile
@@ -46,7 +46,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A POST operation with a JSON body takes a typed Model parameter
-     * @source truth/specs/operation-generator.typ:48
+     * @source truth/specs/operation-generator.typ:49
      *
      * Given Schema declares Operation POST /pet with operationId: addPet
      *   And the request body is application/json with schema #/components/schemas/Pet
@@ -66,7 +66,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A JSON body whose schema is a list of $ref becomes a typed list parameter
-     * @source truth/specs/operation-generator.typ:60
+     * @source truth/specs/operation-generator.typ:61
      *
      * Given Schema declares Operation POST /user/createWithList with operationId: createUsersWithListInput
      *   And the request body is application/json with schema type: array and items #/components/schemas/User
@@ -88,7 +88,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Response deserialization
      *
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
-     * @source truth/specs/operation-generator.typ:74
+     * @source truth/specs/operation-generator.typ:75
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
@@ -104,7 +104,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A scalar 2xx JSON response is returned as the scalar PHP type without hydration
-     * @source truth/specs/operation-generator.typ:83
+     * @source truth/specs/operation-generator.typ:84
      *
      * Given Schema declares Operation GET /user/login with operationId: loginUser whose 200 response schema is type: string
      * When Generator runs against Profile
@@ -122,7 +122,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A 2xx JSON response with `additionalProperties` is returned as a typed associative array
-     * @source truth/specs/operation-generator.typ:93
+     * @source truth/specs/operation-generator.typ:94
      *
      * Given Schema declares Operation GET /store/inventory with operationId: getInventory whose 200 response schema is type: object with additionalProperties: integer
      * When Generator runs against Profile
@@ -142,7 +142,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Query parameters
      *
      * Scenario: An inline enum query parameter becomes a synthesised backed enum method argument
-     * @source truth/specs/operation-generator.typ:105
+     * @source truth/specs/operation-generator.typ:106
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status whose schema is type: string with [available, pending, sold]
      * When Generator runs against Profile
@@ -160,7 +160,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
-     * @source truth/specs/operation-generator.typ:119
+     * @source truth/specs/operation-generator.typ:120
      *
      * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
      * When Generator runs against Profile
@@ -180,7 +180,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Header parameters
      *
      * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
-     * @source truth/specs/operation-generator.typ:131
+     * @source truth/specs/operation-generator.typ:132
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
@@ -200,7 +200,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Identifier normalisation
      *
      * Scenario: A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved
-     * @source truth/specs/operation-generator.typ:143
+     * @source truth/specs/operation-generator.typ:144
      *
      * Given Schema declares Operation POST /proxy with an optional header parameter named Content-Type
      * When Generator runs against Profile
@@ -218,7 +218,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operationId with non-identifier characters is camelCased into a PHP method name
-     * @source truth/specs/operation-generator.typ:158
+     * @source truth/specs/operation-generator.typ:159
      *
      * Given Schema declares Operation POST /proxy with operationId: monitoring_get_foo.yml
      * When Generator runs against Profile
@@ -236,7 +236,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: Profile.renames overrides an operationId verbatim
-     * @source truth/specs/operation-generator.typ:172
+     * @source truth/specs/operation-generator.typ:173
      *
      * Given a Profile whose renames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
      * When Generator runs against Profile
@@ -252,7 +252,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
-     * @source truth/specs/operation-generator.typ:185
+     * @source truth/specs/operation-generator.typ:186
      *
      * Given Schema declares Operation operationId: postInlineBody whose application/json request body is an inline type: object (not a $ref) — a shape paogen does not yet synthesise
      * When Generator runs against Profile
@@ -272,7 +272,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Reference resolution and path-level parameters
      *
      * Scenario: An operation-level `$ref` to a component parameter is resolved to a typed method argument
-     * @source truth/specs/operation-generator.typ:202
+     * @source truth/specs/operation-generator.typ:203
      *
      * Given Schema declares #/components/parameters/Limit limit: integer, in: query, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/Limit
@@ -292,7 +292,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation-level `$ref` to a header component parameter becomes an optional typed header argument
-     * @source truth/specs/operation-generator.typ:213
+     * @source truth/specs/operation-generator.typ:214
      *
      * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
@@ -312,7 +312,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A `$ref` to a component requestBody is resolved to the expected Model body parameter
-     * @source truth/specs/operation-generator.typ:224
+     * @source truth/specs/operation-generator.typ:225
      *
      * Given Schema declares #/components/requestBodies/CreateOrder with application/json schema #/components/schemas/Order
      *   And Operation POST /order with operationId: placeOrder whose requestBody is a #/components/requestBodies/CreateOrder
@@ -332,7 +332,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A PathItem-level inline parameter is inherited by every operation under that path
-     * @source truth/specs/operation-generator.typ:236
+     * @source truth/specs/operation-generator.typ:237
      *
      * Given Schema declares a PathItem /store/{storeId}/items with a single PathItem-level parameter storeId: integer, in: path, required: true
      *   And two operations under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
@@ -352,7 +352,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
-     * @source truth/specs/operation-generator.typ:247
+     * @source truth/specs/operation-generator.typ:248
      *
      * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
      *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
@@ -371,10 +371,30 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
+     * Scenario: A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()
+     * @source truth/specs/operation-generator.typ:259
+     *
+     * Given Schema declares #/components/schemas/SshKeyId as type: integer
+     *   And Operation GET /keys/{ssh_key_id} with operationId: getSshKeyById and a path parameter ssh_key_id whose schema is #/components/schemas/SshKeyId
+     * When Generator runs against Profile
+     * Then the emitted method body interpolates the path token via (string) $ssh_key_id->toScalar(), not (string) $ssh_key_id
+     *   And the operation is not silently skipped even though the path parameter resolves to a ScalarBinding-implementing class
+     */
+    public function testAPathParameterWhoseSchemaRefsAScalarVOComponentIsInterpolatedThroughToScalar(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema('type: integer');
+        $this->steps->givenOperationOpWithIdAndAPathParameterSshKeyIdWhoseSchemaIsRef('GET /keys/{ssh_key_id}', 'operationId: getSshKeyById', '#/components/schemas/SshKeyId');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenTheEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId();
+        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass();
+    }
+
+
+    /**
      * Rule: Non-JSON request bodies
      *
      * Scenario: A form-urlencoded body becomes typed params serialised with http_build_query
-     * @source truth/specs/operation-generator.typ:260
+     * @source truth/specs/operation-generator.typ:277
      *
      * Given Schema declares Operation POST /token with operationId: issueToken whose sole request-body content type is application/x-www-form-urlencoded and whose schema is type: object with grantType: string, clientId: string, scope: string and [grantType, clientId]
      * When Generator runs against Profile
@@ -394,7 +414,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An unsupported multipart or octet-stream body produces a throwing stub
-     * @source truth/specs/operation-generator.typ:278
+     * @source truth/specs/operation-generator.typ:295
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
      * When Generator runs against Profile
@@ -414,7 +434,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.typ:295
+     * @source truth/specs/operation-generator.typ:312
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client
@@ -436,7 +456,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Security schemes
      *
      * Scenario: An apiKey header scheme becomes a constructor arg attached as a header on secured ops
-     * @source truth/specs/operation-generator.typ:311
+     * @source truth/specs/operation-generator.typ:328
      *
      * Given Schema declares #/components/securitySchemes/apiKey with type: apiKey, in: header, name: X-API-Key
      *   And a top-level security: [{ apiKey: [] }] makes every operation secured by default
@@ -456,7 +476,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization
-     * @source truth/specs/operation-generator.typ:326
+     * @source truth/specs/operation-generator.typ:343
      *
      * Given Schema declares #/components/securitySchemes/bearerAuth with type: http, scheme: bearer
      *   And an operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
@@ -476,7 +496,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:341
+     * @source truth/specs/operation-generator.typ:358
      *
      * Given Schema declares a scheme with type: http, scheme: basic
      * When Generator runs against Profile
@@ -491,7 +511,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:350
+     * @source truth/specs/operation-generator.typ:367
      *
      * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
      * When Generator runs against Profile

@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": *
 
 #show: task.with(
   title: "ClientEmitter renders scalar-VO / ScalarBinding path params via toScalar()",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 20),
   priority: "medium",
   spec: "truth/specs/operation-generator.typ",

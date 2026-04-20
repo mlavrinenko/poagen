@@ -73,6 +73,12 @@ hand-editing.
 - speconaut binary expected on `$PATH`. If your install rebuilds on every
   invocation, point at a prebuilt binary directly — see the project
   Justfile for how the recipes invoke it.
+- *Always invoke speconaut through `devbox run -- speconaut …`* (or via
+  `just …` recipes that already do so). The in-tree
+  `~/projects/home/speconaut/target/{debug,release}/speconaut` binary
+  is frequently older than the system install and will reject
+  currently-valid specs with confusing `unknown variable:` errors —
+  do not reach for it as a fallback.
 
 ## When a dependency is broken, fix the dependency first
 

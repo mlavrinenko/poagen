@@ -8,6 +8,7 @@ use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -24,6 +25,18 @@ final readonly class ApiClient
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
+    }
+
+    public function getSshKeyById(SshKeyId $ssh_key_id): void
+    {
+        $path = '/keys/{ssh_key_id}';
+        $path = \str_replace('{ssh_key_id}', (string) $ssh_key_id->toScalar(), $path);
+        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     /**

@@ -1035,4 +1035,43 @@ final class OperationGeneratorSteps
         TestCase::assertStringContainsString('skipped', $stderrContents);
     }
 
+
+    public function givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema(string $schema): void
+    {
+        TestCase::assertSame('type: integer', $schema);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenOperationOpWithIdAndAPathParameterSshKeyIdWhoseSchemaIsRef(
+        string $op,
+        string $id,
+        string $ref,
+    ): void {
+        TestCase::assertSame('GET /keys/{ssh_key_id}', $op);
+        TestCase::assertSame('operationId: getSshKeyById', $id);
+        TestCase::assertSame('#/components/schemas/SshKeyId', $ref);
+    }
+
+
+    public function thenTheEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId(): void
+    {
+        $body = $this->methodSlice('getSshKeyById');
+        TestCase::assertStringContainsString(
+            "\\str_replace('{ssh_key_id}', (string) \$ssh_key_id->toScalar(), \$path)",
+            $body,
+        );
+        TestCase::assertStringNotContainsString(
+            "\\str_replace('{ssh_key_id}', (string) \$ssh_key_id, \$path)",
+            $body,
+        );
+    }
+
+
+    public function thenTheOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass(): void
+    {
+        TestCase::assertStringContainsString('public function getSshKeyById(', $this->source);
+    }
+
+
 }

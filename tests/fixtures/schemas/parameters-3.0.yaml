@@ -125,6 +125,23 @@ paths:
         '204':
           description: ok
 
+  /keys/{ssh_key_id}:
+    # T-031 — path parameter whose schema $refs a top-level scalar
+    # component. The emitted method body must route the variable through
+    # `->toScalar()` rather than emitting a `(string)` cast on the VO.
+    get:
+      operationId: getSshKeyById
+      security: []
+      parameters:
+        - name: ssh_key_id
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/SshKeyId'
+      responses:
+        '204':
+          description: ok
+
   /store/{storeId}/items:
     parameters:
       - name: storeId
@@ -211,3 +228,9 @@ components:
         - placed
         - approved
         - delivered
+    # T-031 — top-level scalar component referenced by the
+    # `/keys/{ssh_key_id}` path parameter. Mirrors DigitalOcean's
+    # `ssh_key_id` shape.
+    SshKeyId:
+      type: integer
+      minimum: 1

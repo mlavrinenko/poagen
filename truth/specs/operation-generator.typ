@@ -16,6 +16,7 @@
     "src/Generator/Emit/OperationEmitter.php",
     "src/Generator/Emit/ParameterAdder.php",
     "src/Generator/Emit/ParameterCollector.php",
+    "src/Generator/Emit/ParameterStringExpr.php",
     "src/Generator/Emit/RequestAssembler.php",
     "src/Generator/Emit/ResponseHandler.php",
     "src/Generator/Emit/ReturnSpec.php",
@@ -253,6 +254,22 @@
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `getPetById(int $petId): Pet`]
       #and_[the operation is *not* silently skipped even though the parameter is declared at the PathItem level via `$ref`]
+    ]
+
+    #scenario(
+      "A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ComponentCatalog.php",
+        "src/Generator/Emit/ComponentShape.php",
+        "tests/fixtures/schemas/parameters-3.0.yaml",
+      ),
+    )[
+      #given[#the(Schema) declares `#/components/schemas/SshKeyId` as #p((schema: "type: integer"))]
+      #and_[#a(Operation) #p((op: "GET /keys/{ssh_key_id}")) with #p((id: "operationId: getSshKeyById")) and a path parameter `ssh_key_id` whose schema is #p((ref: "#/components/schemas/SshKeyId"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted method body interpolates the path token via `(string) $ssh_key_id->toScalar()`, not `(string) $ssh_key_id`]
+      #and_[the operation is *not* silently skipped even though the path parameter resolves to a `ScalarBinding`-implementing class]
     ]
   ]
 
