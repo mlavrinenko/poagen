@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-final readonly class TimelineCommittedEvent
+final readonly class TimelineCommittedEvent implements TimelineIssueEvents
 {
     /**
      * @param list<array<string, mixed>> $parents

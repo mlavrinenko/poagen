@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-final readonly class StateChangeIssueEvent
+final readonly class StateChangeIssueEvent implements TimelineIssueEvents
 {
     public function __construct(
         public SimpleUser $actor,

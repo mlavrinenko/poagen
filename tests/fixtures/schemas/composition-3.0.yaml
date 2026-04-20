@@ -62,3 +62,57 @@ components:
       allOf:
         - $ref: '#/components/schemas/BaseThing'
         - $ref: '#/components/schemas/ExtraThing'
+    # T-026 — top-level scalar component (not an enum)
+    Urn:
+      type: string
+      description: DigitalOcean-style urn; referenced as if it were a class.
+    # T-026 — top-level type: array component
+    TagsArray:
+      type: array
+      items:
+        type: string
+    # T-026 — top-level oneOf with inline object branches (titles drive the branch class names)
+    FloatingIpCreate:
+      oneOf:
+        - title: Assign to Droplet
+          type: object
+          required:
+            - droplet_id
+          properties:
+            droplet_id:
+              type: integer
+        - title: Reserve to Region
+          type: object
+          required:
+            - region
+          properties:
+            region:
+              type: string
+    # T-026 — top-level anyOf with $ref branches (both ref targets implement the interface)
+    LabeledIssueEvent:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+    UnlabeledIssueEvent:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+    IssueEventForIssue:
+      anyOf:
+        - $ref: '#/components/schemas/LabeledIssueEvent'
+        - $ref: '#/components/schemas/UnlabeledIssueEvent'
+    # A sibling Model that references the scalar component to exercise
+    # the round-trip expectation in the T-026 scenarios.
+    Resource:
+      type: object
+      required:
+        - urn
+      properties:
+        urn:
+          $ref: '#/components/schemas/Urn'

@@ -56,7 +56,7 @@ both filed as follow-up tasks the release cut must now sequence.
 - [x] **T-024** — `examples/` folder with petstore, digitalocean, github, and the `just check-examples` recipe.
 - [x] **T-023** — Pluggable OpenAPI → PHP name-normalisation strategies. Default pipeline (`RenamesNormaliser` → `PascalCaseSanitiser`) handles every DO and GitHub component; users compose their own strategies for anything exotic. All three examples pass `just check-examples`.
 - [x] **T-025** — Parameter-name and operationId normalisation. `OperationId` and `ParameterName` join the `SymbolKind` registry (camelCased via the new `CamelCaseSanitiser`), `ResolvedParameter` keeps the raw wire key alongside the sanitised PHP identifier, the T-023 early-skip guards are gone, and `GenerationPlan::$skippedOperations` surfaces the residual skips on stderr. GitHub now generates 827 ops (was 0); DigitalOcean 525 (was 522).
-- [ ] **T-026** — Named scalar + top-level composition components resolve to real PHP types. The `examples/digitalocean/generated` tree references classes like `\Model\Urn` that are never emitted because the component is `type: string`; downstream PHPStan flags the dangling refs. Same with `oneOf`-only top-level components (`floating_ip_create`). Needed for the examples to be PHPStan-clean under `phpstan-generated.neon`.
+- [x] **T-026** — Named scalar + top-level composition components resolve to real PHP types. `ComponentCatalog` classifies every `components.schemas` entry; scalars emit a `ScalarBinding` VO, `type: array` components emit a typed wrapper, top-level `oneOf`/`anyOf` emit a marker interface that inline-branch synths and `$ref`-branch Models `implements`. The DigitalOcean and GitHub golden trees now carry zero `class.notFound` errors under `phpstan-generated.neon`. Path-param `(string)` cast bugs against scalar-VO refs (surfaced by the new classes) filed separately as T-031.
 
 ## Phase 6 — Clean model output (emerged 2026-04-20)
 
@@ -98,6 +98,14 @@ All of the above checked, plus:
 - [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `truth/notes/openapi-3.1-gap.md` and ADR-008.
 - [ ] `CHANGELOG.md` gains a `0.1.0` section.
 - [ ] `composer.json` stability flipped to `stable`.
+
+## Phase 7 — T-026 downstream residual (emerged 2026-04-20)
+
+- [ ] **T-031** — ClientEmitter must route scalar-VO / ScalarBinding
+  path parameters through `toScalar()` instead of `(string) $var`.
+  Surfaced by T-026 now emitting real classes for DO / GitHub
+  top-level scalars. Closes the remaining `cast.string`
+  `identifier=cast.string]` errors under `phpstan-generated.neon`.
 
 ## Post-v0.1 follow-ups (not release-gating)
 

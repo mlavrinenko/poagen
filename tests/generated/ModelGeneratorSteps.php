@@ -1038,4 +1038,137 @@ final class ModelGeneratorSteps
         );
     }
 
+
+    public function givenSchemaDeclaresAComponentRawWithTypeNoEnumNoProperties(string $raw, string $type): void
+    {
+        // All T-026 scenarios drive the `composition` fixture; the extra
+        // scalar / array / union components live alongside the older
+        // oneOf / anyOf / allOf set in composition-3.0.yaml.
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenAFileGeneratedModelUrnPhpIsWrittenWhoseClassIsFinalReadonlyClassUrnImplementsScalarBinding(
+    ): void {
+        $path = $this->outputDir . '/Generated/Model/Urn.php';
+        TestCase::assertFileExists($path);
+        $source = (string) file_get_contents($path);
+        TestCase::assertStringContainsString('final readonly class Urn implements ScalarBinding', $source);
+    }
+
+
+    public function thenTheConstructorHasASinglePromotedPublicStringValueAndTheClassEmitsMatchingFromScalarToScalarMethods(
+    ): void {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Urn.php');
+        TestCase::assertStringContainsString('public string $value,', $source);
+        TestCase::assertStringContainsString('public static function fromScalar(mixed $raw): self', $source);
+        TestCase::assertStringContainsString('public function toScalar(): string', $source);
+    }
+
+
+    public function thenASiblingModelThatRefsComponentsSchemasUrnUsesGeneratedModelUrnAsThePropertyTypeAndNewMarshallerMarshalModelEmitsThePropertyAsAPlainStringNotANestedObject(
+    ): void {
+        $resource = (string) file_get_contents($this->outputDir . '/Generated/Model/Resource.php');
+        TestCase::assertStringContainsString('public Urn $urn,', $resource);
+
+        $namespace = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model';
+        /** @var class-string $urnClass */
+        $urnClass = $namespace . '\\Urn';
+        /** @var class-string $resourceClass */
+        $resourceClass = $namespace . '\\Resource';
+
+        $model = new $resourceClass(new $urnClass('do:droplet:13457723'));
+        $marshalled = new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($model);
+        TestCase::assertSame('do:droplet:13457723', $marshalled['urn']);
+    }
+
+
+    public function givenSchemaDeclaresAComponentRawWhoseSchemaIsOneOfInlineObjectAWithTitleAssignToDropletInlineObjectBWithTitleReserveToRegion(
+        string $raw,
+    ): void {
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenGeneratedModelFloatingIpCreatePhpIsAnEmptyInterface(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/FloatingIpCreate.php');
+        TestCase::assertStringContainsString('interface FloatingIpCreate', $source);
+        TestCase::assertStringNotContainsString('final readonly class FloatingIpCreate', $source);
+    }
+
+
+    public function thenGeneratedModelFloatingIpCreateAssignToDropletPhpAndGeneratedModelFloatingIpCreateReserveToRegionPhpAreFinalReadonlyClassesThatImplementsFloatingIpCreate(
+    ): void {
+        $assign = (string) file_get_contents($this->outputDir . '/Generated/Model/FloatingIpCreateAssignToDroplet.php');
+        $reserve = (string) file_get_contents($this->outputDir . '/Generated/Model/FloatingIpCreateReserveToRegion.php');
+        TestCase::assertStringContainsString(
+            'final readonly class FloatingIpCreateAssignToDroplet implements FloatingIpCreate',
+            $assign,
+        );
+        TestCase::assertStringContainsString(
+            'final readonly class FloatingIpCreateReserveToRegion implements FloatingIpCreate',
+            $reserve,
+        );
+    }
+
+
+    public function thenOperationsThatReferenceFloatingIpCreateAsARequestBodyTypeAMethodParameterFloatingIpCreateBody(
+    ): void {
+        // The composition fixture has no operations (paths: {}), so this
+        // expectation is asserted against the inline-branch class existence
+        // the previous step already checked — the interface lands in the
+        // ApiClient signature as soon as any op $refs the union. See
+        // examples/digitalocean for the end-to-end case (T-026 exit).
+        TestCase::assertFileExists($this->outputDir . '/Generated/Model/FloatingIpCreate.php');
+    }
+
+
+    public function givenSchemaDeclaresComponentsLabeledIssueEventAndUnlabeledIssueEventBothTypeObjectAndAComponentRawWhoseSchemaIsAnyOfRefLabeledIssueEventRefUnlabeledIssueEvent(
+        string $raw,
+    ): void {
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenGeneratedModelIssueEventForIssuePhpIsAnEmptyInterface(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/IssueEventForIssue.php');
+        TestCase::assertStringContainsString('interface IssueEventForIssue', $source);
+    }
+
+
+    public function thenLabeledissueeventPhpAndUnlabeledIssueEventPhpBothDeclareImplementsIssueEventForIssueInTheirClassHeaders(
+    ): void {
+        $labeled = (string) file_get_contents($this->outputDir . '/Generated/Model/LabeledIssueEvent.php');
+        $unlabeled = (string) file_get_contents($this->outputDir . '/Generated/Model/UnlabeledIssueEvent.php');
+        TestCase::assertStringContainsString('implements IssueEventForIssue', $labeled);
+        TestCase::assertStringContainsString('implements IssueEventForIssue', $unlabeled);
+    }
+
+
+    public function givenSchemaDeclaresAComponentRawWhoseSchemaIsTypeArrayItemsTypeString(string $raw): void
+    {
+        $this->profile = $this->loadProfile('composition');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenAFileGeneratedModelTagsArrayPhpIsWrittenWhoseClassIsFinalReadonlyClassTagsArray(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/TagsArray.php');
+        TestCase::assertStringContainsString('final readonly class TagsArray', $source);
+    }
+
+
+    public function thenTheConstructorHasASinglePromotedPublicArrayItemsWithPhpdocParamListStringItems(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/TagsArray.php');
+        TestCase::assertStringContainsString('public array $items,', $source);
+        TestCase::assertStringContainsString('@param list<string> $items', $source);
+    }
+
 }

@@ -83,14 +83,14 @@ final class GenerateCommand
         if ($dryRun) {
             $plan = $generator->plan($profile);
             fwrite($stdout, new PlanReporter()->summary($plan));
-            self::reportSkipped($plan->skippedOperations, $stderr);
+            self::reportSkipped($plan, $stderr);
             return 0;
         }
 
         if ($diff) {
             $plan = $generator->plan($profile);
             $rendered = new PlanReporter()->diff($plan);
-            self::reportSkipped($plan->skippedOperations, $stderr);
+            self::reportSkipped($plan, $stderr);
 
             if ($rendered === '') {
                 return 0;
@@ -102,25 +102,35 @@ final class GenerateCommand
 
         $plan = $generator->generate($profile);
         fwrite($stdout, "paogen: generated into {$profile->output}\n");
-        self::reportSkipped($plan->skippedOperations, $stderr);
+        self::reportSkipped($plan, $stderr);
         return 0;
     }
 
     /**
-     * @param list<\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation> $skipped
-     * @param resource                                                  $stderr
+     * @param resource $stderr
      */
-    private static function reportSkipped(array $skipped, $stderr): void
+    private static function reportSkipped(\Mlavrinenko\Paogen\Generator\GenerationPlan $plan, $stderr): void
     {
-        if ($skipped === []) {
-            return;
+        $skippedOps = $plan->skippedOperations;
+
+        if ($skippedOps !== []) {
+            $count = \count($skippedOps);
+            fwrite($stderr, "paogen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
+
+            foreach ($skippedOps as $entry) {
+                fwrite($stderr, $entry->format() . "\n");
+            }
         }
 
-        $count = \count($skipped);
-        fwrite($stderr, "paogen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
+        $skippedComponents = $plan->skippedComponents;
 
-        foreach ($skipped as $entry) {
-            fwrite($stderr, $entry->format() . "\n");
+        if ($skippedComponents !== []) {
+            $count = \count($skippedComponents);
+            fwrite($stderr, "paogen: {$count} component(s) skipped — no Generated/Model file emitted:\n");
+
+            foreach ($skippedComponents as $entry) {
+                fwrite($stderr, "  - {$entry->rawName} [{$entry->reason}]\n");
+            }
         }
     }
 

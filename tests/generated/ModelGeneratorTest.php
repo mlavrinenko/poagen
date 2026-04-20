@@ -228,7 +228,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable
-     * @source truth/specs/model-generator.typ:170
+     * @source truth/specs/model-generator.typ:173
      *
      * Given Model Order is emitted by Generator under ADR-010
      * When Generated/Model/Order.php is read
@@ -248,7 +248,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A discriminated `oneOf` hydrates to the branch named by the wire tag via #[Discriminator]
-     * @source truth/specs/model-generator.typ:187
+     * @source truth/specs/model-generator.typ:190
      *
      * Given Model Pet declares a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
      * When the generated Pet.php is read and the runtime Hydrator (ADR-010) runs against a payload whose kind.petType is 'Cat'
@@ -268,7 +268,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:200
+     * @source truth/specs/model-generator.typ:203
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -286,7 +286,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.typ:211
+     * @source truth/specs/model-generator.typ:214
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
@@ -306,7 +306,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.typ:226
+     * @source truth/specs/model-generator.typ:229
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user #[BindsFormat('date-time')] binding is registered
@@ -330,7 +330,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Component names are normalised through a configurable pipeline (ADR-003, T-023)
      *
      * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
-     * @source truth/specs/model-generator.typ:245
+     * @source truth/specs/model-generator.typ:248
      *
      * Given Schema declares a component named security-advisory-ecosystems
      *   And Profile does not override nameNormaliser
@@ -350,7 +350,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
-     * @source truth/specs/model-generator.typ:267
+     * @source truth/specs/model-generator.typ:270
      *
      * Given Schema declares a component named version-2
      *   And Profile sets 'version-2' => 'Legacy_V2'
@@ -372,7 +372,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
-     * @source truth/specs/model-generator.typ:284
+     * @source truth/specs/model-generator.typ:287
      *
      * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
      *   And Schema declares components legacy_thing and modern-thing
@@ -392,7 +392,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
-     * @source truth/specs/model-generator.typ:300
+     * @source truth/specs/model-generator.typ:303
      *
      * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
      *   And Schema declares any component, e.g. anything
@@ -412,7 +412,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two raw component names that normalise to the same PHP class abort the run
-     * @source truth/specs/model-generator.typ:316
+     * @source truth/specs/model-generator.typ:319
      *
      * Given Schema declares components named foo-bar and foo_bar
      *   And Profile does not override nameNormaliser
@@ -431,10 +431,88 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
+     * Rule: Top-level components beyond `type: object` (T-026)
+     *
+     * Scenario: A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar
+     * @source truth/specs/model-generator.typ:336
+     *
+     * Given Schema declares a component urn with string (no enum, no properties)
+     * When Generator runs against Profile
+     * Then a file Generated/Model/Urn.php is written whose class is final readonly class Urn implements ScalarBinding
+     *   And the constructor has a single promoted public string $value and the class emits matching fromScalar() / toScalar() methods
+     *   And a sibling Model that $refs #/components/schemas/urn uses \Generated\Model\Urn as the property type and (new Marshaller())->marshal($model) emits the property as a plain string, not a nested object
+     */
+    public function testAScalarComponentEmitsAScalarBindingVOThatRoundTripsTheRawScalar(): void
+    {
+        $this->steps->givenSchemaDeclaresAComponentRawWithTypeNoEnumNoProperties('urn', 'string');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenAFileGeneratedModelUrnPhpIsWrittenWhoseClassIsFinalReadonlyClassUrnImplementsScalarBinding();
+        $this->steps->thenTheConstructorHasASinglePromotedPublicStringValueAndTheClassEmitsMatchingFromScalarToScalarMethods();
+        $this->steps->thenASiblingModelThatRefsComponentsSchemasUrnUsesGeneratedModelUrnAsThePropertyTypeAndNewMarshallerMarshalModelEmitsThePropertyAsAPlainStringNotANestedObject();
+    }
+
+
+    /**
+     * Scenario: A top-level `oneOf` with inline object branches emits an interface and one Model per branch
+     * @source truth/specs/model-generator.typ:354
+     *
+     * Given Schema declares a component floating_ip_create whose schema is oneOf: [<inline object A with title "Assign to Droplet">, <inline object B with title "Reserve to Region">]
+     * When Generator runs against Profile
+     * Then Generated/Model/FloatingIpCreate.php is an empty interface
+     *   And Generated/Model/FloatingIpCreateAssignToDroplet.php and Generated/Model/FloatingIpCreateReserveToRegion.php are final readonly classes that implements FloatingIpCreate
+     *   And operations that reference floating_ip_create as a request body type a method parameter FloatingIpCreate $body
+     */
+    public function testATopLevelOneOfWithInlineObjectBranchesEmitsAnInterfaceAndOneModelPerBranch(): void
+    {
+        $this->steps->givenSchemaDeclaresAComponentRawWhoseSchemaIsOneOfInlineObjectAWithTitleAssignToDropletInlineObjectBWithTitleReserveToRegion('floating_ip_create');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenGeneratedModelFloatingIpCreatePhpIsAnEmptyInterface();
+        $this->steps->thenGeneratedModelFloatingIpCreateAssignToDropletPhpAndGeneratedModelFloatingIpCreateReserveToRegionPhpAreFinalReadonlyClassesThatImplementsFloatingIpCreate();
+        $this->steps->thenOperationsThatReferenceFloatingIpCreateAsARequestBodyTypeAMethodParameterFloatingIpCreateBody();
+    }
+
+
+    /**
+     * Scenario: A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`
+     * @source truth/specs/model-generator.typ:370
+     *
+     * Given Schema declares components LabeledIssueEvent and UnlabeledIssueEvent (both type: object) and a component issue_event_for_issue whose schema is anyOf: [$ref LabeledIssueEvent, $ref UnlabeledIssueEvent]
+     * When Generator runs against Profile
+     * Then Generated/Model/IssueEventForIssue.php is an empty interface
+     *   And LabeledIssueEvent.php and UnlabeledIssueEvent.php both declare implements IssueEventForIssue in their class headers
+     */
+    public function testATopLevelOneOfWithRefBranchesMarksTheBranchModelsAsImplementsInterface(): void
+    {
+        $this->steps->givenSchemaDeclaresComponentsLabeledIssueEventAndUnlabeledIssueEventBothTypeObjectAndAComponentRawWhoseSchemaIsAnyOfRefLabeledIssueEventRefUnlabeledIssueEvent('issue_event_for_issue');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenGeneratedModelIssueEventForIssuePhpIsAnEmptyInterface();
+        $this->steps->thenLabeledissueeventPhpAndUnlabeledIssueEventPhpBothDeclareImplementsIssueEventForIssueInTheirClassHeaders();
+    }
+
+
+    /**
+     * Scenario: A top-level `type: array` component emits a typed wrapper class
+     * @source truth/specs/model-generator.typ:384
+     *
+     * Given Schema declares a component tags_array whose schema is type: array, items.type: string
+     * When Generator runs against Profile
+     * Then a file Generated/Model/TagsArray.php is written whose class is final readonly class TagsArray
+     *   And the constructor has a single promoted public array $items with phpdoc @param list<string> $items
+     */
+    public function testATopLevelTypeArrayComponentEmitsATypedWrapperClass(): void
+    {
+        $this->steps->givenSchemaDeclaresAComponentRawWhoseSchemaIsTypeArrayItemsTypeString('tags_array');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenAFileGeneratedModelTagsArrayPhpIsWrittenWhoseClassIsFinalReadonlyClassTagsArray();
+        $this->steps->thenTheConstructorHasASinglePromotedPublicArrayItemsWithPhpdocParamListStringItems();
+    }
+
+
+    /**
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:333
+     * @source truth/specs/model-generator.typ:401
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -450,7 +528,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:347
+     * @source truth/specs/model-generator.typ:415
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

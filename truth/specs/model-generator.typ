@@ -157,7 +157,10 @@
     #scenario(
       "A property with a non-identifier schema key round-trips via #[WireName]",
       stage: unstable,
-      traces: ("src/Runtime/Attribute/WireName.php",),
+      traces: (
+        "src/Runtime/Attribute/WireName.php",
+        "src/Generator/Emit/ModelAttributeApplier.php",
+      ),
     )[
       #given[#a(Model) `Contact` declares a required property whose schema key is `display-name` (kebab-case)]
       #when[the generator emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (ADR-010) process a payload containing the wire key `display-name`]
@@ -326,6 +329,71 @@
       #when[#the(Generator) runs against #the(Profile)]
       #then[the run aborts with an error naming both raw keys and the shared PHP class `FooBar`]
       #and_[no files are written under #the(Profile)'s `output`]
+    ]
+  ]
+
+  #rule("Top-level components beyond `type: object` (T-026)")[
+    #scenario(
+      "A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ComponentCatalog.php",
+        "src/Generator/Emit/ComponentShape.php",
+        "src/Generator/Emit/ScalarVoEmitter.php",
+        "src/Generator/Emit/SkippedComponent.php",
+        "src/Generator/ModelPlanner.php",
+      ),
+    )[
+      #given[#the(Schema) declares a component #p((raw: "urn")) with #p((type: "string")) (no `enum`, no `properties`)]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/Urn.php` is written whose class is `final readonly class Urn implements ScalarBinding`]
+      #and_[the constructor has a single promoted `public string $value` and the class emits matching `fromScalar()` / `toScalar()` methods]
+      #and_[a sibling #a(Model) that `$ref`s `#/components/schemas/urn` uses `\Generated\Model\Urn` as the property type and `(new Marshaller())->marshal($model)` emits the property as a plain string, not a nested object]
+    ]
+
+    #scenario(
+      "A top-level `oneOf` with inline object branches emits an interface and one Model per branch",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ComponentCatalog.php",
+        "src/Generator/Emit/UnionInterfaceEmitter.php",
+        "src/Generator/ModelPlanner.php",
+      ),
+    )[
+      #given[#the(Schema) declares a component #p((raw: "floating_ip_create")) whose schema is `oneOf: [<inline object A with title "Assign to Droplet">, <inline object B with title "Reserve to Region">]`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[`Generated/Model/FloatingIpCreate.php` is an empty interface]
+      #and_[`Generated/Model/FloatingIpCreateAssignToDroplet.php` and `Generated/Model/FloatingIpCreateReserveToRegion.php` are `final readonly` classes that `implements FloatingIpCreate`]
+      #and_[operations that reference `floating_ip_create` as a request body type a method parameter `FloatingIpCreate $body`]
+    ]
+
+    #scenario(
+      "A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ComponentCatalog.php",
+        "src/Generator/Emit/UnionInterfaceEmitter.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `LabeledIssueEvent` and `UnlabeledIssueEvent` (both `type: object`) and a component #p((raw: "issue_event_for_issue")) whose schema is `anyOf: [$ref LabeledIssueEvent, $ref UnlabeledIssueEvent]`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[`Generated/Model/IssueEventForIssue.php` is an empty interface]
+      #and_[`LabeledIssueEvent.php` and `UnlabeledIssueEvent.php` both declare `implements IssueEventForIssue` in their class headers]
+    ]
+
+    #scenario(
+      "A top-level `type: array` component emits a typed wrapper class",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/ComponentCatalog.php",
+        "src/Generator/Emit/ArrayWrapperEmitter.php",
+        "src/Generator/ModelPlanner.php",
+      ),
+    )[
+      #given[#the(Schema) declares a component #p((raw: "tags_array")) whose schema is `type: array, items.type: string`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/TagsArray.php` is written whose class is `final readonly class TagsArray`]
+      #and_[the constructor has a single promoted `public array $items` with phpdoc `@param list<string> $items`]
     ]
   ]
 

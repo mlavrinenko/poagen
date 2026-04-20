@@ -7,7 +7,7 @@ namespace Acme\GitHub\Generated\Model;
 use Acme\GitHub\Generated\Enum\AuthorAssociation;
 use DateTimeImmutable;
 
-final readonly class TimelineReviewedEvent
+final readonly class TimelineReviewedEvent implements TimelineIssueEvents
 {
     public function __construct(
         public TimelineReviewedEvent_links $_links,

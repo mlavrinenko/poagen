@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 
 /**
@@ -21,10 +22,14 @@ final readonly class GenerationPlan
      * @param list<SkippedOperation> $skippedOperations   Operations the generator chose not to emit. T-025
      *                                                    surfaces them so the user knows what is missing
      *                                                    rather than silently losing endpoints.
+     * @param list<SkippedComponent> $skippedComponents   Components whose shape the generator could not
+     *                                                    materialise (T-026). Surfaces them for the same
+     *                                                    reason as skipped operations.
      */
     public function __construct(
         public array $writes,
         public array $prunes,
         public array $skippedOperations = [],
+        public array $skippedComponents = [],
     ) {}
 }

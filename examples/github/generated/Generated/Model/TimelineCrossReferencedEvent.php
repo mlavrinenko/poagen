@@ -6,7 +6,7 @@ namespace Acme\GitHub\Generated\Model;
 
 use DateTimeImmutable;
 
-final readonly class TimelineCrossReferencedEvent
+final readonly class TimelineCrossReferencedEvent implements TimelineIssueEvents
 {
     public function __construct(
         public DateTimeImmutable $created_at,

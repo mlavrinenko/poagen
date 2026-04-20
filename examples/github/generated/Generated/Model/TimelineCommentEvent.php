@@ -7,7 +7,7 @@ namespace Acme\GitHub\Generated\Model;
 use Acme\GitHub\Generated\Enum\AuthorAssociation;
 use DateTimeImmutable;
 
-final readonly class TimelineCommentEvent
+final readonly class TimelineCommentEvent implements TimelineIssueEvents
 {
     public function __construct(
         public SimpleUser $actor,

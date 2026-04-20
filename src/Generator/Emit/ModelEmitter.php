@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
-use Mlavrinenko\Paogen\Runtime\Attribute\Format;
-use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
-use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
@@ -35,11 +30,15 @@ final readonly class ModelEmitter
 {
     private PsrPrinter $printer;
 
-    public function __construct()
-    {
+    public function __construct(
+        private ModelAttributeApplier $attributes = new ModelAttributeApplier(),
+    ) {
         $this->printer = new PsrPrinter();
     }
 
+    /**
+     * @param list<string> $implements short PHP interface names, defined in $modelNamespace (T-026)
+     */
     public function emit(
         string $modelNamespace,
         string $className,
@@ -47,6 +46,7 @@ final readonly class ModelEmitter
         Bindings $bindings,
         ?EnumCatalog $enums = null,
         ?NameRegistry $registry = null,
+        array $implements = [],
     ): ModelEmission {
         \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         $modelNamespace = trim($modelNamespace, '\\');
@@ -54,6 +54,10 @@ final readonly class ModelEmitter
         $file->setStrictTypes();
         $namespace = $file->addNamespace($modelNamespace);
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
+
+        foreach ($implements as $iface) {
+            $class->addImplement($modelNamespace . '\\' . $iface);
+        }
 
         $constructor = $class->addMethod('__construct');
 
@@ -197,75 +201,7 @@ final readonly class ModelEmitter
             $namespace->addUse(ltrim($resolved->phpDocUse, '\\'));
         }
 
-        $this->applyRuntimeAttributes($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
-    }
-
-    /**
-     * Attach `#[WireName]` / `#[Format]` / `#[Discriminator]` to the promoted
-     * constructor parameter when the schema demands them. ADR-010 keeps the
-     * attribute set small: each attribute encodes one non-structural fact.
-     */
-    private function applyRuntimeAttributes(
-        PhpNamespace $namespace,
-        \Nette\PhpGenerator\PromotedParameter $param,
-        string $wireName,
-        string $phpName,
-        Schema|Reference $propSchema,
-        Bindings $bindings,
-        string $modelNamespace,
-        NameRegistry $registry,
-    ): void {
-        if ($wireName !== $phpName) {
-            $namespace->addUse(WireName::class);
-            $param->addAttribute(WireName::class, [$wireName]);
-        }
-
-        if ($propSchema instanceof Schema && \is_string($propSchema->format)) {
-            $scalarFormat = $bindings->scalarFormat($propSchema->format);
-
-            if ($scalarFormat instanceof ScalarFormat && $scalarFormat->kind === ScalarFormat::KIND_DATE) {
-                $namespace->addUse(Format::class);
-                $param->addAttribute(Format::class, [$propSchema->format]);
-            }
-        }
-
-        $this->applyDiscriminator($namespace, $param, $propSchema, $modelNamespace, $registry);
-    }
-
-    private function applyDiscriminator(
-        PhpNamespace $namespace,
-        \Nette\PhpGenerator\PromotedParameter $param,
-        Schema|Reference $propSchema,
-        string $modelNamespace,
-        NameRegistry $registry,
-    ): void {
-        if (!$propSchema instanceof Schema) {
-            return;
-        }
-        $discriminator = $propSchema->discriminator;
-        if (!$discriminator instanceof Discriminator) {
-            return;
-        }
-
-        $shape = CompositionResolver::shapeForUnion($propSchema, $modelNamespace, $registry);
-        if ($shape === null) {
-            return;
-        }
-
-        /** @var list<string> $branches */
-        $branches = $shape[1];
-        $map = [];
-
-        foreach ($branches as $fqcn) {
-            $short = substr((string) strrchr('\\' . $fqcn, '\\'), 1);
-            $map[$short] = new Literal('\\' . ltrim($fqcn, '\\') . '::class');
-        }
-
-        $namespace->addUse(\Mlavrinenko\Paogen\Runtime\Attribute\Discriminator::class);
-        $param->addAttribute(\Mlavrinenko\Paogen\Runtime\Attribute\Discriminator::class, [
-            'field' => $discriminator->propertyName,
-            'map' => $map,
-        ]);
+        $this->attributes->apply($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
     }
 
     private function phpName(string $openApiName): string

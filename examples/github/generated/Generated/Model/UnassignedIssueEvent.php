@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-final readonly class UnassignedIssueEvent
+final readonly class UnassignedIssueEvent implements IssueEventForIssue
 {
     public function __construct(
         public SimpleUser $actor,

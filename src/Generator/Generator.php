@@ -10,6 +10,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
@@ -82,14 +83,15 @@ final readonly class Generator
         /** @var array<string,string> $writes */
         $writes = [];
 
-        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes);
+        $components = ComponentCatalog::build($openApi, $registry, $enums);
+        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $components);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
 
-        return new GenerationPlan($writes, $prunes, $skipped);
+        return new GenerationPlan($writes, $prunes, $skipped, $components->skipped());
     }
 
     private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums, NameRegistry $enumRegistry): void

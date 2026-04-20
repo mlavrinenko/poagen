@@ -16,8 +16,15 @@ use cebe\openapi\spec\Schema;
  */
 final readonly class SynthesisedModel
 {
+    /**
+     * @param list<string> $implements short interface PHP names in the same
+     *                                 model namespace; T-026 synthesises
+     *                                 `oneOf`/`anyOf` branch classes that
+     *                                 must `implements <Union>`
+     */
     public function __construct(
         public string $name,
         public Schema $schema,
+        public array $implements = [],
     ) {}
 }

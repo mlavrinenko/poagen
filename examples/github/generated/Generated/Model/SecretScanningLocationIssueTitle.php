@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-final readonly class SecretScanningLocationIssueTitle
+final readonly class SecretScanningLocationIssueTitle implements NullableSecretScanningFirstDetectedLocation
 {
     public function __construct(
         public string $issue_title_url,

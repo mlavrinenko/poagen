@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated\Model;
 
-final readonly class ReviewDismissedIssueEvent
+final readonly class ReviewDismissedIssueEvent implements IssueEventForIssue, TimelineIssueEvents
 {
     public function __construct(
         public SimpleUser $actor,
