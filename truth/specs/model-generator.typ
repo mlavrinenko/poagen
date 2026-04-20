@@ -89,17 +89,47 @@
     ]
 
     #scenario(
-      "A `oneOf` of `$ref`-ed components becomes a PHP union type",
+      "A `oneOf` of `$ref`-ed components with a `discriminator` becomes a PHP union type",
       stage: unstable,
       traces: (
         "src/Generator/Emit/CompositionResolver.php",
         "src/Generator/Emit/ClientEmitter.php",
       ),
     )[
-      #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Animal` with a required property `creature` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
-      #when[the model is emitted and `ApiClient::hydrate(Animal::class, $data)` runs against a payload whose `creature` structurally matches the `Dog` branch]
+      #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Animal` with a required property `creature` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
+      #when[#the(Generator) runs against #the(Profile)]
       #then[`Animal` has a promoted constructor parameter typed `Dog|Cat`]
-      #and_[`$animal->creature` is an instance of `Dog`, not `Cat`]
+    ]
+
+    #scenario(
+      "An undiscriminated `oneOf` aborts the run with a pointed diagnostic",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/DiscriminatorEnforcer.php",
+        "src/Exception/UndiscriminatedUnionException.php",
+        "src/Generator/Generator.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `Dog` and `Cat` and a component `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
+      #and_[#the(Profile) has no `discriminators` override for #p((key: "Pet.kind"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the run aborts with #p((error: "UndiscriminatedUnionException")) whose message names `Pet.kind`]
+      #and_[no files are written under #the(Profile)'s `output`]
+    ]
+
+    #scenario(
+      "A profile-level `discriminators` override resolves an otherwise-undiscriminated `oneOf`",
+      stage: unstable,
+      traces: (
+        "src/Generator/Emit/DiscriminatorEnforcer.php",
+        "src/Generator/Profile.php",
+      ),
+    )[
+      #given[#the(Schema) declares components `Dog` and `Cat` and a component `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
+      #and_[#the(Profile) sets #p((discriminators: "'Pet.kind' => 'petType'"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[a file `Generated/Model/Pet.php` is written]
+      #and_[the `kind` constructor parameter carries `#[Discriminator(field: 'petType', ...)]`]
     ]
 
     #scenario(

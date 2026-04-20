@@ -1,8 +1,8 @@
-#import "@local/speconaut:0.1.0": task, proposed
+#import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
   title: "Generator-time error for `oneOf` without `discriminator` (per ADR-010)",
-  status: proposed,
+  status: done,
   date: datetime(year: 2026, month: 4, day: 20),
   priority: "medium",
   spec: "truth/specs/model-generator.typ",

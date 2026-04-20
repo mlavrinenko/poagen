@@ -1,0 +1,1 @@
+T-030: DigitalOcean's `database_config.config` (and others) is a ref-only `oneOf` with no `discriminator`. Requires a custom `Profile::$discriminators` override specifying the wire field that picks a branch for each flagged property. Tracked for follow-up post-v0.1.

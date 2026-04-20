@@ -50,6 +50,8 @@ final class ModelGeneratorSteps
     private array $resolved = [];
     private ?\Throwable $caught = null;
 
+    private bool $expectGeneratorAbort = false;
+
     public function __construct(TestCase $test)
     {
         $this->test = $test;
@@ -82,7 +84,21 @@ final class ModelGeneratorSteps
         }
 
         TestCase::assertNotNull($this->profile);
-        $this->runGenerator($this->profile);
+
+        try {
+            $this->runGenerator($this->profile);
+        } catch (\Throwable $error) {
+            // Some scenarios (T-030 abort) expect a thrown exception and
+            // assert against it in the `then` step via {@see self::$caught}.
+            // Others let the exception propagate.
+            if ($this->expectGeneratorAbort) {
+                $this->caught = $error;
+
+                return;
+            }
+
+            throw $error;
+        }
     }
 
     public function thenAFileGeneratedModelPetPhpIsWrittenUnderProfilesOutput(): void
@@ -618,8 +634,6 @@ final class ModelGeneratorSteps
 
 
     /** @var object|null */
-    private ?object $hydratedAnimal = null;
-    /** @var object|null */
     private ?object $hydratedCompositionPet = null;
 
     /**
@@ -641,46 +655,24 @@ final class ModelGeneratorSteps
         return new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate($target, $payload);
     }
 
-    public function givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator(
+    public function givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
     ): void {
         // The composition fixture declares Dog/Cat components and Animal
-        // with a required `creature` property that is a non-discriminated
-        // oneOf: [$ref Dog, $ref Cat].
+        // with a required `creature` oneOf: [$ref Dog, $ref Cat] and
+        // discriminator.propertyName: petType.
         $this->profile = $this->loadProfile('composition');
-    }
-
-
-    public function whenTheModelIsEmittedAndApiClientHydrateAnimalClassDataRunsAgainstAPayloadWhoseCreatureStructurallyMatchesTheDogBranch(
-    ): void {
-        $this->hydratedAnimal = $this->invokeCompositionHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Animal::class,
-            ['creature' => ['bark' => 'woof']],
-        );
     }
 
 
     public function thenAnimalHasAPromotedConstructorParameterTypedDogCat(): void
     {
         TestCase::assertNotNull($this->profile);
+        $this->runGenerator($this->profile);
         $source = (string) file_get_contents(
             \dirname(__DIR__, 2)
             . '/tests/fixtures/generated/composition/Generated/Model/Animal.php',
         );
         TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
-    }
-
-
-    public function thenAnimalCreatureIsAnInstanceOfDogNotCat(): void
-    {
-        \assert($this->hydratedAnimal instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Animal);
-        TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Dog::class,
-            $this->hydratedAnimal->creature,
-        );
-        TestCase::assertNotInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
-            $this->hydratedAnimal->creature,
-        );
     }
 
 
@@ -1238,6 +1230,60 @@ final class ModelGeneratorSteps
             $this->opcacheSubprocessOutput,
             "Subprocess output: {$this->opcacheSubprocessOutput}",
         );
+    }
+
+
+    public function givenSchemaDeclaresComponentsDogAndCatAndAComponentPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator(
+    ): void {
+        // Two sibling profiles point at the same undiscriminated-oneof
+        // fixture: the `no-override` one drives the abort scenario, the
+        // `-resolved` one drives the override scenario. Each subsequent
+        // given-step picks the right profile.
+    }
+
+
+    public function givenProfileHasNoDiscriminatorsOverrideForKey(string $key): void
+    {
+        $this->profile = $this->loadProfile('undiscriminated-oneof');
+        TestCase::assertArrayNotHasKey($key, $this->profile->discriminators);
+        $this->expectGeneratorAbort = true;
+    }
+
+
+    public function thenTheRunAbortsWithErrorWhoseMessageNamesPetKind(string $error): void
+    {
+        TestCase::assertInstanceOf(
+            \Mlavrinenko\Paogen\Exception\UndiscriminatedUnionException::class,
+            $this->caught,
+            "Expected {$error}, got " . get_debug_type($this->caught),
+        );
+        TestCase::assertStringContainsString('Pet', $this->caught->getMessage());
+        TestCase::assertStringContainsString('kind', $this->caught->getMessage());
+    }
+
+
+    public function givenProfileSetsDiscriminators(string $discriminators): void
+    {
+        $this->profile = $this->loadProfile('undiscriminated-oneof-resolved');
+        // Scenario parameter is "'Pet.kind' => 'petType'" — assert the
+        // profile carries exactly that override.
+        TestCase::assertSame('petType', $this->profile->discriminators['Pet.kind'] ?? null);
+        TestCase::assertStringContainsString("'Pet.kind'", $discriminators);
+        TestCase::assertStringContainsString("'petType'", $discriminators);
+    }
+
+
+    public function thenAFileGeneratedModelPetPhpIsWritten(): void
+    {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Model/Pet.php');
+    }
+
+
+    public function thenTheKindConstructorParameterCarriesDiscriminatorFieldPetType(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
+        TestCase::assertStringContainsString("field: 'petType'", $source);
+        TestCase::assertStringContainsString('#[Discriminator(', $source);
     }
 
 }

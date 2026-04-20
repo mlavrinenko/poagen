@@ -33,6 +33,8 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Dog'
             - $ref: '#/components/schemas/Cat'
+          discriminator:
+            propertyName: petType
     Pet:
       type: object
       required:

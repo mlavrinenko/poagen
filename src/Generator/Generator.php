@@ -11,6 +11,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
+use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
@@ -57,6 +58,10 @@ final readonly class Generator
         // Keep $ref nodes as Reference objects so the emitter can resolve them
         // to typed cross-class references.
         $openApi = Reader::readFromYamlFile($profile->schema, OpenApi::class, false);
+
+        // ADR-010 + T-030: fail fast on property-level `oneOf`/`anyOf` unions
+        // with no discriminator, after applying any profile-level override.
+        new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
 
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';

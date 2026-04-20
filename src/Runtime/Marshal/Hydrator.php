@@ -112,15 +112,16 @@ final class Hydrator
             return $value;
         }
 
-        if ($discriminator instanceof Discriminator) {
-            $branch = $this->branchFromDiscriminator($value, $discriminator);
+        // ADR-010 + T-030: every union descriptor is discriminated — the
+        // generator refuses undiscriminated ref unions, so this branch is
+        // always taken for valid inputs.
+        \assert($discriminator instanceof Discriminator, 'union descriptor missing #[Discriminator] (ADR-010)');
 
-            if ($branch !== null) {
-                return $this->hydrate($branch, $value);
-            }
+        $branch = $this->branchFromDiscriminator($value, $discriminator);
+
+        if ($branch === null) {
+            $branch = $type->branches[0] ?? throw new \LogicException('union descriptor has no branches');
         }
-
-        $branch = $this->branchFromStructure($value, $type->branches);
 
         return $this->hydrate($branch, $value);
     }
@@ -143,32 +144,6 @@ final class Hydrator
         }
 
         return $discriminator->map[$tag] ?? null;
-    }
-
-    /**
-     * @param array<mixed>       $value
-     * @param list<class-string> $branches
-     *
-     * @return class-string
-     */
-    private function branchFromStructure(array $value, array $branches): string
-    {
-        \assert($branches !== []);
-        $payloadKeys = array_map(strval(...), array_keys($value));
-
-        foreach ($branches as $branch) {
-            $wireKeys = [];
-
-            foreach (DescriptorParser::descriptorsFor($branch) as $descriptor) {
-                $wireKeys[] = $descriptor->wireName;
-            }
-
-            if (array_diff($payloadKeys, $wireKeys) === []) {
-                return $branch;
-            }
-        }
-
-        return $branches[0];
     }
 
     /**

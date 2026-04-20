@@ -82,11 +82,16 @@ deprioritised — see ADR-010 "Scope + priority policy".
   for environments where opcache strips comments
   (`opcache.save_comments=0`). Filed as the documented dirty-fix
   follow-up from T-028.
-- [ ] **T-030** — Generator-time error for `oneOf` without
+- [x] **T-030** — Generator-time error for `oneOf` without
   `discriminator` (per ADR-010), with a profile-level discriminator
-  override. Filed as the deferred ADR-010 enforcement from T-028;
-  removes `Hydrator::branchFromStructure()` and updates the
-  composition fixture.
+  override. `DiscriminatorEnforcer` fails the run for property-level
+  ref unions without a `discriminator` after applying
+  `Profile::$discriminators` overrides; `UndiscriminatedUnionException`
+  carries the pointed remediation message. `Hydrator::branchFromStructure()`
+  is gone — unions are discriminator-only. Composition fixture gains a
+  discriminator on `Animal.creature`; the DigitalOcean / GitHub example
+  trees are marked `.expected-failure` pending per-schema discriminator
+  overrides (post-v0.1 follow-up).
 
 ## v0.1 exit criteria
 

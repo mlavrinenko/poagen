@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Undiscriminated Union Fixture
+  version: "1.0.0"
+  description: >
+    T-030 fixture. `Pet.kind` is a `oneOf` of ref-ed components with no
+    `discriminator`. Used by two profiles: one without an override
+    (generator aborts) and one with a `Profile::$discriminators` entry
+    (generator resolves the override and emits the `#[Discriminator]`).
+paths: {}
+components:
+  schemas:
+    Dog:
+      type: object
+      required:
+        - bark
+      properties:
+        bark:
+          type: string
+    Cat:
+      type: object
+      required:
+        - meow
+      properties:
+        meow:
+          type: string
+    Pet:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Cat'

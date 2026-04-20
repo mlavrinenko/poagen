@@ -24,6 +24,10 @@ final readonly class Profile
      *                                              composes RenamesNormaliser($renames) + PascalCaseSanitiser.
      *                                              When set, paogen uses it verbatim — `$renames` is *not*
      *                                              merged in automatically. See ADR-003 (T-023).
+     * @param array<string,string>  $discriminators Override map for undiscriminated property-level
+     *                                              `oneOf`/`anyOf`. Keys are raw `'<ComponentName>.<propertyName>'`
+     *                                              (pre-normalisation); values are the wire field name that
+     *                                              selects the branch. ADR-010 + T-030.
      */
     public function __construct(
         public string $schema,
@@ -32,5 +36,6 @@ final readonly class Profile
         public array $discoverIn = [],
         public array $renames = [],
         public ?NameNormaliser $nameNormaliser = null,
+        public array $discriminators = [],
     ) {}
 }
