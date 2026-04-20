@@ -86,6 +86,7 @@ generate-tests:
         | speconaut-phpunit \
             --output tests/generated \
             --namespace 'Mlavrinenko\Paogen\Tests\Generated'
+    just format
 
 # Verify generated tests are up to date (CI-friendly drift check)
 check-generated-tests:
