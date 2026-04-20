@@ -69,7 +69,7 @@ new runtime `Marshaller`/`Hydrator` drives (de)serialisation via
 `phpstan/phpdoc-parser`. Runtime performance is explicitly
 deprioritised — see ADR-010 "Scope + priority policy".
 
-- [ ] **T-027** — Audit `truth/specs/**` and `truth/decisions/**` for
+- [x] **T-027** — Audit `truth/specs/**` and `truth/decisions/**` for
   performance-flavoured passages superseded by ADR-010; revise
   wording. Supersede-mark ADR-007's representation section. No code
   changes.

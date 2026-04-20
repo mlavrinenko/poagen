@@ -151,16 +151,15 @@
     ]
 
     #scenario(
-      "A property with a non-identifier schema key round-trips through PROPERTY_MAP",
-      stage: unstable,
-      traces: ("src/Generator/Emit/ClientEmitter.php",),
+      "A property with a non-identifier schema key round-trips via #[WireName]",
+      stage: draft,
     )[
       #given[#a(Model) `Contact` declares a required property whose schema key is `display-name` (kebab-case)]
-      #when[the generator emits `Contact.php` and `ApiClient::hydrate` runs against a payload containing the wire key `display-name`]
+      #when[the generator emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (ADR-010) process a payload containing the wire key `display-name`]
       #then[the constructor parameter is emitted as `$displayName` (camelCased PHP identifier)]
-      #and_[`Contact::PROPERTY_MAP` pairs `'displayName'` with wire key `'display-name'`]
-      #and_[hydration populates `$contact->displayName` from the `display-name` payload key]
-      #and_[`json_encode($contact)` emits the key as `display-name`, not `displayName`]
+      #and_[the property carries `#[WireName('display-name')]`, and the class has no `PROPERTY_MAP` constant]
+      #and_[`(new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada'])` populates `$contact->displayName === 'Ada'`]
+      #and_[`(new Marshaller())->marshal($contact)` emits the key as `display-name`, not `displayName`]
     ]
   ]
 

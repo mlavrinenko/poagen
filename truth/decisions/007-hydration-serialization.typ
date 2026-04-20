@@ -7,6 +7,8 @@
   date: datetime(year: 2026, month: 4, day: 18),
 )
 
+*Representation superseded by #link("010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010] (2026-04-20).* The marshal/unmarshal *contract* below — explicit per-property metadata (not reflect-and-guess); `ScalarBinding` VOs round-trip transparently; list and map shapes recurse — remains authoritative. The *representation* — per-Model `PROPERTY_MAP` constant plus `JsonSerializable` — is replaced by a small attribute vocabulary plus phpdoc read at runtime via `phpstan/phpdoc-parser`. See ADR-010 for the current shape and rationale, including why the pre-ADR-010 performance argument against parsing phpdoc at runtime no longer applies.
+
 == Context
 
 The pre-release review (2026-04-18) flagged three tightly-coupled
@@ -91,6 +93,12 @@ implementing task(s); this ADR only locks the *contract*.
 - *Parse `@param list<Foo>` phpdoc at runtime.* Works, but adds a phpdoc
   parser to the consumer's runtime and breaks if the user strips
   comments. Rejected.
+  #link("010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010]
+  reverses this rejection: one MIT-licensed parser
+  (`phpstan/phpdoc-parser`) is the right-sized cost, and a
+  `token_get_all` fallback against the class source handles comment-
+  stripped opcache environments. The 2026-04-20 review ruled that
+  clean output outweighs the added dependency.
 - *`#[\\SerializedName]`-style attribute on every property.* Viable;
   kept as a fallback implementation shape for the `PROPERTY_MAP` step.
   Not picked as the headline design because attributes scatter the map

@@ -158,17 +158,6 @@ stage = "unstable"
 "src/Generator/Emit/PropertyShape.php" = "sha256:6ccc272e8f0d2ed487d22d7ed56a00ebb6c89f78ead6655f837b4d998c20b115"
 "src/Generator/Emit/TypeResolver.php" = "sha256:6afbda34709f090344a38e085d22a851df35ca6da6070321ab50088107481ac2"
 
-[features."Model Generator".scenarios."A property with a non-identifier schema key round-trips through PROPERTY_MAP"]
-as-is-hash = "sha256:17a61a8885667a91b768d1ec7282b649edf3ab016336d3fc6cf571cd4ae40078"
-as-is = "KLUv/QBYdQsAxthFITBv0wZM9GoPiZh/tvebiESfMWs7PbFSOaoyMblKGspEqT4AOwA4AJzQl4NYM/wJ00CAeGhYKGAUFpg3EEi36fPCbUUlpPvoIrfnmsTfwwjsPIVKat7eNFY86r2lu974oriWlxgC2raXB/k1/bzG4U8Yx5aUhz0uEvB7LJXInMWoznisjbpFaOL2dr41J516J+tUx51TivA8CjT4k3Me1gH4vb7H1tZXO0HbnJoa/uQWKyCJidap6crUiWzd3pxoEDsntL+2VVGzLJ2HjgNX4yrtq1kD3PjcN/dYQmtewB5dhBkBpzTlQaSyRHSRRzfiBEongPO1OdDS9VRcLBbnRVtfFpWNP2GcOWCujs3h3GMpAeBsV9ccHwA1hN4lqQIKk/8VTZBURZ6NLUAJBndrOopIoE2U3MaCIsVlNfh5YHoNujuuEwYnW46BRoy53Wq0JoBwHIaJ0QeRCuNAsI00FwJeHATUgxOJwjBS"
-stage = "unstable"
-
-[features."Model Generator".scenarios."A property with a non-identifier schema key round-trips through PROPERTY_MAP".traces]
-"src/Generator/Emit/ClientEmitter.php" = "sha256:fe303ffaecfe7012921c19bb0e78949785a7fa6dedf85fe9987febce41aebe57"
-"src/Generator/Emit/ModelEmitter.php" = "sha256:a9076036e12e2a0bae03ff501178fee631750f7ea2e8e200a4933a0d6080e1fd"
-"src/Generator/Emit/PropertyShape.php" = "sha256:6ccc272e8f0d2ed487d22d7ed56a00ebb6c89f78ead6655f837b4d998c20b115"
-"src/Generator/Emit/TypeResolver.php" = "sha256:6afbda34709f090344a38e085d22a851df35ca6da6070321ab50088107481ac2"
-
 [features."Model Generator".scenarios."A schema with enum values becomes a PHP 8.1 backed enum"]
 as-is-hash = "sha256:2cc1fbe33b1b1746b4220ac5f3645ec6a0a360ec368fe0625d7fac66e8e1774f"
 as-is = "KLUv/QBYTQkAplQ6IVCJmwOArYm9TcL81Pa5hAuQxH/N/qhpIDAQrx7BTOywBjIAMAAyAEphI18NXE3HiDO4i42kKyBsOOAgYMVAMVrPGnrDemfhY+bk3ax6GNkbpE4Y0dTDPFoC+YUZ6e+PWk82pD/tOYc2pCNcbuGUaCbVWzXibmHVWdzFm8/mWENOZ5gPF3panH8CzTplwkbyu+o9rMqucYeEOVmQpH8ph9H5BkE52lO8mgoZtKbz/Nrie17hfJNgI4wB5gRMqrfqbWkDczKpsiaaAFiP8u+OPy826/XUDtK78xWR0xUJFiJFxc+myruK3Q8WAB4TEMdco71Tsnxld2B+towX2eR2MEaWsGrvRk0xrEZYjfHDZmcyg0Ml35m5Xh29UB3YhmiFKaBj1Coo"

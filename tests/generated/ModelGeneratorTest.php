@@ -205,24 +205,20 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: A property with a non-identifier schema key round-trips through PROPERTY_MAP
+     * Scenario: A property with a non-identifier schema key round-trips via #[WireName]
      * @source truth/specs/model-generator.typ:153
      *
      * Given Model Contact declares a required property whose schema key is display-name (kebab-case)
-     * When the generator emits Contact.php and ApiClient::hydrate runs against a payload containing the wire key display-name
+     * When the generator emits Contact.php and the runtime Marshaller / Hydrator (ADR-010) process a payload containing the wire key display-name
      * Then the constructor parameter is emitted as $displayName (camelCased PHP identifier)
-     *   And Contact::PROPERTY_MAP pairs 'displayName' with wire key 'display-name'
-     *   And hydration populates $contact->displayName from the display-name payload key
-     *   And json_encode($contact) emits the key as display-name, not displayName
+     *   And the property carries #[WireName('display-name')], and the class has no PROPERTY_MAP constant
+     *   And (new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada']) populates $contact->displayName === 'Ada'
+     *   And (new Marshaller())->marshal($contact) emits the key as display-name, not displayName
      */
-    public function testAPropertyWithANonIdentifierSchemaKeyRoundTripsThroughPROPERTYMAP(): void
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    public function testAPropertyWithANonIdentifierSchemaKeyRoundTripsViaWireName(): void
     {
-        $this->steps->givenModelContactDeclaresARequiredPropertyWhoseSchemaKeyIsDisplayNameKebabCase();
-        $this->steps->whenTheGeneratorEmitsContactPhpAndApiClientHydrateRunsAgainstAPayloadContainingTheWireKeyDisplayName();
-        $this->steps->thenTheConstructorParameterIsEmittedAsDisplayNameCamelCasedPHPIdentifier();
-        $this->steps->thenContactPROPERTYMAPPairsDisplayNameWithWireKeyDisplayName();
-        $this->steps->thenHydrationPopulatesContactDisplayNameFromTheDisplayNamePayloadKey();
-        $this->steps->thenJsonEncodeContactEmitsTheKeyAsDisplayNameNotDisplayName();
+        $this->markTestIncomplete('Scenario is draft');
     }
 
 
@@ -230,7 +226,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.typ:168
+     * @source truth/specs/model-generator.typ:167
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -248,7 +244,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.typ:179
+     * @source truth/specs/model-generator.typ:178
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
@@ -268,7 +264,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.typ:194
+     * @source truth/specs/model-generator.typ:193
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user #[BindsFormat('date-time')] binding is registered
@@ -292,7 +288,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Component names are normalised through a configurable pipeline (ADR-003, T-023)
      *
      * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
-     * @source truth/specs/model-generator.typ:213
+     * @source truth/specs/model-generator.typ:212
      *
      * Given Schema declares a component named security-advisory-ecosystems
      *   And Profile does not override nameNormaliser
@@ -312,7 +308,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
-     * @source truth/specs/model-generator.typ:235
+     * @source truth/specs/model-generator.typ:234
      *
      * Given Schema declares a component named version-2
      *   And Profile sets 'version-2' => 'Legacy_V2'
@@ -334,7 +330,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
-     * @source truth/specs/model-generator.typ:252
+     * @source truth/specs/model-generator.typ:251
      *
      * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
      *   And Schema declares components legacy_thing and modern-thing
@@ -354,7 +350,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
-     * @source truth/specs/model-generator.typ:268
+     * @source truth/specs/model-generator.typ:267
      *
      * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
      *   And Schema declares any component, e.g. anything
@@ -374,7 +370,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two raw component names that normalise to the same PHP class abort the run
-     * @source truth/specs/model-generator.typ:284
+     * @source truth/specs/model-generator.typ:283
      *
      * Given Schema declares components named foo-bar and foo_bar
      *   And Profile does not override nameNormaliser
@@ -396,7 +392,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.typ:301
+     * @source truth/specs/model-generator.typ:300
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -412,7 +408,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.typ:315
+     * @source truth/specs/model-generator.typ:314
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed

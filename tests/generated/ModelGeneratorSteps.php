@@ -306,7 +306,6 @@ final class ModelGeneratorSteps
     private ?object $hydratedPet = null;
     /** @var object|null */
     private ?object $hydratedContact = null;
-    private string $contactSource = '';
 
     /**
      * Invoke the petstore ApiClient's private static `hydrate` against the
@@ -405,63 +404,6 @@ final class ModelGeneratorSteps
     {
         \assert($this->hydratedPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet);
         TestCase::assertSame(['https://example/a.jpg', 'https://example/b.jpg'], $this->hydratedPet->photoUrls);
-    }
-
-
-    public function givenModelContactDeclaresARequiredPropertyWhoseSchemaKeyIsDisplayNameKebabCase(): void
-    {
-        $this->profile = $this->loadProfile('contact');
-        $this->runGenerator($this->profile);
-        $this->contactSource = (string) file_get_contents($this->outputDir . '/Generated/Model/Contact.php');
-    }
-
-
-    public function whenTheGeneratorEmitsContactPhpAndApiClientHydrateRunsAgainstAPayloadContainingTheWireKeyDisplayName(
-    ): void {
-        // Hydration uses the (class-agnostic) hydrator in petstore's ApiClient.
-        // The hydrator reads Contact::PROPERTY_MAP and instantiates Contact;
-        // Email is a ScalarBinding VO (ADR-007) so the wire value is a bare
-        // string — the hydrator wraps it via `Email::fromScalar()`.
-        $this->hydratedContact = $this->invokeHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
-            [
-                'email' => 'team@example',
-                'display-name' => 'Team',
-                'nickname' => 'teamy',
-                'org_id' => 42,
-            ],
-        );
-    }
-
-
-    public function thenTheConstructorParameterIsEmittedAsDisplayNameCamelCasedPHPIdentifier(): void
-    {
-        TestCase::assertStringContainsString('public string $displayName', $this->contactSource);
-        TestCase::assertStringNotContainsString('public string $display-name', $this->contactSource);
-    }
-
-
-    public function thenContactPROPERTYMAPPairsDisplayNameWithWireKeyDisplayName(): void
-    {
-        $map = \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::PROPERTY_MAP;
-        TestCase::assertArrayHasKey('displayName', $map);
-        TestCase::assertSame(['display-name', null], $map['displayName']);
-    }
-
-
-    public function thenHydrationPopulatesContactDisplayNameFromTheDisplayNamePayloadKey(): void
-    {
-        \assert($this->hydratedContact instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact);
-        TestCase::assertSame('Team', $this->hydratedContact->displayName);
-    }
-
-
-    public function thenJsonEncodeContactEmitsTheKeyAsDisplayNameNotDisplayName(): void
-    {
-        \assert($this->hydratedContact instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact);
-        $encoded = (string) json_encode($this->hydratedContact);
-        TestCase::assertStringContainsString('"display-name":"Team"', $encoded);
-        TestCase::assertStringNotContainsString('"displayName"', $encoded);
     }
 
 
