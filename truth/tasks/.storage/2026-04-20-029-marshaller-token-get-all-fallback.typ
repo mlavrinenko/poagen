@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "49c02657-8834-4baf-8b0b-30191e964244",
   title: "Marshaller/Hydrator: token_get_all phpdoc fallback for opcache-stripped comments",
   status: done,
   date: datetime(year: 2026, month: 4, day: 20),
@@ -48,7 +49,7 @@ var_dump($pet->tags[0] instanceof Tag); // expected: true
   comments (write a minimal eval-with-stripped-doc helper or use
   `php_strip_whitespace()` to simulate).
 + Document the fallback in
-  #link("../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010].
+  #link("../../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010].
 
 == Out of scope
 

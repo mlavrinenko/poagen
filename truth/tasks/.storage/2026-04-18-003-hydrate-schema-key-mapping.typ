@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "26d4ef4c-a872-4fab-845f-150305144180",
   title: "Hydrate Models by original schema key, not camelCased PHP name",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

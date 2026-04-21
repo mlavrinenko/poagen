@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "6135ea03-5ea3-4939-a6d7-022bbb148116",
   title: "Hydrate list-typed Model properties by recursing into the declared item type",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

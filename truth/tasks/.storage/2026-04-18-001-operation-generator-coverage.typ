@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "9c005aea-6599-4dd6-bb6b-98552b198fcf",
   title: "Extend ApiClient emitter to cover headers, scalar responses and list bodies",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),
@@ -25,7 +26,7 @@ the generated client and is a small, self-contained spec-first slice.
 == In scope
 
 Each bullet gets its own scenario under
-#link("../specs/operation-generator.typ"):
+#link("../../specs/operation-generator.typ"):
 
 + *Header parameters.* Emit typed method parameters; attach via
   `withHeader` only when non-null. Cover `deletePet`'s optional

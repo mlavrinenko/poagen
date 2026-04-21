@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "49f804d7-dc60-4168-907f-1758513c0495",
   title: "Assert byte-stability as an integration test, not just a scenario",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

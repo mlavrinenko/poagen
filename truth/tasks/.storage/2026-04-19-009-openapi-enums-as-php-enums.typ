@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "9f800feb-9617-48c3-b072-e759aca328ab",
   title: "Emit OpenAPI enums as PHP 8.1 backed enums",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),
@@ -81,5 +82,5 @@ high-value.
   is `['enum', Status::class]`. `ApiClient::hydrate` gains a branch
   that calls `Status::from($value)`.
 - Non-ScalarBinding user `#[BindsFormat]` VOs still beat the
-  built-in enum resolution when the component $ref is present —
+  built-in enum resolution when the component `$ref` is present —
   consistency with ADR-003's user-wins lookup order.

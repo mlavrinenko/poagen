@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "0a8fa9a0-381f-42be-b9b3-ef1519564927",
   title: "Prune stale files from Generated/ so byte-stability holds on rename",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

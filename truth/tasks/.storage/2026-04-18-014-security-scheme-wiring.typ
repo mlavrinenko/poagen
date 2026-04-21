@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "c8d76e3b-328b-4dac-aa18-d08a760be2a1",
   title: "Surface OpenAPI securitySchemes as method/constructor arguments",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

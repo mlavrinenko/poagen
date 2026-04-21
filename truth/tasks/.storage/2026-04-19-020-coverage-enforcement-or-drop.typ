@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "309d901e-6990-4653-aef5-71522b0a3726",
   title: "Enforce a coverage threshold in CI or drop the codecov pretence",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

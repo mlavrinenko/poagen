@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "7451ef72-26ac-4c69-a3c5-671ac80d49d2",
   title: "Audit truth/ for performance-flavoured constraints superseded by ADR-010",
   status: done,
   date: datetime(year: 2026, month: 4, day: 20),
@@ -85,7 +86,7 @@ records of completed work and were left as-is.
 + *ADR-007 top-of-document — supersede banner added.* One paragraph
   placed between `#show: adr.with(...)` and `== Context`, stating that
   the *representation* is superseded by
-  #link("../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010]
+  #link("../../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010]
   while the *contract* remains authoritative.
 
 + *ADR-007 "Alternatives rejected" / "Parse `@param list<Foo>`
@@ -114,7 +115,7 @@ records of completed work and were left as-is.
   driven".* Left unchanged. Covered by the top-of-document supersede
   banner and useful as a record of ADR-007's original framing.
 
-+ *Spec #link("../specs/model-generator.typ")[Model Generator] —
++ *Spec #link("../../specs/model-generator.typ")[Model Generator] —
   scenario "A property with a non-identifier schema key round-trips
   through PROPERTY_MAP".* Rewritten to describe the ADR-010 world:
   `#[WireName('display-name')]` on the property, runtime
@@ -148,7 +149,7 @@ Non-hits verified:
   parser. Out of scope.
 - ADR-010 itself re-uses the trigger phrases ("runtime cost",
   "performance") but in the current-policy voice; unchanged.
-- #link("../specs/operation-generator.typ")[Operation Generator]:
+- #link("../../specs/operation-generator.typ")[Operation Generator]:
   no performance-flavoured passages.
 - `truth/notes/runtime-type-reflection.md`: aligned with ADR-010
   (same-day note). Out of scope per the task.

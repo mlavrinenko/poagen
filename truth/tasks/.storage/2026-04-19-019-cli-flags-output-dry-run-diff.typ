@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "348f2008-3e62-4708-a988-356b50a2352a",
   title: "Add --output, --dry-run, and --diff flags to paogen generate",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),
@@ -25,7 +26,7 @@ new design territory — `getopt()` already supports long options.
 == In scope
 
 + Promote the draft `--output` scenario under
-  #link("../specs/cli.typ") to `stage: unstable` on implementation.
+  #link("../../specs/cli.typ") to `stage: unstable` on implementation.
 + Add scenarios for:
   - `--output=<dir>`: writes the generated tree under `<dir>`
     instead of the profile's `output`. The profile's `output` is

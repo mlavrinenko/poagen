@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "869202f7-f97b-408e-9fff-47032ae3431a",
   title: "Built-in DateTimeImmutable mapping for format: date-time (and date)",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),
@@ -59,8 +60,8 @@ Pre-release review P1 #9 — coverage gap. Listed in the review's
 
 == Implementation notes
 
-- Hydration uses `new \\DateTimeImmutable($raw)` — permissive ISO-8601
-  / RFC-3339 parsing, no explicit format pinning. `createFromFormat`
+- Hydration uses `new \\DateTimeImmutable($raw)` — permissive ISO-8601 /
+  RFC-3339 parsing, no explicit format pinning. `createFromFormat`
   was rejected because OpenAPI `format: date-time` vendors emit
   slightly different RFC-3339 profiles (trailing `Z`, fractional
   seconds, numeric offset) and we want all of them to round-trip.

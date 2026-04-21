@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "672677ed-1a85-40c5-b819-f7bef1a90a77",
   title: "Support application/x-www-form-urlencoded and stub multipart/form-data",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

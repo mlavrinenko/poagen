@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "3ad17dea-9358-41d9-be83-747d48fe1124",
   title: "Emit inline nested object schemas as typed maps or generated classes",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

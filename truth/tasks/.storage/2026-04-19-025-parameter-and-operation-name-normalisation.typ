@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "ffbe682c-524b-4e56-8fd5-86a017a8549a",
   title: "Parameter-name and operationId normalisation",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),
@@ -65,7 +66,7 @@ override.
     decide during implementation).
 + Report, during generation, the list of ops that *were* skipped
   for any remaining reason (unsupported body type, unresolvable
-  $ref) so the user knows what did not make it into the client.
+  `$ref`) so the user knows what did not make it into the client.
   This is a tiny diagnostic add-on, not a new pipeline stage.
 
 == Out of scope

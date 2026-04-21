@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "a6d80ad0-8116-4b5d-b9ae-39511248f728",
   title: "Round-trip BindsFormat scalar value objects on both send and receive",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

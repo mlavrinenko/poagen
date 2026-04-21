@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "5d8c53fb-eeaa-4a06-be6f-e07568d50e05",
   title: "Throw typed ApiException on non-2xx responses",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

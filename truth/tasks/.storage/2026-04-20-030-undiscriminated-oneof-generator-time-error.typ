@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "a46c2eb6-be75-410f-b6a2-e1f1e4543acf",
   title: "Generator-time error for `oneOf` without `discriminator` (per ADR-010)",
   status: done,
   date: datetime(year: 2026, month: 4, day: 20),

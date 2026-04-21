@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "9d19b14a-0c5d-4002-84c1-2f7017d8bffd",
   title: "examples/ folder: user-facing demonstrations with check-examples recipe",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

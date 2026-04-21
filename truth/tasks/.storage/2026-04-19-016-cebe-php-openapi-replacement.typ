@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "08b3db39-6e59-4be5-908f-798035cc8199",
   title: "Silence cebe/php-openapi PHP 8.4 deprecation noise on the 3.0 parser",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

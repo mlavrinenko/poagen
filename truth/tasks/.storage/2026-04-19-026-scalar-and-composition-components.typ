@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "350bca08-9dc2-4c71-bdb6-a5f1c6c18b1b",
   title: "Named scalar + top-level composition components resolve to real PHP types",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "879ae91f-d8dc-4661-a16b-5d91d1f00ab8",
   title: "Emit typed PHP for oneOf / anyOf / allOf composition",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "3c0728cb-b48e-48c9-879a-b2fc67b29367",
   title: "Emit operation methods that account for PathItem-level parameters",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

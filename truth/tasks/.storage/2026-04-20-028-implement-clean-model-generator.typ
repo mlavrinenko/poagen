@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "1521b30d-0c14-407e-997e-165e4ac533aa",
   title: "Implement ADR-010: clean Model output, attribute + phpdoc-driven Marshaller/Hydrator",
   status: done,
   date: datetime(year: 2026, month: 4, day: 20),
@@ -110,8 +111,8 @@ final readonly class Order
   byte-stability test (T-022) must pass.
 
 + *Specs updated.* Add scenarios to
-  #link("../specs/model-generator.typ")[Model Generator] and
-  #link("../specs/operation-generator.typ")[Operation Generator] for:
+  #link("../../specs/model-generator.typ")[Model Generator] and
+  #link("../../specs/operation-generator.typ")[Operation Generator] for:
   - Model emits no `PROPERTY_MAP`, no `JsonSerializable`.
   - Marshaller round-trips a scalar-binding VO.
   - Hydrator recurses into `list<Tag>`.

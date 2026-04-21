@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": *
 
 #show: task.with(
+  id: "ca4726eb-5214-48e0-9024-148a8e0e624f",
   title: "ClientEmitter renders scalar-VO / ScalarBinding path params via toScalar()",
   status: done,
   date: datetime(year: 2026, month: 4, day: 20),

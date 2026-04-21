@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "daa1d41a-ec28-413c-aa76-e16c0737568f",
   title: "Wire up infection mutation testing or drop the dev dependency",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),

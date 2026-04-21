@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "288778bd-5249-4cb3-8c99-24e9e4f956a8",
   title: "Pluggable OpenAPI → PHP name-normalisation strategies",
   status: done,
   date: datetime(year: 2026, month: 4, day: 19),

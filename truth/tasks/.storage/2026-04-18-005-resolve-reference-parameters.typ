@@ -1,6 +1,7 @@
 #import "@local/speconaut:0.1.0": task, done
 
 #show: task.with(
+  id: "7b339f0c-be3a-47dc-a2ec-c89647dacc95",
   title: "Resolve $ref-to-Parameter/Header/RequestBody at the analyzer boundary",
   status: done,
   date: datetime(year: 2026, month: 4, day: 18),
