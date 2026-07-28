@@ -3,6 +3,8 @@
 #show: task.with(
   title: slot("title", prompt: "Task title"),
   tags: slot("tags", kind: "list", default: ()),
+  priority: slot("priority", kind: "int", default: 5),
+  difficulty: slot("difficulty", kind: "int", default: 4),
 )
 
 == Summary

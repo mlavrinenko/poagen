@@ -4,8 +4,17 @@ set dotenv-load := false
 default:
     @just --list
 
-# Run all quality checks (lint + test + spec check + drift check)
-check: lint test check-specs check-generated-tests check-drift
+# Run all quality checks (lint + test)
+#
+# The speconaut recipes below (check-specs, check-generated-tests,
+# check-drift) are temporarily OUT of this aggregate. speconaut's config
+# schema and DSL moved on while paogen was paused: `[traces]` is no longer
+# a config key, `adr()` no longer exists, `entity()` requires typed props,
+# and artifacts are classified by filename sub-extension. Recovering that
+# is tracked as a chain of tasks — see `mt ls 'has_tag("speconaut")'`,
+# starting at `speconaut-config-rewrite`. `rewire-speconaut-justfile-recipes`
+# puts them back here once the truth tree validates again.
+check: lint test
 
 # Full pre-commit gate
 gate: check
