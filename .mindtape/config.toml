@@ -1,0 +1,244 @@
+#:schema https://raw.githubusercontent.com/mlavrinenko/mindtape/main/schema/config.schema.json
+# .mindtape/config.toml — the `gated` preset.
+#
+# For work handed to an AI coding agent. Strict, but only where the strictness
+# is earned — the thresholds come from measured agent failure data, not taste.
+# A disciplined human team gets the same benefit, usually at lower strictness.
+#
+# Four mechanisms, each aimed at a documented failure mode.
+#
+# Required spec sections. Across agent-authored pull requests, the ticket
+# properties that moved merge rates were narrow and specific: being
+# self-contained, being well-scoped, and stating expected behaviour. Piling on
+# more context did not help. So this preset requires four sections and nothing
+# else — the ones with evidence, gated to non-terminal tasks so a closed task
+# is not held to a spec it has outgrown.
+#
+# A review state `done` cannot skip. Agents report success they have not
+# achieved, and they do not catch it themselves; in one study of real sessions,
+# inaccurate self-reporting was roughly a fifth of all misalignment episodes and
+# the overwhelming majority of corrections came from a human pushing back, not
+# from the agent noticing. Meanwhile the largest single category of rejected
+# agent pull requests was not a code defect at all — it was nobody reviewing
+# them. Making `done` unreachable from `wip` puts that review in the graph
+# instead of in a convention.
+#
+# A note required on `blocked`, `failed`, and `cancelled`. An unexplained flip
+# to `done` is not the only failure mode — an unexplained flip away from work
+# is another, and it is the one no gate command can catch, because nothing runs
+# once a task stops. `[[tasks.status]] note = "required"` demands a written
+# reason exactly on those three: why it stalled, what broke, why it was
+# dropped. `done` is deliberately left at the default (`note = "optional"`) —
+# a note is the one thing an agent will always fill plausibly, so requiring one
+# on every transition buys filler, not evidence; the review gate above is the
+# real check there.
+#
+# No review comments left in the file. A human reading agent-authored work
+# leaves `// no, use X instead` inline; the agent is meant to reframe the task
+# and remove the note. Without a gate that conversation silently becomes the
+# artifact — the objection survives into git and the next reader cannot tell a
+# live one from a settled one. `policy = "forbid"` makes leaving it behind fail
+# `mt check` instead of a convention nobody enforces.
+#
+# A machine check before a task may close. A status is a stamp, not proof, and
+# the state machine alone cannot verify a completion claim — a written
+# justification cannot police the thing that writes it, because a model asked to
+# justify a claim predicts a plausible ending rather than checking reality. An
+# external predicate can. The `[[on.flip]]` gate at the bottom of this file is
+# where you point MindTape at yours.
+
+[tasks]
+[[tasks.roots]]
+path = "truth/tasks"
+derive-tags = true
+
+[tasks.derive-tags]
+enabled = true
+collect = ["segments"]
+
+[[tasks.status]]
+value = "proposed"
+glyph = "💡"
+color = "blue"
+to = ["accepted", "cancelled"]
+
+[[tasks.status]]
+value = "accepted"
+glyph = "📋"
+color = "cyan"
+to = ["wip", "cancelled"]
+
+[[tasks.status]]
+value = "wip"
+glyph = "🔨"
+color = "yellow"
+to = ["needs-review", "blocked", "failed"]
+
+# The gate. `done` is reachable only from here, so no run of work closes itself.
+[[tasks.status]]
+value = "needs-review"
+glyph = "👀"
+color = "magenta"
+to = ["done", "wip", "failed"]
+
+[[tasks.status]]
+value = "blocked"
+glyph = "🔒"
+color = "red"
+to = ["wip", "cancelled", "failed"]
+note = "required"
+
+[[tasks.status]]
+value = "done"
+glyph = "✅"
+color = "green"
+terminal = true
+to = ["wip"]
+
+[[tasks.status]]
+value = "cancelled"
+glyph = "🚫"
+color = "magenta"
+terminal = true
+note = "required"
+
+[[tasks.status]]
+value = "failed"
+glyph = "❌"
+color = "red"
+terminal = true
+to = ["wip"]
+note = "required"
+
+# Priority stays a plain optional integer, and no framework is configured.
+# Requiring a score would buy a number the agent invented to satisfy the field:
+# a model asked for a value it cannot know produces a plausible one. Fields are
+# required here only where the answer is knowable in advance.
+[tasks.priority]
+required = false
+
+# Difficulty is the exception, because it is the routing question: which model
+# tier and reasoning effort this task wants, decided before anyone starts it.
+# That is knowable in advance, unlike a priority score. Keep the number free of
+# any vendor or model name — mapping it onto a model is the reader's policy.
+#
+# Score JUDGMENT REQUIRED, not size. A rubric both a human and an agent apply
+# the same way is the difference between a routing signal and a decorative
+# number; without one, a difficulty is just another invented value.
+#
+#   0-2  mechanical — the change is fully specified; no decision is left open.
+#   3-5  local judgment — one module, one obvious approach, tests fall out of it.
+#   6-8  cross-cutting design — several defensible approaches, and picking one
+#        constrains later work.
+#   9    the approach itself is the open question.
+#
+# Left optional here so the preset stays usable on an existing backlog. Set
+# `required = "!terminal"` once every open task carries one — flipping it first
+# fails the whole backlog at once.
+[tasks.difficulty]
+required = false
+
+# A leftover review comment fails the command; see the fourth mechanism above.
+[tasks.comments]
+policy = "forbid"
+
+# The required spec sections, all gated to non-terminal tasks.
+
+# What problem, stated once, in one place.
+[[tasks.body.headers.rules]]
+path = ["Summary"]
+action = "unique"
+when = "!terminal"
+message = "a task needs exactly one Summary: the problem, stated once"
+
+# How anyone can tell it is finished. This is the single strongest predictor of
+# a task an agent completes successfully.
+[[tasks.body.headers.rules]]
+path = ["Acceptance criteria"]
+action = "unique"
+when = "!terminal"
+message = "a task needs Acceptance criteria — checkable conditions, not a restatement of the summary"
+
+# What is deliberately out of scope. Agents bundle unrelated objectives into one
+# change several times more often than humans do, and oversized changes are the
+# ones that get rejected. Writing the boundary down is what makes drift visible.
+[[tasks.body.headers.rules]]
+path = ["Non-goals"]
+action = "require"
+when = "!terminal"
+message = "a task needs Non-goals — say what it will not touch, or it will touch it"
+
+# Which files this is expected to change. Doubles as the scope boundary you can
+# actually check: compare it against `git diff --name-only` while the work runs.
+[[tasks.body.headers.rules]]
+path = ["Files"]
+action = "require"
+when = "!terminal"
+message = "a task needs Files — the paths it expects to touch"
+
+# The problem comes before the test for it.
+[[tasks.body.headers.rules]]
+action = "order"
+before = ["Summary"]
+after = ["Acceptance criteria"]
+message = "Summary must precede Acceptance criteria"
+
+# `mt ls @wip` is the work-in-progress check. Keep this at one: a change set can
+# only be attributed to a task when one task is in flight.
+[views.wip]
+filter = "status == \"wip\""
+description = "In flight — keep this list at one"
+
+# `mt ls @review` is the queue a human owes an answer to.
+[views.review]
+filter = "status == \"needs-review\""
+sort = ["priority:desc"]
+description = "Waiting on human review before it can close"
+
+# Flip hooks: what happens when a task changes status. `mt flip` is the only
+# command that runs these — `mt check`, `mt ls` and every other read execute
+# nothing, so `mt check` stays safe inside an editor or a commit hook.
+#
+# Trust boundary: a command below is exactly as trusted as a Justfile recipe or
+# a git hook. It comes from this repository's own config and runs with your full
+# authority, from the project root. Nothing sandboxes it, and nothing pretends
+# to. Read a project's config before running `mt flip` under it.
+
+# On the way into work, print what is already in flight, so an agent picking up
+# a task sees the open set rather than assuming it is alone. Nothing is
+# materialised: tasks are files in git, so `mt ls` at the flipping commit
+# reconstructs this list exactly.
+[[on.flip]]
+when = 'into("wip")'
+actions = [{ list = "@wip", title = "Already in flight — finish these first:" }]
+
+# On the way into `done`, an external check. The shipped one is the floor, not
+# the ceiling: it refuses a task whose body still carries this preset's TODO
+# placeholders, because a task nobody ever specified is a task nobody can have
+# finished. Replace the command with the one that actually proves your work —
+# `just check`, `cargo test`, your CI script. It receives $MINDTAPE_TASK_FILE,
+# $MINDTAPE_TASK_STEM and $MINDTAPE_TASK_STATUS, so a script can inspect the
+# artifact being closed.
+#
+# `mt done --force` overrides a failing gate and records the override in the
+# status note — an escape hatch that leaves a trace.
+#
+# MAKE THE GATE CHEAP. Pointing `run` straight at `just check` works, but a full
+# build inside `mt flip` is slow, fires at the least convenient moment, and
+# teaches an agent to reach for `--force` — which defeats the gate. Prefer
+# ASSERTING the check already passed against this worktree over running it:
+#
+#   run = "mmz --is-fresh -- just check"
+#
+# `mmz` (a memoized command runner, github:mlavrinenko/mmz) exits 0 only when
+# `just check` last passed with its declared inputs unchanged, and never runs
+# the wrapped command itself. It is one option, not a requirement — `run` is a
+# plain command, so any equivalent freshness check does. Whatever you use, scope
+# its inputs to exclude the task files themselves: `mt flip` writes the artifact
+# it is gating, so a rule keyed on the whole tree goes stale the instant a status
+# is stamped and the gate can never pass.
+[[on.flip]]
+when = 'into("done")'
+actions = [
+  { run = '! grep -q "TODO:" "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
+]
