@@ -22,6 +22,25 @@
 
 #v(1em)
 
+// --- Vision & Goals ---
+
+#include "vision.typ"
+#pagebreak()
+#include "goals/never-edit-generated.goal.typ"
+#pagebreak()
+#include "goals/user-code-guides-generation.goal.typ"
+#pagebreak()
+#include "goals/strict-clean-output.goal.typ"
+#pagebreak()
+#include "goals/typed-injectable-surface.goal.typ"
+#pagebreak()
+#include "goals/fail-loud-never-silent.goal.typ"
+#pagebreak()
+#include "goals/real-world-schemas.goal.typ"
+#pagebreak()
+#include "goals/cheap-regeneration.goal.typ"
+#pagebreak()
+
 // --- Specifications ---
 
 #text(size: 16pt, weight: "bold", fill: rgb("#5B21B6"))[= Specifications]
