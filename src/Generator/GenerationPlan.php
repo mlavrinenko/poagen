@@ -19,12 +19,15 @@ final readonly class GenerationPlan
     /**
      * @param array<string,string>   $writes              Absolute paths mapped to their would-be file contents.
      * @param list<string>           $prunes              Absolute paths that would be deleted by the prune step.
-     * @param list<SkippedOperation> $skippedOperations   Operations the generator chose not to emit. T-025
-     *                                                    surfaces them so the user knows what is missing
-     *                                                    rather than silently losing endpoints.
-     * @param list<SkippedComponent> $skippedComponents   Components whose shape the generator could not
-     *                                                    materialise (T-026). Surfaces them for the same
-     *                                                    reason as skipped operations.
+     * @param list<SkippedOperation> $skippedOperations   Operations the generator did not emit. Reaching a
+     *                                                    successful plan with a non-empty list here means every
+     *                                                    one of them was explicitly accepted via `Profile::$skip`
+     *                                                    (abort-on-unrepresentable-constructs) — otherwise
+     *                                                    {@see \Mlavrinenko\Paogen\Generator\Generator::plan()}
+     *                                                    throws instead of returning.
+     * @param list<SkippedComponent> $skippedComponents   Components (or components with an undiscriminated
+     *                                                    union property) the generator did not emit. Same
+     *                                                    skip-list guarantee as $skippedOperations.
      */
     public function __construct(
         public array $writes,

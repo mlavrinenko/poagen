@@ -139,7 +139,7 @@ final class ModelGeneratorTest extends TestCase
      * Given Schema declares components Dog and Cat and a component Pet with a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with no discriminator
      *   And Profile has no discriminators override for Pet.kind
      * When Generator runs against Profile
-     * Then the run aborts with UndiscriminatedUnionException whose message names Pet.kind
+     * Then the run aborts with UnrepresentableConstructsException whose message names Pet.kind
      *   And no files are written under Profile's output
      */
     public function testAnUndiscriminatedOneOfAbortsTheRunWithAPointedDiagnostic(): void
@@ -147,7 +147,7 @@ final class ModelGeneratorTest extends TestCase
         $this->steps->givenSchemaDeclaresComponentsDogAndCatAndAComponentPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator();
         $this->steps->givenProfileHasNoDiscriminatorsOverrideForKey('Pet.kind');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheRunAbortsWithErrorWhoseMessageNamesPetKind('UndiscriminatedUnionException');
+        $this->steps->thenTheRunAbortsWithErrorWhoseMessageNamesPetKind('UnrepresentableConstructsException');
         $this->steps->thenNoFilesAreWrittenUnderProfilesOutput();
     }
 

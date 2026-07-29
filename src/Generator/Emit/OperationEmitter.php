@@ -7,6 +7,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
+use cebe\openapi\spec\Reference;
+use cebe\openapi\spec\RequestBody;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
@@ -24,16 +26,18 @@ use Nette\PhpGenerator\PhpNamespace;
  *   - parameters may be `path` (required), scalar/array `query`, or
  *     optional scalar `header`;
  *   - request body may be absent, `application/json` (`$ref`-to-Model or
- *     `list<$ref>`), `application/x-www-form-urlencoded` with declared
- *     properties, or an unsupported `multipart/form-data` /
- *     `application/octet-stream` body which is emitted as a throwing stub
- *     (T-011);
+ *     `list<$ref>`), or `application/x-www-form-urlencoded` with declared
+ *     properties;
  *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`,
  *     a scalar, or an `additionalProperties` map.
  *
- * Anything else returns an {@see EmitOutcome::skipped()} carrying a
- * {@see SkippedOperation} so the user learns *which* endpoint did not
- * make it into the client (T-025).
+ * Anything else — including `multipart/form-data` and
+ * `application/octet-stream` bodies, which used to be emitted as a
+ * throwing stub — returns an {@see EmitOutcome::skipped()} carrying a
+ * {@see SkippedOperation} with a full construct/location/remedy diagnostic,
+ * so the caller can report *which* endpoint did not make it into the
+ * client and *why* instead of emitting a method that only fails at call
+ * time (T-025, abort-on-unrepresentable-constructs).
  */
 final readonly class OperationEmitter
 {
@@ -94,7 +98,7 @@ final readonly class OperationEmitter
                 $httpMethod,
                 $pathUri,
                 $rawOperationId,
-                SkippedOperation::REASON_UNRESOLVABLE_PARAMETER,
+                OperationAnalyzer::describeUnresolvableParameter($operation, $pathItem),
             ));
         }
 
@@ -106,7 +110,7 @@ final readonly class OperationEmitter
                 $httpMethod,
                 $pathUri,
                 $rawOperationId,
-                SkippedOperation::REASON_UNSUPPORTED_BODY,
+                $this->describeUnsupportedBody($operation->requestBody),
             ));
         }
 
@@ -136,12 +140,6 @@ final readonly class OperationEmitter
         $this->paramAdder->addQuery($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $rawOperationId);
         $this->paramAdder->addHeader($method, $namespace, $headerParams, $bindings, $rawOperationId);
 
-        if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec && $body->kind === BodySpec::KIND_UNSUPPORTED) {
-            $this->bodyParamEmitter->emitUnsupportedStub($method, $body, $rawOperationId);
-
-            return EmitOutcome::emitted();
-        }
-
         $this->applyReturnType($method, $namespace, $return);
 
         $activeSchemes = $securityCatalog instanceof SecuritySchemeCatalog
@@ -162,6 +160,15 @@ final readonly class OperationEmitter
         $this->responseHandler->emit($method, $return);
 
         return EmitOutcome::emitted();
+    }
+
+    private function describeUnsupportedBody(RequestBody|Reference $body): string
+    {
+        $resolved = RequestBodyAnalyzer::resolveBody($body);
+
+        return $resolved instanceof RequestBody
+            ? RequestBodyAnalyzer::describeUnsupported($resolved)
+            : 'request body $ref does not resolve to a component requestBody — fix the $ref or inline the body';
     }
 
     /**

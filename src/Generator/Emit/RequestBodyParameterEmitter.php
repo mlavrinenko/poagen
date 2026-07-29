@@ -12,8 +12,7 @@ use Nette\PhpGenerator\PhpNamespace;
 
 /**
  * Materialises a {@see BodySpec} as zero-or-more method parameters on an
- * emitted ApiClient method, and (for UNSUPPORTED kinds) wires the throwing
- * stub.
+ * emitted ApiClient method.
  *
  * Extracted from {@see OperationEmitter} to keep that class under the
  * linecop limit (ADR-004).
@@ -43,28 +42,7 @@ final readonly class RequestBodyParameterEmitter
                 $this->addFormFieldParams($method, $namespace, $body, $bindings);
 
                 return;
-
-            case BodySpec::KIND_UNSUPPORTED:
-                // No body parameter; `emitUnsupportedStub` wires the throw.
-                return;
         }
-    }
-
-    public function emitUnsupportedStub(Method $method, BodySpec $body, string $operationId): void
-    {
-        // Loud runtime signal rather than silent skip: anyone whose schema
-        // uses multipart or octet-stream sees the gap at call time. The
-        // throw itself is the generator-time warning — simpler than a
-        // side-channel logger and impossible to miss downstream.
-        $method->setReturnType('never');
-        $method->addComment('@psalm-return never');
-        $method->addComment('');
-        $method->addComment('TODO(multipart): see task 011 — unsupported body content type');
-        $method->addComment('Body content-type: ' . $body->unsupportedContentType);
-        $method->addBody(
-            'throw new \RuntimeException(?);',
-            [\sprintf("%s not yet supported: operationId '%s'", $body->unsupportedContentType, $operationId)],
-        );
     }
 
     private function addJsonBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body): void

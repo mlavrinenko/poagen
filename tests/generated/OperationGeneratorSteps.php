@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
@@ -35,6 +36,8 @@ final class OperationGeneratorSteps
     private ?Profile $profile = null;
     private string $outputDir = '';
     private string $source = '';
+    private ?string $abortMessage = null;
+    private string $abortOutputDir = '';
 
     private ?ApiClient $client = null;
     private ?RecordingClient $http = null;
@@ -861,50 +864,82 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodUploadFileIntPetIdStringAdditionalMetadataNullThatIsNotSilentlySkipped(
-    ): void {
-        // The whole point of T-011: the op is no longer silently dropped.
-        TestCase::assertStringContainsString(
-            'public function uploadFile(int $petId, ?string $additionalMetadata = null):',
-            $this->source,
+    public function whenGeneratorRunsAgainstProfileDeclaringNoSkipEntryForThatOperation(): void
+    {
+        $base = $this->loadProfile('petstore');
+
+        // A pristine output directory, so "wrote nothing" is observable. The
+        // shared fixture tree is populated by sibling scenarios and would make
+        // the assertion vacuous.
+        $this->abortOutputDir = sys_get_temp_dir() . '/paogen-abort-' . bin2hex(random_bytes(6));
+
+        // Same fixture profile with the skip entry removed, so the octet-stream
+        // body is left unaccepted and has to stop the run.
+        $unaccepted = new Profile(
+            schema: $base->schema,
+            output: $this->abortOutputDir,
+            namespace: $base->namespace,
+            discoverIn: $base->discoverIn,
+            renames: $base->renames,
+            nameNormaliser: $base->nameNormaliser,
+            discriminators: $base->discriminators,
+            skip: [],
         );
+
+        $this->abortMessage = null;
+
+        try {
+            $this->runGenerator($unaccepted);
+        } catch (UnrepresentableConstructsException $e) {
+            $this->abortMessage = $e->getMessage();
+        }
     }
 
 
-    public function thenTheMethodBodyThrowsARuntimeExceptionWhoseMessageMentionsTheOperationIdAndTheUnsupportedContentType(
-    ): void {
-        $body = $this->methodSlice('uploadFile');
-        TestCase::assertStringContainsString('throw new \\RuntimeException(', $body);
-        TestCase::assertStringContainsString('uploadFile', $body);
-        TestCase::assertStringContainsString('application/octet-stream', $body);
-
-        // Round-trip: calling the generated stub raises the expected
-        // RuntimeException rather than executing a (wrong) request.
-        $factory = new Psr17Factory();
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{}'),
-        );
-        $client = new ApiClient(
-            httpClient: $http,
-            requestFactory: $factory,
-            streamFactory: $factory,
-            baseUri: 'https://petstore.example/api/v3',
+    public function thenTheGeneratorsRunFailsAndEmitsNoGeneratedFile(): void
+    {
+        TestCase::assertNotNull(
+            $this->abortMessage,
+            'the generator returned instead of refusing an unrepresentable body',
         );
 
-        // Method has `: never` return, so a RuntimeException must fire.
-        $caught = null;
-        try {
-            $client->uploadFile(123);
-        } catch (\RuntimeException $e) {
-            $caught = $e;
-        }
+        // Refusal means refusal: planning aborts before anything reaches disk.
+        TestCase::assertFileDoesNotExist($this->abortOutputDir . '/Generated/ApiClient.php');
+    }
 
-        TestCase::assertInstanceOf(\RuntimeException::class, $caught);
-        TestCase::assertStringContainsString('uploadFile', $caught->getMessage());
-        TestCase::assertStringContainsString('application/octet-stream', $caught->getMessage());
 
-        // Stub must not touch the transport.
-        TestCase::assertNull($http->lastRequest);
+    public function thenTheGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy(): void
+    {
+        $message = (string) $this->abortMessage;
+
+        TestCase::assertStringContainsString('uploadFile', $message);
+        TestCase::assertStringContainsString('application/octet-stream', $message);
+        // A diagnostic that does not say what to do next is a dead end.
+        TestCase::assertStringContainsString('Profile::$skip', $message);
+    }
+
+
+    public function givenTheProfileDeclaresASkipEntryForThatOperationCarryingAReason(): void
+    {
+        $this->profile = $this->loadProfile('petstore');
+
+        TestCase::assertArrayHasKey('uploadFile', $this->profile->skip);
+        TestCase::assertNotSame('', trim($this->profile->skip['uploadFile']));
+    }
+
+
+    public function thenTheEmittedClientHasNoUploadFileMethodAtAll(): void
+    {
+        TestCase::assertStringNotContainsString('function uploadFile(', $this->source);
+    }
+
+
+    public function thenNoGeneratedFileContainsAMethodThatThrowsOnAnUnsupportedContentType(): void
+    {
+        // The throwing-stub emission path is gone, not merely unused: a method
+        // that compiles and throws when called is the silent skip relocated.
+        TestCase::assertStringNotContainsString('not yet supported: operationId', $this->source);
+        TestCase::assertStringNotContainsString(': never', $this->source);
     }
 
 
@@ -968,6 +1003,10 @@ final class OperationGeneratorSteps
             namespace: $base->namespace,
             discoverIn: $base->discoverIn,
             renames: ['monitoring_get_foo.yml' => 'forwardProxyRequest'],
+            // Carry the fixture's skip list through: this scenario overrides
+            // renames only, and dropping the skips would make it fail on an
+            // unrelated unrepresentable body.
+            skip: $base->skip,
         );
     }
 
@@ -1001,10 +1040,13 @@ final class OperationGeneratorSteps
         TestCase::assertCount(1, $matches, 'expected exactly one skip for postInlineBody');
         TestCase::assertSame('post', $matches[0]->httpMethod);
         TestCase::assertSame('/inline-body', $matches[0]->pathUri);
-        TestCase::assertSame(
-            \Mlavrinenko\Paogen\Generator\Emit\SkippedOperation::REASON_UNSUPPORTED_BODY,
-            $matches[0]->reason,
-        );
+
+        // The reason is now the diagnostic a user would act on rather than a
+        // category label: it names the construct, points at the schema
+        // location, and says what would make it acceptable.
+        TestCase::assertStringContainsString('inline (non-$ref) schema', $matches[0]->reason);
+        TestCase::assertStringContainsString('/paths/~1inline-body/post/requestBody', $matches[0]->reason);
+        TestCase::assertStringContainsString('components.schemas', $matches[0]->reason);
     }
 
 
