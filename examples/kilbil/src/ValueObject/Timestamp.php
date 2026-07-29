@@ -46,13 +46,11 @@ final readonly class Timestamp implements ScalarBinding
             );
         }
 
-        $parsed = \DateTimeImmutable::createFromFormat(self::WIRE, $raw)
-            // Some endpoints omit the time part entirely; fall back to a
-            // permissive parse rather than throwing on a value the vendor
-            // considers valid.
-            ?: new \DateTimeImmutable($raw);
+        $parsed = \DateTimeImmutable::createFromFormat(self::WIRE, $raw);
 
-        return new self($parsed);
+        // Some endpoints omit the time part entirely; fall back to a permissive
+        // parse rather than throwing on a value the vendor considers valid.
+        return new self($parsed instanceof \DateTimeImmutable ? $parsed : new \DateTimeImmutable($raw));
     }
 
     public function toScalar(): string

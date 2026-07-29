@@ -33,6 +33,28 @@ return new Profile(
     ],
 
     /*
+     * All eleven tags are Russian words, and a tag names a sub-client class.
+     * Without an answer here paogen transliterates deterministically —
+     * `Клиенты` becomes `KlientyClient` — which is legible and grep-able but
+     * not what anyone means. These are the names this project wants.
+     *
+     * `Wallet` is absent because the vendor already wrote it in ASCII, so the
+     * default reads correctly.
+     */
+    tagRenames: [
+        'Другое' => 'Misc',
+        'Информация о лояльности' => 'LoyaltySettings',
+        'Клиенты' => 'Customers',
+        'Код подтверждения' => 'ConfirmationCodes',
+        'Номенклатура' => 'Catalogue',
+        'Операции' => 'Transactions',
+        'План-факт' => 'SalesPlan',
+        'Подарочные сертификаты' => 'GiftCertificates',
+        'Промокоды' => 'Promocodes',
+        'Теги' => 'Tags',
+    ],
+
+    /*
      * Every operation id in this document is lowercase and run together.
      * `getclientfullbalance` has no algorithmic path to `getClientFullBalance`
      * — a split needs a dictionary, and a dictionary gives a different answer

@@ -64,6 +64,6 @@ Operation identifiers are normalised by camel-casing on existing word boundaries
 - `src/Generator/Naming/CamelCaseSanitiser.php`, `RenamesNormaliser.php`, `NormaliserFactory.php`
 - `src/Generator/Emit/OperationIdAdvisor.php` (new)
 - `src/Generator/Profile.php`, `src/Generator/ProfileTargetValidator.php`, `src/Generator/GenerationPlan.php`, `src/GenerateCommand.php`
-- `truth/specs/operation-generator.feature-260418.typ`
+- #link("../specs/operation-generator.feature-260418.typ")
 - `examples/kilbil/paogen.php`
 - `tests/`

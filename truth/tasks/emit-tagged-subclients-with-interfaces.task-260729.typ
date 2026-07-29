@@ -5,7 +5,7 @@
   tags: ("dx", "architecture", "generator", "interfaces"),
   priority: 8,
   difficulty: 7,
-  status: proposed(2026, 7, 29),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary

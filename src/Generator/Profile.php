@@ -37,6 +37,21 @@ final readonly class Profile
      *                                              names of any models synthesised for that operation's inline
      *                                              payloads. An entry naming an operation id absent from the
      *                                              document fails the run.
+     * @param array<string,string>  $tagRenames     Map of raw OpenAPI tag → desired PHP name for the sub-client
+     *                                              emitted from it. Without one, paogen transliterates a
+     *                                              non-ASCII tag deterministically, which is legible but
+     *                                              rarely what a consumer wants: `Клиенты` becomes `Klienty`
+     *                                              where they meant `Customers`. An entry naming a tag no
+     *                                              operation carries fails the run.
+     * @param array<string,string>  $tagAssignments Map of raw operation id → raw tag, for an operation the
+     *                                              document left untagged. Repairs an under-tagged vendor
+     *                                              document without editing it: the operation moves off the
+     *                                              root client and onto the named tag's sub-client. The tag
+     *                                              need not already exist in the document.
+     * @param array<string,string>  $tagChoice      Map of raw operation id → raw tag, for an operation carrying
+     *                                              several tags. By default it is emitted on every one of its
+     *                                              sub-clients; this picks one. A choice naming a tag the
+     *                                              operation does not carry fails the run.
      * @param array<string,string>  $inlineModels   Pins the class name paogen synthesises for an operation's
      *                                              inline payload. Keys are `'<operationId>.request'` or
      *                                              `'<operationId>.response'` using the raw operation id from
@@ -64,6 +79,9 @@ final readonly class Profile
         public array $discriminators = [],
         public array $skip = [],
         public array $methodRenames = [],
+        public array $tagRenames = [],
+        public array $tagAssignments = [],
+        public array $tagChoice = [],
         public array $inlineModels = [],
     ) {}
 }

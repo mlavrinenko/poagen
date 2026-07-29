@@ -154,15 +154,25 @@ final class OperationIdNamingTest extends TestCase
         ));
     }
 
+    /**
+     * The whole caller surface, concatenated. kilbil tags every operation, so the
+     * methods live on the tag sub-clients rather than on the root — and which tag
+     * a method landed on is not what these assertions are about.
+     */
     private function clientSource(GenerationPlan $plan): string
     {
+        $out = '';
+
         foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, \DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
+            if (!str_contains($path, \DIRECTORY_SEPARATOR . 'Model' . \DIRECTORY_SEPARATOR)
+                && !str_contains($path, \DIRECTORY_SEPARATOR . 'Enum' . \DIRECTORY_SEPARATOR)) {
+                $out .= $source . "\n";
             }
         }
 
-        self::fail('the plan wrote no ApiClient.php');
+        self::assertNotSame('', $out, 'the plan wrote no caller surface at all');
+
+        return $out;
     }
 
     /**

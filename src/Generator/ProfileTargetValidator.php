@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Generator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
+use Mlavrinenko\Paogen\Generator\Emit\TagCatalogue;
 
 /**
  * Cross-checks the profile's operation-keyed guidance against the document —
@@ -32,14 +33,67 @@ final readonly class ProfileTargetValidator
      * @param  array<string,string> $methodRenames Profile::$methodRenames
      * @return list<string>         failure lines; empty means the run may proceed
      */
-    public function validate(OpenApi $openApi, array $pins, array $methodRenames = []): array
+    public function validate(OpenApi $openApi, array $pins, array $methodRenames = [], ?Profile $profile = null): array
     {
         $known = array_fill_keys($this->operationIds($openApi), true);
 
         return [
             ...$this->validatePins($pins, $known),
             ...$this->validateMethodRenames($methodRenames, $known),
+            ...($profile instanceof Profile ? $this->validateTags($openApi, $profile, $known) : []),
         ];
+    }
+
+    /**
+     * @param  array<string,true> $known
+     * @return list<string>
+     */
+    private function validateTags(OpenApi $openApi, Profile $profile, array $known): array
+    {
+        $carried = TagCatalogue::tagsCarriedByOperations($openApi, $profile);
+        $failures = [];
+
+        foreach (array_keys($profile->tagRenames) as $tag) {
+            if (!isset($carried[$tag])) {
+                $failures[] = \sprintf(
+                    "Profile::\$tagRenames['%s'] names a tag no operation carries — remove this entry, or point it "
+                        . 'at the tag the vendor now uses.',
+                    $tag,
+                );
+            }
+        }
+
+        foreach ($profile->tagChoice as $operationId => $tag) {
+            if (!isset($known[$operationId])) {
+                $failures[] = \sprintf(
+                    "Profile::\$tagChoice['%s'] names an operation id absent from the schema — remove this entry.",
+                    $operationId,
+                );
+
+                continue;
+            }
+
+            if (!\in_array($tag, TagCatalogue::declaredTagsOf($openApi, $operationId), true)) {
+                $failures[] = \sprintf(
+                    "Profile::\$tagChoice['%s'] picks the tag '%s', which that operation does not carry — a choice "
+                        . 'can only narrow the tags the document declared, not add one. Use '
+                        . 'Profile::$tagAssignments to place an untagged operation.',
+                    $operationId,
+                    $tag,
+                );
+            }
+        }
+
+        foreach (array_keys($profile->tagAssignments) as $operationId) {
+            if (!isset($known[$operationId])) {
+                $failures[] = \sprintf(
+                    "Profile::\$tagAssignments['%s'] names an operation id absent from the schema — remove this entry.",
+                    $operationId,
+                );
+            }
+        }
+
+        return $failures;
     }
 
     /**

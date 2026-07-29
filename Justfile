@@ -58,7 +58,12 @@ lint-phpstan-generated:
     #!/usr/bin/env bash
     set -euo pipefail
     shopt -s nullglob
-    paths=(tests/fixtures/generated examples/*/generated)
+    # `examples/*/src` is hand-written consumer code, not output — the decorator
+    # that proves the wrapper architecture works lives there. It belongs in this
+    # tier rather than the generator's: it is exactly the code a consumer writes
+    # against an emitted interface, so it should be held to the standard their own
+    # project would hold it to.
+    paths=(tests/fixtures/generated examples/*/generated examples/*/src)
     phpstan analyse -c phpstan-generated.neon --memory-limit=512M "${paths[@]}"
 
 # Check for Rector refactoring opportunities

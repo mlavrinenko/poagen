@@ -148,7 +148,8 @@ final readonly class Generator
             $inlinePayloads->roots(),
             $ledger,
         );
-        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $writes);
+        $tagRegistry = new NameRegistry($normaliser);
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
@@ -161,7 +162,7 @@ final readonly class Generator
 
         $failures = [
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
-            ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames),
+            ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
         ];
 
         if ($failures !== []) {
@@ -207,6 +208,8 @@ final readonly class Generator
         ComponentCatalog $components,
         InlinePayloadCatalog $inlinePayloads,
         array $preScannedSkips,
+        Profile $profile,
+        NameRegistry $tagRegistry,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
@@ -223,13 +226,7 @@ final readonly class Generator
             inlinePayloads: $inlinePayloads,
             preScannedSkips: $preScannedSkips,
         ));
-        $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
-
-        if ($code === null) {
-            return $emitter->drainSkipped();
-        }
-
-        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'] = $code;
+        $emitter->emit($rootNamespace, $rootDir, $openApi, $bindings, $profile, $tagRegistry, $writes);
 
         return $emitter->drainSkipped();
     }

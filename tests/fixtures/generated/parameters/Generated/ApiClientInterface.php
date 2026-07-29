@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated;
+
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequest;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
+
+/**
+ * The composition root's contract: one accessor per tag, plus whatever the document left untagged.
+ *
+ * A service should depend on the sub-client interface it actually needs rather than on this — that grain is the point of the split.
+ */
+interface ApiClientInterface
+{
+    public function postInlineBody(PostInlineBodyRequest $body): void;
+
+    public function getSshKeyById(SshKeyId $sshKeyId): void;
+
+    /**
+     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
+     */
+    public function listOrders(?int $limit = null, ?string $apiKey = null): array;
+
+    public function placeOrder(Order $body): Order;
+
+    public function getPetById(int $petId): Pet;
+
+    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void;
+
+    /**
+     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
+     */
+    public function listStoreItems(int $storeId): array;
+
+    public function clearStore(int $storeId): void;
+
+    public function issueToken(string $grantType, string $clientId, ?string $scope = null): void;
+}

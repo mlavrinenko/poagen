@@ -38,6 +38,10 @@ final readonly class CamelCaseSanitiser implements NameNormaliser
             return $raw;
         }
 
+        // Same ASCII fold as the Pascal sanitiser: an operation id or parameter
+        // name outside ASCII would otherwise split to nothing.
+        $raw = AsciiFolder::fold($raw);
+
         // Insert an explicit boundary at every lowercase→uppercase
         // transition so camelCase input (`findPetsByStatus`) splits
         // cleanly before the join pass.

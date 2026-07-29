@@ -315,4 +315,86 @@
       #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002]
     ]
   ]
+
+  #rule("The caller surface is grained by tag (emit-tagged-subclients-with-interfaces)")[
+    #scenario(
+      "Each tag becomes a sub-client behind an interface declaring exactly its own methods",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares #an(Operation) #p((id: "operationId: getOrderById")) tagged #p((tag: "store")) and another tagged #p((other: "pet"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/StoreClient.php` is a `final readonly` class implementing `StoreClientInterface`]
+      #and_[#the([emitted], GeneratedFile) `StoreClientInterface.php` declares `getOrderById` and does *not* declare the `pet` operation, so a caller depending on it depends on roughly the endpoints it uses]
+      #and_[#the([emitted], GeneratedFile) interface omits the constructor, because how an implementation acquires its collaborators is not part of the contract a decorator satisfies]
+    ]
+
+    #scenario(
+      "The root client hands out sub-clients and carries no flat operation methods",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) tags every #a(Operation)]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Client) `ApiClient` has one accessor per tag, each returning that tag's interface]
+      #and_[#the(Client) `ApiClient` declares no operation method of its own, so exactly one way exists to reach any endpoint]
+    ]
+
+    #scenario(
+      "A sub-client is constructible without the root",
+      stage: "unstable",
+    )[
+      #given[#the(Generator) has emitted a sub-client for a tag]
+      #when[a consumer constructs #the(Client) directly]
+      #then[#the(Client)'s constructor takes the PSR-18 client, the PSR-17 factories, the base URI, any declared credential and the hydration collaborators — and never #the([root], Client)]
+    ]
+
+    #scenario(
+      "An untagged operation stays on the root and no DefaultApi type is invented",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares #an(Operation) carrying no tag]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Operation) is emitted as a method on #the(Client) `ApiClient` itself]
+      #and_[no #a(GeneratedFile) named for a fallback tag is written]
+    ]
+
+    #scenario(
+      "An operation carrying several tags appears on every one of its sub-clients",
+      stage: "unstable",
+    )[
+      #given[#an(Operation) carries two tags and #the(Profile) sets no `tagChoice` for it]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Operation) is emitted on both sub-clients, because dropping it from either would be an omission nobody asked for]
+      #and_[#the(Profile) key `tagChoice` narrows it to one, and a choice naming a tag #the(Operation) does not carry fails the run]
+    ]
+
+    #scenario(
+      "A tag that is not a legal readable identifier is transliterated deterministically",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) tags #an(Operation) #p((tag: "Клиенты"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/KlientyClient.php` is written — PHP would accept the Russian word as a class name and the result would be unusable]
+      #and_[#the([same], Schema) produces #the([same], GeneratedFile) name on any machine, because the fold is a fixed character table rather than a library whose output tracks an ICU version]
+    ]
+
+    #scenario(
+      "The profile renames a tag, and a rename matching nothing fails the run",
+      stage: "unstable",
+    )[
+      #given[#the(Profile) whose `tagRenames` map carries `'Клиенты' => 'Customers'`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/CustomersClient.php` is written and #the(Client) `ApiClient` exposes `customers()`]
+      #and_[an entry naming a tag no #a(Operation) carries fails the run, on the same reasoning as a stale `skip` — guidance that outlives its target is worse than none]
+    ]
+
+    #scenario(
+      "A hand-written decorator implements a sub-client interface and delegates",
+      stage: "unstable",
+    )[
+      #given[a consumer's own class implementing #the([emitted], GeneratedFile) `StoreClientInterface` and holding the generated implementation]
+      #when[the consumer calls a method on their class, which #the(Client) declared]
+      #then[the call reaches the generated implementation, and their class adds behaviour with no edit to #a(GeneratedFile) — no hook, no protected region, no subclass]
+      #and_[their class satisfies the strictest analysis with nothing suppressed, so a regeneration that changed #the(Client) surface would fail to compile rather than break the seam quietly]
+    ]
+  ]
 ]

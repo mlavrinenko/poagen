@@ -15,12 +15,15 @@
         {
             "type": "path",
             "url": "../..",
-            "options": {"symlink": true}
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "autoload": {
         "psr-4": {
-            "Acme\\Petstore\\Generated\\": "generated/Generated/"
+            "Acme\\Petstore\\Generated\\": "generated/Generated/",
+            "Acme\\Petstore\\": "src/"
         }
     },
     "minimum-stability": "dev",

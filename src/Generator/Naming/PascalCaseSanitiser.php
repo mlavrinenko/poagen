@@ -37,8 +37,9 @@ final readonly class PascalCaseSanitiser implements NameNormaliser
     {
         // OperationId and ParameterName route through CamelCaseSanitiser
         // — PHP method and parameter names are conventionally camelCase
-        // (`findPetsByStatus`, `$petId`), never PascalCase.
-        if ($context->kind !== SymbolKind::SchemaComponent) {
+        // (`findPetsByStatus`, `$petId`), never PascalCase. A Tag names a
+        // sub-client class, so it belongs here.
+        if (!\in_array($context->kind, [SymbolKind::SchemaComponent, SymbolKind::Tag], true)) {
             return null;
         }
 
@@ -49,6 +50,11 @@ final readonly class PascalCaseSanitiser implements NameNormaliser
         if (preg_match(self::PASCAL_CASE, $raw) === 1) {
             return $raw;
         }
+
+        // Fold non-ASCII letters to ASCII before splitting: the split below
+        // keeps only [A-Za-z0-9], so a Cyrillic tag would otherwise reduce to
+        // nothing at all rather than to a readable name.
+        $raw = AsciiFolder::fold($raw);
 
         // Insert an explicit boundary at every lowercase→uppercase
         // transition so camelCase input (`findPetsByStatus`) splits

@@ -50,6 +50,28 @@ final class OperationGeneratorSteps
         $this->test = $test;
     }
 
+    /**
+     * Every emitted caller-surface file, concatenated.
+     *
+     * A scenario says "the emitted Client has a method X"; since
+     * emit-tagged-subclients-with-interfaces that method lives on the sub-client
+     * for its tag rather than on `ApiClient`, and which tag it was is not what any
+     * of these scenarios is about. Reading the whole surface keeps the assertions
+     * about the emitted signature — the thing the specs actually claim — instead
+     * of about the file it landed in.
+     */
+    private function callerSurface(): string
+    {
+        $files = glob($this->outputDir . '/Generated/*.php');
+        $out = '';
+
+        foreach ($files === false ? [] : $files as $file) {
+            $out .= (string) file_get_contents($file) . "\n";
+        }
+
+        return $out;
+    }
+
     public function givenSchemaDeclaresOperationOpWithIdAndPathParameterParam(
         string $op,
         string $id,
@@ -66,7 +88,7 @@ final class OperationGeneratorSteps
     {
         TestCase::assertNotNull($this->profile);
         $this->runGenerator($this->profile);
-        $this->source = (string) file_get_contents($this->outputDir . '/Generated/ApiClient.php');
+        $this->source = $this->callerSurface();
     }
 
     public function thenAFileGeneratedApiClientPhpIsWrittenUnderProfilesOutput(): void
@@ -173,7 +195,8 @@ final class OperationGeneratorSteps
     public function whenGetorderbyid42IsCalledOnClient(): void
     {
         TestCase::assertNotNull($this->client);
-        $this->orderResult = $this->client->getOrderById(42);
+        // Operations live on the tag sub-client now; the root hands it out.
+        $this->orderResult = $this->client->store()->getOrderById(42);
     }
 
     public function thenTheReturnValueIsModelOrderWithId42AndStatusPlaced(): void
@@ -212,7 +235,7 @@ final class OperationGeneratorSteps
             baseUri: 'https://petstore.example/api/v3',
         );
 
-        $client->findPetsByStatus(
+        $client->pet()->findPetsByStatus(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus::Available,
         );
 
@@ -359,7 +382,7 @@ final class OperationGeneratorSteps
             baseUri: 'https://petstore.example/api/v3',
         );
 
-        $client->findPetsByTags(['a', 'b']);
+        $client->pet()->findPetsByTags(['a', 'b']);
 
         TestCase::assertNotNull($http->lastRequest);
         $uri = (string) $http->lastRequest->getUri();
@@ -599,7 +622,7 @@ final class OperationGeneratorSteps
 
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
-        $this->source = (string) file_get_contents($this->outputDir . '/Generated/ApiClient.php');
+        $this->source = $this->callerSurface();
     }
 
 
@@ -627,7 +650,7 @@ final class OperationGeneratorSteps
         TestCase::assertNotNull($this->client);
 
         try {
-            $this->client->getPetById(999);
+            $this->client->pet()->getPetById(999);
             TestCase::fail('Expected ApiException to be thrown.');
         } catch (ApiException $e) {
             $this->caught = $e;
@@ -1026,7 +1049,7 @@ final class OperationGeneratorSteps
         );
 
         $this->runGenerator($viaComponentMap);
-        $source = (string) file_get_contents($this->outputDir . '/Generated/ApiClient.php');
+        $source = $this->callerSurface();
 
         TestCase::assertStringNotContainsString('public function forwardProxyRequest', $source);
         TestCase::assertStringContainsString('public function monitoringGetFooYml', $source);

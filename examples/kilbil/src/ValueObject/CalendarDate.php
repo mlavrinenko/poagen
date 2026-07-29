@@ -30,9 +30,11 @@ final readonly class CalendarDate implements ScalarBinding
             );
         }
 
-        $parsed = \DateTimeImmutable::createFromFormat('!' . self::WIRE, $raw) ?: new \DateTimeImmutable($raw);
+        // The `!` resets the time fields, so a date-only value does not pick up
+        // the current clock and make output non-deterministic.
+        $parsed = \DateTimeImmutable::createFromFormat('!' . self::WIRE, $raw);
 
-        return new self($parsed);
+        return new self($parsed instanceof \DateTimeImmutable ? $parsed : new \DateTimeImmutable($raw));
     }
 
     public function toScalar(): string

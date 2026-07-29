@@ -14,7 +14,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-final readonly class ApiClient
+final readonly class ApiClient implements ApiClientInterface
 {
     public function __construct(
         private ClientInterface $httpClient,

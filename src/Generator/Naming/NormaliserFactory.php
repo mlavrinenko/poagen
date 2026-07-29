@@ -36,6 +36,9 @@ final readonly class NormaliserFactory
         if ($profile->methodRenames !== []) {
             $strategies[] = new RenamesNormaliser($profile->methodRenames, kind: SymbolKind::OperationId, label: 'methodRenames');
         }
+        if ($profile->tagRenames !== []) {
+            $strategies[] = new RenamesNormaliser($profile->tagRenames, kind: SymbolKind::Tag, label: 'tagRenames');
+        }
 
         // Both sanitisers self-filter on `SymbolKind`. The composite walks
         // them in order, the matching one returns the normalised name,
