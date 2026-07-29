@@ -29,7 +29,7 @@ duplicate if so.
   string ("dev" or the last-known-tag) when Composer metadata is
   unavailable (e.g. phar / vendored scenarios).
 + Update the existing `--version` scenario in
-  #link("../../specs/cli.typ") to cover the fallback path: running the
+  #link("../specs/cli.feature-260417.typ") to cover the fallback path: running the
   binary outside a Composer install still produces a non-empty
   version line.
 + Document in the CLI help text that the version reflects the
@@ -58,7 +58,7 @@ duplicate if so.
   back to `"dev"` on `\OutOfBoundsException` or a `null` return. The
   optional `$package` argument exists so the fallback path can be
   regression-tested with a deliberately unknown package.
-- #link("../../specs/cli.typ") grows a "Version falls back to a non-empty
+- #link("../specs/cli.feature-260417.typ") grows a "Version falls back to a non-empty
   sentinel when Composer metadata is missing" scenario under the
   Version rule; the generated PHPUnit test calls
   `Cli::version('does-not-exist/nothing')` and asserts the returned

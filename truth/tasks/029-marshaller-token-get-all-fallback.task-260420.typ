@@ -48,7 +48,7 @@ var_dump($pet->tags[0] instanceof Tag); // expected: true
   comments (write a minimal eval-with-stripped-doc helper or use
   `php_strip_whitespace()` to simulate).
 + Document the fallback in
-  #link("../../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010].
+  #link("../decisions/attribute-and-phpdoc-driven-serialization.decision-260420.typ")[Attribute + phpdoc-driven marshal/unmarshal; Model classes stay clean].
 
 == Non-goals
 

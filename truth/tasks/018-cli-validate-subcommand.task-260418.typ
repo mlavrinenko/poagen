@@ -23,7 +23,7 @@ will bite early adopters.
 == In scope
 
 + Promote the draft `validate` scenario under
-  #link("../../specs/cli.typ") to `stage: unstable` on implementation.
+  #link("../specs/cli.feature-260417.typ") to `stage: unstable` on implementation.
 + Implement `paogen validate <schema>`:
   - Accepts a path to an OpenAPI schema (YAML or JSON).
   - Runs the parser (`cebe/php-openapi` today; whatever task 016
@@ -72,7 +72,7 @@ will bite early adopters.
   type deprecations. Scoped to the CLI process, does not affect
   phpunit (which has its own suppression in `tests/bootstrap.php`)
   or the library API when consumed as a Composer dep.
-- #link("../../specs/cli.typ") rule "Validate subcommand" now has three
+- #link("../specs/cli.feature-260417.typ") rule "Validate subcommand" now has three
   scenarios (valid / malformed / no-arg), all `stage: unstable`,
   locked. The malformed scenario uses `<that-path>` as a sentinel
   substituted at test time with a `tempnam()`-created file, so the

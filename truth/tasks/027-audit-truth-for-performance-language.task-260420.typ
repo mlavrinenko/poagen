@@ -85,7 +85,7 @@ records of completed work and were left as-is.
 + *ADR-007 top-of-document — supersede banner added.* One paragraph
   placed between `#show: adr.with(...)` and `== Context`, stating that
   the *representation* is superseded by
-  #link("../../decisions/010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010]
+  #link("../decisions/attribute-and-phpdoc-driven-serialization.decision-260420.typ")[Attribute + phpdoc-driven marshal/unmarshal; Model classes stay clean]
   while the *contract* remains authoritative.
 
 + *ADR-007 "Alternatives rejected" / "Parse `@param list<Foo>`
@@ -114,7 +114,7 @@ records of completed work and were left as-is.
   driven".* Left unchanged. Covered by the top-of-document supersede
   banner and useful as a record of ADR-007's original framing.
 
-+ *Spec #link("../../specs/model-generator.typ")[Model Generator] —
++ *Spec #link("../specs/model-generator.feature-260418.typ")[Model Generator] —
   scenario "A property with a non-identifier schema key round-trips
   through PROPERTY_MAP".* Rewritten to describe the ADR-010 world:
   `#[WireName('display-name')]` on the property, runtime
@@ -148,7 +148,7 @@ Non-hits verified:
   parser. Out of scope.
 - ADR-010 itself re-uses the trigger phrases ("runtime cost",
   "performance") but in the current-policy voice; unchanged.
-- #link("../../specs/operation-generator.typ")[Operation Generator]:
+- #link("../specs/operation-generator.feature-260418.typ")[Operation Generator]:
   no performance-flavoured passages.
 - `truth/notes/runtime-type-reflection.md`: aligned with ADR-010
   (same-day note). Out of scope per the task.

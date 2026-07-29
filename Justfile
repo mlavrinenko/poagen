@@ -7,13 +7,27 @@ default:
 # Run all quality checks (lint + test)
 #
 # The speconaut recipes below (check-specs, check-generated-tests,
-# check-drift) are temporarily OUT of this aggregate. speconaut's config
-# schema and DSL moved on while paogen was paused: `[traces]` is no longer
-# a config key, `adr()` no longer exists, `entity()` requires typed props,
-# and artifacts are classified by filename sub-extension. Recovering that
-# is tracked as a chain of tasks — see `mt ls 'has_tag("speconaut")'`,
-# starting at `speconaut-config-rewrite`. `rewire-speconaut-justfile-recipes`
-# puts them back here once the truth tree validates again.
+# check-drift) are still OUT of this aggregate, but no longer because the
+# truth tree is broken. That migration is done: the tree validates clean —
+# 4 features, 13 decisions, 7 standards, 7 goals, every link resolving,
+# exit 0 — with only three deliberate standards-coverage warnings naming
+# the standards paogen does not yet enforce.
+#
+# What blocks re-wiring is upstream. `speconaut check` reads this project's
+# `.mindtape/config.toml` through an embedded mindtape that is older than
+# the installed `mt`, and rejects keys `mt` itself writes (`on`,
+# `tasks.comments`, and probably more behind them). Commenting them out to
+# suit the stale parser would mean gutting the gated preset — including the
+# only machine-checked part of it — so we do not.
+#
+# Rebuilding speconaut does not currently fix it either: its Cargo.toml
+# points at `../mindtape/crates/swhid-mint`, which no longer exists in the
+# mindtape checkout, so it does not build against its own path dependency.
+#
+# Tracked as `speconaut-mindtape-config-skew`; `rewire-speconaut-justfile-recipes`
+# restores these to the gate once it lands. Until then validate the tree
+# directly with `speconaut check truth/` from a directory without a
+# `.mindtape/`, or read that task for the reproduction.
 check: lint test
 
 # Full pre-commit gate

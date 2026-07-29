@@ -110,8 +110,8 @@ final readonly class Order
   byte-stability test (T-022) must pass.
 
 + *Specs updated.* Add scenarios to
-  #link("../../specs/model-generator.typ")[Model Generator] and
-  #link("../../specs/operation-generator.typ")[Operation Generator] for:
+  #link("../specs/model-generator.feature-260418.typ")[Model Generator] and
+  #link("../specs/operation-generator.feature-260418.typ")[Operation Generator] for:
   - Model emits no `PROPERTY_MAP`, no `JsonSerializable`.
   - Marshaller round-trips a scalar-binding VO.
   - Hydrator recurses into `list<Tag>`.
