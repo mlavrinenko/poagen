@@ -45,9 +45,21 @@ lint-cs-fixer:
 lint-phpstan:
     phpstan analyse --memory-limit=512M
 
-# Static analysis on generated fixtures (consumer-view; ADR-004)
+# Static analysis on generated fixtures + example trees (consumer-view; ADR-004)
+#
+# phpstan-generated.neon has no `paths:` (PHPStan errors on a path that
+# doesn't exist, and not every examples/*/generated tree exists — some
+# examples are .expected-failure and have no generated/ dir). So the path
+# set is resolved here: tests/fixtures/generated is always analysed, and
+# examples/*/generated is glob-expanded to whichever example trees
+# currently exist (nullglob so a run with zero example trees still
+# analyses the fixtures instead of erroring on a literal unmatched glob).
 lint-phpstan-generated:
-    phpstan analyse -c phpstan-generated.neon --memory-limit=512M
+    #!/usr/bin/env bash
+    set -euo pipefail
+    shopt -s nullglob
+    paths=(tests/fixtures/generated examples/*/generated)
+    phpstan analyse -c phpstan-generated.neon --memory-limit=512M "${paths[@]}"
 
 # Check for Rector refactoring opportunities
 lint-rector:
