@@ -9,8 +9,8 @@ own repo, minus `vendor/`.
 ```
 examples/
 ├── petstore/          ✅ passes — small textbook schema
-├── digitalocean/      ✅ passes (golden tree has T-025 / T-026 follow-ups)
-└── github/            ✅ passes (golden tree has T-025 / T-026 follow-ups)
+├── digitalocean/      ⚠️  expected-failure (T-030) — no generated/ tree
+└── github/            ⚠️  expected-failure (T-030) — no generated/ tree
 ```
 
 ## Running an example
@@ -34,15 +34,14 @@ Packagist round-trip. `composer generate` is a one-line alias for
   known-good end-to-end generation path: models, enums, an inline
   synthesised class, a small `ApiClient`, a `jsonSerialize` round-trip.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
-  (2.7 MB, 722 components). Every kebab-case and snake_case
-  component is auto-normalised by T-023's default pipeline. Two
-  follow-up tasks ([T-025](../truth/tasks/025-parameter-and-operation-name-normalisation.typ),
-  [T-026](../truth/tasks/026-scalar-and-composition-components.typ))
-  track ops the generator currently skips and scalar/composition
-  components that emit dangling class references.
+  (2.7 MB, 722 components). `.expected-failure`: a ref-only `oneOf`
+  without `discriminator` trips ADR-010's generator-time error
+  ([T-030](../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
+  No `generated/` tree is committed for it — see "`just check-examples`"
+  below.
 - **`github/`** — the GitHub REST API 3.0.3 bundle (8.8 MB, ~918
-  components, ~1000 endpoints). Same default pipeline; same
-  T-025 / T-026 follow-ups; same `just check-examples` green.
+  components, ~1000 endpoints). Same `.expected-failure` reason
+  (T-030), same absence of a `generated/` tree.
 
 ## `just check-examples`
 
@@ -58,8 +57,11 @@ generator, and summarises:
 - Directory without `.expected-failure` → generation must succeed
   with no drift vs the committed `generated/` tree.
 - Directory with `.expected-failure` → generation is *expected* to
-  fail. An unexpected success is flagged so the marker doesn't go
-  stale.
+  fail, and the directory carries no `generated/` tree — the marker
+  and a committed tree can't both be true. An unexpected success is
+  flagged so the marker doesn't go stale; an `.expected-failure`
+  directory that still has a `generated/` tree is flagged the same
+  way, naming the example.
 
 `check-examples` is deliberately **not** part of `just check`. Broken
 examples are committed on purpose — they are the dashboard for what

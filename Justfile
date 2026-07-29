@@ -140,6 +140,11 @@ check-examples:
             else
                 reason=$(head -n 1 "$dir/.expected-failure")
                 echo "⚠️  $name: expected-failure — $reason"
+                if [[ -d "$dir/generated" ]]; then
+                    echo "❌ $name: expected-failure but generated/ is still committed"
+                    echo "   → delete $dir/generated/ — it is stale output no current run reproduces"
+                    stale=$((stale + 1))
+                fi
             fi
         else
             if php -d memory_limit=4G bin/paogen generate --diff "$profile" > /tmp/paogen-examples-diff.$$ 2>&1; then

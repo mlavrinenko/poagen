@@ -4,10 +4,12 @@ The full [GitHub REST API](https://docs.github.com/en/rest) OpenAPI
 3.0.3 document — ~1000 endpoints, ~918 schema components, 8.8 MB of
 YAML. This is the industry's "real client generator" torture test.
 
-> **Status: generates successfully.** The `generated/` tree is
-> committed. Some ops are skipped and the output still has PHPStan
-> warnings tracked by [T-025](../../truth/tasks/025-parameter-and-operation-name-normalisation.typ)
-> and [T-026](../../truth/tasks/026-scalar-and-composition-components.typ).
+> **Status: expected failure.** `integration.owner` (and others) is
+> `oneOf: [$ref simple-user, $ref enterprise]` with no
+> `discriminator`; ADR-010 makes that a generator-time error
+> ([T-030](../../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
+> No `generated/` tree is committed — see `.expected-failure`.
+> Clearing the marker and committing a tree is one step, done together.
 
 ## What this demonstrates
 
@@ -25,11 +27,12 @@ YAML. This is the industry's "real client generator" torture test.
 github/
 ├── composer.json              — consumer-style project manifest
 ├── paogen.php                 — the Profile object paogen reads
-├── schemas/
-│   └── api.github.com.yaml    — vendored bundled schema
-└── generated/
-    └── Generated/             — committed golden tree (~2250 files)
+└── schemas/
+    └── api.github.com.yaml    — vendored bundled schema
 ```
+
+No `generated/` here — `.expected-failure` examples don't carry one
+(see "Known limitations").
 
 ## Running it
 
@@ -41,6 +44,10 @@ composer install
 # Needs a raised memory limit to parse the 8.8 MB schema:
 php -d memory_limit=4G vendor/bin/paogen generate paogen.php
 ```
+
+This currently exits non-zero — see `.expected-failure`. Once T-030 is
+addressed here, a successful run writes `./generated/`, and that run's
+diff commits the tree alongside deleting the marker.
 
 ## Source of the schema
 
@@ -69,5 +76,6 @@ Two follow-up tasks track gaps exposed by this fixture.
   composition components that the generator references but does
   not emit a file for. T-026 picks a strategy per shape.
 
-Both tasks block this example from being fully PHPStan-clean under
-`phpstan-generated.neon`; neither blocks the schema from generating.
+Both describe gaps in the golden tree this example had before T-030
+started refusing undiscriminated `oneOf`; they apply again once T-030
+is resolved and a tree is committed.
