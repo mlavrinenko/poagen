@@ -5,7 +5,7 @@
   tags: ("proof",),
   priority: 8,
   difficulty: 5,
-  status: proposed(2026, 7, 28),
+  status: accepted(2026, 7, 29),
 )
 
 == Summary
