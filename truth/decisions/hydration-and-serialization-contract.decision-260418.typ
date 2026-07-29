@@ -1,13 +1,24 @@
-#import "@local/speconaut:0.1.0": adr, accepted
+#import "@local/speconaut:0.1.0": *
+#import "../domain/generation.context.typ": *
 
-#show: adr.with(
-  number: 7,
+#show: decision.with(
   title: "Hydration and serialization contract between the Client, Models, and bound VOs",
-  status: accepted,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: accepted(2026, 4, 18),
+  contexts: (generation-context,),
+  goals: (link("../goals/typed-injectable-surface.goal.typ"),),
+  standards: (link("../standards/caller-surface-is-injectable.standard-260729.typ"),),
 )
 
-*Representation superseded by #link("010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010] (2026-04-20).* The marshal/unmarshal *contract* below — explicit per-property metadata (not reflect-and-guess); `ScalarBinding` VOs round-trip transparently; list and map shapes recurse — remains authoritative. The *representation* — per-Model `PROPERTY_MAP` constant plus `JsonSerializable` — is replaced by a small attribute vocabulary plus phpdoc read at runtime via `phpstan/phpdoc-parser`. See ADR-010 for the current shape and rationale, including why the pre-ADR-010 performance argument against parsing phpdoc at runtime no longer applies.
+Representation superseded by
+#link("attribute-and-phpdoc-driven-serialization.decision-260420.typ")[Attribute + phpdoc-driven marshal/unmarshal; Model classes stay clean] (2026-04-20). The
+marshal/unmarshal contract below — explicit per-property metadata (not
+reflect-and-guess); `ScalarBinding` VOs round-trip transparently; list and
+map shapes recurse — remains authoritative. The representation — per-Model
+`PROPERTY_MAP` constant plus `JsonSerializable` — is replaced by a small
+attribute vocabulary plus phpdoc read at runtime via
+`phpstan/phpdoc-parser`. See the later decision for the current shape and
+rationale, including why the earlier performance argument against parsing
+phpdoc at runtime no longer applies.
 
 == Context
 
@@ -32,12 +43,12 @@ correctness bugs in the emitted `ApiClient::hydrate()`:
   #raw("{\"email\":{\"value\":\"...\"}}") instead of
   #raw("{\"email\":\"...\"}"). Response hydration has the mirror bug.
 
-The three share the same root cause: the generator has no explicit
+The three share the same root cause: #the(Generator) has no explicit
 marshal/unmarshal contract. Reflection is being used as a substitute for
 per-property metadata, and that substitute breaks at the first
 non-trivial shape.
 
-== Decision
+== Choice
 
 Adopt a single, spec-visible marshal/unmarshal contract that the emitter
 materialises per Model:
@@ -58,8 +69,8 @@ materialises per Model:
   }
   ```
 
-  The generator treats any VO implementing it as transparent at the wire
-  boundary — `json_encode` and `hydrate()` both route through
+  #The(Generator) treats any VO implementing it as transparent at the
+  wire boundary — `json_encode` and `hydrate()` both route through
   `toScalar()` / `fromScalar()`. VOs that do not implement it fall back
   to today's whole-object (de)serialization and are considered "object
   bindings" for complex formats.
@@ -72,37 +83,36 @@ materialises per Model:
 
 The exact shape of `PROPERTY_MAP` (array-of-arrays vs. attribute-based
 registry vs. emitted `__propertyMap()` method) is left to the
-implementing task(s); this ADR only locks the *contract*.
+implementing task(s); this decision only locks the contract.
 
 == Consequences
 
-- Every generated Model grows a compile-time property map — ~N lines
-  for N properties. Golden fixtures for Petstore regrow accordingly.
+- Every #a(Model) grows a compile-time property map — ~N lines for N
+  properties. Golden fixtures for Petstore regrow accordingly.
 - `ClientEmitter::hydrate()` becomes data-driven rather than
   reflection-driven, removing the "builtin means stop" failure mode.
 - Users who implement `ScalarBinding` on their VOs get transparent
   round-tripping for free; users who don't keep today's object-wrap
   semantics.
-- The generator gains a small runtime support layer (the interface
-  definition, and possibly a shared hydration helper). ADR-002's
-  "no-inheritance" stance still holds: the support layer is an
-  interface + free functions, not a base class.
+- #The(Generator) gains a small runtime support layer (the interface
+  definition, and possibly a shared hydration helper). The
+  no-inheritance stance still holds: the support layer is an interface
+  plus free functions, not a base class.
 
-== Alternatives rejected
+=== Alternatives rejected
 
 - *Parse `@param list<Foo>` phpdoc at runtime.* Works, but adds a phpdoc
   parser to the consumer's runtime and breaks if the user strips
   comments. Rejected.
-  #link("010-attribute-and-phpdoc-driven-serialization.typ")[ADR-010]
-  reverses this rejection: one MIT-licensed parser
-  (`phpstan/phpdoc-parser`) is the right-sized cost, and a
-  `token_get_all` fallback against the class source handles comment-
-  stripped opcache environments. The 2026-04-20 review ruled that
-  clean output outweighs the added dependency.
+  #link("attribute-and-phpdoc-driven-serialization.decision-260420.typ")[Attribute + phpdoc-driven marshal/unmarshal; Model classes stay clean] reverses this
+  rejection: one MIT-licensed parser (`phpstan/phpdoc-parser`) is the
+  right-sized cost, and a `token_get_all` fallback against the class
+  source handles comment-stripped opcache environments. The 2026-04-20
+  review ruled that clean output outweighs the added dependency.
 - *`#[\\SerializedName]`-style attribute on every property.* Viable;
   kept as a fallback implementation shape for the `PROPERTY_MAP` step.
   Not picked as the headline design because attributes scatter the map
   across the class body and are harder to introspect in bulk.
 - *Force users to subclass a generator-provided `Model` base.* Rejected
-  by ADR-002.
+  by #link("no-inheritance-no-protected-regions.decision-260418.typ")[No inheritance, no protected regions, no attributes-in-generated-files].
 - *Status quo (reflect-and-guess).* Rejected — documented broken.
