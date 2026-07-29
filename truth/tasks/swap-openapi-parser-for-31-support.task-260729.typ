@@ -16,6 +16,8 @@ paogen parses OpenAPI 3.0 through \`cebe/php-openapi\`, which is unmaintained en
 
 The risk this task must contain: a 3.1-native parser hands the emitters JSON Schema 2020-12 constructs they have never seen, and today those fall through \`TypeResolver\` into the silent-skip paths. This task therefore lands after \`abort-on-unrepresentable-constructs\`, so a construct the emitters cannot represent becomes a named failure rather than a quietly smaller client.
 
+Verified against the real document before this task was written, in a scratch project rather than by reading the fork's README. The fork installs clean, reads the kilbil 3.1.0 file, returns \`true\` from \`validate()\` with an empty error list, resolves all 36 operations, and emits no PHP 8.4 deprecation notices. So the parse side of this task carries little unknown risk; the unknown is entirely on the emitter side, downstream of the parser.
+
 == Acceptance criteria
 
 - \`composer.json\` requires \`devizzent/cebe-php-openapi\` and no longer requires \`cebe/php-openapi\`.

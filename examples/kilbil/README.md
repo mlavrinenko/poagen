@@ -14,10 +14,13 @@ Petstore.
 **OpenAPI 3.1.** Not 3.0. The nullable-array idiom, `const`, and JSON Schema
 2020-12 constructs all appear where a 3.0 parser expects something else.
 
-**Inline payloads.** 34 of 36 operations declare their request and response
-bodies inline rather than referencing a named component, so there is no
-`components/schemas` entry to emit a model from. A generator that only handles
-`$ref` payloads emits almost nothing here.
+**No named components at all.** `components/schemas` is empty. Every payload is
+declared inline at its use site: 29 inline JSON request bodies and 71 inline
+JSON response schemas across the 36 operations. paogen's model planner works by
+walking the component catalogue, so against this document it has nothing to walk
+and emits no models whatsoever. Roughly a hundred model names have to be
+synthesised, which is what makes the naming rule load-bearing rather than
+cosmetic — a collision here silently overwrites an emitted file.
 
 **Cyrillic tags.** All eleven operation tags are Russian words — `Клиенты`,
 `Операции`, `Подарочные сертификаты`. Tags become sub-client names, so this

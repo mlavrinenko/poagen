@@ -23,6 +23,8 @@ The whole model pipeline is rooted in the named components of the document. The 
 - A pin naming an operation identifier absent from the document fails the run rather than being ignored.
 - A schema with no components at all generates a complete client.
 - The kilbil loyalty schema emits all 36 operations.
+- The kilbil loyalty schema emits a usable set of models despite declaring zero named components. Measured directly against the parsed document: \`components/schemas\` is empty, and the operations carry 29 inline JSON request bodies and 71 inline JSON response schemas. Every model in that client has to be synthesised — none can come from the component catalogue, because there is no catalogue.
+- Roughly a hundred synthesised names land in one client, so the naming rule is load-bearing rather than cosmetic. Two operations whose payloads differ must not collide, and a collision must fail the run rather than silently overwrite an emitted file.
 
 == Non-goals
 
