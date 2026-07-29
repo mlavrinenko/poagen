@@ -1,10 +1,12 @@
-#import "@local/speconaut:0.1.0": adr, accepted
+#import "@local/speconaut:0.1.0": *
+#import "../domain/generation.context.typ": *
 
-#show: adr.with(
-  number: 9,
+#show: decision.with(
   title: "Error response policy: non-2xx handling in the generated client",
-  status: accepted,
-  date: datetime(year: 2026, month: 4, day: 18),
+  status: accepted(2026, 4, 18),
+  contexts: (generation-context,),
+  goals: (link("../goals/typed-injectable-surface.goal.typ"),),
+  standards: (link("../standards/caller-surface-is-injectable.standard-260729.typ"),),
 )
 
 == Context
@@ -41,10 +43,10 @@ mapping.
    consumer code becomes `if ($r instanceof Err)` everywhere],
 )
 
-== Decision
+== Choice
 
-*Accepted: (b) single generic `ApiException` for the PoC and v0.1,
-with an explicit upgrade path to (a) when a real schema justifies it.*
+Accepted: (b) single generic `ApiException` for the PoC and v0.1, with an
+explicit upgrade path to (a) when a real schema justifies it.
 
 Specifically:
 
@@ -59,34 +61,34 @@ Specifically:
 + Any non-2xx status in any emitted operation throws this exception
   instead of being fed to `hydrate()`.
 + When an OpenAPI operation declares a typed 4xx/5xx response schema,
-  the generator emits the exception's `@phpstan-return` / property
-  type as the union of declared error Models (no new exception
-  subclasses). Consumers narrow via `instanceof` on
+  #the(Generator) emits the exception's `@phpstan-return` / property
+  type as the union of declared error #the(Model) types (no new
+  exception subclasses). Consumers narrow via `instanceof` on
   `getDecodedBody()`. This keeps today's "one class per schema" budget
   at one even for richly-typed error surfaces.
-+ Escalating to (a) is a future ADR decision, triggered when at least
-  one validation-tier schema (ADR-005) has a typed error body that
-  consumers want to catch structurally (not by status code).
++ Escalating to (a) is a future decision, triggered when at least one
+  validation-tier schema (see
+  #link("schema-fixture-policy.decision-260418.typ")[Schema fixture policy: vendor real-world OpenAPI documents under tests/fixtures/schemas/]) has a typed error body that
+  consumers want to catch structurally, not by status code.
 
-The implementing task is
-#link("../tasks/.storage/2026-04-18-012-non-2xx-error-handling.typ"); a concrete alternative
-would have to supersede this ADR with a new one.
+The implementing task tracks this build; a concrete alternative would
+have to supersede this decision with a new one.
 
 == Consequences
 
 - The Operation Generator grows a "response-dispatch" step that
   distinguishes 2xx from everything else; the existing `ReturnSpec` /
   `ResponseHandler` pair gets a matching error branch.
-- `Generated\\ApiException` is the first runtime support class the
-  generator ships. ADR-002's no-inheritance rule holds — this class is
-  *generated*, and consumers extend nothing.
-- The Petstore golden fixture regenerates with a new exception file
-  and error branches in every method.
+- `Generated\\ApiException` is the first runtime support class #the(Generator)
+  ships. The no-inheritance rule holds — this class is generated, and
+  consumers extend nothing.
+- The Petstore golden fixture regenerates with a new exception file and
+  error branches in every method.
 - The test harness gains at least one scenario per direction: "404
   throws `ApiException`", "`getDecodedBody()` returns the decoded
   payload", "non-JSON error body yields `null` decoded body".
 
-== Alternatives rejected
+=== Alternatives rejected
 
 - *Status quo (generic `RuntimeException`).* Documented-broken by the
   review; swallows status code; unusable from consumer try/catch.
