@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated;
+
+use Acme\Kilbil\Generated\Model\GetActionsListRequest;
+use Acme\Kilbil\Generated\Model\GetActionsListResponse;
+use Acme\Kilbil\Generated\Model\GetProgramsResponse;
+
+/**
+ * The contract for the `Информация о лояльности` endpoints.
+ *
+ * Type-hint this rather than the class: hand-written convenience implements the same
+ * contract and delegates to the generated implementation, so a regeneration that changes
+ * the surface fails to compile instead of silently breaking the seam.
+ */
+interface LoyaltySettingsClientInterface
+{
+    public function getActionsList(GetActionsListRequest $body): GetActionsListResponse;
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public function getPrograms(array $body): GetProgramsResponse;
+}

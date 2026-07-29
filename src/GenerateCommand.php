@@ -148,6 +148,16 @@ final class GenerateCommand
         }
     }
 
+    /**
+     * `--output` overrides one field and must carry every other one.
+     *
+     * Enumerating them by hand rotted twice — `$inlineModels` and then the three
+     * tag maps were each added to `Profile` and silently not carried here, so a
+     * `--output` run quietly discarded the consumer's guidance and emitted a
+     * different tree than a plain run would. `ProfileTest` reflects over the
+     * constructor and fails when a parameter is added without appearing below, so
+     * the third time is a red gate rather than a surprise.
+     */
     private static function withOutput(Profile $profile, string $output): Profile
     {
         return new Profile(
@@ -160,6 +170,10 @@ final class GenerateCommand
             discriminators: $profile->discriminators,
             skip: $profile->skip,
             methodRenames: $profile->methodRenames,
+            tagRenames: $profile->tagRenames,
+            tagAssignments: $profile->tagAssignments,
+            tagChoice: $profile->tagChoice,
+            xmlElements: $profile->xmlElements,
             inlineModels: $profile->inlineModels,
         );
     }

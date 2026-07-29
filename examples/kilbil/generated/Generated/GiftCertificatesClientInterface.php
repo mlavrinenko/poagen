@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated;
+
+use Acme\Kilbil\Generated\Model\GenerateGiftCardRequest;
+use Acme\Kilbil\Generated\Model\GenerateGiftCardResponse;
+use Acme\Kilbil\Generated\Model\GetProgramGiftCardResponse;
+use Acme\Kilbil\Generated\Model\SearchGiftCardRequest;
+use Acme\Kilbil\Generated\Model\SearchGiftCardResponse;
+
+/**
+ * The contract for the `Подарочные сертификаты` endpoints.
+ *
+ * Type-hint this rather than the class: hand-written convenience implements the same
+ * contract and delegates to the generated implementation, so a regeneration that changes
+ * the surface fails to compile instead of silently breaking the seam.
+ */
+interface GiftCertificatesClientInterface
+{
+    public function generateGiftCard(GenerateGiftCardRequest $body): GenerateGiftCardResponse;
+
+    public function getProgramGiftCard(): GetProgramGiftCardResponse;
+
+    public function searchGiftCard(SearchGiftCardRequest $body): SearchGiftCardResponse;
+}

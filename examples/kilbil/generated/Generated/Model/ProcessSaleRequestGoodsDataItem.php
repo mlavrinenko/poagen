@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Model;
+
+final readonly class ProcessSaleRequestGoodsDataItem
+{
+    /**
+     * @param ?list<string> $good_promo
+     */
+    public function __construct(
+        public string $code,
+        public float $discounted_price,
+        public float $discounted_total,
+        public string $name,
+        public float $price,
+        public float $quantity,
+        public float $total,
+        public string $vendor_code,
+        public ?string $barcode = null,
+        public ?int $flags = null,
+        public ?array $good_promo = null,
+        public ?float $maxDiscount = null,
+        public ?float $minPrice = null,
+        public ?int $new_price_action_id = null,
+        public ?int $new_price_limit_action_id = null,
+        public ?int $new_price_limit_respond_id = null,
+        public ?int $new_price_limits_counter_quantity = null,
+        public ?int $new_price_respond_id = null,
+        public ?string $parent_code = null,
+        public ?string $parent_vendor_code = null,
+        public ?string $variant = null,
+    ) {
+    }
+}

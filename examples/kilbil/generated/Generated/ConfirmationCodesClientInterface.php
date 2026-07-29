@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated;
+
+use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequest;
+use Acme\Kilbil\Generated\Model\AskConfirmPhoneResponse;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequest;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeResponse;
+
+/**
+ * The contract for the `Код подтверждения` endpoints.
+ *
+ * Type-hint this rather than the class: hand-written convenience implements the same
+ * contract and delegates to the generated implementation, so a regeneration that changes
+ * the surface fails to compile instead of silently breaking the seam.
+ */
+interface ConfirmationCodesClientInterface
+{
+    public function askConfirmPhone(AskConfirmPhoneRequest $body): AskConfirmPhoneResponse;
+
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequest $body): CheckConfirmPhoneCodeResponse;
+}

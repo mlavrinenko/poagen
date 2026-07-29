@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Model;
+
+use Acme\Kilbil\Generated\Enum\SearchGiftCardResponseGcState;
+use Acme\Kilbil\Generated\Enum\SearchGiftCardResponseGcWriteOffType;
+
+final readonly class SearchGiftCardResponse
+{
+    public function __construct(
+        public float $gc_balance,
+        public string $gc_barcode,
+        public string $gc_code,
+        public SearchGiftCardResponseGcState $gc_state,
+        public string $gc_state_text,
+        public SearchGiftCardResponseGcWriteOffType $gc_write_off_type,
+        public string $result_code,
+        public string $result_text,
+    ) {
+    }
+}

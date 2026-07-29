@@ -96,7 +96,59 @@ or cookie parameters at all.
 
 ## Status
 
-Marked `.expected-failure`. The marker's own text names the three tasks that
-have to land before it generates, and `just check-examples` fails if the
-generator ever starts succeeding here without the marker being removed — a
-stale marker is treated as an error, not a convenience.
+Generating. All 36 operations, nothing skipped, `generated/` committed:
+
+```
+php bin/paogen generate examples/kilbil/paogen.php   # exits 0
+just check-examples                                  # ✅ kilbil: no drift
+```
+
+185 files: 11 tag sub-clients and their interfaces, the root client and its
+interface, `ApiException`, 104 synthesised models and 53 synthesised enums. The
+generated tree passes `just lint-phpstan-generated` — max level, no baseline, no
+`excludePaths`, no `ignoreErrors` — and two consecutive runs produce byte-identical
+output.
+
+## What the profile has to say, and what it does not
+
+`paogen.php` is the demonstration that guidance shapes output. Delete everything
+below `namespace:` and generation still succeeds; the client is only less pleasant
+to call. What is there, and why:
+
+| Guidance | Answers |
+|---|---|
+| `discoverIn` + `src/ValueObject/` | Four of the nine format values: `date time`, `data time`, `data`, `phone`. 23 properties gain a real type. |
+| `methodRenames` (33 entries) | Operation ids with no word boundary. `getclientfullbalance` becomes `getClientFullBalance` — and so do its models. |
+| `tagRenames` (10 entries) | Russian tag names. `Клиенты` becomes `CustomersClient` rather than `KlientyClient`. |
+| `xmlElements` (4 entries) | The XML root and item elements OpenAPI supplies no default for. |
+
+Three operation ids are deliberately absent from `methodRenames`, and one tag from
+`tagRenames`. `generate_promocode` and `legal_info` carry real separators, `goods`
+is a single word, and `Wallet` was already ASCII — listing any of them would hide
+whether the defaults work.
+
+`int` (172 uses) and `double` (94) stay unbound. Both are reported on stderr, and a
+consumer wanting a `Money` or `Quantity` type binds them the same way as the
+others. The report exists to make the opportunity visible, not to insist it be
+taken.
+
+## The wrapper, proven rather than described
+
+`src/PhoneConfirmation.php` implements `ConfirmationCodesClientInterface` — the
+contract emitted for the vendor's `Код подтверждения` tag — delegates both calls to
+the generated implementation, and adds `isCodeValid(PhoneNumber, string): bool`,
+which the generator has no way to write.
+
+Nothing under `generated/` changed to allow that: no hook, no protected region, no
+subclass. And `just lint-phpstan-generated` analyses `src/` at max level too, so if
+a regeneration renamed `checkConfirmPhoneCode` the wrapper would stop satisfying its
+interface and the gate would say so. That is what makes the seam a contract rather
+than a convention.
+
+## Known gap
+
+The document's only security scheme is a query-string `apiKey` named `h`, applied
+globally. paogen does not yet wire an `apiKey` with `in: query`, so the committed
+client takes no credential and sends none — every call would come back 403. Tracked
+as `query-apikey-security-scheme`; the tree needs regenerating once it lands, which
+`just check-examples` will report as drift until it is.

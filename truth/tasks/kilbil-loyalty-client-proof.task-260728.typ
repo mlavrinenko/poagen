@@ -5,7 +5,7 @@
   tags: ("proof",),
   priority: 8,
   difficulty: 5,
-  status: accepted(2026, 7, 29),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -28,5 +28,5 @@ The project needs one real, published, unfriendly schema it demonstrably serves 
 
 == Files
 
-- \`examples/kilbil/\`
-- \`Justfile\`
+- `examples/kilbil/`
+- `Justfile`

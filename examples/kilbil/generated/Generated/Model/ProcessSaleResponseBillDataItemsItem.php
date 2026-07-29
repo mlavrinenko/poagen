@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Model;
+
+final readonly class ProcessSaleResponseBillDataItemsItem
+{
+    public function __construct(
+        public float $bonus_in,
+        public float $bonus_out,
+        public float $bonus_out_money,
+        public ?float $client_discount,
+        public string $code,
+        public float $discount,
+        public float $discounted_price,
+        public float $discounted_total,
+        public int $flags,
+        public float $price,
+        public float $quantity,
+        public float $rounding,
+        public float $total,
+    ) {
+    }
+}

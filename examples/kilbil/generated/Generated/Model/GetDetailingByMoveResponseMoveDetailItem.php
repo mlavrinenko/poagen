@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Model;
+
+final readonly class GetDetailingByMoveResponseMoveDetailItem
+{
+    /**
+     * @param ?list<\Acme\Kilbil\Generated\Model\GetDetailingByMoveResponseMoveDetailItemActionsItem> $actions
+     */
+    public function __construct(
+        public ?array $actions = null,
+        public ?string $barcode = null,
+        public ?float $bonus_in = null,
+        public ?float $bonus_out = null,
+        public ?float $cash_discount = null,
+        public ?string $code = null,
+        public ?float $discount = null,
+        public ?float $discounted_price = null,
+        public ?float $discounted_total = null,
+        public ?string $name = null,
+        public ?float $price = null,
+        public ?float $quantity = null,
+        public ?float $total = null,
+    ) {
+    }
+}

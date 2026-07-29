@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Enum;
+
+enum GetProgramsResponseDataItemType: string
+{
+    case Case1 = 'Бонусная';
+    case Case2 = 'Дисконтная';
+    case Case3 = 'Дисконтно-бонусная';
+    case Case4 = 'Подарочный сертификат';
+}

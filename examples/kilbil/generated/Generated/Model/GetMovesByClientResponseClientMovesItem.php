@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acme\Kilbil\Generated\Model;
+
+use Acme\Kilbil\Generated\Enum\GetMovesByClientResponseClientMovesItemOperType;
+use Acme\Kilbil\ValueObject\Timestamp;
+
+final readonly class GetMovesByClientResponseClientMovesItem
+{
+    public function __construct(
+        public ?float $bonus_in = null,
+        public ?Timestamp $bonus_in_date = null,
+        public ?float $bonus_out = null,
+        public ?Timestamp $bonus_term_date = null,
+        public ?float $discount = null,
+        public ?int $id = null,
+        public ?string $manualadd_description = null,
+        public ?float $move_asum = null,
+        public ?Timestamp $move_date = null,
+        public ?string $move_id = null,
+        public ?string $oper_description = null,
+        public ?GetMovesByClientResponseClientMovesItemOperType $oper_type = null,
+        public ?int $rows_count = null,
+        public ?string $trade_object = null,
+    ) {
+    }
+}
