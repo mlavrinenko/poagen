@@ -382,7 +382,7 @@ final class OperationGeneratorSteps
     public function thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid(): void
     {
         TestCase::assertStringContainsString(
-            'public function deletePet(int $petId, ?string $api_key = null): void',
+            'public function deletePet(int $petId, ?string $apiKey = null): void',
             $this->source,
         );
     }
@@ -392,7 +392,7 @@ final class OperationGeneratorSteps
     {
         $body = $this->methodSlice('deletePet');
         TestCase::assertStringContainsString(
-            "if (\$api_key !== null) { \$request = \$request->withHeader('api_key', \$api_key); }",
+            "if (\$apiKey !== null) { \$request = \$request->withHeader('api_key', \$apiKey); }",
             $body,
         );
     }
@@ -451,7 +451,7 @@ final class OperationGeneratorSteps
     public function thenTheEmittedClientHasAMethodListOrdersIntLimitNullArray(): void
     {
         TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $api_key = null): array',
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
             $this->source,
         );
     }
@@ -473,7 +473,7 @@ final class OperationGeneratorSteps
     public function thenTheEmittedMethodSignatureIncludesStringApiKeyNull(): void
     {
         TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $api_key = null): array',
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
             $this->source,
         );
     }
@@ -483,7 +483,7 @@ final class OperationGeneratorSteps
     {
         $body = $this->methodSlice('listOrders');
         TestCase::assertStringContainsString(
-            "if (\$api_key !== null) { \$request = \$request->withHeader('api_key', \$api_key); }",
+            "if (\$apiKey !== null) { \$request = \$request->withHeader('api_key', \$apiKey); }",
             $body,
         );
     }
@@ -996,23 +996,40 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenAProfileWhoseRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest(): void
+    public function givenAProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest(): void
     {
         $base = $this->loadProfile('parameters');
-        // Reuse the parameters fixture wiring but override the
-        // operationId via Profile::$renames — the same map that
-        // overrides schema-component class names (T-023, T-025).
+        // Reuse the parameters fixture wiring but override the operationId via
+        // Profile::$methodRenames. `$renames` used to serve both because it
+        // applied to every symbol kind; each map is now scoped to the kind it
+        // names (operationid-word-splitting).
         $this->profile = new Profile(
             schema: $base->schema,
             output: $base->output,
             namespace: $base->namespace,
             discoverIn: $base->discoverIn,
+            skip: $base->skip,
+            methodRenames: ['monitoring_get_foo.yml' => 'forwardProxyRequest'],
+        );
+    }
+
+    public function thenTheProfilesRenamesMapDoesNotRenameAnOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne(
+    ): void {
+        $base = $this->loadProfile('parameters');
+        $viaComponentMap = new Profile(
+            schema: $base->schema,
+            output: $base->output,
+            namespace: $base->namespace,
+            discoverIn: $base->discoverIn,
             renames: ['monitoring_get_foo.yml' => 'forwardProxyRequest'],
-            // Carry the fixture's skip list through: this scenario overrides
-            // renames only, and dropping the skips would make it fail on an
-            // unrelated unrepresentable body.
             skip: $base->skip,
         );
+
+        $this->runGenerator($viaComponentMap);
+        $source = (string) file_get_contents($this->outputDir . '/Generated/ApiClient.php');
+
+        TestCase::assertStringNotContainsString('public function forwardProxyRequest', $source);
+        TestCase::assertStringContainsString('public function monitoringGetFooYml', $source);
     }
 
 
@@ -1105,11 +1122,11 @@ final class OperationGeneratorSteps
     {
         $body = $this->methodSlice('getSshKeyById');
         TestCase::assertStringContainsString(
-            "\\str_replace('{ssh_key_id}', (string) \$ssh_key_id->toScalar(), \$path)",
+            "\\str_replace('{ssh_key_id}', (string) \$sshKeyId->toScalar(), \$path)",
             $body,
         );
         TestCase::assertStringNotContainsString(
-            "\\str_replace('{ssh_key_id}', (string) \$ssh_key_id, \$path)",
+            "\\str_replace('{ssh_key_id}', (string) \$sshKeyId, \$path)",
             $body,
         );
     }

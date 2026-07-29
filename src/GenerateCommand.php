@@ -138,6 +138,14 @@ final class GenerateCommand
                 fwrite($stderr, "  - {$entry->rawName} [{$entry->reason}]\n");
             }
         }
+
+        // Notices come last and never touch the exit status. Nothing here was
+        // omitted — each one names guidance that would make the emitted client
+        // more pleasant, which `user-code-guides-generation` is explicit must
+        // never be an error.
+        foreach ($plan->notices as $notice) {
+            fwrite($stderr, "paogen: {$notice}\n");
+        }
     }
 
     private static function withOutput(Profile $profile, string $output): Profile
@@ -151,6 +159,8 @@ final class GenerateCommand
             nameNormaliser: $profile->nameNormaliser,
             discriminators: $profile->discriminators,
             skip: $profile->skip,
+            methodRenames: $profile->methodRenames,
+            inlineModels: $profile->inlineModels,
         );
     }
 }

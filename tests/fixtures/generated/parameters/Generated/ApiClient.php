@@ -42,10 +42,10 @@ final readonly class ApiClient
         }
     }
 
-    public function getSshKeyById(SshKeyId $ssh_key_id): void
+    public function getSshKeyById(SshKeyId $sshKeyId): void
     {
         $path = '/keys/{ssh_key_id}';
-        $path = \str_replace('{ssh_key_id}', (string) $ssh_key_id->toScalar(), $path);
+        $path = \str_replace('{ssh_key_id}', (string) $sshKeyId->toScalar(), $path);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -57,7 +57,7 @@ final readonly class ApiClient
     /**
      * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
      */
-    public function listOrders(?int $limit = null, ?string $api_key = null): array
+    public function listOrders(?int $limit = null, ?string $apiKey = null): array
     {
         $path = '/order';
         $query = [];
@@ -66,7 +66,7 @@ final readonly class ApiClient
         }
         if ($query !== []) { $path .= '?' . \implode('&', $query); }
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
-        if ($api_key !== null) { $request = $request->withHeader('api_key', $api_key); }
+        if ($apiKey !== null) { $request = $request->withHeader('api_key', $apiKey); }
         $request = $request->withHeader('X-API-Key', $this->apiKey);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();

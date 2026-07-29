@@ -112,8 +112,8 @@
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "DELETE /pet/{petId}")) with #p((id: "operationId: deletePet")) and an optional header parameter `api_key: string`]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $api_key = null): void`]
-      #and_[#the(Client)'s method calls `$request->withHeader('api_key', $api_key)` only when `$api_key` is not `null`]
+      #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $apiKey = null): void`]
+      #and_[#the(Client)'s method calls `$request->withHeader('api_key', $apiKey)` only when `$apiKey` is not `null`]
     ]
   ]
 
@@ -139,12 +139,13 @@
     ]
 
     #scenario(
-      "Profile.renames overrides an operationId verbatim",
+      "Profile.methodRenames overrides an operationId verbatim",
       stage: "unstable",
     )[
-      #given[#the(Profile) whose `renames` map carries `'monitoring_get_foo.yml' => 'forwardProxyRequest'`]
+      #given[#the(Profile) whose `methodRenames` map carries `'monitoring_get_foo.yml' => 'forwardProxyRequest'`]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `forwardProxyRequest(...)` instead of the auto-sanitised `monitoringGetFooYml`]
+      #and_[#the(Profile)'s `renames` map does *not* rename #an(Operation), because it answers a different question — a document may use one string for both a component and an operation, and one map applying to both would put the consumer's answer on the wrong one]
     ]
 
     #scenario(
@@ -177,8 +178,8 @@
       #given[#the(Schema) declares `#/components/parameters/ApiKey` #p((param: "api_key: string, in: header, required: false"))]
       #and_[#a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) lists a parameter whose value is #p((ref: "#/components/parameters/ApiKey"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#the(Client)'s emitted method signature includes `?string $api_key = null`]
-      #and_[#the(Client)'s method body attaches the `api_key` header only when `$api_key` is not `null`]
+      #then[#the(Client)'s emitted method signature includes `?string $apiKey = null`]
+      #and_[#the(Client)'s method body attaches the `api_key` header only when `$apiKey` is not `null`]
     ]
 
     #scenario(
@@ -221,7 +222,7 @@
       #given[#the(Schema) declares `#/components/schemas/SshKeyId` as #p((schema: "type: integer"))]
       #and_[#a(Operation) #p((op: "GET /keys/{ssh_key_id}")) with #p((id: "operationId: getSshKeyById")) and a path parameter `ssh_key_id` whose schema is #p((ref: "#/components/schemas/SshKeyId"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#the(Client)'s emitted method body interpolates the path token via `(string) $ssh_key_id->toScalar()`, not `(string) $ssh_key_id`]
+      #then[#the(Client)'s emitted method body interpolates the path token via `(string) $sshKeyId->toScalar()`, not `(string) $sshKeyId`]
       #and_[#the(Operation) is *not* silently skipped even though the path parameter resolves to a `ScalarBinding`-implementing class]
     ]
   ]

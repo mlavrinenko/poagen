@@ -28,11 +28,22 @@ final readonly class GenerationPlan
      * @param list<SkippedComponent> $skippedComponents   Components (or components with an undiscriminated
      *                                                    union property) the generator did not emit. Same
      *                                                    skip-list guarantee as $skippedOperations.
+     * @param list<string>           $notices             Facts about the document worth a reader's attention that
+     *                                                    are not omissions: nothing here was left out of the
+     *                                                    emitted tree. They name an opportunity the consumer's
+     *                                                    guidance could take — an operation id with no word
+     *                                                    boundaries, a format annotation paogen does not know —
+     *                                                    which is what `real-world-schemas` means by asking for
+     *                                                    guidance and saying exactly what is needed. Distinct from
+     *                                                    the skip lists on purpose: a notice never affects the
+     *                                                    exit status, because a run that shrank the client is a
+     *                                                    failure and a run that could be more pleasant is not.
      */
     public function __construct(
         public array $writes,
         public array $prunes,
         public array $skippedOperations = [],
         public array $skippedComponents = [],
+        public array $notices = [],
     ) {}
 }

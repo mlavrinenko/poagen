@@ -184,8 +184,8 @@ final class OperationGeneratorTest extends TestCase
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
-     * Then the emitted Client has a method deletePet(int $petId, ?string $api_key = null): void
-     *   And the method calls $request->withHeader('api_key', $api_key) only when $api_key is not null
+     * Then the emitted Client has a method deletePet(int $petId, ?string $apiKey = null): void
+     *   And the method calls $request->withHeader('api_key', $apiKey) only when $apiKey is not null
      */
     public function testAnOptionalHeaderParameterBecomesANullableTypedArgumentAndIsAttachedOnlyWhenNonNull(): void
     {
@@ -235,18 +235,20 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: Profile.renames overrides an operationId verbatim
+     * Scenario: Profile.methodRenames overrides an operationId verbatim
      * @source truth/specs/operation-generator.typ:173
      *
-     * Given a Profile whose renames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
+     * Given a Profile whose methodRenames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
      * When Generator runs against Profile
      * Then the emitted Client has a method forwardProxyRequest(...) instead of the auto-sanitised monitoringGetFooYml
+     *   And the Profile's renames map does not rename an Operation, because it answers a different question — a document may use one string for both a component and an operation, and one map applying to both would put the consumer's answer on the wrong one
      */
-    public function testProfileRenamesOverridesAnOperationIdVerbatim(): void
+    public function testProfileMethodRenamesOverridesAnOperationIdVerbatim(): void
     {
-        $this->steps->givenAProfileWhoseRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest();
+        $this->steps->givenAProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest();
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenTheEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml();
+        $this->steps->thenTheProfilesRenamesMapDoesNotRenameAnOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne();
     }
 
 
@@ -297,8 +299,8 @@ final class OperationGeneratorTest extends TestCase
      * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
      * When Generator runs against Profile
-     * Then the emitted method signature includes ?string $api_key = null
-     *   And the method body attaches the api_key header only when $api_key is not null
+     * Then the emitted method signature includes ?string $apiKey = null
+     *   And the method body attaches the api_key header only when $apiKey is not null
      */
     public function testAnOperationLevelRefToAHeaderComponentParameterBecomesAnOptionalTypedHeaderArgument(): void
     {
@@ -377,7 +379,7 @@ final class OperationGeneratorTest extends TestCase
      * Given Schema declares #/components/schemas/SshKeyId as type: integer
      *   And Operation GET /keys/{ssh_key_id} with operationId: getSshKeyById and a path parameter ssh_key_id whose schema is #/components/schemas/SshKeyId
      * When Generator runs against Profile
-     * Then the emitted method body interpolates the path token via (string) $ssh_key_id->toScalar(), not (string) $ssh_key_id
+     * Then the emitted method body interpolates the path token via (string) $sshKeyId->toScalar(), not (string) $sshKeyId
      *   And the operation is not silently skipped even though the path parameter resolves to a ScalarBinding-implementing class
      */
     public function testAPathParameterWhoseSchemaRefsAScalarVOComponentIsInterpolatedThroughToScalar(): void

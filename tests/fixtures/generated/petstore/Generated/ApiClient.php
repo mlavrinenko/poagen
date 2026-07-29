@@ -151,12 +151,12 @@ final readonly class ApiClient
         return $this->hydrator->hydrate(Pet::class, $data);
     }
 
-    public function deletePet(int $petId, ?string $api_key = null): void
+    public function deletePet(int $petId, ?string $apiKey = null): void
     {
         $path = '/pet/{petId}';
         $path = \str_replace('{petId}', (string) $petId, $path);
         $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
-        if ($api_key !== null) { $request = $request->withHeader('api_key', $api_key); }
+        if ($apiKey !== null) { $request = $request->withHeader('api_key', $apiKey); }
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {

@@ -28,6 +28,15 @@ final readonly class Profile
      *                                              `oneOf`/`anyOf`. Keys are raw `'<ComponentName>.<propertyName>'`
      *                                              (pre-normalisation); values are the wire field name that
      *                                              selects the branch. ADR-010 + T-030.
+     * @param array<string,string>  $methodRenames  Map of raw operation id → desired PHP method name on the
+     *                                              emitted client. This is the documented answer to an operation
+     *                                              id with no word boundaries: `searchclient` has no algorithmic
+     *                                              path to `searchClient`, and guessing would produce a different
+     *                                              wrong answer per schema, so paogen keeps the vendor's spelling
+     *                                              and the consumer supplies the readable one. Also feeds the
+     *                                              names of any models synthesised for that operation's inline
+     *                                              payloads. An entry naming an operation id absent from the
+     *                                              document fails the run.
      * @param array<string,string>  $inlineModels   Pins the class name paogen synthesises for an operation's
      *                                              inline payload. Keys are `'<operationId>.request'` or
      *                                              `'<operationId>.response'` using the raw operation id from
@@ -54,6 +63,7 @@ final readonly class Profile
         public ?NameNormaliser $nameNormaliser = null,
         public array $discriminators = [],
         public array $skip = [],
+        public array $methodRenames = [],
         public array $inlineModels = [],
     ) {}
 }

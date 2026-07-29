@@ -18,6 +18,7 @@ use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
@@ -39,7 +40,7 @@ final readonly class Generator
         private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
         private PlanApplier $applier = new PlanApplier(),
         private SkipListValidator $skipListValidator = new SkipListValidator(),
-        private InlineModelPinValidator $pinValidator = new InlineModelPinValidator(),
+        private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
     }
@@ -151,18 +152,19 @@ final readonly class Generator
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
+        $notices = OperationIdAdvisor::notices($openApi, $profile->methodRenames);
         $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$typeListSkips['components']];
 
         $failures = [
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
-            ...$this->pinValidator->validate($openApi, $profile->inlineModels),
+            ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames),
         ];
 
         if ($failures !== []) {
             throw UnrepresentableConstructsException::forProblems($failures);
         }
 
-        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents);
+        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, $notices);
     }
 
     /**

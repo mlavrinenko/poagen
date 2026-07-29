@@ -18,8 +18,15 @@ namespace Mlavrinenko\Paogen\Generator\Naming;
  */
 final readonly class CamelCaseSanitiser implements NameNormaliser
 {
-    /** "Already a valid camelCase identifier" — passthrough. */
-    private const string CAMEL_CASE = '/^[a-z_]\w*$/';
+    /**
+     * "Already camelCase" — starts with a lowercase letter and uses only
+     * [A-Za-z0-9]. `generate_promocode` matches the PHP identifier grammar but
+     * is *not* camelCase, so it still gets transformed; this pattern used to
+     * admit `_` and let snake_case through untouched, which is how a document
+     * that did supply word boundaries ended up with `legal_info` as a method
+     * name. Mirrors {@see PascalCaseSanitiser::PASCAL_CASE}.
+     */
+    private const string CAMEL_CASE = '/^[a-z][A-Za-z0-9]*$/';
 
     public function normalise(string $raw, NormalisationContext $context): ?string
     {

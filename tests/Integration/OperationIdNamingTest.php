@@ -1,0 +1,213 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Tests\Integration;
+
+use Composer\Autoload\ClassLoader;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
+use Mlavrinenko\Paogen\Generator\AttributeScanner;
+use Mlavrinenko\Paogen\Generator\GenerationPlan;
+use Mlavrinenko\Paogen\Generator\Generator;
+use Mlavrinenko\Paogen\Generator\Profile;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * operationid-word-splitting: separators are honoured, runs-together are
+ * reported, and the answer comes from the profile.
+ *
+ * The two halves of the contract are easy to get wrong in opposite directions.
+ * A document that *did* supply word boundaries must get them used — the old
+ * "already camelCase" test admitted `_`, so `legal_info` passed through
+ * untouched. A document that supplied none must not be guessed at, because a
+ * dictionary gives a different answer per schema and moves names between runs.
+ *
+ * Uses the kilbil loyalty document, which is where both cases live: 33 of its
+ * 36 operation ids are lowercase runs, two carry underscores, and one is a
+ * single word with nothing to split.
+ */
+final class OperationIdNamingTest extends TestCase
+{
+    private const string SCHEMA = __DIR__ . '/../../examples/kilbil/schemas/loyalty_v1.yaml';
+    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Kilbil';
+
+    /**
+     * The two XML bodies are a separate task (xml-content-type-policy); naming
+     * them here keeps this test about names.
+     *
+     * @var array<string,string>
+     */
+    private const array XML_SKIP = [
+        'goodsxml' => 'application/xml request body — xml-content-type-policy',
+        'goodslistxml' => 'application/xml request body — xml-content-type-policy',
+    ];
+
+    /** @var list<string> */
+    private array $outputDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->outputDirs as $dir) {
+            if (is_dir($dir)) {
+                $this->removeDirectory($dir);
+            }
+        }
+
+        parent::tearDown();
+    }
+
+    public function testAnIdentifierWithARealSeparatorIsSplitOnIt(): void
+    {
+        $client = $this->clientSource($this->plan());
+
+        self::assertStringContainsString('public function generatePromocode(', $client);
+        self::assertStringContainsString('public function legalInfo(', $client);
+        self::assertStringNotContainsString('generate_promocode(', $client);
+        self::assertStringNotContainsString('legal_info(', $client);
+    }
+
+    public function testAnIdentifierWithNoSeparatorKeepsTheVendorSpelling(): void
+    {
+        $client = $this->clientSource($this->plan());
+
+        // No guess. `getclientfullbalance` has no algorithmic path to
+        // `getClientFullBalance`, so the literal name is what is emitted until
+        // the consumer says otherwise.
+        self::assertStringContainsString('public function getclientfullbalance(', $client);
+    }
+
+    public function testUnseparatedIdentifiersAreReportedWithTheGuidanceThatFixesThem(): void
+    {
+        $notices = $this->plan()->notices;
+
+        self::assertCount(1, $notices);
+        self::assertStringContainsString('getclientfullbalance', $notices[0]);
+        self::assertStringContainsString('methodRenames', $notices[0]);
+        // A notice is never a failure: nothing was omitted, the client is only
+        // less pleasant to call.
+        self::assertNotSame([], $this->plan()->writes);
+    }
+
+    public function testAMethodRenameNamesBothTheMethodAndItsPayloadModels(): void
+    {
+        $plan = $this->plan(['getclientfullbalance' => 'getClientFullBalance']);
+
+        self::assertStringContainsString('public function getClientFullBalance(', $this->clientSource($plan));
+
+        // One entry, two improvements: the synthesised payload classes are
+        // derived from the normalised method name, not the raw id. This
+        // operation's 2xx response is an array of inline objects, so the class
+        // paogen names for it is the item.
+        $models = $this->emittedNames($plan);
+        self::assertContains('GetClientFullBalanceRequest', $models);
+        self::assertContains('GetClientFullBalanceResponseItem', $models);
+        self::assertNotContains('GetclientfullbalanceRequest', $models);
+    }
+
+    public function testAnAnsweredIdentifierDropsOutOfTheReport(): void
+    {
+        // The notice's own worked example names `getclientfullbalance`, so the
+        // count is what moves rather than the presence of the string.
+        self::assertStringContainsString('34 operation id(s)', $this->plan()->notices[0]);
+        self::assertStringContainsString(
+            '33 operation id(s)',
+            $this->plan(['getclientfullbalance' => 'getClientFullBalance'])->notices[0],
+        );
+    }
+
+    public function testARenameNamingAnAbsentOperationIdFailsTheRun(): void
+    {
+        try {
+            $this->plan(['noSuchOperation' => 'whatever']);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            self::assertStringContainsString('noSuchOperation', $e->getMessage());
+            self::assertStringContainsString('absent from the schema', $e->getMessage());
+        }
+    }
+
+    /**
+     * @param array<string,string> $methodRenames
+     */
+    private function plan(array $methodRenames = []): GenerationPlan
+    {
+        return new Generator(new AttributeScanner($this->composerLoader()))->plan(new Profile(
+            schema: self::SCHEMA,
+            output: $this->makeTempDir(),
+            namespace: self::NAMESPACE,
+            skip: self::XML_SKIP,
+            methodRenames: $methodRenames,
+        ));
+    }
+
+    private function clientSource(GenerationPlan $plan): string
+    {
+        foreach ($plan->writes as $path => $source) {
+            if (str_ends_with($path, \DIRECTORY_SEPARATOR . 'ApiClient.php')) {
+                return $source;
+            }
+        }
+
+        self::fail('the plan wrote no ApiClient.php');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function emittedNames(GenerationPlan $plan): array
+    {
+        $out = [];
+
+        foreach (array_keys($plan->writes) as $path) {
+            $out[] = basename($path, '.php');
+        }
+
+        return $out;
+    }
+
+    private function makeTempDir(): string
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-opid-');
+        unlink($path);
+
+        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
+            self::fail("failed to create temporary directory: {$path}");
+        }
+
+        $this->outputDirs[] = $path;
+
+        return $path;
+    }
+
+    private function composerLoader(): ClassLoader
+    {
+        foreach (spl_autoload_functions() as $fn) {
+            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+                return $fn[0];
+            }
+        }
+
+        self::fail('Composer ClassLoader not found in autoload chain.');
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+
+        /** @var \SplFileInfo $entry */
+        foreach ($iterator as $entry) {
+            if ($entry->isDir()) {
+                rmdir($entry->getPathname());
+
+                continue;
+            }
+
+            unlink($entry->getPathname());
+        }
+
+        rmdir($dir);
+    }
+}
