@@ -261,10 +261,16 @@ final readonly class OperationAnalyzer
             if ($additional instanceof Schema) {
                 $valueType = self::scalarPhpType($additional->type);
 
-                return $valueType === null ? ReturnSpec::void() : ReturnSpec::map($valueType);
+                return $valueType === null ? ReturnSpec::map('mixed') : ReturnSpec::map($valueType);
             }
 
-            return ReturnSpec::void();
+            // An inline object with declared properties never reaches here —
+            // InlinePayloadPlanner synthesised a Model for it. What is left is
+            // an object the document left unconstrained, and a map of unknown
+            // values is what it says. Returning void instead would drop a body
+            // the vendor declared, which is the shrink `silence-means-success`
+            // forbids.
+            return ReturnSpec::map('mixed');
         }
 
         $scalar = self::scalarPhpType($schema->type);

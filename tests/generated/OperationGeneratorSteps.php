@@ -12,6 +12,7 @@ use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\OrderStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
@@ -187,7 +188,11 @@ final class OperationGeneratorSteps
 
         TestCase::assertInstanceOf(Order::class, $this->orderResult);
         TestCase::assertSame(42, $this->orderResult->id);
-        TestCase::assertSame('placed', $this->orderResult->status);
+        // `Order.status` declares an inline enum, so it hydrates into the
+        // backed enum paogen synthesised for it rather than into the raw
+        // string (inline-body-and-response-schemas).
+        TestCase::assertSame(OrderStatus::Placed, $this->orderResult->status);
+        TestCase::assertSame('placed', $this->orderResult->status->value);
     }
 
     public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery(string $arg, string $query): void
@@ -1018,11 +1023,11 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationIdWhoseApplicationJsonRequestBodyIsAnInlineTypeObjectNotARefAShapePaogenDoesNotYetSynthesise(
+    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit(
         string $id,
     ): void {
-        TestCase::assertSame('operationId: postInlineBody', $id);
-        $this->profile = $this->loadProfile('parameters');
+        TestCase::assertSame('operationId: uploadFile', $id);
+        $this->profile = $this->loadProfile('petstore');
     }
 
 
@@ -1034,19 +1039,19 @@ final class OperationGeneratorSteps
         $matches = array_values(array_filter(
             $plan->skippedOperations,
             static fn(\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation $s): bool
-                => $s->operationId === 'postInlineBody',
+                => $s->operationId === 'uploadFile',
         ));
 
-        TestCase::assertCount(1, $matches, 'expected exactly one skip for postInlineBody');
+        TestCase::assertCount(1, $matches, 'expected exactly one skip for uploadFile');
         TestCase::assertSame('post', $matches[0]->httpMethod);
-        TestCase::assertSame('/inline-body', $matches[0]->pathUri);
+        TestCase::assertSame('/pet/{petId}/uploadImage', $matches[0]->pathUri);
 
         // The reason is now the diagnostic a user would act on rather than a
         // category label: it names the construct, points at the schema
         // location, and says what would make it acceptable.
-        TestCase::assertStringContainsString('inline (non-$ref) schema', $matches[0]->reason);
-        TestCase::assertStringContainsString('/paths/~1inline-body/post/requestBody', $matches[0]->reason);
-        TestCase::assertStringContainsString('components.schemas', $matches[0]->reason);
+        TestCase::assertStringContainsString('application/octet-stream request body', $matches[0]->reason);
+        TestCase::assertStringContainsString('/paths/~1pet~1{petId}~1uploadImage/post/requestBody', $matches[0]->reason);
+        TestCase::assertStringContainsString('application/x-www-form-urlencoded', $matches[0]->reason);
     }
 
 
@@ -1054,7 +1059,7 @@ final class OperationGeneratorSteps
     {
         // Drive the real CLI binary so the round-trip exercises
         // GenerateCommand::reportSkipped() exactly as the user sees it.
-        $profilePath = \dirname(__DIR__, 2) . '/tests/fixtures/profiles/parameters.php';
+        $profilePath = \dirname(__DIR__, 2) . '/tests/fixtures/profiles/petstore.php';
 
         $stdout = tmpfile();
         $stderr = tmpfile();
@@ -1072,8 +1077,8 @@ final class OperationGeneratorSteps
 
         rewind($stderr);
         $stderrContents = (string) stream_get_contents($stderr);
-        TestCase::assertStringContainsString('postInlineBody', $stderrContents);
-        TestCase::assertStringContainsString('/inline-body', $stderrContents);
+        TestCase::assertStringContainsString('uploadFile', $stderrContents);
+        TestCase::assertStringContainsString('/pet/{petId}/uploadImage', $stderrContents);
         TestCase::assertStringContainsString('skipped', $stderrContents);
     }
 

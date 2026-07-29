@@ -32,6 +32,7 @@ final readonly class ModelEmitter
 
     public function __construct(
         private ModelAttributeApplier $attributes = new ModelAttributeApplier(),
+        private PropertySynthesiser $properties = new PropertySynthesiser(),
     ) {
         $this->printer = new PsrPrinter();
     }
@@ -89,11 +90,17 @@ final readonly class ModelEmitter
             $propSchema = $properties[$propName];
             $isRequired = \in_array($propName, $required, true);
             $phpName = $this->phpName($propName);
-            $synthFqcn = $this->synthesiseChildIfNeeded($className, $phpName, $propSchema, $children, $modelNamespace);
 
-            $resolved = $synthFqcn !== null
-                ? new TypeResolver($synthFqcn, null, null, false)
-                : TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
+            $resolved = $this->properties->resolve(
+                $className,
+                $phpName,
+                $propSchema,
+                $children,
+                $modelNamespace,
+                $bindings,
+                $registry,
+                $enums,
+            );
 
             $isNullable = !$isRequired || $resolved->nullable;
 
@@ -108,58 +115,11 @@ final readonly class ModelEmitter
                 $bindings,
                 $modelNamespace,
                 $registry,
-                $this->todoFor($propSchema),
+                $this->properties->todoFor($propSchema),
             );
         }
 
         return new ModelEmission($this->printer->printFile($file), $children);
-    }
-
-    /**
-     * Detect an inline `type: object` property with declared `properties`
-     * and queue it as a synthesised child class (T-013). Returns the child
-     * FQCN, or null when the property is not eligible for synthesis.
-     *
-     * @param list<SynthesisedModel> $children
-     */
-    private function synthesiseChildIfNeeded(
-        string $ownerClassName,
-        string $phpPropName,
-        Schema|Reference $propSchema,
-        array &$children,
-        string $modelNamespace,
-    ): ?string {
-        if (!$propSchema instanceof Schema || $propSchema->type !== 'object') {
-            return null;
-        }
-
-        if (InlineObjectResolver::classify($propSchema) !== 'synthesise') {
-            return null;
-        }
-
-        $childName = $ownerClassName . ucfirst($phpPropName);
-        $children[] = new SynthesisedModel($childName, $propSchema);
-
-        return '\\' . $modelNamespace . '\\' . $childName;
-    }
-
-    /**
-     * Build the `@todo` comment for a property whose inline-object schema
-     * mixes declared properties with non-trivial `additionalProperties`
-     * (T-013 case 3; out of scope). Returns null when no todo applies.
-     */
-    private function todoFor(Schema|Reference $propSchema): ?string
-    {
-        if (!$propSchema instanceof Schema || $propSchema->type !== 'object') {
-            return null;
-        }
-
-        if (InlineObjectResolver::classify($propSchema) !== 'map-todo') {
-            return null;
-        }
-
-        return '@todo Inline object mixes declared properties with additionalProperties'
-            . '; emitted as array<string, mixed>. See T-013 out-of-scope.';
     }
 
     private function addProperty(

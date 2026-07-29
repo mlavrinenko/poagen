@@ -5,7 +5,7 @@
   tags: ("generator",),
   priority: 9,
   difficulty: 7,
-  status: accepted(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -17,7 +17,7 @@ The whole model pipeline is rooted in the named components of the document. The 
 - An inline object request body produces a typed parameter backed by a synthesised model.
 - An inline object response produces a typed return value.
 - Inline arrays of inline objects work at both ends.
-- Inline enums inside operation payloads become backed enums, as they already do inside components.
+- Inline enums inside operation payloads become backed enums. This criterion originally read "as they already do inside components", which was wrong: only a *top-level* enum component and a parameter's inline enum were ever backed. A property-level inline enum resolved to its base type wherever it appeared — \`Pet.status\` in the petstore fixture was emitted \`?string\` despite declaring three values. So the reading has to be fixed for both, not just for payloads; a generator that types one location and not the other has no contract a reader can rely on.
 - Synthesised names are derived deterministically from the operation identifier and are stable across runs.
 - The profile can pin an explicit class name for any synthesised model, keyed on the operation identifier, overriding the derivation. When a vendor renames an operation identifier the consumer restores the old class name by pointing the pin at the new identifier, so an upstream rename costs a config line rather than a breaking change to their own callers.
 - A pin naming an operation identifier absent from the document fails the run rather than being ignored.
@@ -33,9 +33,15 @@ The whole model pipeline is rooted in the named components of the document. The 
 
 == Files
 
-- \`src/Generator/Emit/RequestBodyAnalyzer.php\`
+- \`src/Generator/Emit/InlinePayloadPlanner.php\` and \`InlinePayloadCatalog.php\` (new — name the payload classes once, for both halves of the run)
+- \`src/Generator/Emit/PropertySynthesiser.php\` (new — extracted from \`ModelEmitter\` so both stay under the linecop limit)
+- \`src/Generator/Emit/ModelNameLedger.php\` (new — the collision guard for names no raw key covers)
+- \`src/Generator/Emit/ModelEmitter.php\`
+- \`src/Generator/Emit/OperationEmitter.php\`
 - \`src/Generator/Emit/OperationAnalyzer.php\`
+- \`src/Generator/Emit/BodySpec.php\`, \`RequestBodyParameterEmitter.php\`, \`RequestAssembler.php\`
 - \`src/Generator/ModelPlanner.php\`
-- \`src/Generator/Emit/InlineObjectResolver.php\`
-- \`truth/specs/model-generator.typ\`
-- \`truth/specs/operation-generator.typ\`
+- \`src/Generator/Profile.php\` and \`src/Generator/InlineModelPinValidator.php\`
+- \`truth/specs/model-generator.feature-260418.typ\`
+- \`truth/specs/operation-generator.feature-260418.typ\`
+- \`tests/\`

@@ -151,7 +151,7 @@
       "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: postInlineBody")) whose `application/json` request body is an inline `type: object` (not a `$ref`) — a shape paogen does not yet synthesise]
+      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`, which paogen does not emit]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the resulting `GenerationPlan` carries a `skippedOperations` entry naming #the(Operation)'s HTTP method, path, operationId and the reason for the skip]
       #and_[#the(PaogenCli)'s `generate` command prints the same list to stderr so the user knows which ops did not make it into the client]

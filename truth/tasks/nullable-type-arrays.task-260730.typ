@@ -5,7 +5,11 @@
   tags: ("generator", "strictness", "schema"),
   priority: 8,
   difficulty: 3,
-  status: proposed(2026, 7, 30),
+  status: blocked(
+    2026,
+    7,
+    30,
+  )[Sequenced behind inline-body-and-response-schemas: the multi-member type-union abort needs the operation-payload walker that task introduces, so there is somewhere to attribute the finding to an operation id. Picked up immediately after it lands.],
 )
 
 == Summary

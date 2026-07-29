@@ -16,10 +16,8 @@ return new Profile(
     discoverIn: [
         'Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject',
     ],
-    skip: [
-        // /inline-body deliberately carries an inline (non-$ref) JSON
-        // request body — paogen only synthesises typed bodies for a $ref
-        // to a component schema. See abort-on-unrepresentable-constructs.
-        'postInlineBody' => 'inline (non-$ref) application/json request body — paogen does not synthesise a Model from it',
-    ],
+    // /inline-body carries an inline (non-$ref) JSON request body. It used to
+    // need a `skip` entry; inline-body-and-response-schemas synthesises a Model
+    // for it, so the entry went stale and the run said so rather than ignoring
+    // it — see abort-on-unrepresentable-constructs.
 );

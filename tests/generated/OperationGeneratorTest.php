@@ -254,14 +254,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
      * @source truth/specs/operation-generator.typ:186
      *
-     * Given Schema declares Operation operationId: postInlineBody whose application/json request body is an inline type: object (not a $ref) — a shape paogen does not yet synthesise
+     * Given Schema declares Operation operationId: uploadFile whose request body content type is application/octet-stream, which paogen does not emit
      * When Generator runs against Profile
      * Then the resulting GenerationPlan carries a skippedOperations entry naming the HTTP method, path, operationId and the reason for the skip
      *   And paogen generate prints the same list to stderr so the user knows which ops did not make it into the client
      */
     public function testAnOperationWhoseBodyShapeIsUnsupportedIsReportedAsASkipRatherThanDroppedSilently(): void
     {
-        $this->steps->givenSchemaDeclaresOperationIdWhoseApplicationJsonRequestBodyIsAnInlineTypeObjectNotARefAShapePaogenDoesNotYetSynthesise('operationId: postInlineBody');
+        $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit('operationId: uploadFile');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenTheResultingGenerationPlanCarriesASkippedOperationsEntryNamingTheHTTPMethodPathOperationIdAndTheReasonForTheSkip();
         $this->steps->thenPaogenGeneratePrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();

@@ -12,6 +12,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentShape;
 use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\ScalarVoEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel;
 use Mlavrinenko\Paogen\Generator\Emit\UnionInterfaceEmitter;
@@ -34,10 +35,14 @@ final readonly class ModelPlanner
     ) {}
 
     /**
-     * @param array<string,string> $writes
-     * @param array<string,true>   $excludedComponents Raw component names to omit entirely — e.g. ones flagged
-     *                                                  by {@see \Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer}
-     *                                                  and accepted via `Profile::$skip` (abort-on-unrepresentable-constructs).
+     * @param array<string,string>   $writes
+     * @param array<string,true>     $excludedComponents Raw component names to omit entirely — e.g. ones flagged
+     *                                                    by {@see \Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer}
+     *                                                    and accepted via `Profile::$skip` (abort-on-unrepresentable-constructs).
+     * @param list<SynthesisedModel> $extraRoots         Classes named outside the component catalogue — the operation
+     *                                                    payloads {@see \Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner}
+     *                                                    found. They join the same queue as inline children, so nesting
+     *                                                    below them is reached by the machinery that was already there.
      */
     public function plan(
         OpenApi $openApi,
@@ -49,12 +54,15 @@ final readonly class ModelPlanner
         array &$writes,
         ComponentCatalog $components,
         array $excludedComponents = [],
+        array $extraRoots = [],
+        ?ModelNameLedger $ledger = null,
     ): void {
+        $ledger ??= new ModelNameLedger();
         $rawNames = array_keys($components->all());
         sort($rawNames, \SORT_STRING);
 
         /** @var list<SynthesisedModel> $pending */
-        $pending = [];
+        $pending = $extraRoots;
 
         foreach ($rawNames as $rawName) {
             if (isset($excludedComponents[$rawName])) {
@@ -67,10 +75,16 @@ final readonly class ModelPlanner
                 continue;
             }
 
+            // Enum components land in the enum namespace and unsupported ones
+            // land nowhere, so neither competes for a model class name.
+            if (!\in_array($shape->kind, [ComponentShape::KIND_ENUM, ComponentShape::KIND_UNSUPPORTED], true)) {
+                $ledger->claim($shape->phpName, 'components.schemas/' . $rawName);
+            }
+
             $this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending);
         }
 
-        $this->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes);
+        $this->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $ledger);
     }
 
     /**
@@ -188,7 +202,7 @@ final readonly class ModelPlanner
             }
 
             $childName = $parent . $this->branchLabel($branch, $index);
-            $pending[] = new SynthesisedModel($childName, $branch, [$parent]);
+            $pending[] = SynthesisedModel::forNode($childName, $branch, [$parent]);
         }
     }
 
@@ -238,6 +252,7 @@ final readonly class ModelPlanner
         Bindings $bindings,
         EnumCatalog $enums,
         array &$writes,
+        ModelNameLedger $ledger,
     ): void {
         while ($pending !== []) {
             usort(
@@ -249,6 +264,7 @@ final readonly class ModelPlanner
             $pending = [];
 
             foreach ($batch as $child) {
+                $ledger->claim($child->name, $child->origin);
                 $emission = $this->emitter->emit(
                     $modelNamespace,
                     $child->name,

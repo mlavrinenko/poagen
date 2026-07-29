@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: Inline Payload Name Collision Fixture
+  version: "1.0.0"
+  description: >
+    inline-body-and-response-schemas fixture. `placeOrder`'s inline response
+    derives the class name `PlaceOrderResponse`, and a component is declared
+    under that same name — two different shapes, one emitted file. The run has
+    to fail and name both origins rather than let the second write overwrite
+    the first.
+paths:
+  /orders:
+    post:
+      operationId: placeOrder
+      responses:
+        '200':
+          description: the placed order
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+  /echo:
+    post:
+      operationId: echoBack
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceOrderResponse'
+      responses:
+        '204':
+          description: ok
+components:
+  schemas:
+    PlaceOrderResponse:
+      type: object
+      required:
+        - unrelated
+      properties:
+        unrelated:
+          type: string

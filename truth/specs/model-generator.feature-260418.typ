@@ -317,6 +317,89 @@
     ]
   ]
 
+  #rule("Payloads the document declared inline become models too (inline-body-and-response-schemas)")[
+    #scenario(
+      "A document declaring no components still emits a model for every payload",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares an empty `components.schemas` and #an(Operation) #p((id: "placeOrder")) whose `application/json` request body and 2xx response are each an inline `type: object` with declared properties]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrderRequest.php` and #a(GeneratedFile) `Generated/Model/PlaceOrderResponse.php` are both written]
+      #and_[the emitted #the(Client) declares `placeOrder(PlaceOrderRequest $body): PlaceOrderResponse`]
+      #and_[#the(Operation) is *not* reported as a skip]
+    ]
+
+    #scenario(
+      "An inline array of inline objects is typed at both ends",
+      stage: "unstable",
+    )[
+      #given[#an(Operation) #p((id: "placeOrdersBulk")) whose request body and 2xx response are each `type: array` whose `items` is an inline `type: object` with declared properties]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrdersBulkRequestItem.php` and #a(GeneratedFile) `Generated/Model/PlaceOrdersBulkResponseItem.php` are written for the item shapes]
+      #and_[the emitted #the(Client) types the parameter `list<PlaceOrdersBulkRequestItem>` and the return `list<PlaceOrdersBulkResponseItem>` in phpdoc]
+    ]
+
+    #scenario(
+      "Nesting below a synthesised payload is reached by the same queue as nesting below a component",
+      stage: "unstable",
+    )[
+      #given[#an(Operation) #p((id: "placeOrder")) whose inline response carries an inline object property `shipping` and an array property `lines` whose items are an inline object]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrderResponseShipping.php` and #a(GeneratedFile) `Generated/Model/PlaceOrderResponseLinesItem.php` are written]
+      #and_[#the(Model) two properties are typed as those classes rather than `array<string, mixed>`]
+    ]
+
+    #scenario(
+      "An inline enum inside a payload becomes a backed enum, wherever the payload came from",
+      stage: "unstable",
+    )[
+      #given[#an(Operation) #p((id: "placeOrder")) whose inline request body has a property `channel` with `type: string` and #p((cases: "enum: [web, phone, store]"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/Enum/PlaceOrderRequestChannel.php` is a backed enum with those three cases]
+      #and_[#a(Model) nested inside a named component resolves an identical inline `enum` the same way, so the reading does not depend on where the property was declared]
+    ]
+
+    #scenario(
+      "An inline object the document left unconstrained is passed as a map rather than dropping the operation",
+      stage: "unstable",
+    )[
+      #given[#an(Operation) #p((id: "ping")) whose `application/json` request body is `type: object` with no declared properties and no `additionalProperties`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the emitted #the(Client) declares `ping(array $body): void` with phpdoc `@param array<string, mixed> $body`]
+      #and_[#the(Operation) is *not* reported as a skip, because a map is what #the(Schema) said rather than a shape #the(Generator) could not represent]
+    ]
+
+    #scenario(
+      "The profile pins the class name for a synthesised payload",
+      stage: "unstable",
+    )[
+      #given[#the(Profile) whose `inlineModels` map carries #p((pin: "'placeOrder.response' => 'PlacedOrder'"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#a(GeneratedFile) `Generated/Model/PlacedOrder.php` is written and no `PlaceOrderResponse.php` is]
+      #and_[the pin renames the root alone, so #a(Model) nested under it is emitted as `PlacedOrderShipping`]
+    ]
+
+    #scenario(
+      "A pin naming an operation absent from the document fails the run",
+      stage: "unstable",
+    )[
+      #given[#the(Profile) whose `inlineModels` map carries a key `'noSuchOperation.response'`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the run fails naming the key and saying the operation id is absent from #the(Schema)]
+      #and_[no #a(GeneratedFile) is written, so guidance that has outlived #the(Operation) it named cannot pass unnoticed]
+    ]
+
+    #scenario(
+      "Two shapes deriving one class name fail the run rather than overwriting a file",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares a component named `PlaceOrderResponse` and #an(Operation) #p((id: "placeOrder")) whose inline response derives that same name]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[the run fails naming #the(Model) and both origins — the component name, and the JSON pointer of the inline response]
+      #and_[the message names #the(Profile) key that resolves it, so the reader is not left to guess which knob applies]
+    ]
+  ]
+
   #rule("Re-running the generator is byte-stable")[
     #scenario(
       "Running the generator twice with the same inputs produces identical files",

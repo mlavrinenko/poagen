@@ -8,6 +8,7 @@ use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequest;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -25,6 +26,20 @@ final readonly class ApiClient
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
+    }
+
+    public function postInlineBody(PostInlineBodyRequest $body): void
+    {
+        $path = '/inline-body';
+        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $request = $request
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+        $response = $this->httpClient->sendRequest($request);
+        $__status = $response->getStatusCode();
+        if ($__status < 200 || $__status >= 300) {
+            throw new ApiException($__status, $request, $response);
+        }
     }
 
     public function getSshKeyById(SshKeyId $ssh_key_id): void

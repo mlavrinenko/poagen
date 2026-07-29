@@ -7,22 +7,22 @@ namespace Mlavrinenko\Paogen\Generator;
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Reference;
-use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
+use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
+use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\NormaliserFactory;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
 /**
  * Orchestrates a single generation run: schema + profile + bindings → files.
@@ -38,6 +38,7 @@ final readonly class Generator
         private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
         private PlanApplier $applier = new PlanApplier(),
         private SkipListValidator $skipListValidator = new SkipListValidator(),
+        private InlineModelPinValidator $pinValidator = new InlineModelPinValidator(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
     }
@@ -91,7 +92,7 @@ final readonly class Generator
         $normaliser = NormaliserFactory::fromProfile($profile);
         $enums = new EnumCatalog($enumNamespace);
         $enumRegistry = new NameRegistry($normaliser);
-        $this->collectComponentEnums($openApi, $enums, $enumRegistry);
+        new ComponentEnumCollector()->collect($openApi, $enums, $enumRegistry);
 
         // Lazy-populated: every ref-resolution site routes through here
         // so each raw name is normalised exactly once and collisions are
@@ -111,52 +112,44 @@ final readonly class Generator
             array_map(static fn(SkippedComponent $c): string => $c->rawName, $discriminatorSkips),
             true,
         );
-        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $components, $excludedComponents);
-        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $writes);
+
+        // Payload classes are named before anything is emitted, because both
+        // halves of the run need the same answer: the model planner emits them,
+        // and the operation emitter points its parameters and return types at
+        // them (inline-body-and-response-schemas).
+        $ledger = new ModelNameLedger();
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $profile->inlineModels, $ledger);
+
+        $this->modelPlanner->plan(
+            $openApi,
+            $modelNamespace,
+            $modelDir,
+            $registry,
+            $bindings,
+            $enums,
+            $writes,
+            $components,
+            $excludedComponents,
+            $inlinePayloads->roots(),
+            $ledger,
+        );
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
         $skippedComponents = [...$components->skipped(), ...$discriminatorSkips];
 
-        $failures = $this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents);
+        $failures = [
+            ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
+            ...$this->pinValidator->validate($openApi, $profile->inlineModels),
+        ];
 
         if ($failures !== []) {
             throw UnrepresentableConstructsException::forProblems($failures);
         }
 
         return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents);
-    }
-
-    private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums, NameRegistry $enumRegistry): void
-    {
-        $components = $openApi->components;
-
-        if ($components === null) {
-            return;
-        }
-
-        /** @var array<string,Schema|Reference> $schemas */
-        $schemas = $components->schemas ?? [];
-        $context = new NormalisationContext(SymbolKind::SchemaComponent);
-
-        foreach ($schemas as $name => $schema) {
-            if (!$schema instanceof Schema) {
-                continue;
-            }
-
-            $phpName = null;
-            $rawSpec = EnumCatalog::specFromSchema($name, $schema);
-
-            if (!$rawSpec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
-                continue;
-            }
-
-            $phpName = $enumRegistry->resolve($name, $context);
-            $spec = new \Mlavrinenko\Paogen\Generator\Enum\EnumSpec($phpName, $rawSpec->backingType, $rawSpec->cases);
-
-            $enums->registerComponent($name, $spec);
-        }
     }
 
     /**
@@ -192,6 +185,7 @@ final readonly class Generator
         Bindings $bindings,
         EnumCatalog $enums,
         ComponentCatalog $components,
+        InlinePayloadCatalog $inlinePayloads,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
@@ -205,6 +199,7 @@ final readonly class Generator
             $operationIdRegistry,
             $normaliser,
             components: $components,
+            inlinePayloads: $inlinePayloads,
         ));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 

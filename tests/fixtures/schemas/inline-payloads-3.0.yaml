@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: Inline Payloads Fixture
+  version: "1.0.0"
+  description: >
+    inline-body-and-response-schemas fixture. Declares no components at all,
+    so nothing here can come from the component catalogue — every model has
+    to be synthesised from an operation payload. Between them the four
+    operations cover an inline object body, an inline object response, an
+    array of inline objects at both ends, an inline object nested inside a
+    response, an array of inline objects nested inside a response, an inline
+    enum on a property, an inline enum on array items, and an inline object
+    the document deliberately left unconstrained.
+paths:
+  /orders:
+    post:
+      operationId: placeOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sku
+              properties:
+                sku:
+                  type: string
+                channel:
+                  type: string
+                  enum:
+                    - web
+                    - phone
+                    - store
+      responses:
+        '200':
+          description: the placed order
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                  shipping:
+                    type: object
+                    required:
+                      - city
+                    properties:
+                      city:
+                        type: string
+                      postcode:
+                        type: string
+                  lines:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - sku
+                      properties:
+                        sku:
+                          type: string
+                        quantity:
+                          type: integer
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                        - gift
+                        - fragile
+  /orders/bulk:
+    post:
+      operationId: placeOrdersBulk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - sku
+                properties:
+                  sku:
+                    type: string
+      responses:
+        '200':
+          description: the placed orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                  properties:
+                    id:
+                      type: integer
+  /ping:
+    post:
+      operationId: ping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: no input; an empty object is accepted
+      responses:
+        '204':
+          description: ok
+  /health:
+    get:
+      operationId: health
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string

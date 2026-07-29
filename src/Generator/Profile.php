@@ -28,6 +28,15 @@ final readonly class Profile
      *                                              `oneOf`/`anyOf`. Keys are raw `'<ComponentName>.<propertyName>'`
      *                                              (pre-normalisation); values are the wire field name that
      *                                              selects the branch. ADR-010 + T-030.
+     * @param array<string,string>  $inlineModels   Pins the class name paogen synthesises for an operation's
+     *                                              inline payload. Keys are `'<operationId>.request'` or
+     *                                              `'<operationId>.response'` using the raw operation id from
+     *                                              the document; values are the PHP class name. Overrides the
+     *                                              derivation from the operation's method name. A key naming an
+     *                                              operation id absent from the document, or a role outside the
+     *                                              two above, fails the run. When a vendor renames an operation
+     *                                              id, moving the pin to the new id keeps the class name the
+     *                                              consumer's own callers already reference.
      * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
      *                                              skip-listed item is omitted from the output instead of
      *                                              failing the run. An entry that no longer matches a problem
@@ -45,5 +54,6 @@ final readonly class Profile
         public ?NameNormaliser $nameNormaliser = null,
         public array $discriminators = [],
         public array $skip = [],
+        public array $inlineModels = [],
     ) {}
 }

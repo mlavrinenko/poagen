@@ -113,9 +113,12 @@ final readonly class RequestAssembler
             return;
         }
 
-        $payload = $body->isList()
-            ? '\\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)'
-            : '$this->marshaller->marshal($body)';
+        $payload = match ($body->kind) {
+            BodySpec::KIND_JSON_LIST => '\\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)',
+            // No model to marshal — the caller already holds the wire shape.
+            BodySpec::KIND_JSON_MAP => '$body',
+            default => '$this->marshaller->marshal($body)',
+        };
 
         $method->addBody('$request = $request');
         $method->addBody("    ->withHeader('Content-Type', 'application/json')");

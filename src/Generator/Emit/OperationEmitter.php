@@ -55,6 +55,7 @@ final readonly class OperationEmitter
         ?ComponentCatalog $components = null,
         ?RequestAssembler $requestAssembler = null,
         private ResponseHandler $responseHandler = new ResponseHandler(),
+        private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
     ) {
         \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         \assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
@@ -103,7 +104,12 @@ final readonly class OperationEmitter
         }
 
         \assert($this->registry instanceof NameRegistry);
-        $body = OperationAnalyzer::requestBody($operation->requestBody, $this->registry);
+        // The catalog holds only inline payloads and the analyser holds only
+        // `$ref` ones, so the two are disjoint and order expresses no
+        // preference — it just avoids asking the analyser about a body it was
+        // never going to resolve.
+        $body = $this->inlinePayloads->bodyFor($rawOperationId)
+            ?? OperationAnalyzer::requestBody($operation->requestBody, $this->registry);
 
         if ($operation->requestBody !== null && !$body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
             return EmitOutcome::skipped(new SkippedOperation(
@@ -126,7 +132,8 @@ final readonly class OperationEmitter
         $requiredQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => $p->param->required));
         $optionalQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
-        $return = OperationAnalyzer::returnType($operation->responses, $this->registry);
+        $return = $this->inlinePayloads->returnFor($rawOperationId)
+            ?? OperationAnalyzer::returnType($operation->responses, $this->registry);
 
         $method = $class->addMethod($operationId)->setPublic();
 
