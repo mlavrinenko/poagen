@@ -1,0 +1,15 @@
+kilbil-loyalty-client-proof: the acceptance target, not yet reachable. OpenAPI 3.1 is rejected at the version gate (swap-openapi-parser-for-31-support); past it, 34 of 36 operations carry inline payloads the emitters cannot synthesise models from (inline-body-and-response-schemas); and today that produces a two-file client and exit 0 rather than a failure (abort-on-unrepresentable-constructs).
+
+Note for whoever runs `just check-examples` and sees this reported as a STALE
+marker rather than an expected failure.
+
+That is not a mistake in the marker. It is the bug the marker describes,
+demonstrated by the harness itself. `check-examples` decides an example is
+stale by asking whether the generator exits non-zero. Against this document the
+generator drops 34 of 36 operations, writes two files, prints its success line,
+and exits 0 — so the harness concludes the example must be fixed.
+
+A tool whose own example board cannot tell "generated a working client" from
+"generated almost nothing" is the argument for abort-on-unrepresentable-constructs
+in one line. When that task lands, this run fails honestly and the marker reads
+correctly. Until then, treat the stale-marker report on kilbil as expected.

@@ -5,7 +5,7 @@
   tags: ("speconaut",),
   priority: 7,
   difficulty: 5,
-  status: proposed(2026, 7, 28),
+  status: wip(2026, 7, 29),
 )
 
 == Summary

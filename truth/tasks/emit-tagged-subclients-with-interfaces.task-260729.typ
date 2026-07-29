@@ -27,6 +27,8 @@ Both are the same fix: group operations by their OpenAPI tag, emit one sub-clien
 - The root client exposes one accessor per tag and no flat operation methods. Exactly one way exists to reach any given endpoint.
 - Each sub-client is constructible on its own from the PSR-18 client, the PSR-17 factories, the base URI, and the hydration collaborators — it does not require the root client to exist.
 - Each emitted interface is what a consumer type-hints. A hand-written decorator implementing a sub-client interface and delegating to the generated one compiles and satisfies PHPStan at max level, proven by a committed example.
+- A tag that is not already a legal, readable PHP identifier is normalised into one deterministically. kilbil proves this is not hypothetical: all eleven of its tags are Russian words — \`Клиенты\`, \`Операции\`, \`Подарочные сертификаты\`. PHP would accept them as identifiers and the result would be unusable.
+- The profile can rename any tag, so a consumer maps \`Клиенты\` onto \`Customers\` and gets the sub-client name they want rather than the transliteration paogen guessed. A rename naming a tag absent from the document fails the run.
 - Regenerating a document whose tags did not change produces no diff.
 - \`just check\` passes, and \`phpstan-generated.neon\` reports the emitted tree clean at max level.
 
