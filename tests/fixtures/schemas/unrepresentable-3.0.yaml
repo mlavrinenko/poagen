@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Unrepresentable Constructs Fixture
+  version: "1.0.0"
+  description: >
+    abort-on-unrepresentable-constructs fixture. Carries two independent,
+    unrelated problems at once — an operation-level unsupported body
+    (createWidget, multipart/form-data) and a component-level
+    undiscriminated union (Gadget.owner) — plus one fully representable
+    operation (ping) that a Profile::$skip entry should leave untouched.
+    Used to prove the generator collects every problem in one pass instead
+    of stopping at the first, and that Profile::$skip can accept named
+    ones without disturbing the rest of the document.
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '204':
+          description: ok
+  /widgets:
+    post:
+      operationId: createWidget
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '204':
+          description: ok
+components:
+  schemas:
+    Gadget:
+      type: object
+      required:
+        - id
+        - owner
+      properties:
+        id:
+          type: integer
+        owner:
+          oneOf:
+            - $ref: '#/components/schemas/Person'
+            - $ref: '#/components/schemas/Company'
+    Person:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    Company:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string

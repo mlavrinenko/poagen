@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use cebe\openapi\json\JsonPointer;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
@@ -15,6 +17,7 @@ use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
@@ -34,6 +37,7 @@ final readonly class Generator
         private EnumEmitter $enumEmitter = new EnumEmitter(),
         private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
         private PlanApplier $applier = new PlanApplier(),
+        private SkipListValidator $skipListValidator = new SkipListValidator(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
     }
@@ -50,6 +54,14 @@ final readonly class Generator
      * Build the complete set of would-be writes and prunes without
      * touching disk. Called by {@see generate} and by the CLI
      * `--dry-run` / `--diff` flags.
+     *
+     * Plans fully before failing: every construct the generator cannot
+     * represent is collected, not just the first one, and cross-checked
+     * against `Profile::$skip` once at the end. If anything remains
+     * unaccounted for, this throws {@see UnrepresentableConstructsException}
+     * and returns nothing — the plan-then-write split means {@see generate}
+     * never reaches the apply step, so nothing is written to disk
+     * (abort-on-unrepresentable-constructs).
      */
     public function plan(Profile $profile): GenerationPlan
     {
@@ -58,10 +70,16 @@ final readonly class Generator
         // Keep $ref nodes as Reference objects so the emitter can resolve them
         // to typed cross-class references.
         $openApi = Reader::readFromYamlFile($profile->schema, OpenApi::class, false);
+        // Populate JSON-pointer document positions — independent of
+        // reference resolution — so diagnostics can point at the exact
+        // schema node responsible.
+        $openApi->setDocumentContext($openApi, new JsonPointer(''));
 
-        // ADR-010 + T-030: fail fast on property-level `oneOf`/`anyOf` unions
-        // with no discriminator, after applying any profile-level override.
-        new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
+        // ADR-010 + T-030 + abort-on-unrepresentable-constructs: collect
+        // every property-level `oneOf`/`anyOf` union with no discriminator
+        // (after applying any profile-level override), instead of failing
+        // on the first one found.
+        $discriminatorSkips = new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
 
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';
@@ -89,14 +107,25 @@ final readonly class Generator
         $writes = [];
 
         $components = ComponentCatalog::build($openApi, $registry, $enums);
-        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $components);
+        $excludedComponents = array_fill_keys(
+            array_map(static fn(SkippedComponent $c): string => $c->rawName, $discriminatorSkips),
+            true,
+        );
+        $this->modelPlanner->plan($openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $components, $excludedComponents);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
+        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips];
 
-        return new GenerationPlan($writes, $prunes, $skipped, $components->skipped());
+        $failures = $this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents);
+
+        if ($failures !== []) {
+            throw UnrepresentableConstructsException::forProblems($failures);
+        }
+
+        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents);
     }
 
     private function collectComponentEnums(OpenApi $openApi, EnumCatalog $enums, NameRegistry $enumRegistry): void

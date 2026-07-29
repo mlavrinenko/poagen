@@ -6,6 +6,7 @@ namespace Mlavrinenko\Paogen;
 
 use Composer\Autoload\ClassLoader;
 use Mlavrinenko\Paogen\Exception\InvalidProfileException;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\PlanReporter;
@@ -80,30 +81,35 @@ final class GenerateCommand
 
         $generator = new Generator(new AttributeScanner($loader));
 
-        if ($dryRun) {
-            $plan = $generator->plan($profile);
-            fwrite($stdout, new PlanReporter()->summary($plan));
-            self::reportSkipped($plan, $stderr);
-            return 0;
-        }
-
-        if ($diff) {
-            $plan = $generator->plan($profile);
-            $rendered = new PlanReporter()->diff($plan);
-            self::reportSkipped($plan, $stderr);
-
-            if ($rendered === '') {
+        try {
+            if ($dryRun) {
+                $plan = $generator->plan($profile);
+                fwrite($stdout, new PlanReporter()->summary($plan));
+                self::reportSkipped($plan, $stderr);
                 return 0;
             }
 
-            fwrite($stdout, $rendered);
+            if ($diff) {
+                $plan = $generator->plan($profile);
+                $rendered = new PlanReporter()->diff($plan);
+                self::reportSkipped($plan, $stderr);
+
+                if ($rendered === '') {
+                    return 0;
+                }
+
+                fwrite($stdout, $rendered);
+                return 1;
+            }
+
+            $plan = $generator->generate($profile);
+            fwrite($stdout, "paogen: generated into {$profile->output}\n");
+            self::reportSkipped($plan, $stderr);
+            return 0;
+        } catch (UnrepresentableConstructsException $e) {
+            fwrite($stderr, "paogen generate: {$e->getMessage()}\n");
             return 1;
         }
-
-        $plan = $generator->generate($profile);
-        fwrite($stdout, "paogen: generated into {$profile->output}\n");
-        self::reportSkipped($plan, $stderr);
-        return 0;
     }
 
     /**
@@ -142,6 +148,9 @@ final class GenerateCommand
             namespace: $profile->namespace,
             discoverIn: $profile->discoverIn,
             renames: $profile->renames,
+            nameNormaliser: $profile->nameNormaliser,
+            discriminators: $profile->discriminators,
+            skip: $profile->skip,
         );
     }
 }

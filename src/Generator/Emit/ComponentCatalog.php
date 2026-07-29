@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
@@ -135,7 +136,23 @@ final class ComponentCatalog
             ComponentShape::KIND_UNSUPPORTED,
             $phpName,
             schema: $schema,
-            reason: SkippedComponent::REASON_UNKNOWN_SHAPE,
+            reason: self::unsupportedReason($rawName, $schema),
+        );
+    }
+
+    private static function unsupportedReason(string $rawName, Schema $schema): string
+    {
+        $type = \is_string($schema->type) ? $schema->type : 'unspecified';
+        $pointer = $schema->getDocumentPosition();
+        $location = $pointer instanceof JsonPointer ? " (schema at {$pointer->getPointer()})" : '';
+
+        return \sprintf(
+            'component `%s`%s has an unrecognised schema shape (type: %s, no oneOf/anyOf/allOf, no object '
+                . 'properties) — paogen supports object, array, scalar (string/integer/number/boolean), '
+                . 'allOf/oneOf/anyOf union, and enum component shapes; restructure the schema to match one of these',
+            $rawName,
+            $location,
+            $type,
         );
     }
 

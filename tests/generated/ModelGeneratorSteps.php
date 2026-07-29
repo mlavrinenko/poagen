@@ -256,6 +256,10 @@ final class ModelGeneratorSteps
             schema: \dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $tempBase,
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Prune\\Petstore',
+            // Petstore's octet-stream upload is unrepresentable and now stops
+            // the run unless accepted. This scenario is about pruning, so
+            // accept it here rather than exercise the refusal.
+            skip: ['uploadFile' => 'application/octet-stream request body — out of scope for the prune scenario'],
         );
 
         $this->runGenerator($profile);
@@ -1252,8 +1256,12 @@ final class ModelGeneratorSteps
 
     public function thenTheRunAbortsWithErrorWhoseMessageNamesPetKind(string $error): void
     {
+        // Unified refusal: an undiscriminated union is reported through the
+        // same collected-problems exception as every other unrepresentable
+        // construct. UndiscriminatedUnionException survives only as the
+        // factory that phrases this particular diagnostic.
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Exception\UndiscriminatedUnionException::class,
+            \Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException::class,
             $this->caught,
             "Expected {$error}, got " . get_debug_type($this->caught),
         );

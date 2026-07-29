@@ -15,4 +15,10 @@ return new Profile(
     discoverIn: [
         'Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject',
     ],
+    skip: [
+        // multipart/octet-stream request bodies are unrepresentable —
+        // paogen emits JSON and form-urlencoded bodies only. See
+        // abort-on-unrepresentable-constructs.
+        'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
+    ],
 );

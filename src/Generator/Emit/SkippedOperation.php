@@ -14,9 +14,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
  */
 final readonly class SkippedOperation
 {
-    public const string REASON_UNRESOLVABLE_PARAMETER = 'parameter $ref or shape unsupported';
-    public const string REASON_UNSUPPORTED_BODY = 'request body shape unsupported';
-    public const string REASON_MISSING_OPERATION_ID = 'operationId is missing';
+    public const string REASON_MISSING_OPERATION_ID = 'operation has no operationId — paogen needs one to name '
+        . 'a method and to reference the operation from Profile::$skip; add operationId to this operation in the schema';
 
     public function __construct(
         public string $httpMethod,

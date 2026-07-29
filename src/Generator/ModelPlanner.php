@@ -35,6 +35,9 @@ final readonly class ModelPlanner
 
     /**
      * @param array<string,string> $writes
+     * @param array<string,true>   $excludedComponents Raw component names to omit entirely — e.g. ones flagged
+     *                                                  by {@see \Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer}
+     *                                                  and accepted via `Profile::$skip` (abort-on-unrepresentable-constructs).
      */
     public function plan(
         OpenApi $openApi,
@@ -45,6 +48,7 @@ final readonly class ModelPlanner
         EnumCatalog $enums,
         array &$writes,
         ComponentCatalog $components,
+        array $excludedComponents = [],
     ): void {
         $rawNames = array_keys($components->all());
         sort($rawNames, \SORT_STRING);
@@ -53,6 +57,10 @@ final readonly class ModelPlanner
         $pending = [];
 
         foreach ($rawNames as $rawName) {
+            if (isset($excludedComponents[$rawName])) {
+                continue;
+            }
+
             $shape = $components->shapeOf($rawName);
 
             if (!$shape instanceof \Mlavrinenko\Paogen\Generator\Emit\ComponentShape) {

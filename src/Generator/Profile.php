@@ -28,6 +28,13 @@ final readonly class Profile
      *                                              `oneOf`/`anyOf`. Keys are raw `'<ComponentName>.<propertyName>'`
      *                                              (pre-normalisation); values are the wire field name that
      *                                              selects the branch. ADR-010 + T-030.
+     * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
+     *                                              skip-listed item is omitted from the output instead of
+     *                                              failing the run. An entry that no longer matches a problem
+     *                                              (the item now generates cleanly), or that names an
+     *                                              operation id / component absent from the schema, fails the
+     *                                              run instead of being ignored. See
+     *                                              abort-on-unrepresentable-constructs.
      */
     public function __construct(
         public string $schema,
@@ -37,5 +44,6 @@ final readonly class Profile
         public array $renames = [],
         public ?NameNormaliser $nameNormaliser = null,
         public array $discriminators = [],
+        public array $skip = [],
     ) {}
 }

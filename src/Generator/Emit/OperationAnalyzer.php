@@ -63,6 +63,70 @@ final readonly class OperationAnalyzer
     }
 
     /**
+     * Explains why {@see pathParameters()} returned null for this
+     * operation — names the offending parameter (or an unresolved
+     * `$ref`) and what would make it acceptable. Only meaningful to call
+     * after {@see pathParameters()} has returned null.
+     */
+    public static function describeUnresolvableParameter(Operation $operation, ?PathItem $pathItem = null): string
+    {
+        if (
+            self::hasUnresolvedRef($operation->parameters ?? [])
+            || ($pathItem instanceof PathItem && self::hasUnresolvedRef($pathItem->parameters))
+        ) {
+            return 'a parameter `$ref` does not resolve to a component parameter — paogen supports path '
+                . 'parameters, scalar/array query parameters, and optional scalar header parameters; fix or remove the $ref';
+        }
+
+        $params = ParameterCollector::collect($operation, $pathItem) ?? [];
+
+        foreach ($params as $param) {
+            if ($param->in === 'path') {
+                continue;
+            }
+            if ($param->in === 'query' && self::isSupportedQueryParam($param)) {
+                continue;
+            }
+            if ($param->in === 'header' && self::isSupportedHeaderParam($param)) {
+                continue;
+            }
+
+            $schema = $param->schema;
+            $type = $schema instanceof Schema && \is_string($schema->type) ? $schema->type : 'unspecified';
+
+            return \sprintf(
+                "parameter '%s' (in: %s, type: %s) is outside paogen's supported parameter shapes — paogen "
+                    . 'supports path parameters, scalar/array query parameters, and optional scalar header parameters',
+                $param->name,
+                $param->in,
+                $type,
+            );
+        }
+
+        return "this operation has a parameter outside paogen's supported shapes";
+    }
+
+    /**
+     * @param iterable<Parameter|Reference> $raw
+     */
+    private static function hasUnresolvedRef(iterable $raw): bool
+    {
+        foreach ($raw as $param) {
+            if ($param instanceof Parameter) {
+                continue;
+            }
+            if (!$param instanceof Reference) {
+                return true;
+            }
+            if (!$param->resolve() instanceof Parameter) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return list<Parameter> query parameters in declaration order —
      *                         callers emit required ones first
      */

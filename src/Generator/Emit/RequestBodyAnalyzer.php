@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
@@ -23,10 +24,9 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
  *      T-011). A `$ref`-to-Model form body is intentionally skipped to
  *      avoid flattening a whole Model into dozens of parameters; petstore's
  *      JSON+form pairings are already covered by the JSON branch.
- *   3. `multipart/form-data` or `application/octet-stream` — produces an
- *      UNSUPPORTED stub; the method is still emitted but its body throws
- *      `\RuntimeException` at call time (T-011).
- *   4. `null` otherwise — the caller skips the op entirely.
+ *   3. `null` otherwise — the caller skips the op entirely; {@see
+ *      describeUnsupported()} explains why, for the operation to be
+ *      reported instead of silently dropped (abort-on-unrepresentable-constructs).
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (ADR-004).
@@ -37,28 +37,101 @@ final readonly class RequestBodyAnalyzer
 {
     public static function resolve(RequestBody|Reference|null $body, NameRegistry $registry): ?BodySpec
     {
-        if ($body instanceof Reference) {
-            $resolved = $body->resolve();
-            $body = $resolved instanceof RequestBody ? $resolved : null;
-        }
+        $resolved = self::resolveBody($body);
 
-        if (!$body instanceof RequestBody) {
+        if (!$resolved instanceof RequestBody) {
             return null;
         }
 
-        $jsonSpec = self::jsonBody($body, $registry);
+        $jsonSpec = self::jsonBody($resolved, $registry);
 
         if ($jsonSpec instanceof BodySpec) {
             return $jsonSpec;
         }
 
-        $formSpec = self::formBody($body);
+        return self::formBody($resolved);
+    }
 
-        if ($formSpec instanceof BodySpec) {
-            return $formSpec;
+    /**
+     * Resolves a `$ref` request body to its concrete node. Exposed so a
+     * caller whose {@see resolve()} call returned null can build a precise
+     * diagnostic via {@see describeUnsupported()} instead of a generic one.
+     */
+    public static function resolveBody(RequestBody|Reference|null $body): ?RequestBody
+    {
+        if ($body instanceof Reference) {
+            $resolved = $body->resolve();
+
+            return $resolved instanceof RequestBody ? $resolved : null;
         }
 
-        return self::unsupportedBody($body);
+        return $body;
+    }
+
+    /**
+     * Explains why {@see resolve()} returned null for a resolved, non-null
+     * request body — names the unsupported content type(s)/shape and what
+     * would make the body acceptable.
+     */
+    public static function describeUnsupported(RequestBody $body): string
+    {
+        $types = array_keys($body->content);
+        $pointer = $body->getDocumentPosition();
+        $location = $pointer instanceof JsonPointer ? ' (' . $pointer->getPointer() . ')' : '';
+
+        if (isset($body->content['multipart/form-data'])) {
+            return 'multipart/form-data request body' . $location
+                . ' — paogen emits JSON ($ref or list<$ref>) and application/x-www-form-urlencoded bodies only';
+        }
+
+        if (isset($body->content['application/octet-stream'])) {
+            return 'application/octet-stream request body' . $location
+                . ' — paogen emits JSON ($ref or list<$ref>) and application/x-www-form-urlencoded bodies only';
+        }
+
+        if (isset($body->content['application/json'])) {
+            return 'application/json request body with an inline (non-$ref) schema' . $location
+                . ' — paogen only emits a typed body for a $ref to a component schema, or list<$ref>; '
+                . 'move the schema into components.schemas and reference it';
+        }
+
+        $form = $body->content['application/x-www-form-urlencoded'] ?? null;
+
+        if ($form instanceof MediaType) {
+            return self::describeUnsupportedForm($form, $types, $location);
+        }
+
+        $typeList = $types === [] ? '(none declared)' : implode(', ', $types);
+
+        return \sprintf(
+            "request body content type(s) '%s'%s — paogen supports application/json (\$ref/list<\$ref>) and "
+                . 'application/x-www-form-urlencoded as the sole content type with an inline object schema only',
+            $typeList,
+            $location,
+        );
+    }
+
+    /**
+     * @param list<string> $types
+     */
+    private static function describeUnsupportedForm(MediaType $form, array $types, string $location): string
+    {
+        if (\count($types) > 1) {
+            $others = implode(', ', array_values(array_diff($types, ['application/x-www-form-urlencoded'])));
+
+            return "application/x-www-form-urlencoded request body paired with other content type(s) ({$others}){$location}"
+                . ' — paogen only honours it when it is the sole content type';
+        }
+
+        $schema = $form->schema;
+
+        if (!$schema instanceof Schema || $schema->type !== 'object') {
+            return "application/x-www-form-urlencoded request body{$location} whose schema is not an inline `type: object`"
+                . ' — paogen flattens declared properties into method parameters and needs an inline object schema';
+        }
+
+        return "application/x-www-form-urlencoded request body{$location} declares no properties"
+            . ' — paogen needs at least one property to generate method parameters from';
     }
 
     private static function jsonBody(RequestBody $body, NameRegistry $registry): ?BodySpec
@@ -147,21 +220,4 @@ final readonly class RequestBodyAnalyzer
 
         return BodySpec::form($fields);
     }
-
-    /**
-     * `multipart/form-data` and `application/octet-stream` bodies are
-     * unsupported today; the emitter produces a method whose body throws
-     * instead of silently dropping the operation from the client.
-     */
-    private static function unsupportedBody(RequestBody $body): ?BodySpec
-    {
-        foreach (['multipart/form-data', 'application/octet-stream'] as $contentType) {
-            if (isset($body->content[$contentType])) {
-                return BodySpec::unsupported($contentType);
-            }
-        }
-
-        return null;
-    }
-
 }

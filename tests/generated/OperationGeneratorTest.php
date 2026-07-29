@@ -413,20 +413,39 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: An unsupported multipart or octet-stream body produces a throwing stub
-     * @source truth/specs/operation-generator.typ:295
+     * Scenario: An unsupported body content type aborts the run
+     * @source truth/specs/operation-generator.feature-260418.typ:241
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
-     * When Generator runs against Profile
-     * Then the emitted Client has a method uploadFile(int $petId, ?string $additionalMetadata = null) that is not silently skipped
-     *   And the method body throws a \RuntimeException whose message mentions the operationId and the unsupported content type
+     * When Generator runs against Profile declaring no skip entry for that Operation
+     * Then Generator's run fails and emits no GeneratedFile
+     *   And Generator's report names the operationId, the unsupported content type, and the remedy
      */
-    public function testAnUnsupportedMultipartOrOctetStreamBodyProducesAThrowingStub(): void
+    public function testAnUnsupportedBodyContentTypeAbortsTheRun(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
+        $this->steps->whenGeneratorRunsAgainstProfileDeclaringNoSkipEntryForThatOperation();
+        $this->steps->thenTheGeneratorsRunFailsAndEmitsNoGeneratedFile();
+        $this->steps->thenTheGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
+    }
+
+    /**
+     * Scenario: An explicitly skipped operation is omitted rather than stubbed
+     * @source truth/specs/operation-generator.feature-260418.typ:249
+     *
+     * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
+     *   And Profile declares a skip entry for that Operation carrying a reason
+     * When Generator runs against Profile
+     * Then the emitted Client has no uploadFile method at all
+     *   And no GeneratedFile contains a method that throws on an unsupported content type
+     */
+    public function testAnExplicitlySkippedOperationIsOmittedRatherThanStubbed(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
+        $this->steps->givenTheProfileDeclaresASkipEntryForThatOperationCarryingAReason();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodUploadFileIntPetIdStringAdditionalMetadataNullThatIsNotSilentlySkipped();
-        $this->steps->thenTheMethodBodyThrowsARuntimeExceptionWhoseMessageMentionsTheOperationIdAndTheUnsupportedContentType();
+        $this->steps->thenTheEmittedClientHasNoUploadFileMethodAtAll();
+        $this->steps->thenNoGeneratedFileContainsAMethodThatThrowsOnAnUnsupportedContentType();
     }
 
 

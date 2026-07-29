@@ -31,6 +31,16 @@ final class ByteStabilityTest extends TestCase
 {
     private const string PETSTORE_NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore';
 
+    /**
+     * @var array<string,string>
+     */
+    private const array PETSTORE_SKIP = [
+        // Mirrors tests/fixtures/profiles/petstore.php: uploadFile's
+        // application/octet-stream body is unrepresentable — see
+        // abort-on-unrepresentable-constructs.
+        'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
+    ];
+
     private string $firstOutputDir = '';
     private string $secondOutputDir = '';
 
@@ -65,6 +75,7 @@ final class ByteStabilityTest extends TestCase
             output: $this->firstOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
+            skip: self::PETSTORE_SKIP,
         ));
         $firstSnapshot = $this->snapshot($this->firstOutputDir);
 
@@ -73,6 +84,7 @@ final class ByteStabilityTest extends TestCase
             output: $this->secondOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
+            skip: self::PETSTORE_SKIP,
         ));
         $secondSnapshot = $this->snapshot($this->secondOutputDir);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
@@ -11,30 +12,44 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Exception\UndiscriminatedUnionException;
 
 /**
- * Walks `components.schemas[*].properties[*]` and fails the run for any
+ * Walks `components.schemas[*].properties[*]` and collects every
  * property-level ref-only `oneOf` / `anyOf` that lacks a `discriminator`
  * and is not resolved by a `Profile::$discriminators` override (ADR-010,
  * T-030). Mutates in place: when an override supplies a wire field, a
  * synthetic `Discriminator` is attached to the property schema so the
  * downstream `ModelAttributeApplier` sees a uniform input.
+ *
+ * Collects rather than throws (abort-on-unrepresentable-constructs): the
+ * caller — {@see \Mlavrinenko\Paogen\Generator\Generator} — gathers every
+ * problem in the document before deciding whether the run may proceed,
+ * instead of stopping at the first one. Each finding is reported as a
+ * {@see SkippedComponent} keyed by the *component* (not the property): a
+ * `Profile::$skip` entry for the component omits the whole thing from the
+ * output, the same granularity every other skip already uses.
  */
 final readonly class DiscriminatorEnforcer
 {
     /**
-     * @param array<string,string> $overrides `<ComponentName>.<propertyName>' => wireField
+     * @param array<string,string> $overrides '<ComponentName>.<propertyName>' => wireField
      */
     public function __construct(private array $overrides = []) {}
 
-    public function enforce(OpenApi $openApi): void
+    /**
+     * @return list<SkippedComponent>
+     */
+    public function enforce(OpenApi $openApi): array
     {
         $components = $openApi->components;
 
         if ($components === null) {
-            return;
+            return [];
         }
 
         /** @var array<string,Schema|Reference> $schemas */
         $schemas = $components->schemas ?? [];
+
+        /** @var list<SkippedComponent> $problems */
+        $problems = [];
 
         foreach ($schemas as $componentName => $componentSchema) {
             if (!$componentSchema instanceof Schema) {
@@ -45,23 +60,29 @@ final readonly class DiscriminatorEnforcer
             $properties = $componentSchema->properties ?? [];
 
             foreach ($properties as $propName => $propSchema) {
-                $this->enforceProperty((string) $componentName, (string) $propName, $propSchema);
+                $message = $this->enforceProperty((string) $componentName, (string) $propName, $propSchema);
+
+                if ($message !== null) {
+                    $problems[] = new SkippedComponent((string) $componentName, $message);
+                }
             }
         }
+
+        return $problems;
     }
 
-    private function enforceProperty(string $componentName, string $propName, Schema|Reference $propSchema): void
+    private function enforceProperty(string $componentName, string $propName, Schema|Reference $propSchema): ?string
     {
         if (!$propSchema instanceof Schema) {
-            return;
+            return null;
         }
 
         if (!$this->isRefUnion($propSchema)) {
-            return;
+            return null;
         }
 
         if ($propSchema->discriminator instanceof Discriminator) {
-            return;
+            return null;
         }
 
         $key = $componentName . '.' . $propName;
@@ -70,10 +91,13 @@ final readonly class DiscriminatorEnforcer
         if ($wireField !== null) {
             $propSchema->discriminator = new Discriminator(['propertyName' => $wireField]);
 
-            return;
+            return null;
         }
 
-        throw UndiscriminatedUnionException::forProperty($componentName, $propName);
+        $pointer = $propSchema->getDocumentPosition();
+        $message = UndiscriminatedUnionException::forProperty($componentName, $propName)->getMessage();
+
+        return $pointer instanceof JsonPointer ? $message . ' (' . $pointer->getPointer() . ')' : $message;
     }
 
     private function isRefUnion(Schema $schema): bool
