@@ -41,6 +41,26 @@ return new Profile(
      * `Wallet` is absent because the vendor already wrote it in ASCII, so the
      * default reads correctly.
      */
+    /*
+     * `goodsxml` and `goodslistxml` declare `application/xml` request bodies
+     * whose schemas are arrays of inline objects. OpenAPI names the elements for
+     * the properties — a property becomes an element of the same name — but names
+     * nothing for the document root or for the repeated element of a bare array,
+     * and this document carries no `xml:` metadata at all. paogen refuses to
+     * invent either, because a wrong root element is a 400 from the vendor.
+     *
+     * These names follow the vendor's own vocabulary: the endpoint loads
+     * "номенклатура" (catalogue items), and their description says the XML mirrors
+     * the JSON structure. Confirm them against the vendor's XML samples before
+     * sending a live request — paogen cannot, and the example makes no live call.
+     */
+    xmlElements: [
+        'goodsxml' => 'goods',
+        'goodsxml.item' => 'good',
+        'goodslistxml' => 'goodslist',
+        'goodslistxml.item' => 'good',
+    ],
+
     tagRenames: [
         'Другое' => 'Misc',
         'Информация о лояльности' => 'LoyaltySettings',

@@ -133,7 +133,7 @@ final readonly class Generator
         // and the operation emitter points its parameters and return types at
         // them (inline-body-and-response-schemas).
         $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $profile->inlineModels, $ledger);
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $profile->inlineModels, $ledger, $profile->xmlElements);
 
         $this->modelPlanner->plan(
             $openApi,

@@ -52,6 +52,15 @@ final readonly class Profile
      *                                              several tags. By default it is emitted on every one of its
      *                                              sub-clients; this picks one. A choice naming a tag the
      *                                              operation does not carry fails the run.
+     * @param array<string,string>  $xmlElements    Names the XML elements for an operation whose request body the
+     *                                              document declared `application/xml`. Keys are the raw operation
+     *                                              id for the root element, and `'<operationId>.item'` for the
+     *                                              repeated element of a body that is a bare array. OpenAPI
+     *                                              supplies a default for neither — a property becomes an element
+     *                                              of the same name, but nothing names the document root — so an
+     *                                              XML body with no entry here fails the run rather than guessing.
+     *                                              A wrong root element is a 400 from the vendor, and asking at
+     *                                              generation time is cheaper than finding out at runtime.
      * @param array<string,string>  $inlineModels   Pins the class name paogen synthesises for an operation's
      *                                              inline payload. Keys are `'<operationId>.request'` or
      *                                              `'<operationId>.response'` using the raw operation id from
@@ -82,6 +91,7 @@ final readonly class Profile
         public array $tagRenames = [],
         public array $tagAssignments = [],
         public array $tagChoice = [],
+        public array $xmlElements = [],
         public array $inlineModels = [],
     ) {}
 }

@@ -33,19 +33,41 @@ final readonly class BodySpec
     public const string KIND_JSON = 'json';
     public const string KIND_JSON_LIST = 'json_list';
     public const string KIND_JSON_MAP = 'json_map';
+    public const string KIND_XML = 'xml';
+    public const string KIND_XML_LIST = 'xml_list';
     public const string KIND_FORM = 'form_urlencoded';
 
     /**
-     * @param list<FormField> $formFields non-empty when kind is KIND_FORM
-     * @param Schema|null     $schema     the inline node, set when kind is KIND_JSON_MAP so the
-     *                                    parameter emitter can type the map's values
+     * @param list<FormField> $formFields   non-empty when kind is KIND_FORM
+     * @param Schema|null     $schema       the inline node, set when kind is KIND_JSON_MAP so the
+     *                                      parameter emitter can type the map's values
+     * @param string          $rootElement  the XML root element, set for the XML kinds — the
+     *                                      specification supplies no default for it
+     * @param string          $itemElement  the repeated XML element, set for KIND_XML_LIST
      */
     public function __construct(
         public string $kind,
         public string $model = '',
         public array $formFields = [],
         public ?Schema $schema = null,
+        public string $rootElement = '',
+        public string $itemElement = '',
     ) {}
+
+    public static function xml(string $model, string $rootElement): self
+    {
+        return new self(self::KIND_XML, model: $model, rootElement: $rootElement);
+    }
+
+    public static function xmlList(string $model, string $rootElement, string $itemElement): self
+    {
+        return new self(self::KIND_XML_LIST, model: $model, rootElement: $rootElement, itemElement: $itemElement);
+    }
+
+    public function isXml(): bool
+    {
+        return $this->kind === self::KIND_XML || $this->kind === self::KIND_XML_LIST;
+    }
 
     public static function json(string $model): self
     {
@@ -72,6 +94,6 @@ final readonly class BodySpec
 
     public function isList(): bool
     {
-        return $this->kind === self::KIND_JSON_LIST;
+        return $this->kind === self::KIND_JSON_LIST || $this->kind === self::KIND_XML_LIST;
     }
 }

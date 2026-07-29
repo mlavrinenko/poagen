@@ -49,7 +49,7 @@ final readonly class SubClientPlanner
         /** @var list<array{0:string,1:string,2:Operation,3:PathItem}> $untagged */
         $untagged = [];
 
-        foreach (self::operationsInEmissionOrder($openApi) as $entry) {
+        foreach (OperationOrder::inEmissionOrder($openApi) as $entry) {
             foreach (self::tagsFor($entry[2], $profile) as $rawTag) {
                 $byTag[$rawTag][] = $entry;
             }
@@ -113,39 +113,4 @@ final readonly class SubClientPlanner
         return array_values(array_unique($declared));
     }
 
-    /**
-     * Same order {@see InlinePayloadPlanner} and the client emitter use — path
-     * URIs sorted, then the path item's own operation order.
-     *
-     * @return list<array{0:string,1:string,2:Operation,3:PathItem}>
-     */
-    private static function operationsInEmissionOrder(OpenApi $openApi): array
-    {
-        $paths = $openApi->paths;
-
-        if ($paths === null) {
-            return [];
-        }
-
-        $items = [];
-
-        foreach ($paths as $pathUri => $pathItem) {
-            if (\is_string($pathUri) && $pathItem instanceof PathItem) {
-                $items[$pathUri] = $pathItem;
-            }
-        }
-
-        $uris = array_keys($items);
-        sort($uris, \SORT_STRING);
-
-        $out = [];
-
-        foreach ($uris as $pathUri) {
-            foreach ($items[$pathUri]->getOperations() as $httpMethod => $operation) {
-                $out[] = [(string) $httpMethod, $pathUri, $operation, $items[$pathUri]];
-            }
-        }
-
-        return $out;
-    }
 }

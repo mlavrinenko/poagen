@@ -34,6 +34,8 @@ final readonly class RequestBodyParameterEmitter
         switch ($body->kind) {
             case BodySpec::KIND_JSON:
             case BodySpec::KIND_JSON_LIST:
+            case BodySpec::KIND_XML:
+            case BodySpec::KIND_XML_LIST:
                 $this->addJsonBodyParam($method, $namespace, $body);
 
                 return;

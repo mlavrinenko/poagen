@@ -1,0 +1,236 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Tests\Integration;
+
+use Composer\Autoload\ClassLoader;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
+use Mlavrinenko\Paogen\Generator\AttributeScanner;
+use Mlavrinenko\Paogen\Generator\GenerationPlan;
+use Mlavrinenko\Paogen\Generator\Generator;
+use Mlavrinenko\Paogen\Generator\Profile;
+use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * xml-content-type-policy: an `application/xml` request body is serialised, and
+ * the element names the specification does not supply are asked for.
+ *
+ * See `truth/decisions/xml-request-bodies-are-serialised-not-refused.decision-260730.typ`
+ * for why serialising beat refusing: the schema is fully declared, every response
+ * in the corpus is JSON so XML is request-only and bounded, and refusing would
+ * have cost two of kilbil's thirty-six operations over the last step of a pipeline
+ * that already had every earlier one.
+ */
+final class XmlRequestBodyTest extends TestCase
+{
+    private const string SCHEMA = __DIR__ . '/../../examples/kilbil/schemas/loyalty_v1.yaml';
+    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\KilbilXml';
+
+    /** @var array<string,string> */
+    private const array ELEMENTS = [
+        'goodsxml' => 'goods',
+        'goodsxml.item' => 'good',
+        'goodslistxml' => 'goodslist',
+        'goodslistxml.item' => 'good',
+    ];
+
+    /** @var list<string> */
+    private array $outputDirs = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->outputDirs as $dir) {
+            if (is_dir($dir)) {
+                $this->removeDirectory($dir);
+            }
+        }
+
+        parent::tearDown();
+    }
+
+    public function testAnXmlBodyWithNamedElementsIsEmittedAndTyped(): void
+    {
+        $surface = $this->callerSurface($this->plan(self::ELEMENTS));
+
+        // Typed exactly as the JSON twin is — the schema is the same, only the
+        // encoding differs.
+        // No methodRenames here, so the method keeps the vendor's spelling.
+        self::assertStringContainsString('public function goodsxml(array $body', $surface);
+        self::assertStringContainsString('GoodsxmlRequestItem> $body', $surface);
+        self::assertStringContainsString("->withHeader('Content-Type', 'application/xml')", $surface);
+        self::assertStringContainsString('XmlWriter::renderList(', $surface);
+        self::assertStringContainsString("'goods', 'good'", $surface);
+    }
+
+    public function testTheMarshallerStaysInThePathSoBothContentTypesAgree(): void
+    {
+        $surface = $this->callerSurface($this->plan(self::ELEMENTS));
+
+        // Wire names, scalar bindings and date formats are decided once, not
+        // twice differently.
+        self::assertStringContainsString('$this->marshaller->marshal($__m)', $surface);
+    }
+
+    public function testEveryOperationInTheDocumentIsEmittedOnceXmlIsHandled(): void
+    {
+        $plan = $this->plan(self::ELEMENTS);
+
+        self::assertSame([], $plan->skippedOperations);
+        self::assertSame(36, $this->operationMethodCount($plan));
+    }
+
+    public function testAnXmlBodyWithNoNamedRootFailsTheRunRatherThanInventingOne(): void
+    {
+        try {
+            $this->plan([]);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            // A guessed root element does not fail visibly — it produces
+            // well-formed XML the vendor rejects at runtime.
+            self::assertStringContainsString('goodsxml', $e->getMessage());
+            self::assertStringContainsString('application/xml', $e->getMessage());
+        }
+    }
+
+    public function testTheWriterFollowsTheOpenApiElementDefaults(): void
+    {
+        $xml = XmlWriter::renderList(
+            [['code' => 'A1', 'BC' => ['111', '222'], 'is_group' => 0, 'full_name' => null]],
+            'goods',
+            'good',
+        );
+
+        // A property becomes an element of the same name; an array is unwrapped,
+        // so its element repeats; an absent optional property is absent rather
+        // than an empty element, because `<full_name/>` and "no full_name" mean
+        // different things to a parser.
+        self::assertStringContainsString('<goods>', $xml);
+        self::assertStringContainsString('<good>', $xml);
+        self::assertStringContainsString('<code>A1</code>', $xml);
+        self::assertStringContainsString('<BC>111</BC>', $xml);
+        self::assertStringContainsString('<BC>222</BC>', $xml);
+        self::assertStringContainsString('<is_group>0</is_group>', $xml);
+        self::assertStringNotContainsString('full_name', $xml);
+    }
+
+    public function testTheWriterSpellsBooleansAsJsonEncodeDoes(): void
+    {
+        $xml = XmlWriter::renderObject(['active' => true, 'archived' => false], 'item');
+
+        self::assertStringContainsString('<active>true</active>', $xml);
+        self::assertStringContainsString('<archived>false</archived>', $xml);
+    }
+
+    public function testTheWriterIsByteStable(): void
+    {
+        $payload = ['code' => 'A1', 'nested' => ['a' => 1, 'b' => 2]];
+
+        self::assertSame(
+            XmlWriter::renderObject($payload, 'item'),
+            XmlWriter::renderObject($payload, 'item'),
+        );
+    }
+
+    /**
+     * @param array<string,string> $xmlElements
+     */
+    private function plan(array $xmlElements): GenerationPlan
+    {
+        return new Generator(new AttributeScanner($this->composerLoader()))->plan(new Profile(
+            schema: self::SCHEMA,
+            output: $this->makeTempDir(),
+            namespace: self::NAMESPACE,
+            xmlElements: $xmlElements,
+        ));
+    }
+
+    private function callerSurface(GenerationPlan $plan): string
+    {
+        $out = '';
+
+        foreach ($plan->writes as $path => $source) {
+            if (!str_contains($path, \DIRECTORY_SEPARATOR . 'Model' . \DIRECTORY_SEPARATOR)
+                && !str_contains($path, \DIRECTORY_SEPARATOR . 'Enum' . \DIRECTORY_SEPARATOR)) {
+                $out .= $source . "\n";
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Counts operation methods on the emitted classes, skipping the interfaces
+     * that mirror them and the constructors and tag accessors.
+     */
+    private function operationMethodCount(GenerationPlan $plan): int
+    {
+        $count = 0;
+
+        foreach ($plan->writes as $path => $source) {
+            if (!str_ends_with($path, 'Client.php')) {
+                continue;
+            }
+
+            preg_match_all('/^    public function (\w+)\(/m', $source, $matches);
+
+            foreach ($matches[1] as $name) {
+                // A tag accessor takes no arguments and returns an interface; an
+                // operation method always has a body or parameters. Distinguish on
+                // the return type instead, which is unambiguous.
+                if ($name !== '__construct' && preg_match('/public function ' . $name . '\(\): \w+ClientInterface/', $source) !== 1) {
+                    ++$count;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    private function makeTempDir(): string
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-xml-');
+        unlink($path);
+
+        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
+            self::fail("failed to create temporary directory: {$path}");
+        }
+
+        $this->outputDirs[] = $path;
+
+        return $path;
+    }
+
+    private function composerLoader(): ClassLoader
+    {
+        foreach (spl_autoload_functions() as $fn) {
+            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+                return $fn[0];
+            }
+        }
+
+        self::fail('Composer ClassLoader not found in autoload chain.');
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+
+        /** @var \SplFileInfo $entry */
+        foreach ($iterator as $entry) {
+            if ($entry->isDir()) {
+                rmdir($entry->getPathname());
+
+                continue;
+            }
+
+            unlink($entry->getPathname());
+        }
+
+        rmdir($dir);
+    }
+}

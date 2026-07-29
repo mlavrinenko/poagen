@@ -7,7 +7,6 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
-use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
@@ -43,20 +42,21 @@ final readonly class InlinePayloadPlanner
     public const string ROLE_RESPONSE = 'response';
 
     /**
-     * @param array<string,string> $pins `'<operationId>.request'|'<operationId>.response'` → PHP class name
+     * @param array<string,string> $pins        `'<operationId>.request'|'<operationId>.response'` → PHP class name
+     * @param array<string,string> $xmlElements Profile::$xmlElements
      */
     public static function build(
         OpenApi $openApi,
         NameRegistry $operationIdRegistry,
         array $pins,
         ModelNameLedger $ledger,
+        array $xmlElements = [],
     ): InlinePayloadCatalog {
         $bodies = [];
         $returns = [];
         $roots = [];
 
-        foreach (self::operationsInEmissionOrder($openApi) as [$operation, $pathItem]) {
-            unset($pathItem);
+        foreach (OperationOrder::inEmissionOrder($openApi) as [, , $operation]) {
             $rawId = (string) ($operation->operationId ?? '');
 
             if ($rawId === '') {
@@ -65,7 +65,7 @@ final readonly class InlinePayloadPlanner
 
             $base = ucfirst($operationIdRegistry->resolve($rawId, new NormalisationContext(SymbolKind::OperationId)));
 
-            $body = self::planRequest($operation, $rawId, $base, $pins, $ledger, $roots);
+            $body = self::planRequest($operation, $rawId, $base, $pins, $ledger, $roots, $xmlElements);
 
             if ($body instanceof BodySpec) {
                 $bodies[$rawId] = $body;
@@ -84,6 +84,7 @@ final readonly class InlinePayloadPlanner
     /**
      * @param array<string,string>   $pins
      * @param list<SynthesisedModel> $roots
+     * @param array<string,string>   $xmlElements
      */
     private static function planRequest(
         Operation $operation,
@@ -92,6 +93,7 @@ final readonly class InlinePayloadPlanner
         array $pins,
         ModelNameLedger $ledger,
         array &$roots,
+        array $xmlElements = [],
     ): ?BodySpec {
         $resolved = RequestBodyAnalyzer::resolveBody($operation->requestBody);
 
@@ -99,13 +101,15 @@ final readonly class InlinePayloadPlanner
             return null;
         }
 
+        $pin = $pins[$rawId . '.' . self::ROLE_REQUEST] ?? null;
         $schema = self::jsonSchemaOf($resolved->content);
 
         if (!$schema instanceof Schema) {
-            return null;
+            // JSON is preferred where an operation offers both, so an XML body is
+            // only reached when it is the only one on offer — which is why
+            // pairing the two warns about nothing.
+            return self::planXmlRequest($resolved, $rawId, $base, $pin, $ledger, $roots, $xmlElements);
         }
-
-        $pin = $pins[$rawId . '.' . self::ROLE_REQUEST] ?? null;
 
         if (self::isSynthesisableObject($schema)) {
             $name = self::claim($pin ?? $base . 'Request', $schema, $ledger, $roots);
@@ -128,6 +132,54 @@ final readonly class InlinePayloadPlanner
         // vendor deliberately left open.
         if (SchemaType::of($schema)->is('object')) {
             return BodySpec::jsonMap($schema);
+        }
+
+        return null;
+    }
+
+    /**
+     * An `application/xml` request body, whose payload model is synthesised
+     * exactly as a JSON one is — the schema is declared, so nothing about the
+     * shape is different. Only the element names are, and they come from the
+     * profile because OpenAPI supplies no default for the document root.
+     *
+     * Returns null when the profile named nothing, which the caller reports as an
+     * unrepresentable body rather than emitting XML with an invented root.
+     *
+     * @param array<string,string>   $xmlElements
+     * @param list<SynthesisedModel> $roots
+     */
+    private static function planXmlRequest(
+        \cebe\openapi\spec\RequestBody $body,
+        string $rawId,
+        string $base,
+        ?string $pin,
+        ModelNameLedger $ledger,
+        array &$roots,
+        array $xmlElements,
+    ): ?BodySpec {
+        $xml = $body->content['application/xml'] ?? null;
+        $schema = $xml instanceof MediaType && $xml->schema instanceof Schema ? $xml->schema : null;
+
+        if (!$schema instanceof Schema) {
+            return null;
+        }
+
+        $root = $xmlElements[$rawId] ?? null;
+
+        if (!\is_string($root) || $root === '') {
+            return null;
+        }
+
+        if (self::isSynthesisableObject($schema)) {
+            return BodySpec::xml(self::claim($pin ?? $base . 'Request', $schema, $ledger, $roots), $root);
+        }
+
+        $items = self::inlineObjectItemsOf($schema);
+        $item = $xmlElements[$rawId . '.item'] ?? null;
+
+        if ($items instanceof Schema && \is_string($item) && $item !== '') {
+            return BodySpec::xmlList(self::claim($pin ?? $base . 'RequestItem', $items, $ledger, $roots), $root, $item);
         }
 
         return null;
@@ -237,42 +289,5 @@ final readonly class InlinePayloadPlanner
         }
 
         return null;
-    }
-
-    /**
-     * Same order {@see ClientEmitter} emits in — path URIs sorted, then the
-     * path item's own operation order — so a synthesised name never depends on
-     * how the parser happened to hand the document over.
-     *
-     * @return list<array{0:Operation,1:PathItem}>
-     */
-    private static function operationsInEmissionOrder(OpenApi $openApi): array
-    {
-        $paths = $openApi->paths;
-
-        if ($paths === null) {
-            return [];
-        }
-
-        $items = [];
-
-        foreach ($paths as $pathUri => $pathItem) {
-            if (\is_string($pathUri) && $pathItem instanceof PathItem) {
-                $items[$pathUri] = $pathItem;
-            }
-        }
-
-        $uris = array_keys($items);
-        sort($uris, \SORT_STRING);
-
-        $out = [];
-
-        foreach ($uris as $pathUri) {
-            foreach ($items[$pathUri]->getOperations() as $operation) {
-                $out[] = [$operation, $items[$pathUri]];
-            }
-        }
-
-        return $out;
     }
 }

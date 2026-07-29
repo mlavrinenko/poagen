@@ -28,11 +28,13 @@ use Nette\PhpGenerator\Method;
 final readonly class RequestAssembler
 {
     private ParameterStringExpr $stringExprBuilder;
+    private BodyAttachmentEmitter $bodyAttachment;
 
     public function __construct(
         ?ComponentCatalog $components = null,
     ) {
         $this->stringExprBuilder = new ParameterStringExpr($components);
+        $this->bodyAttachment = new BodyAttachmentEmitter();
     }
 
     /**
@@ -63,7 +65,7 @@ final readonly class RequestAssembler
         );
 
         if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
-            $this->emitBodyAttachment($method, $body);
+            $this->bodyAttachment->emit($method, $body);
         }
 
         foreach ($headerParams as $resolved) {
@@ -77,52 +79,6 @@ final readonly class RequestAssembler
         }
 
         $this->emitSecurityHeaders($method, $activeSchemes);
-    }
-
-    /**
-     * Attach the request body per {@see BodySpec::$kind}. JSON kinds round
-     * through `json_encode`; FORM uses `http_build_query` in RFC1738 form
-     * — the shape OAuth2 token endpoints and Stripe-style APIs expect.
-     *
-     * UNSUPPORTED is never reached here — the caller bails out of the
-     * assembler entirely and emits a throwing stub instead.
-     */
-    private function emitBodyAttachment(Method $method, BodySpec $body): void
-    {
-        if ($body->kind === BodySpec::KIND_FORM) {
-            $method->addBody('$__form = [];');
-
-            foreach ($body->formFields as $field) {
-                if ($field->required) {
-                    $method->addBody(
-                        '$__form[?] = $' . $field->name . ';',
-                        [$field->name],
-                    );
-                    continue;
-                }
-                $method->addBody(
-                    'if ($' . $field->name . ' !== null) { $__form[?] = $' . $field->name . '; }',
-                    [$field->name],
-                );
-            }
-
-            $method->addBody('$request = $request');
-            $method->addBody("    ->withHeader('Content-Type', 'application/x-www-form-urlencoded')");
-            $method->addBody('    ->withBody($this->streamFactory->createStream(\\http_build_query($__form, \'\', \'&\', \\PHP_QUERY_RFC1738)));');
-
-            return;
-        }
-
-        $payload = match ($body->kind) {
-            BodySpec::KIND_JSON_LIST => '\\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)',
-            // No model to marshal — the caller already holds the wire shape.
-            BodySpec::KIND_JSON_MAP => '$body',
-            default => '$this->marshaller->marshal($body)',
-        };
-
-        $method->addBody('$request = $request');
-        $method->addBody("    ->withHeader('Content-Type', 'application/json')");
-        $method->addBody('    ->withBody($this->streamFactory->createStream(\\json_encode(' . $payload . ', \\JSON_THROW_ON_ERROR)));');
     }
 
     /**
