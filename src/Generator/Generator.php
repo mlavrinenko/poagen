@@ -13,6 +13,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
+use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
@@ -152,7 +153,10 @@ final readonly class Generator
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
-        $notices = OperationIdAdvisor::notices($openApi, $profile->methodRenames);
+        $notices = [
+            ...OperationIdAdvisor::notices($openApi, $profile->methodRenames),
+            ...FormatAdvisor::notices($openApi, $bindings),
+        ];
         $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$typeListSkips['components']];
 
         $failures = [

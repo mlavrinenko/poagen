@@ -17,6 +17,22 @@ return new Profile(
     namespace: 'Acme\\Kilbil',
 
     /*
+     * Where paogen looks for this project's own `#[BindsFormat]` value objects.
+     * The vendor writes nine format values across 292 uses and paogen knows one
+     * of them, so it reports the other eight and `src/ValueObject/` answers the
+     * four that carry meaning: `date time` and `data time` (both `date-time`
+     * misspelled), `data` (`date` misspelled), and the invented `phone`.
+     *
+     * `int` and `double` are left unbound on purpose. They are reported, and a
+     * consumer who wants a Money or Quantity type binds them the same way — the
+     * point of the report is that the opportunity is visible, not that every
+     * opportunity must be taken.
+     */
+    discoverIn: [
+        'Acme\\Kilbil\\ValueObject',
+    ],
+
+    /*
      * Every operation id in this document is lowercase and run together.
      * `getclientfullbalance` has no algorithmic path to `getClientFullBalance`
      * — a split needs a dictionary, and a dictionary gives a different answer

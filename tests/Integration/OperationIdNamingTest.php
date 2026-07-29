@@ -78,11 +78,10 @@ final class OperationIdNamingTest extends TestCase
 
     public function testUnseparatedIdentifiersAreReportedWithTheGuidanceThatFixesThem(): void
     {
-        $notices = $this->plan()->notices;
+        $notice = $this->operationIdNotice($this->plan());
 
-        self::assertCount(1, $notices);
-        self::assertStringContainsString('getclientfullbalance', $notices[0]);
-        self::assertStringContainsString('methodRenames', $notices[0]);
+        self::assertStringContainsString('getclientfullbalance', $notice);
+        self::assertStringContainsString('methodRenames', $notice);
         // A notice is never a failure: nothing was omitted, the client is only
         // less pleasant to call.
         self::assertNotSame([], $this->plan()->writes);
@@ -108,11 +107,26 @@ final class OperationIdNamingTest extends TestCase
     {
         // The notice's own worked example names `getclientfullbalance`, so the
         // count is what moves rather than the presence of the string.
-        self::assertStringContainsString('34 operation id(s)', $this->plan()->notices[0]);
+        self::assertStringContainsString('34 operation id(s)', $this->operationIdNotice($this->plan()));
         self::assertStringContainsString(
             '33 operation id(s)',
-            $this->plan(['getclientfullbalance' => 'getClientFullBalance'])->notices[0],
+            $this->operationIdNotice($this->plan(['getclientfullbalance' => 'getClientFullBalance'])),
         );
+    }
+
+    /**
+     * The plan's notices carry the unrecognised-format report too; this is the
+     * operation-id one.
+     */
+    private function operationIdNotice(GenerationPlan $plan): string
+    {
+        foreach ($plan->notices as $notice) {
+            if (str_contains($notice, 'operation id(s) carry no word boundary')) {
+                return $notice;
+            }
+        }
+
+        self::fail('no operation-id notice was reported');
     }
 
     public function testARenameNamingAnAbsentOperationIdFailsTheRun(): void

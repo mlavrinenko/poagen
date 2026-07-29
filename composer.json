@@ -54,6 +54,7 @@
             "Mlavrinenko\\Paogen\\Tests\\Generated\\": "tests/generated/",
             "Mlavrinenko\\Paogen\\Tests\\Integration\\": "tests/Integration/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject\\": "tests/fixtures/profiles/value-objects/",
+            "Acme\\Kilbil\\ValueObject\\": "examples/kilbil/src/ValueObject/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\": "tests/fixtures/generated/composition/",
