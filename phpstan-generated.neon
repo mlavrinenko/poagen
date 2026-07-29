@@ -9,7 +9,15 @@ parameters:
   tmpDir: ./build/cache/phpstan-generated
   treatPhpDocTypesAsCertain: false
   level: max
-  paths:
-    - tests/fixtures/generated
+  # No `paths:` here on purpose. PHPStan hard-errors when a listed path
+  # does not exist, but not every examples/*/generated tree exists —
+  # examples marked .expected-failure have no generated/ dir at all
+  # (see check-examples). The real path set — tests/fixtures/generated
+  # plus every examples/*/generated tree that currently exists — is
+  # glob-expanded and passed on the command line by
+  # `just lint-phpstan-generated`, so it grows automatically as more
+  # examples clear their .expected-failure marker. Running this config
+  # with no paths on the CLI fails loudly ("At least one path must be
+  # specified to analyse") instead of silently analysing nothing.
   scanDirectories:
     - tests/fixtures/profiles/value-objects
