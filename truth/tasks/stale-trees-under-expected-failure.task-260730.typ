@@ -5,7 +5,7 @@
   tags: ("examples", "quality-gates", "strictness"),
   priority: 7,
   difficulty: 2,
-  status: proposed(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
