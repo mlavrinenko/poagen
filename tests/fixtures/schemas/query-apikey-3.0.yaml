@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Query apiKey Fixture
+  version: 1.0.0
+  description: >
+    Exercises an `apiKey` security scheme declared with `in: query`
+    (T-260730 / query-apikey-security-scheme) — the kilbil loyalty
+    document's only scheme, and the one `SecurityScheme::fromCebe()`
+    used to silently classify as unsupported.
+servers:
+  - url: https://query-apikey.example/api/v1
+
+security:
+  - queryKey: []
+
+paths:
+  /status:
+    get:
+      # No query parameters of its own — the credential is the ONLY
+      # thing in the query string. Proves the credential still reaches
+      # the wire when `emitQueryAssembly()` would otherwise have
+      # returned early on an empty `$queryParams`.
+      operationId: getStatus
+      responses:
+        '204':
+          description: ok
+
+  /items:
+    get:
+      # Has its own required + optional query parameters. Proves the
+      # credential joins the SAME query string rather than producing a
+      # second `?`.
+      operationId: listItems
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+
+  /disabled:
+    get:
+      # Operation-level `security: []` overrides the global requirement
+      # and must disable the credential entirely (OpenAPI 3.0.3 §4.8.20).
+      operationId: disabledAuth
+      security: []
+      responses:
+        '204':
+          description: ok
+
+  /override:
+    get:
+      # Operation-level requirement naming a different scheme replaces
+      # the global one — the query credential must NOT appear here, and
+      # the header scheme it names instead must.
+      operationId: overrideAuth
+      security:
+        - headerKey: []
+      responses:
+        '204':
+          description: ok
+
+  /cookie-scheme:
+    get:
+      # `in: cookie` stays unsupported and silently unwired here — that
+      # is report-unsupported-security-schemes' job, not this task's.
+      # Regression guard: the operation still emits, with no auth of
+      # any kind attached.
+      operationId: cookieSchemeUnaffected
+      security:
+        - cookieKey: []
+      responses:
+        '204':
+          description: ok
+
+components:
+  securitySchemes:
+    queryKey:
+      type: apiKey
+      in: query
+      name: k
+    headerKey:
+      type: apiKey
+      in: header
+      name: X-Different-Key
+    cookieKey:
+      type: apiKey
+      in: cookie
+      name: session

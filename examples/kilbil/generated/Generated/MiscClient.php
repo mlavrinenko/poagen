@@ -24,6 +24,7 @@ final readonly class MiscClient implements MiscClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -32,6 +33,9 @@ final readonly class MiscClient implements MiscClientInterface
     public function closeSession(CloseSessionRequest $body): CloseSessionResponse
     {
         $path = '/load/closesession';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -50,6 +54,9 @@ final readonly class MiscClient implements MiscClientInterface
     public function exchangePosSettings(ExchangePosSettingsRequest $body): ExchangePosSettingsResponse
     {
         $path = '/load/exchangepossettings';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -68,6 +75,9 @@ final readonly class MiscClient implements MiscClientInterface
     public function generateCard(GenerateCardRequest $body): GenerateCardResponse
     {
         $path = '/load/generatecard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -86,6 +96,9 @@ final readonly class MiscClient implements MiscClientInterface
     public function legalInfo(): LegalInfoResponse
     {
         $path = '/load/legal_info';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();

@@ -25,6 +25,7 @@ final readonly class TagsClient implements TagsClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -33,6 +34,9 @@ final readonly class TagsClient implements TagsClientInterface
     public function addClientTags(AddClientTagsRequest $body): AddClientTagsResponse
     {
         $path = '/load/addclienttags';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -51,6 +55,9 @@ final readonly class TagsClient implements TagsClientInterface
     public function deleteClientTags(DeleteClientTagsRequest $body): DeleteClientTagsResponse
     {
         $path = '/load/deleteclienttags';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -69,6 +76,9 @@ final readonly class TagsClient implements TagsClientInterface
     public function getClientTags(GetClientTagsRequest $body): GetClientTagsResponse
     {
         $path = '/load/getclienttags';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -87,6 +97,9 @@ final readonly class TagsClient implements TagsClientInterface
     public function getListTags(GetListTagsRequest $body): GetListTagsResponse
     {
         $path = '/load/getlisttags';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

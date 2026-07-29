@@ -23,6 +23,7 @@ final readonly class PromocodesClient implements PromocodesClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -31,6 +32,9 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     public function generatePromocode(GeneratePromocodeRequest $body): GeneratePromocodeResponse
     {
         $path = '/load/generate_promocode';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -49,6 +53,9 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     public function reservedPromocode(ReservedPromocodeRequest $body): ReservedPromocodeResponse
     {
         $path = '/load/reservedpromocode';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -67,6 +74,9 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     public function searchPromocode(SearchPromocodeRequest $body): SearchPromocodeResponse
     {
         $path = '/load/searchpromocode';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

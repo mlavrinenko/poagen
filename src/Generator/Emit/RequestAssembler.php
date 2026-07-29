@@ -29,12 +29,14 @@ final readonly class RequestAssembler
 {
     private ParameterStringExpr $stringExprBuilder;
     private BodyAttachmentEmitter $bodyAttachment;
+    private SecurityEmitter $security;
 
     public function __construct(
         ?ComponentCatalog $components = null,
     ) {
         $this->stringExprBuilder = new ParameterStringExpr($components);
         $this->bodyAttachment = new BodyAttachmentEmitter();
+        $this->security = new SecurityEmitter();
     }
 
     /**
@@ -57,7 +59,7 @@ final readonly class RequestAssembler
         $method->addBody('$path = ?;', [$pathUri]);
 
         $this->emitPathInterpolation($method, $pathParams, $bindings);
-        $this->emitQueryAssembly($method, $queryParams, $bindings);
+        $this->emitQueryAssembly($method, $queryParams, $activeSchemes, $bindings);
 
         $method->addBody(
             '$request = $this->requestFactory->createRequest(?, \rtrim($this->baseUri, \'/\') . $path);',
@@ -78,36 +80,7 @@ final readonly class RequestAssembler
             );
         }
 
-        $this->emitSecurityHeaders($method, $activeSchemes);
-    }
-
-    /**
-     * Attach each active security scheme as a header. Runs after the
-     * per-parameter header loop so auth headers consistently land last
-     * in the emitted method body — makes request diffs predictable and
-     * matches the "auth is transport policy" framing of ADR-002.
-     *
-     * @param list<SecurityScheme> $activeSchemes
-     */
-    private function emitSecurityHeaders(Method $method, array $activeSchemes): void
-    {
-        foreach ($activeSchemes as $scheme) {
-            switch ($scheme->kind) {
-                case SecurityScheme::KIND_API_KEY_HEADER:
-                    $method->addBody(
-                        '$request = $request->withHeader(?, $this->' . $scheme->ctorArg . ');',
-                        [$scheme->headerName],
-                    );
-                    break;
-
-                case SecurityScheme::KIND_BEARER:
-                    $method->addBody(
-                        '$request = $request->withHeader(?, ? . $this->' . $scheme->ctorArg . ');',
-                        [$scheme->headerName, 'Bearer '],
-                    );
-                    break;
-            }
-        }
+        $this->security->emitHeaders($method, $activeSchemes);
     }
 
     /**
@@ -129,11 +102,21 @@ final readonly class RequestAssembler
      * parameter is serialised as `tags=a&tags=b` rather than
      * `http_build_query`'s `tags%5B0%5D=a` syntax.
      *
+     * A query-kind security scheme (T-260730) joins the same `$query`
+     * array as a declared parameter — it has no header to ride on — and
+     * counts as an unconditional push: an active credential is always
+     * sent, so it forces the same unguarded `?` append a required
+     * parameter does, whether or not the operation has query params of
+     * its own.
+     *
      * @param list<ResolvedParameter> $queryParams
+     * @param list<SecurityScheme>    $activeSchemes
      */
-    private function emitQueryAssembly(Method $method, array $queryParams, Bindings $bindings): void
+    private function emitQueryAssembly(Method $method, array $queryParams, array $activeSchemes, Bindings $bindings): void
     {
-        if ($queryParams === []) {
+        $querySchemes = $this->security->querySchemes($activeSchemes);
+
+        if ($queryParams === [] && $querySchemes === []) {
             return;
         }
 
@@ -158,6 +141,11 @@ final readonly class RequestAssembler
             $method->addBody('if ($' . $resolved->phpName . ' !== null) {');
             $this->emitScalarQueryPush($method, $resolved, indent: '    ', bindings: $bindings);
             $method->addBody('}');
+        }
+
+        foreach ($querySchemes as $scheme) {
+            $this->security->emitQueryPush($method, $scheme);
+            $hasUnconditionalPush = true;
         }
 
         if ($hasUnconditionalPush) {

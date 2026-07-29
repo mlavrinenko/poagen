@@ -19,6 +19,7 @@ final readonly class SalesPlanClient implements SalesPlanClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -27,6 +28,9 @@ final readonly class SalesPlanClient implements SalesPlanClientInterface
     public function getSalesIndicesSlides(GetSalesIndicesSlidesRequest $body): GetSalesIndicesSlidesResponse
     {
         $path = '/load/getsalesindicesslides';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

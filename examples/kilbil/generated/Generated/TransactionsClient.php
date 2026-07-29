@@ -27,6 +27,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -35,6 +36,9 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     public function confirmSale(ConfirmSaleRequest $body): ConfirmSaleResponse
     {
         $path = '/load/confirmsale';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -53,6 +57,9 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     public function getDetailingByMove(GetDetailingByMoveRequest $body): GetDetailingByMoveResponse
     {
         $path = '/load/getdetailingbymove';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -71,6 +78,9 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     public function getMovesByClient(GetMovesByClientRequest $body): GetMovesByClientResponse
     {
         $path = '/load/getmovesbyclient';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -89,6 +99,9 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     public function manualAdd(ManualAddRequest $body): ManualAddResponse
     {
         $path = '/load/manualadd';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -107,6 +120,9 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     public function processSale(ProcessSaleRequest $body): ProcessSaleResponse
     {
         $path = '/load/processsale';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

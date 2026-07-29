@@ -20,6 +20,7 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -28,6 +29,9 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
     public function getActionsList(GetActionsListRequest $body): GetActionsListResponse
     {
         $path = '/load/getactionslist';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -49,6 +53,9 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
     public function getPrograms(array $body): GetProgramsResponse
     {
         $path = '/load/getprograms';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

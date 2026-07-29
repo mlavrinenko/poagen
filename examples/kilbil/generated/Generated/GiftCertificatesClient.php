@@ -22,6 +22,7 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -30,6 +31,9 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
     public function generateGiftCard(GenerateGiftCardRequest $body): GenerateGiftCardResponse
     {
         $path = '/load/generategiftcard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -48,6 +52,9 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
     public function getProgramGiftCard(): GetProgramGiftCardResponse
     {
         $path = '/load/getprogramgiftcard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
@@ -63,6 +70,9 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
     public function searchGiftCard(SearchGiftCardRequest $body): SearchGiftCardResponse
     {
         $path = '/load/searchgiftcard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

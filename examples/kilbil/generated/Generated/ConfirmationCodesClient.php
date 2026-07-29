@@ -21,6 +21,7 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -29,6 +30,9 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
     public function askConfirmPhone(AskConfirmPhoneRequest $body): AskConfirmPhoneResponse
     {
         $path = '/load/askconfirmphone';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -47,6 +51,9 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
     public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequest $body): CheckConfirmPhoneCodeResponse
     {
         $path = '/load/checkconfirmphonecode';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

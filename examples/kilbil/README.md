@@ -145,10 +145,13 @@ a regeneration renamed `checkConfirmPhoneCode` the wrapper would stop satisfying
 interface and the gate would say so. That is what makes the seam a contract rather
 than a convention.
 
-## Known gap
+## Authentication
 
 The document's only security scheme is a query-string `apiKey` named `h`, applied
-globally. paogen does not yet wire an `apiKey` with `in: query`, so the committed
-client takes no credential and sends none — every call would come back 403. Tracked
-as `query-apikey-security-scheme`; the tree needs regenerating once it lands, which
-`just check-examples` will report as drift until it is.
+globally, and it threads through: every client takes an `$h` constructor argument
+and every request appends `h=<urlencoded key>` to its query string, joining the
+operation's own parameters rather than producing a second `?`.
+
+This was a silent-failure bug until `query-apikey-security-scheme` landed — paogen
+recognised `apiKey` only with `in: header`, so the emitted client took no
+credential, sent no credential, and exited 0. Every call would have come back 403.

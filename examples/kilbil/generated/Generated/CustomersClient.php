@@ -31,6 +31,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
         private string $baseUri,
+        private string $h,
         private Hydrator $hydrator = new Hydrator(),
         private Marshaller $marshaller = new Marshaller(),
     ) {
@@ -39,6 +40,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function addClient(AddClientRequest $body): AddClientResponse
     {
         $path = '/load/addclient';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -57,6 +61,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function blockCard(BlockCardRequest $body): BlockCardResponse
     {
         $path = '/load/blockcard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -75,6 +82,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function getClientCards(GetClientCardsRequest $body): GetClientCardsResponse
     {
         $path = '/load/getclientcards';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -96,6 +106,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function getClientFullBalance(GetClientFullBalanceRequest $body): array
     {
         $path = '/load/getclientfullbalance';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -117,6 +130,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function getConfirmationCode(GetConfirmationCodeRequest $body): GetConfirmationCodeResponse
     {
         $path = '/load/getconfirmationcode';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -135,6 +151,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function replaceCard(ReplaceCardRequest $body): ReplaceCardResponse
     {
         $path = '/load/replacecard';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
@@ -153,6 +172,9 @@ final readonly class CustomersClient implements CustomersClientInterface
     public function searchClient(SearchClientRequest $body): SearchClientResponse
     {
         $path = '/load/searchclient';
+        $query = [];
+        $query[] = 'h=' . \urlencode($this->h);
+        $path .= '?' . \implode('&', $query);
         $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')

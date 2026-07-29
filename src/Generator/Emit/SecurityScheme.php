@@ -8,9 +8,10 @@ use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
 
 /**
  * Classifies one OpenAPI `securityScheme` into the subset the generator
- * actually wires up today: `apiKey` with `in: header` and `http bearer`.
+ * actually wires up today: `apiKey` with `in: header`, `apiKey` with
+ * `in: query`, and `http bearer`.
  *
- * Everything else — `apiKey` in cookie/query, `http basic`, `oauth2`,
+ * Everything else — `apiKey` in cookie, `http basic`, `oauth2`,
  * `openIdConnect` — is flagged {@see self::KIND_UNSUPPORTED} and left
  * to the decorator-layer runtime per ADR-002. Treating unsupported
  * schemes as first-class values (rather than null) keeps the catalog's
@@ -22,12 +23,19 @@ use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
 final readonly class SecurityScheme
 {
     public const string KIND_API_KEY_HEADER = 'api_key_header';
+    public const string KIND_API_KEY_QUERY = 'api_key_query';
     public const string KIND_BEARER = 'bearer';
     public const string KIND_UNSUPPORTED = 'unsupported';
 
+    /**
+     * `$wireName` is the key this credential travels under on the wire: a
+     * header name for the header/bearer kinds, a query parameter name for
+     * the query kind. Deliberately not `headerName` — a query-string
+     * credential has no header at all.
+     */
     public function __construct(
         public string $kind,
-        public string $headerName,
+        public string $wireName,
         public string $ctorArg,
     ) {}
 
@@ -47,12 +55,20 @@ final readonly class SecurityScheme
 
         if ($type === 'apiKey') {
             $in = (string) ($scheme->in ?? '');
-            $headerName = (string) ($scheme->name ?? '');
+            $wireName = (string) ($scheme->name ?? '');
 
-            if ($in === 'header' && $headerName !== '') {
+            if ($in === 'header' && $wireName !== '') {
                 return new self(
                     kind: self::KIND_API_KEY_HEADER,
-                    headerName: $headerName,
+                    wireName: $wireName,
+                    ctorArg: self::camelize($name),
+                );
+            }
+
+            if ($in === 'query' && $wireName !== '') {
+                return new self(
+                    kind: self::KIND_API_KEY_QUERY,
+                    wireName: $wireName,
                     ctorArg: self::camelize($name),
                 );
             }
@@ -64,7 +80,7 @@ final readonly class SecurityScheme
             if ($httpScheme === 'bearer') {
                 return new self(
                     kind: self::KIND_BEARER,
-                    headerName: 'Authorization',
+                    wireName: 'Authorization',
                     ctorArg: 'bearerToken',
                 );
             }
@@ -72,7 +88,7 @@ final readonly class SecurityScheme
 
         return new self(
             kind: self::KIND_UNSUPPORTED,
-            headerName: '',
+            wireName: '',
             ctorArg: '',
         );
     }
