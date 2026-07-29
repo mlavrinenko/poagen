@@ -1,16 +1,25 @@
 # Roadmap — paogen v0.1
 
-This file is the **single source of truth for release-path sequencing**
-until paogen ships its first tagged version. It is *derived* from the
-truth tree (`truth/specs/*.typ`, `truth/decisions/*.typ`,
-`truth/tasks/*.typ`) and the 2026-04-18 pre-release review at
+> **This is a release checklist, not the work queue.** The queue is
+> MindTape: run `mt ls`. Where the two disagree, `mt` wins. This file
+> records what has to be true before a `0.1.0` tag, and retires on that
+> tag. Closing it out is tracked as `v01-release-exit-criteria`.
+>
+> Two things below are now out of date and left in place as history
+> rather than silently rewritten. OpenAPI 3.1 is no longer a post-v0.1
+> follow-up — the `openapi-31-through-a-maintained-parser` decision
+> supersedes that, because every schema worth generating against is 3.1.
+> And the `T-NNN` identifiers predate the move to task slugs; the
+> corresponding artifacts are `truth/tasks/<slug>.task-<yymmdd>.typ`.
+
+This file was **derived** from the truth tree and the 2026-04-18
+pre-release review at
 [`truth/reviews/2026-04-18-pre-release-review.md`](truth/reviews/2026-04-18-pre-release-review.md).
 
 **Scope policy.** v0.1 is the first consumable release, not feature
-parity with mature generators. We ship what makes the existing
-OpenAPI 3.0 pipeline *correct*, *type-safe*, and *pleasant* to use on
-real schemas. OpenAPI 3.1 and mutation testing are explicit
-**post-v0.1** follow-ups.
+parity with mature generators. We ship what makes the pipeline
+*correct*, *type-safe*, and *pleasant* to use on real schemas. Mutation
+testing remains an explicit **post-v0.1** follow-up.
 
 ## Phase 1 — Release blocker + `ScalarBinding` foundation
 
