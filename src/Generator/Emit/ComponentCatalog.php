@@ -106,13 +106,13 @@ final class ComponentCatalog
             );
         }
 
-        $type = $schema->type;
+        $type = SchemaType::of($schema);
 
-        if ($type === 'object' || (\is_array($schema->properties) && $schema->properties !== [])) {
+        if ($type->is('object') || (\is_array($schema->properties) && $schema->properties !== [])) {
             return new ComponentShape(ComponentShape::KIND_OBJECT, $phpName, schema: $schema);
         }
 
-        if ($type === 'array') {
+        if ($type->is('array')) {
             $items = $schema->items;
 
             return new ComponentShape(
@@ -123,11 +123,11 @@ final class ComponentCatalog
             );
         }
 
-        if (\in_array($type, ['string', 'integer', 'number', 'boolean'], true)) {
+        if ($type->isScalar()) {
             return new ComponentShape(
                 ComponentShape::KIND_SCALAR,
                 $phpName,
-                scalarType: $type,
+                scalarType: $type->scalarName(),
                 schema: $schema,
             );
         }
@@ -142,7 +142,7 @@ final class ComponentCatalog
 
     private static function unsupportedReason(string $rawName, Schema $schema): string
     {
-        $type = \is_string($schema->type) ? $schema->type : 'unspecified';
+        $type = SchemaType::of($schema)->describe();
         $pointer = $schema->getDocumentPosition();
         $location = $pointer instanceof JsonPointer ? " (schema at {$pointer->getPointer()})" : '';
 

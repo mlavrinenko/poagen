@@ -1,17 +1,21 @@
-kilbil-loyalty-client-proof: the acceptance target, not yet reachable. `components/schemas` is empty and every payload is declared inline, so the model planner — which walks the component catalogue — has nothing to walk. 34 of 36 operations are unrepresentable today. Tracked as inline-body-and-response-schemas.
+kilbil-loyalty-client-proof: the acceptance target. Inline payloads now synthesise, so 34 of 36 operations generate; the two `application/xml` request bodies (`goodsxml`, `goodslistxml`) are what remain. Tracked as xml-content-type-policy.
 
-A correction worth recording, because an earlier version of this file got it
-wrong and the wrong version informed the task backlog.
+Two corrections worth recording, because earlier versions of this file got the
+same question wrong in opposite directions and both wrong versions informed the
+task backlog.
 
-This document declares `openapi: 3.1.0`, and that was assumed to be the first
-blocker — rejected at a version gate before anything else could matter. There is
-no version gate. paogen never inspects `$openApi->openapi` and never calls
-`validate()`, so a 3.1 document is read structurally like any other.
+The first version said a `3.1.0` version string would be rejected at a version
+gate before anything else could matter. There is no version gate. paogen never
+inspects `$openApi->openapi` and never calls `validate()`, so a 3.1 document is
+read structurally like any other. That correction stands.
 
-More to the point, this document uses no 3.1 construct at all: no
-`type: [T, "null"]`, no `const`, no `prefixItems`, no `unevaluatedProperties`.
-It is a 3.0-shaped document carrying a 3.1 version string, which is why it
-parses cleanly and reaches the emitters.
+The second version went further and said this document uses no 3.1 construct at
+all — "no `type: [T, "null"]`" in as many words. It uses 87 of them: 48
+`[string, "null"]`, 26 `[integer, "null"]`, 12 `[array, "null"]`, and one
+`[number, "null"]`. Nothing else from 3.1 appears.
 
-So the parser swap is not what stands between paogen and this client. Inline
-payloads are, and they are the whole of it.
+So the parser swap is still not what stands between paogen and this client.
+`cebe/php-openapi` hands the type list over verbatim while declaring
+`Schema::$type` as `string`; it was paogen's reading of it that was wrong, and
+`nullable-type-arrays` fixed that without touching the dependency. What is left
+is XML request serialisation, and that is the whole of it.

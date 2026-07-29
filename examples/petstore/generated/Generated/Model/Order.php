@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\Petstore\Generated\Model;
 
+use Acme\Petstore\Generated\Enum\OrderStatus;
 use DateTimeImmutable;
 
 final readonly class Order
@@ -14,7 +15,7 @@ final readonly class Order
         public ?int $petId = null,
         public ?int $quantity = null,
         public ?DateTimeImmutable $shipDate = null,
-        public ?string $status = null,
+        public ?OrderStatus $status = null,
     ) {
     }
 }

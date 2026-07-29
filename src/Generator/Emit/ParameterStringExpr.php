@@ -50,7 +50,7 @@ final readonly class ParameterStringExpr
             return new Literal($formatExpr);
         }
 
-        $alreadyString = $schema instanceof Schema && $schema->type === 'string';
+        $alreadyString = $schema instanceof Schema && SchemaType::of($schema)->is('string');
 
         return $alreadyString
             ? new Literal('$' . $varName)
@@ -116,7 +116,9 @@ final readonly class ParameterStringExpr
     private function isEnumSchema(Schema $schema): bool
     {
         if (\is_array($schema->enum) && $schema->enum !== []) {
-            return \in_array($schema->type, ['string', 'integer'], true);
+            $name = SchemaType::of($schema)->name;
+
+            return $name === 'string' || $name === 'integer';
         }
 
         return false;

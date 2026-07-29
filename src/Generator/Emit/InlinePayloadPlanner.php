@@ -126,7 +126,7 @@ final readonly class InlinePayloadPlanner
         // schema says, so it is what the caller passes; dropping the operation
         // for want of a class name would shrink the client over a body the
         // vendor deliberately left open.
-        if ($schema->type === 'object') {
+        if (SchemaType::of($schema)->is('object')) {
             return BodySpec::jsonMap($schema);
         }
 
@@ -183,7 +183,7 @@ final readonly class InlinePayloadPlanner
 
     private static function isSynthesisableObject(Schema $schema): bool
     {
-        return $schema->type === 'object' && InlineObjectResolver::classify($schema) === 'synthesise';
+        return SchemaType::of($schema)->is('object') && InlineObjectResolver::classify($schema) === 'synthesise';
     }
 
     /**
@@ -192,7 +192,7 @@ final readonly class InlinePayloadPlanner
      */
     private static function inlineObjectItemsOf(Schema $schema): ?Schema
     {
-        if ($schema->type !== 'array') {
+        if (!SchemaType::of($schema)->is('array')) {
             return null;
         }
 

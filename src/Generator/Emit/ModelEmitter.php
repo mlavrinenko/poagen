@@ -102,15 +102,20 @@ final readonly class ModelEmitter
                 $enums,
             );
 
-            $isNullable = !$isRequired || $resolved->nullable;
-
+            // Two separate facts, and conflating them mis-orders the
+            // constructor. A property may be required *and* nullable — the
+            // caller has to pass it and may pass null — so the type admits null
+            // while the parameter takes no default. Only an optional property
+            // gets a default, which is what keeps every defaulted parameter
+            // after every non-defaulted one.
             $this->addProperty(
                 $namespace,
                 $constructor,
                 $propName,
                 $phpName,
                 $resolved,
-                $isNullable,
+                !$isRequired || $resolved->nullable,
+                !$isRequired,
                 $propSchema,
                 $bindings,
                 $modelNamespace,
@@ -129,6 +134,7 @@ final readonly class ModelEmitter
         string $phpName,
         TypeResolver $resolved,
         bool $isNullable,
+        bool $hasDefault,
         Schema|Reference $propSchema,
         Bindings $bindings,
         string $modelNamespace,
@@ -138,11 +144,24 @@ final readonly class ModelEmitter
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
 
+        // `?T` is only spellable for a single type. `mixed` already admits null,
+        // and a union has to carry `|null` inside the type string — `?Dog|Cat`
+        // is not PHP. Either way an optional property defaults to null so the
+        // caller may omit it.
+        $spellsOwnNull = $type === 'mixed' || ($type !== null && str_contains($type, '|'));
+
         if ($type !== null) {
-            $param->setType($type);
+            $param->setType(
+                $isNullable && $spellsOwnNull && $type !== 'mixed' && !str_ends_with($type, '|null')
+                    ? $type . '|null'
+                    : $type,
+            );
         }
-        if ($isNullable) {
-            $param->setNullable()->setDefaultValue(null);
+        if ($isNullable && !$spellsOwnNull) {
+            $param->setNullable();
+        }
+        if ($hasDefault) {
+            $param->setDefaultValue(null);
         }
         if ($resolved->phpDoc !== null) {
             $constructor->addComment(\sprintf('@param %s%s $%s', $isNullable ? '?' : '', $resolved->phpDoc, $phpName));

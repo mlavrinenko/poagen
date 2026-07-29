@@ -23,8 +23,6 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
  */
 final readonly class OperationAnalyzer
 {
-    private const array SCALAR_TYPES = ['string', 'integer', 'number', 'boolean'];
-
     /**
      * @return list<Parameter>|null null if any parameter sits outside the
      *                              supported subset (path + scalar/array
@@ -92,7 +90,7 @@ final readonly class OperationAnalyzer
             }
 
             $schema = $param->schema;
-            $type = $schema instanceof Schema && \is_string($schema->type) ? $schema->type : 'unspecified';
+            $type = $schema instanceof Schema ? SchemaType::of($schema)->describe() : 'unspecified';
 
             return \sprintf(
                 "parameter '%s' (in: %s, type: %s) is outside paogen's supported parameter shapes — paogen "
@@ -154,7 +152,7 @@ final readonly class OperationAnalyzer
     {
         $schema = $param->schema;
 
-        return $schema instanceof Schema && $schema->type === 'array';
+        return $schema instanceof Schema && SchemaType::of($schema)->is('array');
     }
 
     private static function isSupportedQueryParam(Parameter $param): bool
@@ -165,14 +163,16 @@ final readonly class OperationAnalyzer
             return false;
         }
 
-        if (\in_array($schema->type, self::SCALAR_TYPES, true)) {
+        $type = SchemaType::of($schema);
+
+        if ($type->isScalar()) {
             return true;
         }
 
-        if ($schema->type === 'array') {
+        if ($type->is('array')) {
             $items = $schema->items;
 
-            return $items instanceof Schema && \in_array($items->type, self::SCALAR_TYPES, true);
+            return $items instanceof Schema && SchemaType::of($items)->isScalar();
         }
 
         return false;
@@ -186,7 +186,7 @@ final readonly class OperationAnalyzer
 
         $schema = $param->schema;
 
-        return $schema instanceof Schema && \in_array($schema->type, self::SCALAR_TYPES, true);
+        return $schema instanceof Schema && SchemaType::of($schema)->isScalar();
     }
 
     /**
@@ -242,7 +242,9 @@ final readonly class OperationAnalyzer
             return ReturnSpec::void();
         }
 
-        if ($schema->type === 'array') {
+        $type = SchemaType::of($schema);
+
+        if ($type->is('array')) {
             $items = $schema->items;
 
             if ($items instanceof Reference) {
@@ -255,11 +257,11 @@ final readonly class OperationAnalyzer
             return ReturnSpec::void();
         }
 
-        if ($schema->type === 'object') {
+        if ($type->is('object')) {
             $additional = $schema->additionalProperties;
 
             if ($additional instanceof Schema) {
-                $valueType = self::scalarPhpType($additional->type);
+                $valueType = SchemaType::of($additional)->scalarPhpType();
 
                 return $valueType === null ? ReturnSpec::map('mixed') : ReturnSpec::map($valueType);
             }
@@ -273,20 +275,8 @@ final readonly class OperationAnalyzer
             return ReturnSpec::map('mixed');
         }
 
-        $scalar = self::scalarPhpType($schema->type);
+        $scalar = $type->scalarPhpType();
 
         return $scalar === null ? ReturnSpec::void() : ReturnSpec::scalar($scalar);
     }
-
-    private static function scalarPhpType(mixed $openApiType): ?string
-    {
-        return match ($openApiType) {
-            'string' => 'string',
-            'integer' => 'int',
-            'number' => 'float',
-            'boolean' => 'bool',
-            default => null,
-        };
-    }
-
 }

@@ -125,7 +125,7 @@ final readonly class RequestBodyAnalyzer
 
         $schema = $form->schema;
 
-        if (!$schema instanceof Schema || $schema->type !== 'object') {
+        if (!$schema instanceof Schema || !SchemaType::of($schema)->is('object')) {
             return "application/x-www-form-urlencoded request body{$location} whose schema is not an inline `type: object`"
                 . ' — paogen flattens declared properties into method parameters and needs an inline object schema';
         }
@@ -151,7 +151,7 @@ final readonly class RequestBodyAnalyzer
             return $raw === '' ? null : BodySpec::json(ComponentName::phpFromRef($ref, $registry));
         }
 
-        if ($schema instanceof Schema && $schema->type === 'array') {
+        if ($schema instanceof Schema && SchemaType::of($schema)->is('array')) {
             $items = $schema->items;
 
             if ($items instanceof Reference) {
@@ -188,7 +188,7 @@ final readonly class RequestBodyAnalyzer
 
         $schema = $media->schema;
 
-        if (!$schema instanceof Schema || $schema->type !== 'object') {
+        if (!$schema instanceof Schema || !SchemaType::of($schema)->is('object')) {
             return null;
         }
 

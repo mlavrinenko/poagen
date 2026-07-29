@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\Petstore\Generated\Model;
 
+use Acme\Petstore\Generated\Enum\PetStatus;
+
 final readonly class Pet
 {
     /**
@@ -16,7 +18,7 @@ final readonly class Pet
         public ?Category $category = null,
         public ?int $id = null,
         public ?PetShipping $shipping = null,
-        public ?string $status = null,
+        public ?PetStatus $status = null,
         public ?array $tags = null,
     ) {
     }

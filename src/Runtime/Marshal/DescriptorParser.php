@@ -177,7 +177,11 @@ final class DescriptorParser
             $branches[] = $branchName;
         }
 
-        return PropertyType::union($branches);
+        // A union of builtins only — `string|int` from a schema that named
+        // several scalar types. There is nothing to pick between, so the value
+        // passes through as the wire gave it rather than through a branch
+        // resolution that has no branches to resolve.
+        return $branches === [] ? PropertyType::passthrough() : PropertyType::union($branches);
     }
 
     private static function resolveClassType(string $name, ?string $format): PropertyType

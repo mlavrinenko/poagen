@@ -46,6 +46,10 @@ final readonly class OperationEmitter
 
     private RequestAssembler $requestAssembler;
 
+    /**
+     * @param array<string,string> $preScannedSkips raw operationId → reason, from a pass that ran
+     *                                              over the whole document before emission
+     */
     public function __construct(
         private string $modelNamespace,
         ?EnumCatalog $enums = null,
@@ -56,6 +60,7 @@ final readonly class OperationEmitter
         ?RequestAssembler $requestAssembler = null,
         private ResponseHandler $responseHandler = new ResponseHandler(),
         private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
+        private array $preScannedSkips = [],
     ) {
         \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         \assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
@@ -84,6 +89,14 @@ final readonly class OperationEmitter
                 $rawOperationId,
                 SkippedOperation::REASON_MISSING_OPERATION_ID,
             ));
+        }
+
+        // A refusal found by a document-wide pass before emission started —
+        // reported once here rather than emitted and reported both.
+        $preScanned = $this->preScannedSkips[$rawOperationId] ?? null;
+
+        if (\is_string($preScanned)) {
+            return EmitOutcome::skipped(new SkippedOperation($httpMethod, $pathUri, $rawOperationId, $preScanned));
         }
 
         \assert($this->operationIdRegistry instanceof NameRegistry);

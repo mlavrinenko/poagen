@@ -70,7 +70,7 @@ final readonly class PropertySynthesiser
             return new TypeResolver('\\' . $modelNamespace . '\\' . $preferred, null, null, $nullable);
         }
 
-        if ($propSchema->type === 'array') {
+        if (SchemaType::of($propSchema)->is('array')) {
             $itemType = $this->resolveArrayItem($preferred . 'Item', $propSchema, $children, $modelNamespace, $enums);
 
             if ($itemType !== null) {
@@ -88,7 +88,7 @@ final readonly class PropertySynthesiser
      */
     public function todoFor(Schema|Reference $propSchema): ?string
     {
-        if (!$propSchema instanceof Schema || $propSchema->type !== 'object') {
+        if (!$propSchema instanceof Schema || !SchemaType::of($propSchema)->is('object')) {
             return null;
         }
 
@@ -136,7 +136,7 @@ final readonly class PropertySynthesiser
 
     private function isSynthesisableObject(Schema $schema): bool
     {
-        return $schema->type === 'object' && InlineObjectResolver::classify($schema) === 'synthesise';
+        return SchemaType::of($schema)->is('object') && InlineObjectResolver::classify($schema) === 'synthesise';
     }
 
     /**

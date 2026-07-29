@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Enum;
 
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Emit\SchemaType;
 
 /**
  * Tracks the enum classes the generator plans to emit.
@@ -109,7 +110,11 @@ final class EnumCatalog
             return null;
         }
 
-        $backing = match ($schema->type) {
+        // Reads `type: [string, "null"]` the same as `type: string` — a
+        // nullable enum still backs onto its declared member, and the
+        // null-carrying case list below is what decides whether paogen can
+        // represent it.
+        $backing = match (SchemaType::of($schema)->name) {
             'string' => EnumSpec::BACKING_STRING,
             'integer' => EnumSpec::BACKING_INT,
             default => null,

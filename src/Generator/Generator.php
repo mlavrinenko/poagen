@@ -19,6 +19,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
+use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
@@ -82,6 +83,10 @@ final readonly class Generator
         // on the first one found.
         $discriminatorSkips = new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
 
+        // Same discipline, one construct further out: a `type` list naming
+        // several types PHP cannot express as one (nullable-type-arrays).
+        $typeListSkips = TypeListScanner::scan($openApi);
+
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';
         $enumNamespace = $rootNamespace . '\\Enum';
@@ -109,9 +114,17 @@ final readonly class Generator
 
         $components = ComponentCatalog::build($openApi, $registry, $enums);
         $excludedComponents = array_fill_keys(
-            array_map(static fn(SkippedComponent $c): string => $c->rawName, $discriminatorSkips),
+            array_map(
+                static fn(SkippedComponent $c): string => $c->rawName,
+                [...$discriminatorSkips, ...$typeListSkips['components']],
+            ),
             true,
         );
+        $preScannedSkips = [];
+
+        foreach ($typeListSkips['operations'] as $skip) {
+            $preScannedSkips[$skip->operationId] = $skip->reason;
+        }
 
         // Payload classes are named before anything is emitted, because both
         // halves of the run need the same answer: the model planner emits them,
@@ -133,12 +146,12 @@ final readonly class Generator
             $inlinePayloads->roots(),
             $ledger,
         );
-        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $writes);
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $writes);
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
         $prunes = $this->planPrunes($rootDir, $writes);
-        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips];
+        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$typeListSkips['components']];
 
         $failures = [
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
@@ -171,6 +184,7 @@ final readonly class Generator
     }
 
     /**
+     * @param  array<string,string>                                $preScannedSkips raw operationId → reason
      * @param  array<string,string>                                $writes
      * @return list<\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation>
      */
@@ -186,6 +200,7 @@ final readonly class Generator
         EnumCatalog $enums,
         ComponentCatalog $components,
         InlinePayloadCatalog $inlinePayloads,
+        array $preScannedSkips,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
@@ -200,6 +215,7 @@ final readonly class Generator
             $normaliser,
             components: $components,
             inlinePayloads: $inlinePayloads,
+            preScannedSkips: $preScannedSkips,
         ));
         $code = $emitter->emit($rootNamespace, 'ApiClient', $openApi, $bindings);
 
