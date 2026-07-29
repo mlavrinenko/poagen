@@ -1,150 +1,198 @@
 # Agent guide for paogen
 
-## Release sequencing — read ROADMAP.md first
+## What paogen is trying to be
 
-[`ROADMAP.md`](ROADMAP.md) at the repo root is the **ordered queue of
-work until paogen ships v0.1**. Before starting any task, check the
-roadmap:
+Read `truth/vision.typ` before your first task. It describes what consuming an
+HTTP API from a project that uses paogen should feel like, and it links the
+seven goals that judge whether we got there. Every goal carries an acid test
+that can be run rather than argued about.
 
-- Pick up the next `[ ]` item in the earliest unfinished phase. Do
-  *not* skip ahead unless the roadmap explicitly permits it.
-- When a task completes (status `done` in the truth tree), tick its
-  checkbox in `ROADMAP.md` **in the same commit** that flips the
-  status.
-- New tasks, withdrawn tasks, and re-sequencing all go through
-  `ROADMAP.md` edits — see the "How to update this roadmap" section
-  of that file for the rules.
-- The roadmap retires on the `0.1.0` tag. Post-v0.1 follow-ups live
-  in its "Post-v0.1 follow-ups" section until then.
+The short version: a consumer points paogen at the schema their vendor
+published, gets a typed client they never edit, and extends it from their own
+code rather than by patching ours. Everything below serves that.
 
-Drift between `ROADMAP.md` and `speconaut status` is a bug. Fix
-whichever is wrong, do not paper over it.
+## The knowledge tree
 
-## Workflow
+`truth/` is the source of truth. If code and spec disagree, fix the spec first,
+then re-confirm. Artifacts are classified by filename sub-extension, not by
+directory — the folder layout is a convenience and the suffix is what counts.
 
-- **Spec-first.** Use the `speconaut-workflow` skill before any change to
-  `src/` or `truth/`. Specs live in `truth/specs/*.typ`; decisions in
-  `truth/decisions/*.typ`. The `truth/` directory is the source of truth —
-  if code and spec disagree, fix the spec first, then re-confirm.
-- **Conventional commits**, English. No `Co-Authored-By` lines.
+| Kind | Filename | What it is |
+|---|---|---|
+| Vision | `truth/vision.typ` | Singleton narrative root linking every goal |
+| Goal | `<slug>.goal.typ` | An outcome plus an acid test that can be run |
+| Standard | `<slug>.standard-<yymmdd>.typ` | A rule decisions cite. Slot-only — the rule lives in `rule:`, never in a body |
+| Decision | `<slug>.decision-<yymmdd>.typ` | A choice, its options, and its consequences |
+| Feature | `<slug>.feature-<yymmdd>.typ` | Behavioural scenarios |
+| Context | `<slug>.context.typ` | Bounded-context domain vocabulary |
+| Task | `<slug>.task-<yymmdd>.typ` | MindTape task. Discovered automatically |
 
-## Quality gates (`just check`)
+Every artifact except tasks must be `#include`-d in `truth/main.typ`. A file
+that is not included fails `speconaut check`.
 
-- **PHPStan**: `level: max` with `phpstan-strict-rules`,
-  `phpstan-deprecation-rules`, and bleeding-edge config — see ADR-004.
-- **Linecop**: enforced on `src/**`. Exempt: `tests/fixtures/**`,
-  `vendor/**`, `build/**`, `tests/generated/**`. Configured in
-  `.linecop.yaml`.
-- **php-cs-fixer + rector** must run cleanly.
-- **speconaut**: `just check-specs` validates the truth tree;
-  `just check-generated-tests` enforces no drift in generated PHPUnit
-  stubs.
+Two rules worth internalising before you write an artifact:
 
-When the linter complains about formatting, run `just format` before
-hand-editing.
+- **An accepted decision cites at least one goal and at least one standard**,
+  or declares `process-only:` with a reason. A goal no decision serves is
+  unrealised; a decision serving no goal is drift.
+- **Every scenario step must reference a domain entity** wrapped in `#a()`,
+  `#an()`, `#the()`, `#v()` or their capitalised forms. Do not bolt an
+  irrelevant entity onto a step to satisfy the checker — that writes prose
+  which lies about what is being tested. If a step cannot honestly reference
+  one, say so rather than inventing.
 
-## Generated-code policy
+Prose rules that will fail your check: no comment above the first `#show:`; no
+duplicate article (`a #a(Model)` — `#a()` already supplies it); no misplaced
+modifier (`the same #a(Schema)` must be `#the([same], Schema)`).
 
-- The generator's output lives under directories named `Generated/`. They
-  are **never hand-edited**.
-- All user customisation lives in either:
-  - the user's `paogen.php` `Profile` (project-level config), or
-  - attributes on the user's own value objects (`#[BindsFormat(...)]`
-    et al.).
-- See ADRs 001–003 for the rationale.
+Long-form notes live in `truth/notes/*.md`, review archives in
+`truth/reviews/*.md`. Decisions do not belong in either.
 
-## Where things live
+## Tasks are MindTape, and the queue is `mt`
 
-| Topic | Location |
-|---|---|
-| Behaviour specs | `truth/specs/*.typ` |
-| Architectural decisions | `truth/decisions/*.typ` |
-| Domain entities | `truth/domain/*.typ` |
-| Implementation tasks | `truth/tasks/*.typ` (when present) |
-| Long-form notes | `truth/notes/*.md` (limitations and design-exploration write-ups — decisions belong in `truth/decisions/`) |
-| Review archives | `truth/reviews/*.md` (historical review passes preserved verbatim) |
-| Real-world OpenAPI fixtures | `tests/fixtures/schemas/` |
-| Sample profiles | `tests/fixtures/profiles/` |
-| Golden generated trees | `tests/fixtures/generated/<vendor>/` |
+The backlog lives in `truth/tasks/` as one MindTape task per file. `mt ls` is
+the queue. `ROADMAP.md` is a release checklist that retires on the `0.1.0` tag,
+not a work queue — when the two disagree, `mt` wins.
+
+```
+mt ls                      # open work
+mt ls '!terminal' --sort priority:desc
+mt ls @wip                 # what is in flight — keep this at one
+mt add -f values.json --name <slug>.task-<yymmdd>
+mt flip wip truth/tasks/<slug>.task-<yymmdd>.typ
+```
+
+Resolve tasks by path. Slug resolution wants the full stem including the
+`.task-<yymmdd>` part, which is easy to get wrong; a path always works.
+
+This project runs MindTape's `gated` preset, which means:
+
+- Four sections are required on any non-terminal task: Summary, Acceptance
+  criteria, Non-goals, Files. Acceptance criteria are conditions someone else
+  can check without asking you.
+- `done` is reachable only from `needs-review`. No run of work closes itself.
+  If you did the work, flip to `needs-review` and let a human close it. This is
+  deliberate — agents report success they have not achieved and do not catch it
+  themselves.
+- `blocked`, `failed` and `cancelled` require a note saying why.
+- A leftover review comment in a task file fails `mt check`.
+
+`difficulty` scores judgment required, not size: 0–2 mechanical, 3–5 local
+judgment, 6–8 cross-cutting design, 9 the approach itself is the open question.
+It is the routing signal for which model tier should pick the task up.
+
+## Commits
+
+Conventional Commits, English, no `Co-Authored-By`. Every commit carries a
+`Refs:` trailer naming the task slug — the filename stem without the
+`.task-<yymmdd>.typ` suffix. One trailer line per task. See CONTRIBUTING.md.
+
+Work with no task behind it needs a task first.
 
 ## Environment
 
-- PHP 8.4 via devbox (`devbox shell`); see `devbox.json`.
-- speconaut binary expected on `$PATH`. If your install rebuilds on every
-  invocation, point at a prebuilt binary directly — see the project
-  Justfile for how the recipes invoke it.
-- *Always invoke speconaut through `devbox run -- speconaut …`* (or via
-  `just …` recipes that already do so). The in-tree
-  `~/projects/home/speconaut/target/{debug,release}/speconaut` binary
-  is frequently older than the system install and will reject
-  currently-valid specs with confusing `unknown variable:` errors —
-  do not reach for it as a fallback.
+PHP 8.4 via devbox. The dev-shell PATH does not survive a non-interactive
+shell, so `devbox run -- <cmd>` will lose devbox-provided binaries and
+`composer`-installed ones alike. Call them through an explicit PATH:
+
+```
+PATH="$PWD/.devbox/nix/profile/default/bin:$PWD/vendor/bin:$PATH" just check
+```
+
+`speconaut` and `mt` are on the system PATH and need no wrapper. Do not reach
+for `~/projects/home/speconaut/target/{debug,release}/speconaut` as a fallback —
+an in-tree build is frequently older than the system install and rejects
+currently-valid specs with confusing `unknown variable:` errors.
+
+Never pipe a gate command into `head`, `tail`, or anything else when you care
+about whether it passed. The pipeline reports the last command's status, so a
+red gate reads as exit 0. Redirect to a file and echo `$?`.
+
+## Quality gates (`just check`)
+
+`just check` is `lint test`. Lint is php-cs-fixer, PHPStan on `src/`, PHPStan on
+the generated fixtures, rector, and linecop, run in parallel.
+
+- PHPStan runs at `level: max` with `phpstan-strict-rules`,
+  `phpstan-deprecation-rules` and bleeding-edge, in two tiers held to different
+  absolutes — see the `analysis-runs-at-maximum-strictness` standard.
+  `phpstan-generated.neon` analyses the emitted tree with no baseline, no
+  `excludePaths` and no `ignoreErrors` at all: a finding there is fixed in the
+  emitter, never annotated away in the output. `phpstan.neon.dist` analyses the
+  generator and permits an exemption only where the tool is provably blind
+  (reflection-only property reads, third-party rule-set limitations), each one
+  carrying an inline comment naming the blind spot. Adding an exemption for a
+  real finding is forbidden.
+- Linecop enforces per-language line limits on `src/**`. Read `.linecop.yaml`
+  before writing and split into modules up front rather than refactoring after
+  the gate trips.
+- `just format` before hand-fixing style complaints.
+
+The speconaut recipes (`check-specs`, `check-generated-tests`, `check-drift`)
+are currently **outside** this aggregate while the truth tree finishes
+migrating to current speconaut. `rewire-speconaut-justfile-recipes` puts them
+back. Until then, run `speconaut check truth/` directly.
+
+`just check-examples` is deliberately outside the gate too. It reports each
+example as passing, drifting, or expected-failure, and treats a stale
+expected-failure marker as an error. Broken examples are committed on purpose,
+as targets for upcoming work.
+
+## Generated-code policy
+
+Output under `Generated/` is never hand-edited. There is no protected region,
+no marked insertion point, no inheritance hook — see the
+`generated-types-are-total` standard. If output is wrong, fix the emitter.
+
+All consumer customisation lives in the `paogen.php` `Profile` or in attributes
+on the consumer's own value objects. Guidance is data paogen reads, never code
+paogen runs — see `guidance-is-data-not-code`. Delete every bit of guidance and
+generation still succeeds, producing a client that is less pleasant and no less
+correct.
 
 ## When a dependency is broken, fix the dependency first
 
-paogen depends on speconaut (core + PHPUnit adapter). If a speconaut-
-side bug blocks routine paogen work — `lock` refuses a clean change,
-`status` misreports drift, codegen produces wrong output, an adapter
-emits bad stubs — do *not* route around it inside paogen. Stop paogen
-work before any hand-edit or workaround, then:
+paogen depends on speconaut (core plus the PHPUnit adapter) and on MindTape. If
+a dependency-side bug blocks routine work, do not route around it inside
+paogen. Stop before any hand-edit or workaround, then file a focused task in
+the owning repo with the reproducible example from the session that surfaced
+it, fix it there under that repo's own workflow, land green, and return.
 
-+ *File a focused task in the owning repo* (see "Task placement"
-  below), with the reproducible example taken from the paogen session
-  that surfaced the problem.
-+ *Fix the dependency there.* Switch `cwd` to
-  `~/projects/home/speconaut` (or the relevant adapter path),
-  implement the fix under its own spec-first workflow, land a green
-  build, and commit.
-+ *Return to paogen* and re-run the blocked workflow. If it is now
-  green, proceed. If it is not, that is another dependency bug — file
-  again.
-
-This is not optional. A paogen change built on a hacked-around
-dependency is a landmine for the next session.
+A paogen change built on a hacked-around dependency is a landmine for the next
+session.
 
 ## Workflow hazards — stop and escalate
 
-Some failure modes signal that the tooling is out of step with reality,
-not that your change is wrong. Do not hack around them.
+These signal that tooling is out of step with reality, not that your change is
+wrong.
 
-- *Never hand-edit `.speconaut/state.lock`.* If `speconaut lock --approve`
-  refuses a routine change, stop. Do not compute sha256 / zstd / base64
-  snapshots by hand, and do not `sed` over trace hashes. File a task in
-  the repo that owns the fix (see "Task placement" below), report to the
-  user, and pause until it is resolved.
-- *Never edit generated trees by hand.* Files under `Generated/`, under
-  `tests/generated/*Test.php`, or under any `speconaut`-owned artifact
-  are produced by tooling. If the tool output is wrong, fix the tool,
-  not the output.
-- If `just check`, `just check-drift`, `speconaut lock`, or
-  `speconaut status` fails in a way that seems to *expect* you to patch
-  generated state by hand, that is a workflow abomination. Stop, file
-  upstream, ask.
+- **Never hand-edit `.speconaut/state.lock`.** If `speconaut lock` refuses a
+  routine change, stop. Do not compute hashes by hand or `sed` over trace
+  values. File upstream and pause.
+- **Never edit generated trees by hand** — `Generated/`, `tests/generated/`, or
+  any tool-owned artifact.
+- If a gate fails in a way that seems to *expect* you to patch generated state
+  by hand, that is a workflow abomination. Stop, file upstream, ask.
 
-## Task hygiene
+## Task placement
 
-- *One issue per task.* If you identify two problems, write two tasks,
-  even if they were surfaced by the same symptom.
-- *Tasks live in the repo that owns the fix:*
-  - paogen behavior / specs: `~/projects/home/paogen/truth/tasks/`
-  - speconaut core (engine, `lock`, `status`, `check`, CLI):
-    `~/projects/home/speconaut/truth/tasks/`
-  - speconaut adapter behavior (e.g. PHPUnit codegen, Rust codegen):
-    `~/projects/home/speconaut/adapters/<adapter>/truth/tasks/`
-  - Cross-adapter protocol: `~/projects/home/speconaut/adapter-truth/`.
-    Check `ls ~/projects/home/speconaut/` first — the layout evolves.
-- *Every task carries a reproducible example.* The exact commands to
-  run, the observed output (copied, not paraphrased), the expected
-  output, and the file:line references the reader needs. A task a
-  reader has to re-derive to understand is a task that will be
-  deprioritised forever.
-- *Use `~/` paths, not bare relative paths.* `~/projects/home/paogen`
-  is unambiguous across sessions and agents; `the paogen repo` or
-  `./truth/specs/` is not.
+One issue per task. Two problems surfaced by one symptom are two tasks.
+
+- paogen behaviour and specs: `~/projects/home/paogen/truth/tasks/`
+- speconaut core: `~/projects/home/speconaut/truth/tasks/`
+- speconaut adapters: `~/projects/home/speconaut/adapters/<adapter>/truth/tasks/`
+- MindTape: `~/projects/home/mindtape/`
+
+Check `ls ~/projects/home/speconaut/` first — the layout evolves.
+
+Every task carries a reproducible example: the exact commands, the observed
+output copied rather than paraphrased, the expected output, and the references
+a reader needs. A task someone has to re-derive to understand is a task that
+gets deprioritised forever. Use `~/` paths, not bare relative ones.
 
 ## Reporting back
 
-When you finish a chunk of work, say concretely what changed and where.
-Quote file:line references. Do not summarise in the passive voice. If
-something was blocked or worked around, say so explicitly in the same
-breath — do not bury it.
+Say concretely what changed and where, with `file:line` references. Not the
+passive voice. If something was blocked or worked around, say so in the same
+breath rather than burying it — and if you could not verify something, say that
+too instead of implying you did.

@@ -7,16 +7,24 @@
   contexts: (generation-context,),
   rule: [
     Static analysis runs at its strictest available setting over both
-    #the(Generator) and the tree it emits, with no baseline file, no
-    suppression annotation, no ignored-error pattern, and no excluded path.
-    #A(GeneratedFile) is analysed exactly as a consumer's own code would be.
+    #the(Generator) and the tree it emits, and the two tiers are held to
+    different absolutes because they are read by different people.
 
-    The output tier is the one that matters. Consumers run their own analysis
-    at whatever level they have chosen, and a generated tree that needs a
-    baseline to pass has exported #the(Generator)'s unfinished work into their
-    repository. So the standard is not that we analyse the output; it is that
-    the output needs no help to pass. A finding is fixed at its source in
-    #the(Generator), never annotated away in what it emits.
+    On the emitted tree the rule admits nothing: no baseline, no suppression
+    annotation, no ignored-error pattern, no excluded path. #A(GeneratedFile)
+    is analysed exactly as a consumer's own code would be, because that is the
+    tier that matters. Consumers run their own analysis at whatever level they
+    have chosen, and output that needs a baseline to pass has exported
+    #the(Generator)'s unfinished work into their repository. A finding there is
+    fixed at its source, never annotated away in what gets emitted.
+
+    On #the(Generator)'s own analysis an exemption is permitted only where the
+    tool is provably blind — a property read solely through reflection, a
+    pattern a third-party rule set cannot see through — and each one carries an
+    inline comment naming the blind spot. An exemption for a real finding is
+    forbidden. The distinction is not a convenience: the moment an exemption
+    stops naming a tool limitation and starts naming a deadline, this rule has
+    become decoration.
   ],
-  structural: "enforced by phpstan.neon and phpstan-generated.neon running at max level with no baseline and no ignored-error patterns, both wired into the check recipe",
+  structural: "enforced by phpstan-generated.neon, which analyses the emitted tree at max level with no baseline, no excludePaths and no ignoreErrors; and by phpstan.neon.dist, which analyses the generator at max level with seven documented tool-blind-spot exemptions and no baseline",
 )
