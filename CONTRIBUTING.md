@@ -45,6 +45,21 @@ just test       # run PHPUnit
 This project follows the [Conventional Commits][cc] specification. Keep commit
 messages focused on the *why*, not the *what* — the diff speaks for itself.
 
+Every commit carries a `Refs:` trailer naming the task it belongs to, using the
+task's slug — the filename stem without the `.task-<yymmdd>.typ` suffix:
+
+```
+refactor(generator): synthesise models from inline payloads
+
+Refs: inline-body-and-response-schemas
+```
+
+Slugs are stable and greppable, so `git log --grep` finds every commit behind a
+task and `truth/tasks/<slug>.task-*.typ` is always the matching artifact. List
+them with `mt ls`. A commit spanning several tasks repeats the trailer, one per
+line. Work with no task behind it needs a task first — that is the point of the
+trailer, not a formality it satisfies.
+
 ### Pull Requests
 
 * One feature per PR.

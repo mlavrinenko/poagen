@@ -18,8 +18,9 @@ The generator has three different reactions to a construct it cannot handle, and
 - The message names the construct, the operation or component, and what would make it acceptable.
 - The success line is not printed on a run that skipped anything.
 - The three existing reactions are unified: undiscriminated unions, unsupported bodies and unsupported content types all fail the same way.
-- A profile-level opt-out exists, is explicit, is scoped to named constructs rather than global, and is recorded in the user's profile.
-- Regression tests cover: abort by default, opt-out honoured, exit code, and empty output directory on abort.
+- A profile-level skip list exists, is explicit, is scoped to named operations and components rather than global, and is recorded in the user's profile alongside a reason.
+- A stale skip entry fails the run: if a skipped operation would now generate cleanly, the generator refuses and names the entry to delete. A skip list that silently outlives its cause is the same silent-success bug wearing a different hat.
+- Regression tests cover: abort by default, skip honoured, stale skip refused, exit code, and empty output directory on abort.
 
 == Non-goals
 

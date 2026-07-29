@@ -1,0 +1,9 @@
+#import "@local/speconaut:0.1.0": entity, bounded-context
+
+#let cli-context = bounded-context("cli", layer: "technical")
+
+// The command surface a consumer actually runs. Thin by design: the CLI
+// resolves a profile and hands off, so `cheap-regeneration` stays one command
+// rather than a procedure.
+
+#let PaogenCli = entity("paogen CLI", props: ())

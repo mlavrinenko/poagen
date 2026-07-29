@@ -1,2 +1,36 @@
-[traces]
-source-dirs = ["src", "bin"]
+[check]
+
+# Roots the untraced-source finding walks.
+source-roots = ["src", "bin"]
+
+# Behavioural specs live here. The spec-first gate treats a change under a
+# source root as needing a paired change under one of these.
+spec-roots = ["truth/specs"]
+
+# The code-ref sweep forbids file paths, member chains, and call shapes in
+# specs, decisions, standards, and domain artifacts, so those layers stay
+# portable across reimplementations. paogen exempts them, for two different
+# reasons that deserve to be told apart.
+#
+# The call shapes and attribute forms are legitimate. paogen's product IS
+# emitted PHP, so `addPet(Pet $body): Pet` and `#[BindsFormat('date-time')]`
+# are the observable behaviour a scenario asserts, not an implementation leak.
+# Rephrasing them behaviourally would describe the generator by describing
+# nothing.
+#
+# The `src/` paths are not legitimate, and this exemption is debt. 140 of them
+# point at paogen's own internals rather than at anything a consumer observes.
+# They are suppressed here to unblock the migration rather than because they
+# are right — `narrow-the-code-ref-exemption` rewrites them and shrinks this
+# list to the output vocabulary alone.
+[check.code-refs]
+source-extensions = []
+allowlist = [
+  # Output vocabulary: emitted signatures, attributes, member references.
+  "(",
+  "::",
+  # Debt: references to paogen's own tree. To be rewritten behaviourally.
+  "src/",
+  "bin/",
+  "tests/",
+]

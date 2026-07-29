@@ -1,12 +1,14 @@
 // paogen — unified knowledge entry point.
-// Compiles specs + decisions into one document. Tasks are discovered
-// automatically from truth/tasks/ when present.
 //
-// Every spec and decision file MUST be included here.
-// Run `speconaut check` to detect missing includes.
+// Every artifact except tasks must be #include-d here, wherever it lives under
+// truth/. Files are classified by sub-extension (`.goal`, `.context`,
+// `.standard-<yymmdd>`, `.feature-<yymmdd>`, `.decision-<yymmdd>`), not by
+// directory. Tasks are discovered by their `.task-<yymmdd>` sub-extension and
+// need no entry here.
+//
+// Run `speconaut check truth/` to detect missing includes.
 
 #import "@local/speconaut:0.1.0": *
-#import "domain.typ": *
 
 #set document(title: "paogen — Source of Truth")
 #set text(size: 10pt)
@@ -41,45 +43,69 @@
 #include "goals/cheap-regeneration.goal.typ"
 #pagebreak()
 
+// --- Standards ---
+
+#text(size: 16pt, weight: "bold", fill: rgb("#B45309"))[= Standards]
+
+#include "standards/guidance-is-data-not-code.standard-260729.typ"
+#pagebreak()
+#include "standards/generated-types-are-total.standard-260729.typ"
+#pagebreak()
+#include "standards/analysis-runs-at-maximum-strictness.standard-260729.typ"
+#pagebreak()
+#include "standards/fixtures-are-unmodified-vendor-documents.standard-260729.typ"
+#pagebreak()
+#include "standards/silence-means-success.standard-260729.typ"
+#pagebreak()
+#include "standards/caller-surface-is-injectable.standard-260729.typ"
+#pagebreak()
+#include "standards/regeneration-is-deterministic-and-total.standard-260729.typ"
+#pagebreak()
+
 // --- Specifications ---
 
 #text(size: 16pt, weight: "bold", fill: rgb("#5B21B6"))[= Specifications]
 
-#include "specs/cli.typ"
-#include "specs/profile.typ"
-#include "specs/model-generator.typ"
-#include "specs/operation-generator.typ"
+#include "specs/cli.feature-260417.typ"
+#include "specs/profile.feature-260418.typ"
+#include "specs/model-generator.feature-260418.typ"
+#include "specs/operation-generator.feature-260418.typ"
 
-// --- Architectural Decisions ---
+// --- Decisions ---
 
 #pagebreak()
-#text(size: 16pt, weight: "bold", fill: rgb("#1E40AF"))[= Architectural Decisions]
+#text(size: 16pt, weight: "bold", fill: rgb("#1E40AF"))[= Decisions]
 
-#include "decisions/001-profile-driven-generation.typ"
+#include "decisions/plain-getopt-for-the-cli.decision-260417.typ"
 #pagebreak()
-#include "decisions/002-no-inheritance-no-protected-regions.typ"
+#include "decisions/profile-driven-generation.decision-260418.typ"
 #pagebreak()
-#include "decisions/003-profile-and-attribute-dx.typ"
+#include "decisions/no-inheritance-no-protected-regions.decision-260418.typ"
 #pagebreak()
-#include "decisions/004-quality-gates.typ"
+#include "decisions/typed-profile-and-colocated-attributes.decision-260418.typ"
 #pagebreak()
-#include "decisions/005-schema-fixture-policy.typ"
+#include "decisions/quality-gates-at-maximum-strictness.decision-260418.typ"
 #pagebreak()
-#include "decisions/006-cli-tooling.typ"
+#include "decisions/schema-fixture-policy.decision-260418.typ"
 #pagebreak()
-#include "decisions/007-hydration-serialization.typ"
+#include "decisions/hydration-and-serialization-contract.decision-260418.typ"
 #pagebreak()
-#include "decisions/008-openapi-31-strategy.typ"
+#include "decisions/error-response-policy.decision-260418.typ"
 #pagebreak()
-#include "decisions/009-error-response-policy.typ"
+#include "decisions/openapi-31-strategy.decision-260419.typ"
 #pagebreak()
-#include "decisions/010-attribute-and-phpdoc-driven-serialization.typ"
+#include "decisions/attribute-and-phpdoc-driven-serialization.decision-260420.typ"
+#pagebreak()
+#include "decisions/openapi-31-through-a-maintained-parser.decision-260729.typ"
+#pagebreak()
+#include "decisions/tagged-subclients-as-the-primary-surface.decision-260729.typ"
+#pagebreak()
+#include "decisions/code-references-permitted-in-generator-specs.decision-260729.typ"
 
 // --- Supplementary artefacts ---
 //
-// Markdown notes and historical reviews stored under truth/ for
-// portability. They are referenced here so speconaut's orphan
-// detector sees them as reachable. See AGENT.md "Where things live".
+// Markdown notes and historical reviews stored under truth/ for portability.
+// Referenced here so the orphan detector sees them as reachable.
 
 #pagebreak()
 #text(size: 16pt, weight: "bold", fill: rgb("#0F766E"))[= Supplementary artefacts]

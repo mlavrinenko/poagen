@@ -18,7 +18,9 @@ The whole model pipeline is rooted in the named components of the document. The 
 - An inline object response produces a typed return value.
 - Inline arrays of inline objects work at both ends.
 - Inline enums inside operation payloads become backed enums, as they already do inside components.
-- Synthesised names are derived deterministically from the operation and are stable across runs.
+- Synthesised names are derived deterministically from the operation identifier and are stable across runs.
+- The profile can pin an explicit class name for any synthesised model, keyed on the operation identifier, overriding the derivation. When a vendor renames an operation identifier the consumer restores the old class name by pointing the pin at the new identifier, so an upstream rename costs a config line rather than a breaking change to their own callers.
+- A pin naming an operation identifier absent from the document fails the run rather than being ignored.
 - A schema with no components at all generates a complete client.
 - The kilbil loyalty schema emits all 36 operations.
 
