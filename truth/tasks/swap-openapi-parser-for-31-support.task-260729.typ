@@ -5,7 +5,11 @@
   tags: ("parser", "openapi-31", "generator"),
   priority: 6,
   difficulty: 5,
-  status: proposed(2026, 7, 29),
+  status: blocked(
+    2026,
+    7,
+    30,
+  )[3.1 support is postponed. The premise that made this urgent was wrong: paogen has no version gate, and the kilbil acceptance target uses no 3.1 construct at all, so nothing about serving kilbil needs the fork. Deferred until the kilbil client is feature complete; the fork swap is then the first thing that resumes, and whatever depends on it unblocks behind it.],
 )
 
 == Summary
