@@ -5,7 +5,7 @@
   tags: ("generator",),
   priority: 9,
   difficulty: 7,
-  status: proposed(2026, 7, 28),
+  status: accepted(2026, 7, 30),
 )
 
 == Summary

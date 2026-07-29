@@ -11,8 +11,16 @@ Petstore.
 
 ## What makes it a real test
 
-**OpenAPI 3.1.** Not 3.0. The nullable-array idiom, `const`, and JSON Schema
-2020-12 constructs all appear where a 3.0 parser expects something else.
+**Declares OpenAPI 3.1, but does not use it.** The version string is `3.1.0`
+and that is the whole of it: no `type: [T, "null"]`, no `const`, no
+`prefixItems`, no `unevaluatedProperties`. Structurally it is a 3.0 document.
+
+This is worth stating because the opposite was assumed at first, and the
+assumption shaped the task backlog before anyone checked. paogen has no version
+gate — it never inspects `$openApi->openapi` and never calls `validate()` — so
+the document parses cleanly and reaches the emitters. The parser swap is still
+worth doing for schemas that genuinely use 3.1, and to drop a patch we carry,
+but it is not what blocks this client.
 
 **No named components at all.** `components/schemas` is empty. Every payload is
 declared inline at its use site: 29 inline JSON request bodies and 71 inline

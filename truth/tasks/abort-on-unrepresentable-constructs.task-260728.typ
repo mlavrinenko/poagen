@@ -5,7 +5,7 @@
   tags: ("strictness", "generator"),
   priority: 9,
   difficulty: 6,
-  status: wip(2026, 7, 29),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary

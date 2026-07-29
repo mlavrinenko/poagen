@@ -1,15 +1,17 @@
-kilbil-loyalty-client-proof: the acceptance target, not yet reachable. OpenAPI 3.1 is rejected at the version gate (swap-openapi-parser-for-31-support); past it, 34 of 36 operations carry inline payloads the emitters cannot synthesise models from (inline-body-and-response-schemas); and today that produces a two-file client and exit 0 rather than a failure (abort-on-unrepresentable-constructs).
+kilbil-loyalty-client-proof: the acceptance target, not yet reachable. `components/schemas` is empty and every payload is declared inline, so the model planner — which walks the component catalogue — has nothing to walk. 34 of 36 operations are unrepresentable today. Tracked as inline-body-and-response-schemas.
 
-Note for whoever runs `just check-examples` and sees this reported as a STALE
-marker rather than an expected failure.
+A correction worth recording, because an earlier version of this file got it
+wrong and the wrong version informed the task backlog.
 
-That is not a mistake in the marker. It is the bug the marker describes,
-demonstrated by the harness itself. `check-examples` decides an example is
-stale by asking whether the generator exits non-zero. Against this document the
-generator drops 34 of 36 operations, writes two files, prints its success line,
-and exits 0 — so the harness concludes the example must be fixed.
+This document declares `openapi: 3.1.0`, and that was assumed to be the first
+blocker — rejected at a version gate before anything else could matter. There is
+no version gate. paogen never inspects `$openApi->openapi` and never calls
+`validate()`, so a 3.1 document is read structurally like any other.
 
-A tool whose own example board cannot tell "generated a working client" from
-"generated almost nothing" is the argument for abort-on-unrepresentable-constructs
-in one line. When that task lands, this run fails honestly and the marker reads
-correctly. Until then, treat the stale-marker report on kilbil as expected.
+More to the point, this document uses no 3.1 construct at all: no
+`type: [T, "null"]`, no `const`, no `prefixItems`, no `unevaluatedProperties`.
+It is a 3.0-shaped document carrying a 3.1 version string, which is why it
+parses cleanly and reaches the emitters.
+
+So the parser swap is not what stands between paogen and this client. Inline
+payloads are, and they are the whole of it.

@@ -1,7 +1,7 @@
 #import "@local/speconaut:0.1.0": *
 #import "../domain/schema.context.typ": schema-context, Schema, Operation
 #import "../domain/guidance.context.typ": guidance-context, Profile
-#import "../domain/generation.context.typ": generation-context, Generator, Client, Model
+#import "../domain/generation.context.typ": generation-context, Generator, Client, Model, GeneratedFile
 #import "../domain/cli.context.typ": cli-context, PaogenCli
 
 #feature(
@@ -239,13 +239,24 @@
     ]
 
     #scenario(
-      "An unsupported multipart or octet-stream body produces a throwing stub",
+      "An unsupported body content type aborts the run",
       stage: "unstable",
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
+      #when[#the(Generator) runs against #a(Profile) declaring no skip entry for that #a(Operation)]
+      #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
+      #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]
+    ]
+
+    #scenario(
+      "An explicitly skipped operation is omitted rather than stubbed",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
+      #and_[#the(Profile) declares a skip entry for that #a(Operation) carrying a reason]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `uploadFile(int $petId, ?string $additionalMetadata = null)` that is *not* silently skipped]
-      #and_[#the(Client)'s method body throws a `\RuntimeException` whose message mentions the operationId and the unsupported content type]
+      #then[the emitted #the(Client) has no `uploadFile` method at all]
+      #and_[no #a(GeneratedFile) contains a method that throws on an unsupported content type]
     ]
   ]
 

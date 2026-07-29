@@ -81,7 +81,7 @@
       #given[#the(Schema) declares components `Dog` and `Cat` and a component `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
       #and_[#the(Profile) has no `discriminators` override for #p((key: "Pet.kind"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#the(Generator)'s run aborts with #p((error: "UndiscriminatedUnionException")) whose message names `Pet.kind`]
+      #then[#the(Generator)'s run aborts with #p((error: "UnrepresentableConstructsException")) whose message names `Pet.kind`]
       #and_[no files are written under #the(Profile)'s `output`]
     ]
 
