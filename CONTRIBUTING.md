@@ -17,6 +17,13 @@ This repo uses [devbox](https://www.jetify.com/docs/devbox/) to pin toolchain
 versions. If you have `devbox` + `direnv` set up, the environment is loaded
 automatically when you `cd` into the repo.
 
+`composer.lock` is committed, so `composer install` — never `composer update`
+— reproduces the exact phpstan / rector / php-cs-fixer versions the gate was
+last green under. paogen is an application, not a library: nothing else pins
+its QA tooling, so an uncommitted lock means every checkout resolves its own
+versions and `just check` can pass on one machine and fail on another for no
+real reason.
+
 ```bash
 composer install
 ```
