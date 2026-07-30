@@ -11,15 +11,19 @@ use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
+use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
 use function is_array;
+use function json_encode;
 
 use const DIRECTORY_SEPARATOR;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * xml-content-type-policy: an `application/xml` request body is serialised, and
@@ -67,18 +71,24 @@ final class XmlRequestBodyTest extends TestCase
         // No methodRenames here, so the method keeps the vendor's spelling.
         self::assertStringContainsString('public function goodsxml(array $body', $surface);
         self::assertStringContainsString('GoodsxmlRequestItem> $body', $surface);
-        self::assertStringContainsString("->withHeader('Content-Type', 'application/xml')", $surface);
-        self::assertStringContainsString('XmlWriter::renderList(', $surface);
-        self::assertStringContainsString("'goods', 'good'", $surface);
+        // The element names the document supplies travel with the body; how it
+        // is rendered and which content type it carries are the transport's.
+        self::assertStringContainsString("->xmlList(\$body, 'goods', 'good')", $surface);
+        self::assertStringNotContainsString('Content-Type', $surface);
     }
 
     public function testTheMarshallerStaysInThePathSoBothContentTypesAgree(): void
     {
-        $surface = $this->callerSurface($this->plan(self::ELEMENTS));
-
         // Wire names, scalar bindings and date formats are decided once, not
-        // twice differently.
-        self::assertStringContainsString('$this->marshaller->marshal($__m)', $surface);
+        // twice differently: the writer renders what the marshaller produced,
+        // so a `#[WireName]` that JSON honours reaches the XML too.
+        $marshalled = new Marshaller()->marshal(new Contact('Grace'));
+
+        self::assertSame('{"display-name":"Grace","email":null}', json_encode($marshalled, JSON_THROW_ON_ERROR));
+        self::assertStringContainsString(
+            '<display-name>Grace</display-name>',
+            new XmlWriter()->renderObject($marshalled, 'contact'),
+        );
     }
 
     public function testEveryOperationInTheDocumentIsEmittedOnceXmlIsHandled(): void
@@ -104,7 +114,7 @@ final class XmlRequestBodyTest extends TestCase
 
     public function testTheWriterFollowsTheOpenApiElementDefaults(): void
     {
-        $xml = XmlWriter::renderList(
+        $xml = new XmlWriter()->renderList(
             [['code' => 'A1', 'BC' => ['111', '222'], 'is_group' => 0, 'full_name' => null]],
             'goods',
             'good',
@@ -125,7 +135,7 @@ final class XmlRequestBodyTest extends TestCase
 
     public function testTheWriterSpellsBooleansAsJsonEncodeDoes(): void
     {
-        $xml = XmlWriter::renderObject(['active' => true, 'archived' => false], 'item');
+        $xml = new XmlWriter()->renderObject(['active' => true, 'archived' => false], 'item');
 
         self::assertStringContainsString('<active>true</active>', $xml);
         self::assertStringContainsString('<archived>false</archived>', $xml);
@@ -136,8 +146,8 @@ final class XmlRequestBodyTest extends TestCase
         $payload = ['code' => 'A1', 'nested' => ['a' => 1, 'b' => 2]];
 
         self::assertSame(
-            XmlWriter::renderObject($payload, 'item'),
-            XmlWriter::renderObject($payload, 'item'),
+            new XmlWriter()->renderObject($payload, 'item'),
+            new XmlWriter()->renderObject($payload, 'item'),
         );
     }
 

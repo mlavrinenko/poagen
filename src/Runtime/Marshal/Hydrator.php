@@ -8,6 +8,9 @@ use BackedEnum;
 use DateTimeImmutable;
 use LogicException;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
+use Mlavrinenko\Paogen\Runtime\Contract\DescriptorParserInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\HydratorInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\PropertyType;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 
 use function array_key_exists;
@@ -21,8 +24,12 @@ use function is_string;
  * Model instance. Recurses into nested models, lists, maps, and
  * discriminated / structural unions. See ADR-010.
  */
-final class Hydrator
+final readonly class Hydrator implements HydratorInterface
 {
+    public function __construct(
+        private DescriptorParserInterface $descriptors = new DescriptorParser(),
+    ) {}
+
     /**
      * @template T of object
      *
@@ -35,7 +42,7 @@ final class Hydrator
     {
         $args = [];
 
-        foreach (DescriptorParser::descriptorsFor($class) as $descriptor) {
+        foreach ($this->descriptors->descriptorsFor($class) as $descriptor) {
             if (!array_key_exists($descriptor->wireName, $data)) {
                 continue;
             }

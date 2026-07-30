@@ -46,6 +46,15 @@ type-safe, and pleasant on real schemas. The generator emits:
   best-effort decoded body narrowable via `instanceof` when an error
   schema is declared (see
   [ADR-009](truth/decisions/009-error-response-policy.typ)).
+* **Runtime transport** — an emitted operation is one call: it describes
+  its request as an
+  [`Endpoint`](src/Runtime/Contract/Endpoint.php), names the shape it
+  expects back as a
+  [`ResponseType`](src/Runtime/Contract/ResponseType.php), and hands both
+  to the injected
+  [`TransportInterface`](src/Runtime/Contract/TransportInterface.php).
+  A client takes that transport plus whatever credentials the schema
+  declares, and nothing else.
 * **Runtime (de)serialisation** — a shared
   [`Marshaller`](src/Runtime/Marshal/Marshaller.php) /
   [`Hydrator`](src/Runtime/Marshal/Hydrator.php) pair drives every
@@ -53,6 +62,12 @@ type-safe, and pleasant on real schemas. The generator emits:
   attributes (`#[WireName]`, `#[Discriminator]`, …). Model classes carry
   no generator boilerplate (see
   [ADR-010](truth/decisions/010-attribute-and-phpdoc-driven-serialization.typ)).
+* **Replaceable** — every runtime collaborator a generated file names is
+  an interface under
+  [`src/Runtime/Contract/`](src/Runtime/Contract/), and the emitted
+  type-hints point at those rather than at implementations. Supply your
+  own hydrator, marshaller, XML writer, descriptor parser or error policy —
+  or your own transport for all of it — without editing a generated file.
 
 Specs and decisions live under [`truth/`](truth/); the release queue is
 in [`ROADMAP.md`](ROADMAP.md) until the `0.1.0` tag.

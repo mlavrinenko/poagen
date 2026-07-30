@@ -93,12 +93,12 @@ final class TaggedSubClientTest extends TestCase
     {
         $sub = $this->sourceOf($this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']), 'StoreClient');
 
-        // Its own transport, factories, base address and hydration collaborators
-        // — nothing that requires the root object to exist.
-        self::assertStringContainsString('private ClientInterface $httpClient', $sub);
-        self::assertStringContainsString('private string $baseUri', $sub);
-        self::assertStringContainsString('private Hydrator $hydrator = new Hydrator()', $sub);
+        // Its own transport — nothing that requires the root object to exist,
+        // and an interface rather than an implementation, so a consumer can
+        // stand one up against a substitute runtime.
+        self::assertStringContainsString('private TransportInterface $transport', $sub);
         self::assertStringNotContainsString('ApiClient $', $sub);
+        self::assertStringNotContainsString('= new ', $sub);
     }
 
     public function testANonAsciiTagIsTransliteratedDeterministically(): void

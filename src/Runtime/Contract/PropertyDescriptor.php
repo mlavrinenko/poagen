@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Runtime\Marshal;
+namespace Mlavrinenko\Paogen\Runtime\Contract;
 
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 

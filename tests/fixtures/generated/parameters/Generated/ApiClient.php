@@ -4,69 +4,37 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated;
 
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequest;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-
-use function array_map;
-use function array_values;
-use function assert;
-use function http_build_query;
-use function implode;
-use function is_array;
-use function json_decode;
-use function json_encode;
-use function rtrim;
-use function str_replace;
-use function urlencode;
-
-use const JSON_THROW_ON_ERROR;
-use const PHP_QUERY_RFC1738;
 
 final readonly class ApiClient implements ApiClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $apiKey,
         private string $bearerToken,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
     public function postInlineBody(PostInlineBodyRequest $body): void
     {
-        $path = '/inline-body';
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
+        $this->transport->send(
+            Endpoint::post('/inline-body')->json($body),
+            ResponseType::nothing(),
+        );
     }
 
     public function getSshKeyById(SshKeyId $sshKeyId): void
     {
-        $path = '/keys/{ssh_key_id}';
-        $path = str_replace('{ssh_key_id}', (string) $sshKeyId->toScalar(), $path);
-        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
+        $this->transport->send(
+            Endpoint::get('/keys/{ssh_key_id}')->path('ssh_key_id', $sshKeyId->toScalar()),
+            ResponseType::nothing(),
+        );
     }
 
     /**
@@ -74,75 +42,41 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function listOrders(?int $limit = null, ?string $apiKey = null): array
     {
-        $path = '/order';
-        $query = [];
-        if ($limit !== null) {
-            $query[] = 'limit=' . urlencode((string) $limit);
-        }
-        if ($query !== []) { $path .= '?' . implode('&', $query); }
-        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
-        if ($apiKey !== null) { $request = $request->withHeader('api_key', $apiKey); }
-        $request = $request->withHeader('X-API-Key', $this->apiKey);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return array_values(array_map(
-            fn(mixed $item): Order => $this->hydrator->hydrate(Order::class, (array) $item),
-            $data,
-        ));
+        return $this->transport->send(
+            Endpoint::get('/order')
+                ->query('limit', $limit)
+                ->header('api_key', $apiKey)
+                ->header('X-API-Key', $this->apiKey),
+            ResponseType::listOf(Order::class),
+        );
     }
 
     public function placeOrder(Order $body): Order
     {
-        $path = '/order';
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(Order::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/order')
+                ->header('Authorization', 'Bearer ' . $this->bearerToken)
+                ->json($body),
+            ResponseType::object(Order::class),
+        );
     }
 
     public function getPetById(int $petId): Pet
     {
-        $path = '/pet/{petId}';
-        $path = str_replace('{petId}', (string) $petId, $path);
-        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(Pet::class, $data);
+        return $this->transport->send(
+            Endpoint::get('/pet/{petId}')->path('petId', $petId),
+            ResponseType::object(Pet::class),
+        );
     }
 
     public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void
     {
-        $path = '/proxy';
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        if ($contentType !== null) { $request = $request->withHeader('Content-Type', $contentType); }
-        if ($xTraceId !== null) { $request = $request->withHeader('X-Trace-ID', $xTraceId); }
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
+        $this->transport->send(
+            Endpoint::post('/proxy')
+                ->header('Content-Type', $contentType)
+                ->header('X-Trace-ID', $xTraceId),
+            ResponseType::nothing(),
+        );
     }
 
     /**
@@ -150,52 +84,30 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function listStoreItems(int $storeId): array
     {
-        $path = '/store/{storeId}/items';
-        $path = str_replace('{storeId}', (string) $storeId, $path);
-        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
-        $request = $request->withHeader('X-API-Key', $this->apiKey);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return array_values(array_map(
-            fn(mixed $item): Order => $this->hydrator->hydrate(Order::class, (array) $item),
-            $data,
-        ));
+        return $this->transport->send(
+            Endpoint::get('/store/{storeId}/items')
+                ->path('storeId', $storeId)
+                ->header('X-API-Key', $this->apiKey),
+            ResponseType::listOf(Order::class),
+        );
     }
 
     public function clearStore(int $storeId): void
     {
-        $path = '/store/{storeId}/items';
-        $path = str_replace('{storeId}', (string) $storeId, $path);
-        $request = $this->requestFactory->createRequest('DELETE', rtrim($this->baseUri, '/') . $path);
-        $request = $request->withHeader('X-API-Key', $this->apiKey);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
+        $this->transport->send(
+            Endpoint::delete('/store/{storeId}/items')
+                ->path('storeId', $storeId)
+                ->header('X-API-Key', $this->apiKey),
+            ResponseType::nothing(),
+        );
     }
 
     public function issueToken(string $grantType, string $clientId, ?string $scope = null): void
     {
-        $path = '/token';
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $__form = [];
-        $__form['grantType'] = $grantType;
-        $__form['clientId'] = $clientId;
-        if ($scope !== null) { $__form['scope'] = $scope; }
-        $request = $request
-            ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
-            ->withBody($this->streamFactory->createStream(http_build_query($__form, '', '&', PHP_QUERY_RFC1738)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
+        $this->transport->send(
+            Endpoint::post('/token')
+                ->form(['grantType' => $grantType, 'clientId' => $clientId, 'scope' => $scope]),
+            ResponseType::nothing(),
+        );
     }
 }

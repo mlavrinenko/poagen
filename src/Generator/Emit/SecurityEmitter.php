@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use Nette\PhpGenerator\Method;
-use Nette\PhpGenerator\PhpNamespace;
+use function sprintf;
+use function var_export;
 
 /**
- * Attaches a request's active security schemes to the emitted method body:
- * header-kind schemes as PSR-7 headers, query-kind schemes as entries in
- * the `$query` array {@see RequestAssembler::emitQueryAssembly()} folds
- * into the path's query string.
+ * The chain segments that put an operation's active credentials on the
+ * request: header-kind schemes as headers, query-kind schemes as query keys.
  *
- * Split out of {@see RequestAssembler} so that class stays under ADR-004's
- * 250-line cap once query-string credentials join header ones.
+ * A credential is unconditional — an active scheme is always sent — so it
+ * needs no null branch, and a query credential joins the same query bag a
+ * declared parameter does. That is what keeps one `?` in the request target
+ * whether or not the operation has query parameters of its own.
+ *
+ * Credential segments come last of their kind, after the declared parameters,
+ * so request diffs stay predictable and auth reads as the transport policy
+ * ADR-002 frames it as.
  *
  * @internal
  */
@@ -36,46 +40,34 @@ final readonly class SecurityEmitter
         ));
     }
 
-    /**
-     * Push one query-kind scheme's credential onto the `$query` array.
-     * Caller guarantees `$query` already exists in the emitted method body.
-     */
-    public function emitQueryPush(Method $method, PhpNamespace $namespace, SecurityScheme $scheme): void
+    public function querySegment(SecurityScheme $scheme): string
     {
-        $namespace->addUseFunction('urlencode');
-        $method->addBody(
-            '$query[] = ? . urlencode($this->' . $scheme->ctorArg . ');',
-            [$scheme->wireName . '='],
-        );
+        return sprintf('->query(%s, $this->%s)', var_export($scheme->wireName, true), $scheme->ctorArg);
     }
 
     /**
-     * Attach each header-kind active security scheme as a header. Runs
-     * after the per-parameter header loop so auth headers consistently
-     * land last in the emitted method body — makes request diffs
-     * predictable and matches the "auth is transport policy" framing of
-     * ADR-002.
-     *
      * @param list<SecurityScheme> $activeSchemes
+     *
+     * @return list<string>
      */
-    public function emitHeaders(Method $method, array $activeSchemes): void
+    public function headerSegments(array $activeSchemes): array
     {
+        $segments = [];
+
         foreach ($activeSchemes as $scheme) {
+            $name = var_export($scheme->wireName, true);
+
             switch ($scheme->kind) {
                 case SecurityScheme::KIND_API_KEY_HEADER:
-                    $method->addBody(
-                        '$request = $request->withHeader(?, $this->' . $scheme->ctorArg . ');',
-                        [$scheme->wireName],
-                    );
+                    $segments[] = sprintf('->header(%s, $this->%s)', $name, $scheme->ctorArg);
                     break;
 
                 case SecurityScheme::KIND_BEARER:
-                    $method->addBody(
-                        '$request = $request->withHeader(?, ? . $this->' . $scheme->ctorArg . ');',
-                        [$scheme->wireName, 'Bearer '],
-                    );
+                    $segments[] = sprintf("->header(%s, 'Bearer ' . \$this->%s)", $name, $scheme->ctorArg);
                     break;
             }
         }
+
+        return $segments;
     }
 }

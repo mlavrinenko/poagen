@@ -94,8 +94,6 @@ final readonly class SubClientEmitter
         $file = new PhpFile();
         $file->setStrictTypes();
         $namespace = $file->addNamespace($clientNamespace);
-        // Same-namespace use so the per-profile ApiException prints short.
-        $namespace->addUse($clientNamespace . '\\ApiException');
 
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
         $class->addImplement($clientNamespace . '\\' . $interfaceName);

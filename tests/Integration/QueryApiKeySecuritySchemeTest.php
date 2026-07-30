@@ -7,8 +7,10 @@ namespace Mlavrinenko\Paogen\Tests\Integration;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
+use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\StubErrorFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -121,14 +123,9 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         $body = $this->methodSlice('getStatus');
 
-        self::assertStringContainsString('$query = [];', $body);
-        self::assertStringContainsString(
-            "\$query[] = 'k=' . urlencode(\$this->queryKey);",
-            $body,
-        );
-        // Unconditional append: a credential is always sent, so there is
-        // no `if ($query !== [])` guard around it.
-        self::assertStringContainsString("\$path .= '?' . implode('&', \$query);", $body);
+        // The credential is one query key like any other, and unconditional:
+        // an active scheme is always sent, so it carries no null branch.
+        self::assertStringContainsString("->query('k', \$this->queryKey)", $body);
 
         $client = $this->buildClient(queryKey: 'a&b=c', headerKey: 'unused');
         $this->invoke($client['client'], 'getStatus');
@@ -143,8 +140,11 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         $body = $this->methodSlice('listItems');
 
-        self::assertStringContainsString("\$path .= '?' . implode('&', \$query);", $body);
-        self::assertStringNotContainsString('if ($query !== [])', $body);
+        // The credential joins the operation's own keys in one chain, so
+        // there is one query string to build rather than two to splice.
+        self::assertStringContainsString("->query('limit', \$limit)", $body);
+        self::assertStringContainsString("->query('cursor', \$cursor)", $body);
+        self::assertStringContainsString("->query('k', \$this->queryKey)", $body);
 
         $client = $this->buildClient(queryKey: 'sekret', headerKey: 'unused');
         $this->invoke($client['client'], 'listItems', 5, 'abc');
@@ -166,7 +166,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         $body = $this->methodSlice('disabledAuth');
 
-        self::assertStringNotContainsString('$query', $body);
+        self::assertStringNotContainsString('->query(', $body);
         self::assertStringNotContainsString('queryKey', $body);
 
         $client = $this->buildClient(queryKey: 'should-not-appear', headerKey: 'unused');
@@ -181,10 +181,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         $body = $this->methodSlice('overrideAuth');
 
         self::assertStringNotContainsString('queryKey', $body);
-        self::assertStringContainsString(
-            "\$request = \$request->withHeader('X-Different-Key', \$this->headerKey);",
-            $body,
-        );
+        self::assertStringContainsString("->header('X-Different-Key', \$this->headerKey)", $body);
 
         $client = $this->buildClient(queryKey: 'unused', headerKey: 'header-secret');
         $this->invoke($client['client'], 'overrideAuth');
@@ -201,7 +198,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         // into the query string this change adds.
         $body = $this->methodSlice('cookieSchemeUnaffected');
 
-        self::assertStringNotContainsString('$query', $body);
+        self::assertStringNotContainsString('->query(', $body);
         self::assertStringNotContainsString('Cookie', $body);
 
         $client = $this->buildClient(queryKey: 'unused', headerKey: 'unused');
@@ -222,10 +219,13 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         self::assertInstanceOf(ReflectionClass::class, self::$clientReflection);
 
         $client = self::$clientReflection->newInstanceArgs([
-            'httpClient' => $http,
-            'requestFactory' => $factory,
-            'streamFactory' => $factory,
-            'baseUri' => self::BASE_URI,
+            'transport' => new HttpTransport(
+                self::BASE_URI,
+                new StubErrorFactory(),
+                $http,
+                $factory,
+                $factory,
+            ),
             'queryKey' => $queryKey,
             'headerKey' => $headerKey,
         ]);

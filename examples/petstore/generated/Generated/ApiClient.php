@@ -4,21 +4,12 @@ declare(strict_types=1);
 
 namespace Acme\Petstore\Generated;
 
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ApiClient implements ApiClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
+        private TransportInterface $transport,
     ) {
     }
 
@@ -27,7 +18,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function pet(): PetClientInterface
     {
-        return new PetClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->hydrator, $this->marshaller);
+        return new PetClient($this->transport);
     }
 
     /**
@@ -35,7 +26,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function store(): StoreClientInterface
     {
-        return new StoreClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->hydrator, $this->marshaller);
+        return new StoreClient($this->transport);
     }
 
     /**
@@ -43,6 +34,6 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function user(): UserClientInterface
     {
-        return new UserClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->hydrator, $this->marshaller);
+        return new UserClient($this->transport);
     }
 }

@@ -44,10 +44,13 @@ use function is_string;
  */
 final readonly class OperationEmitter
 {
+    /** Width past which the endpoint chain is broken one segment per line. */
+    private const int CHAIN_WIDTH = 84;
+
     private RequestBodyParameterEmitter $bodyParamEmitter;
     private ParameterAdder $paramAdder;
 
-    private RequestAssembler $requestAssembler;
+    private EndpointChainEmitter $endpoints;
 
     /**
      * @param array<string,string> $preScannedSkips raw operationId → reason, from a pass that ran
@@ -60,8 +63,7 @@ final readonly class OperationEmitter
         private ?NameRegistry $operationIdRegistry = null,
         private ?NameNormaliser $paramNormaliser = null,
         ?ComponentCatalog $components = null,
-        ?RequestAssembler $requestAssembler = null,
-        private ResponseHandler $responseHandler = new ResponseHandler(),
+        private ResponseTypeEmitter $responseTypes = new ResponseTypeEmitter(),
         private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
         private array $preScannedSkips = [],
     ) {
@@ -70,7 +72,7 @@ final readonly class OperationEmitter
         assert($paramNormaliser instanceof NameNormaliser, 'paramNormaliser is required (T-025).');
         $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums, $registry);
         $this->paramAdder = new ParameterAdder($modelNamespace, $enums, $registry);
-        $this->requestAssembler = $requestAssembler ?? new RequestAssembler($components);
+        $this->endpoints = new EndpointChainEmitter($modelNamespace, $enums, $registry, $components);
     }
 
     public function emit(
@@ -169,8 +171,7 @@ final readonly class OperationEmitter
             ? $securityCatalog->activeSchemesFor($operation)
             : [];
 
-        $this->requestAssembler->emitRequest(
-            $method,
+        $segments = $this->endpoints->segments(
             $namespace,
             $httpMethod,
             $pathUri,
@@ -181,9 +182,39 @@ final readonly class OperationEmitter
             $bindings,
             $activeSchemes,
         );
-        $this->responseHandler->emit($method, $namespace, $return);
+        $method->setBody($this->callBody(
+            $segments,
+            $this->responseTypes->expr($namespace, $return, $this->modelNamespace),
+            $return->kind === ReturnSpec::KIND_VOID,
+        ));
 
         return EmitOutcome::emitted();
+    }
+
+    /**
+     * The whole emitted body: one call describing the request and naming the
+     * response shape.
+     *
+     * The chain stays on one line while it reads as one — past that, one
+     * segment per line, so an operation with many parameters is still read
+     * top to bottom rather than scrolled sideways. A `void` operation drops
+     * the `return` and nothing else.
+     *
+     * @param list<string> $segments
+     */
+    private function callBody(array $segments, string $responseType, bool $isVoid): string
+    {
+        $oneLine = implode('', $segments);
+        $chain = strlen($oneLine) <= self::CHAIN_WIDTH
+            ? $oneLine
+            : implode("\n        ", $segments);
+
+        return ($isVoid ? '' : 'return ')
+            . "\$this->transport->send(\n    "
+            . $chain
+            . ",\n    "
+            . $responseType
+            . ",\n);";
     }
 
     private function describeUnsupportedBody(RequestBody|Reference $body): string
