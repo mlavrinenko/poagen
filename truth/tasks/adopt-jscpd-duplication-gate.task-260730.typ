@@ -33,7 +33,7 @@ Emitting the markers has to stay data. A per-project callback hook that decorate
 - A committed jscpd configuration sets the thresholds, and \`minTokens\` is chosen from a measured run rather than left at the default.
 - Two recipes exist, mirroring the two PHPStan tiers: one over \`src/\` and \`tests/\`, one over \`tests/fixtures/generated\`, \`examples/\*/generated\` and \`examples/\*/src\`. The generated-tier recipe resolves its paths the way \`lint-phpstan-generated\` does, since not every example has a \`generated/\` directory.
 - Both recipes report rather than fail while the duplication is still being removed, and a follow-up flips them to failing. Which one flips them is named in this task.
-- The generator's own import blocks are wrapped in \`jscpd:ignore-start\` / \`jscpd:ignore-end\`, and the measured \`src/\` figure after that wrapping is recorded here.
+- ~~The generator's own import blocks are wrapped in \`jscpd:ignore-start\` / \`jscpd:ignore-end\`, and the measured \`src/\` figure after that wrapping is recorded here.~~ Dropped from this task and moved to \`sweep-import-block-duplication-markers\`. The sweep touches around 97 files in \`src/\` and would have collided with the emitter work running in parallel, so \`minTokens\` was raised to 84 to clear the noise instead. That is a stopgap and the threshold comes back down when the markers land — see the baseline below for why.
 - \`CONTRIBUTING.md\` lists the tool alongside the others.
 - No consumer-supplied callback runs during generation.
 
