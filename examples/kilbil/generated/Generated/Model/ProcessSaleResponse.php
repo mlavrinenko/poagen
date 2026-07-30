@@ -7,8 +7,8 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class ProcessSaleResponse
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\ProcessSaleResponseBillBodyItem> $_bill_body
-     * @param ?list<\Acme\Kilbil\Generated\Model\ProcessSaleResponseCashierMessagesItem> $cashier_messages
+     * @param list<ProcessSaleResponseBillBodyItem> $_bill_body
+     * @param ?list<ProcessSaleResponseCashierMessagesItem> $cashier_messages
      * @param ?list<mixed> $coupons_out
      */
     public function __construct(

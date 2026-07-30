@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class GetProgramGiftCardResponse
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GetProgramGiftCardResponseDataItem> $data
+     * @param list<GetProgramGiftCardResponseDataItem> $data
      */
     public function __construct(
         public array $data,

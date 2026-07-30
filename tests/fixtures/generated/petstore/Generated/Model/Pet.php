@@ -10,7 +10,7 @@ final readonly class Pet
 {
     /**
      * @param list<string> $photoUrls
-     * @param ?list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag> $tags
+     * @param ?list<Tag> $tags
      */
     public function __construct(
         public string $name,

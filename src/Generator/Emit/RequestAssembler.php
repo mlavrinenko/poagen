@@ -9,6 +9,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpNamespace;
 
 /**
  * Emits the body lines that build the PSR-7 request: path interpolation,
@@ -47,6 +48,7 @@ final readonly class RequestAssembler
      */
     public function emitRequest(
         Method $method,
+        PhpNamespace $namespace,
         string $httpMethod,
         string $pathUri,
         array $pathParams,
@@ -58,22 +60,23 @@ final readonly class RequestAssembler
     ): void {
         $method->addBody('$path = ?;', [$pathUri]);
 
-        $this->emitPathInterpolation($method, $pathParams, $bindings);
-        $this->emitQueryAssembly($method, $queryParams, $activeSchemes, $bindings);
+        $this->emitPathInterpolation($method, $namespace, $pathParams, $bindings);
+        $this->emitQueryAssembly($method, $namespace, $queryParams, $activeSchemes, $bindings);
 
+        $namespace->addUseFunction('rtrim');
         $method->addBody(
-            '$request = $this->requestFactory->createRequest(?, \rtrim($this->baseUri, \'/\') . $path);',
+            '$request = $this->requestFactory->createRequest(?, rtrim($this->baseUri, \'/\') . $path);',
             [strtoupper($httpMethod)],
         );
 
         if ($body instanceof BodySpec) {
-            $this->bodyAttachment->emit($method, $body);
+            $this->bodyAttachment->emit($method, $namespace, $body);
         }
 
         foreach ($headerParams as $resolved) {
             $schemaNode = $resolved->param->schema;
             $check = new Literal('$' . $resolved->phpName);
-            $value = $this->stringExpr($resolved->phpName, $schemaNode, $bindings);
+            $value = $this->stringExpr($resolved->phpName, $schemaNode, $bindings, $namespace);
             $method->addBody(
                 'if (? !== null) { $request = $request->withHeader(?, ?); }',
                 [$check, $resolved->rawName(), $value],
@@ -86,12 +89,13 @@ final readonly class RequestAssembler
     /**
      * @param list<ResolvedParameter> $pathParams
      */
-    private function emitPathInterpolation(Method $method, array $pathParams, Bindings $bindings): void
+    private function emitPathInterpolation(Method $method, PhpNamespace $namespace, array $pathParams, Bindings $bindings): void
     {
         foreach ($pathParams as $resolved) {
-            $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings);
+            $namespace->addUseFunction('str_replace');
+            $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings, $namespace);
             $method->addBody(
-                '$path = \str_replace(?, ?, $path);',
+                '$path = str_replace(?, ?, $path);',
                 ['{' . $resolved->rawName() . '}', $valueExpr],
             );
         }
@@ -112,7 +116,7 @@ final readonly class RequestAssembler
      * @param list<ResolvedParameter> $queryParams
      * @param list<SecurityScheme>    $activeSchemes
      */
-    private function emitQueryAssembly(Method $method, array $queryParams, array $activeSchemes, Bindings $bindings): void
+    private function emitQueryAssembly(Method $method, PhpNamespace $namespace, array $queryParams, array $activeSchemes, Bindings $bindings): void
     {
         $querySchemes = $this->security->querySchemes($activeSchemes);
 
@@ -128,50 +132,54 @@ final readonly class RequestAssembler
             $isArray = OperationAnalyzer::isArrayQueryParam($resolved->param);
 
             if ($isArray) {
-                $this->emitArrayQueryPush($method, $resolved, $bindings);
+                $this->emitArrayQueryPush($method, $namespace, $resolved, $bindings);
                 continue;
             }
 
             if ($resolved->param->required) {
-                $this->emitScalarQueryPush($method, $resolved, indent: '', bindings: $bindings);
+                $this->emitScalarQueryPush($method, $namespace, $resolved, indent: '', bindings: $bindings);
                 $hasUnconditionalPush = true;
                 continue;
             }
 
             $method->addBody('if ($' . $resolved->phpName . ' !== null) {');
-            $this->emitScalarQueryPush($method, $resolved, indent: '    ', bindings: $bindings);
+            $this->emitScalarQueryPush($method, $namespace, $resolved, indent: '    ', bindings: $bindings);
             $method->addBody('}');
         }
 
         foreach ($querySchemes as $scheme) {
-            $this->security->emitQueryPush($method, $scheme);
+            $this->security->emitQueryPush($method, $namespace, $scheme);
             $hasUnconditionalPush = true;
         }
 
+        $namespace->addUseFunction('implode');
+
         if ($hasUnconditionalPush) {
-            $method->addBody('$path .= \'?\' . \implode(\'&\', $query);');
+            $method->addBody('$path .= \'?\' . implode(\'&\', $query);');
 
             return;
         }
 
-        $method->addBody('if ($query !== []) { $path .= \'?\' . \implode(\'&\', $query); }');
+        $method->addBody('if ($query !== []) { $path .= \'?\' . implode(\'&\', $query); }');
     }
 
-    private function emitScalarQueryPush(Method $method, ResolvedParameter $resolved, string $indent, Bindings $bindings): void
+    private function emitScalarQueryPush(Method $method, PhpNamespace $namespace, ResolvedParameter $resolved, string $indent, Bindings $bindings): void
     {
-        $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings);
+        $namespace->addUseFunction('urlencode');
+        $valueExpr = $this->stringExpr($resolved->phpName, $resolved->param->schema, $bindings, $namespace);
         $method->addBody(
-            $indent . '$query[] = ? . \urlencode(?);',
+            $indent . '$query[] = ? . urlencode(?);',
             [$resolved->rawName() . '=', $valueExpr],
         );
     }
 
-    private function emitArrayQueryPush(Method $method, ResolvedParameter $resolved, Bindings $bindings): void
+    private function emitArrayQueryPush(Method $method, PhpNamespace $namespace, ResolvedParameter $resolved, Bindings $bindings): void
     {
+        $namespace->addUseFunction('urlencode');
         $itemSchema = $resolved->param->schema instanceof Schema ? $resolved->param->schema->items : null;
-        $itemExpr = $this->stringExpr('__v', $itemSchema, $bindings);
+        $itemExpr = $this->stringExpr('__v', $itemSchema, $bindings, $namespace);
 
-        $loop = 'foreach ($' . $resolved->phpName . ' as $__v) { $query[] = ? . \urlencode(?); }';
+        $loop = 'foreach ($' . $resolved->phpName . ' as $__v) { $query[] = ? . urlencode(?); }';
 
         if ($resolved->param->required) {
             $method->addBody($loop, [$resolved->rawName() . '=', $itemExpr]);
@@ -185,8 +193,8 @@ final readonly class RequestAssembler
         );
     }
 
-    private function stringExpr(string $varName, Schema|Reference|null $node, Bindings $bindings): Literal
+    private function stringExpr(string $varName, Schema|Reference|null $node, Bindings $bindings, PhpNamespace $namespace): Literal
     {
-        return $this->stringExprBuilder->build($varName, $node, $bindings);
+        return $this->stringExprBuilder->build($varName, $node, $bindings, $namespace);
     }
 }

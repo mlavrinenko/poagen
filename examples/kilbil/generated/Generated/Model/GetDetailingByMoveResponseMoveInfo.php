@@ -10,9 +10,9 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class GetDetailingByMoveResponseMoveInfo
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetDetailingByMoveResponseMoveInfoBonusInDetailItem> $bonus_in_detail
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetDetailingByMoveResponseMoveInfoBonusPresentsItem> $bonus_presents
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetDetailingByMoveResponseMoveInfoMoveActionsItem> $move_actions
+     * @param ?list<GetDetailingByMoveResponseMoveInfoBonusInDetailItem> $bonus_in_detail
+     * @param ?list<GetDetailingByMoveResponseMoveInfoBonusPresentsItem> $bonus_presents
+     * @param ?list<GetDetailingByMoveResponseMoveInfoMoveActionsItem> $move_actions
      * @param ?list<string> $promo_codes
      */
     public function __construct(

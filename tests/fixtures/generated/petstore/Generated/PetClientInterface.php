@@ -21,13 +21,13 @@ interface PetClientInterface
     public function addPet(Pet $body): Pet;
 
     /**
-     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet>
+     * @return list<Pet>
      */
     public function findPetsByStatus(FindPetsByStatusStatus $status): array;
 
     /**
      * @param list<string> $tags
-     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet>
+     * @return list<Pet>
      */
     public function findPetsByTags(array $tags): array;
 

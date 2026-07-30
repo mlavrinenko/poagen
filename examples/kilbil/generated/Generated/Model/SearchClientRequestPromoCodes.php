@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class SearchClientRequestPromoCodes
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\SearchClientRequestPromoCodesCouponsItem> $coupons
+     * @param ?list<SearchClientRequestPromoCodesCouponsItem> $coupons
      */
     public function __construct(
         public ?array $coupons = null,

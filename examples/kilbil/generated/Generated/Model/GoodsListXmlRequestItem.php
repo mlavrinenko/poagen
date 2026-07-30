@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class GoodsListXmlRequestItem
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsListXmlRequestItemInsideItem> $inside
+     * @param list<GoodsListXmlRequestItemInsideItem> $inside
      */
     public function __construct(
         public int $ID,

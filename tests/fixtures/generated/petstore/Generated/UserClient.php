@@ -11,6 +11,18 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
+use function array_map;
+use function assert;
+use function implode;
+use function is_array;
+use function json_decode;
+use function json_encode;
+use function rtrim;
+use function str_replace;
+use function urlencode;
+
+use const JSON_THROW_ON_ERROR;
+
 final readonly class UserClient implements UserClientInterface
 {
     public function __construct(
@@ -26,39 +38,39 @@ final readonly class UserClient implements UserClientInterface
     public function createUser(User $body): User
     {
         $path = '/user';
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(User::class, $data);
     }
 
     /**
-     * @param list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\User> $body
+     * @param list<User> $body
      */
     public function createUsersWithListInput(array $body): User
     {
         $path = '/user/createWithList';
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode(\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(User::class, $data);
     }
 
@@ -67,13 +79,13 @@ final readonly class UserClient implements UserClientInterface
         $path = '/user/login';
         $query = [];
         if ($username !== null) {
-            $query[] = 'username=' . \urlencode($username);
+            $query[] = 'username=' . urlencode($username);
         }
         if ($password !== null) {
-            $query[] = 'password=' . \urlencode($password);
+            $query[] = 'password=' . urlencode($password);
         }
-        if ($query !== []) { $path .= '?' . \implode('&', $query); }
-        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        if ($query !== []) { $path .= '?' . implode('&', $query); }
+        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -85,7 +97,7 @@ final readonly class UserClient implements UserClientInterface
     public function logoutUser(): void
     {
         $path = '/user/logout';
-        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -96,27 +108,27 @@ final readonly class UserClient implements UserClientInterface
     public function getUserByName(string $username): User
     {
         $path = '/user/{username}';
-        $path = \str_replace('{username}', $username, $path);
-        $request = $this->requestFactory->createRequest('GET', \rtrim($this->baseUri, '/') . $path);
+        $path = str_replace('{username}', $username, $path);
+        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(User::class, $data);
     }
 
     public function updateUser(string $username, User $body): void
     {
         $path = '/user/{username}';
-        $path = \str_replace('{username}', $username, $path);
-        $request = $this->requestFactory->createRequest('PUT', \rtrim($this->baseUri, '/') . $path);
+        $path = str_replace('{username}', $username, $path);
+        $request = $this->requestFactory->createRequest('PUT', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
@@ -127,8 +139,8 @@ final readonly class UserClient implements UserClientInterface
     public function deleteUser(string $username): void
     {
         $path = '/user/{username}';
-        $path = \str_replace('{username}', $username, $path);
-        $request = $this->requestFactory->createRequest('DELETE', \rtrim($this->baseUri, '/') . $path);
+        $path = str_replace('{username}', $username, $path);
+        $request = $this->requestFactory->createRequest('DELETE', rtrim($this->baseUri, '/') . $path);
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {

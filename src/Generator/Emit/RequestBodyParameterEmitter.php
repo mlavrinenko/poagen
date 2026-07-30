@@ -44,7 +44,7 @@ final readonly class RequestBodyParameterEmitter
                 return;
 
             case BodySpec::KIND_JSON_MAP:
-                $this->addJsonMapBodyParam($method, $body, $bindings);
+                $this->addJsonMapBodyParam($method, $namespace, $body, $bindings);
 
                 return;
 
@@ -64,7 +64,7 @@ final readonly class RequestBodyParameterEmitter
 
         if ($body->isList()) {
             $phpParam->setType('array');
-            $method->addComment('@param list<' . $fqcn . '> $body');
+            $method->addComment('@param ' . DocTypeSimplifier::shorten($namespace, 'list<' . $fqcn . '>') . ' $body');
 
             return;
         }
@@ -77,14 +77,15 @@ final readonly class RequestBodyParameterEmitter
      * still types the values when the document supplied it, so the phpdoc comes
      * from the same resolver that types such a schema on a model property.
      */
-    private function addJsonMapBodyParam(Method $method, BodySpec $body, Bindings $bindings): void
+    private function addJsonMapBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
     {
         assert($this->registry instanceof NameRegistry);
         $schema = $body->schema ?? new Schema(['type' => 'object']);
         $resolved = InlineObjectResolver::resolve($schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
+        $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc ?? 'array<string, mixed>');
 
         $method->addParameter('body')->setType('array');
-        $method->addComment('@param ' . ($resolved->phpDoc ?? 'array<string, mixed>') . ' $body');
+        $method->addComment('@param ' . $docType . ' $body');
     }
 
     private function addFormFieldParams(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void

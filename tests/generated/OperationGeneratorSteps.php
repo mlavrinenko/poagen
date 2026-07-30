@@ -121,7 +121,7 @@ final class OperationGeneratorSteps
             $this->source,
         );
         TestCase::assertStringContainsString(
-            "\\str_replace('{orderId}', (string) \$orderId, \$path)",
+            "str_replace('{orderId}', (string) \$orderId, \$path)",
             $this->source,
         );
     }
@@ -158,7 +158,7 @@ final class OperationGeneratorSteps
 
     public function thenTheMethodJSONEncodesBodyAndAttachesItAsTheRequestBody(): void
     {
-        TestCase::assertStringContainsString("'POST', \\rtrim(\$this->baseUri, '/') . \$path", $this->source);
+        TestCase::assertStringContainsString("'POST', rtrim(\$this->baseUri, '/') . \$path", $this->source);
         TestCase::assertStringContainsString(
             "->withHeader('Content-Type', 'application/json')",
             $this->source,
@@ -167,7 +167,7 @@ final class OperationGeneratorSteps
         // json_encode so wire keys, ScalarBindings, and date formats
         // are normalised at the boundary instead of inside Model::jsonSerialize.
         TestCase::assertStringContainsString(
-            '\\json_encode($this->marshaller->marshal($body), \\JSON_THROW_ON_ERROR)',
+            'json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)',
             $this->source,
         );
     }
@@ -285,7 +285,7 @@ final class OperationGeneratorSteps
         $body = $this->methodSlice('createUsersWithListInput');
         TestCase::assertStringContainsString('public function createUsersWithListInput(array $body)', $body);
         TestCase::assertStringContainsString(
-            '@param list<\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\User> $body',
+            '@param list<User> $body',
             $body,
         );
     }
@@ -343,7 +343,7 @@ final class OperationGeneratorSteps
     public function thenTheMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate(): void
     {
         $body = $this->methodSlice('getInventory');
-        TestCase::assertStringContainsString('\\json_decode((string) $response->getBody()', $body);
+        TestCase::assertStringContainsString('json_decode((string) $response->getBody()', $body);
         TestCase::assertStringContainsString('return $data;', $body);
         TestCase::assertStringNotContainsString('self::hydrate', $body);
     }
@@ -848,8 +848,8 @@ final class OperationGeneratorSteps
             "->withHeader('Content-Type', 'application/x-www-form-urlencoded')",
             $body,
         );
-        TestCase::assertStringContainsString('\\http_build_query(', $body);
-        TestCase::assertStringContainsString('\\PHP_QUERY_RFC1738', $body);
+        TestCase::assertStringContainsString('http_build_query(', $body);
+        TestCase::assertStringContainsString('PHP_QUERY_RFC1738', $body);
     }
 
 
@@ -1152,11 +1152,11 @@ final class OperationGeneratorSteps
     {
         $body = $this->methodSlice('getSshKeyById');
         TestCase::assertStringContainsString(
-            "\\str_replace('{ssh_key_id}', (string) \$sshKeyId->toScalar(), \$path)",
+            "str_replace('{ssh_key_id}', (string) \$sshKeyId->toScalar(), \$path)",
             $body,
         );
         TestCase::assertStringNotContainsString(
-            "\\str_replace('{ssh_key_id}', (string) \$sshKeyId, \$path)",
+            "str_replace('{ssh_key_id}', (string) \$sshKeyId, \$path)",
             $body,
         );
     }

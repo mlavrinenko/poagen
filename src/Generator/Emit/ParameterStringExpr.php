@@ -9,6 +9,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\Literal;
+use Nette\PhpGenerator\PhpNamespace;
 
 use function assert;
 use function is_array;
@@ -36,7 +37,7 @@ final readonly class ParameterStringExpr
         private ?ComponentCatalog $components = null,
     ) {}
 
-    public function build(string $varName, Schema|Reference|null $node, Bindings $bindings): Literal
+    public function build(string $varName, Schema|Reference|null $node, Bindings $bindings, PhpNamespace $namespace): Literal
     {
         if ($this->refsScalarVo($node)) {
             return new Literal('(string) $' . $varName . '->toScalar()');
@@ -48,7 +49,7 @@ final readonly class ParameterStringExpr
             return new Literal('$' . $varName . '->value');
         }
 
-        $formatExpr = $this->formatExpr($schema, $varName, $bindings);
+        $formatExpr = $this->formatExpr($schema, $varName, $bindings, $namespace);
 
         if ($formatExpr !== null) {
             return new Literal($formatExpr);
@@ -97,7 +98,7 @@ final readonly class ParameterStringExpr
         return $shape instanceof ComponentShape && $shape->kind === ComponentShape::KIND_SCALAR;
     }
 
-    private function formatExpr(?Schema $schema, string $varName, Bindings $bindings): ?string
+    private function formatExpr(?Schema $schema, string $varName, Bindings $bindings, PhpNamespace $namespace): ?string
     {
         if (!$schema instanceof Schema || !is_string($schema->format)) {
             return null;
@@ -109,8 +110,12 @@ final readonly class ParameterStringExpr
             return null;
         }
 
+        if ($scalarFormat->kind === ScalarFormat::KIND_DATETIME) {
+            $namespace->addUse('DateTimeInterface');
+        }
+
         return match ($scalarFormat->kind) {
-            ScalarFormat::KIND_DATETIME => '$' . $varName . '->format(\DateTimeInterface::RFC3339)',
+            ScalarFormat::KIND_DATETIME => '$' . $varName . '->format(' . $namespace->simplifyName('DateTimeInterface') . '::RFC3339)',
             ScalarFormat::KIND_DATE => '$' . $varName . '->format(\'Y-m-d\')',
             ScalarFormat::KIND_SCALAR => '$' . $varName . '->toScalar()',
             default => null,

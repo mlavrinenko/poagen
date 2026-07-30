@@ -1041,14 +1041,8 @@ final class ModelGeneratorSteps
     {
         TestCase::assertStringContainsString('#[Discriminator(', $this->source);
         TestCase::assertStringContainsString("field: 'petType'", $this->source);
-        TestCase::assertStringContainsString(
-            "'Dog' => \\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model\\Dog::class",
-            $this->source,
-        );
-        TestCase::assertStringContainsString(
-            "'Cat' => \\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model\\Cat::class",
-            $this->source,
-        );
+        TestCase::assertStringContainsString("'Dog' => Dog::class", $this->source);
+        TestCase::assertStringContainsString("'Cat' => Cat::class", $this->source);
     }
 
     public function thenPetKindIsAnInstanceOfCatIndependentOfStructuralOverlapWithDog(): void

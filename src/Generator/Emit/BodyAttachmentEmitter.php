@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
 use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpNamespace;
 
 use function sprintf;
 
@@ -27,45 +28,57 @@ use function sprintf;
  */
 final readonly class BodyAttachmentEmitter
 {
-    public function emit(Method $method, BodySpec $body): void
+    public function emit(Method $method, PhpNamespace $namespace, BodySpec $body): void
     {
         if ($body->kind === BodySpec::KIND_FORM) {
-            $this->emitForm($method, $body);
+            $this->emitForm($method, $namespace, $body);
 
             return;
         }
 
+        $isList = $body->kind === BodySpec::KIND_JSON_LIST || $body->kind === BodySpec::KIND_XML_LIST;
+
+        if ($isList) {
+            $namespace->addUseFunction('array_map');
+        }
+
         $payload = match ($body->kind) {
-            BodySpec::KIND_JSON_LIST, BodySpec::KIND_XML_LIST => '\\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)',
+            BodySpec::KIND_JSON_LIST, BodySpec::KIND_XML_LIST => 'array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body)',
             // No model to marshal — the caller already holds the wire shape.
             BodySpec::KIND_JSON_MAP => '$body',
             default => '$this->marshaller->marshal($body)',
         };
 
         if ($body->isXml()) {
-            $this->emitXml($method, $body, $payload);
+            $this->emitXml($method, $namespace, $body, $payload);
 
             return;
         }
 
+        $namespace->addUseFunction('json_encode');
+        $namespace->addUseConstant('JSON_THROW_ON_ERROR');
+
         $method->addBody('$request = $request');
         $method->addBody("    ->withHeader('Content-Type', 'application/json')");
-        $method->addBody('    ->withBody($this->streamFactory->createStream(\\json_encode(' . $payload . ', \\JSON_THROW_ON_ERROR)));');
+        $method->addBody('    ->withBody($this->streamFactory->createStream(json_encode(' . $payload . ', JSON_THROW_ON_ERROR)));');
     }
 
-    private function emitXml(Method $method, BodySpec $body, string $payload): void
+    private function emitXml(Method $method, PhpNamespace $namespace, BodySpec $body, string $payload): void
     {
+        $namespace->addUse(XmlWriter::class);
+        $writer = $namespace->simplifyName(XmlWriter::class);
+
         $render = $body->kind === BodySpec::KIND_XML_LIST
             ? sprintf(
-                '\\%s::renderList(%s, %s, %s)',
-                XmlWriter::class,
+                '%s::renderList(%s, %s, %s)',
+                $writer,
                 $payload,
                 var_export($body->rootElement, true),
                 var_export($body->itemElement, true),
             )
             : sprintf(
-                '\\%s::renderObject(%s, %s)',
-                XmlWriter::class,
+                '%s::renderObject(%s, %s)',
+                $writer,
                 $payload,
                 var_export($body->rootElement, true),
             );
@@ -75,7 +88,7 @@ final readonly class BodyAttachmentEmitter
         $method->addBody('    ->withBody($this->streamFactory->createStream(' . $render . '));');
     }
 
-    private function emitForm(Method $method, BodySpec $body): void
+    private function emitForm(Method $method, PhpNamespace $namespace, BodySpec $body): void
     {
         $method->addBody('$__form = [];');
 
@@ -92,8 +105,11 @@ final readonly class BodyAttachmentEmitter
             );
         }
 
+        $namespace->addUseFunction('http_build_query');
+        $namespace->addUseConstant('PHP_QUERY_RFC1738');
+
         $method->addBody('$request = $request');
         $method->addBody("    ->withHeader('Content-Type', 'application/x-www-form-urlencoded')");
-        $method->addBody('    ->withBody($this->streamFactory->createStream(\\http_build_query($__form, \'\', \'&\', \\PHP_QUERY_RFC1738)));');
+        $method->addBody('    ->withBody($this->streamFactory->createStream(http_build_query($__form, \'\', \'&\', PHP_QUERY_RFC1738)));');
     }
 }

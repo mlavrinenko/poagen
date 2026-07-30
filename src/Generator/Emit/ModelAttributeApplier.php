@@ -80,7 +80,8 @@ final readonly class ModelAttributeApplier
 
         foreach ($branches as $fqcn) {
             $short = substr((string) strrchr('\\' . $fqcn, '\\'), 1);
-            $map[$short] = new Literal('\\' . ltrim($fqcn, '\\') . '::class');
+            $namespace->addUse(ltrim($fqcn, '\\'));
+            $map[$short] = new Literal($namespace->simplifyName($fqcn) . '::class');
         }
 
         $namespace->addUse(DiscriminatorAttr::class);

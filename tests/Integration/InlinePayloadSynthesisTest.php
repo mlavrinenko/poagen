@@ -78,8 +78,11 @@ final class InlinePayloadSynthesisTest extends TestCase
     {
         $client = $this->clientSource($this->plan());
 
-        self::assertStringContainsString('@param list<\\' . self::NAMESPACE . '\\Generated\\Model\\PlaceOrdersBulkRequestItem> $body', $client);
-        self::assertStringContainsString('@return list<\\' . self::NAMESPACE . '\\Generated\\Model\\PlaceOrdersBulkResponseItem>', $client);
+        // Both models are imported into the client's namespace, so a correct
+        // emitter shortens the doc type to the imported alias (T-260730)
+        // rather than repeating the FQCN nette already resolves in the signature.
+        self::assertStringContainsString('@param list<PlaceOrdersBulkRequestItem> $body', $client);
+        self::assertStringContainsString('@return list<PlaceOrdersBulkResponseItem>', $client);
         self::assertStringContainsString('public function placeOrdersBulk(array $body): array', $client);
     }
 

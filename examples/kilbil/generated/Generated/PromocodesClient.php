@@ -16,6 +16,16 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
+use function assert;
+use function implode;
+use function is_array;
+use function json_decode;
+use function json_encode;
+use function rtrim;
+use function urlencode;
+
+use const JSON_THROW_ON_ERROR;
+
 final readonly class PromocodesClient implements PromocodesClientInterface
 {
     public function __construct(
@@ -33,20 +43,20 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     {
         $path = '/load/generate_promocode';
         $query = [];
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(GeneratePromocodeResponse::class, $data);
     }
 
@@ -54,20 +64,20 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     {
         $path = '/load/reservedpromocode';
         $query = [];
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(ReservedPromocodeResponse::class, $data);
     }
 
@@ -75,20 +85,20 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     {
         $path = '/load/searchpromocode';
         $query = [];
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode($this->marshaller->marshal($body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(SearchPromocodeResponse::class, $data);
     }
 }

@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class GetProgramsResponse
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetProgramsResponseDataItem> $data
+     * @param ?list<GetProgramsResponseDataItem> $data
      */
     public function __construct(
         public string $result_code,

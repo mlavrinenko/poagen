@@ -171,6 +171,7 @@ final readonly class OperationEmitter
 
         $this->requestAssembler->emitRequest(
             $method,
+            $namespace,
             $httpMethod,
             $pathUri,
             $pathParams,
@@ -180,7 +181,7 @@ final readonly class OperationEmitter
             $bindings,
             $activeSchemes,
         );
-        $this->responseHandler->emit($method, $return);
+        $this->responseHandler->emit($method, $namespace, $return);
 
         return EmitOutcome::emitted();
     }
@@ -225,7 +226,7 @@ final readonly class OperationEmitter
 
             case ReturnSpec::KIND_MAP:
                 $method->setReturnType('array');
-                $method->addComment('@return array<string, ' . $return->mapValuePhpType . '>');
+                $method->addComment('@return ' . DocTypeSimplifier::shorten($namespace, 'array<string, ' . $return->mapValuePhpType . '>'));
 
                 return;
         }
@@ -235,7 +236,7 @@ final readonly class OperationEmitter
 
         if ($return->kind === ReturnSpec::KIND_LIST) {
             $method->setReturnType('array');
-            $method->addComment('@return list<' . $fqcn . '>');
+            $method->addComment('@return ' . DocTypeSimplifier::shorten($namespace, 'list<' . $fqcn . '>'));
 
             return;
         }

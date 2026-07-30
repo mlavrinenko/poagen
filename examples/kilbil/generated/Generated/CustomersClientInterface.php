@@ -35,7 +35,7 @@ interface CustomersClientInterface
     public function getClientCards(GetClientCardsRequest $body): GetClientCardsResponse;
 
     /**
-     * @return list<\Acme\Kilbil\Generated\Model\GetClientFullBalanceResponseItem>
+     * @return list<GetClientFullBalanceResponseItem>
      */
     public function getClientFullBalance(GetClientFullBalanceRequest $body): array;
 
