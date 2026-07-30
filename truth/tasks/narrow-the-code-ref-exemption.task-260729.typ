@@ -5,7 +5,13 @@
   tags: ("speconaut", "specs", "debt"),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 7, 29),
+  status: status(
+    "needs-review",
+    2026,
+    7,
+    31,
+    note: [landed this session; verified on the merged head by the orchestrator],
+  ),
 )
 
 == Summary

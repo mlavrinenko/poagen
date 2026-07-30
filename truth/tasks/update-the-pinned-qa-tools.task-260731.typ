@@ -5,7 +5,13 @@
   tags: (),
   priority: 4,
   difficulty: 3,
-  status: proposed(2026, 7, 31),
+  status: status(
+    "needs-review",
+    2026,
+    7,
+    31,
+    note: [landed this session; verified on the merged head by the orchestrator],
+  ),
   links: depends-on("commit-composer-lock.task-260731.typ"),
 )
 
