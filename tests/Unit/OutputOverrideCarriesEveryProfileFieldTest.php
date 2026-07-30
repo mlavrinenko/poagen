@@ -7,6 +7,11 @@ namespace Mlavrinenko\Paogen\Tests\Unit;
 use Mlavrinenko\Paogen\GenerateCommand;
 use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
+
+use function count;
 
 /**
  * `paogen generate --output=<dir>` must change the output directory and nothing
@@ -55,7 +60,7 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
             // Read through reflection rather than a variable property: the
             // strict rule set forbids the latter, and this is the one place a
             // by-name read is the whole point.
-            $property = new \ReflectionProperty(Profile::class, $field);
+            $property = new ReflectionProperty(Profile::class, $field);
 
             self::assertSame(
                 $property->getValue($original),
@@ -70,7 +75,7 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
      */
     private function profileFieldNames(): array
     {
-        $constructor = new \ReflectionClass(Profile::class)->getConstructor();
+        $constructor = new ReflectionClass(Profile::class)->getConstructor();
         self::assertNotNull($constructor);
 
         $names = [];
@@ -80,14 +85,14 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
         }
 
         // A guard that reflected over nothing would pass silently.
-        self::assertGreaterThan(10, \count($names));
+        self::assertGreaterThan(10, count($names));
 
         return $names;
     }
 
     private function withOutput(Profile $profile, string $output): Profile
     {
-        $method = new \ReflectionMethod(GenerateCommand::class, 'withOutput');
+        $method = new ReflectionMethod(GenerateCommand::class, 'withOutput');
         $result = $method->invoke(null, $profile, $output);
         self::assertInstanceOf(Profile::class, $result);
 

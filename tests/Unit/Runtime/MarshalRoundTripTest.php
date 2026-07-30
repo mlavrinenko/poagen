@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Animal;
@@ -68,7 +69,7 @@ final class MarshalRoundTripTest extends TestCase
         self::assertSame(9, $hydrated->id);
         self::assertSame(101, $hydrated->petId);
         self::assertInstanceOf(DateTimeImmutable::class, $hydrated->shipDate);
-        self::assertSame('2026-05-01T10:20:30+02:00', $hydrated->shipDate->format(\DateTimeInterface::RFC3339));
+        self::assertSame('2026-05-01T10:20:30+02:00', $hydrated->shipDate->format(DateTimeInterface::RFC3339));
         self::assertSame(Status::Approved, $hydrated->status);
     }
 

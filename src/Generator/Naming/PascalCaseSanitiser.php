@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Naming;
 
+use function in_array;
+
 /**
  * Splits the raw name on `[^A-Za-z0-9]+`, PascalCases each segment,
  * and prefixes an underscore when the result starts with a digit.
@@ -39,7 +41,7 @@ final readonly class PascalCaseSanitiser implements NameNormaliser
         // — PHP method and parameter names are conventionally camelCase
         // (`findPetsByStatus`, `$petId`), never PascalCase. A Tag names a
         // sub-client class, so it belongs here.
-        if (!\in_array($context->kind, [SymbolKind::SchemaComponent, SymbolKind::Tag], true)) {
+        if (!in_array($context->kind, [SymbolKind::SchemaComponent, SymbolKind::Tag], true)) {
             return null;
         }
 

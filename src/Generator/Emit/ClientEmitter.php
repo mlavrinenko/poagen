@@ -10,6 +10,8 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Nette\PhpGenerator\PsrPrinter;
 
+use const DIRECTORY_SEPARATOR;
+
 /**
  * Emits the whole caller surface: one sub-client and interface per tag, plus the
  * root `ApiClient` that hands them out.
@@ -78,8 +80,8 @@ final class ClientEmitter
                 continue;
             }
 
-            $writes[$rootDir . \DIRECTORY_SEPARATOR . $group->phpName . '.php'] = $result['source'];
-            $writes[$rootDir . \DIRECTORY_SEPARATOR . $group->interfaceName() . '.php'] = $result['interface'];
+            $writes[$rootDir . DIRECTORY_SEPARATOR . $group->phpName . '.php'] = $result['source'];
+            $writes[$rootDir . DIRECTORY_SEPARATOR . $group->interfaceName() . '.php'] = $result['interface'];
             $written += 2;
             $live[] = $group;
         }
@@ -146,8 +148,8 @@ final class ClientEmitter
             $accessor->setBody('return new ' . $sub->phpName . '(' . $args . ');');
         }
 
-        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'] = $this->printer->printFile($file);
-        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClientInterface.php'] = $this->subClients->printInterface(
+        $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClient.php'] = $this->printer->printFile($file);
+        $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClientInterface.php'] = $this->subClients->printInterface(
             $clientNamespace,
             'ApiClientInterface',
             "The composition root's contract: one accessor per tag, plus whatever the document left untagged.\n\n"

@@ -13,6 +13,9 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
+use function is_array;
+use function sprintf;
+
 /**
  * Classifies every named `components.schemas` entry into a {@see ComponentShape}
  * and carries the interface-membership graph implied by top-level `oneOf` /
@@ -89,12 +92,12 @@ final class ComponentCatalog
             return new ComponentShape(ComponentShape::KIND_ENUM, $phpName, schema: $schema);
         }
 
-        if (\is_array($schema->allOf) && $schema->allOf !== []) {
+        if (is_array($schema->allOf) && $schema->allOf !== []) {
             return new ComponentShape(ComponentShape::KIND_ALLOF_OBJECT, $phpName, schema: $schema);
         }
 
-        $oneOf = \is_array($schema->oneOf) ? $schema->oneOf : [];
-        $anyOf = \is_array($schema->anyOf) ? $schema->anyOf : [];
+        $oneOf = is_array($schema->oneOf) ? $schema->oneOf : [];
+        $anyOf = is_array($schema->anyOf) ? $schema->anyOf : [];
         $branches = $oneOf !== [] ? $oneOf : $anyOf;
 
         if ($branches !== []) {
@@ -108,7 +111,7 @@ final class ComponentCatalog
 
         $type = SchemaType::of($schema);
 
-        if ($type->is('object') || (\is_array($schema->properties) && $schema->properties !== [])) {
+        if ($type->is('object') || (is_array($schema->properties) && $schema->properties !== [])) {
             return new ComponentShape(ComponentShape::KIND_OBJECT, $phpName, schema: $schema);
         }
 
@@ -146,7 +149,7 @@ final class ComponentCatalog
         $pointer = $schema->getDocumentPosition();
         $location = $pointer instanceof JsonPointer ? " (schema at {$pointer->getPointer()})" : '';
 
-        return \sprintf(
+        return sprintf(
             'component `%s`%s has an unrecognised schema shape (type: %s, no oneOf/anyOf/allOf, no object '
                 . 'properties) — paogen supports object, array, scalar (string/integer/number/boolean), '
                 . 'allOf/oneOf/anyOf union, and enum component shapes; restructure the schema to match one of these',

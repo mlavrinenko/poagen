@@ -19,6 +19,9 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 
+use function assert;
+use function is_string;
+
 /**
  * Emits one method on the ApiClient class for one OpenAPI operation.
  *
@@ -62,9 +65,9 @@ final readonly class OperationEmitter
         private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
         private array $preScannedSkips = [],
     ) {
-        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
-        \assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
-        \assert($paramNormaliser instanceof NameNormaliser, 'paramNormaliser is required (T-025).');
+        assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
+        assert($paramNormaliser instanceof NameNormaliser, 'paramNormaliser is required (T-025).');
         $this->bodyParamEmitter = new RequestBodyParameterEmitter($modelNamespace, $enums, $registry);
         $this->paramAdder = new ParameterAdder($modelNamespace, $enums, $registry);
         $this->requestAssembler = $requestAssembler ?? new RequestAssembler($components);
@@ -95,11 +98,11 @@ final readonly class OperationEmitter
         // reported once here rather than emitted and reported both.
         $preScanned = $this->preScannedSkips[$rawOperationId] ?? null;
 
-        if (\is_string($preScanned)) {
+        if (is_string($preScanned)) {
             return EmitOutcome::skipped(new SkippedOperation($httpMethod, $pathUri, $rawOperationId, $preScanned));
         }
 
-        \assert($this->operationIdRegistry instanceof NameRegistry);
+        assert($this->operationIdRegistry instanceof NameRegistry);
         $operationId = $this->operationIdRegistry->resolve(
             $rawOperationId,
             new NormalisationContext(SymbolKind::OperationId),
@@ -116,7 +119,7 @@ final readonly class OperationEmitter
             ));
         }
 
-        \assert($this->registry instanceof NameRegistry);
+        assert($this->registry instanceof NameRegistry);
         // The catalog holds only inline payloads and the analyser holds only
         // `$ref` ones, so the two are disjoint and order expresses no
         // preference — it just avoids asking the analyser about a body it was
@@ -124,7 +127,7 @@ final readonly class OperationEmitter
         $body = $this->inlinePayloads->bodyFor($rawOperationId)
             ?? OperationAnalyzer::requestBody($operation->requestBody, $this->registry);
 
-        if ($operation->requestBody !== null && !$body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
+        if ($operation->requestBody !== null && !$body instanceof BodySpec) {
             return EmitOutcome::skipped(new SkippedOperation(
                 $httpMethod,
                 $pathUri,
@@ -136,7 +139,7 @@ final readonly class OperationEmitter
         // Per-op registry: parameter-name uniqueness only matters within
         // a single PHP method signature, so each emit call gets a fresh
         // scope rather than aliasing across ops.
-        \assert($this->paramNormaliser instanceof NameNormaliser);
+        assert($this->paramNormaliser instanceof NameNormaliser);
         $paramRegistry = new NameRegistry($this->paramNormaliser);
 
         $pathParams = $this->resolveParameters($rawPathParams, $paramRegistry);
@@ -153,7 +156,7 @@ final readonly class OperationEmitter
         $this->paramAdder->addPath($method, $namespace, $pathParams, $bindings, $rawOperationId);
         $this->paramAdder->addQuery($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $rawOperationId);
 
-        if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
+        if ($body instanceof BodySpec) {
             $this->bodyParamEmitter->addBodyParams($method, $namespace, $body, $bindings);
         }
 

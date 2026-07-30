@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use function sprintf;
+
 /**
  * Diagnostic record for an OpenAPI operation that the generator chose
  * not to emit. Surfaced through {@see GenerationPlan} so the CLI can
@@ -28,6 +30,6 @@ final readonly class SkippedOperation
     {
         $id = $this->operationId === '' ? '<missing operationId>' : $this->operationId;
 
-        return \sprintf('  %s %s (%s) — %s', strtoupper($this->httpMethod), $this->pathUri, $id, $this->reason);
+        return sprintf('  %s %s (%s) — %s', strtoupper($this->httpMethod), $this->pathUri, $id, $this->reason);
     }
 }

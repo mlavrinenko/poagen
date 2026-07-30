@@ -4,8 +4,17 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
+use BackedEnum;
+use DateTimeImmutable;
+use LogicException;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+
+use function array_key_exists;
+use function assert;
+use function is_array;
+use function is_int;
+use function is_string;
 
 /**
  * Inverse of {@see Marshaller}: turns a JSON-decoded array into a typed
@@ -27,7 +36,7 @@ final class Hydrator
         $args = [];
 
         foreach (DescriptorParser::descriptorsFor($class) as $descriptor) {
-            if (!\array_key_exists($descriptor->wireName, $data)) {
+            if (!array_key_exists($descriptor->wireName, $data)) {
                 continue;
             }
 
@@ -56,26 +65,26 @@ final class Hydrator
         };
     }
 
-    private function decodeDateTime(mixed $value): \DateTimeImmutable
+    private function decodeDateTime(mixed $value): DateTimeImmutable
     {
-        if ($value instanceof \DateTimeImmutable) {
+        if ($value instanceof DateTimeImmutable) {
             return $value;
         }
-        \assert(\is_string($value));
+        assert(is_string($value));
 
-        return new \DateTimeImmutable($value);
+        return new DateTimeImmutable($value);
     }
 
-    private function decodeEnum(mixed $value, PropertyType $type): \BackedEnum
+    private function decodeEnum(mixed $value, PropertyType $type): BackedEnum
     {
-        /** @var class-string<\BackedEnum> $class */
+        /** @var class-string<BackedEnum> $class */
         $class = $type->class;
 
         if ($value instanceof $class) {
             return $value;
         }
 
-        \assert(\is_string($value) || \is_int($value));
+        assert(is_string($value) || is_int($value));
 
         return $class::from($value);
     }
@@ -83,13 +92,13 @@ final class Hydrator
     private function decodeModel(mixed $value, PropertyType $type): object
     {
         $class = $type->class;
-        \assert(\is_string($class));
+        assert(is_string($class));
 
         if ($value instanceof $class) {
             return $value;
         }
 
-        \assert(\is_array($value));
+        assert(is_array($value));
 
         return $this->hydrate($class, $value);
     }
@@ -108,19 +117,19 @@ final class Hydrator
 
     private function decodeUnion(mixed $value, PropertyType $type, ?Discriminator $discriminator): mixed
     {
-        if (!\is_array($value)) {
+        if (!is_array($value)) {
             return $value;
         }
 
         // ADR-010 + T-030: every union descriptor is discriminated — the
         // generator refuses undiscriminated ref unions, so this branch is
         // always taken for valid inputs.
-        \assert($discriminator instanceof Discriminator, 'union descriptor missing #[Discriminator] (ADR-010)');
+        assert($discriminator instanceof Discriminator, 'union descriptor missing #[Discriminator] (ADR-010)');
 
         $branch = $this->branchFromDiscriminator($value, $discriminator);
 
         if ($branch === null) {
-            $branch = $type->branches[0] ?? throw new \LogicException('union descriptor has no branches');
+            $branch = $type->branches[0] ?? throw new LogicException('union descriptor has no branches');
         }
 
         return $this->hydrate($branch, $value);
@@ -133,13 +142,13 @@ final class Hydrator
      */
     private function branchFromDiscriminator(array $value, Discriminator $discriminator): ?string
     {
-        if (!\array_key_exists($discriminator->field, $value)) {
+        if (!array_key_exists($discriminator->field, $value)) {
             return null;
         }
 
         $tag = $value[$discriminator->field];
 
-        if (!\is_string($tag)) {
+        if (!is_string($tag)) {
             return null;
         }
 
@@ -151,7 +160,7 @@ final class Hydrator
      */
     private function decodeList(mixed $value, PropertyType $type): array
     {
-        \assert(\is_array($value));
+        assert(is_array($value));
         $itemType = $type->itemType ?? PropertyType::passthrough();
         $out = [];
 
@@ -167,7 +176,7 @@ final class Hydrator
      */
     private function decodeMap(mixed $value, PropertyType $type): array
     {
-        \assert(\is_array($value));
+        assert(is_array($value));
         $valueType = $type->itemType ?? PropertyType::passthrough();
         $out = [];
 

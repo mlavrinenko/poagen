@@ -8,7 +8,7 @@ final readonly class Pet
 {
     /**
      * @param list<string>|null $photoUrls
-     * @param list<\Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag>|null $tags
+     * @param list<Tag>|null $tags
      */
     public function __construct(
         public ?int $id = null,

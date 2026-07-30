@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Exception;
 
+use RuntimeException;
+
+use function sprintf;
+
 /**
  * Thrown when two different schema nodes claim the same emitted model class
  * name.
@@ -20,11 +24,11 @@ namespace Mlavrinenko\Paogen\Exception;
  * `silence-means-success` exists to forbid, so a collision stops the run and
  * names both origins.
  */
-final class ModelNameCollisionException extends \RuntimeException
+final class ModelNameCollisionException extends RuntimeException
 {
     public static function between(string $phpName, string $firstOrigin, string $secondOrigin): self
     {
-        return new self(\sprintf(
+        return new self(sprintf(
             "Model name collision: `%s` is claimed by two different schema nodes:\n"
                 . "  - %s\n"
                 . "  - %s\n"

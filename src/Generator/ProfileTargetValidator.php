@@ -9,6 +9,9 @@ use cebe\openapi\spec\PathItem;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\TagCatalogue;
 
+use function in_array;
+use function sprintf;
+
 /**
  * Cross-checks the profile's operation-keyed guidance against the document —
  * `Profile::$inlineModels` and `Profile::$methodRenames`.
@@ -55,7 +58,7 @@ final readonly class ProfileTargetValidator
 
         foreach (array_keys($profile->tagRenames) as $tag) {
             if (!isset($carried[$tag])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$tagRenames['%s'] names a tag no operation carries — remove this entry, or point it "
                         . 'at the tag the vendor now uses.',
                     $tag,
@@ -65,7 +68,7 @@ final readonly class ProfileTargetValidator
 
         foreach ($profile->tagChoice as $operationId => $tag) {
             if (!isset($known[$operationId])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$tagChoice['%s'] names an operation id absent from the schema — remove this entry.",
                     $operationId,
                 );
@@ -73,8 +76,8 @@ final readonly class ProfileTargetValidator
                 continue;
             }
 
-            if (!\in_array($tag, TagCatalogue::declaredTagsOf($openApi, $operationId), true)) {
-                $failures[] = \sprintf(
+            if (!in_array($tag, TagCatalogue::declaredTagsOf($openApi, $operationId), true)) {
+                $failures[] = sprintf(
                     "Profile::\$tagChoice['%s'] picks the tag '%s', which that operation does not carry — a choice "
                         . 'can only narrow the tags the document declared, not add one. Use '
                         . 'Profile::$tagAssignments to place an untagged operation.',
@@ -86,7 +89,7 @@ final readonly class ProfileTargetValidator
 
         foreach (array_keys($profile->tagAssignments) as $operationId) {
             if (!isset($known[$operationId])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$tagAssignments['%s'] names an operation id absent from the schema — remove this entry.",
                     $operationId,
                 );
@@ -107,7 +110,7 @@ final readonly class ProfileTargetValidator
 
         foreach (array_keys($methodRenames) as $operationId) {
             if (!isset($known[$operationId])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$methodRenames['%s'] names an operation id absent from the schema — remove this "
                         . 'entry, or point it at the operation id the vendor now uses.',
                     $operationId,
@@ -130,7 +133,7 @@ final readonly class ProfileTargetValidator
 
         foreach ($pins as $key => $className) {
             if (preg_match(self::IDENTIFIER, $className) !== 1) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$inlineModels['%s'] => '%s' is not a valid PHP class name.",
                     $key,
                     $className,
@@ -143,8 +146,8 @@ final readonly class ProfileTargetValidator
             $operationId = $split === false ? $key : substr($key, 0, $split);
             $role = $split === false ? '' : substr($key, $split + 1);
 
-            if (!\in_array($role, $roles, true)) {
-                $failures[] = \sprintf(
+            if (!in_array($role, $roles, true)) {
+                $failures[] = sprintf(
                     "Profile::\$inlineModels['%s'] does not name a payload role — a key is "
                         . "'<operationId>.request' or '<operationId>.response'.",
                     $key,
@@ -154,7 +157,7 @@ final readonly class ProfileTargetValidator
             }
 
             if (!isset($known[$operationId])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$inlineModels['%s'] names an operation id absent from the schema — remove this "
                         . 'entry, or point it at the operation id the vendor now uses.',
                     $key,

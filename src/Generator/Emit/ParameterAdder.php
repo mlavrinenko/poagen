@@ -8,6 +8,7 @@ use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Enum\EnumSpec;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
@@ -120,7 +121,7 @@ final readonly class ParameterAdder
         $synthName = EnumCatalog::pascalize($operationId) . EnumCatalog::pascalize($paramName);
         $spec = EnumCatalog::specFromSchema($synthName, $schema);
 
-        if (!$spec instanceof \Mlavrinenko\Paogen\Generator\Enum\EnumSpec) {
+        if (!$spec instanceof EnumSpec) {
             return null;
         }
 

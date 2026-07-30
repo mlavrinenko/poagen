@@ -32,7 +32,7 @@ final readonly class ParameterCollector
             return null;
         }
 
-        $pathParams = $pathItem instanceof \cebe\openapi\spec\PathItem ? self::resolveAll($pathItem->parameters) : [];
+        $pathParams = $pathItem instanceof PathItem ? self::resolveAll($pathItem->parameters) : [];
 
         if ($pathParams === null) {
             return null;

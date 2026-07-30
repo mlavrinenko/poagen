@@ -8,6 +8,10 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 
+use function is_string;
+
+use const SORT_STRING;
+
 /**
  * The one order every pass walks the document's operations in: path URIs sorted,
  * then each path item's own operation order.
@@ -37,13 +41,13 @@ final readonly class OperationOrder
         $items = [];
 
         foreach ($paths as $pathUri => $pathItem) {
-            if (\is_string($pathUri) && $pathItem instanceof PathItem) {
+            if (is_string($pathUri) && $pathItem instanceof PathItem) {
                 $items[$pathUri] = $pathItem;
             }
         }
 
         $uris = array_keys($items);
-        sort($uris, \SORT_STRING);
+        sort($uris, SORT_STRING);
 
         $out = [];
 

@@ -5,7 +5,16 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator;
 
 use Composer\Autoload\ClassLoader;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
+use SplFileInfo;
+
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Walks PSR-4 directories that overlap with the Profile's `discoverIn`
@@ -20,7 +29,7 @@ final readonly class AttributeScanner
         $formats = [];
 
         foreach ($this->classesIn($profile->discoverIn) as $fqcn) {
-            $reflection = new \ReflectionClass($fqcn);
+            $reflection = new ReflectionClass($fqcn);
 
             foreach ($reflection->getAttributes(BindsFormat::class) as $attribute) {
                 /** @var BindsFormat $instance */
@@ -52,11 +61,11 @@ final readonly class AttributeScanner
                     continue;
                 }
 
-                $relative = substr($namespace, \strlen($prefixTrimmed));
-                $subPath = str_replace('\\', \DIRECTORY_SEPARATOR, ltrim($relative, '\\'));
+                $relative = substr($namespace, strlen($prefixTrimmed));
+                $subPath = str_replace('\\', DIRECTORY_SEPARATOR, ltrim($relative, '\\'));
 
                 foreach ($dirs as $dir) {
-                    $root = $dir . ($subPath !== '' ? \DIRECTORY_SEPARATOR . $subPath : '');
+                    $root = $dir . ($subPath !== '' ? DIRECTORY_SEPARATOR . $subPath : '');
 
                     if (!is_dir($root)) {
                         continue;
@@ -73,11 +82,11 @@ final readonly class AttributeScanner
      */
     private function scanDirectory(string $root, string $namespace): iterable
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
         );
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile()) {
                 continue;
@@ -85,8 +94,8 @@ final readonly class AttributeScanner
             if ($file->getExtension() !== 'php') {
                 continue;
             }
-            $relativePath = substr($file->getPathname(), \strlen($root) + 1, -\strlen('.php'));
-            $classSuffix = str_replace(\DIRECTORY_SEPARATOR, '\\', $relativePath);
+            $relativePath = substr($file->getPathname(), strlen($root) + 1, -strlen('.php'));
+            $classSuffix = str_replace(DIRECTORY_SEPARATOR, '\\', $relativePath);
             $fqcn = $namespace . '\\' . $classSuffix;
 
             if (class_exists($fqcn)) {

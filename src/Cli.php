@@ -8,6 +8,15 @@ use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
+use OutOfBoundsException;
+use Throwable;
+
+use function array_slice;
+use function in_array;
+use function is_array;
+
+use const STDERR;
+use const STDOUT;
 
 /**
  * Minimal hand-rolled CLI entry point. See ADR-006.
@@ -56,17 +65,17 @@ final class Cli
      */
     public static function run(array $argv, $stdout = null, $stderr = null): int
     {
-        $stdout ??= \STDOUT;
-        $stderr ??= \STDERR;
+        $stdout ??= STDOUT;
+        $stderr ??= STDERR;
 
-        $args = \array_slice($argv, 1);
+        $args = array_slice($argv, 1);
 
-        if ($args === [] || \in_array($args[0], ['-h', '--help', 'help'], true)) {
+        if ($args === [] || in_array($args[0], ['-h', '--help', 'help'], true)) {
             fwrite($stdout, self::USAGE . "\n");
             return 0;
         }
 
-        if (\in_array($args[0], ['-V', '--version', 'version'], true)) {
+        if (in_array($args[0], ['-V', '--version', 'version'], true)) {
             fwrite($stdout, 'paogen ' . self::version() . "\n");
             return 0;
         }
@@ -79,11 +88,11 @@ final class Cli
                 return 1;
             }
 
-            return GenerateCommand::run(\array_slice($args, 1), $loader, $stdout, $stderr);
+            return GenerateCommand::run(array_slice($args, 1), $loader, $stdout, $stderr);
         }
 
         if ($args[0] === 'validate') {
-            return self::validate(\array_slice($args, 1), $stdout, $stderr);
+            return self::validate(array_slice($args, 1), $stdout, $stderr);
         }
 
         $command = $args[0];
@@ -125,7 +134,7 @@ final class Cli
             $openApi = str_ends_with(strtolower($absolutePath), '.json')
                 ? Reader::readFromJsonFile($absolutePath, OpenApi::class, false)
                 : Reader::readFromYamlFile($absolutePath, OpenApi::class, false);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             fwrite($stderr, "paogen validate: parse error: {$e->getMessage()}\n");
             return 1;
         }
@@ -156,7 +165,7 @@ final class Cli
     {
         try {
             $version = InstalledVersions::getPrettyVersion($package);
-        } catch (\OutOfBoundsException) {
+        } catch (OutOfBoundsException) {
             return 'dev';
         }
 
@@ -166,7 +175,7 @@ final class Cli
     private static function composerLoader(): ?ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }

@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
+use ReflectionMethod;
+
+use function count;
+use function in_array;
+use function is_array;
+
 /**
  * Recovers the doc comment for a named method by re-tokenising the file
  * that declares it. Used by {@see DescriptorParser} as a fallback when
@@ -22,7 +28,7 @@ final class MethodDocScanner
     /** @var array<string, array<string, string>> */
     private static array $cache = [];
 
-    public static function docFor(\ReflectionMethod $method): string|false
+    public static function docFor(ReflectionMethod $method): string|false
     {
         $file = $method->getFileName();
 
@@ -49,14 +55,14 @@ final class MethodDocScanner
         }
 
         $tokens = token_get_all($source);
-        $count = \count($tokens);
+        $count = count($tokens);
         $result = [];
         $pendingDoc = null;
 
         for ($i = 0; $i < $count; ++$i) {
             $token = $tokens[$i];
 
-            if (!\is_array($token)) {
+            if (!is_array($token)) {
                 $pendingDoc = null;
 
                 continue;
@@ -103,7 +109,7 @@ final class MethodDocScanner
      */
     private static function isIgnorableBeforeFunction(int $id): bool
     {
-        return \in_array(
+        return in_array(
             $id,
             [T_WHITESPACE, T_COMMENT, T_PUBLIC, T_PROTECTED, T_PRIVATE, T_STATIC, T_ABSTRACT, T_FINAL, T_READONLY],
             true,
@@ -121,7 +127,7 @@ final class MethodDocScanner
         while ($i < $count && $depth > 0) {
             $token = $tokens[$i];
 
-            if (\is_array($token)) {
+            if (is_array($token)) {
                 ++$i;
 
                 continue;
@@ -146,7 +152,7 @@ final class MethodDocScanner
         for ($j = $functionIndex + 1; $j < $count; ++$j) {
             $token = $tokens[$j];
 
-            if (!\is_array($token)) {
+            if (!is_array($token)) {
                 return null;
             }
 

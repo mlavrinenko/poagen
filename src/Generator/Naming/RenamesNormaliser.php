@@ -6,6 +6,8 @@ namespace Mlavrinenko\Paogen\Generator\Naming;
 
 use Mlavrinenko\Paogen\Exception\InvalidProfileException;
 
+use function sprintf;
+
 /**
  * Looks up the raw name in a static map. Returns the mapped value if
  * present, null otherwise. Validates each mapped value against the
@@ -35,7 +37,7 @@ final readonly class RenamesNormaliser implements NameNormaliser
     ) {
         foreach ($map as $raw => $php) {
             if (preg_match(self::IDENTIFIER, $php) !== 1) {
-                throw new InvalidProfileException(\sprintf(
+                throw new InvalidProfileException(sprintf(
                     "Profile %s map: '%s' is not a valid PHP identifier (mapped from '%s').",
                     $label,
                     $php,
@@ -47,7 +49,7 @@ final readonly class RenamesNormaliser implements NameNormaliser
 
     public function normalise(string $raw, NormalisationContext $context): ?string
     {
-        if ($this->kind instanceof \Mlavrinenko\Paogen\Generator\Naming\SymbolKind && $context->kind !== $this->kind) {
+        if ($this->kind instanceof SymbolKind && $context->kind !== $this->kind) {
             return null;
         }
         if ($this->pattern !== null && preg_match($this->pattern, $raw) !== 1) {

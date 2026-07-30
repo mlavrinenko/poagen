@@ -17,6 +17,8 @@ use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PromotedParameter;
 
+use function is_string;
+
 /**
  * Attaches `#[WireName]` / `#[Format]` / `#[Discriminator]` to a promoted
  * constructor parameter. Extracted from {@see ModelEmitter} to keep that
@@ -40,7 +42,7 @@ final readonly class ModelAttributeApplier
             $param->addAttribute(WireName::class, [$wireName]);
         }
 
-        if ($propSchema instanceof Schema && \is_string($propSchema->format)) {
+        if ($propSchema instanceof Schema && is_string($propSchema->format)) {
             $scalarFormat = $bindings->scalarFormat($propSchema->format);
 
             if ($scalarFormat instanceof ScalarFormat && $scalarFormat->kind === ScalarFormat::KIND_DATE) {

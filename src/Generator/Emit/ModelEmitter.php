@@ -14,6 +14,14 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 
+use function array_slice;
+use function assert;
+use function in_array;
+use function is_int;
+use function sprintf;
+
+use const SORT_STRING;
+
 /**
  * Emits a single `final readonly` PHP class for one OpenAPI named schema.
  *
@@ -49,7 +57,7 @@ final readonly class ModelEmitter
         ?NameRegistry $registry = null,
         array $implements = [],
     ): ModelEmission {
-        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         $modelNamespace = trim($modelNamespace, '\\');
         $file = new PhpFile();
         $file->setStrictTypes();
@@ -72,15 +80,15 @@ final readonly class ModelEmitter
         // a uniform input shape.
         $names = [];
         foreach (array_keys($properties) as $k) {
-            $names[] = \is_int($k) ? (string) $k : $k;
+            $names[] = is_int($k) ? (string) $k : $k;
         }
-        sort($names, \SORT_STRING);
+        sort($names, SORT_STRING);
 
         // Required first (in sorted order), then optional. PHP forbids
         // required-after-optional.
         $ordered = array_merge(
-            array_values(array_filter($names, static fn(string $n): bool => \in_array($n, $required, true))),
-            array_values(array_filter($names, static fn(string $n): bool => !\in_array($n, $required, true))),
+            array_values(array_filter($names, static fn(string $n): bool => in_array($n, $required, true))),
+            array_values(array_filter($names, static fn(string $n): bool => !in_array($n, $required, true))),
         );
 
         /** @var list<SynthesisedModel> $children */
@@ -88,7 +96,7 @@ final readonly class ModelEmitter
 
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
-            $isRequired = \in_array($propName, $required, true);
+            $isRequired = in_array($propName, $required, true);
             $phpName = $this->phpName($propName);
 
             $resolved = $this->properties->resolve(
@@ -164,7 +172,7 @@ final readonly class ModelEmitter
             $param->setDefaultValue(null);
         }
         if ($resolved->phpDoc !== null) {
-            $constructor->addComment(\sprintf('@param %s%s $%s', $isNullable ? '?' : '', $resolved->phpDoc, $phpName));
+            $constructor->addComment(sprintf('@param %s%s $%s', $isNullable ? '?' : '', $resolved->phpDoc, $phpName));
         }
         if ($todo !== null) {
             $constructor->addComment($todo);
@@ -193,7 +201,7 @@ final readonly class ModelEmitter
             return 'value';
         }
         $head = strtolower($parts[0]);
-        $tail = array_map(static fn(string $p): string => ucfirst(strtolower($p)), \array_slice($parts, 1));
+        $tail = array_map(static fn(string $p): string => ucfirst(strtolower($p)), array_slice($parts, 1));
         $name = $head . implode('', $tail);
 
         // `'1'`, `'-'`, etc. still yield an invalid PHP identifier — prefix `_`.

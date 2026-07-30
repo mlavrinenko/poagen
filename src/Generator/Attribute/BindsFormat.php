@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Attribute;
 
+use Attribute;
+
 /**
  * Marks a user value object as the PHP type for an OpenAPI `format` value.
  *
@@ -28,7 +30,7 @@ namespace Mlavrinenko\Paogen\Generator\Attribute;
  * The generator's AttributeScanner discovers these on classes whose namespace
  * is listed in the Profile's `discoverIn`. See ADR-003.
  */
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 final readonly class BindsFormat
 {
     public function __construct(public string $format) {}

@@ -7,6 +7,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 
+use function strlen;
+
 /**
  * One sub-client's worth of operations: the tag as the document wrote it, the
  * PHP name derived from it, and the operations that belong on it.
@@ -38,7 +40,7 @@ final readonly class TagGroup
     public function accessor(): string
     {
         $stem = str_ends_with($this->phpName, 'Client')
-            ? substr($this->phpName, 0, -\strlen('Client'))
+            ? substr($this->phpName, 0, -strlen('Client'))
             : $this->phpName;
 
         return $stem === '' ? 'client' : lcfirst($stem);

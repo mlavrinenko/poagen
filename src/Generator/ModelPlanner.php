@@ -7,10 +7,13 @@ namespace Mlavrinenko\Paogen\Generator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use LogicException;
 use Mlavrinenko\Paogen\Generator\Emit\ArrayWrapperEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentShape;
 use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
+use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
+use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\ScalarVoEmitter;
@@ -18,6 +21,13 @@ use Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel;
 use Mlavrinenko\Paogen\Generator\Emit\UnionInterfaceEmitter;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+
+use function in_array;
+use function is_array;
+use function is_string;
+
+use const DIRECTORY_SEPARATOR;
+use const SORT_STRING;
 
 /**
  * Walks the {@see ComponentCatalog}, dispatches each entry to the
@@ -37,10 +47,10 @@ final readonly class ModelPlanner
     /**
      * @param array<string,string>   $writes
      * @param array<string,true>     $excludedComponents Raw component names to omit entirely — e.g. ones flagged
-     *                                                    by {@see \Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer}
+     *                                                    by {@see DiscriminatorEnforcer}
      *                                                    and accepted via `Profile::$skip` (abort-on-unrepresentable-constructs).
      * @param list<SynthesisedModel> $extraRoots         Classes named outside the component catalogue — the operation
-     *                                                    payloads {@see \Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner}
+     *                                                    payloads {@see InlinePayloadPlanner}
      *                                                    found. They join the same queue as inline children, so nesting
      *                                                    below them is reached by the machinery that was already there.
      */
@@ -59,7 +69,7 @@ final readonly class ModelPlanner
     ): void {
         $ledger ??= new ModelNameLedger();
         $rawNames = array_keys($components->all());
-        sort($rawNames, \SORT_STRING);
+        sort($rawNames, SORT_STRING);
 
         /** @var list<SynthesisedModel> $pending */
         $pending = $extraRoots;
@@ -71,13 +81,13 @@ final readonly class ModelPlanner
 
             $shape = $components->shapeOf($rawName);
 
-            if (!$shape instanceof \Mlavrinenko\Paogen\Generator\Emit\ComponentShape) {
+            if (!$shape instanceof ComponentShape) {
                 continue;
             }
 
             // Enum components land in the enum namespace and unsupported ones
             // land nowhere, so neither competes for a model class name.
-            if (!\in_array($shape->kind, [ComponentShape::KIND_ENUM, ComponentShape::KIND_UNSUPPORTED], true)) {
+            if (!in_array($shape->kind, [ComponentShape::KIND_ENUM, ComponentShape::KIND_UNSUPPORTED], true)) {
                 $ledger->claim($shape->phpName, 'components.schemas/' . $rawName);
             }
 
@@ -104,7 +114,7 @@ final readonly class ModelPlanner
         array &$writes,
         array &$pending,
     ): void {
-        $path = $modelDir . \DIRECTORY_SEPARATOR . $shape->phpName . '.php';
+        $path = $modelDir . DIRECTORY_SEPARATOR . $shape->phpName . '.php';
 
         switch ($shape->kind) {
             case ComponentShape::KIND_ENUM:
@@ -112,15 +122,15 @@ final readonly class ModelPlanner
                 return;
 
             case ComponentShape::KIND_OBJECT:
-                $effective = $shape->schema ?? throw new \LogicException('object shape missing schema');
+                $effective = $shape->schema ?? throw new LogicException('object shape missing schema');
                 $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending);
 
                 return;
 
             case ComponentShape::KIND_ALLOF_OBJECT:
-                $effective = $this->materialiseAllOf($shape->schema ?? throw new \LogicException('allOf shape missing schema'), $openApi);
+                $effective = $this->materialiseAllOf($shape->schema ?? throw new LogicException('allOf shape missing schema'), $openApi);
 
-                if (!$effective instanceof \cebe\openapi\spec\Schema) {
+                if (!$effective instanceof Schema) {
                     return;
                 }
 
@@ -210,7 +220,7 @@ final readonly class ModelPlanner
     {
         $title = $branch->title;
 
-        if (\is_string($title) && $title !== '') {
+        if (is_string($title) && $title !== '') {
             $pascal = EnumCatalog::pascalize($title);
 
             if ($pascal !== '') {
@@ -228,7 +238,7 @@ final readonly class ModelPlanner
      */
     private function materialiseAllOf(Schema $schema, OpenApi $openApi): ?Schema
     {
-        if (!\is_array($schema->allOf) || $schema->allOf === []) {
+        if (!is_array($schema->allOf) || $schema->allOf === []) {
             return $schema;
         }
 
@@ -274,7 +284,7 @@ final readonly class ModelPlanner
                     $registry,
                     $child->implements,
                 );
-                $writes[$modelDir . \DIRECTORY_SEPARATOR . $child->name . '.php'] = $emission->source;
+                $writes[$modelDir . DIRECTORY_SEPARATOR . $child->name . '.php'] = $emission->source;
 
                 foreach ($emission->children as $grand) {
                     $pending[] = $grand;

@@ -23,7 +23,7 @@ final readonly class GenerationPlan
      *                                                    successful plan with a non-empty list here means every
      *                                                    one of them was explicitly accepted via `Profile::$skip`
      *                                                    (abort-on-unrepresentable-constructs) — otherwise
-     *                                                    {@see \Mlavrinenko\Paogen\Generator\Generator::plan()}
+     *                                                    {@see Generator::plan()}
      *                                                    throws instead of returning.
      * @param list<SkippedComponent> $skippedComponents   Components (or components with an undiscriminated
      *                                                    union property) the generator did not emit. Same

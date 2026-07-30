@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
+use BackedEnum;
+use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use ReflectionClass;
+
+use function assert;
+use function is_array;
+use function is_object;
 
 /**
  * Walks a Model instance, produces a JSON-ready array keyed by wire names.
@@ -21,7 +28,7 @@ final class Marshaller
     public function marshal(object $model): array
     {
         $out = [];
-        $reflection = new \ReflectionClass($model);
+        $reflection = new ReflectionClass($model);
 
         foreach (DescriptorParser::descriptorsFor($model::class) as $descriptor) {
             $value = $reflection->getProperty($descriptor->phpName)->getValue($model);
@@ -51,22 +58,22 @@ final class Marshaller
 
     private function encodeDateTime(mixed $value, PropertyType $type): string
     {
-        \assert($value instanceof \DateTimeInterface);
-        $format = $type->format === 'date' ? 'Y-m-d' : \DateTimeInterface::RFC3339;
+        assert($value instanceof DateTimeInterface);
+        $format = $type->format === 'date' ? 'Y-m-d' : DateTimeInterface::RFC3339;
 
         return $value->format($format);
     }
 
     private function encodeEnum(mixed $value): string|int
     {
-        \assert($value instanceof \BackedEnum);
+        assert($value instanceof BackedEnum);
 
         return $value->value;
     }
 
     private function encodeModel(mixed $value): mixed
     {
-        if (!\is_object($value)) {
+        if (!is_object($value)) {
             return $value;
         }
 
@@ -79,7 +86,7 @@ final class Marshaller
 
     private function encodeScalarBinding(mixed $value): string|int|float|bool
     {
-        \assert($value instanceof ScalarBinding);
+        assert($value instanceof ScalarBinding);
 
         return $value->toScalar();
     }
@@ -89,7 +96,7 @@ final class Marshaller
      */
     private function encodeList(mixed $value, PropertyType $type): array
     {
-        \assert(\is_array($value));
+        assert(is_array($value));
         $itemType = $type->itemType ?? PropertyType::passthrough();
         $out = [];
 
@@ -105,7 +112,7 @@ final class Marshaller
      */
     private function encodeMap(mixed $value, PropertyType $type): array
     {
-        \assert(\is_array($value));
+        assert(is_array($value));
         $valueType = $type->itemType ?? PropertyType::passthrough();
         $out = [];
 

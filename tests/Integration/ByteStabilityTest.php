@@ -5,10 +5,18 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Composer\Autoload\ClassLoader;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
+use function dirname;
+use function is_array;
+use function strlen;
 
 /**
  * T-022: independent byte-stability check against the Petstore golden tree.
@@ -57,8 +65,8 @@ final class ByteStabilityTest extends TestCase
 
     public function testPetstoreGeneratorRunsAreByteIdenticalToEachOtherAndToTheGoldenTree(): void
     {
-        $schema = \dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml';
-        $goldenDir = \dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore';
+        $schema = dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml';
+        $goldenDir = dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore';
 
         self::assertFileExists($schema, 'petstore schema must exist for this integration test');
         self::assertDirectoryExists($goldenDir, 'petstore golden tree must exist for this integration test');
@@ -122,13 +130,13 @@ final class ByteStabilityTest extends TestCase
      */
     private function snapshot(string $dir): array
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
         );
 
         $out = [];
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile()) {
                 continue;
@@ -136,7 +144,7 @@ final class ByteStabilityTest extends TestCase
             if ($file->getExtension() !== 'php') {
                 continue;
             }
-            $relative = substr($file->getPathname(), \strlen($dir) + 1);
+            $relative = substr($file->getPathname(), strlen($dir) + 1);
             $out[$relative] = (string) file_get_contents($file->getPathname());
         }
 
@@ -148,7 +156,7 @@ final class ByteStabilityTest extends TestCase
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -158,12 +166,12 @@ final class ByteStabilityTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
-        /** @var \SplFileInfo $entry */
+        /** @var SplFileInfo $entry */
         foreach ($iterator as $entry) {
             if ($entry->isDir()) {
                 rmdir($entry->getPathname());

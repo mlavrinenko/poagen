@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
 
+use DateTimeImmutable;
 use Mlavrinenko\Paogen\Runtime\Marshal\MethodDocScanner;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+
+use function dirname;
+use function extension_loaded;
+use function sprintf;
+
+use const PHP_BINARY;
 
 /**
  * Exercises the `token_get_all` fallback path that kicks in when
@@ -17,28 +25,33 @@ final class DescriptorParserFallbackTest extends TestCase
 {
     public function testTokenScanRecoversConstructorPhpdocFromFile(): void
     {
-        $reflection = new \ReflectionMethod(Pet::class, '__construct');
+        $reflection = new ReflectionMethod(Pet::class, '__construct');
         $doc = MethodDocScanner::docFor($reflection);
 
         self::assertIsString($doc);
-        self::assertStringContainsString('@param list<\Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag>|null $tags', $doc);
+        // `Tag` unqualified: it shares a namespace with `Pet`, so this is the
+        // shortest valid spelling and the one the file carries. Resolving it
+        // back to a class is `PropertyTypeResolver`'s job, and
+        // `testHydratorRecoversListItemTypeWhenOpcacheStripsComments` below
+        // proves it happens even with comments stripped.
+        self::assertStringContainsString('@param list<Tag>|null $tags', $doc);
     }
 
     public function testTokenScanReturnsFalseForInternalReflection(): void
     {
         // `\DateTimeImmutable::__construct` is a C-defined method — no source file.
-        $reflection = new \ReflectionMethod(\DateTimeImmutable::class, '__construct');
+        $reflection = new ReflectionMethod(DateTimeImmutable::class, '__construct');
 
         self::assertFalse(MethodDocScanner::docFor($reflection));
     }
 
     public function testHydratorRecoversListItemTypeWhenOpcacheStripsComments(): void
     {
-        if (!\extension_loaded('Zend OPcache')) {
+        if (!extension_loaded('Zend OPcache')) {
             self::markTestSkipped('Zend OPcache not loaded in CLI.');
         }
 
-        $projectRoot = \dirname(__DIR__, 3);
+        $projectRoot = dirname(__DIR__, 3);
         $autoload = $projectRoot . '/vendor/autoload.php';
         $script = <<<PHP
             <?php
@@ -57,15 +70,15 @@ final class DescriptorParserFallbackTest extends TestCase
             PHP;
         $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
 
-        if (!is_dir(\dirname($scriptPath))) {
-            mkdir(\dirname($scriptPath), 0o755, true);
+        if (!is_dir(dirname($scriptPath))) {
+            mkdir(dirname($scriptPath), 0o755, true);
         }
         file_put_contents($scriptPath, $script);
 
         try {
-            $cmd = \sprintf(
+            $cmd = sprintf(
                 '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 %s 2>&1',
-                escapeshellarg(\PHP_BINARY),
+                escapeshellarg(PHP_BINARY),
                 escapeshellarg($scriptPath),
             );
             $output = trim((string) shell_exec($cmd));

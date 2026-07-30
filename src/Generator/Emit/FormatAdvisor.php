@@ -8,9 +8,15 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
+use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
+
+use function is_array;
+use function is_string;
+use function sprintf;
 
 /**
  * Names every `format` annotation the generator does not recognise, with a
@@ -64,7 +70,7 @@ final readonly class FormatAdvisor
         $notices = [];
 
         foreach ($formats as $format) {
-            $notices[] = \sprintf(
+            $notices[] = sprintf(
                 "format '%s' is not one paogen recognises — %d use(s), first at %s. The property keeps its base "
                     . "type. To give it a type of your own, put #[BindsFormat('%s')] on a value object in a "
                     . 'namespace listed in Profile::$discoverIn; implement Runtime\\ScalarBinding on it and paogen '
@@ -87,12 +93,12 @@ final readonly class FormatAdvisor
     {
         $format = $schema->format;
 
-        if (\is_string($format) && $format !== '' && !self::isRecognised($format, $bindings)) {
+        if (is_string($format) && $format !== '' && !self::isRecognised($format, $bindings)) {
             $counts[$format] = ($counts[$format] ?? 0) + 1;
             $firstSeen[$format] ??= SynthesisedModel::originOf($schema);
         }
 
-        foreach (\is_array($schema->properties) ? $schema->properties : [] as $property) {
+        foreach (is_array($schema->properties) ? $schema->properties : [] as $property) {
             if ($property instanceof Schema) {
                 self::walk($property, $bindings, $counts, $firstSeen);
             }
@@ -105,7 +111,7 @@ final readonly class FormatAdvisor
         }
 
         foreach ([$schema->allOf, $schema->oneOf, $schema->anyOf] as $branches) {
-            foreach (\is_array($branches) ? $branches : [] as $branch) {
+            foreach (is_array($branches) ? $branches : [] as $branch) {
                 if ($branch instanceof Schema) {
                     self::walk($branch, $bindings, $counts, $firstSeen);
                 }
@@ -123,7 +129,7 @@ final readonly class FormatAdvisor
      */
     private static function isRecognised(string $format, Bindings $bindings): bool
     {
-        return $bindings->scalarFormat($format) instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat
+        return $bindings->scalarFormat($format) instanceof ScalarFormat
             || $bindings->formatType($format) !== null;
     }
 
@@ -170,7 +176,7 @@ final readonly class FormatAdvisor
         $out = [];
         $body = RequestBodyAnalyzer::resolveBody($operation->requestBody);
 
-        foreach ($body instanceof \cebe\openapi\spec\RequestBody ? $body->content : [] as $media) {
+        foreach ($body instanceof RequestBody ? $body->content : [] as $media) {
             if ($media->schema instanceof Schema) {
                 $out[] = $media->schema;
             }

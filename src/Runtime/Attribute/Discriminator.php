@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Runtime\Attribute;
 
+use Attribute;
+
 /**
  * Property-level: the wire field whose value selects a branch of a PHP union
  * type. `$map` carries an OpenAPI `discriminator.mapping` (or the generator-
@@ -11,7 +13,7 @@ namespace Mlavrinenko\Paogen\Runtime\Attribute;
  *
  * See ADR-010.
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
 final readonly class Discriminator
 {
     /**

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\ValueObject;
 
+use InvalidArgumentException;
 use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+
+use function is_string;
 
 /**
  * Fixture: a user value object that opts in as the PHP type for `format: email`
@@ -19,8 +22,8 @@ final readonly class Email implements ScalarBinding
 
     public static function fromScalar(mixed $raw): self
     {
-        if (!\is_string($raw)) {
-            throw new \InvalidArgumentException(
+        if (!is_string($raw)) {
+            throw new InvalidArgumentException(
                 'Email expects a string payload, got ' . get_debug_type($raw),
             );
         }

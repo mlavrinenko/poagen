@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
+use DateTimeImmutable;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Exception\NameNormalisationException;
+use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Naming\CompositeNormaliser;
@@ -17,7 +20,30 @@ use Mlavrinenko\Paogen\Generator\Naming\RenamesNormaliser;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
+use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
+use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
+use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+use Throwable;
+
+use function assert;
+use function count;
+use function dirname;
+use function extension_loaded;
+use function is_array;
+use function sprintf;
+use function strlen;
+
+use const PHP_BINARY;
 
 /**
  * Step implementations for ModelGenerator.
@@ -48,7 +74,7 @@ final class ModelGeneratorSteps
     private array $renames = [];
     /** @var array<string,string> raw → php resolved by the pipeline */
     private array $resolved = [];
-    private ?\Throwable $caught = null;
+    private ?Throwable $caught = null;
 
     private bool $expectGeneratorAbort = false;
 
@@ -87,7 +113,7 @@ final class ModelGeneratorSteps
 
         try {
             $this->runGenerator($this->profile);
-        } catch (\Throwable $error) {
+        } catch (Throwable $error) {
             // Some scenarios (T-030 abort) expect a thrown exception and
             // assert against it in the `then` step via {@see self::$caught}.
             // Others let the exception propagate.
@@ -195,7 +221,7 @@ final class ModelGeneratorSteps
 
     private function loadProfile(string $name): Profile
     {
-        $profile = new ProfileLoader()->load(\dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
+        $profile = new ProfileLoader()->load(dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
         $this->outputDir = $profile->output;
 
         return $profile;
@@ -211,19 +237,19 @@ final class ModelGeneratorSteps
      */
     private function snapshot(string $dir): array
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
         );
 
         $out = [];
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($iterator as $file) {
             if (!$file->isFile() || $file->getExtension() !== 'php') {
                 continue;
             }
 
-            $relative = substr($file->getPathname(), \strlen($dir) + 1);
+            $relative = substr($file->getPathname(), strlen($dir) + 1);
             $out[$relative] = (string) file_get_contents($file->getPathname());
         }
 
@@ -235,7 +261,7 @@ final class ModelGeneratorSteps
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -250,10 +276,10 @@ final class ModelGeneratorSteps
     {
         $tempBase = (string) tempnam(sys_get_temp_dir(), 'paogen-prune-');
         unlink($tempBase);
-        \assert(mkdir($tempBase, 0o755, true));
+        assert(mkdir($tempBase, 0o755, true));
 
         $profile = new Profile(
-            schema: \dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
+            schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $tempBase,
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Prune\\Petstore',
             // Petstore's octet-stream upload is unrepresentable and now stops
@@ -330,7 +356,7 @@ final class ModelGeneratorSteps
 
     /**
      * Hydrate a payload into the supplied class via the runtime
-     * {@see \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator}. Per ADR-010 this
+     * {@see Hydrator}. Per ADR-010 this
      * is a free function — the generated `ApiClient` no longer carries
      * a private `hydrate()` helper. Regenerates the petstore fixture so
      * its models are on disk before invoking the hydrator on Petstore types.
@@ -343,7 +369,7 @@ final class ModelGeneratorSteps
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
 
-        return new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate($target, $payload);
+        return new Hydrator()->hydrate($target, $payload);
     }
 
     public function givenModelPetHasAPropertyTagsWhoseSchemaIsTypeArrayItemsRefComponentsSchemasTag(): void
@@ -355,7 +381,7 @@ final class ModelGeneratorSteps
     public function whenTheRuntimeHydratorADR010RunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(): void
     {
         $this->hydratedPet = $this->invokeHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet::class,
+            Pet::class,
             [
                 'name' => 'doggie',
                 'photoUrls' => ['http://example/1.jpg'],
@@ -370,10 +396,10 @@ final class ModelGeneratorSteps
 
     public function thenPetTags0IsAnInstanceOfTag(): void
     {
-        \assert($this->hydratedPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet);
+        assert($this->hydratedPet instanceof Pet);
         TestCase::assertIsArray($this->hydratedPet->tags);
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag::class,
+            Tag::class,
             $this->hydratedPet->tags[0],
         );
         TestCase::assertSame(1, $this->hydratedPet->tags[0]->id);
@@ -383,10 +409,10 @@ final class ModelGeneratorSteps
 
     public function thenPetTags1IsAnInstanceOfTag(): void
     {
-        \assert($this->hydratedPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet);
+        assert($this->hydratedPet instanceof Pet);
         TestCase::assertIsArray($this->hydratedPet->tags);
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag::class,
+            Tag::class,
             $this->hydratedPet->tags[1],
         );
         TestCase::assertSame(2, $this->hydratedPet->tags[1]->id);
@@ -403,7 +429,7 @@ final class ModelGeneratorSteps
     public function whenTheRuntimeHydratorADR010RunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(): void
     {
         $this->hydratedPet = $this->invokeHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet::class,
+            Pet::class,
             [
                 'name' => 'doggie',
                 'photoUrls' => ['https://example/a.jpg', 'https://example/b.jpg'],
@@ -414,7 +440,7 @@ final class ModelGeneratorSteps
 
     public function thenEachPetPhotoUrlsIIsTheOriginalStringNoObjectWrapping(): void
     {
-        \assert($this->hydratedPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet);
+        assert($this->hydratedPet instanceof Pet);
         TestCase::assertSame(['https://example/a.jpg', 'https://example/b.jpg'], $this->hydratedPet->photoUrls);
     }
 
@@ -428,8 +454,8 @@ final class ModelGeneratorSteps
         // Exercise the interface at the VO level so a regression that drops
         // `implements ScalarBinding` from the fixture is caught here as well
         // as by phpstan's static check.
-        $vo = \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email::fromScalar('probe@example');
-        TestCase::assertInstanceOf(\Mlavrinenko\Paogen\Runtime\ScalarBinding::class, $vo);
+        $vo = Email::fromScalar('probe@example');
+        TestCase::assertInstanceOf(ScalarBinding::class, $vo);
         TestCase::assertSame('probe@example', $vo->toScalar());
     }
 
@@ -443,17 +469,17 @@ final class ModelGeneratorSteps
 
     public function whenJsonEncodeContactRunsAgainstAContactWhoseEmailIsAnEmailTeamExample(): void
     {
-        $contact = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact(
+        $contact = new Contact(
             displayName: 'Team',
-            email: new \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email('team@example'),
+            email: new Email('team@example'),
         );
 
         $this->scalarEncoded = (string) json_encode(
-            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($contact),
+            new Marshaller()->marshal($contact),
         );
 
         $this->hydratedContact = $this->invokeHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
+            Contact::class,
             [
                 'email' => 'team@example',
                 'display-name' => 'Team',
@@ -471,9 +497,9 @@ final class ModelGeneratorSteps
 
     public function thenApiclientHydrateContactClassEmailTeamExampleProducesAContactWhoseEmailIsAnEmailInstanceWithValueTeamExample(
     ): void {
-        \assert($this->hydratedContact instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact);
+        assert($this->hydratedContact instanceof Contact);
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email::class,
+            Email::class,
             $this->hydratedContact->email,
         );
         TestCase::assertSame('team@example', $this->hydratedContact->email->value);
@@ -503,7 +529,7 @@ final class ModelGeneratorSteps
         // `?DateTimeImmutable` (the runtime default for a bare DateTime
         // property is RFC3339), with no `#[Format]` override and no
         // ScalarBinding wrapper class anywhere in the file.
-        \assert($this->profile !== null);
+        assert($this->profile !== null);
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
         TestCase::assertStringContainsString('?DateTimeImmutable $shipDate', $source);
         TestCase::assertStringNotContainsString('#[Format', $source);
@@ -516,7 +542,7 @@ final class ModelGeneratorSteps
     ): void {
         $this->dateTimeWire = trim($wire, "'\"");
         $this->hydratedOrder = $this->invokeHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order::class,
+            Order::class,
             ['shipDate' => $this->dateTimeWire],
         );
     }
@@ -531,10 +557,10 @@ final class ModelGeneratorSteps
 
     public function thenTheHydratedOrderShipDateIsAnInstanceOfDateTimeImmutableWhoseTimestampMatchesTheParsedRFC3339String(
     ): void {
-        \assert($this->hydratedOrder instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order);
-        TestCase::assertInstanceOf(\DateTimeImmutable::class, $this->hydratedOrder->shipDate);
+        assert($this->hydratedOrder instanceof Order);
+        TestCase::assertInstanceOf(DateTimeImmutable::class, $this->hydratedOrder->shipDate);
         TestCase::assertSame(
-            new \DateTimeImmutable($this->dateTimeWire)->getTimestamp(),
+            new DateTimeImmutable($this->dateTimeWire)->getTimestamp(),
             $this->hydratedOrder->shipDate->getTimestamp(),
         );
     }
@@ -542,12 +568,12 @@ final class ModelGeneratorSteps
 
     public function thenJsonEncodeOrderWithThatShipDateEmitsShipDate20260418T1234560000OnTheWireNotANestedObject(
     ): void {
-        $order = new \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order(
-            shipDate: new \DateTimeImmutable($this->dateTimeWire),
+        $order = new Order(
+            shipDate: new DateTimeImmutable($this->dateTimeWire),
         );
 
         $this->orderEncoded = (string) json_encode(
-            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($order),
+            new Marshaller()->marshal($order),
         );
         TestCase::assertStringContainsString(
             '"shipDate":"2026-04-18T12:34:56+00:00"',
@@ -642,7 +668,7 @@ final class ModelGeneratorSteps
 
     /**
      * Hydrate a composition-fixture payload via the runtime
-     * {@see \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator} (ADR-010).
+     * {@see Hydrator} (ADR-010).
      *
      * @param class-string $target
      * @param array<mixed> $payload
@@ -656,7 +682,7 @@ final class ModelGeneratorSteps
         $this->runGenerator($petstore);
         $this->outputDir = $petstore->output;
 
-        return new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate($target, $payload);
+        return new Hydrator()->hydrate($target, $payload);
     }
 
     public function givenSchemaDeclaresComponentsDogAndCatAndModelAnimalWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
@@ -673,7 +699,7 @@ final class ModelGeneratorSteps
         TestCase::assertNotNull($this->profile);
         $this->runGenerator($this->profile);
         $source = (string) file_get_contents(
-            \dirname(__DIR__, 2)
+            dirname(__DIR__, 2)
             . '/tests/fixtures/generated/composition/Generated/Model/Animal.php',
         );
         TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
@@ -701,9 +727,9 @@ final class ModelGeneratorSteps
 
     public function thenPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog(): void
     {
-        \assert($this->hydratedCompositionPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
+        assert($this->hydratedCompositionPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
+            Cat::class,
             $this->hydratedCompositionPet->kind,
         );
     }
@@ -763,7 +789,7 @@ final class ModelGeneratorSteps
     {
         // The spec parameter is a textual snippet; parse `'raw' => 'php'`.
         preg_match("/'([^']+)'\\s*=>\\s*'([^']+)'/", $renames, $match);
-        if (\count($match) === 3) {
+        if (count($match) === 3) {
             $this->renames[$match[1]] = $match[2];
         }
     }
@@ -877,7 +903,7 @@ final class ModelGeneratorSteps
         foreach ($this->rawNames as $raw) {
             try {
                 $this->resolved[$raw] = $registry->resolve($raw, $context);
-            } catch (\Throwable $error) {
+            } catch (Throwable $error) {
                 $this->caught = $error;
 
                 return;
@@ -895,7 +921,7 @@ final class ModelGeneratorSteps
         $this->rawNames = [$raw];
     }
 
-    private ?\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact $hydratedKebabContact = null;
+    private ?Contact $hydratedKebabContact = null;
     private string $kebabMarshalled = '';
 
     public function givenModelContactDeclaresARequiredPropertyWhoseSchemaKeyIsDisplayNameKebabCase(): void
@@ -906,9 +932,9 @@ final class ModelGeneratorSteps
 
     public function whenTheGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorADR010ProcessAPayloadContainingTheWireKeyDisplayName(
     ): void {
-        $hydrator = new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator();
+        $hydrator = new Hydrator();
         $this->hydratedKebabContact = $hydrator->hydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact::class,
+            Contact::class,
             [
                 'display-name' => 'Ada',
                 'email' => 'ada@example',
@@ -916,7 +942,7 @@ final class ModelGeneratorSteps
         );
 
         $this->kebabMarshalled = (string) json_encode(
-            new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($this->hydratedKebabContact),
+            new Marshaller()->marshal($this->hydratedKebabContact),
         );
     }
 
@@ -936,7 +962,7 @@ final class ModelGeneratorSteps
 
     public function thenNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda(): void
     {
-        \assert($this->hydratedKebabContact !== null);
+        assert($this->hydratedKebabContact !== null);
         TestCase::assertSame('Ada', $this->hydratedKebabContact->displayName);
     }
 
@@ -955,7 +981,7 @@ final class ModelGeneratorSteps
 
     public function whenGeneratedModelOrderPhpIsRead(): void
     {
-        \assert($this->profile !== null);
+        assert($this->profile !== null);
         $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Order.php');
     }
 
@@ -1005,7 +1031,7 @@ final class ModelGeneratorSteps
     ): void {
         $tag = trim($wire, "'\"");
         $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
-        $this->hydratedDiscriminatedPet = new \Mlavrinenko\Paogen\Runtime\Marshal\Hydrator()->hydrate(
+        $this->hydratedDiscriminatedPet = new Hydrator()->hydrate(
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
             ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
         );
@@ -1027,9 +1053,9 @@ final class ModelGeneratorSteps
 
     public function thenPetKindIsAnInstanceOfCatIndependentOfStructuralOverlapWithDog(): void
     {
-        \assert($this->hydratedDiscriminatedPet !== null);
+        assert($this->hydratedDiscriminatedPet !== null);
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat::class,
+            Cat::class,
             $this->hydratedDiscriminatedPet->kind,
         );
     }
@@ -1075,7 +1101,7 @@ final class ModelGeneratorSteps
         $resourceClass = $namespace . '\\Resource';
 
         $model = new $resourceClass(new $urnClass('do:droplet:13457723'));
-        $marshalled = new \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller()->marshal($model);
+        $marshalled = new Marshaller()->marshal($model);
         TestCase::assertSame('do:droplet:13457723', $marshalled['urn']);
     }
 
@@ -1182,7 +1208,7 @@ final class ModelGeneratorSteps
 
     public function givenPhpIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse(): void
     {
-        if (!\extension_loaded('Zend OPcache')) {
+        if (!extension_loaded('Zend OPcache')) {
             TestCase::markTestSkipped('Zend OPcache not loaded in CLI.');
         }
     }
@@ -1190,7 +1216,7 @@ final class ModelGeneratorSteps
 
     public function whenNewHydratorHydratePetClassTagsId1NameARuns(): void
     {
-        $projectRoot = \dirname(__DIR__, 2);
+        $projectRoot = dirname(__DIR__, 2);
         $autoload = $projectRoot . '/vendor/autoload.php';
         $petClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
         $tagClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
@@ -1199,7 +1225,7 @@ final class ModelGeneratorSteps
         // given-step, we pass `file_update_protection=0` — without it, opcache
         // refuses to cache a file younger than 2 seconds (opcache default),
         // the file is read from disk, and the fallback never fires.
-        $script = \sprintf(
+        $script = sprintf(
             '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Mlavrinenko\\Paogen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
             var_export($autoload, true),
             $petClass,
@@ -1209,15 +1235,15 @@ final class ModelGeneratorSteps
 
         $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
 
-        if (!is_dir(\dirname($scriptPath))) {
-            mkdir(\dirname($scriptPath), 0o755, true);
+        if (!is_dir(dirname($scriptPath))) {
+            mkdir(dirname($scriptPath), 0o755, true);
         }
         file_put_contents($scriptPath, $script);
 
         try {
-            $cmd = \sprintf(
+            $cmd = sprintf(
                 '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
-                escapeshellarg(\PHP_BINARY),
+                escapeshellarg(PHP_BINARY),
                 escapeshellarg($scriptPath),
             );
             $this->opcacheSubprocessOutput = trim((string) shell_exec($cmd));
@@ -1261,7 +1287,7 @@ final class ModelGeneratorSteps
         // construct. UndiscriminatedUnionException survives only as the
         // factory that phrases this particular diagnostic.
         TestCase::assertInstanceOf(
-            \Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException::class,
+            UnrepresentableConstructsException::class,
             $this->caught,
             "Expected {$error}, got " . get_debug_type($this->caught),
         );

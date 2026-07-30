@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
+use InvalidArgumentException;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
 use PHPUnit\Framework\TestCase;
@@ -154,7 +155,7 @@ final class CountingStoreClient implements StoreClientInterface
 
     public function refresh(Order $order): Order
     {
-        $id = $order->id ?? throw new \InvalidArgumentException('cannot refresh an Order with no id');
+        $id = $order->id ?? throw new InvalidArgumentException('cannot refresh an Order with no id');
         unset($this->orders[$id]);
 
         return $this->getOrderById($id);

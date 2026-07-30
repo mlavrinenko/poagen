@@ -10,6 +10,8 @@ use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 
+use function sprintf;
+
 /**
  * Cross-checks the operations/components the generator could not represent
  * this run against {@see Profile::$skip}.
@@ -69,7 +71,7 @@ final readonly class SkipListValidator
 
         foreach (array_keys($skip) as $target) {
             if (!isset($validTargets[$target])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$skip['%s'] names an operation id or component absent from the schema — remove this entry.",
                     $target,
                 );
@@ -78,7 +80,7 @@ final readonly class SkipListValidator
             }
 
             if (!isset($problemTargets[$target])) {
-                $failures[] = \sprintf(
+                $failures[] = sprintf(
                     "Profile::\$skip['%s'] is stale — it now generates cleanly; delete this entry.",
                     $target,
                 );

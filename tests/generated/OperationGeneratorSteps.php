@@ -6,17 +6,24 @@ namespace Mlavrinenko\Paogen\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
+use Mlavrinenko\Paogen\GenerateCommand;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
+use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\OrderStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+
+use function dirname;
+use function is_array;
+use function strlen;
 
 /**
  * Step implementations for OperationGenerator.
@@ -236,7 +243,7 @@ final class OperationGeneratorSteps
         );
 
         $client->pet()->findPetsByStatus(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus::Available,
+            FindPetsByStatusStatus::Available,
         );
 
         TestCase::assertNotNull($http->lastRequest);
@@ -245,7 +252,7 @@ final class OperationGeneratorSteps
 
     private function loadProfile(string $name): Profile
     {
-        $profile = new ProfileLoader()->load(\dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
+        $profile = new ProfileLoader()->load(dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
         $this->outputDir = $profile->output;
 
         return $profile;
@@ -259,7 +266,7 @@ final class OperationGeneratorSteps
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -446,7 +453,7 @@ final class OperationGeneratorSteps
             }
         }
 
-        $next = strpos($this->source, "\n    public function ", $methodStart + \strlen($needle));
+        $next = strpos($this->source, "\n    public function ", $methodStart + strlen($needle));
 
         return $next === false
             ? substr($this->source, $start)
@@ -1078,7 +1085,7 @@ final class OperationGeneratorSteps
 
         $matches = array_values(array_filter(
             $plan->skippedOperations,
-            static fn(\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation $s): bool
+            static fn(SkippedOperation $s): bool
                 => $s->operationId === 'uploadFile',
         ));
 
@@ -1099,14 +1106,14 @@ final class OperationGeneratorSteps
     {
         // Drive the real CLI binary so the round-trip exercises
         // GenerateCommand::reportSkipped() exactly as the user sees it.
-        $profilePath = \dirname(__DIR__, 2) . '/tests/fixtures/profiles/petstore.php';
+        $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/petstore.php';
 
         $stdout = tmpfile();
         $stderr = tmpfile();
         TestCase::assertNotFalse($stdout);
         TestCase::assertNotFalse($stderr);
 
-        $exit = \Mlavrinenko\Paogen\GenerateCommand::run(
+        $exit = GenerateCommand::run(
             [$profilePath, '--dry-run'],
             $this->composerLoader(),
             $stdout,

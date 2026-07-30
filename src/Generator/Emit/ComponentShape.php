@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 
 /**
@@ -27,7 +28,7 @@ final readonly class ComponentShape
     /**
      * @param 'string'|'integer'|'number'|'boolean'|null $scalarType    populated when KIND_SCALAR
      * @param Schema|null                                $arrayItems    populated when KIND_ARRAY
-     * @param list<Schema|\cebe\openapi\spec\Reference>  $unionBranches populated when KIND_UNION
+     * @param list<Schema|Reference>  $unionBranches populated when KIND_UNION
      */
     public function __construct(
         public string $kind,

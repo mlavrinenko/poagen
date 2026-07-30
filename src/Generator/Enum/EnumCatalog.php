@@ -6,6 +6,12 @@ namespace Mlavrinenko\Paogen\Generator\Enum;
 
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaType;
+use RuntimeException;
+
+use function count;
+use function is_int;
+use function is_string;
+use function sprintf;
 
 /**
  * Tracks the enum classes the generator plans to emit.
@@ -47,7 +53,7 @@ final class EnumCatalog
         if (isset($this->synthesized[$preferredName])) {
             $existing = $this->synthesized[$preferredName];
             if ($existing->cases !== $spec->cases || $existing->backingType !== $spec->backingType) {
-                throw new \RuntimeException(\sprintf(
+                throw new RuntimeException(sprintf(
                     'Synthesised enum name collision: %s already mapped to different values.',
                     $preferredName,
                 ));
@@ -128,7 +134,7 @@ final class EnumCatalog
         $seenNames = [];
 
         foreach ($enum as $value) {
-            if (!\is_string($value) && !\is_int($value)) {
+            if (!is_string($value) && !is_int($value)) {
                 return null;
             }
 
@@ -136,7 +142,7 @@ final class EnumCatalog
 
             if ($caseName === '' || isset($seenNames[$caseName])) {
                 // Fall back to a positional suffix to avoid a collision.
-                $caseName = $caseName === '' ? 'Case' . (\count($cases) + 1) : $caseName . (\count($cases) + 1);
+                $caseName = $caseName === '' ? 'Case' . (count($cases) + 1) : $caseName . (count($cases) + 1);
             }
 
             $seenNames[$caseName] = true;

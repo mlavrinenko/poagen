@@ -10,6 +10,8 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
+use function in_array;
+
 /**
  * Resolution strategy for composition keywords `oneOf`, `anyOf`, `allOf`
  * (T-008). Mirrors {@see InlineObjectResolver} in tone: a small stateless
@@ -117,7 +119,7 @@ final class CompositionResolver
             $req = $target->required ?? [];
 
             foreach ($req as $name) {
-                if (!\in_array($name, $required, true)) {
+                if (!in_array($name, $required, true)) {
                     $required[] = $name;
                 }
             }

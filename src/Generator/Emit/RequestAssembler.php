@@ -66,7 +66,7 @@ final readonly class RequestAssembler
             [strtoupper($httpMethod)],
         );
 
-        if ($body instanceof \Mlavrinenko\Paogen\Generator\Emit\BodySpec) {
+        if ($body instanceof BodySpec) {
             $this->bodyAttachment->emit($method, $body);
         }
 

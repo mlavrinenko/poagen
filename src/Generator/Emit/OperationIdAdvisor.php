@@ -7,6 +7,12 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
 
+use function count;
+use function sprintf;
+use function strlen;
+
+use const SORT_STRING;
+
 /**
  * Names the operation ids the document gave paogen no way to make readable, and
  * says what would fix them.
@@ -52,7 +58,7 @@ final readonly class OperationIdAdvisor
             if (isset($methodRenames[$id])) {
                 continue;
             }
-            if (preg_match(self::UNSEPARATED, $id) === 1 && \strlen($id) > 3) {
+            if (preg_match(self::UNSEPARATED, $id) === 1 && strlen($id) > 3) {
                 $unseparated[] = $id;
             }
         }
@@ -61,15 +67,15 @@ final readonly class OperationIdAdvisor
             return [];
         }
 
-        sort($unseparated, \SORT_STRING);
+        sort($unseparated, SORT_STRING);
 
-        return [\sprintf(
+        return [sprintf(
             "%d operation id(s) carry no word boundary, so the emitted method keeps the vendor's spelling: %s. "
                 . 'paogen does not guess a split — a dictionary would give a different answer per schema and move '
                 . "names between runs. Where the vendor's spelling reads badly, name the method you want in "
                 . "Profile::\$methodRenames, keyed on the operation id (e.g. 'getclientfullbalance' => "
                 . "'getClientFullBalance'). A single word needs no answer.",
-            \count($unseparated),
+            count($unseparated),
             implode(', ', $unseparated),
         )];
     }

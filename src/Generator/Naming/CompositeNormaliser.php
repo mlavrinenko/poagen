@@ -6,6 +6,8 @@ namespace Mlavrinenko\Paogen\Generator\Naming;
 
 use Mlavrinenko\Paogen\Exception\NameNormalisationException;
 
+use function count;
+
 /**
  * Walks an ordered list of strategies. First non-null result wins.
  * If every strategy returns null, throws — no silent identity
@@ -29,6 +31,6 @@ final readonly class CompositeNormaliser implements NameNormaliser
             }
         }
 
-        throw NameNormalisationException::unhandled($raw, $context, \count($this->strategies));
+        throw NameNormalisationException::unhandled($raw, $context, count($this->strategies));
     }
 }

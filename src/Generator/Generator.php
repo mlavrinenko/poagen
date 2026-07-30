@@ -21,11 +21,15 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
+use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormaliserFactory;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Orchestrates a single generation run: schema + profile + bindings → files.
@@ -42,6 +46,7 @@ final readonly class Generator
         private PlanApplier $applier = new PlanApplier(),
         private SkipListValidator $skipListValidator = new SkipListValidator(),
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
+        private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
     }
@@ -92,9 +97,9 @@ final readonly class Generator
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';
         $enumNamespace = $rootNamespace . '\\Enum';
-        $rootDir = rtrim($profile->output, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . 'Generated';
-        $modelDir = $rootDir . \DIRECTORY_SEPARATOR . 'Model';
-        $enumDir = $rootDir . \DIRECTORY_SEPARATOR . 'Enum';
+        $rootDir = rtrim($profile->output, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'Generated';
+        $modelDir = $rootDir . DIRECTORY_SEPARATOR . 'Model';
+        $enumDir = $rootDir . DIRECTORY_SEPARATOR . 'Enum';
 
         $normaliser = NormaliserFactory::fromProfile($profile);
         $enums = new EnumCatalog($enumNamespace);
@@ -153,7 +158,7 @@ final readonly class Generator
         $this->emitApiException($rootNamespace, $rootDir, $writes);
         $this->emitEnums($enums, $enumDir, $writes);
 
-        $prunes = $this->planPrunes($rootDir, $writes);
+        $prunes = $this->prunePlanner->plan($rootDir, $writes);
         $notices = [
             ...OperationIdAdvisor::notices($openApi, $profile->methodRenames),
             ...FormatAdvisor::notices($openApi, $bindings),
@@ -185,7 +190,7 @@ final readonly class Generator
 
         foreach ($specs as $spec) {
             $code = $this->enumEmitter->emit($enums->enumNamespace, $spec);
-            $path = $enumDir . \DIRECTORY_SEPARATOR . $spec->name . '.php';
+            $path = $enumDir . DIRECTORY_SEPARATOR . $spec->name . '.php';
             $writes[$path] = $code;
         }
     }
@@ -193,7 +198,7 @@ final readonly class Generator
     /**
      * @param  array<string,string>                                $preScannedSkips raw operationId → reason
      * @param  array<string,string>                                $writes
-     * @return list<\Mlavrinenko\Paogen\Generator\Emit\SkippedOperation>
+     * @return list<SkippedOperation>
      */
     private function emitClient(
         OpenApi $openApi,
@@ -202,7 +207,7 @@ final readonly class Generator
         string $modelNamespace,
         NameRegistry $registry,
         NameRegistry $operationIdRegistry,
-        \Mlavrinenko\Paogen\Generator\Naming\NameNormaliser $normaliser,
+        NameNormaliser $normaliser,
         Bindings $bindings,
         EnumCatalog $enums,
         ComponentCatalog $components,
@@ -236,48 +241,10 @@ final readonly class Generator
     {
         // Only emit when ApiClient was emitted: the exception has no
         // referent without at least one operation that throws it.
-        if (!isset($writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
+        if (!isset($writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
             return;
         }
-        $writes[$rootDir . \DIRECTORY_SEPARATOR . 'ApiException.php'] = $this->apiExceptionEmitter->emit($rootNamespace);
+        $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiException.php'] = $this->apiExceptionEmitter->emit($rootNamespace);
     }
 
-    /**
-     * List every file under `Generated/` that the current run did not
-     * emit. Guarded strictly to the `Generated/` subtree so user code
-     * alongside it is never touched. Returns an empty list if the root
-     * does not yet exist (first-ever run).
-     *
-     * @param  array<string,string> $writes
-     * @return list<string>
-     */
-    private function planPrunes(string $rootDir, array $writes): array
-    {
-        if (!is_dir($rootDir)) {
-            return [];
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($rootDir, \FilesystemIterator::SKIP_DOTS),
-        );
-
-        /** @var list<string> $prunes */
-        $prunes = [];
-
-        foreach ($iterator as $entry) {
-            \assert($entry instanceof \SplFileInfo);
-
-            if (!$entry->isFile()) {
-                continue;
-            }
-
-            $path = $entry->getPathname();
-
-            if (!isset($writes[$path])) {
-                $prunes[] = $path;
-            }
-        }
-
-        return $prunes;
-    }
 }

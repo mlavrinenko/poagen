@@ -11,6 +11,8 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
 
+use function sprintf;
+
 /**
  * Emits one client class and the interface it implements.
  *
@@ -61,7 +63,7 @@ final readonly class SubClientEmitter
             'interface' => $this->printInterface(
                 $clientNamespace,
                 $group->interfaceName(),
-                \sprintf(
+                sprintf(
                     "The contract for the `%s` endpoints.\n\n"
                         . "Type-hint this rather than the class: hand-written convenience implements the same\n"
                         . "contract and delegates to the generated implementation, so a regeneration that changes\n"

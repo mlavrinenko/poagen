@@ -4,8 +4,22 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Cli;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
+use function assert;
+use function dirname;
+use function is_array;
+use function is_resource;
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
+use const PHP_BINARY;
+use const SORT_STRING;
 
 /**
  * Step implementations for PaogenCLI.
@@ -32,7 +46,7 @@ final class PaogenCLISteps
     {
         $outStream = fopen('php://memory', 'w+');
         $errStream = fopen('php://memory', 'w+');
-        \assert($outStream !== false && $errStream !== false);
+        assert($outStream !== false && $errStream !== false);
 
         $this->exitCode = Cli::run($argv, $outStream, $errStream);
 
@@ -116,7 +130,7 @@ final class PaogenCLISteps
         }
 
         $parts = preg_split('/\s+/', trim($args));
-        \assert(\is_array($parts));
+        assert(is_array($parts));
         $parts = array_values(array_filter($parts, static fn($p) => $p !== ''));
 
         if ($this->spawnBinary) {
@@ -158,7 +172,7 @@ final class PaogenCLISteps
         // stderr (PHP deprecation notices, which go to the engine's real
         // stderr, not any in-process captured stream), switch the step
         // to spawn `bin/paogen` as a subprocess.
-        TestCase::assertFileExists(\dirname(__DIR__, 2) . '/' . $path);
+        TestCase::assertFileExists(dirname(__DIR__, 2) . '/' . $path);
         $this->spawnBinary = true;
     }
 
@@ -175,7 +189,7 @@ final class PaogenCLISteps
      */
     private function invokeBinary(array $args): void
     {
-        $root = \dirname(__DIR__, 2);
+        $root = dirname(__DIR__, 2);
         $bin = $root . '/bin/paogen';
         TestCase::assertFileExists($bin);
 
@@ -185,9 +199,9 @@ final class PaogenCLISteps
             2 => ['pipe', 'w'],
         ];
 
-        $cmd = array_merge([\PHP_BINARY, $bin], $args);
+        $cmd = array_merge([PHP_BINARY, $bin], $args);
         $process = proc_open($cmd, $descriptors, $pipes, $root);
-        \assert(\is_resource($process));
+        assert(is_resource($process));
         fclose($pipes[0]);
 
         $this->stdout = (string) stream_get_contents($pipes[1]);
@@ -201,7 +215,7 @@ final class PaogenCLISteps
 
     public function givenProfileAtPathWhoseDeclaredOutputIsTestsFixturesGeneratedPetstore(string $path): void
     {
-        TestCase::assertFileExists(\dirname(__DIR__, 2) . '/' . $path);
+        TestCase::assertFileExists(dirname(__DIR__, 2) . '/' . $path);
         $this->tmpDir = $this->makeScratchDir('paogen-output-');
     }
 
@@ -238,7 +252,7 @@ final class PaogenCLISteps
     public function givenATemporaryCopyOfPathAtPath(string $source, string $placeholder = '<tmp-dir>'): void
     {
         $this->tmpDir = $this->makeScratchDir('paogen-diff-match-');
-        $this->copyTree(\dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
+        $this->copyTree(dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
     }
 
 
@@ -251,13 +265,13 @@ final class PaogenCLISteps
     public function givenATemporaryCopyOfPathAtPathWithOneFileTruncated(string $source, string $placeholder = '<tmp-dir>'): void
     {
         $this->tmpDir = $this->makeScratchDir('paogen-diff-corrupt-');
-        $this->copyTree(\dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
+        $this->copyTree(dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
 
         $files = $this->listFilesRecursive($this->tmpDir);
         TestCase::assertNotEmpty($files, 'copied tree must have at least one file');
 
         // Pick the lexicographically-first file to keep the test byte-stable.
-        sort($files, \SORT_STRING);
+        sort($files, SORT_STRING);
         file_put_contents($files[0], '');
     }
 
@@ -275,15 +289,15 @@ final class PaogenCLISteps
     {
         TestCase::assertDirectoryExists($from);
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($from, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($from, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST,
         );
 
         foreach ($iterator as $entry) {
-            \assert($entry instanceof \SplFileInfo);
-            $relative = substr($entry->getPathname(), \strlen($from) + 1);
-            $target = $to . \DIRECTORY_SEPARATOR . $relative;
+            assert($entry instanceof SplFileInfo);
+            $relative = substr($entry->getPathname(), strlen($from) + 1);
+            $target = $to . DIRECTORY_SEPARATOR . $relative;
 
             if ($entry->isDir()) {
                 if (!is_dir($target)) {
@@ -292,7 +306,7 @@ final class PaogenCLISteps
                 continue;
             }
 
-            @mkdir(\dirname($target), 0o755, true);
+            @mkdir(dirname($target), 0o755, true);
             copy($entry->getPathname(), $target);
         }
     }
@@ -307,13 +321,13 @@ final class PaogenCLISteps
             return [];
         }
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
         );
 
         $out = [];
         foreach ($iterator as $entry) {
-            \assert($entry instanceof \SplFileInfo);
+            assert($entry instanceof SplFileInfo);
             if ($entry->isFile()) {
                 $out[] = $entry->getPathname();
             }

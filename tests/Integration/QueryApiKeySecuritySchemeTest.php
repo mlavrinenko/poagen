@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Composer\Autoload\ClassLoader;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
+use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+
+use function strlen;
 
 /**
  * query-apikey-security-scheme (T-260730): an `apiKey` scheme declared
@@ -28,6 +30,8 @@ use ReflectionClass;
  */
 final class QueryApiKeySecuritySchemeTest extends TestCase
 {
+    use GeneratedTreeSandbox;
+
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/query-apikey-3.0.yaml';
     private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\QueryApiKey';
     private const string BASE_URI = 'https://query-apikey.example/api/v1';
@@ -37,12 +41,9 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     /** @var ReflectionClass<object>|null */
     private static ?ReflectionClass $clientReflection = null;
 
-    /** @var list<string> */
-    private static array $outputDirs = [];
-
     public static function setUpBeforeClass(): void
     {
-        $output = self::makeTempDir();
+        $output = self::makeSandboxDir('paogen-queryapikey-');
 
         $generator = new Generator(new AttributeScanner(self::composerLoader()));
         $plan = $generator->generate(new Profile(
@@ -104,11 +105,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        foreach (self::$outputDirs as $dir) {
-            if (is_dir($dir)) {
-                self::removeDirectory($dir);
-            }
-        }
+        self::removeSandboxDirs();
     }
 
     public function testTheQueryApiKeySchemeGetsAConstructorArgumentJustLikeTheHeaderVariant(): void
@@ -261,52 +258,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
         $end = strpos(self::$clientSource, "\n\n", $start);
 
-        return substr(self::$clientSource, $start, ($end === false ? \strlen(self::$clientSource) : $end) - $start);
+        return substr(self::$clientSource, $start, ($end === false ? strlen(self::$clientSource) : $end) - $start);
     }
 
-    private static function makeTempDir(): string
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-queryapikey-');
-        unlink($path);
-
-        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
-            self::fail("failed to create temporary directory: {$path}");
-        }
-
-        self::$outputDirs[] = $path;
-
-        return $path;
-    }
-
-    private static function composerLoader(): ClassLoader
-    {
-        foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
-                return $fn[0];
-            }
-        }
-
-        self::fail('Composer ClassLoader not found in autoload chain.');
-    }
-
-    private static function removeDirectory(string $dir): void
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var \SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            if ($entry->isDir()) {
-                rmdir($entry->getPathname());
-
-                continue;
-            }
-
-            unlink($entry->getPathname());
-        }
-
-        rmdir($dir);
-    }
 }

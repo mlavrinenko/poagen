@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Records which schema node owns each emitted model class name, for the one
  * namespace they all share.
  *
- * {@see \Mlavrinenko\Paogen\Generator\Naming\NameRegistry} already guards the
+ * {@see NameRegistry} already guards the
  * names that come from `components.schemas`, because those are declared and it
  * can key on the raw name. Synthesised names have no raw name to key on: they
  * are derived from an operation identifier, or from an owning class plus a

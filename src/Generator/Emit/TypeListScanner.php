@@ -12,6 +12,12 @@ use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 
+use function is_array;
+use function is_string;
+use function sprintf;
+
+use const SORT_STRING;
+
 /**
  * Finds every schema node whose `type` names several types that PHP cannot
  * express as one, and attributes each to the operation or component that
@@ -62,13 +68,13 @@ final readonly class TypeListScanner
         $items = [];
 
         foreach ($paths as $pathUri => $pathItem) {
-            if (\is_string($pathUri) && $pathItem instanceof PathItem) {
+            if (is_string($pathUri) && $pathItem instanceof PathItem) {
                 $items[$pathUri] = $pathItem;
             }
         }
 
         $uris = array_keys($items);
-        sort($uris, \SORT_STRING);
+        sort($uris, SORT_STRING);
 
         $out = [];
 
@@ -106,7 +112,7 @@ final readonly class TypeListScanner
         /** @var array<string,Schema|Reference> $schemas */
         $schemas = $components->schemas ?? [];
         $rawNames = array_keys($schemas);
-        sort($rawNames, \SORT_STRING);
+        sort($rawNames, SORT_STRING);
 
         $out = [];
 
@@ -188,7 +194,7 @@ final readonly class TypeListScanner
         $type = SchemaType::of($schema);
 
         if ($type->isUnrepresentable()) {
-            return \sprintf(
+            return sprintf(
                 'schema at %s declares `type: [%s]` — paogen emits a PHP union for a list of scalar types, but a '
                     . 'list mixing `object` or `array` with anything else has no single PHP type: an inline object '
                     . 'member needs a class of its own and an array member needs one item type. Split it into a '
@@ -198,7 +204,7 @@ final readonly class TypeListScanner
             );
         }
 
-        foreach (\is_array($schema->properties) ? $schema->properties : [] as $property) {
+        foreach (is_array($schema->properties) ? $schema->properties : [] as $property) {
             if ($property instanceof Schema && ($reason = self::walk($property)) !== null) {
                 return $reason;
             }
@@ -227,7 +233,7 @@ final readonly class TypeListScanner
         $out = [];
 
         foreach ([$schema->allOf, $schema->oneOf, $schema->anyOf] as $branches) {
-            if (\is_array($branches)) {
+            if (is_array($branches)) {
                 $out = [...$out, ...array_values($branches)];
             }
         }

@@ -7,11 +7,14 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
+use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+
+use function is_string;
 
 /**
  * Names a model class for every operation payload the document declared inline.
@@ -97,7 +100,7 @@ final readonly class InlinePayloadPlanner
     ): ?BodySpec {
         $resolved = RequestBodyAnalyzer::resolveBody($operation->requestBody);
 
-        if (!$resolved instanceof \cebe\openapi\spec\RequestBody) {
+        if (!$resolved instanceof RequestBody) {
             return null;
         }
 
@@ -150,7 +153,7 @@ final readonly class InlinePayloadPlanner
      * @param list<SynthesisedModel> $roots
      */
     private static function planXmlRequest(
-        \cebe\openapi\spec\RequestBody $body,
+        RequestBody $body,
         string $rawId,
         string $base,
         ?string $pin,
@@ -167,7 +170,7 @@ final readonly class InlinePayloadPlanner
 
         $root = $xmlElements[$rawId] ?? null;
 
-        if (!\is_string($root) || $root === '') {
+        if (!is_string($root) || $root === '') {
             return null;
         }
 
@@ -178,7 +181,7 @@ final readonly class InlinePayloadPlanner
         $items = self::inlineObjectItemsOf($schema);
         $item = $xmlElements[$rawId . '.item'] ?? null;
 
-        if ($items instanceof Schema && \is_string($item) && $item !== '') {
+        if ($items instanceof Schema && is_string($item) && $item !== '') {
             return BodySpec::xmlList(self::claim($pin ?? $base . 'RequestItem', $items, $ledger, $roots), $root, $item);
         }
 

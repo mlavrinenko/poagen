@@ -24,7 +24,7 @@ final readonly class NormaliserFactory
 {
     public static function fromProfile(Profile $profile): NameNormaliser
     {
-        if ($profile->nameNormaliser instanceof \Mlavrinenko\Paogen\Generator\Naming\NameNormaliser) {
+        if ($profile->nameNormaliser instanceof NameNormaliser) {
             return $profile->nameNormaliser;
         }
 

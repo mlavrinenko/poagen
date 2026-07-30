@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -523,7 +524,7 @@ final class OperationGeneratorTest extends TestCase
      * When Generator runs against Profile
      * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    #[DoesNotPerformAssertions]
     public function testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
     {
         $this->markTestIncomplete('Scenario is draft');
@@ -538,7 +539,7 @@ final class OperationGeneratorTest extends TestCase
      * When Generator runs against Profile
      * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
      */
-    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+    #[DoesNotPerformAssertions]
     public function testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
     {
         $this->markTestIncomplete('Scenario is draft');

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use RuntimeException;
+
+use function dirname;
+
 /**
  * Executes a {@see GenerationPlan} against the filesystem.
  *
@@ -15,7 +19,7 @@ final readonly class PlanApplier
     public function apply(GenerationPlan $plan): void
     {
         foreach ($plan->writes as $path => $contents) {
-            $this->ensureDir(\dirname($path));
+            $this->ensureDir(dirname($path));
             file_put_contents($path, $contents);
         }
 
@@ -29,7 +33,7 @@ final readonly class PlanApplier
     private function ensureDir(string $dir): void
     {
         if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
-            throw new \RuntimeException("Could not create output dir: {$dir}");
+            throw new RuntimeException("Could not create output dir: {$dir}");
         }
     }
 }

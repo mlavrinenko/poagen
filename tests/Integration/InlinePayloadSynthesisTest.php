@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Composer\Autoload\ClassLoader;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
@@ -12,6 +13,14 @@ use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
+use function is_array;
+
+use const DIRECTORY_SEPARATOR;
+use const SORT_STRING;
 
 /**
  * inline-body-and-response-schemas: a document that names no components still
@@ -184,7 +193,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     private function clientSource(GenerationPlan $plan): string
     {
         foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, \DIRECTORY_SEPARATOR . 'ApiClient.php')) {
+            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
                 return $source;
             }
         }
@@ -221,7 +230,7 @@ final class InlinePayloadSynthesisTest extends TestCase
      */
     private function emittedNames(GenerationPlan $plan, string $subdirectory): array
     {
-        $needle = \DIRECTORY_SEPARATOR . $subdirectory . \DIRECTORY_SEPARATOR;
+        $needle = DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR;
         $out = [];
 
         foreach (array_keys($plan->writes) as $path) {
@@ -230,7 +239,7 @@ final class InlinePayloadSynthesisTest extends TestCase
             }
         }
 
-        sort($out, \SORT_STRING);
+        sort($out, SORT_STRING);
 
         return $out;
     }
@@ -252,7 +261,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -262,12 +271,12 @@ final class InlinePayloadSynthesisTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
-        /** @var \SplFileInfo $entry */
+        /** @var SplFileInfo $entry */
         foreach ($iterator as $entry) {
             if ($entry->isDir()) {
                 rmdir($entry->getPathname());

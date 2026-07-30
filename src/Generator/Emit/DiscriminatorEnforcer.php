@@ -10,6 +10,7 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Exception\UndiscriminatedUnionException;
+use Mlavrinenko\Paogen\Generator\Generator;
 
 /**
  * Walks `components.schemas[*].properties[*]` and collects every
@@ -20,7 +21,7 @@ use Mlavrinenko\Paogen\Exception\UndiscriminatedUnionException;
  * downstream `ModelAttributeApplier` sees a uniform input.
  *
  * Collects rather than throws (abort-on-unrepresentable-constructs): the
- * caller — {@see \Mlavrinenko\Paogen\Generator\Generator} — gathers every
+ * caller — {@see Generator} — gathers every
  * problem in the document before deciding whether the run may proceed,
  * instead of stopping at the first one. Each finding is reported as a
  * {@see SkippedComponent} keyed by the *component* (not the property): a

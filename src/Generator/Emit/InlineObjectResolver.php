@@ -10,6 +10,8 @@ use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
+use function is_array;
+
 /**
  * Resolution strategy for an inline `type: object` schema (T-013).
  *
@@ -61,7 +63,7 @@ final class InlineObjectResolver
      */
     public static function classify(Schema $node): string
     {
-        $hasProperties = \is_array($node->properties) && $node->properties !== [];
+        $hasProperties = is_array($node->properties) && $node->properties !== [];
         $additional = $node->additionalProperties;
         $hasNonTrivialAdditional = $additional instanceof Schema || $additional instanceof Reference;
 

@@ -6,6 +6,11 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
 
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+
 /**
  * One reading of a schema's `type`, whichever of its two spellings the document
  * used.
@@ -60,11 +65,11 @@ final readonly class SchemaType
     {
         $raw = self::rawType($schema);
 
-        if (\is_string($raw)) {
+        if (is_string($raw)) {
             return new self($raw === '' ? null : $raw, false, $raw === '' ? [] : [$raw]);
         }
 
-        if (!\is_array($raw)) {
+        if (!is_array($raw)) {
             return new self(null, false, []);
         }
 
@@ -72,7 +77,7 @@ final readonly class SchemaType
         $nullable = false;
 
         foreach ($raw as $member) {
-            if (!\is_string($member)) {
+            if (!is_string($member)) {
                 continue;
             }
             if ($member === '') {
@@ -85,7 +90,7 @@ final readonly class SchemaType
             $members[] = $member;
         }
 
-        return new self(\count($members) === 1 ? $members[0] : null, $nullable, $members);
+        return new self(count($members) === 1 ? $members[0] : null, $nullable, $members);
     }
 
     /**
@@ -106,10 +111,10 @@ final readonly class SchemaType
      */
     public function isScalarUnion(): bool
     {
-        if (\count($this->members) < 2) {
+        if (count($this->members) < 2) {
             return false;
         }
-        return array_all($this->members, fn($member): bool => \in_array($member, self::SCALARS, true));
+        return array_all($this->members, fn($member): bool => in_array($member, self::SCALARS, true));
     }
 
     /**
@@ -118,7 +123,7 @@ final readonly class SchemaType
      */
     public function isUnrepresentable(): bool
     {
-        return \count($this->members) >= 2 && !$this->isScalarUnion();
+        return count($this->members) >= 2 && !$this->isScalarUnion();
     }
 
     /**

@@ -5,7 +5,7 @@
   tags: ("style", "dx"),
   priority: 6,
   difficulty: 1,
-  status: proposed(2026, 7, 30),
+  status: wip(2026, 7, 30),
 )
 
 == Summary
@@ -35,3 +35,16 @@ The two rules are mutually exclusive: \`global\_namespace\_import\` with \`impor
 - \`src/\`
 - \`tests/\`
 - \`bin/\`
+
+The import lines pushed three files past linecop's 250-line limit, so the change
+carried three splits it did not set out to make:
+
+- \`src/Runtime/Marshal/PropertyTypeResolver.php\` takes the type-resolution half
+  of \`DescriptorParser\` (259 lines to 139).
+- \`src/Generator/PrunePlanner.php\` takes the \`Generated/\` tree walk out of
+  \`Generator\` (253 to 216).
+- \`tests/Support/GeneratedTreeSandbox.php\` takes the scratch-directory,
+  autoloader and cleanup helpers out of
+  \`tests/Integration/QueryApiKeySecuritySchemeTest.php\` (256 to 213). All ten
+  integration tests carry their own copy of those three helpers; only this one
+  moved onto the shared trait, and \`deduplicate-the-test-suite\` moves the rest.

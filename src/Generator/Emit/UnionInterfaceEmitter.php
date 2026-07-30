@@ -7,6 +7,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 
+use function assert;
+
 /**
  * Emits the empty marker interface that represents a top-level `oneOf` /
  * `anyOf` component (T-026).
@@ -26,7 +28,7 @@ final readonly class UnionInterfaceEmitter
 
     public function emit(string $modelNamespace, ComponentShape $shape): string
     {
-        \assert($shape->kind === ComponentShape::KIND_UNION);
+        assert($shape->kind === ComponentShape::KIND_UNION);
 
         $file = new PhpFile();
         $file->setStrictTypes();

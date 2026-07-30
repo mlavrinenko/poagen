@@ -10,6 +10,10 @@ use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
 use Nette\PhpGenerator\Literal;
 
+use function assert;
+use function is_array;
+use function is_string;
+
 /**
  * Builds the smallest expression that turns a parameter variable into a
  * `string` for path / query / header interpolation. Extracted from
@@ -67,8 +71,8 @@ final readonly class ParameterStringExpr
             return $this->isScalarComponentRef($node);
         }
 
-        $branches = (\is_array($node->oneOf) && $node->oneOf !== []) ? $node->oneOf
-            : ((\is_array($node->anyOf) && $node->anyOf !== []) ? $node->anyOf : []);
+        $branches = (is_array($node->oneOf) && $node->oneOf !== []) ? $node->oneOf
+            : ((is_array($node->anyOf) && $node->anyOf !== []) ? $node->anyOf : []);
 
         if ($branches === []) {
             return false;
@@ -81,7 +85,7 @@ final readonly class ParameterStringExpr
 
     private function isScalarComponentRef(Reference $ref): bool
     {
-        \assert($this->components instanceof ComponentCatalog);
+        assert($this->components instanceof ComponentCatalog);
         $rawName = ComponentName::rawFromRef($ref->getReference());
 
         if ($rawName === '') {
@@ -90,12 +94,12 @@ final readonly class ParameterStringExpr
 
         $shape = $this->components->shapeOf($rawName);
 
-        return $shape instanceof \Mlavrinenko\Paogen\Generator\Emit\ComponentShape && $shape->kind === ComponentShape::KIND_SCALAR;
+        return $shape instanceof ComponentShape && $shape->kind === ComponentShape::KIND_SCALAR;
     }
 
     private function formatExpr(?Schema $schema, string $varName, Bindings $bindings): ?string
     {
-        if (!$schema instanceof Schema || !\is_string($schema->format)) {
+        if (!$schema instanceof Schema || !is_string($schema->format)) {
             return null;
         }
 
@@ -115,7 +119,7 @@ final readonly class ParameterStringExpr
 
     private function isEnumSchema(Schema $schema): bool
     {
-        if (\is_array($schema->enum) && $schema->enum !== []) {
+        if (is_array($schema->enum) && $schema->enum !== []) {
             $name = SchemaType::of($schema)->name;
 
             return $name === 'string' || $name === 'integer';

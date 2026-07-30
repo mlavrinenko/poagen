@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Exception;
 
+use Mlavrinenko\Paogen\Generator\Profile;
+use RuntimeException;
+
+use function count;
+use function sprintf;
+
 /**
  * Thrown once, at the end of planning, when the schema contains constructs
- * paogen cannot represent, or {@see \Mlavrinenko\Paogen\Generator\Profile::$skip}
+ * paogen cannot represent, or {@see Profile::$skip}
  * is stale or names something absent from the schema.
  *
  * Carries every problem found during this run — not just the first one
@@ -17,18 +23,18 @@ namespace Mlavrinenko\Paogen\Exception;
  * memory and only throws before returning it, so the apply step that
  * touches the filesystem never runs.
  */
-final class UnrepresentableConstructsException extends \RuntimeException
+final class UnrepresentableConstructsException extends RuntimeException
 {
     /**
      * @param list<string> $problems fully formatted diagnostic lines, one per problem
      */
     public static function forProblems(array $problems): self
     {
-        $count = \count($problems);
+        $count = count($problems);
         $noun = $count === 1 ? 'problem' : 'problems';
         $lines = array_map(static fn(string $p): string => '  - ' . $p, $problems);
 
-        return new self(\sprintf(
+        return new self(sprintf(
             "%d %s found; nothing was written:\n%s\n\nAdd an entry to Profile::\$skip naming the operation id or "
                 . 'component to accept one of these and generate without it.',
             $count,

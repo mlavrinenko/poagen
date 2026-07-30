@@ -11,6 +11,10 @@ use cebe\openapi\spec\SecurityRequirement;
 use cebe\openapi\spec\SecurityRequirements;
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
 
+use function is_string;
+
+use const SORT_STRING;
+
 /**
  * One-shot lookup over `components.securitySchemes` plus the resolution
  * rules that govern which schemes apply to a given operation.
@@ -131,7 +135,7 @@ final readonly class SecuritySchemeCatalog
         $out = [];
 
         foreach ($schemes as $name => $scheme) {
-            if (!\is_string($name)) {
+            if (!is_string($name)) {
                 continue;
             }
 
@@ -185,7 +189,7 @@ final readonly class SecuritySchemeCatalog
         $out = [];
 
         foreach (array_keys($raw) as $name) {
-            if (\is_string($name)) {
+            if (is_string($name)) {
                 $out[] = $name;
             }
         }
@@ -201,7 +205,7 @@ final readonly class SecuritySchemeCatalog
     private function orderSupported(array $byName): array
     {
         $names = array_keys($byName);
-        sort($names, \SORT_STRING);
+        sort($names, SORT_STRING);
 
         $out = [];
 

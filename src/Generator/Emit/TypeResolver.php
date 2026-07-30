@@ -9,6 +9,10 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
+
+use function assert;
+use function is_string;
 
 /**
  * Maps an OpenAPI Schema/Reference to a PHP type plus optional PHPDoc.
@@ -34,7 +38,7 @@ final readonly class TypeResolver
 
             if ($enums instanceof EnumCatalog && $enums->isEnumComponent($component)) {
                 $fqcn = $enums->componentFqcn($component);
-                \assert(\is_string($fqcn));
+                assert(is_string($fqcn));
 
                 return new self($fqcn, null, null, false);
             }
@@ -50,10 +54,10 @@ final readonly class TypeResolver
         // one; a document may use either, so honour both.
         $nullable = (bool) $node->nullable || $type->nullable;
 
-        if (\is_string($format) && $format !== '') {
+        if (is_string($format) && $format !== '') {
             $scalarFormat = $bindings->scalarFormat($format);
 
-            if ($scalarFormat instanceof \Mlavrinenko\Paogen\Generator\ScalarFormat) {
+            if ($scalarFormat instanceof ScalarFormat) {
                 return new self($scalarFormat->phpType, null, null, $nullable);
             }
 

@@ -5,8 +5,17 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Composer\Autoload\ClassLoader;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\GenerateCommand;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
+use function assert;
+use function is_array;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * abort-on-unrepresentable-constructs, CLI surface: `--dry-run`, `--diff`,
@@ -65,7 +74,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
         self::assertSame(1, $exit);
         self::assertStringContainsString('2 problems found', $stderr);
         self::assertStringNotContainsString('generated into', $stdout);
-        self::assertDirectoryDoesNotExist($outputDir . \DIRECTORY_SEPARATOR . 'Generated');
+        self::assertDirectoryDoesNotExist($outputDir . DIRECTORY_SEPARATOR . 'Generated');
     }
 
     /**
@@ -79,7 +88,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 
         $stdout = fopen('php://memory', 'w+');
         $stderr = fopen('php://memory', 'w+');
-        \assert($stdout !== false && $stderr !== false);
+        assert($stdout !== false && $stderr !== false);
 
         $exit = GenerateCommand::run([$profilePath, ...$extraArgs], $this->composerLoader(), $stdout, $stderr);
 
@@ -127,7 +136,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -137,12 +146,12 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
-        /** @var \SplFileInfo $entry */
+        /** @var SplFileInfo $entry */
         foreach ($iterator as $entry) {
             if ($entry->isDir()) {
                 rmdir($entry->getPathname());

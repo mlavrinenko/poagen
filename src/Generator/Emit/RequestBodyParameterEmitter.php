@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+
+use function assert;
 
 /**
  * Materialises a {@see BodySpec} as zero-or-more method parameters on an
@@ -26,7 +29,7 @@ final readonly class RequestBodyParameterEmitter
         private ?EnumCatalog $enums = null,
         private ?NameRegistry $registry = null,
     ) {
-        \assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
     }
 
     public function addBodyParams(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
@@ -76,8 +79,8 @@ final readonly class RequestBodyParameterEmitter
      */
     private function addJsonMapBodyParam(Method $method, BodySpec $body, Bindings $bindings): void
     {
-        \assert($this->registry instanceof NameRegistry);
-        $schema = $body->schema ?? new \cebe\openapi\spec\Schema(['type' => 'object']);
+        assert($this->registry instanceof NameRegistry);
+        $schema = $body->schema ?? new Schema(['type' => 'object']);
         $resolved = InlineObjectResolver::resolve($schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
 
         $method->addParameter('body')->setType('array');
@@ -113,7 +116,7 @@ final readonly class RequestBodyParameterEmitter
         Bindings $bindings,
         bool $required,
     ): void {
-        \assert($this->registry instanceof NameRegistry);
+        assert($this->registry instanceof NameRegistry);
         $resolved = TypeResolver::resolve($field->schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
         $type = $resolved->phpType;
 

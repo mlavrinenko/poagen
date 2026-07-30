@@ -8,10 +8,13 @@ use Composer\Autoload\ClassLoader;
 use Mlavrinenko\Paogen\Exception\InvalidProfileException;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
+use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\PlanReporter;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
+
+use function count;
 
 /**
  * `paogen generate` command handler.
@@ -115,12 +118,12 @@ final class GenerateCommand
     /**
      * @param resource $stderr
      */
-    private static function reportSkipped(\Mlavrinenko\Paogen\Generator\GenerationPlan $plan, $stderr): void
+    private static function reportSkipped(GenerationPlan $plan, $stderr): void
     {
         $skippedOps = $plan->skippedOperations;
 
         if ($skippedOps !== []) {
-            $count = \count($skippedOps);
+            $count = count($skippedOps);
             fwrite($stderr, "paogen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
 
             foreach ($skippedOps as $entry) {
@@ -131,7 +134,7 @@ final class GenerateCommand
         $skippedComponents = $plan->skippedComponents;
 
         if ($skippedComponents !== []) {
-            $count = \count($skippedComponents);
+            $count = count($skippedComponents);
             fwrite($stderr, "paogen: {$count} component(s) skipped — no Generated/Model file emitted:\n");
 
             foreach ($skippedComponents as $entry) {

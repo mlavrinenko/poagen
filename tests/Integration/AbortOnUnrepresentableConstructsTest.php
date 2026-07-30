@@ -5,12 +5,20 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Composer\Autoload\ClassLoader;
+use FilesystemIterator;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
+
+use function is_array;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * abort-on-unrepresentable-constructs: the generator plans fully, collects
@@ -126,7 +134,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
             ));
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException) {
-            self::assertDirectoryDoesNotExist($outputDir . \DIRECTORY_SEPARATOR . 'Generated');
+            self::assertDirectoryDoesNotExist($outputDir . DIRECTORY_SEPARATOR . 'Generated');
         }
     }
 
@@ -157,7 +165,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
@@ -167,12 +175,12 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST,
         );
 
-        /** @var \SplFileInfo $entry */
+        /** @var SplFileInfo $entry */
         foreach ($iterator as $entry) {
             if ($entry->isDir()) {
                 rmdir($entry->getPathname());

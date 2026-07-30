@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
+use DOMDocument;
+use DOMElement;
+use InvalidArgumentException;
+
+use function is_array;
+use function is_bool;
+use function is_float;
+use function is_int;
+use function is_string;
+
 /**
  * Renders a marshalled payload as XML, for an operation whose request body the
  * document declared `application/xml`.
@@ -65,9 +75,9 @@ final readonly class XmlWriter
         return (string) $document->saveXML();
     }
 
-    private static function newDocument(): \DOMDocument
+    private static function newDocument(): DOMDocument
     {
-        $document = new \DOMDocument('1.0', 'UTF-8');
+        $document = new DOMDocument('1.0', 'UTF-8');
         // Byte-stability at the boundary: without this the output depends on
         // whatever whitespace libxml felt like, which makes a request body
         // impossible to diff in a test.
@@ -80,14 +90,14 @@ final readonly class XmlWriter
     /**
      * @param array<array-key,mixed> $data
      */
-    private static function appendMap(\DOMDocument $document, \DOMElement $parent, array $data): void
+    private static function appendMap(DOMDocument $document, DOMElement $parent, array $data): void
     {
         foreach ($data as $name => $value) {
             self::appendValue($document, $parent, (string) $name, $value);
         }
     }
 
-    private static function appendValue(\DOMDocument $document, \DOMElement $parent, string $name, mixed $value): void
+    private static function appendValue(DOMDocument $document, DOMElement $parent, string $name, mixed $value): void
     {
         // An absent optional property is absent from the document rather than an
         // empty element: `<price/>` and "no price" mean different things to a
@@ -96,7 +106,7 @@ final readonly class XmlWriter
             return;
         }
 
-        if (\is_array($value)) {
+        if (is_array($value)) {
             self::appendArray($document, $parent, $name, $value);
 
             return;
@@ -110,7 +120,7 @@ final readonly class XmlWriter
     /**
      * @param array<array-key,mixed> $value
      */
-    private static function appendArray(\DOMDocument $document, \DOMElement $parent, string $name, array $value): void
+    private static function appendArray(DOMDocument $document, DOMElement $parent, string $name, array $value): void
     {
         if (array_is_list($value)) {
             // Unwrapped, per the OpenAPI default: the element repeats.
@@ -128,17 +138,17 @@ final readonly class XmlWriter
 
     private static function scalar(mixed $value): string
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             // `true`/`false` rather than `1`/`0`: the same spelling
             // `json_encode` uses, so the two content types agree.
             return $value ? 'true' : 'false';
         }
 
-        if (\is_int($value) || \is_float($value) || \is_string($value)) {
+        if (is_int($value) || is_float($value) || is_string($value)) {
             return (string) $value;
         }
 
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
             'XML request bodies carry scalars, lists and maps; got ' . get_debug_type($value),
         );
     }

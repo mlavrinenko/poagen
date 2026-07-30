@@ -11,6 +11,12 @@ use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use PHPUnit\Framework\TestCase;
+use Throwable;
+
+use function dirname;
+use function is_array;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Step implementations for Profile.
@@ -22,7 +28,7 @@ final class ProfileSteps
 
     private string $loaderPath = '';
     private ?Profile $loadedProfile = null;
-    private ?\Throwable $loaderError = null;
+    private ?Throwable $loaderError = null;
     private ?string $tempFile = null;
 
     private string $boundFormat = '';
@@ -38,16 +44,16 @@ final class ProfileSteps
 
     public function givenAPHPFileAtPathReturnsProfileForSchemaAtSchema(string $path, string $schema): void
     {
-        $this->loaderPath = \dirname(__DIR__, 2) . \DIRECTORY_SEPARATOR . $path;
+        $this->loaderPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . $path;
         TestCase::assertFileExists($this->loaderPath, "fixture profile missing: {$path}");
-        TestCase::assertFileExists(\dirname(__DIR__, 2) . \DIRECTORY_SEPARATOR . $schema, "fixture schema missing: {$schema}");
+        TestCase::assertFileExists(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . $schema, "fixture schema missing: {$schema}");
     }
 
     public function whenTheLoaderIsInvokedWithThatPath(): void
     {
         try {
             $this->loadedProfile = new ProfileLoader()->load($this->loaderPath);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->loaderError = $e;
         }
     }
@@ -106,7 +112,7 @@ final class ProfileSteps
     public function whenAttributeScanRunsOverProfile(): void
     {
         $profile = new Profile(
-            schema: \dirname(__DIR__, 2) . '/tests/fixtures/schemas/contact-3.0.yaml',
+            schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/contact-3.0.yaml',
             output: '/tmp',
             namespace: 'Anything',
             discoverIn: $this->discoverIn,
@@ -129,7 +135,7 @@ final class ProfileSteps
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (\is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }

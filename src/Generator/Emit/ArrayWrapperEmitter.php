@@ -11,6 +11,8 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 
+use function assert;
+
 /**
  * Emits a thin wrapper class for a top-level `type: array` component (T-026).
  *
@@ -36,7 +38,7 @@ final readonly class ArrayWrapperEmitter
         NameRegistry $registry,
         EnumCatalog $enums,
     ): string {
-        \assert($shape->kind === ComponentShape::KIND_ARRAY);
+        assert($shape->kind === ComponentShape::KIND_ARRAY);
 
         $namespaceName = trim($modelNamespace, '\\');
         $file = new PhpFile();

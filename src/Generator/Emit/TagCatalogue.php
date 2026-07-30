@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use Mlavrinenko\Paogen\Generator\Profile;
+
+use function is_string;
 
 /**
  * Which tags the document's operations actually carry.
@@ -56,7 +59,7 @@ final readonly class TagCatalogue
             $out = [];
 
             foreach ($operation->tags ?? [] as $tag) {
-                if (\is_string($tag) && $tag !== '') {
+                if (is_string($tag) && $tag !== '') {
                     $out[] = $tag;
                 }
             }
@@ -68,7 +71,7 @@ final readonly class TagCatalogue
     }
 
     /**
-     * @return iterable<\cebe\openapi\spec\Operation>
+     * @return iterable<Operation>
      */
     private static function operations(OpenApi $openApi): iterable
     {

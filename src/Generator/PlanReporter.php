@@ -7,6 +7,8 @@ namespace Mlavrinenko\Paogen\Generator;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
+use const SORT_STRING;
+
 /**
  * Formats a {@see GenerationPlan} for human consumption.
  *
@@ -27,14 +29,14 @@ final class PlanReporter
         $lines = [];
 
         $writes = array_keys($plan->writes);
-        sort($writes, \SORT_STRING);
+        sort($writes, SORT_STRING);
 
         foreach ($writes as $path) {
             $lines[] = "would write: {$path}";
         }
 
         $prunes = $plan->prunes;
-        sort($prunes, \SORT_STRING);
+        sort($prunes, SORT_STRING);
 
         foreach ($prunes as $path) {
             $lines[] = "would prune: {$path}";
@@ -56,7 +58,7 @@ final class PlanReporter
         $out = '';
 
         $writes = $plan->writes;
-        ksort($writes, \SORT_STRING);
+        ksort($writes, SORT_STRING);
 
         foreach ($writes as $path => $new) {
             $current = is_file($path) ? (string) file_get_contents($path) : '';
@@ -69,7 +71,7 @@ final class PlanReporter
         }
 
         $prunes = $plan->prunes;
-        sort($prunes, \SORT_STRING);
+        sort($prunes, SORT_STRING);
 
         foreach ($prunes as $path) {
             $current = is_file($path) ? (string) file_get_contents($path) : '';

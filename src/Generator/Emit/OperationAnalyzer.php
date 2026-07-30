@@ -15,6 +15,8 @@ use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
+use function sprintf;
+
 /**
  * Summary of an operation used by the emitter, with `null` meaning the
  * operation falls outside the supported shapes and should be skipped.
@@ -92,7 +94,7 @@ final readonly class OperationAnalyzer
             $schema = $param->schema;
             $type = $schema instanceof Schema ? SchemaType::of($schema)->describe() : 'unspecified';
 
-            return \sprintf(
+            return sprintf(
                 "parameter '%s' (in: %s, type: %s) is outside paogen's supported parameter shapes — paogen "
                     . 'supports path parameters, scalar/array query parameters, and optional scalar header parameters',
                 $param->name,
@@ -203,7 +205,7 @@ final readonly class OperationAnalyzer
      */
     public static function returnType(?Responses $responses, NameRegistry $registry): ReturnSpec
     {
-        if (!$responses instanceof \cebe\openapi\spec\Responses) {
+        if (!$responses instanceof Responses) {
             return ReturnSpec::void();
         }
 

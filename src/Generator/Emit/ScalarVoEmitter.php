@@ -8,6 +8,8 @@ use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 
+use function assert;
+
 /**
  * Emits a thin `ScalarBinding` value object for a top-level scalar component
  * (T-026). DigitalOcean-style `urn`, `ssh_key_id` etc. are declared as
@@ -33,8 +35,8 @@ final readonly class ScalarVoEmitter
 
     public function emit(string $modelNamespace, ComponentShape $shape): string
     {
-        \assert($shape->kind === ComponentShape::KIND_SCALAR);
-        \assert($shape->scalarType !== null);
+        assert($shape->kind === ComponentShape::KIND_SCALAR);
+        assert($shape->scalarType !== null);
 
         $phpType = self::PHP_TYPE_BY_JSON[$shape->scalarType];
         $namespaceName = trim($modelNamespace, '\\');

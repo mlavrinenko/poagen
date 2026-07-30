@@ -8,6 +8,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 /**
  * Emits the per-profile `Generated\ApiException` class.
@@ -37,11 +38,11 @@ final readonly class ApiExceptionEmitter
         $namespace = $file->addNamespace($clientNamespace);
         $namespace->addUse(RequestInterface::class);
         $namespace->addUse(ResponseInterface::class);
-        $namespace->addUse(\RuntimeException::class);
+        $namespace->addUse(RuntimeException::class);
 
         $class = $namespace->addClass('ApiException')
             ->setFinal()
-            ->setExtends(\RuntimeException::class);
+            ->setExtends(RuntimeException::class);
 
         $class->addComment('Thrown by every emitted operation when the response status is non-2xx.');
         $class->addComment('');

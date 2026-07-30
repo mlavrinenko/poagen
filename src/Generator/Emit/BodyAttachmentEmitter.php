@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
 use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
 use Nette\PhpGenerator\Method;
+
+use function sprintf;
 
 /**
  * Emits the lines that attach a request body, per {@see BodySpec::$kind}.
  *
- * Every kind routes through the runtime {@see \Mlavrinenko\Paogen\Runtime\Marshal\Marshaller}
+ * Every kind routes through the runtime {@see Marshaller}
  * first, so wire names, scalar bindings and date formats are decided once and the
  * content types cannot disagree about a value. Only the last step differs: JSON
  * hands the array to `json_encode`, XML hands the same array to
@@ -53,14 +56,14 @@ final readonly class BodyAttachmentEmitter
     private function emitXml(Method $method, BodySpec $body, string $payload): void
     {
         $render = $body->kind === BodySpec::KIND_XML_LIST
-            ? \sprintf(
+            ? sprintf(
                 '\\%s::renderList(%s, %s, %s)',
                 XmlWriter::class,
                 $payload,
                 var_export($body->rootElement, true),
                 var_export($body->itemElement, true),
             )
-            : \sprintf(
+            : sprintf(
                 '\\%s::renderObject(%s, %s)',
                 XmlWriter::class,
                 $payload,

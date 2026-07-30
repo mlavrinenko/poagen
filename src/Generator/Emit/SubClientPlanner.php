@@ -12,6 +12,9 @@ use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 use Mlavrinenko\Paogen\Generator\Profile;
 
+use function in_array;
+use function is_string;
+
 /**
  * Groups the document's operations into the sub-clients that will be emitted.
  *
@@ -93,7 +96,7 @@ final readonly class SubClientPlanner
         $declared = [];
 
         foreach ($operation->tags ?? [] as $tag) {
-            if (\is_string($tag) && $tag !== '') {
+            if (is_string($tag) && $tag !== '') {
                 $declared[] = $tag;
             }
         }
@@ -101,12 +104,12 @@ final readonly class SubClientPlanner
         if ($declared === []) {
             $assigned = $profile->tagAssignments[$rawId] ?? null;
 
-            return \is_string($assigned) && $assigned !== '' ? [$assigned] : [];
+            return is_string($assigned) && $assigned !== '' ? [$assigned] : [];
         }
 
         $choice = $profile->tagChoice[$rawId] ?? null;
 
-        if (\is_string($choice) && \in_array($choice, $declared, true)) {
+        if (is_string($choice) && in_array($choice, $declared, true)) {
             return [$choice];
         }
 

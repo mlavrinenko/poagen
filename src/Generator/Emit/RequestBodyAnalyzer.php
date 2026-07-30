@@ -11,6 +11,12 @@ use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
+use function count;
+use function in_array;
+use function is_array;
+use function is_string;
+use function sprintf;
+
 /**
  * Resolves the `requestBody` of an OpenAPI Operation into a {@see BodySpec}.
  *
@@ -103,7 +109,7 @@ final readonly class RequestBodyAnalyzer
 
         $typeList = $types === [] ? '(none declared)' : implode(', ', $types);
 
-        return \sprintf(
+        return sprintf(
             "request body content type(s) '%s'%s — paogen supports application/json (\$ref/list<\$ref>) and "
                 . 'application/x-www-form-urlencoded as the sole content type with an inline object schema only',
             $typeList,
@@ -116,7 +122,7 @@ final readonly class RequestBodyAnalyzer
      */
     private static function describeUnsupportedForm(MediaType $form, array $types, string $location): string
     {
-        if (\count($types) > 1) {
+        if (count($types) > 1) {
             $others = implode(', ', array_values(array_diff($types, ['application/x-www-form-urlencoded'])));
 
             return "application/x-www-form-urlencoded request body paired with other content type(s) ({$others}){$location}"
@@ -176,7 +182,7 @@ final readonly class RequestBodyAnalyzer
             return null;
         }
 
-        if (\count($body->content) > 1) {
+        if (count($body->content) > 1) {
             return null;
         }
 
@@ -194,15 +200,15 @@ final readonly class RequestBodyAnalyzer
 
         $properties = $schema->properties;
 
-        if (!\is_array($properties) || $properties === []) {
+        if (!is_array($properties) || $properties === []) {
             return null;
         }
 
-        $required = \is_array($schema->required) ? $schema->required : [];
+        $required = is_array($schema->required) ? $schema->required : [];
         $fields = [];
 
         foreach ($properties as $name => $propSchema) {
-            if (!\is_string($name)) {
+            if (!is_string($name)) {
                 continue;
             }
             if ($name === '') {
@@ -211,7 +217,7 @@ final readonly class RequestBodyAnalyzer
             if (!$propSchema instanceof Schema && !$propSchema instanceof Reference) {
                 continue;
             }
-            $fields[] = new FormField($name, $propSchema, \in_array($name, $required, true));
+            $fields[] = new FormField($name, $propSchema, in_array($name, $required, true));
         }
 
         if ($fields === []) {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Naming;
 
+use function in_array;
+
 /**
  * Sibling of {@see PascalCaseSanitiser} for {@see SymbolKind::OperationId}
  * and {@see SymbolKind::ParameterName}.
@@ -30,7 +32,7 @@ final readonly class CamelCaseSanitiser implements NameNormaliser
 
     public function normalise(string $raw, NormalisationContext $context): ?string
     {
-        if (!\in_array($context->kind, [SymbolKind::OperationId, SymbolKind::ParameterName], true)) {
+        if (!in_array($context->kind, [SymbolKind::OperationId, SymbolKind::ParameterName], true)) {
             return null;
         }
 

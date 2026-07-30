@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Exception;
 
-final class InvalidProfileException extends \RuntimeException {}
+use RuntimeException;
+
+final class InvalidProfileException extends RuntimeException {}
