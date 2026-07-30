@@ -138,7 +138,7 @@ final class PropertyTypeResolver
         if ($node instanceof UnionTypeNode) {
             $non = array_values(array_filter(
                 $node->types,
-                static fn(TypeNode $t): bool => !($t instanceof IdentifierTypeNode && $t->name === 'null'),
+                static fn(TypeNode $t): bool => !$t instanceof IdentifierTypeNode || $t->name !== 'null',
             ));
 
             if (count($non) === 1) {
