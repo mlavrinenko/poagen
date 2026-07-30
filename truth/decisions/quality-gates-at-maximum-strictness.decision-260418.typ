@@ -11,24 +11,24 @@
 
 == Context
 
-paogen has two distinct PHP audiences: #the(Generator) itself (lives in
-`src/`) and #a(GeneratedFile) it produces. They have different
+paogen has two distinct PHP audiences: #the(Generator) itself (its library
+code) and #a(GeneratedFile) it produces. They have different
 pathologies. Library code can grow into a big-ball-of-mud; generated code
 doesn't, but it must withstand the user's own static analyser.
 
 == Choice
 
-=== Library code (`src/`)
+=== Library code
 
 - `phpstan analyse` at `level: max` with `phpstan-strict-rules` and
   `phpstan-deprecation-rules` enabled. Bleeding-edge config also enabled.
 - `php-cs-fixer` on PER-CS 2.0 + PHP 8.4 rules.
 - Rector dry-run gate.
-- Linecop (#link("https://github.com/mlavrinenko/linecop")) limits PHP
-  files in `src/` to 250 lines (code and comments). Tests and fixtures are
-  excluded.
+- Linecop (#link("https://github.com/mlavrinenko/linecop")) limits
+  library-code files to 250 lines (code and comments). Tests and fixtures
+  are excluded.
 
-=== Generated code (`tests/fixtures/generated/**`)
+=== Generated code
 
 - Must independently pass `phpstan analyse --level=max` as the consumer
   would run it (no library-internal baselines).
@@ -59,8 +59,8 @@ the world. Tunable by editing `.linecop.yaml`.
 - Test coverage is not a v0.1 gate. codecov was wired with no threshold,
   which is worse than no coverage report at all: it implied a bar that did
   not exist. The `codecov.yml` config and the `code-coverage` CI job were
-  removed. Much of paogen's logic is exercised via generated fixtures
-  under `tests/fixtures/generated/`, so a line-coverage number on `src/`
+  removed. Much of paogen's logic is exercised via the committed
+  golden-output fixtures, so a line-coverage number on the library code
   alone would be both noisy and misleading. When the code surface
   stabilises, a new decision may re-introduce a coverage threshold
   alongside mutation testing (also deferred per `ROADMAP.md`).

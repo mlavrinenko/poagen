@@ -53,6 +53,7 @@ migrate to `minicli/minicli` first (near-zero cost) before considering
 
 == Consequences
 
-- `bin/paogen` is hand-rolled; `src/Cli.php` contains the dispatch.
+- #the(PaogenCli)'s entry point is hand-rolled; a single class contains
+  the dispatch.
 - Help text is a single `const` string. Keep it short.
 - No autocompletion scripts out-of-the-box. Fine for a generator.
