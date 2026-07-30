@@ -5,7 +5,7 @@
   tags: ("generator", "runtime", "dx"),
   priority: 8,
   difficulty: 7,
-  status: proposed(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -68,3 +68,36 @@ The transport must be replaceable, not merely injected — see \`swappable-runti
 - \`tests/fixtures/generated/\`
 - \`examples/petstore/generated/\`
 - \`examples/kilbil/generated/\`
+
+== Result
+
+Every figure below was re-measured on the merged commit rather than taken from the branch that produced it.
+
+#table(
+  columns: 3,
+  [*Measure*], [*Before*], [*After*],
+  [Generated trees, clones], [115], [38],
+  [Generated trees, duplicated lines], [39.92%], [22.40%],
+  [Generated trees, duplicated tokens], [47.67%], [28.19%],
+  [Generated lines analysed], [5218], [4053],
+  [kilbil tree, total lines], [4514], [3851],
+  [\`TagsClient.php\`], [117 lines], [58],
+)
+
+The emitted shape:
+
+\`\`\`php
+public function addClientTags(AddClientTagsRequest \$body): AddClientTagsResponse
+{
+return \$this->transport->send(
+Endpoint::post('/load/addclienttags')->query('h', \$this->h)->json(\$body),
+ResponseType::object(AddClientTagsResponse::class),
+);
+}
+\`\`\`
+
+The second argument diverges from the shape originally sketched, and the reason is worth keeping. Passing a bare class name cannot express void, list, scalar or map returns without one transport method per kind --- seven or eight of them. That would have cost the single-method interface, which is the thing that makes a substitute or a decorator cheap to write. A generic response descriptor keeps \`send()\` alone on the interface and still lets static analysis agree the call returns a model, a list of models, or a typed map, with no annotation anywhere in the emitted tree.
+
+Emitted bodies also lost every conditional: a null query value, header or form field drops itself at the boundary, so an optional parameter costs no branch in generated code.
+
+One behaviour fix came with it. A scalar \`int\`/\`float\`/\`bool\` return used to cast the response stream object rather than its contents, which raised a warning and yielded 1. The runtime casts the body string.

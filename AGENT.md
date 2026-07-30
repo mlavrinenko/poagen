@@ -187,8 +187,16 @@ wrong.
 - **Never hand-edit `.speconaut/state.lock`.** If `speconaut lock` refuses a
   routine change, stop. Do not compute hashes by hand or `sed` over trace
   values. File upstream and pause.
-- **Never edit generated trees by hand** — `Generated/`, `tests/generated/`, or
-  any tool-owned artifact.
+- **Never edit generated trees by hand** — `Generated/`, `tests/generated/*Test.php`,
+  or any tool-owned artifact.
+
+  `tests/generated/*Steps.php` is the exception, and it says so in its own
+  header: "This file is yours — speconaut only appends new step stubs." Those
+  files are scaffolded once and then written by hand; `OperationGeneratorSteps.php`
+  carries some four hundred lines that no regeneration produces, and
+  `phpstan.neon.dist` treats them as hand-written. Editing a step *body* is
+  normal work. Adding or renaming step *methods* is not — those come from the
+  specs.
 - If a gate fails in a way that seems to *expect* you to patch generated state
   by hand, that is a workflow abomination. Stop, file upstream, ask.
 

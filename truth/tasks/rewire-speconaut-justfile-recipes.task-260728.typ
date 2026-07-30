@@ -35,9 +35,7 @@ Two: generation cannot be run against the repository root at all, because \`spec
 
 Three, and this is the one that changes the shape of this task: regenerating does not reproduce the committed tree, and would destroy work if it did. \`speconaut generate-tests\` emits stubs. The committed step files are those stubs plus hand-written bodies --- \`ProfileSteps.php\` is 145 lines against a freshly generated 100, and \`OperationGeneratorSteps.php\` is 1171 against 778. The fresh output also lands in namespace \`Speconaut\\Generated\` rather than the project's, and the new subcommand takes no \`--namespace\` flag where the retired pipeline did.
 
-So the acceptance criterion below asking for "no diff against the committed tree" cannot be met as written, and the non-goal forbidding hand edits does not describe how these files are actually maintained. Both need rewriting as part of this task: decide what speconaut owns in that tree, what a human owns, and what \`--check --strict\` is actually allowed to assert.
-
-Ten literal-string assertions in \`ModelGeneratorSteps.php\` and \`OperationGeneratorSteps.php\` were hand-edited under \`import-generated-type-references\` because the emitted spellings they pin changed and no tool could regenerate them. Those edits are debt this task settles.
+So the acceptance criterion below asking for "no diff against the committed tree" cannot be met as written, and the non-goal forbidding hand edits contradicts the files' own header: "This file is yours --- speconaut only appends new step stubs." Both need rewriting as part of this task: decide what speconaut owns in that tree, what a human owns, and what \`--check --strict\` is actually allowed to assert. The answer is visible in the artifacts already --- speconaut owns the \`\*Test.php\` stubs and the set of step methods; a human owns every step body --- it is just written down nowhere the check can use.
 
 == Acceptance criteria
 

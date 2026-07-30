@@ -5,7 +5,7 @@
   tags: ("runtime", "packaging", "dx"),
   priority: 7,
   difficulty: 7,
-  status: proposed(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -40,3 +40,19 @@ This matters more once \`collapse-operations-onto-a-runtime-transport\` lands, b
 - \`src/Generator/Emit/ClientEmitter.php\`
 - \`src/Generator/Emit/ModelEmitter.php\`
 - \`tests/\`
+
+== Result
+
+Contracts live in \`src/Runtime/Contract/\` and depend on nothing but the PSR HTTP interfaces. Everything a generated file names is one of them: the transport, the hydrator, the marshaller, the XML writer, the descriptor parser. \`PropertyType\` and \`PropertyDescriptor\` moved there too, so a consumer implementing a contract does not have to reach back into the implementation namespace for the types it speaks in.
+
+A consumer who replaces nothing writes one line and gets working defaults, with the PSR-18 client discovered lazily on first send:
+
+\`\`\`php
+new ApiClient(new HttpTransport('https://api.example.com', ApiException::class))
+\`\`\`
+
+From there they replace one collaborator by name, or several, or implement the transport interface and replace the lot. \`tests/Integration/RuntimeSubstitutionTest.php\` proves each case and asserts the substitutes were actually called rather than merely accepted.
+
+Two shapes are deliberately not interfaces. \`Endpoint\` is the message rather than the messenger --- it carries no behaviour a consumer would want to swap, and making it injectable would cost a constructor parameter and a longer call at every emitted site. The response descriptor is the same argument.
+
+\`HttpTransport\` takes the profile's exception class as a required argument rather than defaulting it. The runtime cannot name a per-profile generated class, and a default would hand somebody the wrong exception type silently --- which is the failure mode \`fail-loud-never-silent\` exists to prevent.

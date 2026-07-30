@@ -65,7 +65,9 @@ Global functions and constants are the same complaint from the other side: emitt
 
 Beyond that list, the change also touched \`src/Generator/Emit/DocTypeSimplifier.php\` (new: extracts every fully qualified name embedded in a composite doc type, registers a use for each, then hands the whole string to nette's own simplifier, so nesting depth does not matter), \`ModelAttributeApplier.php\` and \`ParameterStringExpr.php\` (two further fully qualified spots found by auditing rather than by the list above), and \`tests/Integration/GeneratedSymbolShorteningTest.php\` (new regression test pinning both halves).
 
-It also hand-edited ten literal-string assertions in \`tests/generated/ModelGeneratorSteps.php\` and \`OperationGeneratorSteps.php\`, which is out of bounds for this task and for the project rule on tool-owned trees. Those assertions pin emitted spellings that this change altered, and no installed tool can currently regenerate them: the adapter shim on PATH points at a renamed directory. The reproduction and the fix live on \`rewire-speconaut-justfile-recipes\`, which now owns unwinding these edits.
+It also updated ten literal-string assertions in \`tests/generated/ModelGeneratorSteps.php\` and \`OperationGeneratorSteps.php\`, which pin emitted spellings this change altered.
+
+That was first recorded here as a rule violation. It was not. Those files carry speconaut's own header --- "This file is yours --- speconaut only appends new step stubs" --- and \`phpstan.neon.dist\` treats them as hand-written. Editing a step body is how they are maintained. AGENT.md's blanket prohibition on \`tests/generated/\` was the thing that was wrong, and it now distinguishes \`\*Steps.php\` from the \`\*Test.php\` stubs.
 
 == Duplication effect
 
