@@ -16,14 +16,20 @@ The Justfile drives speconaut through \`speconaut interop extract --format json 
 
 Three separate problems sit behind the one symptom, and only the first is what this task originally assumed.
 
-One: the adapter shim on PATH points at a directory that was renamed. \`/home/tank/.nix/modules/apps/speconaut.nix\` lines 50--51 build the wrapper against \`adapters/speconaut-phpunit\`, and the adapter now lives at \`adapters/speconaut-php-phpunit\` with the binary renamed to match. So the wrapper exits 1 before doing anything, and \`speconaut generate-tests\` fails through it too, because the core CLI shells out to the same name:
+One: the adapter shim on PATH pointed at a directory that had been renamed. That is now fixed in the nix module, and the working invocation is:
 
 \`\`\`
-error: rpc generate-tests failed against /etc/profiles/per-user/tank/bin/speconaut-phpunit:
+speconaut generate-tests truth/ --adapter php-phpunit -o <dir>
+\`\`\`
+
+Two things about it are easy to get wrong. The adapter is named \`php-phpunit\`, not \`phpunit\` --- the core CLI resolves \`--adapter X\` to a \`speconaut-X\` binary on PATH, so the old name now fails with \`no backend found for adapter 'phpunit'\`. And the adapter is a PHP script, so \`php\` has to be on PATH; without it the adapter dies on startup and the caller reports a broken pipe rather than anything about PHP:
+
+\`\`\`
+error: rpc generate-tests failed against .../speconaut-php-phpunit:
 failed to write rpc request: Broken pipe (os error 32)
 \`\`\`
 
-Point a shim at the real binary and generation succeeds --- \`Generated 9 test module(s)\`, exit 0. That is the fix, and it belongs in the nix module, not here.
+Since \`php\` here comes from devbox and not from the system profile, any recipe or hook invoking this needs the devbox profile on PATH. With both right, generation exits 0: \`Generated 9 test module(s)\`.
 
 Two: generation cannot be run against the repository root at all, because \`speconaut\` reads the project's MindTape config and rejects keys \`mt\` itself writes. Copy \`truth/\` and \`.speconaut/\` somewhere without a \`.mindtape/\` and it works. That is \`speconaut-mindtape-config-skew\`.
 

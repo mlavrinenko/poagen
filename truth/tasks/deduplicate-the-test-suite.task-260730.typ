@@ -6,6 +6,7 @@
   priority: 5,
   difficulty: 4,
   status: proposed(2026, 7, 30),
+  links: depends-on("adopt-jscpd-duplication-gate.task-260730.typ"),
 )
 
 == Summary
