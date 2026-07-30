@@ -97,9 +97,9 @@
       "--dry-run prints a tree summary and writes nothing",
       stage: "unstable",
     )[
-      #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php"))]
+      #given[#a(Profile) at #p((path: "<profile-path>"))]
       #and_[a fresh directory at #p((path: "<tmp-dir>")) as #the(PaogenCli)'s output target]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --dry-run"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path> --output=<tmp-dir> --dry-run"))]
       #then[#the(PaogenCli)'s stdout should contain #p((needle: "would write"))]
       #and_[#the(PaogenCli)'s output directory at #p((path: "<tmp-dir>")) contains no files]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
@@ -119,8 +119,8 @@
       "--diff against a corrupted golden tree prints unified diff and exits 1",
       stage: "unstable",
     )[
-      #given[a temporary copy of #p((path: "tests/fixtures/generated/petstore")) at #p((path: "<tmp-dir>")) for #the(PaogenCli) to diff against, with one file truncated]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff"))]
+      #given[a temporary copy of #a(GeneratedFile) tree at #p((path: "<tmp-dir>")) for #the(PaogenCli) to diff against, with one file truncated]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path> --output=<tmp-dir> --diff"))]
       #then[#the(PaogenCli)'s stdout should contain #p((needle: "@@"))]
       #and_[#the(PaogenCli) should exit with code #p((code: "1"))]
     ]
@@ -129,7 +129,7 @@
       "--dry-run combined with --diff is a usage error",
       stage: "unstable",
     )[
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --dry-run --diff"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path> --dry-run --diff"))]
       #then[#the(PaogenCli)'s stderr should contain #p((needle: "mutually exclusive"))]
       #and_[#the(PaogenCli) should exit with code #p((code: "2"))]
     ]
@@ -140,8 +140,8 @@
       "generate emits no PHP deprecation notices on 8.4",
       stage: "unstable",
     )[
-      #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php"))]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php"))]
+      #given[#a(Profile) at #p((path: "<profile-path>"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path>"))]
       #then[neither #the(PaogenCli)'s stdout nor stderr contains #p((needle: "Deprecated:"))]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]

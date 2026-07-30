@@ -13,7 +13,7 @@
 
 speconaut forbids file paths, member chains, and call shapes in specs,
 decisions, standards and domain artifacts, so those layers survive a
-reimplementation. paogen exempts them, and the exemption has two halves
+reimplementation. paogen exempted them, and the exemption had two halves
 that must be told apart.
 
 == Choice
@@ -23,24 +23,29 @@ attribute form is the observable behaviour a scenario asserts, not an
 implementation leak. Rephrasing it behaviourally would describe
 #the(Generator) by describing nothing.
 
-Debt half: 140 references point at paogen's own tree rather than at
-anything a consumer observes. Those are exactly what the rule exists to
-prevent, and they are suppressed to unblock the migration rather than
-because they are right. A task tracks narrowing the exemption to the
-output vocabulary alone.
+Debt half: 32 references, counted directly rather than estimated, pointed
+at paogen's own tree rather than at anything a consumer observes. Those
+were exactly what the rule exists to prevent, and were suppressed to
+unblock the migration rather than because they were right. `narrow-the-code-ref-exemption` rewrote all 32 behaviourally rather than leaving them
+suppressed. A separate, much larger population — 258 references inside
+task artifacts — stays exempt by design, since a task names the
+implementation bridge on purpose; an earlier headcount that conflated the
+two populations is where this decision used to claim 140, which was
+never a measurement of either population and has been corrected.
 
-The exemption is configured explicitly in `.speconaut/config.toml` with
-both halves commented, rather than the check being switched off, so the
-debt stays visible.
+The exemption is configured explicitly in `.speconaut/config.toml` rather
+than the check being switched off, so its reasoning stays legible even
+after the debt half is paid down.
 
 == Consequences
 
 - Scenarios, decisions and standards may name a PHP signature, an
   attribute form, or a call shape when that shape is what a consumer of
   #the(GeneratedFile) observes.
-- References into `src/`, `bin/`, and `tests/` remain allowlisted only
-  as recorded debt, not as an endorsed pattern; the allowlist comment in
-  `.speconaut/config.toml` says so explicitly.
-- Narrowing the exemption to the output vocabulary alone is tracked as
-  its own task rather than attempted inline with this decision, so the
-  migration this decision unblocks is not itself gated on that cleanup.
+- Nothing in specs, decisions, standards, or domain artifacts names a path
+  into paogen's own tree any longer; the debt above was rewritten, not
+  merely suppressed, and the allowlist in `.speconaut/config.toml` now
+  carries only the output vocabulary the Choice section above describes
+  as legitimate.
+- Task artifacts are unaffected: they are meant to name files, and stay
+  exempt from this rule by design rather than by allowlist entry.

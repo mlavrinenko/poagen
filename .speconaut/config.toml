@@ -9,8 +9,8 @@ spec-roots = ["truth/specs"]
 
 # The code-ref sweep forbids file paths, member chains, and call shapes in
 # specs, decisions, standards, and domain artifacts, so those layers stay
-# portable across reimplementations. paogen exempts them, for two different
-# reasons that deserve to be told apart.
+# portable across reimplementations. paogen exempts the output vocabulary
+# alone; it used to also exempt debt pointing at paogen's own tree.
 #
 # The call shapes and attribute forms are legitimate. paogen's product IS
 # emitted PHP, so `addPet(Pet $body): Pet` and `#[BindsFormat('date-time')]`
@@ -18,21 +18,20 @@ spec-roots = ["truth/specs"]
 # Rephrasing them behaviourally would describe the generator by describing
 # nothing.
 #
-# The `src/` paths are not legitimate, and this exemption is debt. 140 of them
-# point at paogen's own internals rather than at anything a consumer observes.
-# They are suppressed here to unblock the migration rather than because they
-# are right — `narrow-the-code-ref-exemption` rewrites them and shrinks this
-# list to the output vocabulary alone.
+# `src/`, `bin/`, and `tests/` paths were exempted here too, as debt: 32
+# references (measured directly with a grep sweep, not estimated) pointed at
+# paogen's own tree across truth/specs/ and truth/decisions/, none under
+# truth/standards/ or truth/domain/. An earlier pass had claimed 140 —
+# wrong, and likely a conflation with truth/tasks/, which separately carries
+# 258 such references and stays exempt by design, since tasks are the
+# implementation bridge and are meant to name files. `narrow-the-code-ref-
+# exemption` rewrote the 32 behaviourally and dropped the debt entries below.
 [check.code-refs]
 source-extensions = []
 allowlist = [
   # Output vocabulary: emitted signatures, attributes, member references.
   "(",
   "::",
-  # Debt: references to paogen's own tree. To be rewritten behaviourally.
-  "src/",
-  "bin/",
-  "tests/",
 ]
 
 # Required L2 sections on decisions and standards. This restates, on purpose,
