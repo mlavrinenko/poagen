@@ -5,7 +5,7 @@
   tags: ("generator", "dx", "strictness"),
   priority: 7,
   difficulty: 3,
-  status: proposed(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -62,3 +62,20 @@ Global functions and constants are the same complaint from the other side: emitt
 - \`tests/fixtures/generated/\`
 - \`examples/petstore/generated/\`
 - \`examples/kilbil/generated/\`
+
+Beyond that list, the change also touched \`src/Generator/Emit/DocTypeSimplifier.php\` (new: extracts every fully qualified name embedded in a composite doc type, registers a use for each, then hands the whole string to nette's own simplifier, so nesting depth does not matter), \`ModelAttributeApplier.php\` and \`ParameterStringExpr.php\` (two further fully qualified spots found by auditing rather than by the list above), and \`tests/Integration/GeneratedSymbolShorteningTest.php\` (new regression test pinning both halves).
+
+It also hand-edited ten literal-string assertions in \`tests/generated/ModelGeneratorSteps.php\` and \`OperationGeneratorSteps.php\`, which is out of bounds for this task and for the project rule on tool-owned trees. Those assertions pin emitted spellings that this change altered, and no installed tool can currently regenerate them: the adapter shim on PATH points at a renamed directory. The reproduction and the fix live on \`rewire-speconaut-justfile-recipes\`, which now owns unwinding these edits.
+
+== Duplication effect
+
+Worth recording because it runs against the intuition. Importing symbols made measured duplication worse on both tiers, since an import block is itself repeated text and every generated client now carries one:
+
+#table(
+  columns: 3,
+  [*Tier*], [*Before*], [*After*],
+  [\`src/\` + \`tests/\`], [60 clones, 5.11%], [59 clones, 5.62%],
+  [generated trees], [106 clones, 36.67%], [108 clones, 39.10%],
+)
+
+Neither number argues against the change. They argue for the two things already queued behind it: wrapping import blocks in duplication markers, and collapsing the repeated request-and-response sequence out of the emitted tree entirely.
