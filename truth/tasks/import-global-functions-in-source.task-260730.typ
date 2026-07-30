@@ -5,7 +5,7 @@
   tags: ("style", "dx"),
   priority: 6,
   difficulty: 1,
-  status: wip(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
