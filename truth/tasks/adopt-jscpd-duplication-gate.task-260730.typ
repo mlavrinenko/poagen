@@ -5,7 +5,7 @@
   tags: ("quality", "tooling"),
   priority: 7,
   difficulty: 4,
-  status: proposed(2026, 7, 30),
+  status: status("needs-review", 2026, 7, 30),
 )
 
 == Summary
@@ -50,4 +50,58 @@ Emitting the markers has to stay data. A per-project callback hook that decorate
 - \`.jscpd.json\`
 - \`Justfile\`
 - \`CONTRIBUTING.md\`
-- \`src/\`
+
+\`src/\` was NOT touched: the import-block marker sweep is deferred rather than
+done, so nothing in this task edits a source file.
+
+== Measured baseline
+
+The \`minTokens\` sweep over \`src/\`, which is what picked 84. Clone counts, and
+how many of those clones were pure import blocks rather than code:
+
+#table(
+  columns: 3,
+  [*minTokens*], [*clones*], [*import-block matches*],
+  [50 (default)], [39], [9],
+  [60], [20], [5],
+  [70], [14], [1],
+  [80], [12], [1],
+  [83], [11], [1],
+  [84], [10], [0],
+  [85--90], [10], [0],
+  [100], [7], [0],
+  [120], [3], [0],
+  [150], [1], [0],
+)
+
+84 is the exact boundary: the longest surviving import-block match runs 83
+tokens (\`FormatAdvisor.php:1\` against \`TypeListScanner.php:1\`, 14 lines). From 84
+to 90 the same ten real clones survive, so the tight boundary loses nothing the
+rounder number would keep.
+
+Baseline at \`minTokens: 84\`, on the tree this task landed against:
+
+#table(
+  columns: 3,
+  [*Tier*], [*Clones*], [*Duplicated lines*],
+  [\`src/\`], [10], [1.50%],
+  [\`tests/\`], [49], [8.37%],
+  [\`just lint-jscpd\` (both)], [60], [5.11%],
+  [\`tests/fixtures/generated\`], [29], [30.23%],
+  [kilbil generated + src], [56], [24.64%],
+  [petstore generated + src], [20], [24.12%],
+  [\`just lint-jscpd-generated\` (all)], [106], [36.67%],
+)
+
+One number moved while this task was open, and the direction is worth keeping.
+At jscpd's defaults \`src/\` measured 36 clones and 3.76% when the task was filed,
+and 39 clones and 4.00% when it landed. The change in between was
+\`import-global-functions-in-source\`, which replaced \`\\json\_decode(...)\` with
+\`use function json\_decode;\` — every converted file grew its import block, and
+import blocks are what duplicate. Trading a prefix for an import is the right
+call on other grounds, but it made the header noise worse, which is the argument
+for the marker sweep rather than a higher threshold.
+
+\`tests/\` still carries header noise at 84: its import-block matches run up to
+103 tokens, well past the threshold that clears \`src/\`. So the tests tier stays
+noisy until it is swept too.
