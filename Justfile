@@ -74,6 +74,44 @@ lint-rector:
 lint-linecop:
     linecop
 
+# Duplication report on src/ and tests/ (report-only for now)
+#
+# `minTokens: 84` in .jscpd.json was chosen from a measured sweep: at
+# jscpd's default 50, roughly a third of the findings in src/ are pure
+# import blocks (license header + namespace + use list) rather than real
+# code — e.g. InlineObjectResolver.php:1 matching TypeResolver.php:1 for 14
+# lines / 69 tokens. jscpd can only skip those via jscpd:ignore-start /
+# jscpd:ignore-end markers, which are not wired in yet
+# (adopt-jscpd-duplication-gate defers that sweep). 84 is the lowest
+# minTokens that drops every import-block match measured in src/ (the
+# longest was 83 tokens) while still keeping all 10 real clones found there.
+#
+# NOT wired into `lint`: `lint` uses `parallel --halt now,fail=1`, and a
+# report-only recipe in there is noise nobody reads. This recipe reports
+# rather than fails because the duplication it finds has not been removed
+# yet — collapse-operations-onto-a-runtime-transport and
+# deduplicate-the-test-suite do that. Once they land, add `--exit-code 1`
+# here (always give --exit-code an explicit value — spelled bare it eats the
+# next positional argument) and fold this into `lint`.
+lint-jscpd:
+    jscpd -c .jscpd.json src/ tests/
+
+# Duplication report on generated fixtures + example trees (report-only for now)
+#
+# Resolves its path set the way lint-phpstan-generated does: not every
+# example has a generated/ directory (some are .expected-failure), so
+# nullglob keeps a run with zero example trees from erroring on a literal
+# unmatched glob instead of falling back to tests/fixtures/generated alone.
+#
+# NOT wired into `lint` — see lint-jscpd above for why, and which tasks flip
+# both recipes to failing.
+lint-jscpd-generated:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    shopt -s nullglob
+    paths=(tests/fixtures/generated examples/*/generated examples/*/src)
+    jscpd -c .jscpd.json "${paths[@]}"
+
 # Auto-fix code style
 format:
     php-cs-fixer fix --diff --verbose

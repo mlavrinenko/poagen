@@ -1,0 +1,4 @@
+{
+  "minTokens": 84,
+  "reporters": ["console"]
+}
