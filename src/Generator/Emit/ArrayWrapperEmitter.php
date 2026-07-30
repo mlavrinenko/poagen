@@ -48,7 +48,7 @@ final readonly class ArrayWrapperEmitter
 
         $constructor = $class->addMethod('__construct');
         $itemDoc = $this->itemPhpDoc($shape->arrayItems, $bindings, $namespaceName, $registry, $enums);
-        $constructor->addComment('@param list<' . $itemDoc . '> $items');
+        $constructor->addComment('@param ' . DocTypeSimplifier::shorten($namespace, 'list<' . $itemDoc . '>') . ' $items');
 
         $constructor->addPromotedParameter('items')
             ->setPublic()

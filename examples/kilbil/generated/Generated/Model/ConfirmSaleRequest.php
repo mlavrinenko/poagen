@@ -10,8 +10,8 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class ConfirmSaleRequest
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\ConfirmSaleRequestGoodsDataItem> $goods_data
-     * @param ?list<\Acme\Kilbil\Generated\Model\ConfirmSaleRequestPaymentsItem> $payments
+     * @param ?list<ConfirmSaleRequestGoodsDataItem> $goods_data
+     * @param ?list<ConfirmSaleRequestPaymentsItem> $payments
      */
     public function __construct(
         public Timestamp $doc_dt,

@@ -8,6 +8,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
+use function json_decode;
+use function json_last_error;
+
+use const JSON_ERROR_NONE;
+
 /**
  * Thrown by every emitted operation when the response status is non-2xx.
  *
@@ -65,9 +70,9 @@ final class ApiException extends RuntimeException
         }
 
         /** @var mixed $decoded */
-        $decoded = \json_decode($body, true);
+        $decoded = json_decode($body, true);
 
-        if (\json_last_error() !== \JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->decodedBody;
         }
 

@@ -9,7 +9,7 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class CloseSessionRequest
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\CloseSessionRequestPaymentsItem> $payments
+     * @param list<CloseSessionRequestPaymentsItem> $payments
      */
     public function __construct(
         public array $payments,

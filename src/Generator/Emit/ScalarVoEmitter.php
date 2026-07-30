@@ -54,11 +54,14 @@ final readonly class ScalarVoEmitter
             ->setPublic()
             ->setType($phpType);
 
+        $namespace->addUseFunction('assert');
+        $namespace->addUseFunction('is_' . $phpType);
+
         $class->addMethod('fromScalar')
             ->setStatic()
             ->setPublic()
             ->setReturnType('self')
-            ->addBody('\\assert(\\is_' . $phpType . '($raw));')
+            ->addBody('assert(is_' . $phpType . '($raw));')
             ->addBody('return new self($raw);')
             ->addParameter('raw')
             ->setType('mixed');

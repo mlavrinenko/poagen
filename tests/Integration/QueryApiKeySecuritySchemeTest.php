@@ -123,12 +123,12 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
         self::assertStringContainsString('$query = [];', $body);
         self::assertStringContainsString(
-            "\$query[] = 'k=' . \\urlencode(\$this->queryKey);",
+            "\$query[] = 'k=' . urlencode(\$this->queryKey);",
             $body,
         );
         // Unconditional append: a credential is always sent, so there is
         // no `if ($query !== [])` guard around it.
-        self::assertStringContainsString("\$path .= '?' . \\implode('&', \$query);", $body);
+        self::assertStringContainsString("\$path .= '?' . implode('&', \$query);", $body);
 
         $client = $this->buildClient(queryKey: 'a&b=c', headerKey: 'unused');
         $this->invoke($client['client'], 'getStatus');
@@ -143,7 +143,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         $body = $this->methodSlice('listItems');
 
-        self::assertStringContainsString("\$path .= '?' . \\implode('&', \$query);", $body);
+        self::assertStringContainsString("\$path .= '?' . implode('&', \$query);", $body);
         self::assertStringNotContainsString('if ($query !== [])', $body);
 
         $client = $this->buildClient(queryKey: 'sekret', headerKey: 'unused');

@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class SearchClientResponseBillData
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\SearchClientResponseBillDataItemsItem> $items
+     * @param list<SearchClientResponseBillDataItemsItem> $items
      */
     public function __construct(
         public array $items,

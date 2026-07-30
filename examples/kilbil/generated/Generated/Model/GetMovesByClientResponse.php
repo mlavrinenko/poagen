@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class GetMovesByClientResponse
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetMovesByClientResponseClientMovesItem> $client_moves
+     * @param ?list<GetMovesByClientResponseClientMovesItem> $client_moves
      */
     public function __construct(
         public string $result_code,

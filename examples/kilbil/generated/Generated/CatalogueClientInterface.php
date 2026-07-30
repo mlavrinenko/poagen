@@ -23,22 +23,22 @@ use Acme\Kilbil\Generated\Model\GoodsXmlResponse;
 interface CatalogueClientInterface
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsRequestItem> $body
+     * @param list<GoodsRequestItem> $body
      */
     public function goods(array $body, ?int $partial = null, ?int $id = null): GoodsResponse;
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsListRequestItem> $body
+     * @param list<GoodsListRequestItem> $body
      */
     public function goodsList(array $body, ?int $id = null): GoodsListResponse;
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsListXmlRequestItem> $body
+     * @param list<GoodsListXmlRequestItem> $body
      */
     public function goodsListXml(array $body, ?int $id = null): GoodsListXmlResponse;
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsXmlRequestItem> $body
+     * @param list<GoodsXmlRequestItem> $body
      */
     public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXmlResponse;
 }

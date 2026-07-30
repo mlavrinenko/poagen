@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class GetDetailingByMoveResponseMoveDetailItem
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetDetailingByMoveResponseMoveDetailItemActionsItem> $actions
+     * @param ?list<GetDetailingByMoveResponseMoveDetailItemActionsItem> $actions
      */
     public function __construct(
         public ?array $actions = null,

@@ -11,7 +11,7 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class SearchClientRequest
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\SearchClientRequestGoodsDataItem> $goods_data
+     * @param ?list<SearchClientRequestGoodsDataItem> $goods_data
      */
     public function __construct(
         public SearchClientRequestSearchMode $search_mode,

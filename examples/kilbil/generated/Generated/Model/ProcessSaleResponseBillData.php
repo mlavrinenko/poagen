@@ -7,7 +7,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class ProcessSaleResponseBillData
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\ProcessSaleResponseBillDataItemsItem> $items
+     * @param list<ProcessSaleResponseBillDataItemsItem> $items
      */
     public function __construct(
         public float $bonus_in,

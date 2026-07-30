@@ -39,6 +39,9 @@ final readonly class ApiExceptionEmitter
         $namespace->addUse(RequestInterface::class);
         $namespace->addUse(ResponseInterface::class);
         $namespace->addUse(RuntimeException::class);
+        $namespace->addUseFunction('json_decode');
+        $namespace->addUseFunction('json_last_error');
+        $namespace->addUseConstant('JSON_ERROR_NONE');
 
         $class = $namespace->addClass('ApiException')
             ->setFinal()
@@ -103,9 +106,9 @@ final readonly class ApiExceptionEmitter
             }
 
             /** @var mixed $decoded */
-            $decoded = \json_decode($body, true);
+            $decoded = json_decode($body, true);
 
-            if (\json_last_error() !== \JSON_ERROR_NONE) {
+            if (json_last_error() !== JSON_ERROR_NONE) {
                 return $this->decodedBody;
             }
 

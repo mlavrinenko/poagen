@@ -172,7 +172,8 @@ final readonly class ModelEmitter
             $param->setDefaultValue(null);
         }
         if ($resolved->phpDoc !== null) {
-            $constructor->addComment(sprintf('@param %s%s $%s', $isNullable ? '?' : '', $resolved->phpDoc, $phpName));
+            $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc);
+            $constructor->addComment(sprintf('@param %s%s $%s', $isNullable ? '?' : '', $docType, $phpName));
         }
         if ($todo !== null) {
             $constructor->addComment($todo);

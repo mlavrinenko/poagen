@@ -15,7 +15,7 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class AddClientRequest
 {
     /**
-     * @param ?list<\Acme\Kilbil\Generated\Model\AddClientRequestSpecialDaysItem> $special_days
+     * @param ?list<AddClientRequestSpecialDaysItem> $special_days
      */
     public function __construct(
         public ?int $client_id,

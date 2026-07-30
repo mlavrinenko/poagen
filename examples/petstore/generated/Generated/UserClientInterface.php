@@ -18,7 +18,7 @@ interface UserClientInterface
     public function createUser(User $body): User;
 
     /**
-     * @param list<\Acme\Petstore\Generated\Model\User> $body
+     * @param list<User> $body
      */
     public function createUsersWithListInput(array $body): User;
 

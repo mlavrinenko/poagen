@@ -69,7 +69,8 @@ final readonly class ParameterAdder
             }
 
             if ($resolved->phpDoc !== null) {
-                $method->addComment('@param ' . $resolved->phpDoc . ' $' . $resolvedParam->phpName);
+                $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc);
+                $method->addComment('@param ' . $docType . ' $' . $resolvedParam->phpName);
             }
 
             if (!$required) {

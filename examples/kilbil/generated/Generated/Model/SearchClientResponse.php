@@ -25,11 +25,11 @@ use Mlavrinenko\Paogen\Runtime\Attribute\Format;
 final readonly class SearchClientResponse
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\SearchClientResponseSpecialDaysTypesItem> $special_days_types
+     * @param list<SearchClientResponseSpecialDaysTypesItem> $special_days_types
      * @param ?list<string> $tags
      * @param ?list<string> $top_sales
-     * @param ?list<\Acme\Kilbil\Generated\Model\SearchClientResponseCardsItem> $cards
-     * @param ?list<\Acme\Kilbil\Generated\Model\SearchClientResponseInterfacesItem> $interfaces
+     * @param ?list<SearchClientResponseCardsItem> $cards
+     * @param ?list<SearchClientResponseInterfacesItem> $interfaces
      */
     public function __construct(
         public SearchClientResponseBillData $_bill_data,

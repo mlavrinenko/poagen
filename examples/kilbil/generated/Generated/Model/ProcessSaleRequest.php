@@ -12,7 +12,7 @@ use Acme\Kilbil\ValueObject\Timestamp;
 final readonly class ProcessSaleRequest
 {
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\ProcessSaleRequestGoodsDataItem> $goods_data
+     * @param list<ProcessSaleRequestGoodsDataItem> $goods_data
      */
     public function __construct(
         public float $bonus_out,

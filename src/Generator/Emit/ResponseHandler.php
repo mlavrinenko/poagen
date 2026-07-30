@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpNamespace;
 
 /**
  * Emits the body lines that send the request and decode the response.
@@ -20,7 +21,7 @@ use Nette\PhpGenerator\Method;
  */
 final readonly class ResponseHandler
 {
-    public function emit(Method $method, ReturnSpec $return): void
+    public function emit(Method $method, PhpNamespace $namespace, ReturnSpec $return): void
     {
         // Use a `$__status` local to avoid colliding with method parameters
         // named `$status` (e.g. `findPetsByStatus`).
@@ -43,21 +44,29 @@ final readonly class ResponseHandler
             return;
         }
 
+        $namespace->addUseFunction('json_decode');
+        $namespace->addUseConstant('JSON_THROW_ON_ERROR');
+
         if ($return->kind === ReturnSpec::KIND_MAP) {
             $method->addBody('/** @var array<string, ' . $return->mapValuePhpType . '> $data */');
-            $method->addBody('$data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);');
+            $method->addBody('$data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);');
             $method->addBody('return $data;');
 
             return;
         }
 
         $method->addBody('/** @var mixed $data */');
-        $method->addBody('$data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);');
+        $method->addBody('$data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);');
+
+        $namespace->addUseFunction('assert');
+        $namespace->addUseFunction('is_array');
 
         if ($return->kind === ReturnSpec::KIND_LIST) {
+            $namespace->addUseFunction('array_values');
+            $namespace->addUseFunction('array_map');
             $model = (string) $return->model;
-            $method->addBody('\assert(\is_array($data));');
-            $method->addBody('return \array_values(\array_map(');
+            $method->addBody('assert(is_array($data));');
+            $method->addBody('return array_values(array_map(');
             $method->addBody('    fn(mixed $item): ' . $model . ' => $this->hydrator->hydrate(' . $model . '::class, (array) $item),');
             $method->addBody('    $data,');
             $method->addBody('));');
@@ -66,7 +75,7 @@ final readonly class ResponseHandler
         }
 
         $model = (string) $return->model;
-        $method->addBody('\assert(\is_array($data));');
+        $method->addBody('assert(is_array($data));');
         $method->addBody('return $this->hydrator->hydrate(' . $model . '::class, $data);');
     }
 }

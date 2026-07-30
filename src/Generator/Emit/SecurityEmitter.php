@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpNamespace;
 
 /**
  * Attaches a request's active security schemes to the emitted method body:
@@ -39,10 +40,11 @@ final readonly class SecurityEmitter
      * Push one query-kind scheme's credential onto the `$query` array.
      * Caller guarantees `$query` already exists in the emitted method body.
      */
-    public function emitQueryPush(Method $method, SecurityScheme $scheme): void
+    public function emitQueryPush(Method $method, PhpNamespace $namespace, SecurityScheme $scheme): void
     {
+        $namespace->addUseFunction('urlencode');
         $method->addBody(
-            '$query[] = ? . \urlencode($this->' . $scheme->ctorArg . ');',
+            '$query[] = ? . urlencode($this->' . $scheme->ctorArg . ');',
             [$scheme->wireName . '='],
         );
     }

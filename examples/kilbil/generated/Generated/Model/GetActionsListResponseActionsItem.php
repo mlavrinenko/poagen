@@ -12,9 +12,9 @@ final readonly class GetActionsListResponseActionsItem
 {
     /**
      * @param ?list<string> $actions_programs
-     * @param ?list<\Acme\Kilbil\Generated\Model\GetActionsListResponseActionsItemRespondsItem> $responds
+     * @param ?list<GetActionsListResponseActionsItemRespondsItem> $responds
      * @param ?list<string> $trade_objects
-     * @param ?list<\Acme\Kilbil\Generated\Enum\GetActionsListResponseActionsItemWeekDaysItem> $week_days
+     * @param ?list<GetActionsListResponseActionsItemWeekDaysItem> $week_days
      */
     public function __construct(
         public ?string $action = null,

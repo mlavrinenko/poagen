@@ -6,6 +6,9 @@ namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Mode
 
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 
+use function assert;
+use function is_string;
+
 final readonly class Urn implements ScalarBinding
 {
     public function __construct(
@@ -15,7 +18,7 @@ final readonly class Urn implements ScalarBinding
 
     public static function fromScalar(mixed $raw): self
     {
-        \assert(\is_string($raw));
+        assert(is_string($raw));
         return new self($raw);
     }
 

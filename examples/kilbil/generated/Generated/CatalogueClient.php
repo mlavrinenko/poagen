@@ -14,9 +14,21 @@ use Acme\Kilbil\Generated\Model\GoodsXmlRequestItem;
 use Acme\Kilbil\Generated\Model\GoodsXmlResponse;
 use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+
+use function array_map;
+use function assert;
+use function implode;
+use function is_array;
+use function json_decode;
+use function json_encode;
+use function rtrim;
+use function urlencode;
+
+use const JSON_THROW_ON_ERROR;
 
 final readonly class CatalogueClient implements CatalogueClientInterface
 {
@@ -32,116 +44,116 @@ final readonly class CatalogueClient implements CatalogueClientInterface
     }
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsRequestItem> $body
+     * @param list<GoodsRequestItem> $body
      */
     public function goods(array $body, ?int $partial = null, ?int $id = null): GoodsResponse
     {
         $path = '/load/goods';
         $query = [];
         if ($partial !== null) {
-            $query[] = 'partial=' . \urlencode((string) $partial);
+            $query[] = 'partial=' . urlencode((string) $partial);
         }
         if ($id !== null) {
-            $query[] = 'id=' . \urlencode((string) $id);
+            $query[] = 'id=' . urlencode((string) $id);
         }
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode(\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(GoodsResponse::class, $data);
     }
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsListRequestItem> $body
+     * @param list<GoodsListRequestItem> $body
      */
     public function goodsList(array $body, ?int $id = null): GoodsListResponse
     {
         $path = '/load/goodslist';
         $query = [];
         if ($id !== null) {
-            $query[] = 'id=' . \urlencode((string) $id);
+            $query[] = 'id=' . urlencode((string) $id);
         }
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(\json_encode(\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), \JSON_THROW_ON_ERROR)));
+            ->withBody($this->streamFactory->createStream(json_encode(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), JSON_THROW_ON_ERROR)));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(GoodsListResponse::class, $data);
     }
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsListXmlRequestItem> $body
+     * @param list<GoodsListXmlRequestItem> $body
      */
     public function goodsListXml(array $body, ?int $id = null): GoodsListXmlResponse
     {
         $path = '/load/goodslistxml';
         $query = [];
         if ($id !== null) {
-            $query[] = 'id=' . \urlencode((string) $id);
+            $query[] = 'id=' . urlencode((string) $id);
         }
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/xml')
-            ->withBody($this->streamFactory->createStream(\Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter::renderList(\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goodslist', 'good')));
+            ->withBody($this->streamFactory->createStream(XmlWriter::renderList(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goodslist', 'good')));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(GoodsListXmlResponse::class, $data);
     }
 
     /**
-     * @param list<\Acme\Kilbil\Generated\Model\GoodsXmlRequestItem> $body
+     * @param list<GoodsXmlRequestItem> $body
      */
     public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXmlResponse
     {
         $path = '/load/goodsxml';
         $query = [];
         if ($partial !== null) {
-            $query[] = 'partial=' . \urlencode((string) $partial);
+            $query[] = 'partial=' . urlencode((string) $partial);
         }
         if ($id !== null) {
-            $query[] = 'id=' . \urlencode((string) $id);
+            $query[] = 'id=' . urlencode((string) $id);
         }
-        $query[] = 'h=' . \urlencode($this->h);
-        $path .= '?' . \implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', \rtrim($this->baseUri, '/') . $path);
+        $query[] = 'h=' . urlencode($this->h);
+        $path .= '?' . implode('&', $query);
+        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
         $request = $request
             ->withHeader('Content-Type', 'application/xml')
-            ->withBody($this->streamFactory->createStream(\Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter::renderList(\array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goods', 'good')));
+            ->withBody($this->streamFactory->createStream(XmlWriter::renderList(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goods', 'good')));
         $response = $this->httpClient->sendRequest($request);
         $__status = $response->getStatusCode();
         if ($__status < 200 || $__status >= 300) {
             throw new ApiException($__status, $request, $response);
         }
         /** @var mixed $data */
-        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
-        \assert(\is_array($data));
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        assert(is_array($data));
         return $this->hydrator->hydrate(GoodsXmlResponse::class, $data);
     }
 }

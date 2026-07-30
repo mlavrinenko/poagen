@@ -21,7 +21,7 @@ interface ApiClientInterface
     public function getSshKeyById(SshKeyId $sshKeyId): void;
 
     /**
-     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
+     * @return list<Order>
      */
     public function listOrders(?int $limit = null, ?string $apiKey = null): array;
 
@@ -32,7 +32,7 @@ interface ApiClientInterface
     public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void;
 
     /**
-     * @return list<\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order>
+     * @return list<Order>
      */
     public function listStoreItems(int $storeId): array;
 
