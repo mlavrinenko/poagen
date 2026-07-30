@@ -103,6 +103,8 @@
 #include "decisions/code-references-permitted-in-generator-specs.decision-260729.typ"
 #pagebreak()
 #include "decisions/xml-request-bodies-are-serialised-not-refused.decision-260730.typ"
+#pagebreak()
+#include "decisions/operations-delegate-to-an-injected-transport.decision-260730.typ"
 
 // --- Supplementary artefacts ---
 //

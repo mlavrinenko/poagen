@@ -131,7 +131,25 @@ the generated fixtures, rector, and linecop, run in parallel.
 The speconaut recipes (`check-specs`, `check-generated-tests`, `check-drift`)
 are currently **outside** this aggregate while the truth tree finishes
 migrating to current speconaut. `rewire-speconaut-justfile-recipes` puts them
-back. Until then, run `speconaut check truth/` directly.
+back.
+
+Until then, validate the tree by copying it somewhere without a `.mindtape/`:
+
+```
+rm -rf /tmp/spec-validate && mkdir -p /tmp/spec-validate
+cp -r truth .speconaut /tmp/spec-validate/
+cd /tmp/spec-validate && speconaut check truth/
+```
+
+Copy `.speconaut/` as well as `truth/`. Without it you lose the
+`code-references-permitted-in-generator-specs` exemption and the run buries the
+real result under 95 spurious "code reference in non-task artifact" errors. A
+clean run is exit 0, `All specs valid`, and three standards-coverage warnings
+naming the standards paogen does not yet enforce.
+
+Running `speconaut check truth/` from the repo root fails on the mindtape config
+skew instead — `unknown field 'on'` — which is `speconaut-mindtape-config-skew`,
+not anything wrong with your artifact.
 
 `just check-examples` is deliberately outside the gate too. It reports each
 example as passing, drifting, or expected-failure, and treats a stale
