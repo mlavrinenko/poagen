@@ -348,7 +348,7 @@
     )[
       #given[#the(Generator) has emitted a sub-client for a tag]
       #when[a consumer constructs #the(Client) directly]
-      #then[#the(Client)'s constructor takes the PSR-18 client, the PSR-17 factories, the base URI, any declared credential and the hydration collaborators — and never #the([root], Client)]
+      #then[#the(Client)'s constructor takes `TransportInterface` and whatever credential #the(Schema) declares — and never #the([root], Client)]
     ]
 
     #scenario(
