@@ -14,6 +14,23 @@
 
 Nothing in it can verify, so \`speconaut status\` and \`speconaut diff\` report against a fiction and \`check-drift\` cannot honestly sit in the gate.
 
+=== The adapter has to be named first, 2026-07-31
+
+\`speconaut lock\` and \`speconaut status\` both spawn the adapter to resolve
+traces, and \`.speconaut/config.toml\` never sets one — so both fall through to
+the default, which is \`rust\`:
+
+```
+error: failed to resolve traces via TraceProvider: failed to load manifest for
+rpc audit-traces against /etc/profiles/per-user/tank/bin/speconaut-rust:
+read manifest .../tests/generated/manifest.json: No such file or directory
+```
+
+paogen is a PHP project and wants the PHPUnit adapter. Setting
+\`\[audit-traces\] adapter\` to the name that adapter actually answers to is part
+of this task; \`make-the-php-adapter-usable-by-a-consumer\` in the speconaut repo
+settles what that name is.
+
 == Acceptance criteria
 
 - \`speconaut lock\` completes against the current tree
@@ -31,4 +48,5 @@ Nothing in it can verify, so \`speconaut status\` and \`speconaut diff\` report 
 == Files
 
 - \`.speconaut/state.lock\`
+- \`.speconaut/config.toml\` — the \`[audit-traces]\` adapter name
 - \`Justfile\`
