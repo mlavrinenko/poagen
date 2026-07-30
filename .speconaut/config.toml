@@ -1,3 +1,21 @@
+# paogen declined the speconaut session workflow: no `speconaut session
+# start`/`close`, no installed pre-commit hook driving it, tasks go
+# proposed -> wip -> done by hand through mindtape instead. `enabled = false`
+# says that was a choice, not neglect, so `check`/`status` stop treating
+# every `done` task's missing session block as a bypassed lifecycle —
+# without it, all 31 `done`/`cancelled` tasks in truth/tasks/ produced a
+# `task lifecycle provenance` warning apiece (verified: zero after this
+# line, see `declare-paogen-runs-no-sessions`). This opt-out only silences
+# that provenance check; `speconaut lock` (apply mode) stays gated behind an
+# open session either way — `enabled` governs whether the lifecycle-report
+# heuristic applies, not whether the FSM exists. Revisit if paogen ever
+# wants the workflow-runtime session protocol's other benefits (in-process
+# spec-first gate on `lock`, orientation dumps via `session start`) enough
+# to also install the hook and start opening/closing sessions per task —
+# until then, the provenance check has nothing true to assert.
+[session]
+enabled = false
+
 [check]
 
 # Roots the untraced-source finding walks.
