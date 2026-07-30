@@ -4,31 +4,31 @@ set dotenv-load := false
 default:
     @just --list
 
-# Run all quality checks (lint + test)
+# Run all quality checks (lint + test + speconaut check-specs)
 #
-# The speconaut recipes below (check-specs, check-generated-tests,
-# check-drift) are still OUT of this aggregate, but no longer because the
-# truth tree is broken. That migration is done: the tree validates clean —
-# 4 features, 13 decisions, 7 standards, 7 goals, every link resolving,
-# exit 0 — with only three deliberate standards-coverage warnings naming
-# the standards paogen does not yet enforce.
+# The speconaut recipes below were out of this aggregate for months under a
+# wrong diagnosis: an earlier version of this comment blamed `speconaut
+# check` reading paogen's `.mindtape/config.toml` through a stale embedded
+# mindtape parser that rejected keys `mt` itself writes. That was never the
+# actual cause and is not preserved here because it is wrong — the real
+# cause was upstream of any config: speconaut's own Cargo workspace did not
+# resolve (its manifest pointed at `../mindtape/crates/swhid-mint`, a path
+# dependency that no longer existed in the mindtape checkout), so it could
+# not rebuild and the installed binary stayed frozen at a July build, long
+# before any of these recipes could run against paogen's current tree or
+# CLI. The toolchain was healed 2026-07-31: the workspace resolves, the
+# installed binary is current, and `speconaut check truth/` runs clean — 4
+# features, 0 warnings (down from 31, all `task lifecycle provenance`; see
+# `declare-paogen-runs-no-sessions`).
 #
-# What blocks re-wiring is upstream. `speconaut check` reads this project's
-# `.mindtape/config.toml` through an embedded mindtape that is older than
-# the installed `mt`, and rejects keys `mt` itself writes (`on`,
-# `tasks.comments`, and probably more behind them). Commenting them out to
-# suit the stale parser would mean gutting the gated preset — including the
-# only machine-checked part of it — so we do not.
-#
-# Rebuilding speconaut does not currently fix it either: its Cargo.toml
-# points at `../mindtape/crates/swhid-mint`, which no longer exists in the
-# mindtape checkout, so it does not build against its own path dependency.
-#
-# Tracked as `speconaut-mindtape-config-skew`; `rewire-speconaut-justfile-recipes`
-# restores these to the gate once it lands. Until then validate the tree
-# directly with `speconaut check truth/` from a directory without a
-# `.mindtape/`, or read that task for the reproduction.
-check: lint test
+# `check-specs` is restored to the gate below. `check-drift` and
+# `check-generated-tests` stay out — both need `tests/generated/
+# manifest.json`, which does not exist because these recipes have never
+# run `generate-tests` for real, and producing it means accepting the
+# ~200 outstanding `Implement:` step stubs (plus 149 now-orphaned step
+# methods) that `implement-the-outrun-step-bodies` owns, not this one. See
+# each recipe's own comment for specifics.
+check: lint test check-specs
 
 # Full pre-commit gate
 gate: check
@@ -147,6 +147,20 @@ check-specs:
     speconaut check truth/
 
 # Verify no spec/source drift (lockfile current with traces)
+#
+# NOT wired into `check`. The command below is already correct against the
+# current CLI and schema — `speconaut status --format json-schema` confirms
+# `content_mismatches` is a live field today, not a retired one an earlier
+# draft of this task assumed it was. What blocks this recipe is data, not
+# wiring: `status` (like `lock`) unconditionally spawns the php-phpunit
+# adapter to resolve coverage-derived traces via `tests/generated/
+# manifest.json`, and that file does not exist — these recipes have never
+# run `generate-tests` for real. The adapter's `audit-traces` RPC has no
+# fallback for a missing manifest by design (fails loud rather than
+# reporting empty traces), so this hard-errors today instead of reporting
+# drift. `implement-the-outrun-step-bodies` unblocks it: once a real
+# `generate-tests` run lands a `manifest.json`, this recipe starts working
+# and can move into `check`.
 check-drift:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -159,24 +173,31 @@ check-drift:
     echo "speconaut: no drift (0 content_mismatches)"
 
 # Generate/update PHPUnit test stubs from specs (dogfooding)
+#
+# `speconaut interop extract --format json | speconaut-phpunit ...` is
+# gone: test generation is one subcommand now, and `--namespace` moved off
+# the CLI entirely onto `.speconaut/config.toml`'s top-level `namespace`
+# key (a PHP namespace is backslash-separated; a shell-quoted CLI flag
+# can't carry that as safely as a TOML literal string can).
 generate-tests:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    speconaut interop extract --format json \
-        | speconaut-phpunit \
-            --output tests/generated \
-            --namespace 'Mlavrinenko\Paogen\Tests\Generated'
+    speconaut generate-tests truth/ --adapter php-phpunit --output tests/generated
     just format
 
 # Verify generated tests are up to date (CI-friendly drift check)
+#
+# NOT wired into `check`. Syntactically correct today (`--adapter
+# php-phpunit`, no `--strict` — `--check` alone already fails on any
+# warning, which is what `--strict` used to mean), but regenerating right
+# now would append roughly 200 outstanding `Implement:` step stubs —
+# paogen's specs outran their implemented step bodies while these recipes
+# sat unwired — and separately reports 149 `orphaned step` warnings for
+# step methods no current scenario references. Either alone fails
+# `--check`. Both are real content changes `tests/generated/` needs, not a
+# wiring problem, and both belong to `implement-the-outrun-step-bodies`.
+# Move this into `check` once that lands and a real `generate-tests` run
+# is clean.
 check-generated-tests:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    speconaut interop extract --format json \
-        | speconaut-phpunit \
-            --output tests/generated \
-            --namespace 'Mlavrinenko\Paogen\Tests\Generated' \
-            --check --strict
+    speconaut generate-tests truth/ --adapter php-phpunit --output tests/generated --check
 
 # Run each examples/*/ profile through paogen; report pass / drift /
 # expected-failure. Deliberately NOT wired into `just check` — broken

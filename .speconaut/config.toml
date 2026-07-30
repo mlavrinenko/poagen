@@ -1,3 +1,14 @@
+# Namespace generated PHPUnit test stubs (tests/generated/) declare. Matches
+# the namespace the committed tree already uses — `Mlavrinenko\Paogen\Tests\
+# Generated`, the same vendor prefix as src/'s own PSR-4 root
+# (`Mlavrinenko\Paogen\`) — so this states what the files already say rather
+# than introducing a new convention. `generate-tests` no longer takes
+# `--namespace` as a CLI flag; the adapter reads it from here instead.
+# Single-quoted TOML literal string on purpose: a PHP namespace is
+# backslash-separated, and a double-quoted TOML string treats backslash as
+# an escape, which would silently mangle it.
+namespace = 'Mlavrinenko\Paogen\Tests\Generated'
+
 # paogen declined the speconaut session workflow: no `speconaut session
 # start`/`close`, no installed pre-commit hook driving it, tasks go
 # proposed -> wip -> done by hand through mindtape instead. `enabled = false`
