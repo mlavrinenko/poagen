@@ -76,15 +76,17 @@ lint-linecop:
 
 # Duplication report on src/ and tests/ (report-only for now)
 #
-# `minTokens: 84` in .jscpd.json was chosen from a measured sweep: at
-# jscpd's default 50, roughly a third of the findings in src/ are pure
-# import blocks (license header + namespace + use list) rather than real
-# code — e.g. InlineObjectResolver.php:1 matching TypeResolver.php:1 for 14
-# lines / 69 tokens. jscpd can only skip those via jscpd:ignore-start /
-# jscpd:ignore-end markers, which are not wired in yet
-# (adopt-jscpd-duplication-gate defers that sweep). 84 is the lowest
-# minTokens that drops every import-block match measured in src/ (the
-# longest was 83 tokens) while still keeping all 10 real clones found there.
+# A file's preamble is repeated text that says nothing about duplicated
+# logic: two files importing the same eight symbols are not two copies of
+# an idea. So `.jscpd.json` drops `declare`, `namespace` and top-level
+# `use` lines with an `ignorePattern` before detection, which lets
+# `minTokens` sit at jscpd's default 50 and still report zero header
+# matches in src/. Raising the threshold instead was the first attempt and
+# the wrong one: 84 was needed to bury the noise, and it buried every
+# genuine short clone with it.
+#
+# The pattern is anchored to column 0 (`(?m)^`), so a trait `use` inside a
+# class body — which is real code — still counts. Only the preamble goes.
 #
 # NOT wired into `lint`: `lint` uses `parallel --halt now,fail=1`, and a
 # report-only recipe in there is noise nobody reads. This recipe reports

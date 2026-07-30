@@ -5,7 +5,11 @@
   tags: ("quality", "tooling"),
   priority: 5,
   difficulty: 3,
-  status: proposed(2026, 7, 30),
+  status: cancelled(
+    2026,
+    7,
+    30,
+  )[Superseded by an ignorePattern in .jscpd.json. jscpd can drop preamble lines before detection, so no marker sweep across ~97 source files is needed, no emitter has to learn to write pragmas, and no profile field has to exist for a consumer to ask for them. minTokens comes back to the default 50 with zero header matches in src/.],
 )
 
 == Summary
