@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Runtime\Marshal;
 use DOMDocument;
 use DOMElement;
 use InvalidArgumentException;
+use Mlavrinenko\Paogen\Runtime\Contract\XmlWriterInterface;
 
 use function is_array;
 use function is_bool;
@@ -38,16 +39,16 @@ use function is_string;
  * root element produces XML the vendor's parser rejects, and rejecting it at
  * generation time with a question is cheaper than at runtime with a 400.
  */
-final readonly class XmlWriter
+final readonly class XmlWriter implements XmlWriterInterface
 {
     /**
      * Render a single object payload.
      *
      * @param array<string,mixed> $data
      */
-    public static function renderObject(array $data, string $rootElement): string
+    public function renderObject(array $data, string $rootElement): string
     {
-        $document = self::newDocument();
+        $document = $this->newDocument();
         $root = $document->createElement($rootElement);
         $document->appendChild($root);
         self::appendMap($document, $root, $data);
@@ -60,9 +61,9 @@ final readonly class XmlWriter
      *
      * @param list<array<string,mixed>> $items
      */
-    public static function renderList(array $items, string $rootElement, string $itemElement): string
+    public function renderList(array $items, string $rootElement, string $itemElement): string
     {
-        $document = self::newDocument();
+        $document = $this->newDocument();
         $root = $document->createElement($rootElement);
         $document->appendChild($root);
 
@@ -75,7 +76,7 @@ final readonly class XmlWriter
         return (string) $document->saveXML();
     }
 
-    private static function newDocument(): DOMDocument
+    private function newDocument(): DOMDocument
     {
         $document = new DOMDocument('1.0', 'UTF-8');
         // Byte-stability at the boundary: without this the output depends on

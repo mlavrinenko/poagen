@@ -67,17 +67,33 @@ final class GeneratedSymbolShorteningTest extends TestCase
 
     public function testAnImportedGlobalFunctionIsWrittenUnqualifiedInAnEmittedBody(): void
     {
-        // Every emitted operation method builds its request URI with
-        // `rtrim($this->baseUri, '/')`. The emitter used to spell it
-        // `\rtrim(...)` inline; it now imports the symbol once with
-        // `use function rtrim;` and calls it unqualified, mirroring what
+        // The emitter used to spell a global function `\json_decode(...)`
+        // inline; it imports the symbol once with `use function json_decode;`
+        // and calls it unqualified, mirroring what
         // `import-global-functions-in-source` already does for paogen's own
-        // sources.
+        // sources. Since request assembly moved to the runtime, the emitted
+        // file that still calls one is the per-profile `ApiException`.
+        $exception = $this->sourceEndingWith('Generated/ApiException.php');
+
+        self::assertStringContainsString('use function json_decode;', $exception);
+        self::assertStringContainsString('use const JSON_ERROR_NONE;', $exception);
+        self::assertStringContainsString('$decoded = json_decode($body, true);', $exception);
+        self::assertStringNotContainsString('\\json_decode(', $exception);
+        self::assertStringNotContainsString('\\JSON_ERROR_NONE', $exception);
+    }
+
+    public function testAnEmittedClientCarriesNoImportItDoesNotUse(): void
+    {
+        // The collapse onto a transport took every request-assembly symbol
+        // out of the emitted body. An import left behind for one of them
+        // would be an unused-import finding in the consumer's own project,
+        // which is the tier `analysis-runs-at-maximum-strictness` admits
+        // nothing on.
         $client = $this->sourceEndingWith('Generated/PetClient.php');
 
-        self::assertStringContainsString('use function rtrim;', $client);
-        self::assertStringContainsString("rtrim(\$this->baseUri, '/')", $client);
-        self::assertStringNotContainsString('\\rtrim(', $client);
+        self::assertStringNotContainsString('use function', $client);
+        self::assertStringNotContainsString('use const', $client);
+        self::assertStringContainsString('use Mlavrinenko\\Paogen\\Runtime\\Contract\\Endpoint;', $client);
     }
 
     private function sourceEndingWith(string $suffix): string

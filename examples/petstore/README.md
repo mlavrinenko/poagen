@@ -53,21 +53,41 @@ against an unchanged schema produces byte-identical files (ADR-001).
 
 ```php
 use Acme\Petstore\Generated\ApiClient;
+use Acme\Petstore\Generated\ApiException;
 use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
+use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 
-$client = new ApiClient(
-    $httpClient,       // any PSR-18 client
-    $requestFactory,   // PSR-17
-    $streamFactory,    // PSR-17
+// Two facts only you can supply: where the API lives, and which exception
+// this profile throws. The PSR-18 client, the PSR-17 factories and the
+// marshalling machinery all default to working implementations.
+$client = new ApiClient(new HttpTransport(
     'https://petstore3.swagger.io/api/v3',
-);
+    ApiException::class,
+));
 
-$pets = $client->findPetsByStatus(FindPetsByStatusStatus::Available);
+$pets = $client->pet()->findPetsByStatus(FindPetsByStatusStatus::Available);
 
 foreach ($pets as $pet) {
     echo $pet->name, "\n";
 }
 ```
+
+Replace any part of the runtime by naming it — the transport takes each
+collaborator as an interface:
+
+```php
+$transport = new HttpTransport(
+    'https://petstore3.swagger.io/api/v3',
+    ApiException::class,
+    $guzzle,            // any PSR-18 client
+    $requestFactory,    // PSR-17
+    $streamFactory,     // PSR-17
+    hydrator: $myHydrator,
+);
+```
+
+Or replace all of it: implement `TransportInterface` and construct the same
+generated client with it. Nothing under `generated/` changes either way.
 
 ## How the Profile is wired
 

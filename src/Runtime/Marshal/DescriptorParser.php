@@ -7,6 +7,9 @@ namespace Mlavrinenko\Paogen\Runtime\Marshal;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Attribute\Format;
 use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
+use Mlavrinenko\Paogen\Runtime\Contract\DescriptorParserInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\PropertyDescriptor;
+use Mlavrinenko\Paogen\Runtime\Contract\PropertyType;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
@@ -30,46 +33,46 @@ use function assert;
  *
  * @internal
  */
-final class DescriptorParser
+final class DescriptorParser implements DescriptorParserInterface
 {
     /** @var array<class-string, list<PropertyDescriptor>> */
-    private static array $cache = [];
+    private array $cache = [];
 
-    private static ?PhpDocParser $docParser = null;
-    private static ?Lexer $lexer = null;
+    private ?PhpDocParser $docParser = null;
+    private ?Lexer $lexer = null;
 
     /**
      * @param class-string $class
      *
      * @return list<PropertyDescriptor>
      */
-    public static function descriptorsFor(string $class): array
+    public function descriptorsFor(string $class): array
     {
-        if (isset(self::$cache[$class])) {
-            return self::$cache[$class];
+        if (isset($this->cache[$class])) {
+            return $this->cache[$class];
         }
 
         $reflection = new ReflectionClass($class);
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
-            return self::$cache[$class] = [];
+            return $this->cache[$class] = [];
         }
 
-        $phpdocTypes = self::parseConstructorPhpdoc($constructor);
+        $phpdocTypes = $this->parseConstructorPhpdoc($constructor);
         $descriptors = [];
 
         foreach ($constructor->getParameters() as $parameter) {
-            $descriptors[] = self::buildDescriptor($parameter, $phpdocTypes[$parameter->getName()] ?? null, $reflection->getNamespaceName());
+            $descriptors[] = $this->buildDescriptor($parameter, $phpdocTypes[$parameter->getName()] ?? null, $reflection->getNamespaceName());
         }
 
-        return self::$cache[$class] = $descriptors;
+        return $this->cache[$class] = $descriptors;
     }
 
     /**
      * @return array<string, TypeNode>
      */
-    private static function parseConstructorPhpdoc(ReflectionMethod $constructor): array
+    private function parseConstructorPhpdoc(ReflectionMethod $constructor): array
     {
         $doc = $constructor->getDocComment();
 
@@ -81,17 +84,17 @@ final class DescriptorParser
             return [];
         }
 
-        if (!self::$docParser instanceof PhpDocParser) {
+        if (!$this->docParser instanceof PhpDocParser) {
             $config = new ParserConfig([]);
             $constExpr = new ConstExprParser($config);
             $typeParser = new TypeParser($config, $constExpr);
-            self::$docParser = new PhpDocParser($config, $typeParser, $constExpr);
-            self::$lexer = new Lexer($config);
+            $this->docParser = new PhpDocParser($config, $typeParser, $constExpr);
+            $this->lexer = new Lexer($config);
         }
 
-        assert(self::$lexer instanceof Lexer);
-        $tokens = new TokenIterator(self::$lexer->tokenize($doc));
-        $node = self::$docParser->parse($tokens);
+        assert($this->lexer instanceof Lexer);
+        $tokens = new TokenIterator($this->lexer->tokenize($doc));
+        $node = $this->docParser->parse($tokens);
 
         $out = [];
 
@@ -102,16 +105,16 @@ final class DescriptorParser
         return $out;
     }
 
-    private static function buildDescriptor(
+    private function buildDescriptor(
         ReflectionParameter $parameter,
         ?TypeNode $phpdocType,
         string $namespace,
     ): PropertyDescriptor {
         $phpName = $parameter->getName();
-        $wireAttr = self::attributeValue($parameter, WireName::class);
+        $wireAttr = $this->attributeValue($parameter, WireName::class);
         $wireName = $wireAttr === null ? $phpName : $wireAttr->name;
-        $formatAttr = self::attributeValue($parameter, Format::class);
-        $discriminator = self::attributeValue($parameter, Discriminator::class);
+        $formatAttr = $this->attributeValue($parameter, Format::class);
+        $discriminator = $this->attributeValue($parameter, Discriminator::class);
 
         $type = PropertyTypeResolver::resolve(
             $parameter->getType(),
@@ -130,7 +133,7 @@ final class DescriptorParser
      *
      * @return T|null
      */
-    private static function attributeValue(ReflectionParameter $parameter, string $name): ?object
+    private function attributeValue(ReflectionParameter $parameter, string $name): ?object
     {
         $attrs = $parameter->getAttributes($name);
 

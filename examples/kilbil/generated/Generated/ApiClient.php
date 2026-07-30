@@ -4,22 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ApiClient implements ApiClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $h,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
@@ -28,7 +19,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function catalogue(): CatalogueClientInterface
     {
-        return new CatalogueClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new CatalogueClient($this->transport, $this->h);
     }
 
     /**
@@ -36,7 +27,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function confirmationCodes(): ConfirmationCodesClientInterface
     {
-        return new ConfirmationCodesClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new ConfirmationCodesClient($this->transport, $this->h);
     }
 
     /**
@@ -44,7 +35,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function customers(): CustomersClientInterface
     {
-        return new CustomersClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new CustomersClient($this->transport, $this->h);
     }
 
     /**
@@ -52,7 +43,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function giftCertificates(): GiftCertificatesClientInterface
     {
-        return new GiftCertificatesClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new GiftCertificatesClient($this->transport, $this->h);
     }
 
     /**
@@ -60,7 +51,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function loyaltySettings(): LoyaltySettingsClientInterface
     {
-        return new LoyaltySettingsClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new LoyaltySettingsClient($this->transport, $this->h);
     }
 
     /**
@@ -68,7 +59,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function misc(): MiscClientInterface
     {
-        return new MiscClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new MiscClient($this->transport, $this->h);
     }
 
     /**
@@ -76,7 +67,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function promocodes(): PromocodesClientInterface
     {
-        return new PromocodesClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new PromocodesClient($this->transport, $this->h);
     }
 
     /**
@@ -84,7 +75,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function salesPlan(): SalesPlanClientInterface
     {
-        return new SalesPlanClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new SalesPlanClient($this->transport, $this->h);
     }
 
     /**
@@ -92,7 +83,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function tags(): TagsClientInterface
     {
-        return new TagsClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new TagsClient($this->transport, $this->h);
     }
 
     /**
@@ -100,7 +91,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function transactions(): TransactionsClientInterface
     {
-        return new TransactionsClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new TransactionsClient($this->transport, $this->h);
     }
 
     /**
@@ -108,6 +99,6 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function wallet(): WalletClientInterface
     {
-        return new WalletClient($this->httpClient, $this->requestFactory, $this->streamFactory, $this->baseUri, $this->h, $this->hydrator, $this->marshaller);
+        return new WalletClient($this->transport, $this->h);
     }
 }

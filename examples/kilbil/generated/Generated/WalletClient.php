@@ -6,53 +6,23 @@ namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetWalletLinkRequest;
 use Acme\Kilbil\Generated\Model\GetWalletLinkResponse;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-
-use function assert;
-use function implode;
-use function is_array;
-use function json_decode;
-use function json_encode;
-use function rtrim;
-use function urlencode;
-
-use const JSON_THROW_ON_ERROR;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class WalletClient implements WalletClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $h,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
     public function getWalletLink(GetWalletLinkRequest $body): GetWalletLinkResponse
     {
-        $path = '/load/getwalletlink';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GetWalletLinkResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/getwalletlink')->query('h', $this->h)->json($body),
+            ResponseType::object(GetWalletLinkResponse::class),
+        );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\Petstore\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\ApiErrorInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -14,13 +15,18 @@ use function json_last_error;
 use const JSON_ERROR_NONE;
 
 /**
- * Thrown by every emitted operation when the response status is non-2xx.
+ * Thrown when the response status is outside the 2xx range.
  *
  * Carries the original PSR-7 request and response together with a
  * best-effort JSON decode of the body. Decode failures are swallowed:
  * `getDecodedBody()` returns `null` when the body is empty or not JSON.
+ *
+ * Named once where the transport is wired — `new HttpTransport($baseUri,
+ * ApiException::class)` — and thrown from there, so this stays the type
+ * a caller catches for this API while the sequence that raises it lives
+ * in the runtime.
  */
-final class ApiException extends RuntimeException
+final class ApiException extends RuntimeException implements ApiErrorInterface
 {
     private mixed $decodedBody = null;
     private bool $decoded = false;

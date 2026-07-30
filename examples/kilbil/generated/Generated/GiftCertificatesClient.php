@@ -9,92 +9,39 @@ use Acme\Kilbil\Generated\Model\GenerateGiftCardResponse;
 use Acme\Kilbil\Generated\Model\GetProgramGiftCardResponse;
 use Acme\Kilbil\Generated\Model\SearchGiftCardRequest;
 use Acme\Kilbil\Generated\Model\SearchGiftCardResponse;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-
-use function assert;
-use function implode;
-use function is_array;
-use function json_decode;
-use function json_encode;
-use function rtrim;
-use function urlencode;
-
-use const JSON_THROW_ON_ERROR;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GiftCertificatesClient implements GiftCertificatesClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $h,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
     public function generateGiftCard(GenerateGiftCardRequest $body): GenerateGiftCardResponse
     {
-        $path = '/load/generategiftcard';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GenerateGiftCardResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/generategiftcard')->query('h', $this->h)->json($body),
+            ResponseType::object(GenerateGiftCardResponse::class),
+        );
     }
 
     public function getProgramGiftCard(): GetProgramGiftCardResponse
     {
-        $path = '/load/getprogramgiftcard';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('GET', rtrim($this->baseUri, '/') . $path);
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GetProgramGiftCardResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::get('/load/getprogramgiftcard')->query('h', $this->h),
+            ResponseType::object(GetProgramGiftCardResponse::class),
+        );
     }
 
     public function searchGiftCard(SearchGiftCardRequest $body): SearchGiftCardResponse
     {
-        $path = '/load/searchgiftcard';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(SearchGiftCardResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/searchgiftcard')->query('h', $this->h)->json($body),
+            ResponseType::object(SearchGiftCardResponse::class),
+        );
     }
 }

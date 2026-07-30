@@ -12,34 +12,15 @@ use Acme\Kilbil\Generated\Model\GoodsRequestItem;
 use Acme\Kilbil\Generated\Model\GoodsResponse;
 use Acme\Kilbil\Generated\Model\GoodsXmlRequestItem;
 use Acme\Kilbil\Generated\Model\GoodsXmlResponse;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-
-use function array_map;
-use function assert;
-use function implode;
-use function is_array;
-use function json_decode;
-use function json_encode;
-use function rtrim;
-use function urlencode;
-
-use const JSON_THROW_ON_ERROR;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CatalogueClient implements CatalogueClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $h,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
@@ -48,29 +29,14 @@ final readonly class CatalogueClient implements CatalogueClientInterface
      */
     public function goods(array $body, ?int $partial = null, ?int $id = null): GoodsResponse
     {
-        $path = '/load/goods';
-        $query = [];
-        if ($partial !== null) {
-            $query[] = 'partial=' . urlencode((string) $partial);
-        }
-        if ($id !== null) {
-            $query[] = 'id=' . urlencode((string) $id);
-        }
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GoodsResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/goods')
+                ->query('partial', $partial)
+                ->query('id', $id)
+                ->query('h', $this->h)
+                ->jsonList($body),
+            ResponseType::object(GoodsResponse::class),
+        );
     }
 
     /**
@@ -78,26 +44,13 @@ final readonly class CatalogueClient implements CatalogueClientInterface
      */
     public function goodsList(array $body, ?int $id = null): GoodsListResponse
     {
-        $path = '/load/goodslist';
-        $query = [];
-        if ($id !== null) {
-            $query[] = 'id=' . urlencode((string) $id);
-        }
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GoodsListResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/goodslist')
+                ->query('id', $id)
+                ->query('h', $this->h)
+                ->jsonList($body),
+            ResponseType::object(GoodsListResponse::class),
+        );
     }
 
     /**
@@ -105,26 +58,13 @@ final readonly class CatalogueClient implements CatalogueClientInterface
      */
     public function goodsListXml(array $body, ?int $id = null): GoodsListXmlResponse
     {
-        $path = '/load/goodslistxml';
-        $query = [];
-        if ($id !== null) {
-            $query[] = 'id=' . urlencode((string) $id);
-        }
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/xml')
-            ->withBody($this->streamFactory->createStream(XmlWriter::renderList(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goodslist', 'good')));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GoodsListXmlResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/goodslistxml')
+                ->query('id', $id)
+                ->query('h', $this->h)
+                ->xmlList($body, 'goodslist', 'good'),
+            ResponseType::object(GoodsListXmlResponse::class),
+        );
     }
 
     /**
@@ -132,28 +72,13 @@ final readonly class CatalogueClient implements CatalogueClientInterface
      */
     public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXmlResponse
     {
-        $path = '/load/goodsxml';
-        $query = [];
-        if ($partial !== null) {
-            $query[] = 'partial=' . urlencode((string) $partial);
-        }
-        if ($id !== null) {
-            $query[] = 'id=' . urlencode((string) $id);
-        }
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/xml')
-            ->withBody($this->streamFactory->createStream(XmlWriter::renderList(array_map(fn(object $__m): array => $this->marshaller->marshal($__m), $body), 'goods', 'good')));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GoodsXmlResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/goodsxml')
+                ->query('partial', $partial)
+                ->query('id', $id)
+                ->query('h', $this->h)
+                ->xmlList($body, 'goods', 'good'),
+            ResponseType::object(GoodsXmlResponse::class),
+        );
     }
 }

@@ -64,11 +64,6 @@ final readonly class BodySpec
         return new self(self::KIND_XML_LIST, model: $model, rootElement: $rootElement, itemElement: $itemElement);
     }
 
-    public function isXml(): bool
-    {
-        return $this->kind === self::KIND_XML || $this->kind === self::KIND_XML_LIST;
-    }
-
     public static function json(string $model): self
     {
         return new self(self::KIND_JSON, model: $model);

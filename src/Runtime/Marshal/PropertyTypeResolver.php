@@ -6,6 +6,7 @@ namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
 use BackedEnum;
 use DateTimeInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\PropertyType;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;

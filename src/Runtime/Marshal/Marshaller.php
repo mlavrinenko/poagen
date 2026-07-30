@@ -6,6 +6,9 @@ namespace Mlavrinenko\Paogen\Runtime\Marshal;
 
 use BackedEnum;
 use DateTimeInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\DescriptorParserInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\MarshallerInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\PropertyType;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 use ReflectionClass;
 
@@ -20,8 +23,12 @@ use function is_object;
  * phpdoc + attributes); see ADR-010. The result is intended to be passed
  * directly to `json_encode(..., JSON_THROW_ON_ERROR)`.
  */
-final class Marshaller
+final readonly class Marshaller implements MarshallerInterface
 {
+    public function __construct(
+        private DescriptorParserInterface $descriptors = new DescriptorParser(),
+    ) {}
+
     /**
      * @return array<string, mixed>
      */
@@ -30,7 +37,7 @@ final class Marshaller
         $out = [];
         $reflection = new ReflectionClass($model);
 
-        foreach (DescriptorParser::descriptorsFor($model::class) as $descriptor) {
+        foreach ($this->descriptors->descriptorsFor($model::class) as $descriptor) {
             $value = $reflection->getProperty($descriptor->phpName)->getValue($model);
             $out[$descriptor->wireName] = $this->encode($value, $descriptor->type);
         }

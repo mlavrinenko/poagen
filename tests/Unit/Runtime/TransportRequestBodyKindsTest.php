@@ -1,0 +1,118 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
+
+/**
+ * Every body shape a schema declares, encoded once in the runtime.
+ *
+ * The marshaller runs first for every kind that has a Model behind it, so
+ * wire names and formats are decided once and the content types cannot
+ * disagree about a value. An absent optional field is dropped rather than
+ * sent empty, which is what lets an emitted method pass its parameters
+ * without an `if`.
+ */
+final class TransportRequestBodyKindsTest extends TestCase
+{
+    public function testNoBodyMeansNoContentTypeAtAll(): void
+    {
+        $request = $this->send(Endpoint::get('/pet/1'));
+
+        self::assertFalse($request->hasHeader('Content-Type'));
+        self::assertSame('', (string) $request->getBody());
+    }
+
+    public function testAJsonBodyIsMarshalledThenEncoded(): void
+    {
+        $request = $this->send(Endpoint::post('/contact')->json(new Contact('Grace')));
+
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        // `display-name`, not `displayName`: the marshaller decided the wire
+        // name before the encoder ever saw the value.
+        self::assertSame('{"display-name":"Grace","email":null}', (string) $request->getBody());
+    }
+
+    public function testAJsonListMarshallsEveryItem(): void
+    {
+        $request = $this->send(
+            Endpoint::post('/contacts')->jsonList([new Contact('Grace'), new Contact('Ada')]),
+        );
+
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame(
+            '[{"display-name":"Grace","email":null},{"display-name":"Ada","email":null}]',
+            (string) $request->getBody(),
+        );
+    }
+
+    public function testAnUnconstrainedObjectBodyIsSentAsTheCallerHoldsIt(): void
+    {
+        $request = $this->send(Endpoint::post('/opaque')->jsonRaw(['a' => 1, 'b' => null]));
+
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"a":1,"b":null}', (string) $request->getBody());
+    }
+
+    public function testAnXmlBodyIsMarshalledThenRenderedUnderTheNamedRoot(): void
+    {
+        $request = $this->send(Endpoint::post('/contact')->xml(new Contact('Grace'), 'contact'));
+
+        self::assertSame('application/xml', $request->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('<contact>', (string) $request->getBody());
+        self::assertStringContainsString('<display-name>Grace</display-name>', (string) $request->getBody());
+    }
+
+    public function testAnXmlListRepeatsTheNamedItemElement(): void
+    {
+        $request = $this->send(
+            Endpoint::post('/contacts')->xmlList([new Contact('Grace'), new Contact('Ada')], 'contacts', 'contact'),
+        );
+        $body = (string) $request->getBody();
+
+        self::assertSame('application/xml', $request->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('<contacts>', $body);
+        self::assertSame(2, substr_count($body, '<contact>'));
+    }
+
+    public function testAFormBodyIsRfc1738EncodedAndDropsTheFieldsTheCallerLeftOut(): void
+    {
+        $request = $this->send(
+            Endpoint::post('/token')->form(['grantType' => 'password', 'clientId' => 'my app', 'scope' => null]),
+        );
+
+        self::assertSame('application/x-www-form-urlencoded', $request->getHeaderLine('Content-Type'));
+        // `+` for the space is RFC1738, which is what an OAuth2 token
+        // endpoint expects.
+        self::assertSame('grantType=password&clientId=my+app', (string) $request->getBody());
+    }
+
+    private function send(Endpoint $endpoint): RequestInterface
+    {
+        $factory = new Psr17Factory();
+        $http = new RecordingClient(new Response(204, [], ''));
+
+        new HttpTransport(
+            'https://example.test/api',
+            ApiException::class,
+            $http,
+            $factory,
+            $factory,
+        )->send($endpoint, ResponseType::nothing());
+
+        self::assertNotNull($http->lastRequest);
+
+        return $http->lastRequest;
+    }
+}

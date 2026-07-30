@@ -18,98 +18,40 @@ use Acme\Kilbil\Generated\Model\ReplaceCardRequest;
 use Acme\Kilbil\Generated\Model\ReplaceCardResponse;
 use Acme\Kilbil\Generated\Model\SearchClientRequest;
 use Acme\Kilbil\Generated\Model\SearchClientResponse;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-
-use function array_map;
-use function array_values;
-use function assert;
-use function implode;
-use function is_array;
-use function json_decode;
-use function json_encode;
-use function rtrim;
-use function urlencode;
-
-use const JSON_THROW_ON_ERROR;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CustomersClient implements CustomersClientInterface
 {
     public function __construct(
-        private ClientInterface $httpClient,
-        private RequestFactoryInterface $requestFactory,
-        private StreamFactoryInterface $streamFactory,
-        private string $baseUri,
+        private TransportInterface $transport,
         private string $h,
-        private Hydrator $hydrator = new Hydrator(),
-        private Marshaller $marshaller = new Marshaller(),
     ) {
     }
 
     public function addClient(AddClientRequest $body): AddClientResponse
     {
-        $path = '/load/addclient';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(AddClientResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/addclient')->query('h', $this->h)->json($body),
+            ResponseType::object(AddClientResponse::class),
+        );
     }
 
     public function blockCard(BlockCardRequest $body): BlockCardResponse
     {
-        $path = '/load/blockcard';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(BlockCardResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/blockcard')->query('h', $this->h)->json($body),
+            ResponseType::object(BlockCardResponse::class),
+        );
     }
 
     public function getClientCards(GetClientCardsRequest $body): GetClientCardsResponse
     {
-        $path = '/load/getclientcards';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GetClientCardsResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/getclientcards')->query('h', $this->h)->json($body),
+            ResponseType::object(GetClientCardsResponse::class),
+        );
     }
 
     /**
@@ -117,88 +59,33 @@ final readonly class CustomersClient implements CustomersClientInterface
      */
     public function getClientFullBalance(GetClientFullBalanceRequest $body): array
     {
-        $path = '/load/getclientfullbalance';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return array_values(array_map(
-            fn(mixed $item): GetClientFullBalanceResponseItem => $this->hydrator->hydrate(GetClientFullBalanceResponseItem::class, (array) $item),
-            $data,
-        ));
+        return $this->transport->send(
+            Endpoint::post('/load/getclientfullbalance')->query('h', $this->h)->json($body),
+            ResponseType::listOf(GetClientFullBalanceResponseItem::class),
+        );
     }
 
     public function getConfirmationCode(GetConfirmationCodeRequest $body): GetConfirmationCodeResponse
     {
-        $path = '/load/getconfirmationcode';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(GetConfirmationCodeResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/getconfirmationcode')->query('h', $this->h)->json($body),
+            ResponseType::object(GetConfirmationCodeResponse::class),
+        );
     }
 
     public function replaceCard(ReplaceCardRequest $body): ReplaceCardResponse
     {
-        $path = '/load/replacecard';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(ReplaceCardResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/replacecard')->query('h', $this->h)->json($body),
+            ResponseType::object(ReplaceCardResponse::class),
+        );
     }
 
     public function searchClient(SearchClientRequest $body): SearchClientResponse
     {
-        $path = '/load/searchclient';
-        $query = [];
-        $query[] = 'h=' . urlencode($this->h);
-        $path .= '?' . implode('&', $query);
-        $request = $this->requestFactory->createRequest('POST', rtrim($this->baseUri, '/') . $path);
-        $request = $request
-            ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($this->marshaller->marshal($body), JSON_THROW_ON_ERROR)));
-        $response = $this->httpClient->sendRequest($request);
-        $__status = $response->getStatusCode();
-        if ($__status < 200 || $__status >= 300) {
-            throw new ApiException($__status, $request, $response);
-        }
-        /** @var mixed $data */
-        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-        assert(is_array($data));
-        return $this->hydrator->hydrate(SearchClientResponse::class, $data);
+        return $this->transport->send(
+            Endpoint::post('/load/searchclient')->query('h', $this->h)->json($body),
+            ResponseType::object(SearchClientResponse::class),
+        );
     }
 }

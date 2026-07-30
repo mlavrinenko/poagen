@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use Mlavrinenko\Paogen\Runtime\Contract\ApiErrorInterface;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 use Psr\Http\Message\RequestInterface;
@@ -36,6 +37,7 @@ final readonly class ApiExceptionEmitter
         $file->setStrictTypes();
 
         $namespace = $file->addNamespace($clientNamespace);
+        $namespace->addUse(ApiErrorInterface::class);
         $namespace->addUse(RequestInterface::class);
         $namespace->addUse(ResponseInterface::class);
         $namespace->addUse(RuntimeException::class);
@@ -45,13 +47,19 @@ final readonly class ApiExceptionEmitter
 
         $class = $namespace->addClass('ApiException')
             ->setFinal()
-            ->setExtends(RuntimeException::class);
+            ->setExtends(RuntimeException::class)
+            ->addImplement(ApiErrorInterface::class);
 
-        $class->addComment('Thrown by every emitted operation when the response status is non-2xx.');
+        $class->addComment('Thrown when the response status is outside the 2xx range.');
         $class->addComment('');
         $class->addComment('Carries the original PSR-7 request and response together with a');
         $class->addComment('best-effort JSON decode of the body. Decode failures are swallowed:');
         $class->addComment('`getDecodedBody()` returns `null` when the body is empty or not JSON.');
+        $class->addComment('');
+        $class->addComment('Named once where the transport is wired — `new HttpTransport($baseUri,');
+        $class->addComment('ApiException::class)` — and thrown from there, so this stays the type');
+        $class->addComment('a caller catches for this API while the sequence that raises it lives');
+        $class->addComment('in the runtime.');
 
         $class->addProperty('decodedBody')
             ->setPrivate()
