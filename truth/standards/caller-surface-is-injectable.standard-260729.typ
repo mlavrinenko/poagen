@@ -25,4 +25,13 @@
     object exposing every operation in #the(Schema) — otherwise a unit test has
     to stand in for a surface it never calls.
   ],
+  structural: "enforced by ClientConstructor.php, which is the sole constructor
+    for the root client and every sub-client and routes every collaborator —
+    the transport and any credential the schema declares — through a promoted
+    parameter type-hinted against TransportInterface rather than a concrete
+    class; and by SubClientEmitter.php, which emits a matching interface with
+    no constructor member for each client, so a hand-written decorator
+    satisfies the same contract by implementing the interface rather than by
+    extending or reaching into the class. No emitter resolves a collaborator
+    from a container or global state.",
 )

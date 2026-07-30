@@ -20,4 +20,20 @@
     still succeeds, producing a client that is less pleasant to use and no
     less correct.
   ],
+  structural: "enforced by Profile.php, a readonly value object whose
+    schema-shaping fields (renames, skip, tagRenames, tagAssignments,
+    tagChoice, xmlElements, inlineModels, discriminators) are plain scalars
+    and arrays, never a closure — ProfileLoader.php only requires the file to
+    obtain that value and does not invoke anything on it; and by
+    AttributeScanner.php, which reflects `#[BindsFormat]` off consumer classes
+    and reads the attribute instance without ever calling a method on the
+    scanned class. One field is a bounded exception worth naming rather than
+    hiding: `Profile::$nameNormaliser` (ADR-003) lets a consumer supply a
+    `NameNormaliser` strategy the generator calls to decide an identifier
+    string. It shapes a name only, carries no default requirement — the
+    built-in pipeline runs when it is unset, so guidance stays inert on its
+    own — and contributes nothing to generated behaviour, but it is a
+    consumer-authored method the generator does invoke, and any future
+    extension point should be weighed against this rule rather than assumed
+    to inherit this exemption.",
 )

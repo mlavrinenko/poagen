@@ -8,6 +8,10 @@
   title: "A run that completes emitted everything it was asked for",
   status: accepted(2026, 7, 29),
   contexts: (generation-context, cli-context),
+  requires-cases: (
+    "unsupported-content-type-aborts-run",
+    "explicit-skip-omits-without-stub",
+  ),
   rule: [
     When #the(PaogenCli) exits successfully, every #an(Operation) and every
     payload shape in #the(Schema) is present in the emitted tree. There is no

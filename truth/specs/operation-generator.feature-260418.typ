@@ -242,6 +242,8 @@
     #scenario(
       "An unsupported body content type aborts the run",
       stage: "unstable",
+      case: "unsupported-content-type-aborts-run",
+      standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
       #when[#the(Generator) runs against #a(Profile) declaring no skip entry for that #a(Operation)]
@@ -252,6 +254,8 @@
     #scenario(
       "An explicitly skipped operation is omitted rather than stubbed",
       stage: "unstable",
+      case: "explicit-skip-omits-without-stub",
+      standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
       #and_[#the(Profile) declares a skip entry for that #a(Operation) carrying a reason]
