@@ -6,6 +6,7 @@
   priority: 6,
   difficulty: 3,
   status: proposed(2026, 7, 31),
+  links: depends-on("implement-the-outrun-step-bodies.task-260731.typ"),
 )
 
 == Summary
@@ -30,6 +31,30 @@ paogen is a PHP project and wants the PHPUnit adapter. Setting
 \`\[audit-traces\] adapter\` to the name that adapter actually answers to is part
 of this task; \`make-the-php-adapter-usable-by-a-consumer\` in the speconaut repo
 settles what that name is.
+
+=== Two blockers, measured 2026-07-31
+
+Naming the adapter was necessary and is not sufficient. `lock`, `lock --check`
+and `status` all resolve traces first, unconditionally, with no degraded path —
+and trace resolution needs `tests/generated/manifest.json`, which does not
+exist:
+
+```
+error: failed to resolve traces via TraceProvider: failed to load manifest for
+rpc audit-traces against .../speconaut-php-phpunit:
+read manifest tests/generated/manifest.json: No such file or directory
+```
+
+The manifest is an output of a real `generate-tests` run. Producing one means
+accepting roughly 200 appended `Implement:` stubs and 149 orphaned-step
+warnings, which is `implement-the-outrun-step-bodies`.
+
+Separately, `speconaut lock` in apply mode is gated behind an open session even
+with `[session] enabled = false`. That is `session-opt-out-does-not-reach-lock`
+in the speconaut repo.
+
+So this task cannot be done by hand-editing the lockfile — its own header
+forbids that, and fabricating trace data would be worse. It waits.
 
 == Acceptance criteria
 
