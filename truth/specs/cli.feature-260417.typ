@@ -2,6 +2,7 @@
 #import "../domain/cli.context.typ": cli-context, PaogenCli
 #import "../domain/guidance.context.typ": guidance-context, Profile
 #import "../domain/schema.context.typ": schema-context, Schema
+#import "../domain/generation.context.typ": generation-context, GeneratedFile
 
 #feature("paogen CLI", description: [
   The top-level `paogen` command dispatches to subcommands. This feature covers
@@ -62,7 +63,8 @@
 
   #rule("Validate subcommand")[
     #scenario("validate on a syntactically valid OpenAPI document exits 0", stage: "unstable")[
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "validate tests/fixtures/schemas/petstore-3.0.yaml"))]
+      #given[a syntactically valid #a(Schema) document at #p((path: "<schema-path>"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "validate <schema-path>"))]
       #then[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
 
@@ -85,8 +87,8 @@
       "--output redirects the generated tree to the supplied directory",
       stage: "unstable",
     )[
-      #given[#a(Profile) at #p((path: "tests/fixtures/profiles/petstore.php")) whose declared `output` is `tests/fixtures/generated/petstore`]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir>"))]
+      #given[#a(Profile) at #p((path: "<profile-path>")) whose declared `output` is #p((path: "<declared-output-dir>"))]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path> --output=<tmp-dir>"))]
       #then[the generated tree is written under #p((path: "<tmp-dir>")) instead of #the(Profile)'s declared `output`]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]
@@ -107,8 +109,8 @@
       "--diff against a matching golden tree exits 0 with no output",
       stage: "unstable",
     )[
-      #given[a temporary copy of #p((path: "tests/fixtures/generated/petstore")) at #p((path: "<tmp-dir>")) for #the(PaogenCli) to diff against]
-      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate tests/fixtures/profiles/petstore.php --output=<tmp-dir> --diff"))]
+      #given[a temporary copy of #a([matching], GeneratedFile) tree at #p((path: "<tmp-dir>")) for #the(PaogenCli) to diff against]
+      #when[#the(PaogenCli) is invoked with arguments #p((args: "generate <profile-path> --output=<tmp-dir> --diff"))]
       #then[#the(PaogenCli)'s stdout is empty]
       #and_[#the(PaogenCli) should exit with code #p((code: "0"))]
     ]

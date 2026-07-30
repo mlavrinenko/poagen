@@ -13,7 +13,7 @@
       "A PHP file that returns a Profile is loaded as that Profile",
       stage: "unstable",
     )[
-      #given[a PHP file at #p((path: "tests/fixtures/profiles/petstore.php")) returns #a(Profile) for #the(Schema) at #p((schema: "tests/fixtures/schemas/petstore-3.0.yaml"))]
+      #given[a PHP file at #p((path: "<profile-path>")) returns #a(Profile) for #the(Schema) at #p((schema: "<schema-path>"))]
       #when[#the(Profile) is loaded from that path]
       #then[the result is #a(Profile)]
       #and_[#the(Profile)'s `schema` resolves to the fixture path]

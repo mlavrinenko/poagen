@@ -66,7 +66,7 @@ Rationale:
   than shipping without it.
 - Validation-tier #a(Schema) documents that are 3.1-only (Kubernetes,
   modern GitHub bundles), named in
-  #link("schema-fixture-policy.decision-260418.typ")[Schema fixture policy: vendor real-world OpenAPI documents under tests/fixtures/schemas/], can be reached via an external 3.1 →
+  #link("schema-fixture-policy.decision-260418.typ")[Schema fixture policy: vendor real-world OpenAPI documents], can be reached via an external 3.1 →
   3.0 pre-processor (e.g. `redocly bundle --ext`) until in-tree support
   lands. This is documented as a known limitation in the README and in
   `truth/notes/openapi-3.1-gap.md`.

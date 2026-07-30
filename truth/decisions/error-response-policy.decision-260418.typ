@@ -68,7 +68,7 @@ Specifically:
   at one even for richly-typed error surfaces.
 + Escalating to (a) is a future decision, triggered when at least one
   validation-tier schema (see
-  #link("schema-fixture-policy.decision-260418.typ")[Schema fixture policy: vendor real-world OpenAPI documents under tests/fixtures/schemas/]) has a typed error body that
+  #link("schema-fixture-policy.decision-260418.typ")[Schema fixture policy: vendor real-world OpenAPI documents]) has a typed error body that
   consumers want to catch structurally, not by status code.
 
 The implementing task tracks this build; a concrete alternative would

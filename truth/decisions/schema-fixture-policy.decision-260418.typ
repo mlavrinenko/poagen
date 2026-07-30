@@ -2,7 +2,7 @@
 #import "../domain/schema.context.typ": *
 
 #show: decision.with(
-  title: "Schema fixture policy: vendor real-world OpenAPI documents under tests/fixtures/schemas/",
+  title: "Schema fixture policy: vendor real-world OpenAPI documents",
   status: accepted(2026, 4, 18),
   contexts: (schema-context,),
   goals: (link("../goals/real-world-schemas.goal.typ"),),
@@ -19,10 +19,10 @@ release if it matters.
 
 == Choice
 
-Vendor schemas as plain files under `tests/fixtures/schemas/<vendor>-<version>.yaml`.
-Each schema gets one matching `tests/fixtures/profiles/<vendor>.php`. Each
-schema gets one matching `tests/fixtures/generated/<vendor>/` directory
-containing the committed generator output (golden file).
+Vendor schemas as plain files named `<vendor>-<version>.yaml`. Each schema
+gets one matching profile named `<vendor>.php`. Each schema gets one
+matching golden-output directory named `<vendor>/` containing the
+committed generator output (golden file).
 
 === PoC tier
 
