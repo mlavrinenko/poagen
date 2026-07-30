@@ -32,7 +32,7 @@ All tasks are exposed via [`just`](https://github.com/casey/just):
 
 ```bash
 just            # list recipes
-just check      # lint + test
+just check      # lint + test + speconaut check-specs
 just format     # auto-fix code style
 just test       # run PHPUnit
 ```
