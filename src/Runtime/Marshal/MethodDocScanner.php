@@ -13,7 +13,7 @@ use function is_array;
 /**
  * Recovers the doc comment for a named method by re-tokenising the file
  * that declares it. Used by {@see DescriptorParser} as a fallback when
- * {@see \ReflectionMethod::getDocComment()} returns `false` — which
+ * {@see ReflectionMethod::getDocComment()} returns `false` — which
  * happens under `opcache.save_comments=0`, where the opcache strips
  * comments from its in-memory copy of the class, even though the source
  * file on disk is unchanged.
