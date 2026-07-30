@@ -16,6 +16,31 @@
 [session]
 enabled = false
 
+# `lock`/`status`/`diff` spawn an adapter to resolve traces; unset, the
+# adapter name falls through to speconaut's baked-in default, `rust`, which
+# paogen — a PHP project — never satisfies:
+#
+#   error: failed to resolve traces via TraceProvider: failed to load
+#   manifest for rpc audit-traces against .../speconaut-rust: read manifest
+#   tests/generated/manifest.json: No such file or directory
+#
+# Naming the real adapter fixes *that* failure — the same command now
+# resolves `speconaut-php-phpunit` instead of `speconaut-rust` — but does
+# not, by itself, make `lock`/`status` succeed: `tests/generated/` has no
+# `manifest.json` (verified: `ls tests/generated/` today shows only the
+# committed `*Test.php`/`*Steps.php` files, no manifest), because these
+# recipes have never actually run `generate-tests` for real. The adapter's
+# `audit-traces` RPC has no fallback for a missing manifest by design (it
+# fails loud rather than reporting empty traces), so `lock`/`status` still
+# hard-error post this fix, just against the right binary. Producing that
+# manifest means running `generate-tests` for real, which appends the
+# ~200 outstanding `Implement:` step stubs `implement-the-outrun-step-
+# bodies` owns — out of this config change's scope. This line is still
+# correct and necessary; it is one of two preconditions, not the fix on
+# its own.
+[audit-traces]
+adapter = "php-phpunit"
+
 [check]
 
 # Roots the untraced-source finding walks.
