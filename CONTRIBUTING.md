@@ -37,6 +37,7 @@ just test       # run PHPUnit
 | Code style        | [php-cs-fixer](https://cs.symfony.com) (PER-CS 2.0)     |
 | Static analysis   | [PHPStan](https://phpstan.org) at `max` + strict rules  |
 | Refactoring       | [Rector](https://getrector.com)                         |
+| Duplication       | [jscpd](https://github.com/kucherenko/jscpd) (report-only) |
 | Tests             | [PHPUnit](https://phpunit.de)                           |
 | Code generation   | [nette/php-generator](https://github.com/nette/php-generator) |
 
