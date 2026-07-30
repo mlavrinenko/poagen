@@ -136,7 +136,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
-            if (is_array($fn) && isset($fn[0]) && $fn[0] instanceof ClassLoader) {
+            if (is_array($fn) && $fn[0] instanceof ClassLoader) {
                 return $fn[0];
             }
         }
