@@ -33,4 +33,4 @@ The second one is why this is its own task: rewording that Then changes the deri
 
 == Files
 
-- TODO: paths this task expects to change
+- \`truth/specs/operation-generator.feature-260418.typ\`

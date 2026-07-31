@@ -36,4 +36,4 @@ Verified end to end on a throwaway copy of paogen with that one line added: \`Al
 
 == Files
 
-- TODO: paths this task expects to change
+- \`.speconaut/config.toml\`

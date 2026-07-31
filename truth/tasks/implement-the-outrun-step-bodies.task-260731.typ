@@ -31,4 +31,6 @@ Append-only holds — zero lines were removed from any Steps file — so the han
 
 == Files
 
-- TODO: paths this task expects to change
+- \`.php-cs-fixer.dist.php\`
+- \`phpstan.neon.dist\`
+- \`tests/generated/\`

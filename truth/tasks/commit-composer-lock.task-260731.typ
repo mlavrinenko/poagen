@@ -37,4 +37,6 @@ So the gate is green here and red on a fresh clone, and neither result is more r
 
 == Files
 
-- TODO: paths this task expects to change
+- \`.gitignore\`
+- \`CONTRIBUTING.md\`
+- \`composer.lock\`

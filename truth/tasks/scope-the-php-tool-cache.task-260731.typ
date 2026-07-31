@@ -27,4 +27,5 @@ This cost two agents time on 2026-07-31 and made a third report a red gate again
 
 == Files
 
-- TODO: paths this task expects to change
+- \`Justfile\`
+- \`AGENT.md\`

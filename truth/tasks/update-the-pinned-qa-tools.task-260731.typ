@@ -38,4 +38,9 @@ None of these are false positives on their face; they are findings the project h
 
 == Files
 
-- TODO: paths this task expects to change
+- \`composer.lock\`
+- \`src/Cli.php\`
+- \`src/Runtime/Marshal/PropertyTypeResolver.php\`
+- \`tests/Integration/\`
+- \`tests/Support/GeneratedTreeSandbox.php\`
+- \`tests/generated/\`

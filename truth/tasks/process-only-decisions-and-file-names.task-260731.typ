@@ -43,4 +43,5 @@ vocabulary alone.
 
 == Files
 
-- TODO: paths this task expects to change
+- \`truth/decisions/plain-getopt-for-the-cli.decision-260417.typ\`
+- \`truth/decisions/code-references-permitted-in-generator-specs.decision-260729.typ\`

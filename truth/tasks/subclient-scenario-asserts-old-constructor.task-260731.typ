@@ -38,4 +38,4 @@ Surfaced while giving the standards a testable obligation: this was the one cand
 
 == Files
 
-- TODO: paths this task expects to change
+- \`truth/specs/operation-generator.feature-260418.typ\`
