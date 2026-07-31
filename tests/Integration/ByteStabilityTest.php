@@ -40,6 +40,14 @@ final class ByteStabilityTest extends TestCase
     private const string PETSTORE_NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore';
 
     /**
+     * The golden tree is produced by running the CLI against this profile from
+     * the repository root, and each emitted file's header names it. A profile
+     * built in code here has no path of its own, so it has to say which file it
+     * stands in for or the header alone would fail the comparison.
+     */
+    private const string PETSTORE_PROFILE = 'tests/fixtures/profiles/petstore.php';
+
+    /**
      * @var array<string,string>
      */
     private const array PETSTORE_SKIP = [
@@ -84,6 +92,7 @@ final class ByteStabilityTest extends TestCase
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
+            source: self::PETSTORE_PROFILE,
         ));
         $firstSnapshot = $this->snapshot($this->firstOutputDir);
 
@@ -93,6 +102,7 @@ final class ByteStabilityTest extends TestCase
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
+            source: self::PETSTORE_PROFILE,
         ));
         $secondSnapshot = $this->snapshot($this->secondOutputDir);
 

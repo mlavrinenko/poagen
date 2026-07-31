@@ -105,6 +105,8 @@
 #include "decisions/xml-request-bodies-are-serialised-not-refused.decision-260730.typ"
 #pagebreak()
 #include "decisions/operations-delegate-to-an-injected-transport.decision-260730.typ"
+#pagebreak()
+#include "decisions/a-header-not-a-chmod.decision-260731.typ"
 
 // --- Supplementary artefacts ---
 //

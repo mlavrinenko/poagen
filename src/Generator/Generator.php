@@ -14,6 +14,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\GeneratedFileHeader;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
@@ -173,6 +174,14 @@ final readonly class Generator
         if ($failures !== []) {
             throw UnrepresentableConstructsException::forProblems($failures);
         }
+
+        // Stamped once over the finished write set rather than inside each of
+        // the emitters: every file paogen emits carries the header, and a
+        // per-emitter copy would be a rule the next emitter could forget.
+        // Stamping inside the plan rather than in {@see PlanApplier} is what
+        // makes `--diff` and `--dry-run` show the same bytes a real run writes.
+        $header = new GeneratedFileHeader($profile->source);
+        $writes = array_map($header->stamp(...), $writes);
 
         return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, $notices);
     }

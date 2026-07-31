@@ -113,14 +113,16 @@ rector, and linecop, in parallel.
 exiting 0 with `All specs valid (4 features)` and no warnings. There is no
 longer any reason to copy the tree elsewhere to validate it.
 
-`check-drift` and `check-generated-tests` stay **outside** the gate, blocked on
-data rather than wiring: both need `tests/generated/manifest.json`, which only a
-real `generate-tests` run produces, and that run means accepting ~200 outstanding
-`Implement:` stubs and 149 orphaned-step warnings — `implement-the-outrun-step-
-bodies` owns those. Read each recipe's own comment before touching either. For
-the same missing manifest, `speconaut status`, `lock` and `diff` all hard-error
-today with `failed to resolve traces via TraceProvider`. Expected and known
-(`refresh-the-speconaut-lockfile`); not something your change broke.
+`check-drift` and `check-generated-tests` are **in** the gate as of 2026-07-31,
+and this paragraph said the opposite until then. They were blocked on data
+rather than wiring: both need `tests/generated/manifest.json`, which only a real
+`generate-tests` run produces, and that run appended ~200 `Implement:` stubs and
+149 orphaned-step warnings. `implement-the-outrun-step-bodies` cleared both, the
+manifest is committed, and `speconaut status`, `lock` and `diff` all resolve
+traces now. Adding a scenario therefore means running `speconaut generate-tests`
+and implementing its stubs, then `speconaut lock`, in the same change — leave
+either out and the gate is red. Read each recipe's own comment before touching
+it.
 
 `just check-examples` is deliberately outside the gate too. It reports each
 example as passing, drifting, or expected-failure, and treats a stale
@@ -213,6 +215,13 @@ Work with no task behind it needs a task first.
 Output under `Generated/` is never hand-edited. There is no protected region,
 no marked insertion point, no inheritance hook — see the
 `generated-types-are-total` standard. If output is wrong, fix the emitter.
+
+Every emitted file says so itself, in a header naming the profile it came from
+and the `paogen generate <profile>` that reproduces it, so the rule travels with
+the artifact instead of living only here. Nothing is made read-only: git keeps
+no write bit through a clone, so the barrier would exist on one machine only —
+see `a-header-not-a-chmod`. The header is the whole mechanism, which is why an
+edit under `Generated/` is caught by a reader rather than by the filesystem.
 
 All consumer customisation lives in the `paogen.php` `Profile` or in attributes
 on the consumer's own value objects. Guidance is data paogen reads, never code

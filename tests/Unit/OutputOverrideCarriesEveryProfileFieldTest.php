@@ -17,7 +17,7 @@ use function count;
  * `paogen generate --output=<dir>` must change the output directory and nothing
  * else.
  *
- * This guard exists because the hand-enumerated copy inside
+ * This guard exists because the hand-enumerated copy behind
  * `GenerateCommand::withOutput()` rotted twice: `$inlineModels` was added to
  * `Profile` and not carried, then the three tag maps and `$xmlElements` were too.
  * Each time the symptom was silent — a `--output` run emitted a different tree
@@ -26,7 +26,9 @@ use function count;
  * makes the preview lie about what a real run would write.
  *
  * Reflecting over the constructor is what makes this hold for the *next* field
- * rather than only for the ones already forgotten.
+ * rather than only for the ones already forgotten. Every field below is set to a
+ * non-default value on purpose: a field left at its default would compare equal
+ * to a copy that dropped it, and the guard would pass on the bug it exists for.
  */
 final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
 {
@@ -46,6 +48,7 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
             tagChoice: ['someOp' => 'Customers'],
             xmlElements: ['someOp' => 'root'],
             inlineModels: ['someOp.request' => 'SomeRequest'],
+            source: 'config/acme-paogen.php',
         );
 
         $overridden = $this->withOutput($original, '/elsewhere');
@@ -65,7 +68,7 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
             self::assertSame(
                 $property->getValue($original),
                 $property->getValue($overridden),
-                "--output dropped Profile::\${$field}; carry it in GenerateCommand::withOutput()",
+                "--output dropped Profile::\${$field}; carry it in Profile::with()",
             );
         }
     }

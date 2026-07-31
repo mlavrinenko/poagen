@@ -6,7 +6,7 @@
 
 [features."Model Generator"]
 spec = "truth/specs/model-generator.feature-260418.typ"
-spec-hash = "sha256:552f364387b9ce658213fc366a35d99fd7fc3b715a5183ad13d941027e11861c"
+spec-hash = "sha256:4e140edbcb41f034d83d081a3d11d75665659111632b0a04471ec5411a0c6496"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding"]
 as-is-hash = "sha256:c9ade5ccdc58c200739725602a225a2085d64cafefd3fc8ec033c938bf9bcf51"
@@ -123,6 +123,11 @@ as-is-hash = "sha256:393eb23a4aefe4d538de24455815daf07af9f2bf5c07b86e545ecb1b523
 as-is = "KLUv/QBYPQkAJhY9IFBN0wZ/XrZssrEqZm1S14TCyCJ2L5XOwkDRNGbCpjkBMwAzADQAh3YOv1k3aw+nI1TwE3OmLusdVJ5Yy3mjqFe5RILGx1rP5B1vNeuIZSGlivAVGEHLuiuNZ0aQGT3NMfEEMHPWNFzLwLr3w8dBxfqspBy54TuFJdiLp6RWz2HkTG3DXuht8w/m4wUdq2fFlPUc6cSt/D3B98bBXkBYYHkyHowsCymV1XzF5oHO5BWYs1w1kp5UqtyKA6MrB+SZb+lJJYaRMbxn1vzeqazHias4cvVQMfqig/lYqymwF/ddy4fV/DTPAAEB+pMhGL3BFkwGBxEACTtgJXuVO/MtmKCYO7AiltRuyXZfDQtmGvYjXNnntFRcKDOApYb/SREOsitIAQ=="
 stage = "unstable"
 
+[features."Model Generator".scenarios."An emitted file opens with a header naming the profile and the command that reproduces it"]
+as-is-hash = "sha256:b6c5144d74e28bdcb3aaa37c5b8132979217f4e20c31fb7063f7bff6c2b688c2"
+as-is = "KLUv/QBYBQgA5pEwHGBn2waDaHK5Sd4vNUwy0WwtDDaGDHuElIIOgjgnACoAKABPr6WkEIOmcvloffCSofPGjmxGewkrfik/uYPNdy/dSPBAXRoeMQSGGvpUtuAOhq5+nVQebG5MJVZLCBiPuIJdPDlsFRUPfmwNdrFnPaIYlSsKwe9eJvzkAmy+5BE3Hg3YxSqeHbOikk61lscXjEcEdrHQAniq1f0KA128XGrWJ0OCXRg05OWw+Z65f3gVelVJ+KNseTnOng/eYurFpxQVAPx4wDQCOCPubXLg27uYmEG2leGxp1e84MQ+5zfiutYdsmtxG1k/fZ9evPIbLhMJTr9gntkGK0FBAQ=="
+stage = "unstable"
+
 [features."Model Generator".scenarios."An explicit `renames` entry takes precedence over the auto-sanitiser"]
 as-is-hash = "sha256:c22dfc1b1ca08c684715a2e77372f21d26f0c3fea67c9ddb2a189c3bdacfba33"
 as-is = "KLUv/QBYjQgAxpI2IkCrpgMDEiVRbfI1rD+mbWk5xwtiuIFBlIWFRFVuVnHDKwIrACsALwBrF54e2lbOf9b5qPkJr56ekPUMt77k4h3RUw6fEe9Ki0ENNy6caCsPnxoBDyMO2JbmI6tTDr14bBClJZ/1eSxd+Sh/UsP4aDFs5mzhVrHixCe3DZvJa4rrJmfFSjrbXh7PMP5JsBmI4uEG4VC4pJu8oPGAwk1j3avPlqTlgRUubAaisFwGdlvrI9b0aUfVUQfAbS15BviSj74NHfjdlRbrMvRAAg67agaO+tkisDqCzWwTAFCCyO5vW+GsvQPPFouIPkAUQNlwQVAhtQA7y/UPRWJFdlJDdgPhR+0FNC4QSguNFBMN"
@@ -178,9 +183,19 @@ as-is-hash = "sha256:7b679ec0a281ada1d0c01b23eda480ebc6c9100a4ab41b10f57f3b882aa
 as-is = "KLUv/QBYPQYAYg4pH1Br0wbAadEOWmlTbnWyuQF+iAuqCmZo0hw8j5nYhRoINeeEz9QhBs4pbCS/Zyor+RjCe+bzRQYzuazVcOIqTa4eKlYABBs53zXmVmsk2MiCAxIJMyl4OctVJ2fqjOrQNmF++Z45OebGmsPoBw18fzACGzliqNVrnHypZdiI6k/gPK1xePpcWbNQKeqCheKeDuxAhLDB+vRYPzafMBdO0LLuCiMLAEvsdJnsvIpQVsDQTlEqLgopBjUb5ml0TxBp2kKZAQ=="
 stage = "unstable"
 
+[features."Model Generator".scenarios."Regenerating over an existing tree replaces it rather than failing on it"]
+as-is-hash = "sha256:9c125ffafedc008b6be72fe5cbd986ab9492fbc5192355c81989f0d60f1d258c"
+as-is = "KLUv/QBYPQcAdtAsHWBp0waDmsSayf65QrYltYZci3KWlR8VSiCAU90KIwAkACUAhfjqrPNnK71m/VFIefrPVUu4r5xf0MnZVv6evMAFtKz7cQjGPTuyAZvvWiq8MPVEZa3jRIPvixls4whRq5dceFJ7sI01H7JXi/xy69dScSl/1uCJ0oStzeFxdVkvpRPPgW1sUjahFeDIEEyCixytpiH+WVyjOmzvxgK+C4TVjKBmfGhOwDYSM2886yYqT5sSAAYjl/QAfjR/WQKwKZqJESsGJbu5oyoaCK4QKNGVY1KFow54C7oZyDAvWd0btfMJ"
+stage = "unstable"
+
 [features."Model Generator".scenarios."Running the generator twice with the same inputs produces identical files"]
 as-is-hash = "sha256:3e44a06afd054e3caad26db86fdf8d109d1992dec307e1c08b756d71e69aeea7"
 as-is = "KLUv/QBY5QUAko0lHHC3aQOAKHKV0UqzZFsiyuM1KocbLJwnB6AXRQi36Nxkh+OS9Jo4BpiQwTVxOM26i25yAuDPrRP4w31HBIYkFCjDkTHOKinnLaICu/hRfcUCfH7OlW8u+RadhQq+H6xgF1eO0rw14UmpYRd5xRArZUzvx5w3exIuTt3lzDdUIjWEbwyhxqSFvyc+UidndztgQjKsuzECDAACK7BcY8ZQgiW7DrCmqxDKxzpUCGePkisKssAWyoivqQc="
+stage = "unstable"
+
+[features."Model Generator".scenarios."The header carries nothing that moves between runs"]
+as-is-hash = "sha256:38feefd5dee99c121152fcd7d9bc0148f8f34a086878c9ea91d949256d059bc5"
+as-is = "KLUv/QBY3QYAtpAtHHC3aQMQm8SOyWJG6MdElMfr5HBvWJAbgqn++4UkACQAJwCJWsMu9FL6foP9Yf2CibfQOnGGFs96yyzj/KkjHyFsQMu6GyN/ro+YgM/PTTqYis+Vbw59Ka2FnLiVvx98X+xgF0eOWr1kwwNGytjejwF8Dw6rKeEgv9x3hLACzIFKjozhJ6XOL+izSpT1UiICuwhoS/E3IahH+cqJLhya5heXC0pSq09sXXYuwC6UkNCWp+KjNW4MAFRQwJi+BlscMrsPbATFyOEIQgFzOtPCEQqjgA/QD6Gi"
 stage = "unstable"
 
 [features."Model Generator".scenarios."The profile pins the class name for a synthesised payload"]

@@ -467,6 +467,30 @@
             "stage": "unstable"
         },
         {
+            "test_id": "ModelGeneratorTest::testAnEmittedFileOpensWithAHeaderNamingTheProfileAndTheCommandThatReproducesIt",
+            "feature": "Model Generator",
+            "scenario": "An emitted file opens with a header naming the profile and the command that reproduces it",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 425,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testTheHeaderCarriesNothingThatMovesBetweenRuns",
+            "feature": "Model Generator",
+            "scenario": "The header carries nothing that moves between runs",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 436,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testRegeneratingOverAnExistingTreeReplacesItRatherThanFailingOnIt",
+            "feature": "Model Generator",
+            "scenario": "Regenerating over an existing tree replaces it rather than failing on it",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 446,
+            "stage": "unstable"
+        },
+        {
             "test_id": "OperationGeneratorTest::testAGETOperationWithAPathParameterBecomesATypedClientMethod",
             "feature": "Operation Generator",
             "scenario": "A GET operation with a path parameter becomes a typed client method",

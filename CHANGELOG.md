@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Every emitted file opens with a comment naming itself as generated, naming
+  the profile it came from, and printing the `paogen generate <profile>` that
+  reproduces it. The header carries no timestamp, no version and no absolute
+  path, so a re-run over unchanged inputs is still an empty diff. Emitted files
+  are deliberately *not* made read-only — see
+  [the decision](truth/decisions/a-header-not-a-chmod.decision-260731.typ) for
+  why a permission bit that no clone preserves is not the mechanism to reach
+  for.
+- `Profile::$source` names the profile in that header. `ProfileLoader` fills it
+  with the path the run was given, relative to the working directory; a profile
+  built in code keeps the conventional `paogen.php` unless it says otherwise.
 
 ## 0.1.0 - TBD
 

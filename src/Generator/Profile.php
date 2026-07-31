@@ -77,6 +77,14 @@ final readonly class Profile
      *                                              operation id / component absent from the schema, fails the
      *                                              run instead of being ignored. See
      *                                              abort-on-unrepresentable-constructs.
+     * @param string                $source         How this profile is named in the header of every file it
+     *                                              produces, and in the regenerate command that header prints.
+     *                                              {@see ProfileLoader} fills it with the path the run was given,
+     *                                              relative to the directory it was invoked from — never absolute,
+     *                                              because an absolute path would make one machine's output differ
+     *                                              from another's and turn a re-run into a diff. A profile built in
+     *                                              code rather than loaded from disk keeps the default, which names
+     *                                              the file paogen's own examples and docs use.
      */
     public function __construct(
         public string $schema,
@@ -93,5 +101,40 @@ final readonly class Profile
         public array $tagChoice = [],
         public array $xmlElements = [],
         public array $inlineModels = [],
+        public string $source = 'paogen.php',
     ) {}
+
+    /**
+     * Copy this profile with one or two fields replaced.
+     *
+     * The single hand-enumerated copy of every field lives here, next to the
+     * constructor it has to track. It used to live in `GenerateCommand`, one
+     * file away, and rotted twice — `$inlineModels`, then the tag maps and
+     * `$xmlElements`, each added to the constructor and silently not carried,
+     * so a `--output` run quietly discarded the consumer's guidance and
+     * reported success. A second copy for `$source` would have been a third
+     * chance at the same bug; there is one copy now, and
+     * `OutputOverrideCarriesEveryProfileFieldTest` reflects over the
+     * constructor to fail when a field skips it.
+     */
+    public function with(?string $output = null, ?string $source = null): self
+    {
+        return new self(
+            schema: $this->schema,
+            output: $output ?? $this->output,
+            namespace: $this->namespace,
+            discoverIn: $this->discoverIn,
+            renames: $this->renames,
+            nameNormaliser: $this->nameNormaliser,
+            discriminators: $this->discriminators,
+            skip: $this->skip,
+            methodRenames: $this->methodRenames,
+            tagRenames: $this->tagRenames,
+            tagAssignments: $this->tagAssignments,
+            tagChoice: $this->tagChoice,
+            xmlElements: $this->xmlElements,
+            inlineModels: $this->inlineModels,
+            source: $source ?? $this->source,
+        );
+    }
 }

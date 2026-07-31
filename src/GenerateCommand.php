@@ -154,30 +154,16 @@ final class GenerateCommand
     /**
      * `--output` overrides one field and must carry every other one.
      *
-     * Enumerating them by hand rotted twice — `$inlineModels` and then the three
-     * tag maps were each added to `Profile` and silently not carried here, so a
-     * `--output` run quietly discarded the consumer's guidance and emitted a
-     * different tree than a plain run would. `ProfileTest` reflects over the
-     * constructor and fails when a parameter is added without appearing below, so
-     * the third time is a red gate rather than a surprise.
+     * The hand-enumerated copy that did the carrying used to live here and
+     * rotted twice — `$inlineModels` and then the three tag maps were each
+     * added to `Profile` and silently not carried, so a `--output` run quietly
+     * discarded the consumer's guidance and emitted a different tree than a
+     * plain run would. It now lives on `Profile` itself, next to the
+     * constructor it tracks and shared with the loader, which is the only
+     * other caller that needs to replace a field.
      */
     private static function withOutput(Profile $profile, string $output): Profile
     {
-        return new Profile(
-            schema: $profile->schema,
-            output: $output,
-            namespace: $profile->namespace,
-            discoverIn: $profile->discoverIn,
-            renames: $profile->renames,
-            nameNormaliser: $profile->nameNormaliser,
-            discriminators: $profile->discriminators,
-            skip: $profile->skip,
-            methodRenames: $profile->methodRenames,
-            tagRenames: $profile->tagRenames,
-            tagAssignments: $profile->tagAssignments,
-            tagChoice: $profile->tagChoice,
-            xmlElements: $profile->xmlElements,
-            inlineModels: $profile->inlineModels,
-        );
+        return $profile->with(output: $output);
     }
 }

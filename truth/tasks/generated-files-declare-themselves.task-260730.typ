@@ -5,8 +5,10 @@
   tags: ("generator", "dx", "strictness"),
   priority: 6,
   difficulty: 4,
-  status: proposed(2026, 7, 30),
-  links: depends-on("collapse-operations-onto-a-runtime-transport.task-260730.typ"),
+  status: status("needs-review", 2026, 7, 31),
+  links: depends-on(
+    "collapse-operations-onto-a-runtime-transport.task-260730.typ",
+  ),
 )
 
 == Summary
