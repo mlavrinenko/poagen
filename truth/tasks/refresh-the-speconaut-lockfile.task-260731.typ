@@ -49,12 +49,13 @@ The manifest is an output of a real `generate-tests` run. Producing one means
 accepting roughly 200 appended `Implement:` stubs and 149 orphaned-step
 warnings, which is `implement-the-outrun-step-bodies`.
 
-Separately, `speconaut lock` in apply mode is gated behind an open session even
-with `[session] enabled = false`. That is `session-opt-out-does-not-reach-lock`
-in the speconaut repo.
+A second blocker — `lock` demanding an open session despite the opt-out — was
+fixed upstream the same day, as `session-opt-out-does-not-reach-lock`. `lock`
+now reaches trace resolution here and fails only on the manifest, so that is
+the single thing left.
 
-So this task cannot be done by hand-editing the lockfile — its own header
-forbids that, and fabricating trace data would be worse. It waits.
+This cannot be done by hand-editing the lockfile — its own header forbids that,
+and fabricating trace data would be worse. It waits on one thing.
 
 == Acceptance criteria
 

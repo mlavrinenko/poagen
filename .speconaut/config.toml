@@ -16,10 +16,15 @@ namespace = 'Mlavrinenko\Paogen\Tests\Generated'
 # every `done` task's missing session block as a bypassed lifecycle —
 # without it, all 31 `done`/`cancelled` tasks in truth/tasks/ produced a
 # `task lifecycle provenance` warning apiece (verified: zero after this
-# line, see `declare-paogen-runs-no-sessions`). This opt-out only silences
-# that provenance check; `speconaut lock` (apply mode) stays gated behind an
-# open session either way — `enabled` governs whether the lifecycle-report
-# heuristic applies, not whether the FSM exists. Revisit if paogen ever
+# line, see `declare-paogen-runs-no-sessions`). It also reaches `lock`, which
+# used to demand an open session regardless and now runs as a plain lockfile
+# primitive here: the FSM ordering check and the spec-first diff baseline are
+# both session-shaped, so for a project that never opens one they are
+# undefined rather than skipped. The `git-hook pre-commit` spec-first pairing
+# still applies — the staged set is a baseline it can judge without a session.
+# Fixed upstream 2026-07-31 as `session-opt-out-does-not-reach-lock`; an
+# earlier version of this comment said the opposite and was right when
+# written. Revisit if paogen ever
 # wants the workflow-runtime session protocol's other benefits (in-process
 # spec-first gate on `lock`, orientation dumps via `session start`) enough
 # to also install the hook and start opening/closing sessions per task —
