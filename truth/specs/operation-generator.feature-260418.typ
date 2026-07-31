@@ -12,8 +12,8 @@
     as typed method parameters; `application/json` request bodies carry
     #a(Model) payload; response JSON is deserialized back into the typed
     #a(Model). #the(Client) is emitted as a `final readonly` class whose
-    constructor takes a PSR-18 `ClientInterface` together with PSR-17
-    request and stream factories, and a base URI string.
+    constructor takes a `TransportInterface` together with one argument per
+    credential #the(Schema) declares.
   ],
 )[
 
@@ -286,7 +286,7 @@
       #given[#the(Schema) declares `#/components/securitySchemes/apiKey` with #p((scheme: "type: apiKey, in: header, name: X-API-Key"))]
       #and_[a top-level `security: [{ apiKey: [] }]` makes every #the(Operation) secured by default]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#the(Client)'s emitted `ApiClient` constructor has a required `string $apiKey` promoted private argument placed after `$baseUri`]
+      #then[#the(Client)'s emitted `ApiClient` constructor has a required `string $apiKey` promoted private argument placed after `$transport`]
       #and_[each secured #the(Operation)'s method body calls `$request = $request->withHeader('X-API-Key', $this->apiKey);` before `sendRequest`]
     ]
 
