@@ -1,8 +1,23 @@
 set dotenv-load := false
 
+# Rector, and PHPStan when no `tmpDir` is configured, compile a DI container
+# into $TMPDIR and key it by config hash — not by checkout. The default is a
+# machine-wide /tmp path, so containers built by one worktree are reused by
+# another, and a deleted worktree leaves absolute paths baked into a cache a
+# later run still hits. The symptom is an opaque worker-spawn failure that
+# reads like a tool regression: `Process "..." not found`, or a Phar path that
+# does not exist. Scoping it per checkout makes the cache follow the tree that
+# built it, and `just clean` can then actually clear it.
+export TMPDIR := justfile_directory() / "build/cache/tmp"
+
 # List available recipes
 default:
     @just --list
+
+# Ensure the per-checkout tool cache exists (see TMPDIR above)
+[private]
+tmpdir:
+    @mkdir -p "{{ TMPDIR }}"
 
 # Run all quality checks (lint + test + speconaut check-specs)
 #
@@ -28,13 +43,13 @@ default:
 # ~200 outstanding `Implement:` step stubs (plus 149 now-orphaned step
 # methods) that `implement-the-outrun-step-bodies` owns, not this one. See
 # each recipe's own comment for specifics.
-check: lint test check-specs
+check: tmpdir lint test check-specs
 
 # Full pre-commit gate
 gate: check
 
 # Run all linters in parallel
-lint:
+lint: tmpdir
     @echo -n 'cs-fixer phpstan phpstan-generated rector linecop' | parallel --will-cite --halt now,fail=1 --delimiter=' ' just lint-{}
 
 # Check code style (PER-CS 2.0 + PHP 8.4)
@@ -42,7 +57,7 @@ lint-cs-fixer:
     php-cs-fixer fix --diff --verbose --dry-run
 
 # Static analysis on src/
-lint-phpstan:
+lint-phpstan: tmpdir
     phpstan analyse --memory-limit=512M
 
 # Static analysis on generated fixtures + example trees (consumer-view; ADR-004)
@@ -54,7 +69,7 @@ lint-phpstan:
 # examples/*/generated is glob-expanded to whichever example trees
 # currently exist (nullglob so a run with zero example trees still
 # analyses the fixtures instead of erroring on a literal unmatched glob).
-lint-phpstan-generated:
+lint-phpstan-generated: tmpdir
     #!/usr/bin/env bash
     set -euo pipefail
     shopt -s nullglob
@@ -67,7 +82,7 @@ lint-phpstan-generated:
     phpstan analyse -c phpstan-generated.neon --memory-limit=512M "${paths[@]}"
 
 # Check for Rector refactoring opportunities
-lint-rector:
+lint-rector: tmpdir
     rector --dry-run
 
 # Per-language line-count limits on src/ (ADR-004)
@@ -123,7 +138,7 @@ format-rector:
     rector
 
 # Run tests
-test:
+test: tmpdir
     phpunit
 
 # Run tests with coverage

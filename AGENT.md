@@ -34,38 +34,31 @@ PHP 8.4 via devbox; `composer install`, never `composer update` — the lockfile
 is committed so every checkout gates on the same phpstan (2.2.7), rector
 (2.5.9), php-cs-fixer and phpunit.
 
-A fresh worktree needs all three before any gate will run — the third is not
-optional, see the `TMPDIR` trap below:
+A fresh worktree needs both before any gate will run:
 
 ```
 devbox install
 composer install
-TMPDIR="$PWD/build/cache/tmp" devbox run -- just check
+devbox run -- just check
 ```
 
 `devbox run -- <cmd>` keeps the full dev-shell PATH (`bin/`, `vendor/bin/`, the
-devbox profile) and passes `TMPDIR` through. So does `direnv exec . <cmd>`. An
-explicit PATH works too if you want no wrapper:
+devbox profile). So does `direnv exec . <cmd>`. An explicit PATH works too if
+you want no wrapper:
 
 ```
-TMPDIR="$PWD/build/cache/tmp" \
-  PATH="$PWD/.devbox/nix/profile/default/bin:$PWD/vendor/bin:$PATH" just check
+PATH="$PWD/.devbox/nix/profile/default/bin:$PWD/vendor/bin:$PATH" just check
 ```
 
-### Three traps that cost real time
+### Two traps that cost real time
 
-**Set `TMPDIR` to something worktree-local, or rector fails.** Rector pins its
-compiled DI container to `sys_get_temp_dir()` (`vendor/rector/rector/config/
-config.php` calls `containerCacheDirectory(sys_get_temp_dir())`, which
-`rector.php`'s `withCache(...)` does not override) — machine-wide
-`/tmp/cache/nette.configurator`, shared by every checkout on the box. Those
-containers bake in absolute paths, so one compiled by a worktree that no longer
-exists kills rector's workers with an opaque `ProcessPool.php line 30: Process
-"<random>" not found`. Nothing is wrong with your change. Run gates as:
-
-```
-TMPDIR="$PWD/build/cache/tmp" devbox run -- just check
-```
+A third one used to live here — rector dying on a DI container compiled by some
+other checkout, because it pins that cache to `sys_get_temp_dir()` and every
+worktree on the box shares it. The `Justfile` now exports a per-checkout
+`TMPDIR` and creates it, so the gate runs clean from a cold tree with nothing
+set in your environment. It is recorded here only so the symptom is
+recognisable if you meet it outside `just`: an opaque `ProcessPool.php line 30:
+Process "<random>" not found`, which means a stale cache, not a broken change.
 
 **Build any `$PWD`-based PATH *after* you `cd`, never before.** There are
 usually several paogen worktrees live at once, each with its own `vendor/`. A
