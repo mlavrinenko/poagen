@@ -20,11 +20,6 @@ parameters:
       path: tests/generated/*Steps.php
     - identifier: property.onlyWritten
       path: tests/generated/*Steps.php
-    # Generated PHPUnit stubs call markTestIncomplete on $this for draft
-    # scenarios. PHPUnit allows the pattern idiomatically, and the stubs
-    # are produced by speconaut-phpunit, so we can't rewrite them.
-    - identifier: staticMethod.dynamicCall
-      path: tests/generated/*Test.php
     # Runtime attribute classes are a public ABI: their public properties
     # are read by user code (and future runtime registries) via
     # reflection on the attribute instance. Shipmonk's static analysis

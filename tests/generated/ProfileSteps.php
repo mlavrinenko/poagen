@@ -42,55 +42,6 @@ final class ProfileSteps
         $this->test = $test;
     }
 
-    public function givenAPHPFileAtPathReturnsProfileForSchemaAtSchema(string $path, string $schema): void
-    {
-        $this->loaderPath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . $path;
-        TestCase::assertFileExists($this->loaderPath, "fixture profile missing: {$path}");
-        TestCase::assertFileExists(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . $schema, "fixture schema missing: {$schema}");
-    }
-
-    public function whenTheLoaderIsInvokedWithThatPath(): void
-    {
-        try {
-            $this->loadedProfile = new ProfileLoader()->load($this->loaderPath);
-        } catch (Throwable $e) {
-            $this->loaderError = $e;
-        }
-    }
-
-    public function thenTheResultIsProfile(): void
-    {
-        TestCase::assertInstanceOf(Profile::class, $this->loadedProfile);
-    }
-
-    public function thenItsSchemaResolvesToTheFixturePath(): void
-    {
-        TestCase::assertNotNull($this->loadedProfile);
-        TestCase::assertFileExists($this->loadedProfile->schema);
-    }
-
-    public function givenAPHPFileThatReturnsTheIntegerValue(int $value): void
-    {
-        $tmp = tempnam(sys_get_temp_dir(), 'paogen-bad-profile-') . '.php';
-        file_put_contents($tmp, "<?php\nreturn {$value};\n");
-        $this->tempFile = $tmp;
-        $this->loaderPath = $tmp;
-    }
-
-    public function thenTheLoaderThrowsError(string $error): void
-    {
-        TestCase::assertNotNull($this->loaderError, 'expected loader error, got none');
-        TestCase::assertSame(
-            'Mlavrinenko\\Paogen\\Exception\\' . $error,
-            $this->loaderError::class,
-        );
-
-        if ($this->tempFile !== null) {
-            @unlink($this->tempFile);
-            $this->tempFile = null;
-        }
-    }
-
     public function givenValueObjectClassIsAnnotatedWithAttr(string $attr): void
     {
         if (preg_match("/BindsFormat\\(['\"]([^'\"]+)['\"]\\)/", $attr, $m) === 1) {
@@ -120,18 +71,6 @@ final class ProfileSteps
         $this->bindings = new AttributeScanner($this->composerLoader())->scan($profile);
     }
 
-    public function thenTheResultingBindingMapContainsFormatThatClass(string $format): void
-    {
-        TestCase::assertNotNull($this->bindings);
-        TestCase::assertSame($this->valueObjectFqcn, $this->bindings->formatType($format));
-    }
-
-    public function thenTheResultingBindingMapDoesNotContainFormat(string $format): void
-    {
-        TestCase::assertNotNull($this->bindings);
-        TestCase::assertNull($this->bindings->formatType($format));
-    }
-
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
@@ -142,4 +81,92 @@ final class ProfileSteps
 
         TestCase::fail('Composer ClassLoader not found in autoload chain.');
     }
+
+    public function givenPhpFileAtPathReturnsProfileForSchemaAtSchema(string $path, string $schema): void
+    {
+        // The spec writes `<profile-path>` / `<schema-path>` rather than
+        // naming fixtures, so the binding to real files lives here.
+        $fixtures = [
+            '<profile-path>' => 'tests/fixtures/profiles/petstore.php',
+            '<schema-path>' => 'tests/fixtures/schemas/petstore-3.0.yaml',
+        ];
+        TestCase::assertArrayHasKey($path, $fixtures, "unbound profile placeholder: {$path}");
+        TestCase::assertArrayHasKey($schema, $fixtures, "unbound schema placeholder: {$schema}");
+
+        $root = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+        $this->loaderPath = $root . $fixtures[$path];
+        TestCase::assertFileExists($this->loaderPath, "fixture profile missing: {$path}");
+        TestCase::assertFileExists($root . $fixtures[$schema], "fixture schema missing: {$schema}");
+    }
+
+
+    public function whenProfileIsLoadedFromThatPath(): void
+    {
+        try {
+            $this->loadedProfile = new ProfileLoader()->load($this->loaderPath);
+        } catch (Throwable $e) {
+            $this->loaderError = $e;
+        }
+    }
+
+
+    public function thenResultIsProfile(): void
+    {
+        TestCase::assertInstanceOf(Profile::class, $this->loadedProfile);
+    }
+
+
+    public function thenProfilesSchemaResolvesToTheFixturePath(): void
+    {
+        TestCase::assertNotNull($this->loadedProfile);
+        TestCase::assertFileExists($this->loadedProfile->schema);
+    }
+
+
+    public function givenPhpFileThatReturnsTheIntegerValueInsteadOfProfile(int $value): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'paogen-bad-profile-') . '.php';
+        file_put_contents($tmp, "<?php\nreturn {$value};\n");
+        $this->tempFile = $tmp;
+        $this->loaderPath = $tmp;
+    }
+
+
+    public function whenLoadingProfileFromThatPathIsAttempted(): void
+    {
+        // "is attempted" rather than "is loaded": this scenario's path is the
+        // rejecting one, so the throw is the outcome under test and the `then`
+        // step reads it off {@see self::$loaderError}.
+        $this->whenProfileIsLoadedFromThatPath();
+    }
+
+
+    public function thenLoadingProfileThrowsError(string $error): void
+    {
+        TestCase::assertNotNull($this->loaderError, 'expected loader error, got none');
+        TestCase::assertSame(
+            'Mlavrinenko\\Paogen\\Exception\\' . $error,
+            $this->loaderError::class,
+        );
+
+        if ($this->tempFile !== null) {
+            @unlink($this->tempFile);
+            $this->tempFile = null;
+        }
+    }
+
+
+    public function thenResultingBindingMapContainsFormatThatValueObject(string $format): void
+    {
+        TestCase::assertNotNull($this->bindings);
+        TestCase::assertSame($this->valueObjectFqcn, $this->bindings->formatType($format));
+    }
+
+
+    public function thenResultingBindingMapDoesNotContainFormatForThatValueObject(string $format): void
+    {
+        TestCase::assertNotNull($this->bindings);
+        TestCase::assertNull($this->bindings->formatType($format));
+    }
+
 }

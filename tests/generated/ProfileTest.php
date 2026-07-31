@@ -26,35 +26,35 @@ final class ProfileTest extends TestCase
      * Rule: Loading a Profile
      *
      * Scenario: A PHP file that returns a Profile is loaded as that Profile
-     * @source truth/specs/profile.typ:15
+     * @source truth/specs/profile.feature-260418.typ:12
      *
-     * Given a PHP file at tests/fixtures/profiles/petstore.php returns Profile for Schema at tests/fixtures/schemas/petstore-3.0.yaml
-     * When the loader is invoked with that path
+     * Given a PHP file at <profile-path> returns Profile for Schema at <schema-path>
+     * When Profile is loaded from that path
      * Then the result is Profile
-     *   And its schema resolves to the fixture path
+     *   And Profile's schema resolves to the fixture path
      */
     public function testAPHPFileThatReturnsAProfileIsLoadedAsThatProfile(): void
     {
-        $this->steps->givenAPHPFileAtPathReturnsProfileForSchemaAtSchema('tests/fixtures/profiles/petstore.php', 'tests/fixtures/schemas/petstore-3.0.yaml');
-        $this->steps->whenTheLoaderIsInvokedWithThatPath();
-        $this->steps->thenTheResultIsProfile();
-        $this->steps->thenItsSchemaResolvesToTheFixturePath();
+        $this->steps->givenPhpFileAtPathReturnsProfileForSchemaAtSchema('<profile-path>', '<schema-path>');
+        $this->steps->whenProfileIsLoadedFromThatPath();
+        $this->steps->thenResultIsProfile();
+        $this->steps->thenProfilesSchemaResolvesToTheFixturePath();
     }
 
 
     /**
      * Scenario: A PHP file that does not return a Profile is rejected
-     * @source truth/specs/profile.typ:26
+     * @source truth/specs/profile.feature-260418.typ:22
      *
-     * Given a PHP file that returns the integer 42
-     * When the loader is invoked with that path
-     * Then the loader throws InvalidProfileException
+     * Given a PHP file that returns the integer 42 instead of Profile
+     * When loading Profile from that path is attempted
+     * Then loading Profile throws InvalidProfileException
      */
     public function testAPHPFileThatDoesNotReturnAProfileIsRejected(): void
     {
-        $this->steps->givenAPHPFileThatReturnsTheIntegerValue(42);
-        $this->steps->whenTheLoaderIsInvokedWithThatPath();
-        $this->steps->thenTheLoaderThrowsError('InvalidProfileException');
+        $this->steps->givenPhpFileThatReturnsTheIntegerValueInsteadOfProfile(42);
+        $this->steps->whenLoadingProfileFromThatPathIsAttempted();
+        $this->steps->thenLoadingProfileThrowsError('InvalidProfileException');
     }
 
 
@@ -62,36 +62,36 @@ final class ProfileTest extends TestCase
      * Rule: Discovering user value-object bindings
      *
      * Scenario: A user class with BindsFormat in a discovered namespace registers a format binding
-     * @source truth/specs/profile.typ:41
+     * @source truth/specs/profile.feature-260418.typ:33
      *
      * Given Value Object class is annotated with #[BindsFormat('email')]
      *   And its namespace is listed in Profile's discoverIn
      * When Attribute Scan runs over Profile
-     * Then the resulting binding map contains email → that class
+     * Then the resulting binding map contains email → that Value Object
      */
     public function testAUserClassWithBindsFormatInADiscoveredNamespaceRegistersAFormatBinding(): void
     {
         $this->steps->givenValueObjectClassIsAnnotatedWithAttr('#[BindsFormat(\'email\')]');
         $this->steps->givenItsNamespaceIsListedInProfilesDiscoverIn();
         $this->steps->whenAttributeScanRunsOverProfile();
-        $this->steps->thenTheResultingBindingMapContainsFormatThatClass('email');
+        $this->steps->thenResultingBindingMapContainsFormatThatValueObject('email');
     }
 
 
     /**
      * Scenario: A class outside discoverIn is ignored even if annotated
-     * @source truth/specs/profile.typ:56
+     * @source truth/specs/profile.feature-260418.typ:43
      *
      * Given Value Object class is annotated with #[BindsFormat('uuid')]
      *   And its namespace is not listed in Profile's discoverIn
      * When Attribute Scan runs over Profile
-     * Then the resulting binding map does not contain uuid
+     * Then the resulting binding map does not contain uuid for that Value Object
      */
     public function testAClassOutsideDiscoverInIsIgnoredEvenIfAnnotated(): void
     {
         $this->steps->givenValueObjectClassIsAnnotatedWithAttr('#[BindsFormat(\'uuid\')]');
         $this->steps->givenItsNamespaceIsNotListedInProfilesDiscoverIn();
         $this->steps->whenAttributeScanRunsOverProfile();
-        $this->steps->thenTheResultingBindingMapDoesNotContainFormat('uuid');
+        $this->steps->thenResultingBindingMapDoesNotContainFormatForThatValueObject('uuid');
     }
 }

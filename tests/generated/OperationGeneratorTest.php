@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Feature: Operation Generator
  *
- * Walks Schema's paths and emits one method per OpenAPI Operation onto a single Client class. Path parameters appear as typed method parameters; application/json request bodies carry Model payload; response JSON is deserialized back into the typed Model. Client is emitted as a final readonly class whose constructor takes a PSR-18 ClientInterface together with PSR-17 request and stream factories, and a base URI string.
+ * Walks Schema's paths and emits one method per OpenAPI Operation onto a single Client class. Path parameters appear as typed method parameters; application/json request bodies carry Model payload; response JSON is deserialized back into the typed Model. Client is emitted as a final readonly class whose constructor takes a TransportInterface together with one argument per credential Schema declares.
  */
 final class OperationGeneratorTest extends TestCase
 {
@@ -27,61 +26,61 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Emitting operations as client methods
      *
      * Scenario: A GET operation with a path parameter becomes a typed client method
-     * @source truth/specs/operation-generator.typ:38
+     * @source truth/specs/operation-generator.feature-260418.typ:21
      *
      * Given Schema declares Operation GET /store/order/{orderId} with operationId: getOrderById and path parameter orderId: integer
      * When Generator runs against Profile
      * Then a file Generated/ApiClient.php is written under Profile's output
      *   And the emitted class is final readonly in Profile's namespace \Generated
-     *   And the class has a method getOrderById(int $orderId): Order that interpolates {orderId} into the request path
+     *   And Client has a method getOrderById(int $orderId): Order that interpolates {orderId} into the request path
      */
     public function testAGETOperationWithAPathParameterBecomesATypedClientMethod(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdAndPathParameterParam('GET /store/order/{orderId}', 'operationId: getOrderById', 'orderId: integer');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenAFileGeneratedApiClientPhpIsWrittenUnderProfilesOutput();
-        $this->steps->thenTheEmittedClassIsFinalReadonlyInProfilesNamespaceGenerated();
-        $this->steps->thenTheClassHasAMethodGetOrderByIdIntOrderIdOrderThatInterpolatesTokenIntoTheRequestPath('{orderId}');
+        $this->steps->thenFileGeneratedApiClientPhpIsWrittenUnderProfilesOutput();
+        $this->steps->thenEmittedClassIsFinalReadonlyInProfilesNamespaceGenerated();
+        $this->steps->thenClientHasAMethodGetOrderByIdIntOrderIdOrderThatInterpolatesTokenIntoTheRequestPath('{orderId}');
     }
 
 
     /**
      * Scenario: A POST operation with a JSON body takes a typed Model parameter
-     * @source truth/specs/operation-generator.typ:49
+     * @source truth/specs/operation-generator.feature-260418.typ:32
      *
      * Given Schema declares Operation POST /pet with operationId: addPet
-     *   And the request body is application/json with schema #/components/schemas/Pet
+     *   And Operation's request body is application/json with schema #/components/schemas/Pet
      * When Generator runs against Profile
      * Then the emitted Client has a method addPet(Pet $body): Pet
-     *   And the method JSON-encodes $body and attaches it as the request body
+     *   And Client's method JSON-encodes $body and attaches it as the request body
      */
     public function testAPOSTOperationWithAJSONBodyTakesATypedModelParameter(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithId('POST /pet', 'operationId: addPet');
-        $this->steps->givenTheRequestBodyIsApplicationJsonWithSchemaRef('#/components/schemas/Pet');
+        $this->steps->givenOperationsRequestBodyIsApplicationJsonWithSchemaRef('#/components/schemas/Pet');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodAddPetPetBodyPet();
-        $this->steps->thenTheMethodJSONEncodesBodyAndAttachesItAsTheRequestBody();
+        $this->steps->thenEmittedClientHasAMethodAddPetPetBodyPet();
+        $this->steps->thenClientsMethodJSONEncodesBodyAndAttachesItAsTheRequestBody();
     }
 
 
     /**
      * Scenario: A JSON body whose schema is a list of $ref becomes a typed list parameter
-     * @source truth/specs/operation-generator.typ:61
+     * @source truth/specs/operation-generator.feature-260418.typ:43
      *
      * Given Schema declares Operation POST /user/createWithList with operationId: createUsersWithListInput
-     *   And the request body is application/json with schema type: array and items #/components/schemas/User
+     *   And Operation's request body is application/json with schema type: array and items #/components/schemas/User
      * When Generator runs against Profile
      * Then the emitted Client has a method createUsersWithListInput(array $body) whose $body parameter is annotated @param list<User> $body
-     *   And the method JSON-encodes $body and attaches it as the request body
+     *   And Client's method JSON-encodes $body and attaches it as the request body
      */
     public function testAJSONBodyWhoseSchemaIsAListOfRefBecomesATypedListParameter(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithId('POST /user/createWithList', 'operationId: createUsersWithListInput');
-        $this->steps->givenTheRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef('#/components/schemas/User');
+        $this->steps->givenOperationsRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef('#/components/schemas/User');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody();
-        $this->steps->thenTheMethodJSONEncodesBodyAndAttachesItAsTheRequestBody();
+        $this->steps->thenEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody();
+        $this->steps->thenClientsMethodJSONEncodesBodyAndAttachesItAsTheRequestBody();
     }
 
 
@@ -89,7 +88,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Response deserialization
      *
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
-     * @source truth/specs/operation-generator.typ:75
+     * @source truth/specs/operation-generator.feature-260418.typ:56
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
@@ -99,43 +98,43 @@ final class OperationGeneratorTest extends TestCase
     {
         $this->steps->givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(200, '{\"id\":42,\"status\":\"placed\"}');
         $this->steps->whenGetorderbyid42IsCalledOnClient();
-        $this->steps->thenTheReturnValueIsModelOrderWithId42AndStatusPlaced();
+        $this->steps->thenReturnValueIsModelOrderWithId42AndStatusPlaced();
     }
 
 
     /**
      * Scenario: A scalar 2xx JSON response is returned as the scalar PHP type without hydration
-     * @source truth/specs/operation-generator.typ:84
+     * @source truth/specs/operation-generator.feature-260418.typ:65
      *
      * Given Schema declares Operation GET /user/login with operationId: loginUser whose 200 response schema is type: string
      * When Generator runs against Profile
      * Then the emitted Client has a method whose return type is string
-     *   And the method body returns (string) $response->getBody() and never invokes self::hydrate
+     *   And Client's method body returns (string) $response->getBody() and never invokes self::hydrate
      */
     public function testAScalar2xxJSONResponseIsReturnedAsTheScalarPHPTypeWithoutHydration(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeString('GET /user/login', 'operationId: loginUser');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodWhoseReturnTypeIsString();
-        $this->steps->thenTheMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate();
+        $this->steps->thenEmittedClientHasAMethodWhoseReturnTypeIsString();
+        $this->steps->thenClientsMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate();
     }
 
 
     /**
      * Scenario: A 2xx JSON response with `additionalProperties` is returned as a typed associative array
-     * @source truth/specs/operation-generator.typ:94
+     * @source truth/specs/operation-generator.feature-260418.typ:75
      *
      * Given Schema declares Operation GET /store/inventory with operationId: getInventory whose 200 response schema is type: object with additionalProperties: integer
      * When Generator runs against Profile
      * Then the emitted Client has a method whose return type is array annotated @return array<string, int>
-     *   And the method body returns the json_decoded payload directly without invoking self::hydrate
+     *   And Client's method body returns the json_decoded payload directly without invoking self::hydrate
      */
     public function testA2xxJSONResponseWithAdditionalPropertiesIsReturnedAsATypedAssociativeArray(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeObjectWithMap('GET /store/inventory', 'operationId: getInventory', 'additionalProperties: integer');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt();
-        $this->steps->thenTheMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate();
+        $this->steps->thenEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt();
+        $this->steps->thenClientsMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate();
     }
 
 
@@ -143,37 +142,37 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Query parameters
      *
      * Scenario: An inline enum query parameter becomes a synthesised backed enum method argument
-     * @source truth/specs/operation-generator.typ:106
+     * @source truth/specs/operation-generator.feature-260418.typ:87
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status whose schema is type: string with [available, pending, sold]
      * When Generator runs against Profile
      * Then a file Generated/Enum/FindPetsByStatusStatus.php is written and the emitted Client has a method findPetsByStatus(FindPetsByStatusStatus $status): array
-     *   And calling it with status: FindPetsByStatusStatus::Available sends a request whose URI ends with ?status=available
+     *   And calling Client's method with status: FindPetsByStatusStatus::Available sends a request whose URI ends with ?status=available
      */
     public function testAnInlineEnumQueryParameterBecomesASynthesisedBackedEnumMethodArgument(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterStatusWhoseSchemaIsTypeStringWithEnum('GET /pet/findByStatus', 'operationId: findPetsByStatus', '[available, pending, sold]');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenAFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray();
-        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery('status: FindPetsByStatusStatus::Available', '?status=available');
+        $this->steps->thenFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray();
+        $this->steps->thenCallingClientsMethodWithArgSendsARequestWhoseURIEndsWithQuery('status: FindPetsByStatusStatus::Available', '?status=available');
     }
 
 
     /**
      * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
-     * @source truth/specs/operation-generator.typ:120
+     * @source truth/specs/operation-generator.feature-260418.typ:97
      *
      * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
      * When Generator runs against Profile
      * Then the emitted Client has a method findPetsByTags(array $tags): array annotated @param list<string> $tags
-     *   And calling it with tags: ['a', 'b'] sends a request whose URI ends with ?tags=a&tags=b instead of tags%5B0%5D=a&tags%5B1%5D=b
+     *   And calling Client's method with tags: ['a', 'b'] sends a request whose URI ends with ?tags=a&tags=b instead of tags%5B0%5D=a&tags%5B1%5D=b
      */
     public function testAnExplodeTrueArrayQueryParameterIsSerialisedAsRepeatedNameValuePairs(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterTagsSchema('GET /pet/findByTags', 'operationId: findPetsByTags', 'type: array, items.type: string, explode: true');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags();
-        $this->steps->thenCallingItWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB('tags: [\'a\', \'b\']', '?tags=a&tags=b');
+        $this->steps->thenEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags();
+        $this->steps->thenCallingClientsMethodWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB('tags: [\'a\', \'b\']', '?tags=a&tags=b');
     }
 
 
@@ -181,19 +180,19 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Header parameters
      *
      * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
-     * @source truth/specs/operation-generator.typ:132
+     * @source truth/specs/operation-generator.feature-260418.typ:109
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
      * Then the emitted Client has a method deletePet(int $petId, ?string $apiKey = null): void
-     *   And the method calls $request->withHeader('api_key', $apiKey) only when $apiKey is not null
+     *   And Client's method calls $request->withHeader('api_key', $apiKey) only when $apiKey is not null
      */
     public function testAnOptionalHeaderParameterBecomesANullableTypedArgumentAndIsAttachedOnlyWhenNonNull(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdAndAnOptionalHeaderParameterApiKeyString('DELETE /pet/{petId}', 'operationId: deletePet');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid();
-        $this->steps->thenTheMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull();
+        $this->steps->thenEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid();
+        $this->steps->thenClientsMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull();
     }
 
 
@@ -201,73 +200,73 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Identifier normalisation
      *
      * Scenario: A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved
-     * @source truth/specs/operation-generator.typ:144
+     * @source truth/specs/operation-generator.feature-260418.typ:121
      *
      * Given Schema declares Operation POST /proxy with an optional header parameter named Content-Type
      * When Generator runs against Profile
-     * Then the emitted method takes a ?string $contentType = null argument
-     *   And the method body attaches the header with the original wire key Content-Type (not contentType)
+     * Then Client's emitted method takes a ?string $contentType = null argument
+     *   And Client's method body attaches the header with the original wire key Content-Type (not contentType)
      */
     public function testAHeaderParameterWhoseRawNameIsNotAPHPIdentifierIsNormalisedButTheWireKeyIsPreserved(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithAnOptionalHeaderParameterNamedContentType('POST /proxy');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedMethodTakesAStringContentTypeNullArgument();
-        $this->steps->thenTheMethodBodyAttachesTheHeaderWithTheOriginalWireKeyContentTypeNotContentType();
+        $this->steps->thenClientsEmittedMethodTakesAStringContentTypeNullArgument();
+        $this->steps->thenClientsMethodBodyAttachesTheHeaderWithTheOriginalWireKeyContentTypeNotContentType();
     }
 
 
     /**
      * Scenario: An operationId with non-identifier characters is camelCased into a PHP method name
-     * @source truth/specs/operation-generator.typ:159
+     * @source truth/specs/operation-generator.feature-260418.typ:131
      *
      * Given Schema declares Operation POST /proxy with operationId: monitoring_get_foo.yml
      * When Generator runs against Profile
      * Then the emitted Client has a method monitoringGetFooYml(...)
-     *   And the operation is not silently skipped even though the raw operationId contains a .
+     *   And Operation is not silently skipped even though the raw operationId contains a .
      */
     public function testAnOperationIdWithNonIdentifierCharactersIsCamelCasedIntoAPHPMethodName(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithId('POST /proxy', 'operationId: monitoring_get_foo.yml');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodMonitoringGetFooYml();
-        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA();
+        $this->steps->thenEmittedClientHasAMethodMonitoringGetFooYml();
+        $this->steps->thenOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA();
     }
 
 
     /**
      * Scenario: Profile.methodRenames overrides an operationId verbatim
-     * @source truth/specs/operation-generator.typ:173
+     * @source truth/specs/operation-generator.feature-260418.typ:141
      *
-     * Given a Profile whose methodRenames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
+     * Given Profile whose methodRenames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
      * When Generator runs against Profile
      * Then the emitted Client has a method forwardProxyRequest(...) instead of the auto-sanitised monitoringGetFooYml
-     *   And the Profile's renames map does not rename an Operation, because it answers a different question — a document may use one string for both a component and an operation, and one map applying to both would put the consumer's answer on the wrong one
+     *   And Profile's renames map does not rename Operation, because it answers a different question — a document may use one string for both a component and an operation, and one map applying to both would put the consumer's answer on the wrong one
      */
     public function testProfileMethodRenamesOverridesAnOperationIdVerbatim(): void
     {
-        $this->steps->givenAProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest();
+        $this->steps->givenProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml();
-        $this->steps->thenTheProfilesRenamesMapDoesNotRenameAnOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne();
+        $this->steps->thenEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml();
+        $this->steps->thenProfilesRenamesMapDoesNotRenameOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne();
     }
 
 
     /**
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
-     * @source truth/specs/operation-generator.typ:186
+     * @source truth/specs/operation-generator.feature-260418.typ:151
      *
      * Given Schema declares Operation operationId: uploadFile whose request body content type is application/octet-stream, which paogen does not emit
      * When Generator runs against Profile
-     * Then the resulting GenerationPlan carries a skippedOperations entry naming the HTTP method, path, operationId and the reason for the skip
-     *   And paogen generate prints the same list to stderr so the user knows which ops did not make it into the client
+     * Then the resulting GenerationPlan carries a skippedOperations entry naming Operation's HTTP method, path, operationId and the reason for the skip
+     *   And paogen CLI's generate command prints the same list to stderr so the user knows which ops did not make it into the client
      */
     public function testAnOperationWhoseBodyShapeIsUnsupportedIsReportedAsASkipRatherThanDroppedSilently(): void
     {
         $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit('operationId: uploadFile');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheResultingGenerationPlanCarriesASkippedOperationsEntryNamingTheHTTPMethodPathOperationIdAndTheReasonForTheSkip();
-        $this->steps->thenPaogenGeneratePrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();
+        $this->steps->thenResultingGenerationPlanCarriesASkippedOperationsEntryNamingOperationsHTTPMethodPathOperationIdAndTheReasonForTheSkip();
+        $this->steps->thenPaogenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();
     }
 
 
@@ -275,121 +274,121 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Reference resolution and path-level parameters
      *
      * Scenario: An operation-level `$ref` to a component parameter is resolved to a typed method argument
-     * @source truth/specs/operation-generator.typ:203
+     * @source truth/specs/operation-generator.feature-260418.typ:163
      *
      * Given Schema declares #/components/parameters/Limit limit: integer, in: query, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/Limit
      * When Generator runs against Profile
      * Then the emitted Client has a method listOrders(?int $limit = null): array
-     *   And the operation is not silently skipped even though the parameter is a $ref
+     *   And Operation is not silently skipped even though the parameter is a $ref
      */
     public function testAnOperationLevelRefToAComponentParameterIsResolvedToATypedMethodArgument(): void
     {
         $this->steps->givenSchemaDeclaresComponentsParametersLimitParam('limit: integer, in: query, required: false');
         $this->steps->givenOperationOpWithIdListsAParameterWhoseValueIsRef('GET /order', 'operationId: listOrders', '#/components/parameters/Limit');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodListOrdersIntLimitNullArray();
-        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef();
+        $this->steps->thenEmittedClientHasAMethodListOrdersIntLimitNullArray();
+        $this->steps->thenOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef();
     }
 
 
     /**
      * Scenario: An operation-level `$ref` to a header component parameter becomes an optional typed header argument
-     * @source truth/specs/operation-generator.typ:214
+     * @source truth/specs/operation-generator.feature-260418.typ:174
      *
      * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
      * When Generator runs against Profile
-     * Then the emitted method signature includes ?string $apiKey = null
-     *   And the method body attaches the api_key header only when $apiKey is not null
+     * Then Client's emitted method signature includes ?string $apiKey = null
+     *   And Client's method body attaches the api_key header only when $apiKey is not null
      */
     public function testAnOperationLevelRefToAHeaderComponentParameterBecomesAnOptionalTypedHeaderArgument(): void
     {
         $this->steps->givenSchemaDeclaresComponentsParametersApiKeyParam('api_key: string, in: header, required: false');
         $this->steps->givenOperationOpWithIdListsAParameterWhoseValueIsRef('GET /order', 'operationId: listOrders', '#/components/parameters/ApiKey');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedMethodSignatureIncludesStringApiKeyNull();
-        $this->steps->thenTheMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull();
+        $this->steps->thenClientsEmittedMethodSignatureIncludesStringApiKeyNull();
+        $this->steps->thenClientsMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull();
     }
 
 
     /**
      * Scenario: A `$ref` to a component requestBody is resolved to the expected Model body parameter
-     * @source truth/specs/operation-generator.typ:225
+     * @source truth/specs/operation-generator.feature-260418.typ:185
      *
      * Given Schema declares #/components/requestBodies/CreateOrder with application/json schema #/components/schemas/Order
      *   And Operation POST /order with operationId: placeOrder whose requestBody is a #/components/requestBodies/CreateOrder
      * When Generator runs against Profile
      * Then the emitted Client has a method placeOrder(Order $body): Order
-     *   And the operation is not silently skipped even though the request body is declared via $ref
+     *   And Operation is not silently skipped even though the request body is declared via $ref
      */
     public function testARefToAComponentRequestBodyIsResolvedToTheExpectedModelBodyParameter(): void
     {
         $this->steps->givenSchemaDeclaresComponentsRequestBodiesCreateOrderWithApplicationJsonSchemaRef('#/components/schemas/Order');
         $this->steps->givenOperationOpWithIdWhoseRequestBodyIsARef('POST /order', 'operationId: placeOrder', '#/components/requestBodies/CreateOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodPlaceOrderOrderBodyOrder();
-        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef();
+        $this->steps->thenEmittedClientHasAMethodPlaceOrderOrderBodyOrder();
+        $this->steps->thenOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef();
     }
 
 
     /**
      * Scenario: A PathItem-level inline parameter is inherited by every operation under that path
-     * @source truth/specs/operation-generator.typ:237
+     * @source truth/specs/operation-generator.feature-260418.typ:196
      *
      * Given Schema declares a PathItem /store/{storeId}/items with a single PathItem-level parameter storeId: integer, in: path, required: true
-     *   And two operations under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
+     *   And two Operation entries under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
      * When Generator runs against Profile
      * Then the emitted Client has listStoreItems(int $storeId): array and clearStore(int $storeId): void
-     *   And neither operation is silently skipped even though the parameter lives only on the PathItem
+     *   And neither Operation is silently skipped even though the parameter lives only on the PathItem
      */
     public function testAPathItemLevelInlineParameterIsInheritedByEveryOperationUnderThatPath(): void
     {
         $this->steps->givenSchemaDeclaresAPathItemStoreStoreIdItemsWithASinglePathItemLevelParameterParam('storeId: integer, in: path, required: true');
-        $this->steps->givenTwoOperationsUnderItIdAndIdDoNotRestateTheParameter('operationId: listStoreItems', 'operationId: clearStore');
+        $this->steps->givenTwoOperationEntriesUnderItIdAndIdDoNotRestateTheParameter('operationId: listStoreItems', 'operationId: clearStore');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid();
+        $this->steps->thenEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid();
         $this->steps->thenNeitherOperationIsSilentlySkippedEvenThoughTheParameterLivesOnlyOnThePathItem();
     }
 
 
     /**
      * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
-     * @source truth/specs/operation-generator.typ:248
+     * @source truth/specs/operation-generator.feature-260418.typ:207
      *
      * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
      *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
      * When Generator runs against Profile
      * Then the emitted Client has a method getPetById(int $petId): Pet
-     *   And the operation is not silently skipped even though the parameter is declared at the PathItem level via $ref
+     *   And Operation is not silently skipped even though the parameter is declared at the PathItem level via $ref
      */
     public function testAnOperationWhosePathItemDeclaresARefParameterIsStillEmitted(): void
     {
         $this->steps->givenSchemaDeclaresComponentsParametersPetIdParam('petId: integer, in: path, required: true');
         $this->steps->givenOperationOpWithIdInheritsAPathItemLevelParameterWhoseValueIsRef('GET /pet/{petId}', 'operationId: getPetById', '#/components/parameters/PetId');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodGetPetByIdIntPetIdPet();
-        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef();
+        $this->steps->thenEmittedClientHasAMethodGetPetByIdIntPetIdPet();
+        $this->steps->thenOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef();
     }
 
 
     /**
      * Scenario: A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()
-     * @source truth/specs/operation-generator.typ:259
+     * @source truth/specs/operation-generator.feature-260418.typ:218
      *
      * Given Schema declares #/components/schemas/SshKeyId as type: integer
      *   And Operation GET /keys/{ssh_key_id} with operationId: getSshKeyById and a path parameter ssh_key_id whose schema is #/components/schemas/SshKeyId
      * When Generator runs against Profile
-     * Then the emitted method body interpolates the path token via (string) $sshKeyId->toScalar(), not (string) $sshKeyId
-     *   And the operation is not silently skipped even though the path parameter resolves to a ScalarBinding-implementing class
+     * Then Client's emitted method body interpolates the path token via (string) $sshKeyId->toScalar(), not (string) $sshKeyId
+     *   And Operation is not silently skipped even though the path parameter resolves to a ScalarBinding-implementing class
      */
     public function testAPathParameterWhoseSchemaRefsAScalarVOComponentIsInterpolatedThroughToScalar(): void
     {
         $this->steps->givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema('type: integer');
         $this->steps->givenOperationOpWithIdAndAPathParameterSshKeyIdWhoseSchemaIsRef('GET /keys/{ssh_key_id}', 'operationId: getSshKeyById', '#/components/schemas/SshKeyId');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId();
-        $this->steps->thenTheOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass();
+        $this->steps->thenClientsEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId();
+        $this->steps->thenOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass();
     }
 
 
@@ -397,57 +396,58 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Non-JSON request bodies
      *
      * Scenario: A form-urlencoded body becomes typed params serialised with http_build_query
-     * @source truth/specs/operation-generator.typ:277
+     * @source truth/specs/operation-generator.feature-260418.typ:231
      *
      * Given Schema declares Operation POST /token with operationId: issueToken whose sole request-body content type is application/x-www-form-urlencoded and whose schema is type: object with grantType: string, clientId: string, scope: string and [grantType, clientId]
      * When Generator runs against Profile
      * Then the emitted Client has a method issueToken(string $grantType, string $clientId, ?string $scope = null): void with one method parameter per declared property
-     *   And the method body assembles the request body with http_build_query([...]) and sends Content-Type: application/x-www-form-urlencoded
-     *   And calling it through a PSR-18 recording client records a request whose body contains grantType=password and clientId=my-app pairs
+     *   And Client's method body assembles the request body with http_build_query([...]) and sends Content-Type: application/x-www-form-urlencoded
+     *   And calling Client's method through a PSR-18 recording client records a request whose body contains grantType=password and clientId=my-app pairs
      */
     public function testAFormUrlencodedBodyBecomesTypedParamsSerialisedWithHttpBuildQuery(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseSoleRequestBodyContentTypeIsApplicationXWwwFormUrlencodedAndWhoseSchemaIsTypeObjectWithPropsAndRequired('POST /token', 'operationId: issueToken', 'grantType: string, clientId: string, scope: string', '[grantType, clientId]');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty();
-        $this->steps->thenTheMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded();
-        $this->steps->thenCallingItThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs();
+        $this->steps->thenEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty();
+        $this->steps->thenClientsMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded();
+        $this->steps->thenCallingClientsMethodThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs();
     }
 
 
     /**
      * Scenario: An unsupported body content type aborts the run
-     * @source truth/specs/operation-generator.feature-260418.typ:241
+     * @source truth/specs/operation-generator.feature-260418.typ:242
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
      * When Generator runs against Profile declaring no skip entry for that Operation
-     * Then Generator's run fails and emits no GeneratedFile
+     * Then Generator's run fails and emits no Generated File
      *   And Generator's report names the operationId, the unsupported content type, and the remedy
      */
     public function testAnUnsupportedBodyContentTypeAbortsTheRun(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
         $this->steps->whenGeneratorRunsAgainstProfileDeclaringNoSkipEntryForThatOperation();
-        $this->steps->thenTheGeneratorsRunFailsAndEmitsNoGeneratedFile();
-        $this->steps->thenTheGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
+        $this->steps->thenGeneratorsRunFailsAndEmitsNoGeneratedFile();
+        $this->steps->thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
     }
+
 
     /**
      * Scenario: An explicitly skipped operation is omitted rather than stubbed
-     * @source truth/specs/operation-generator.feature-260418.typ:249
+     * @source truth/specs/operation-generator.feature-260418.typ:254
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
      *   And Profile declares a skip entry for that Operation carrying a reason
      * When Generator runs against Profile
      * Then the emitted Client has no uploadFile method at all
-     *   And no GeneratedFile contains a method that throws on an unsupported content type
+     *   And no Generated File contains a method that throws on an unsupported content type
      */
     public function testAnExplicitlySkippedOperationIsOmittedRatherThanStubbed(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
-        $this->steps->givenTheProfileDeclaresASkipEntryForThatOperationCarryingAReason();
+        $this->steps->givenProfileDeclaresASkipEntryForThatOperationCarryingAReason();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedClientHasNoUploadFileMethodAtAll();
+        $this->steps->thenEmittedClientHasNoUploadFileMethodAtAll();
         $this->steps->thenNoGeneratedFileContainsAMethodThatThrowsOnAnUnsupportedContentType();
     }
 
@@ -456,21 +456,21 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.typ:312
+     * @source truth/specs/operation-generator.feature-260418.typ:269
      *
      * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client
-     * Then the call throws Generated\\ApiException
-     *   And the exception's getStatusCode() returns 404
-     *   And the exception's getDecodedBody() returns the decoded error payload
+     * Then the call on Client throws Generated\\ApiException
+     *   And Client's exception's getStatusCode() returns 404
+     *   And Client's exception's getDecodedBody() returns the decoded error payload
      */
     public function testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException(): void
     {
         $this->steps->givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(404, '{\"message\":\"not found\"}');
         $this->steps->whenGetpetbyid999IsCalledOnClient();
-        $this->steps->thenTheCallThrowsGeneratedApiException();
-        $this->steps->thenTheExceptionsGetStatusCodeReturns404();
-        $this->steps->thenTheExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload();
+        $this->steps->thenCallOnClientThrowsGeneratedApiException();
+        $this->steps->thenClientsExceptionsGetStatusCodeReturns404();
+        $this->steps->thenClientsExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload();
     }
 
 
@@ -478,70 +478,216 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Security schemes
      *
      * Scenario: An apiKey header scheme becomes a constructor arg attached as a header on secured ops
-     * @source truth/specs/operation-generator.typ:328
+     * @source truth/specs/operation-generator.feature-260418.typ:282
      *
      * Given Schema declares #/components/securitySchemes/apiKey with type: apiKey, in: header, name: X-API-Key
-     *   And a top-level security: [{ apiKey: [] }] makes every operation secured by default
+     *   And a top-level security: [{ apiKey: [] }] makes every Operation secured by default
      * When Generator runs against Profile
-     * Then the emitted ApiClient constructor has a required string $apiKey promoted private argument placed after $baseUri
-     *   And each secured operation's method body calls $request = $request->withHeader('X-API-Key', $this->apiKey); before sendRequest
+     * Then Client's emitted ApiClient constructor has a required string $apiKey promoted private argument placed after $transport
+     *   And each secured Operation's method body calls $request = $request->withHeader('X-API-Key', $this->apiKey); before sendRequest
      */
     public function testAnApiKeyHeaderSchemeBecomesAConstructorArgAttachedAsAHeaderOnSecuredOps(): void
     {
         $this->steps->givenSchemaDeclaresComponentsSecuritySchemesApiKeyWithScheme('type: apiKey, in: header, name: X-API-Key');
-        $this->steps->givenATopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault();
+        $this->steps->givenTopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterBaseUri();
+        $this->steps->thenClientsEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterTransport();
         $this->steps->thenEachSecuredOperationsMethodBodyCallsRequestRequestWithHeaderXAPIKeyThisApiKeyBeforeSendRequest();
     }
 
 
     /**
      * Scenario: An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization
-     * @source truth/specs/operation-generator.typ:343
+     * @source truth/specs/operation-generator.feature-260418.typ:293
      *
      * Given Schema declares #/components/securitySchemes/bearerAuth with type: http, scheme: bearer
-     *   And an operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
+     *   And Operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
      * When Generator runs against Profile
-     * Then the emitted ApiClient constructor has a required string $bearerToken promoted private argument
-     *   And placeOrder's method body calls $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken); before sendRequest
+     * Then Client's emitted ApiClient constructor has a required string $bearerToken promoted private argument
+     *   And Client's placeOrder method body calls $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken); before sendRequest
      */
     public function testAnHttpBearerSchemeBecomesABearerTokenCtorArgAttachedAsAuthorization(): void
     {
         $this->steps->givenSchemaDeclaresComponentsSecuritySchemesBearerAuthWithScheme('type: http, scheme: bearer');
-        $this->steps->givenAnOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth('operationId: placeOrder');
+        $this->steps->givenOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth('operationId: placeOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenTheEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument();
-        $this->steps->thenPlaceordersMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest();
+        $this->steps->thenClientsEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument();
+        $this->steps->thenClientsPlaceOrderMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest();
     }
 
 
     /**
      * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:358
+     * @source truth/specs/operation-generator.feature-260418.typ:304
      *
      * Given Schema declares a scheme with type: http, scheme: basic
      * When Generator runs against Profile
      * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
      */
-    #[DoesNotPerformAssertions]
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        self::markTestIncomplete('Scenario is draft');
     }
 
 
     /**
      * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.typ:367
+     * @source truth/specs/operation-generator.feature-260418.typ:313
      *
      * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
      * When Generator runs against Profile
      * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
      */
-    #[DoesNotPerformAssertions]
+    #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
     public function testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
     {
-        $this->markTestIncomplete('Scenario is draft');
+        self::markTestIncomplete('Scenario is draft');
+    }
+
+
+    /**
+     * Rule: The caller surface is grained by tag (emit-tagged-subclients-with-interfaces)
+     *
+     * Scenario: Each tag becomes a sub-client behind an interface declaring exactly its own methods
+     * @source truth/specs/operation-generator.feature-260418.typ:324
+     *
+     * Given Schema declares Operation operationId: getOrderById tagged store and another tagged pet
+     * When Generator runs against Profile
+     * Then Generated File Generated/StoreClient.php is a final readonly class implementing StoreClientInterface
+     *   And emitted Generated File StoreClientInterface.php declares getOrderById and does not declare the pet operation, so a caller depending on it depends on roughly the endpoints it uses
+     *   And emitted Generated File interface omits the constructor, because how an implementation acquires its collaborators is not part of the contract a decorator satisfies
+     */
+    public function testEachTagBecomesASubClientBehindAnInterfaceDeclaringExactlyItsOwnMethods(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationIdTaggedTagAndAnotherTaggedOther('operationId: getOrderById', 'store', 'pet');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenGeneratedFileGeneratedStoreClientPhpIsAFinalReadonlyClassImplementingStoreClientInterface();
+        $this->steps->thenEmittedGeneratedFileStoreClientInterfacePhpDeclaresGetOrderByIdAndDoesNotDeclareThePetOperationSoACallerDependingOnItDependsOnRoughlyTheEndpointsItUses();
+        $this->steps->thenEmittedGeneratedFileInterfaceOmitsTheConstructorBecauseHowAnImplementationAcquiresItsCollaboratorsIsNotPartOfTheContractADecoratorSatisfies();
+    }
+
+
+    /**
+     * Scenario: The root client hands out sub-clients and carries no flat operation methods
+     * @source truth/specs/operation-generator.feature-260418.typ:335
+     *
+     * Given Schema tags every Operation
+     * When Generator runs against Profile
+     * Then Client ApiClient has one accessor per tag, each returning that tag's interface
+     *   And Client ApiClient declares no operation method of its own, so exactly one way exists to reach any endpoint
+     */
+    public function testTheRootClientHandsOutSubClientsAndCarriesNoFlatOperationMethods(): void
+    {
+        $this->steps->givenSchemaTagsEveryOperation();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenClientApiClientHasOneAccessorPerTagEachReturningThatTagsInterface();
+        $this->steps->thenClientApiClientDeclaresNoOperationMethodOfItsOwnSoExactlyOneWayExistsToReachAnyEndpoint();
+    }
+
+
+    /**
+     * Scenario: A sub-client is constructible without the root
+     * @source truth/specs/operation-generator.feature-260418.typ:345
+     *
+     * Given Generator has emitted a sub-client for a tag
+     * When a consumer constructs Client directly
+     * Then Client's constructor takes TransportInterface and whatever credential Schema declares — and never root Client
+     */
+    public function testASubClientIsConstructibleWithoutTheRoot(): void
+    {
+        $this->steps->givenGeneratorHasEmittedASubClientForATag();
+        $this->steps->whenConsumerConstructsClientDirectly();
+        $this->steps->thenClientsConstructorTakesTransportInterfaceAndWhateverCredentialSchemaDeclaresAndNeverRootClient();
+    }
+
+
+    /**
+     * Scenario: An untagged operation stays on the root and no DefaultApi type is invented
+     * @source truth/specs/operation-generator.feature-260418.typ:354
+     *
+     * Given Schema declares Operation carrying no tag
+     * When Generator runs against Profile
+     * Then Operation is emitted as a method on Client ApiClient itself
+     *   And no Generated File named for a fallback tag is written
+     */
+    public function testAnUntaggedOperationStaysOnTheRootAndNoDefaultApiTypeIsInvented(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationCarryingNoTag();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenOperationIsEmittedAsAMethodOnClientApiClientItself();
+        $this->steps->thenNoGeneratedFileNamedForAFallbackTagIsWritten();
+    }
+
+
+    /**
+     * Scenario: An operation carrying several tags appears on every one of its sub-clients
+     * @source truth/specs/operation-generator.feature-260418.typ:364
+     *
+     * Given Operation carries two tags and Profile sets no tagChoice for it
+     * When Generator runs against Profile
+     * Then Operation is emitted on both sub-clients, because dropping it from either would be an omission nobody asked for
+     *   And Profile key tagChoice narrows it to one, and a choice naming a tag Operation does not carry fails the run
+     */
+    public function testAnOperationCarryingSeveralTagsAppearsOnEveryOneOfItsSubClients(): void
+    {
+        $this->steps->givenOperationCarriesTwoTagsAndProfileSetsNoTagChoiceForIt();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenOperationIsEmittedOnBothSubClientsBecauseDroppingItFromEitherWouldBeAnOmissionNobodyAskedFor();
+        $this->steps->thenProfileKeyTagChoiceNarrowsItToOneAndAChoiceNamingATagOperationDoesNotCarryFailsTheRun();
+    }
+
+
+    /**
+     * Scenario: A tag that is not a legal readable identifier is transliterated deterministically
+     * @source truth/specs/operation-generator.feature-260418.typ:374
+     *
+     * Given Schema tags Operation Клиенты
+     * When Generator runs against Profile
+     * Then Generated File Generated/KlientyClient.php is written — PHP would accept the Russian word as a class name and the result would be unusable
+     *   And same Schema produces same Generated File name on any machine, because the fold is a fixed character table rather than a library whose output tracks an ICU version
+     */
+    public function testATagThatIsNotALegalReadableIdentifierIsTransliteratedDeterministically(): void
+    {
+        $this->steps->givenSchemaTagsOperationTag('Клиенты');
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenGeneratedFileGeneratedKlientyClientPhpIsWrittenPHPWouldAcceptTheRussianWordAsAClassNameAndTheResultWouldBeUnusable();
+        $this->steps->thenSameSchemaProducesSameGeneratedFileNameOnAnyMachineBecauseTheFoldIsAFixedCharacterTableRatherThanALibraryWhoseOutputTracksAnICUVersion();
+    }
+
+
+    /**
+     * Scenario: The profile renames a tag, and a rename matching nothing fails the run
+     * @source truth/specs/operation-generator.feature-260418.typ:384
+     *
+     * Given Profile whose tagRenames map carries 'Клиенты' => 'Customers'
+     * When Generator runs against Profile
+     * Then Generated File Generated/CustomersClient.php is written and Client ApiClient exposes customers()
+     *   And an entry naming a tag no Operation carries fails the run, on the same reasoning as a stale skip — guidance that outlives its target is worse than none
+     */
+    public function testTheProfileRenamesATagAndARenameMatchingNothingFailsTheRun(): void
+    {
+        $this->steps->givenProfileWhoseTagRenamesMapCarriesКлиентыCustomers();
+        $this->steps->whenGeneratorRunsAgainstProfile();
+        $this->steps->thenGeneratedFileGeneratedCustomersClientPhpIsWrittenAndClientApiClientExposesCustomers();
+        $this->steps->thenEntryNamingATagNoOperationCarriesFailsTheRunOnTheSameReasoningAsAStaleSkipGuidanceThatOutlivesItsTargetIsWorseThanNone();
+    }
+
+
+    /**
+     * Scenario: A hand-written decorator implements a sub-client interface and delegates
+     * @source truth/specs/operation-generator.feature-260418.typ:394
+     *
+     * Given a consumer's own class implementing emitted Generated File StoreClientInterface and holding the generated implementation
+     * When the consumer calls a method on their class, which Client declared
+     * Then the call reaches the generated implementation, and their class adds behaviour with no edit to Generated File — no hook, no protected region, no subclass
+     *   And their class satisfies the strictest analysis with nothing suppressed, so a regeneration that changed Client surface would fail to compile rather than break the seam quietly
+     */
+    public function testAHandWrittenDecoratorImplementsASubClientInterfaceAndDelegates(): void
+    {
+        $this->steps->givenConsumersOwnClassImplementingEmittedGeneratedFileStoreClientInterfaceAndHoldingTheGeneratedImplementation();
+        $this->steps->whenConsumerCallsAMethodOnTheirClassWhichClientDeclared();
+        $this->steps->thenCallReachesTheGeneratedImplementationAndTheirClassAddsBehaviourWithNoEditToGeneratedFileNoHookNoProtectedRegionNoSubclass();
+        $this->steps->thenTheirClassSatisfiesTheStrictestAnalysisWithNothingSuppressedSoARegenerationThatChangedClientSurfaceWouldFailToCompileRatherThanBreakTheSeamQuietly();
     }
 }

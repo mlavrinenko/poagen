@@ -64,11 +64,6 @@ final class PaogenCLISteps
         $this->invokeCli(['paogen']);
     }
 
-    public function thenStdoutShouldContainUSAGE(): void
-    {
-        TestCase::assertStringContainsString('USAGE', $this->stdout);
-    }
-
     public function thenPaogenCLIShouldExitWithCodeCode(int $code): void
     {
         TestCase::assertSame($code, $this->exitCode);
@@ -79,48 +74,34 @@ final class PaogenCLISteps
         $this->invokeCli(['paogen', $arg]);
     }
 
-    public function thenStdoutShouldStartWithPrefix(string $prefix): void
-    {
-        if ($prefix === '') {
-            TestCase::fail('prefix must be non-empty');
-        }
-        TestCase::assertStringStartsWith($prefix, $this->stdout);
-    }
-
-    public function thenStderrShouldContainNeedle(string $needle): void
-    {
-        TestCase::assertStringContainsString($needle, $this->stderr);
-    }
-
-    public function givenComposerHasNoInstalledVersionRecordForAQueriedPackage(): void
-    {
-        // Precondition marker: the `when` step passes a deliberately unknown
-        // package name, so Composer's InstalledVersions cannot resolve it.
-        // No runtime setup is required.
-    }
-
-
-    public function whenTheCLIResolvesAVersionForAPackagePackage(string $package): void
-    {
-        $this->resolvedVersion = Cli::version($package);
-    }
-
-
-    public function thenTheReturnedVersionTokenIsNonEmpty(): void
-    {
-        TestCase::assertNotSame('', $this->resolvedVersion);
-    }
-
-
     private string $brokenYamlPath = '';
     private bool $spawnBinary = false;
     private string $tmpDir = '';
 
+    /**
+     * The profile the CLI scenarios drive. The spec writes `<profile-path>`
+     * rather than naming a fixture, so the binding lives here.
+     */
+    private const PROFILE_FIXTURE = 'tests/fixtures/profiles/petstore.php';
+
+    /** Likewise for `<schema-path>`, which the validate scenarios use. */
+    private const SCHEMA_FIXTURE = 'tests/fixtures/schemas/petstore-3.0.yaml';
+
+    private function profileFixturePath(): string
+    {
+        return dirname(__DIR__, 2) . '/' . self::PROFILE_FIXTURE;
+    }
+
+    private function schemaFixturePath(): string
+    {
+        return dirname(__DIR__, 2) . '/' . self::SCHEMA_FIXTURE;
+    }
+
     public function whenPaogenCLIIsInvokedWithArgumentsArgs(string $args): void
     {
-        // The spec uses `<that-path>` / `<tmp-dir>` as placeholders for
-        // the scratch paths created in the matching `given` step;
-        // substitute when present.
+        // The spec uses `<that-path>` / `<tmp-dir>` / `<profile-path>` as
+        // placeholders for the scratch paths created in the matching
+        // `given` step; substitute when present.
         if ($this->brokenYamlPath !== '') {
             $args = str_replace('<that-path>', $this->brokenYamlPath, $args);
         }
@@ -128,6 +109,9 @@ final class PaogenCLISteps
         if ($this->tmpDir !== '') {
             $args = str_replace('<tmp-dir>', $this->tmpDir, $args);
         }
+
+        $args = str_replace('<profile-path>', $this->profileFixturePath(), $args);
+        $args = str_replace('<schema-path>', $this->schemaFixturePath(), $args);
 
         $parts = preg_split('/\s+/', trim($args));
         assert(is_array($parts));
@@ -143,27 +127,6 @@ final class PaogenCLISteps
     }
 
 
-    public function givenATemporaryFileThatIsNotValidYAML(): void
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-validate-');
-        // Deliberately malformed YAML — unterminated flow sequence with
-        // colons in an unquoted scalar is guaranteed to trip the parser.
-        file_put_contents($path, "not: valid: yaml: [\n");
-
-        $this->brokenYamlPath = $path;
-    }
-
-
-    public function thenStderrShouldContainAParseErrorSignal(): void
-    {
-        TestCase::assertStringContainsString('paogen validate: parse error:', $this->stderr);
-
-        if ($this->brokenYamlPath !== '' && is_file($this->brokenYamlPath)) {
-            unlink($this->brokenYamlPath);
-        }
-    }
-
-
     public function givenProfileAtPath(string $path): void
     {
         // Precondition marker. The matching `when` step runs the CLI and
@@ -172,15 +135,9 @@ final class PaogenCLISteps
         // stderr (PHP deprecation notices, which go to the engine's real
         // stderr, not any in-process captured stream), switch the step
         // to spawn `bin/paogen` as a subprocess.
-        TestCase::assertFileExists(dirname(__DIR__, 2) . '/' . $path);
+        TestCase::assertSame('<profile-path>', $path);
+        TestCase::assertFileExists($this->profileFixturePath());
         $this->spawnBinary = true;
-    }
-
-
-    public function thenNeitherStdoutNorStderrContainsNeedle(string $needle): void
-    {
-        TestCase::assertStringNotContainsString($needle, $this->stdout);
-        TestCase::assertStringNotContainsString($needle, $this->stderr);
     }
 
 
@@ -210,69 +167,6 @@ final class PaogenCLISteps
         fclose($pipes[2]);
 
         $this->exitCode = proc_close($process);
-    }
-
-
-    public function givenProfileAtPathWhoseDeclaredOutputIsTestsFixturesGeneratedPetstore(string $path): void
-    {
-        TestCase::assertFileExists(dirname(__DIR__, 2) . '/' . $path);
-        $this->tmpDir = $this->makeScratchDir('paogen-output-');
-    }
-
-
-    public function thenTheGeneratedTreeIsWrittenUnderPathInsteadOfTheProfilesDeclaredOutput(string $path): void
-    {
-        // $path is the spec placeholder literal; we check the resolved
-        // directory captured in the `given` step.
-        TestCase::assertNotSame('', $this->tmpDir);
-        TestCase::assertDirectoryExists($this->tmpDir . '/Generated');
-        TestCase::assertFileExists($this->tmpDir . '/Generated/ApiClient.php');
-    }
-
-
-    public function givenAFreshOutputDirectoryAtPath(string $path): void
-    {
-        $this->tmpDir = $this->makeScratchDir('paogen-dryrun-');
-    }
-
-
-    public function thenStdoutShouldContainNeedle(string $needle): void
-    {
-        TestCase::assertStringContainsString($needle, $this->stdout);
-    }
-
-
-    public function thenTheDirectoryPathContainsNoFiles(string $path): void
-    {
-        TestCase::assertNotSame('', $this->tmpDir);
-        TestCase::assertSame([], $this->listFilesRecursive($this->tmpDir));
-    }
-
-
-    public function givenATemporaryCopyOfPathAtPath(string $source, string $placeholder = '<tmp-dir>'): void
-    {
-        $this->tmpDir = $this->makeScratchDir('paogen-diff-match-');
-        $this->copyTree(dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
-    }
-
-
-    public function thenStdoutIsEmpty(): void
-    {
-        TestCase::assertSame('', $this->stdout);
-    }
-
-
-    public function givenATemporaryCopyOfPathAtPathWithOneFileTruncated(string $source, string $placeholder = '<tmp-dir>'): void
-    {
-        $this->tmpDir = $this->makeScratchDir('paogen-diff-corrupt-');
-        $this->copyTree(dirname(__DIR__, 2) . '/' . $source, $this->tmpDir);
-
-        $files = $this->listFilesRecursive($this->tmpDir);
-        TestCase::assertNotEmpty($files, 'copied tree must have at least one file');
-
-        // Pick the lexicographically-first file to keep the test byte-stable.
-        sort($files, SORT_STRING);
-        file_put_contents($files[0], '');
     }
 
 
@@ -333,6 +227,160 @@ final class PaogenCLISteps
             }
         }
         return $out;
+    }
+
+
+    public function thenPaogenCLIsStdoutShouldContainUSAGE(): void
+    {
+        TestCase::assertStringContainsString('USAGE', $this->stdout);
+    }
+
+
+    public function thenPaogenCLIsStdoutShouldStartWithPrefix(string $prefix): void
+    {
+        if ($prefix === '') {
+            TestCase::fail('prefix must be non-empty');
+        }
+        TestCase::assertStringStartsWith($prefix, $this->stdout);
+    }
+
+
+    public function givenPaogenCLIsComposerMetadataHasNoInstalledVersionRecordForAQueriedPackage(): void
+    {
+        // Precondition marker: the `when` step passes a deliberately unknown
+        // package name, so Composer's InstalledVersions cannot resolve it.
+        // No runtime setup is required.
+    }
+
+
+    public function whenPaogenCLIResolvesAVersionForAPackagePackage(string $package): void
+    {
+        $this->resolvedVersion = Cli::version($package);
+    }
+
+
+    public function thenVersionTokenPaogenCLIReturnsIsNonEmpty(): void
+    {
+        TestCase::assertNotSame('', $this->resolvedVersion);
+    }
+
+
+    public function thenPaogenCLIsStderrShouldContainNeedle(string $needle): void
+    {
+        TestCase::assertStringContainsString($needle, $this->stderr);
+    }
+
+
+    public function givenSyntacticallyValidSchemaDocumentAtPath(string $path): void
+    {
+        // Petstore parses cleanly, which is the whole precondition. The
+        // matching `when` step substitutes the same placeholder into the
+        // argument string it hands the CLI.
+        TestCase::assertSame('<schema-path>', $path);
+        TestCase::assertFileExists($this->schemaFixturePath());
+    }
+
+
+    public function givenTemporaryMalformedSchemaFileThatIsNotValidYAML(): void
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-validate-');
+        // Deliberately malformed YAML — unterminated flow sequence with
+        // colons in an unquoted scalar is guaranteed to trip the parser.
+        file_put_contents($path, "not: valid: yaml: [\n");
+
+        $this->brokenYamlPath = $path;
+    }
+
+
+    public function thenPaogenCLIsStderrShouldContainAParseErrorSignal(): void
+    {
+        TestCase::assertStringContainsString('paogen validate: parse error:', $this->stderr);
+
+        if ($this->brokenYamlPath !== '' && is_file($this->brokenYamlPath)) {
+            unlink($this->brokenYamlPath);
+        }
+    }
+
+
+    /**
+     * Both of this Given's placeholders are keyed `path`, so the derived
+     * signature folds them into one parameter while the call site still passes
+     * both positionally. Widened to name them, the way
+     * `givenTwoOperationEntriesUnderIt...` is on the operation-generator side.
+     */
+    public function givenProfileAtPathWhoseDeclaredOutputIsPath(string $path, string $declaredOutput): void
+    {
+        TestCase::assertSame('<profile-path>', $path);
+        TestCase::assertSame('<declared-output-dir>', $declaredOutput);
+        TestCase::assertFileExists($this->profileFixturePath());
+        $this->tmpDir = $this->makeScratchDir('paogen-output-');
+    }
+
+
+    public function thenGeneratedTreeIsWrittenUnderPathInsteadOfProfilesDeclaredOutput(string $path): void
+    {
+        // $path is the spec placeholder literal; we check the resolved
+        // directory captured in the `given` step.
+        TestCase::assertNotSame('', $this->tmpDir);
+        TestCase::assertDirectoryExists($this->tmpDir . '/Generated');
+        TestCase::assertFileExists($this->tmpDir . '/Generated/ApiClient.php');
+    }
+
+
+    public function givenFreshDirectoryAtPathAsPaogenCLIsOutputTarget(string $path): void
+    {
+        $this->tmpDir = $this->makeScratchDir('paogen-dryrun-');
+    }
+
+
+    public function thenPaogenCLIsStdoutShouldContainNeedle(string $needle): void
+    {
+        TestCase::assertStringContainsString($needle, $this->stdout);
+    }
+
+
+    public function thenPaogenCLIsOutputDirectoryAtPathContainsNoFiles(string $path): void
+    {
+        TestCase::assertNotSame('', $this->tmpDir);
+        TestCase::assertSame([], $this->listFilesRecursive($this->tmpDir));
+    }
+
+
+    public function givenTemporaryCopyOfMatchingGeneratedFileTreeAtPathForPaogenCLIToDiffAgainst(string $path): void
+    {
+        // Spec names the tree only as "matching": the fixture the profile
+        // under test regenerates byte-for-byte. `$path` is the `<tmp-dir>`
+        // placeholder, so the real directory is made here.
+        $this->tmpDir = $this->makeScratchDir('paogen-diff-match-');
+        $this->copyTree(dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore', $this->tmpDir);
+    }
+
+
+    public function thenPaogenCLIsStdoutIsEmpty(): void
+    {
+        TestCase::assertSame('', $this->stdout);
+    }
+
+
+    public function givenTemporaryCopyOfGeneratedFileTreeAtPathForPaogenCLIToDiffAgainstWithOneFileTruncated(
+        string $path,
+    ): void {
+        $this->tmpDir = $this->makeScratchDir('paogen-diff-corrupt-');
+        $this->copyTree(dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore', $this->tmpDir);
+
+        $files = $this->listFilesRecursive($this->tmpDir);
+        TestCase::assertNotEmpty($files, 'copied tree must have at least one file');
+
+        // Pick the lexicographically-first file to keep the test byte-stable.
+        sort($files, SORT_STRING);
+        file_put_contents($files[0], '');
+    }
+
+
+    public function thenNeitherPaogenCLIsStdoutNorStderrContainsNeedle(string $needle): void
+    {
+        TestCase::assertStringNotContainsString($needle, $this->stdout);
+        TestCase::assertStringNotContainsString($needle, $this->stderr);
     }
 
 }
