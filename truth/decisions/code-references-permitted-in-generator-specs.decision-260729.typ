@@ -42,10 +42,16 @@ after the debt half is paid down.
 - Scenarios, decisions and standards may name a PHP signature, an
   attribute form, or a call shape when that shape is what a consumer of
   #the(GeneratedFile) observes.
-- Nothing in specs, decisions, standards, or domain artifacts names a path
-  into paogen's own tree any longer; the debt above was rewritten, not
-  merely suppressed, and the allowlist in `.speconaut/config.toml` now
-  carries only the output vocabulary the Choice section above describes
-  as legitimate.
+- No artifact that describes observable behaviour names a path into
+  paogen's own tree any longer; the debt above was rewritten, not merely
+  suppressed, and the allowlist in `.speconaut/config.toml` now carries
+  only the output vocabulary the Choice section above describes as
+  legitimate.
+- A decision declaring `process-only:` is the one exception, and it is a
+  whole-file exemption the checker derives from that slot rather than
+  anything paogen configures. Such a decision is non-portable by
+  construction — that is what the slot declares — so genericising a file
+  name out of one buys no portability and costs the reader the pointer to
+  what is being discussed.
 - Task artifacts are unaffected: they are meant to name files, and stay
   exempt from this rule by design rather than by allowlist entry.
