@@ -1,0 +1,750 @@
+{
+    "version": "0.1.0",
+    "adapter": "phpunit",
+    "entries": [
+        {
+            "test_id": "PaogenCLITest::testNoArgumentsPrintsUsageAndExits0",
+            "feature": "paogen CLI",
+            "scenario": "No arguments prints usage and exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 14,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testHelpPrintsUsageAndExits0",
+            "feature": "paogen CLI",
+            "scenario": "--help prints usage and exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 20,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testHelpSubcommandPrintsUsageAndExits0",
+            "feature": "paogen CLI",
+            "scenario": "help subcommand prints usage and exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 26,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testVersionPrintsThePaogenVersionAndExits0",
+            "feature": "paogen CLI",
+            "scenario": "--version prints the paogen version and exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 34,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testVersionSubcommandPrintsThePaogenVersionAndExits0",
+            "feature": "paogen CLI",
+            "scenario": "version subcommand prints the paogen version and exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 40,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testVersionFallsBackToANonEmptySentinelWhenComposerMetadataIsMissing",
+            "feature": "paogen CLI",
+            "scenario": "Version falls back to a non-empty sentinel when Composer metadata is missing",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 46,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testUnknownCommandReportsOnStderrAndExits2",
+            "feature": "paogen CLI",
+            "scenario": "Unknown command reports on stderr and exits 2",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 57,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testValidateOnASyntacticallyValidOpenAPIDocumentExits0",
+            "feature": "paogen CLI",
+            "scenario": "validate on a syntactically valid OpenAPI document exits 0",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 65,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testValidateOnAMalformedDocumentReportsOnStderrAndExits1",
+            "feature": "paogen CLI",
+            "scenario": "validate on a malformed document reports on stderr and exits 1",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 71,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testValidateWithNoArgumentReportsOnStderrAndExits2",
+            "feature": "paogen CLI",
+            "scenario": "validate with no argument reports on stderr and exits 2",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 78,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testOutputRedirectsTheGeneratedTreeToTheSuppliedDirectory",
+            "feature": "paogen CLI",
+            "scenario": "--output redirects the generated tree to the supplied directory",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 86,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testDryRunPrintsATreeSummaryAndWritesNothing",
+            "feature": "paogen CLI",
+            "scenario": "--dry-run prints a tree summary and writes nothing",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 96,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testDiffAgainstAMatchingGoldenTreeExits0WithNoOutput",
+            "feature": "paogen CLI",
+            "scenario": "--diff against a matching golden tree exits 0 with no output",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 108,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testDiffAgainstACorruptedGoldenTreePrintsUnifiedDiffAndExits1",
+            "feature": "paogen CLI",
+            "scenario": "--diff against a corrupted golden tree prints unified diff and exits 1",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 118,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testDryRunCombinedWithDiffIsAUsageError",
+            "feature": "paogen CLI",
+            "scenario": "--dry-run combined with --diff is a usage error",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 128,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "PaogenCLITest::testGenerateEmitsNoPHPDeprecationNoticesOn84",
+            "feature": "paogen CLI",
+            "scenario": "generate emits no PHP deprecation notices on 8.4",
+            "spec_file": "truth/specs/cli.feature-260417.typ",
+            "spec_line": 139,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ProfileTest::testAPHPFileThatReturnsAProfileIsLoadedAsThatProfile",
+            "feature": "Profile",
+            "scenario": "A PHP file that returns a Profile is loaded as that Profile",
+            "spec_file": "truth/specs/profile.feature-260418.typ",
+            "spec_line": 12,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ProfileTest::testAPHPFileThatDoesNotReturnAProfileIsRejected",
+            "feature": "Profile",
+            "scenario": "A PHP file that does not return a Profile is rejected",
+            "spec_file": "truth/specs/profile.feature-260418.typ",
+            "spec_line": 22,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ProfileTest::testAUserClassWithBindsFormatInADiscoveredNamespaceRegistersAFormatBinding",
+            "feature": "Profile",
+            "scenario": "A user class with BindsFormat in a discovered namespace registers a format binding",
+            "spec_file": "truth/specs/profile.feature-260418.typ",
+            "spec_line": 33,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ProfileTest::testAClassOutsideDiscoverInIsIgnoredEvenIfAnnotated",
+            "feature": "Profile",
+            "scenario": "A class outside discoverIn is ignored even if annotated",
+            "spec_file": "truth/specs/profile.feature-260418.typ",
+            "spec_line": 43,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testEachNamedSchemaComponentBecomesAFinalReadonlyClass",
+            "feature": "Model Generator",
+            "scenario": "Each named schema component becomes a final readonly class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 17,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testPropertyTypesFollowOpenAPIScalarsAndRequiredNess",
+            "feature": "Model Generator",
+            "scenario": "Property types follow OpenAPI scalars and required-ness",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 27,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testARefToAnotherComponentBecomesATypedPropertyOfThatClass",
+            "feature": "Model Generator",
+            "scenario": "A `$ref` to another component becomes a typed property of that class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 37,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnInlineNestedObjectSchemaBecomesASynthesisedTypedClass",
+            "feature": "Model Generator",
+            "scenario": "An inline nested object schema becomes a synthesised typed class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 46,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testASchemaWithEnumValuesBecomesAPHP81BackedEnum",
+            "feature": "Model Generator",
+            "scenario": "A schema with enum values becomes a PHP 8.1 backed enum",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 57,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAOneOfOfRefEdComponentsWithADiscriminatorBecomesAPHPUnionType",
+            "feature": "Model Generator",
+            "scenario": "A `oneOf` of `$ref`-ed components with a `discriminator` becomes a PHP union type",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 68,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnUndiscriminatedOneOfAbortsTheRunWithAPointedDiagnostic",
+            "feature": "Model Generator",
+            "scenario": "An undiscriminated `oneOf` aborts the run with a pointed diagnostic",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 77,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAProfileLevelDiscriminatorsOverrideResolvesAnOtherwiseUndiscriminatedOneOf",
+            "feature": "Model Generator",
+            "scenario": "A profile-level `discriminators` override resolves an otherwise-undiscriminated `oneOf`",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 88,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAOneOfWithADiscriminatorPropertyNamePicksTheBranchByWireValue",
+            "feature": "Model Generator",
+            "scenario": "A `oneOf` with a `discriminator.propertyName` picks the branch by wire value",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 99,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnAllOfThatMergesTwoObjectSchemasBecomesASingleModelWithTheUnionOfProperties",
+            "feature": "Model Generator",
+            "scenario": "An `allOf` that merges two object schemas becomes a single Model with the union of properties",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 108,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAListOfModelPropertyHydratesEachItemIntoTheDeclaredClass",
+            "feature": "Model Generator",
+            "scenario": "A list-of-Model property hydrates each item into the declared class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 120,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAListOfScalarPropertyHydratesItemsUntouched",
+            "feature": "Model Generator",
+            "scenario": "A list-of-scalar property hydrates items untouched",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 130,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPropertyWithANonIdentifierSchemaKeyRoundTripsViaWireName",
+            "feature": "Model Generator",
+            "scenario": "A property with a non-identifier schema key round-trips via #[WireName]",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 139,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testGeneratedModelsCarryNoPROPERTYMAPAndDoNotImplementJsonSerializable",
+            "feature": "Model Generator",
+            "scenario": "Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 151,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testADiscriminatedOneOfHydratesToTheBranchNamedByTheWireTagViaDiscriminator",
+            "feature": "Model Generator",
+            "scenario": "A discriminated `oneOf` hydrates to the branch named by the wire tag via #[Discriminator]",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 162,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsADR010",
+            "feature": "Model Generator",
+            "scenario": "Hydration recovers phpdoc types when opcache strips comments (ADR-010)",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 172,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPropertyWithAFormatThatHasABindsFormatBindingUsesTheUserClass",
+            "feature": "Model Generator",
+            "scenario": "A property with a format that has a BindsFormat binding uses the user class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 184,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testABindsFormatScalarValueObjectRoundTripsThroughScalarBinding",
+            "feature": "Model Generator",
+            "scenario": "A BindsFormat scalar value object round-trips through ScalarBinding",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 194,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAFormatDateTimePropertyIsEmittedAsDateTimeImmutableAndRoundTripsThroughTheWireString",
+            "feature": "Model Generator",
+            "scenario": "A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 205,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAKebabCaseComponentNameBecomesAPascalCasePHPClassUnderTheDefaultPipeline",
+            "feature": "Model Generator",
+            "scenario": "A kebab-case component name becomes a PascalCase PHP class under the default pipeline",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 219,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnExplicitRenamesEntryTakesPrecedenceOverTheAutoSanitiser",
+            "feature": "Model Generator",
+            "scenario": "An explicit `renames` entry takes precedence over the auto-sanitiser",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 230,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPatternGatedStrategyOnlyHandlesNamesMatchingItsPatternAndFallsThroughOtherwise",
+            "feature": "Model Generator",
+            "scenario": "A pattern-gated strategy only handles names matching its pattern and falls through otherwise",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 242,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testACustomPipelineThatReturnsNullForEveryNameAbortsWithAPointedDiagnostic",
+            "feature": "Model Generator",
+            "scenario": "A custom pipeline that returns null for every name aborts with a pointed diagnostic",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 253,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testTwoRawComponentNamesThatNormaliseToTheSamePHPClassAbortTheRun",
+            "feature": "Model Generator",
+            "scenario": "Two raw component names that normalise to the same PHP class abort the run",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 264,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAScalarComponentEmitsAScalarBindingVOThatRoundTripsTheRawScalar",
+            "feature": "Model Generator",
+            "scenario": "A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 277,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testATopLevelOneOfWithInlineObjectBranchesEmitsAnInterfaceAndOneModelPerBranch",
+            "feature": "Model Generator",
+            "scenario": "A top-level `oneOf` with inline object branches emits an interface and one Model per branch",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 288,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testATopLevelOneOfWithRefBranchesMarksTheBranchModelsAsImplementsInterface",
+            "feature": "Model Generator",
+            "scenario": "A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 299,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testATopLevelTypeArrayComponentEmitsATypedWrapperClass",
+            "feature": "Model Generator",
+            "scenario": "A top-level `type: array` component emits a typed wrapper class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 309,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testADocumentDeclaringNoComponentsStillEmitsAModelForEveryPayload",
+            "feature": "Model Generator",
+            "scenario": "A document declaring no components still emits a model for every payload",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 321,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnInlineArrayOfInlineObjectsIsTypedAtBothEnds",
+            "feature": "Model Generator",
+            "scenario": "An inline array of inline objects is typed at both ends",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 332,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testNestingBelowASynthesisedPayloadIsReachedByTheSameQueueAsNestingBelowAComponent",
+            "feature": "Model Generator",
+            "scenario": "Nesting below a synthesised payload is reached by the same queue as nesting below a component",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 342,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnInlineEnumInsideAPayloadBecomesABackedEnumWhereverThePayloadCameFrom",
+            "feature": "Model Generator",
+            "scenario": "An inline enum inside a payload becomes a backed enum, wherever the payload came from",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 352,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAnInlineObjectTheDocumentLeftUnconstrainedIsPassedAsAMapRatherThanDroppingTheOperation",
+            "feature": "Model Generator",
+            "scenario": "An inline object the document left unconstrained is passed as a map rather than dropping the operation",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 362,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testTheProfilePinsTheClassNameForASynthesisedPayload",
+            "feature": "Model Generator",
+            "scenario": "The profile pins the class name for a synthesised payload",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 372,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPinNamingAnOperationAbsentFromTheDocumentFailsTheRun",
+            "feature": "Model Generator",
+            "scenario": "A pin naming an operation absent from the document fails the run",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 382,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testTwoShapesDerivingOneClassNameFailTheRunRatherThanOverwritingAFile",
+            "feature": "Model Generator",
+            "scenario": "Two shapes deriving one class name fail the run rather than overwriting a file",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 392,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testRunningTheGeneratorTwiceWithTheSameInputsProducesIdenticalFiles",
+            "feature": "Model Generator",
+            "scenario": "Running the generator twice with the same inputs produces identical files",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 404,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAComponentRemovedFromTheSchemaIsPrunedFromGeneratedOnTheNextRun",
+            "feature": "Model Generator",
+            "scenario": "A component removed from the schema is pruned from Generated/ on the next run",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 413,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAGETOperationWithAPathParameterBecomesATypedClientMethod",
+            "feature": "Operation Generator",
+            "scenario": "A GET operation with a path parameter becomes a typed client method",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 21,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAPOSTOperationWithAJSONBodyTakesATypedModelParameter",
+            "feature": "Operation Generator",
+            "scenario": "A POST operation with a JSON body takes a typed Model parameter",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 32,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAJSONBodyWhoseSchemaIsAListOfRefBecomesATypedListParameter",
+            "feature": "Operation Generator",
+            "scenario": "A JSON body whose schema is a list of $ref becomes a typed list parameter",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 43,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testA2xxJSONResponseBodyIsDeserializedIntoTheTypedModel",
+            "feature": "Operation Generator",
+            "scenario": "A 2xx JSON response body is deserialized into the typed Model",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 56,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAScalar2xxJSONResponseIsReturnedAsTheScalarPHPTypeWithoutHydration",
+            "feature": "Operation Generator",
+            "scenario": "A scalar 2xx JSON response is returned as the scalar PHP type without hydration",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 65,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testA2xxJSONResponseWithAdditionalPropertiesIsReturnedAsATypedAssociativeArray",
+            "feature": "Operation Generator",
+            "scenario": "A 2xx JSON response with `additionalProperties` is returned as a typed associative array",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 75,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnInlineEnumQueryParameterBecomesASynthesisedBackedEnumMethodArgument",
+            "feature": "Operation Generator",
+            "scenario": "An inline enum query parameter becomes a synthesised backed enum method argument",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 87,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnExplodeTrueArrayQueryParameterIsSerialisedAsRepeatedNameValuePairs",
+            "feature": "Operation Generator",
+            "scenario": "An `explode: true` array query parameter is serialised as repeated `name=value` pairs",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 97,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOptionalHeaderParameterBecomesANullableTypedArgumentAndIsAttachedOnlyWhenNonNull",
+            "feature": "Operation Generator",
+            "scenario": "An optional header parameter becomes a nullable typed argument and is attached only when non-null",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 109,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAHeaderParameterWhoseRawNameIsNotAPHPIdentifierIsNormalisedButTheWireKeyIsPreserved",
+            "feature": "Operation Generator",
+            "scenario": "A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 121,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationIdWithNonIdentifierCharactersIsCamelCasedIntoAPHPMethodName",
+            "feature": "Operation Generator",
+            "scenario": "An operationId with non-identifier characters is camelCased into a PHP method name",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 131,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testProfileMethodRenamesOverridesAnOperationIdVerbatim",
+            "feature": "Operation Generator",
+            "scenario": "Profile.methodRenames overrides an operationId verbatim",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 141,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationWhoseBodyShapeIsUnsupportedIsReportedAsASkipRatherThanDroppedSilently",
+            "feature": "Operation Generator",
+            "scenario": "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 151,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationLevelRefToAComponentParameterIsResolvedToATypedMethodArgument",
+            "feature": "Operation Generator",
+            "scenario": "An operation-level `$ref` to a component parameter is resolved to a typed method argument",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 163,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationLevelRefToAHeaderComponentParameterBecomesAnOptionalTypedHeaderArgument",
+            "feature": "Operation Generator",
+            "scenario": "An operation-level `$ref` to a header component parameter becomes an optional typed header argument",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 174,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testARefToAComponentRequestBodyIsResolvedToTheExpectedModelBodyParameter",
+            "feature": "Operation Generator",
+            "scenario": "A `$ref` to a component requestBody is resolved to the expected Model body parameter",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 185,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAPathItemLevelInlineParameterIsInheritedByEveryOperationUnderThatPath",
+            "feature": "Operation Generator",
+            "scenario": "A PathItem-level inline parameter is inherited by every operation under that path",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 196,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationWhosePathItemDeclaresARefParameterIsStillEmitted",
+            "feature": "Operation Generator",
+            "scenario": "An operation whose PathItem declares a `$ref` parameter is still emitted",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 207,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAPathParameterWhoseSchemaRefsAScalarVOComponentIsInterpolatedThroughToScalar",
+            "feature": "Operation Generator",
+            "scenario": "A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 218,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAFormUrlencodedBodyBecomesTypedParamsSerialisedWithHttpBuildQuery",
+            "feature": "Operation Generator",
+            "scenario": "A form-urlencoded body becomes typed params serialised with http_build_query",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 231,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnUnsupportedBodyContentTypeAbortsTheRun",
+            "feature": "Operation Generator",
+            "scenario": "An unsupported body content type aborts the run",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 242,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnExplicitlySkippedOperationIsOmittedRatherThanStubbed",
+            "feature": "Operation Generator",
+            "scenario": "An explicitly skipped operation is omitted rather than stubbed",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 254,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException",
+            "feature": "Operation Generator",
+            "scenario": "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 269,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnApiKeyHeaderSchemeBecomesAConstructorArgAttachedAsAHeaderOnSecuredOps",
+            "feature": "Operation Generator",
+            "scenario": "An apiKey header scheme becomes a constructor arg attached as a header on secured ops",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 282,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnHttpBearerSchemeBecomesABearerTokenCtorArgAttachedAsAuthorization",
+            "feature": "Operation Generator",
+            "scenario": "An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 293,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign",
+            "feature": "Operation Generator",
+            "scenario": "An http basic scheme is left as a placeholder pending ADR-002 runtime design",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 304,
+            "stage": "draft"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign",
+            "feature": "Operation Generator",
+            "scenario": "An oauth2 scheme is left as a placeholder pending ADR-002 runtime design",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 313,
+            "stage": "draft"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testEachTagBecomesASubClientBehindAnInterfaceDeclaringExactlyItsOwnMethods",
+            "feature": "Operation Generator",
+            "scenario": "Each tag becomes a sub-client behind an interface declaring exactly its own methods",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 324,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testTheRootClientHandsOutSubClientsAndCarriesNoFlatOperationMethods",
+            "feature": "Operation Generator",
+            "scenario": "The root client hands out sub-clients and carries no flat operation methods",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 335,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testASubClientIsConstructibleWithoutTheRoot",
+            "feature": "Operation Generator",
+            "scenario": "A sub-client is constructible without the root",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 345,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnUntaggedOperationStaysOnTheRootAndNoDefaultApiTypeIsInvented",
+            "feature": "Operation Generator",
+            "scenario": "An untagged operation stays on the root and no DefaultApi type is invented",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 354,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAnOperationCarryingSeveralTagsAppearsOnEveryOneOfItsSubClients",
+            "feature": "Operation Generator",
+            "scenario": "An operation carrying several tags appears on every one of its sub-clients",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 364,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testATagThatIsNotALegalReadableIdentifierIsTransliteratedDeterministically",
+            "feature": "Operation Generator",
+            "scenario": "A tag that is not a legal readable identifier is transliterated deterministically",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 374,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testTheProfileRenamesATagAndARenameMatchingNothingFailsTheRun",
+            "feature": "Operation Generator",
+            "scenario": "The profile renames a tag, and a rename matching nothing fails the run",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 384,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAHandWrittenDecoratorImplementsASubClientInterfaceAndDelegates",
+            "feature": "Operation Generator",
+            "scenario": "A hand-written decorator implements a sub-client interface and delegates",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 394,
+            "stage": "unstable"
+        }
+    ]
+}

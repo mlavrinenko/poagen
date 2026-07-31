@@ -7,7 +7,18 @@ $finder = (new PhpCsFixer\Finder())
     // Generated fixtures are nette/php-generator's canonical output (ADR-004).
     // cs-fixer disagrees with nette on a few stylistic choices (e.g. empty
     // body collapse); excluding them keeps the generator deterministic.
-    ->exclude(['fixtures/generated']);
+    ->exclude(['fixtures/generated'])
+    // Same reasoning, other generator: `tests/generated/*Test.php` is
+    // speconaut's canonical output, rewritten wholesale on every
+    // `generate-tests` run. cs-fixer wants to hoist the fully-qualified
+    // `#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]` it emits
+    // into a `use`, which `check-generated-tests` then reads as drift — the
+    // two gates cannot both be satisfied while this file is formatted.
+    //
+    // Scoped to `*Test.php` on purpose: the `*Steps.php` files beside them are
+    // hand-written (speconaut only ever appends stubs to those), so they stay
+    // formatted like the rest of the suite.
+    ->notPath('#^generated/.*Test\.php$#');
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)

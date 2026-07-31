@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
+use cebe\openapi\Reader;
+use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\PathItem;
 use Composer\Autoload\ClassLoader;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\GenerateCommand;
@@ -12,6 +15,7 @@ use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient as ParametersClient;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiException as ParametersApiException;
@@ -23,9 +27,13 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPets
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\OrderStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClient;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionParameter;
 
 use function dirname;
 use function is_array;
@@ -104,36 +112,6 @@ final class OperationGeneratorSteps
         $this->source = $this->callerSurface();
     }
 
-    public function thenAFileGeneratedApiClientPhpIsWrittenUnderProfilesOutput(): void
-    {
-        TestCase::assertFileExists($this->outputDir . '/Generated/ApiClient.php');
-    }
-
-    public function thenTheEmittedClassIsFinalReadonlyInProfilesNamespaceGenerated(): void
-    {
-        TestCase::assertStringContainsString('final readonly class ApiClient', $this->source);
-        TestCase::assertStringContainsString(
-            'namespace Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated;',
-            $this->source,
-        );
-    }
-
-    public function thenTheClassHasAMethodGetOrderByIdIntOrderIdOrderThatInterpolatesTokenIntoTheRequestPath(
-        string $token,
-    ): void {
-        TestCase::assertSame('{orderId}', $token);
-        TestCase::assertStringContainsString(
-            'public function getOrderById(int $orderId): Order',
-            $this->source,
-        );
-        // The token is named and filled where the path is named. Which
-        // string operation fills it is the transport's business.
-        TestCase::assertStringContainsString(
-            "Endpoint::get('/store/order/{orderId}')->path('orderId', \$orderId)",
-            $this->source,
-        );
-    }
-
     public function givenSchemaDeclaresOperationOpWithId(string $op, string $id): void
     {
         // Reused by the JSON body scenarios (POST /pet, POST /user/createWithList)
@@ -149,46 +127,6 @@ final class OperationGeneratorSteps
         $this->profile = $op === 'POST /proxy'
             ? $this->loadProfile('parameters')
             : $this->loadProfile('petstore');
-    }
-
-    public function givenTheRequestBodyIsApplicationJsonWithSchemaRef(string $ref): void
-    {
-        TestCase::assertSame('#/components/schemas/Pet', $ref);
-    }
-
-    public function thenTheEmittedClientHasAMethodAddPetPetBodyPet(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function addPet(Pet $body): Pet',
-            $this->source,
-        );
-    }
-
-    public function thenTheMethodJSONEncodesBodyAndAttachesItAsTheRequestBody(): void
-    {
-        // The emitted method says the body is JSON and hands over the model.
-        TestCase::assertStringContainsString("Endpoint::post('/pet')->json(\$body)", $this->source);
-
-        // Proven at the wire rather than in the text: ADR-010 routes bodies
-        // through the runtime Marshaller before json_encode, so wire keys,
-        // ScalarBindings and date formats are normalised at the boundary
-        // instead of inside Model::jsonSerialize.
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{"id":7,"name":"Rex","photoUrls":[]}'),
-        );
-        $this->petstoreClient($http)->pet()->addPet(new Pet(name: 'Rex', photoUrls: []));
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('POST', $http->lastRequest->getMethod());
-        TestCase::assertSame(
-            'https://petstore.example/api/v3/pet',
-            (string) $http->lastRequest->getUri(),
-        );
-        TestCase::assertSame('application/json', $http->lastRequest->getHeaderLine('Content-Type'));
-        TestCase::assertSame(
-            '{"name":"Rex","photoUrls":[],"category":null,"id":null,"shipping":null,"status":null,"tags":null}',
-            (string) $http->lastRequest->getBody(),
-        );
     }
 
     /**
@@ -257,42 +195,6 @@ final class OperationGeneratorSteps
         $this->orderResult = $this->client->store()->getOrderById(42);
     }
 
-    public function thenTheReturnValueIsModelOrderWithId42AndStatusPlaced(): void
-    {
-        TestCase::assertNotNull($this->http);
-        TestCase::assertNotNull($this->http->lastRequest);
-        TestCase::assertSame('GET', $this->http->lastRequest->getMethod());
-        TestCase::assertSame(
-            'https://petstore.example/api/v3/store/order/42',
-            (string) $this->http->lastRequest->getUri(),
-        );
-
-        TestCase::assertInstanceOf(Order::class, $this->orderResult);
-        TestCase::assertSame(42, $this->orderResult->id);
-        // `Order.status` declares an inline enum, so it hydrates into the
-        // backed enum paogen synthesised for it rather than into the raw
-        // string (inline-body-and-response-schemas).
-        TestCase::assertSame(OrderStatus::Placed, $this->orderResult->status);
-        TestCase::assertSame('placed', $this->orderResult->status->value);
-    }
-
-    public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQuery(string $arg, string $query): void
-    {
-        TestCase::assertSame('status: FindPetsByStatusStatus::Available', $arg);
-        TestCase::assertSame('?status=available', $query);
-
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '[]'),
-        );
-
-        $this->petstoreClient($http)->pet()->findPetsByStatus(
-            FindPetsByStatusStatus::Available,
-        );
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertStringEndsWith($query, (string) $http->lastRequest->getUri());
-    }
-
     private function loadProfile(string $name): Profile
     {
         $profile = new ProfileLoader()->load(dirname(__DIR__, 2) . "/tests/fixtures/profiles/{$name}.php");
@@ -306,6 +208,184 @@ final class OperationGeneratorSteps
         new Generator(new AttributeScanner($this->composerLoader()))->generate($profile);
     }
 
+    // ---- emit-tagged-subclients-with-interfaces -------------------------
+    //
+    // These scenarios need documents whose tags differ from petstore's, and
+    // several of them need a run that fails, so each generates into a scratch
+    // directory rather than against a committed fixture tree.
+
+    private const PETSTORE_SCHEMA = 'tests/fixtures/schemas/petstore-3.0.yaml';
+    private const PARAMETERS_SCHEMA = 'tests/fixtures/schemas/parameters-3.0.yaml';
+    private const KILBIL_SCHEMA = 'examples/kilbil/schemas/loyalty_v1.yaml';
+
+    /**
+     * Petstore's octet-stream upload is unrepresentable and stops the run
+     * unless accepted. None of the tag scenarios is about that.
+     *
+     * @var array<string,string>
+     */
+    private const PETSTORE_SKIP = ['uploadFile' => 'application/octet-stream request body — not what the tag scenarios are about'];
+
+    /** @var array<string,string> */
+    private const KILBIL_SKIP = [
+        'goodsxml' => 'application/xml request body — xml-content-type-policy',
+        'goodslistxml' => 'application/xml request body — xml-content-type-policy',
+    ];
+
+    private string $tagOutputDir = '';
+    private string $multiTagSchema = '';
+    private ?StoreClient $subClient = null;
+    private ?RecordingStoreClient $seamInner = null;
+    private ?CachingStoreClient $seamDecorator = null;
+    private ?Order $seamOrder = null;
+
+    /**
+     * A profile over one of the tag fixtures, writing to a scratch tree.
+     *
+     * @param array<string,string> $skip
+     * @param array<string,string> $tagRenames
+     * @param array<string,string> $tagChoice
+     */
+    private function taggedProfile(
+        string $schema,
+        array $skip = [],
+        array $tagRenames = [],
+        array $tagChoice = [],
+    ): Profile {
+        $this->tagOutputDir = $this->makeScratchOutputDir('paogen-tagged-');
+        $this->outputDir = $this->tagOutputDir;
+
+        return new Profile(
+            schema: str_starts_with($schema, '/') ? $schema : dirname(__DIR__, 2) . '/' . $schema,
+            output: $this->tagOutputDir,
+            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\TaggedSteps',
+            skip: $skip,
+            tagRenames: $tagRenames,
+            tagChoice: $tagChoice,
+        );
+    }
+
+    /** One emitted file from the scratch tree, by its basename. */
+    private function emittedSource(string $basename): string
+    {
+        $path = $this->tagOutputDir . '/Generated/' . $basename;
+        TestCase::assertFileExists($path);
+
+        return (string) file_get_contents($path);
+    }
+
+    /**
+     * The class names emitted onto the scratch tree's caller surface.
+     *
+     * @return list<string>
+     */
+    private function emittedClassNames(): array
+    {
+        $files = glob($this->tagOutputDir . '/Generated/*.php');
+        $names = [];
+
+        foreach ($files === false ? [] : $files as $file) {
+            $names[] = basename($file, '.php');
+        }
+
+        sort($names, SORT_STRING);
+
+        return $names;
+    }
+
+    /**
+     * Operation ids the document leaves untagged.
+     *
+     * @return list<string>
+     */
+    private function untaggedOperationIds(string $schema): array
+    {
+        $openApi = Reader::readFromYamlFile(dirname(__DIR__, 2) . '/' . $schema, OpenApi::class, false);
+        $untagged = [];
+
+        foreach ($openApi->paths ?? [] as $pathItem) {
+            if (!$pathItem instanceof PathItem) {
+                continue;
+            }
+
+            foreach ($pathItem->getOperations() as $operation) {
+                if (($operation->tags ?? []) === []) {
+                    $untagged[] = (string) ($operation->operationId ?? '');
+                }
+            }
+        }
+
+        return $untagged;
+    }
+
+    /**
+     * A document whose `listThings` carries two tags, each of which also has an
+     * endpoint of its own.
+     *
+     * Written here because no committed fixture carries an operation under two
+     * tags, and the `tagChoice` half of the scenario needs the other tag to
+     * survive the narrowing so its absence of `listThings` is observable.
+     */
+    private function writeMultiTagSchema(): string
+    {
+        $dir = $this->makeScratchOutputDir('paogen-multitag-');
+        $path = $dir . '/multi-tag-3.0.yaml';
+
+        file_put_contents($path, <<<'YAML'
+            openapi: 3.0.3
+            info:
+              title: Multi-tag
+              version: 1.0.0
+            paths:
+              /things:
+                get:
+                  operationId: listThings
+                  tags: [alpha, beta]
+                  responses:
+                    '200':
+                      description: ok
+                      content:
+                        application/json:
+                          schema:
+                            type: array
+                            items:
+                              type: string
+              /alpha-only:
+                get:
+                  operationId: alphaOnly
+                  tags: [alpha]
+                  responses:
+                    '200':
+                      description: ok
+                      content:
+                        application/json:
+                          schema:
+                            type: string
+              /beta-only:
+                get:
+                  operationId: betaOnly
+                  tags: [beta]
+                  responses:
+                    '200':
+                      description: ok
+                      content:
+                        application/json:
+                          schema:
+                            type: string
+            YAML);
+
+        return $path;
+    }
+
+    private function makeScratchOutputDir(string $prefix): string
+    {
+        $base = (string) tempnam(sys_get_temp_dir(), $prefix);
+        unlink($base);
+        assert(mkdir($base, 0o755, true));
+
+        return $base;
+    }
+
     private function composerLoader(): ClassLoader
     {
         foreach (spl_autoload_functions() as $fn) {
@@ -317,23 +397,6 @@ final class OperationGeneratorSteps
         TestCase::fail('Composer ClassLoader not found in autoload chain.');
     }
 
-    public function givenTheRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef(string $ref): void
-    {
-        TestCase::assertSame('#/components/schemas/User', $ref);
-    }
-
-
-    public function thenTheEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody(
-    ): void {
-        $body = $this->methodSlice('createUsersWithListInput');
-        TestCase::assertStringContainsString('public function createUsersWithListInput(array $body)', $body);
-        TestCase::assertStringContainsString(
-            '@param list<User> $body',
-            $body,
-        );
-    }
-
-
     public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeString(
         string $op,
         string $id,
@@ -342,29 +405,6 @@ final class OperationGeneratorSteps
         TestCase::assertSame('operationId: loginUser', $id);
 
         $this->profile = $this->loadProfile('petstore');
-    }
-
-
-    public function thenTheEmittedClientHasAMethodWhoseReturnTypeIsString(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function loginUser(?string $username = null, ?string $password = null): string',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate(): void
-    {
-        $body = $this->methodSlice('loginUser');
-        // The scalar shape is named, so the body is read as a string rather
-        // than decoded and hydrated.
-        TestCase::assertStringContainsString('ResponseType::string()', $body);
-        TestCase::assertStringNotContainsString('hydrate', $body);
-
-        $http = new RecordingClient(new Response(200, ['Content-Type' => 'text/plain'], 'session-token'));
-
-        TestCase::assertSame('session-token', $this->petstoreClient($http)->user()->loginUser('ada', 'pw'));
     }
 
 
@@ -381,33 +421,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt(): void
-    {
-        $body = $this->methodSlice('getInventory');
-        TestCase::assertStringContainsString('public function getInventory(): array', $body);
-        TestCase::assertStringContainsString('@return array<string, int>', $body);
-    }
-
-
-    public function thenTheMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate(): void
-    {
-        $body = $this->methodSlice('getInventory');
-        // A map of the declared value type: decoded and handed back, never
-        // hydrated into a Model the document did not declare.
-        TestCase::assertStringContainsString('ResponseType::mapOf(ResponseType::int())', $body);
-        TestCase::assertStringNotContainsString('hydrate', $body);
-
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{"available":7,"sold":2}'),
-        );
-
-        TestCase::assertSame(
-            ['available' => 7, 'sold' => 2],
-            $this->petstoreClient($http)->store()->getInventory(),
-        );
-    }
-
-
     public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterTagsSchema(
         string $op,
         string $id,
@@ -421,34 +434,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags(): void
-    {
-        $body = $this->methodSlice('findPetsByTags');
-        TestCase::assertStringContainsString('public function findPetsByTags(array $tags): array', $body);
-        TestCase::assertStringContainsString('@param list<string> $tags', $body);
-    }
-
-
-    public function thenCallingItWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB(
-        string $arg,
-        string $query,
-    ): void {
-        TestCase::assertSame("tags: ['a', 'b']", $arg);
-        TestCase::assertSame('?tags=a&tags=b', $query);
-
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '[]'),
-        );
-
-        $this->petstoreClient($http)->pet()->findPetsByTags(['a', 'b']);
-
-        TestCase::assertNotNull($http->lastRequest);
-        $uri = (string) $http->lastRequest->getUri();
-        TestCase::assertStringEndsWith($query, $uri);
-        TestCase::assertStringNotContainsString('tags%5B', $uri);
-    }
-
-
     public function givenSchemaDeclaresOperationOpWithIdAndAnOptionalHeaderParameterApiKeyString(
         string $op,
         string $id,
@@ -459,36 +444,6 @@ final class OperationGeneratorSteps
         $this->profile = $this->loadProfile('petstore');
     }
 
-
-    public function thenTheEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function deletePet(int $petId, ?string $apiKey = null): void',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull(): void
-    {
-        $body = $this->methodSlice('deletePet');
-        // No `if` in the emitted body: the value is passed as it is and a
-        // null drops itself at the boundary.
-        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
-        TestCase::assertStringNotContainsString('if (', $body);
-
-        $http = new RecordingClient(new Response(204, [], ''));
-        $this->petstoreClient($http)->pet()->deletePet(3);
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
-
-        $http = new RecordingClient(new Response(204, [], ''));
-        $this->petstoreClient($http)->pet()->deletePet(3, 'k-9');
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('k-9', $http->lastRequest->getHeaderLine('api_key'));
-    }
 
     /**
      * Slice the source covering one public method, including any
@@ -541,48 +496,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodListOrdersIntLimitNullArray(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef(): void
-    {
-        TestCase::assertStringContainsString('public function listOrders(', $this->source);
-    }
-
-
     public function givenSchemaDeclaresComponentsParametersApiKeyParam(string $param): void
     {
         TestCase::assertSame('api_key: string, in: header, required: false', $param);
         $this->profile = $this->loadProfile('parameters');
-    }
-
-
-    public function thenTheEmittedMethodSignatureIncludesStringApiKeyNull(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull(): void
-    {
-        $body = $this->methodSlice('listOrders');
-        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
-        TestCase::assertStringNotContainsString('if (', $body);
-
-        $http = new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '[]'));
-        $this->parametersClient($http, 'unused-here', 'unused-here')->listOrders();
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
     }
 
 
@@ -602,46 +519,11 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodPlaceOrderOrderBodyOrder(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function placeOrder(Order $body): Order',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef(): void
-    {
-        TestCase::assertStringContainsString('public function placeOrder(', $this->source);
-    }
-
-
     public function givenSchemaDeclaresAPathItemStoreStoreIdItemsWithASinglePathItemLevelParameterParam(
         string $param,
     ): void {
         TestCase::assertSame('storeId: integer, in: path, required: true', $param);
         $this->profile = $this->loadProfile('parameters');
-    }
-
-
-    public function givenTwoOperationsUnderItIdAndIdDoNotRestateTheParameter(string $idA, string $idB): void
-    {
-        TestCase::assertSame('operationId: listStoreItems', $idA);
-        TestCase::assertSame('operationId: clearStore', $idB);
-    }
-
-
-    public function thenTheEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function listStoreItems(int $storeId): array',
-            $this->source,
-        );
-        TestCase::assertStringContainsString(
-            'public function clearStore(int $storeId): void',
-            $this->source,
-        );
     }
 
 
@@ -670,21 +552,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodGetPetByIdIntPetIdPet(): void
-    {
-        TestCase::assertStringContainsString(
-            'public function getPetById(int $petId): Pet',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef(
-    ): void {
-        TestCase::assertStringContainsString('public function getPetById(', $this->source);
-    }
-
-
     public function givenSchemaDeclaresOperationOpWithIdAndARequiredQueryParameterStatusWhoseSchemaIsTypeStringWithEnum(
         string $op,
         string $id,
@@ -697,25 +564,6 @@ final class OperationGeneratorSteps
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
         $this->source = $this->callerSurface();
-    }
-
-
-    public function thenAFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray(
-    ): void {
-        TestCase::assertFileExists($this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php');
-
-        $enumSource = (string) file_get_contents(
-            $this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php',
-        );
-        TestCase::assertStringContainsString('enum FindPetsByStatusStatus: string', $enumSource);
-        TestCase::assertStringContainsString("case Available = 'available';", $enumSource);
-        TestCase::assertStringContainsString("case Pending = 'pending';", $enumSource);
-        TestCase::assertStringContainsString("case Sold = 'sold';", $enumSource);
-
-        TestCase::assertStringContainsString(
-            'public function findPetsByStatus(FindPetsByStatusStatus $status): array',
-            $this->source,
-        );
     }
 
 
@@ -732,63 +580,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheCallThrowsGeneratedApiException(): void
-    {
-        TestCase::assertInstanceOf(ApiException::class, $this->caught);
-    }
-
-
-    public function thenTheExceptionsGetStatusCodeReturns404(): void
-    {
-        TestCase::assertNotNull($this->caught);
-        TestCase::assertSame(404, $this->caught->getStatusCode());
-    }
-
-
-    public function thenTheExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload(): void
-    {
-        TestCase::assertNotNull($this->caught);
-        // Raw decoded array — never a Model instance, even if the schema
-        // declared a 4xx $ref-to-Model body (T-012 acceptance). The
-        // exact-shape `assertSame` itself proves the value is `array`,
-        // not an instance of `Pet` or any other Model class.
-        $decoded = $this->caught->getDecodedBody();
-        TestCase::assertSame(['message' => 'not found'], $decoded);
-
-        // Round-trips: cached after first call, same value on every call.
-        TestCase::assertSame($decoded, $this->caught->getDecodedBody());
-
-        // Request and response are the originals carried into the exception.
-        TestCase::assertNotNull($this->http);
-        TestCase::assertSame($this->http->lastRequest, $this->caught->getRequest());
-        TestCase::assertSame(404, $this->caught->getResponse()->getStatusCode());
-    }
-
-
     public function givenSchemaDeclaresComponentsSecuritySchemesApiKeyWithScheme(string $scheme): void
     {
         TestCase::assertSame('type: apiKey, in: header, name: X-API-Key', $scheme);
         $this->profile = $this->loadProfile('parameters');
-    }
-
-
-    public function givenATopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault(): void
-    {
-        // The parameters fixture carries `security: [{ apiKey: [] }]` at
-        // schema root. No-op: recorded here for scenario readability.
-        TestCase::assertNotNull($this->profile);
-    }
-
-
-    public function thenTheEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterBaseUri(
-    ): void {
-        // Signature ordering: security args come AFTER the transport, in
-        // scheme-name sort order. Regex is tight: literal apiKey first,
-        // literal bearerToken second — no room for wrong insertion.
-        TestCase::assertMatchesRegularExpression(
-            '/private TransportInterface \$transport,\s+private string \$apiKey,\s+private string \$bearerToken,/',
-            $this->source,
-        );
     }
 
 
@@ -824,44 +619,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenAnOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth(string $id): void
-    {
-        TestCase::assertSame('operationId: placeOrder', $id);
-    }
-
-
-    public function thenTheEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument(): void
-    {
-        TestCase::assertStringContainsString(
-            'private string $bearerToken,',
-            $this->source,
-        );
-    }
-
-
-    public function thenPlaceordersMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest(
-    ): void {
-        $body = $this->methodSlice('placeOrder');
-        TestCase::assertStringContainsString(
-            "->header('Authorization', 'Bearer ' . \$this->bearerToken)",
-            $body,
-        );
-        // Bearer replaces (not augments) the inherited apiKey on placeOrder.
-        TestCase::assertStringNotContainsString('X-API-Key', $body);
-
-        // Round-trip via RecordingClient: Authorization header actually
-        // reaches the transport, prefixed with the literal "Bearer ".
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{"id":1}'),
-        );
-
-        $this->parametersClient($http, 'unused-here', 'tok-abc')->placeOrder(new ParametersOrder(id: 1));
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
-    }
-
-
     public function givenSchemaDeclaresOperationOpWithIdWhoseSoleRequestBodyContentTypeIsApplicationXWwwFormUrlencodedAndWhoseSchemaIsTypeObjectWithPropsAndRequired(
         string $op,
         string $id,
@@ -874,55 +631,6 @@ final class OperationGeneratorSteps
         TestCase::assertSame('[grantType, clientId]', $required);
 
         $this->profile = $this->loadProfile('parameters');
-    }
-
-
-    public function thenTheEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty(
-    ): void {
-        TestCase::assertStringContainsString(
-            'public function issueToken(string $grantType, string $clientId, ?string $scope = null): void',
-            $this->source,
-        );
-    }
-
-
-    public function thenTheMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded(
-    ): void {
-        $body = $this->methodSlice('issueToken');
-        // Declared fields, named once, in declaration order. The encoding and
-        // the content type belong to the transport, and the optional field
-        // needs no `if` because a null drops itself there.
-        TestCase::assertStringContainsString(
-            "->form(['grantType' => \$grantType, 'clientId' => \$clientId, 'scope' => \$scope])",
-            $body,
-        );
-    }
-
-
-    public function thenCallingItThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs(
-    ): void {
-        $http = new RecordingClient(
-            new Response(204, [], ''),
-        );
-
-        $this->parametersClient($http, 'unused-here', 'unused-here')
-            ->issueToken(grantType: 'password', clientId: 'my-app');
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame(
-            'application/x-www-form-urlencoded',
-            $http->lastRequest->getHeaderLine('Content-Type'),
-        );
-
-        // Tolerant assertion: `http_build_query` ordering is stable but
-        // key order in the emitted array could shift with future
-        // refactors. Parse the pairs back out and match as a set.
-        $raw = (string) $http->lastRequest->getBody();
-        parse_str($raw, $parsed);
-        TestCase::assertSame('password', $parsed['grantType'] ?? null);
-        TestCase::assertSame('my-app', $parsed['clientId'] ?? null);
-        // Optional field omitted: not in the body at all.
-        TestCase::assertArrayNotHasKey('scope', $parsed);
     }
 
 
@@ -969,44 +677,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheGeneratorsRunFailsAndEmitsNoGeneratedFile(): void
-    {
-        TestCase::assertNotNull(
-            $this->abortMessage,
-            'the generator returned instead of refusing an unrepresentable body',
-        );
-
-        // Refusal means refusal: planning aborts before anything reaches disk.
-        TestCase::assertFileDoesNotExist($this->abortOutputDir . '/Generated/ApiClient.php');
-    }
-
-
-    public function thenTheGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy(): void
-    {
-        $message = (string) $this->abortMessage;
-
-        TestCase::assertStringContainsString('uploadFile', $message);
-        TestCase::assertStringContainsString('application/octet-stream', $message);
-        // A diagnostic that does not say what to do next is a dead end.
-        TestCase::assertStringContainsString('Profile::$skip', $message);
-    }
-
-
-    public function givenTheProfileDeclaresASkipEntryForThatOperationCarryingAReason(): void
-    {
-        $this->profile = $this->loadProfile('petstore');
-
-        TestCase::assertArrayHasKey('uploadFile', $this->profile->skip);
-        TestCase::assertNotSame('', trim($this->profile->skip['uploadFile']));
-    }
-
-
-    public function thenTheEmittedClientHasNoUploadFileMethodAtAll(): void
-    {
-        TestCase::assertStringNotContainsString('function uploadFile(', $this->source);
-    }
-
-
     public function thenNoGeneratedFileContainsAMethodThatThrowsOnAnUnsupportedContentType(): void
     {
         // The throwing-stub emission path is gone, not merely unused: a method
@@ -1023,7 +693,294 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedMethodTakesAStringContentTypeNullArgument(): void
+    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit(
+        string $id,
+    ): void {
+        TestCase::assertSame('operationId: uploadFile', $id);
+        $this->profile = $this->loadProfile('petstore');
+    }
+
+
+    public function givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema(string $schema): void
+    {
+        TestCase::assertSame('type: integer', $schema);
+        $this->profile = $this->loadProfile('parameters');
+    }
+
+
+    public function givenOperationOpWithIdAndAPathParameterSshKeyIdWhoseSchemaIsRef(
+        string $op,
+        string $id,
+        string $ref,
+    ): void {
+        TestCase::assertSame('GET /keys/{ssh_key_id}', $op);
+        TestCase::assertSame('operationId: getSshKeyById', $id);
+        TestCase::assertSame('#/components/schemas/SshKeyId', $ref);
+    }
+
+
+    public function thenFileGeneratedApiClientPhpIsWrittenUnderProfilesOutput(): void
+    {
+        TestCase::assertFileExists($this->outputDir . '/Generated/ApiClient.php');
+    }
+
+
+    public function thenEmittedClassIsFinalReadonlyInProfilesNamespaceGenerated(): void
+    {
+        TestCase::assertStringContainsString('final readonly class ApiClient', $this->source);
+        TestCase::assertStringContainsString(
+            'namespace Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated;',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientHasAMethodGetOrderByIdIntOrderIdOrderThatInterpolatesTokenIntoTheRequestPath(
+        string $token,
+    ): void {
+        TestCase::assertSame('{orderId}', $token);
+        TestCase::assertStringContainsString(
+            'public function getOrderById(int $orderId): Order',
+            $this->source,
+        );
+        // The token is named and filled where the path is named. Which
+        // string operation fills it is the transport's business.
+        TestCase::assertStringContainsString(
+            "Endpoint::get('/store/order/{orderId}')->path('orderId', \$orderId)",
+            $this->source,
+        );
+    }
+
+
+    public function givenOperationsRequestBodyIsApplicationJsonWithSchemaRef(string $ref): void
+    {
+        TestCase::assertSame('#/components/schemas/Pet', $ref);
+    }
+
+
+    public function thenEmittedClientHasAMethodAddPetPetBodyPet(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function addPet(Pet $body): Pet',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsMethodJSONEncodesBodyAndAttachesItAsTheRequestBody(): void
+    {
+        // The emitted method says the body is JSON and hands over the model.
+        TestCase::assertStringContainsString("Endpoint::post('/pet')->json(\$body)", $this->source);
+
+        // Proven at the wire rather than in the text: ADR-010 routes bodies
+        // through the runtime Marshaller before json_encode, so wire keys,
+        // ScalarBindings and date formats are normalised at the boundary
+        // instead of inside Model::jsonSerialize.
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"id":7,"name":"Rex","photoUrls":[]}'),
+        );
+        $this->petstoreClient($http)->pet()->addPet(new Pet(name: 'Rex', photoUrls: []));
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('POST', $http->lastRequest->getMethod());
+        TestCase::assertSame(
+            'https://petstore.example/api/v3/pet',
+            (string) $http->lastRequest->getUri(),
+        );
+        TestCase::assertSame('application/json', $http->lastRequest->getHeaderLine('Content-Type'));
+        TestCase::assertSame(
+            '{"name":"Rex","photoUrls":[],"category":null,"id":null,"shipping":null,"status":null,"tags":null}',
+            (string) $http->lastRequest->getBody(),
+        );
+    }
+
+
+    public function givenOperationsRequestBodyIsApplicationJsonWithSchemaTypeArrayAndItemsRef(string $ref): void
+    {
+        TestCase::assertSame('#/components/schemas/User', $ref);
+    }
+
+
+    public function thenEmittedClientHasAMethodCreateUsersWithListInputArrayBodyWhoseBodyParameterIsAnnotatedParamListUserBody(
+    ): void {
+        $body = $this->methodSlice('createUsersWithListInput');
+        TestCase::assertStringContainsString('public function createUsersWithListInput(array $body)', $body);
+        TestCase::assertStringContainsString(
+            '@param list<User> $body',
+            $body,
+        );
+    }
+
+
+    public function thenReturnValueIsModelOrderWithId42AndStatusPlaced(): void
+    {
+        TestCase::assertNotNull($this->http);
+        TestCase::assertNotNull($this->http->lastRequest);
+        TestCase::assertSame('GET', $this->http->lastRequest->getMethod());
+        TestCase::assertSame(
+            'https://petstore.example/api/v3/store/order/42',
+            (string) $this->http->lastRequest->getUri(),
+        );
+
+        TestCase::assertInstanceOf(Order::class, $this->orderResult);
+        TestCase::assertSame(42, $this->orderResult->id);
+        // `Order.status` declares an inline enum, so it hydrates into the
+        // backed enum paogen synthesised for it rather than into the raw
+        // string (inline-body-and-response-schemas).
+        TestCase::assertSame(OrderStatus::Placed, $this->orderResult->status);
+        TestCase::assertSame('placed', $this->orderResult->status->value);
+    }
+
+
+    public function thenEmittedClientHasAMethodWhoseReturnTypeIsString(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function loginUser(?string $username = null, ?string $password = null): string',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate(): void
+    {
+        $body = $this->methodSlice('loginUser');
+        // The scalar shape is named, so the body is read as a string rather
+        // than decoded and hydrated.
+        TestCase::assertStringContainsString('ResponseType::string()', $body);
+        TestCase::assertStringNotContainsString('hydrate', $body);
+
+        $http = new RecordingClient(new Response(200, ['Content-Type' => 'text/plain'], 'session-token'));
+
+        TestCase::assertSame('session-token', $this->petstoreClient($http)->user()->loginUser('ada', 'pw'));
+    }
+
+
+    public function thenEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt(): void
+    {
+        $body = $this->methodSlice('getInventory');
+        TestCase::assertStringContainsString('public function getInventory(): array', $body);
+        TestCase::assertStringContainsString('@return array<string, int>', $body);
+    }
+
+
+    public function thenClientsMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate(): void
+    {
+        $body = $this->methodSlice('getInventory');
+        // A map of the declared value type: decoded and handed back, never
+        // hydrated into a Model the document did not declare.
+        TestCase::assertStringContainsString('ResponseType::mapOf(ResponseType::int())', $body);
+        TestCase::assertStringNotContainsString('hydrate', $body);
+
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"available":7,"sold":2}'),
+        );
+
+        TestCase::assertSame(
+            ['available' => 7, 'sold' => 2],
+            $this->petstoreClient($http)->store()->getInventory(),
+        );
+    }
+
+
+    public function thenFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray(
+    ): void {
+        TestCase::assertFileExists($this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php');
+
+        $enumSource = (string) file_get_contents(
+            $this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php',
+        );
+        TestCase::assertStringContainsString('enum FindPetsByStatusStatus: string', $enumSource);
+        TestCase::assertStringContainsString("case Available = 'available';", $enumSource);
+        TestCase::assertStringContainsString("case Pending = 'pending';", $enumSource);
+        TestCase::assertStringContainsString("case Sold = 'sold';", $enumSource);
+
+        TestCase::assertStringContainsString(
+            'public function findPetsByStatus(FindPetsByStatusStatus $status): array',
+            $this->source,
+        );
+    }
+
+
+    public function thenCallingClientsMethodWithArgSendsARequestWhoseURIEndsWithQuery(
+        string $arg,
+        string $query,
+    ): void {
+        TestCase::assertSame('status: FindPetsByStatusStatus::Available', $arg);
+        TestCase::assertSame('?status=available', $query);
+
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+
+        $this->petstoreClient($http)->pet()->findPetsByStatus(
+            FindPetsByStatusStatus::Available,
+        );
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertStringEndsWith($query, (string) $http->lastRequest->getUri());
+    }
+
+
+    public function thenEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags(): void
+    {
+        $body = $this->methodSlice('findPetsByTags');
+        TestCase::assertStringContainsString('public function findPetsByTags(array $tags): array', $body);
+        TestCase::assertStringContainsString('@param list<string> $tags', $body);
+    }
+
+
+    public function thenCallingClientsMethodWithArgSendsARequestWhoseURIEndsWithQueryInsteadOfTags5B05DATags5B15DB(
+        string $arg,
+        string $query,
+    ): void {
+        TestCase::assertSame("tags: ['a', 'b']", $arg);
+        TestCase::assertSame('?tags=a&tags=b', $query);
+
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+
+        $this->petstoreClient($http)->pet()->findPetsByTags(['a', 'b']);
+
+        TestCase::assertNotNull($http->lastRequest);
+        $uri = (string) $http->lastRequest->getUri();
+        TestCase::assertStringEndsWith($query, $uri);
+        TestCase::assertStringNotContainsString('tags%5B', $uri);
+    }
+
+
+    public function thenEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function deletePet(int $petId, ?string $apiKey = null): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull(): void
+    {
+        $body = $this->methodSlice('deletePet');
+        // No `if` in the emitted body: the value is passed as it is and a
+        // null drops itself at the boundary.
+        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
+        TestCase::assertStringNotContainsString('if (', $body);
+
+        $http = new RecordingClient(new Response(204, [], ''));
+        $this->petstoreClient($http)->pet()->deletePet(3);
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
+
+        $http = new RecordingClient(new Response(204, [], ''));
+        $this->petstoreClient($http)->pet()->deletePet(3, 'k-9');
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('k-9', $http->lastRequest->getHeaderLine('api_key'));
+    }
+
+
+    public function thenClientsEmittedMethodTakesAStringContentTypeNullArgument(): void
     {
         TestCase::assertStringContainsString(
             'public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void',
@@ -1032,7 +989,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheMethodBodyAttachesTheHeaderWithTheOriginalWireKeyContentTypeNotContentType(): void
+    public function thenClientsMethodBodyAttachesTheHeaderWithTheOriginalWireKeyContentTypeNotContentType(): void
     {
         $body = $this->methodSlice('monitoringGetFooYml');
         // Wire key `Content-Type` survives verbatim; PHP variable was
@@ -1042,13 +999,13 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodMonitoringGetFooYml(): void
+    public function thenEmittedClientHasAMethodMonitoringGetFooYml(): void
     {
         TestCase::assertStringContainsString('public function monitoringGetFooYml(', $this->source);
     }
 
 
-    public function thenTheOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA(): void
+    public function thenOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA(): void
     {
         // Pre-T-025 the dot in `monitoring_get_foo.yml` made the emitter
         // skip the op outright. After T-025 the op exists under its
@@ -1058,7 +1015,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenAProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest(): void
+    public function givenProfileWhoseMethodRenamesMapCarriesMonitoringGetFooYmlForwardProxyRequest(): void
     {
         $base = $this->loadProfile('parameters');
         // Reuse the parameters fixture wiring but override the operationId via
@@ -1075,7 +1032,15 @@ final class OperationGeneratorSteps
         );
     }
 
-    public function thenTheProfilesRenamesMapDoesNotRenameAnOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne(
+
+    public function thenEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml(): void
+    {
+        TestCase::assertStringContainsString('public function forwardProxyRequest(', $this->source);
+        TestCase::assertStringNotContainsString('public function monitoringGetFooYml(', $this->source);
+    }
+
+
+    public function thenProfilesRenamesMapDoesNotRenameOperationBecauseItAnswersADifferentQuestionADocumentMayUseOneStringForBothAComponentAndAnOperationAndOneMapApplyingToBothWouldPutTheConsumersAnswerOnTheWrongOne(
     ): void {
         $base = $this->loadProfile('parameters');
         $viaComponentMap = new Profile(
@@ -1095,22 +1060,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheEmittedClientHasAMethodForwardProxyRequestInsteadOfTheAutoSanitisedMonitoringGetFooYml(
-    ): void {
-        TestCase::assertStringContainsString('public function forwardProxyRequest(', $this->source);
-        TestCase::assertStringNotContainsString('public function monitoringGetFooYml(', $this->source);
-    }
-
-
-    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit(
-        string $id,
-    ): void {
-        TestCase::assertSame('operationId: uploadFile', $id);
-        $this->profile = $this->loadProfile('petstore');
-    }
-
-
-    public function thenTheResultingGenerationPlanCarriesASkippedOperationsEntryNamingTheHTTPMethodPathOperationIdAndTheReasonForTheSkip(
+    public function thenResultingGenerationPlanCarriesASkippedOperationsEntryNamingOperationsHTTPMethodPathOperationIdAndTheReasonForTheSkip(
     ): void {
         TestCase::assertNotNull($this->profile);
         $plan = new Generator(new AttributeScanner($this->composerLoader()))->plan($this->profile);
@@ -1134,8 +1084,8 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenPaogenGeneratePrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient(): void
-    {
+    public function thenPaogenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient(
+    ): void {
         // Drive the real CLI binary so the round-trip exercises
         // GenerateCommand::reportSkipped() exactly as the user sees it.
         $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/petstore.php';
@@ -1162,26 +1112,96 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema(string $schema): void
+    public function thenEmittedClientHasAMethodListOrdersIntLimitNullArray(): void
     {
-        TestCase::assertSame('type: integer', $schema);
-        $this->profile = $this->loadProfile('parameters');
+        TestCase::assertStringContainsString(
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
+            $this->source,
+        );
     }
 
 
-    public function givenOperationOpWithIdAndAPathParameterSshKeyIdWhoseSchemaIsRef(
-        string $op,
-        string $id,
-        string $ref,
+    public function thenOperationIsNotSilentlySkippedEvenThoughTheParameterIsARef(): void
+    {
+        TestCase::assertStringContainsString('public function listOrders(', $this->source);
+    }
+
+
+    public function thenClientsEmittedMethodSignatureIncludesStringApiKeyNull(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull(): void
+    {
+        $body = $this->methodSlice('listOrders');
+        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
+        TestCase::assertStringNotContainsString('if (', $body);
+
+        $http = new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '[]'));
+        $this->parametersClient($http, 'unused-here', 'unused-here')->listOrders();
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
+    }
+
+
+    public function thenEmittedClientHasAMethodPlaceOrderOrderBodyOrder(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function placeOrder(Order $body): Order',
+            $this->source,
+        );
+    }
+
+
+    public function thenOperationIsNotSilentlySkippedEvenThoughTheRequestBodyIsDeclaredViaRef(): void
+    {
+        TestCase::assertStringContainsString('public function placeOrder(', $this->source);
+    }
+
+
+    public function givenTwoOperationEntriesUnderItIdAndIdDoNotRestateTheParameter(string $idA, string $idB): void
+    {
+        TestCase::assertSame('operationId: listStoreItems', $idA);
+        TestCase::assertSame('operationId: clearStore', $idB);
+    }
+
+
+    public function thenEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function listStoreItems(int $storeId): array',
+            $this->source,
+        );
+        TestCase::assertStringContainsString(
+            'public function clearStore(int $storeId): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenEmittedClientHasAMethodGetPetByIdIntPetIdPet(): void
+    {
+        TestCase::assertStringContainsString(
+            'public function getPetById(int $petId): Pet',
+            $this->source,
+        );
+    }
+
+
+    public function thenOperationIsNotSilentlySkippedEvenThoughTheParameterIsDeclaredAtThePathItemLevelViaRef(): void
+    {
+        TestCase::assertStringContainsString('public function getPetById(', $this->source);
+    }
+
+
+    public function thenClientsEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId(
     ): void {
-        TestCase::assertSame('GET /keys/{ssh_key_id}', $op);
-        TestCase::assertSame('operationId: getSshKeyById', $id);
-        TestCase::assertSame('#/components/schemas/SshKeyId', $ref);
-    }
-
-
-    public function thenTheEmittedMethodBodyInterpolatesThePathTokenViaStringSshKeyIdToScalarNotStringSshKeyId(): void
-    {
         $body = $this->methodSlice('getSshKeyById');
         TestCase::assertStringContainsString("->path('ssh_key_id', \$sshKeyId->toScalar())", $body);
         TestCase::assertStringNotContainsString("->path('ssh_key_id', \$sshKeyId)", $body);
@@ -1200,10 +1220,571 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenTheOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass(): void
-    {
+    public function thenOperationIsNotSilentlySkippedEvenThoughThePathParameterResolvesToAScalarBindingImplementingClass(
+    ): void {
         TestCase::assertStringContainsString('public function getSshKeyById(', $this->source);
     }
 
+
+    public function thenEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty(
+    ): void {
+        TestCase::assertStringContainsString(
+            'public function issueToken(string $grantType, string $clientId, ?string $scope = null): void',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsMethodBodyAssemblesTheRequestBodyWithHttpBuildQueryAndSendsContentTypeApplicationXWwwFormUrlencoded(
+    ): void {
+        $body = $this->methodSlice('issueToken');
+        // Declared fields, named once, in declaration order. The encoding and
+        // the content type belong to the transport, and the optional field
+        // needs no `if` because a null drops itself there.
+        TestCase::assertStringContainsString(
+            "->form(['grantType' => \$grantType, 'clientId' => \$clientId, 'scope' => \$scope])",
+            $body,
+        );
+    }
+
+
+    public function thenCallingClientsMethodThroughAPSR18RecordingClientRecordsARequestWhoseBodyContainsGrantTypePasswordAndClientIdMyAppPairs(
+    ): void {
+        $http = new RecordingClient(
+            new Response(204, [], ''),
+        );
+
+        $this->parametersClient($http, 'unused-here', 'unused-here')
+            ->issueToken(grantType: 'password', clientId: 'my-app');
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame(
+            'application/x-www-form-urlencoded',
+            $http->lastRequest->getHeaderLine('Content-Type'),
+        );
+
+        // Tolerant assertion: `http_build_query` ordering is stable but
+        // key order in the emitted array could shift with future
+        // refactors. Parse the pairs back out and match as a set.
+        $raw = (string) $http->lastRequest->getBody();
+        parse_str($raw, $parsed);
+        TestCase::assertSame('password', $parsed['grantType'] ?? null);
+        TestCase::assertSame('my-app', $parsed['clientId'] ?? null);
+        // Optional field omitted: not in the body at all.
+        TestCase::assertArrayNotHasKey('scope', $parsed);
+    }
+
+
+    public function thenGeneratorsRunFailsAndEmitsNoGeneratedFile(): void
+    {
+        TestCase::assertNotNull(
+            $this->abortMessage,
+            'the generator returned instead of refusing an unrepresentable body',
+        );
+
+        // Refusal means refusal: planning aborts before anything reaches disk.
+        TestCase::assertFileDoesNotExist($this->abortOutputDir . '/Generated/ApiClient.php');
+    }
+
+
+    public function thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy(): void
+    {
+        $message = (string) $this->abortMessage;
+
+        TestCase::assertStringContainsString('uploadFile', $message);
+        TestCase::assertStringContainsString('application/octet-stream', $message);
+        // A diagnostic that does not say what to do next is a dead end.
+        TestCase::assertStringContainsString('Profile::$skip', $message);
+    }
+
+
+    public function givenProfileDeclaresASkipEntryForThatOperationCarryingAReason(): void
+    {
+        $this->profile = $this->loadProfile('petstore');
+
+        TestCase::assertArrayHasKey('uploadFile', $this->profile->skip);
+        TestCase::assertNotSame('', trim($this->profile->skip['uploadFile']));
+    }
+
+
+    public function thenEmittedClientHasNoUploadFileMethodAtAll(): void
+    {
+        TestCase::assertStringNotContainsString('function uploadFile(', $this->source);
+    }
+
+
+    public function thenCallOnClientThrowsGeneratedApiException(): void
+    {
+        TestCase::assertInstanceOf(ApiException::class, $this->caught);
+    }
+
+
+    public function thenClientsExceptionsGetStatusCodeReturns404(): void
+    {
+        TestCase::assertNotNull($this->caught);
+        TestCase::assertSame(404, $this->caught->getStatusCode());
+    }
+
+
+    public function thenClientsExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload(): void
+    {
+        TestCase::assertNotNull($this->caught);
+        // Raw decoded array — never a Model instance, even if the schema
+        // declared a 4xx $ref-to-Model body (T-012 acceptance). The
+        // exact-shape `assertSame` itself proves the value is `array`,
+        // not an instance of `Pet` or any other Model class.
+        $decoded = $this->caught->getDecodedBody();
+        TestCase::assertSame(['message' => 'not found'], $decoded);
+
+        // Round-trips: cached after first call, same value on every call.
+        TestCase::assertSame($decoded, $this->caught->getDecodedBody());
+
+        // Request and response are the originals carried into the exception.
+        TestCase::assertNotNull($this->http);
+        TestCase::assertSame($this->http->lastRequest, $this->caught->getRequest());
+        TestCase::assertSame(404, $this->caught->getResponse()->getStatusCode());
+    }
+
+
+    public function givenTopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault(): void
+    {
+        // The parameters fixture carries `security: [{ apiKey: [] }]` at
+        // schema root. No-op: recorded here for scenario readability.
+        TestCase::assertNotNull($this->profile);
+    }
+
+
+    public function thenClientsEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterTransport(
+    ): void {
+        // Signature ordering: security args come AFTER the transport, in
+        // scheme-name sort order. Regex is tight: literal apiKey first,
+        // literal bearerToken second — no room for wrong insertion.
+        TestCase::assertMatchesRegularExpression(
+            '/private TransportInterface \$transport,\s+private string \$apiKey,\s+private string \$bearerToken,/',
+            $this->source,
+        );
+    }
+
+
+    public function givenOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth(string $id): void
+    {
+        TestCase::assertSame('operationId: placeOrder', $id);
+    }
+
+
+    public function thenClientsEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument(): void
+    {
+        TestCase::assertStringContainsString(
+            'private string $bearerToken,',
+            $this->source,
+        );
+    }
+
+
+    public function thenClientsPlaceOrderMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest(
+    ): void {
+        $body = $this->methodSlice('placeOrder');
+        TestCase::assertStringContainsString(
+            "->header('Authorization', 'Bearer ' . \$this->bearerToken)",
+            $body,
+        );
+        // Bearer replaces (not augments) the inherited apiKey on placeOrder.
+        TestCase::assertStringNotContainsString('X-API-Key', $body);
+
+        // Round-trip via RecordingClient: Authorization header actually
+        // reaches the transport, prefixed with the literal "Bearer ".
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"id":1}'),
+        );
+
+        $this->parametersClient($http, 'unused-here', 'tok-abc')->placeOrder(new ParametersOrder(id: 1));
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
+    }
+
+
+    public function givenSchemaDeclaresOperationIdTaggedTagAndAnotherTaggedOther(
+        string $id,
+        string $tag,
+        string $other,
+    ): void {
+        TestCase::assertSame('operationId: getOrderById', $id);
+        TestCase::assertSame('store', $tag);
+        TestCase::assertSame('pet', $other);
+
+        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+    }
+
+
+    public function thenGeneratedFileGeneratedStoreClientPhpIsAFinalReadonlyClassImplementingStoreClientInterface(
+    ): void {
+        TestCase::assertStringContainsString(
+            'final readonly class StoreClient implements StoreClientInterface',
+            $this->emittedSource('StoreClient.php'),
+        );
+    }
+
+
+    public function thenEmittedGeneratedFileStoreClientInterfacePhpDeclaresGetOrderByIdAndDoesNotDeclareThePetOperationSoACallerDependingOnItDependsOnRoughlyTheEndpointsItUses(
+    ): void {
+        $interface = $this->emittedSource('StoreClientInterface.php');
+
+        TestCase::assertStringContainsString('public function getOrderById(int $orderId): Order;', $interface);
+
+        // Exactly its own: a `pet` endpoint has no business on the store
+        // contract, which is what makes the interface a narrower dependency
+        // than the whole document.
+        TestCase::assertStringNotContainsString('addPet', $interface);
+        TestCase::assertStringNotContainsString('findPetsByStatus', $interface);
+    }
+
+
+    public function thenEmittedGeneratedFileInterfaceOmitsTheConstructorBecauseHowAnImplementationAcquiresItsCollaboratorsIsNotPartOfTheContractADecoratorSatisfies(
+    ): void {
+        TestCase::assertStringNotContainsString('__construct', $this->emittedSource('StoreClientInterface.php'));
+    }
+
+
+    public function givenSchemaTagsEveryOperation(): void
+    {
+        // Petstore's operations are tagged without exception, which is this
+        // scenario's premise — asserted rather than assumed, because an
+        // untagged one would land on the root and quietly weaken the `then`.
+        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+
+        TestCase::assertSame([], $this->untaggedOperationIds(self::PETSTORE_SCHEMA));
+    }
+
+
+    public function thenClientApiClientHasOneAccessorPerTagEachReturningThatTagsInterface(): void
+    {
+        $root = $this->emittedSource('ApiClient.php');
+
+        // Each accessor returns the *interface*, not the implementation: that
+        // is what lets a consumer hand back a decorator instead.
+        TestCase::assertStringContainsString('public function pet(): PetClientInterface', $root);
+        TestCase::assertStringContainsString('public function store(): StoreClientInterface', $root);
+        TestCase::assertStringContainsString('public function user(): UserClientInterface', $root);
+
+        // One per tag and no more — petstore declares exactly these three.
+        TestCase::assertSame(3, preg_match_all('/public function \w+\(\): \w+ClientInterface/', $root));
+    }
+
+
+    public function thenClientApiClientDeclaresNoOperationMethodOfItsOwnSoExactlyOneWayExistsToReachAnyEndpoint(
+    ): void {
+        $root = $this->emittedSource('ApiClient.php');
+
+        TestCase::assertStringNotContainsString('public function getOrderById', $root);
+        TestCase::assertStringNotContainsString('public function addPet', $root);
+
+        // Stronger than naming two absent methods: an operation method is one
+        // that reaches the transport, and the root performs no send at all.
+        // Two ways to reach an endpoint would let a call site slip past
+        // whatever decorator a consumer wrapped the sub-client in.
+        TestCase::assertStringNotContainsString('$this->transport->send(', $root);
+    }
+
+
+    public function givenGeneratorHasEmittedASubClientForATag(): void
+    {
+        // The committed petstore fixture tree is real generator output and is
+        // autoloadable, which the next step needs: it constructs the emitted
+        // class rather than reading it as text.
+        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+        $this->runGenerator($this->profile);
+
+        TestCase::assertFileExists($this->tagOutputDir . '/Generated/StoreClient.php');
+        TestCase::assertFileExists($this->tagOutputDir . '/Generated/StoreClientInterface.php');
+    }
+
+
+    public function whenConsumerConstructsClientDirectly(): void
+    {
+        // Directly: one argument, no root object anywhere in reach.
+        $factory = new Psr17Factory();
+
+        $this->subClient = new StoreClient(new HttpTransport(
+            'https://petstore.example/api/v3',
+            ApiException::class,
+            new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '{}')),
+            $factory,
+            $factory,
+        ));
+    }
+
+
+    public function thenClientsConstructorTakesTransportInterfaceAndWhateverCredentialSchemaDeclaresAndNeverRootClient(
+    ): void {
+        TestCase::assertInstanceOf(StoreClientInterface::class, $this->subClient);
+
+        $constructor = new ReflectionClass(StoreClient::class)->getConstructor();
+        TestCase::assertNotNull($constructor);
+
+        $types = array_map(
+            static fn(ReflectionParameter $parameter): string => (string) $parameter->getType(),
+            $constructor->getParameters(),
+        );
+
+        // Petstore declares no security scheme, so the transport is the whole
+        // signature. The type is the interface, never an implementation —
+        // injecting a final class is not substitution.
+        TestCase::assertSame([TransportInterface::class], $types);
+
+        // And never the root: a sub-client that needed `ApiClient` to exist
+        // would not be separately injectable, which is the point of the grain.
+        TestCase::assertStringNotContainsString('ApiClient $', $this->emittedSource('StoreClient.php'));
+    }
+
+
+    public function givenSchemaDeclaresOperationCarryingNoTag(): void
+    {
+        // The parameters fixture tags nothing at all, so every one of its
+        // operations is the case under test.
+        $this->profile = $this->taggedProfile(self::PARAMETERS_SCHEMA);
+
+        TestCase::assertNotEmpty($this->untaggedOperationIds(self::PARAMETERS_SCHEMA));
+    }
+
+
+    public function thenOperationIsEmittedAsAMethodOnClientApiClientItself(): void
+    {
+        $root = $this->emittedSource('ApiClient.php');
+
+        TestCase::assertStringContainsString('public function getPetById(', $root);
+        TestCase::assertStringContainsString('public function listOrders(', $root);
+    }
+
+
+    public function thenNoGeneratedFileNamedForAFallbackTagIsWritten(): void
+    {
+        // No `DefaultApi`, no `DefaultClient`, no bucket type of any name: the
+        // root already is where an untagged operation belongs, so inventing a
+        // tag for it would be a class the document never asked for.
+        $subClients = array_values(array_filter(
+            $this->emittedClassNames(),
+            static fn(string $name): bool => str_ends_with($name, 'Client') && $name !== 'ApiClient',
+        ));
+
+        TestCase::assertSame([], $subClients);
+    }
+
+
+    public function givenOperationCarriesTwoTagsAndProfileSetsNoTagChoiceForIt(): void
+    {
+        // No committed fixture carries an operation under two tags, so the
+        // scenario's document is written here rather than reaching outside
+        // this file for one.
+        $this->multiTagSchema = $this->writeMultiTagSchema();
+        $this->profile = $this->taggedProfile($this->multiTagSchema);
+    }
+
+
+    public function thenOperationIsEmittedOnBothSubClientsBecauseDroppingItFromEitherWouldBeAnOmissionNobodyAskedFor(
+    ): void {
+        TestCase::assertStringContainsString('public function listThings(', $this->emittedSource('AlphaClient.php'));
+        TestCase::assertStringContainsString('public function listThings(', $this->emittedSource('BetaClient.php'));
+
+        // Declared on both contracts too, not just on the implementations.
+        TestCase::assertStringContainsString('public function listThings(', $this->emittedSource('AlphaClientInterface.php'));
+        TestCase::assertStringContainsString('public function listThings(', $this->emittedSource('BetaClientInterface.php'));
+    }
+
+
+    public function thenProfileKeyTagChoiceNarrowsItToOneAndAChoiceNamingATagOperationDoesNotCarryFailsTheRun(): void
+    {
+        // Narrowing: with a choice the operation lands on that tag alone, and
+        // the other sub-client — which has an endpoint of its own — keeps
+        // existing without it.
+        $narrowed = $this->taggedProfile($this->multiTagSchema, tagChoice: ['listThings' => 'alpha']);
+        $this->runGenerator($narrowed);
+
+        TestCase::assertStringContainsString('public function listThings(', $this->emittedSource('AlphaClient.php'));
+        TestCase::assertStringContainsString('public function betaOnly(', $this->emittedSource('BetaClient.php'));
+        TestCase::assertStringNotContainsString('public function listThings(', $this->emittedSource('BetaClient.php'));
+
+        // A choice can only narrow the tags the document declared. One naming
+        // a tag the operation does not carry is guidance that cannot apply, so
+        // it fails the run rather than being quietly ignored.
+        $bogus = $this->taggedProfile($this->multiTagSchema, tagChoice: ['listThings' => 'gamma']);
+
+        try {
+            $this->runGenerator($bogus);
+            TestCase::fail('expected a tagChoice naming an uncarried tag to fail the run');
+        } catch (UnrepresentableConstructsException $error) {
+            TestCase::assertStringContainsString('tagChoice', $error->getMessage());
+            TestCase::assertStringContainsString('does not carry', $error->getMessage());
+        }
+    }
+
+
+    public function givenSchemaTagsOperationTag(string $tag): void
+    {
+        TestCase::assertSame('Клиенты', $tag);
+
+        // The kilbil loyalty document is the real thing this exists for: all
+        // eleven of its tags are Russian words.
+        $this->profile = $this->taggedProfile(self::KILBIL_SCHEMA, self::KILBIL_SKIP);
+    }
+
+
+    public function thenGeneratedFileGeneratedKlientyClientPhpIsWrittenPHPWouldAcceptTheRussianWordAsAClassNameAndTheResultWouldBeUnusable(
+    ): void {
+        TestCase::assertFileExists($this->tagOutputDir . '/Generated/KlientyClient.php');
+
+        // PHP would happily accept the raw word as a class name, which is the
+        // trap: it compiles and is unusable. A readable romanisation is the
+        // default, and neither the raw word nor an invented `Tag1` appears.
+        TestCase::assertNotContains('КлиентыClient', $this->emittedClassNames());
+        TestCase::assertNotContains('Tag1Client', $this->emittedClassNames());
+    }
+
+
+    public function thenSameSchemaProducesSameGeneratedFileNameOnAnyMachineBecauseTheFoldIsAFixedCharacterTableRatherThanALibraryWhoseOutputTracksAnICUVersion(
+    ): void {
+        $first = $this->emittedClassNames();
+
+        // Same document, a second run, a different output directory: a fold
+        // that consulted anything machine-local would have to agree with
+        // itself here anyway, so the names are also pinned literally below.
+        $second = $this->taggedProfile(self::KILBIL_SCHEMA, self::KILBIL_SKIP);
+        $this->runGenerator($second);
+
+        TestCase::assertSame($first, $this->emittedClassNames());
+
+        // Pinned rather than merely stable: these are the exact names the
+        // fixed table yields, so a swap to a locale- or ICU-driven fold would
+        // fail here instead of drifting silently between machines.
+        TestCase::assertContains('KlientyClient', $first);
+        TestCase::assertContains('PodarochnyeSertifikatyClient', $first);
+
+        // A tag the vendor already wrote in ASCII is passed through untouched.
+        TestCase::assertContains('WalletClient', $first);
+    }
+
+
+    public function givenProfileWhoseTagRenamesMapCarriesКлиентыCustomers(): void
+    {
+        $this->profile = $this->taggedProfile(
+            self::KILBIL_SCHEMA,
+            self::KILBIL_SKIP,
+            tagRenames: ['Клиенты' => 'Customers'],
+        );
+    }
+
+
+    public function thenGeneratedFileGeneratedCustomersClientPhpIsWrittenAndClientApiClientExposesCustomers(): void
+    {
+        TestCase::assertFileExists($this->tagOutputDir . '/Generated/CustomersClient.php');
+        TestCase::assertFileExists($this->tagOutputDir . '/Generated/CustomersClientInterface.php');
+
+        // The rename replaces the romanisation rather than sitting beside it.
+        TestCase::assertNotContains('KlientyClient', $this->emittedClassNames());
+
+        TestCase::assertStringContainsString(
+            'public function customers(): CustomersClientInterface',
+            $this->emittedSource('ApiClient.php'),
+        );
+    }
+
+
+    public function thenEntryNamingATagNoOperationCarriesFailsTheRunOnTheSameReasoningAsAStaleSkipGuidanceThatOutlivesItsTargetIsWorseThanNone(
+    ): void {
+        // `Клиенти` is a near-miss of the real tag — the shape a rename takes
+        // once a vendor renames the tag underneath it.
+        $stale = $this->taggedProfile(
+            self::KILBIL_SCHEMA,
+            self::KILBIL_SKIP,
+            tagRenames: ['Клиенти' => 'Customers'],
+        );
+
+        try {
+            $this->runGenerator($stale);
+            TestCase::fail('expected a tagRenames entry matching no tag to fail the run');
+        } catch (UnrepresentableConstructsException $error) {
+            TestCase::assertStringContainsString('tagRenames', $error->getMessage());
+            TestCase::assertStringContainsString('no operation carries', $error->getMessage());
+        }
+    }
+
+
+    public function givenConsumersOwnClassImplementingEmittedGeneratedFileStoreClientInterfaceAndHoldingTheGeneratedImplementation(
+    ): void {
+        $this->seamInner = new RecordingStoreClient();
+        $this->seamDecorator = new CachingStoreClient($this->seamInner);
+
+        // Type-hinting the contract is the point: consumer code depends on the
+        // interface, not on either implementation.
+        TestCase::assertInstanceOf(StoreClientInterface::class, $this->seamDecorator);
+        TestCase::assertInstanceOf(StoreClientInterface::class, $this->seamInner);
+    }
+
+
+    public function whenConsumerCallsAMethodOnTheirClassWhichClientDeclared(): void
+    {
+        TestCase::assertNotNull($this->seamDecorator);
+
+        // Twice, so the added behaviour has something to show for itself.
+        $this->seamOrder = $this->seamDecorator->getOrderById(42);
+        $this->seamDecorator->getOrderById(42);
+    }
+
+
+    public function thenCallReachesTheGeneratedImplementationAndTheirClassAddsBehaviourWithNoEditToGeneratedFileNoHookNoProtectedRegionNoSubclass(
+    ): void {
+        TestCase::assertNotNull($this->seamOrder);
+        TestCase::assertSame(42, $this->seamOrder->id);
+
+        // Reached once, not twice: the second call was served from the
+        // decorator's cache. That is behaviour added without a generated file
+        // changing to permit it.
+        TestCase::assertNotNull($this->seamInner);
+        TestCase::assertSame([42], $this->seamInner->fetched);
+
+        // No subclass: the decorator extends nothing, and could not extend the
+        // generated class even if it wanted to, because that class is final.
+        TestCase::assertFalse(new ReflectionClass(CachingStoreClient::class)->getParentClass());
+        TestCase::assertTrue(new ReflectionClass(StoreClient::class)->isFinal());
+
+        // No hook and no protected region: the generated class exposes no
+        // extension point for a consumer to hang behaviour on.
+        $generated = (string) file_get_contents(
+            dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore/Generated/StoreClient.php',
+        );
+        TestCase::assertStringNotContainsString('protected', $generated);
+        TestCase::assertStringNotContainsString('abstract', $generated);
+    }
+
+
+    public function thenTheirClassSatisfiesTheStrictestAnalysisWithNothingSuppressedSoARegenerationThatChangedClientSurfaceWouldFailToCompileRatherThanBreakTheSeamQuietly(
+    ): void {
+        $root = dirname(__DIR__, 2);
+
+        // The committed proof: a consumer's decorator living in an example
+        // project, against that example's own generated tree.
+        $decorator = $root . '/examples/petstore/src/CachingStoreClient.php';
+        TestCase::assertFileExists($decorator);
+
+        $source = (string) file_get_contents($decorator);
+        TestCase::assertStringContainsString('implements StoreClientInterface', $source);
+
+        // Nothing suppressed — a suppression is exactly how a broken seam
+        // would be made to look fine.
+        foreach (['@phpstan-ignore', '@psalm-suppress', '@SuppressWarnings', 'phpcs:ignore', '@phan-suppress'] as $suppression) {
+            TestCase::assertStringNotContainsString($suppression, $source);
+        }
+
+        // "The strictest analysis" is a claim about the gate, so read the
+        // gate: `phpstan-generated.neon` is level max with strict rules, and
+        // `lint-phpstan-generated` points it at every `examples/*/src`.
+        $config = (string) file_get_contents($root . '/phpstan-generated.neon');
+        TestCase::assertStringContainsString('level: max', $config);
+        TestCase::assertStringContainsString('phpstan-strict-rules', $config);
+
+        $justfile = (string) file_get_contents($root . '/Justfile');
+        TestCase::assertStringContainsString('examples/*/src', $justfile);
+        TestCase::assertStringContainsString('phpstan analyse -c phpstan-generated.neon', $justfile);
+    }
 
 }
