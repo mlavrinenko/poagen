@@ -36,14 +36,15 @@ tmpdir:
 # features, 0 warnings (down from 31, all `task lifecycle provenance`; see
 # `declare-paogen-runs-no-sessions`).
 #
-# `check-specs` is restored to the gate below. `check-drift` and
-# `check-generated-tests` stay out — both need `tests/generated/
-# manifest.json`, which does not exist because these recipes have never
-# run `generate-tests` for real, and producing it means accepting the
-# ~200 outstanding `Implement:` step stubs (plus 149 now-orphaned step
-# methods) that `implement-the-outrun-step-bodies` owns, not this one. See
-# each recipe's own comment for specifics.
-check: tmpdir lint test check-specs
+# All three are in the gate now. `check-drift` and `check-generated-tests`
+# needed `tests/generated/manifest.json`, which only a real `generate-tests`
+# run produces — and that run appended ~200 `Implement:` stubs plus 149
+# orphaned step methods, so neither recipe could pass until the step bodies
+# caught up with the specs. They have: the 149 orphans were the stubs' old
+# names, their bodies rehomed, and the generated suite went 77 tests to 93
+# with no failures. The lockfile was refreshed the same day, first time
+# since April — 88 scenarios, 565 traces.
+check: tmpdir lint test check-specs check-drift check-generated-tests
 
 # Full pre-commit gate
 gate: check
@@ -163,29 +164,20 @@ check-specs:
 
 # Verify no spec/source drift (lockfile current with traces)
 #
-# NOT wired into `check`. The command below is already correct against the
-# current CLI and schema — `speconaut status --format json-schema` confirms
-# `content_mismatches` is a live field today, not a retired one an earlier
-# draft of this task assumed it was. What blocks this recipe is data, not
-# wiring: `status` (like `lock`) unconditionally spawns the php-phpunit
-# adapter to resolve coverage-derived traces via `tests/generated/
-# manifest.json`, and that file does not exist — these recipes have never
-# run `generate-tests` for real. The adapter's `audit-traces` RPC has no
-# fallback for a missing manifest by design (fails loud rather than
-# reporting empty traces), so this hard-errors today instead of reporting
-# drift. `implement-the-outrun-step-bodies` unblocks it: once a real
-# `generate-tests` run lands a `manifest.json`, this recipe starts working
-# and can move into `check`.
+# `speconaut lock --check` is the purpose-built form: read-only, and it
+# skips the session gate by design so it runs in CI. It replaced a pipeline
+# that counted `content_mismatches` out of `speconaut status --format json`
+# through php. That pipeline reported drift the recipe did not have —
+# `status` exits 1 whenever it has anything to report at all, including
+# ordinary debt like untraced features and process-only decisions, so under
+# `pipefail` it failed before counting anything. Measured: exit 1 with
+# `content_mismatches: 0`.
+#
+# Proven to detect real drift rather than merely exiting 0: editing one
+# scenario's `#then` moves it to exit 1 and `content_mismatches: 1`, and
+# reverting returns it to 0.
 check-drift:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    n=$(speconaut status --format json \
-        | php -r 'echo count(json_decode(stream_get_contents(STDIN), true)["content_mismatches"] ?? []);')
-    if [[ "$n" -ne 0 ]]; then
-        speconaut status >&2
-        exit 1
-    fi
-    echo "speconaut: no drift (0 content_mismatches)"
+    speconaut lock --check
 
 # Generate/update PHPUnit test stubs from specs (dogfooding)
 #
@@ -200,17 +192,14 @@ generate-tests:
 
 # Verify generated tests are up to date (CI-friendly drift check)
 #
-# NOT wired into `check`. Syntactically correct today (`--adapter
-# php-phpunit`, no `--strict` — `--check` alone already fails on any
-# warning, which is what `--strict` used to mean), but regenerating right
-# now would append roughly 200 outstanding `Implement:` step stubs —
-# paogen's specs outran their implemented step bodies while these recipes
-# sat unwired — and separately reports 149 `orphaned step` warnings for
-# step methods no current scenario references. Either alone fails
-# `--check`. Both are real content changes `tests/generated/` needs, not a
-# wiring problem, and both belong to `implement-the-outrun-step-bodies`.
-# Move this into `check` once that lands and a real `generate-tests` run
-# is clean.
+# `--check` alone; there is no `--strict`, and `--check` already fails on
+# any warning, which is what `--strict` used to mean.
+#
+# This sat outside the gate while paogen's specs had outrun their step
+# bodies: regenerating appended ~200 `Implement:` stubs and reported 149
+# orphaned step methods, and either alone fails `--check`. Both are gone —
+# the 149 orphans were the old names of the stubs, their bodies rehomed to
+# the renamed steps.
 check-generated-tests:
     speconaut generate-tests truth/ --adapter php-phpunit --output tests/generated --check
 

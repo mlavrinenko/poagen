@@ -5,7 +5,7 @@
   tags: ("speconaut",),
   priority: 6,
   difficulty: 3,
-  status: proposed(2026, 7, 31),
+  status: status("needs-review", 2026, 7, 31),
   links: depends-on("implement-the-outrun-step-bodies.task-260731.typ"),
 )
 
