@@ -16,20 +16,38 @@ parameters:
     # PHPStan setup is what gates it (ADR-004).
     - tests/fixtures/generated/*
   ignoreErrors:
+    # speconaut-php-phpunit's StepStub::stubBody() appends
+    # `$this->test->fail('Implement: ...')` for any spec step that does not
+    # yet have a hand-written body, on every *Steps.php it generates —
+    # $test exists so that call has a TestCase to reach. Whether the
+    # property is ever read is a function of which specs currently lack a
+    # body, not of this file's own logic: read it out of `ignoreErrors` and
+    # the gate goes red the moment every step in some *Steps.php happens to
+    # already be implemented, exactly as it did here when
+    # pre-transport-claims-survive-the-sweep filled in the last pending
+    # stub. Scoped to the exact property, not the whole file, so an
+    # unrelated dead property in the same class still fails — see the
+    # removed $boundFormat case in ProfileSteps.php (revert-the-strictness-
+    # relaxation), which this exemption never covered.
     - identifier: shipmonk.deadProperty.neverRead
       path: tests/generated/*Steps.php
+      message: '#::\$test is never read$#'
     - identifier: property.onlyWritten
       path: tests/generated/*Steps.php
-    # Runtime attribute classes are a public ABI: their public properties
-    # are read by user code (and future runtime registries) via
-    # reflection on the attribute instance. Shipmonk's static analysis
-    # cannot see those reflection reads, so the dead-property warning
-    # does not apply. See ADR-010.
+      message: '#::\$test is never read, only written\.$#'
+    # attribute-and-phpdoc-driven-serialization (2026-04-20) commits the
+    # runtime's attribute vocabulary to exactly six members, of which only
+    # WireName, Format and Discriminator are wired: ModelAttributeApplier
+    # emits them and DescriptorParser/Hydrator read them back. The other
+    # three below are accepted design with no implementation behind them
+    # yet — the generator never emits them onto a Model and nothing reads
+    # them via reflection, so this is not a tool blind spot like the wired
+    # three; it is debt against an accepted decision. Remove each line by
+    # wiring generator emission and runtime consumption for that attribute,
+    # not by writing to it from a test.
     - identifier: shipmonk.deadProperty.neverRead
-      path: src/Runtime/Attribute/*
-    # Marshaller/Hydrator round-trip fixtures hold properties that are
-    # only read via reflection — same blind spot as above.
+      path: src/Runtime/Attribute/AdditionalProperties.php
     - identifier: shipmonk.deadProperty.neverRead
-      path: tests/Unit/Runtime/Fixtures/*
-    - identifier: shipmonk.deadEnumCase
-      path: tests/Unit/Runtime/Fixtures/*
+      path: src/Runtime/Attribute/Deprecated.php
+    - identifier: shipmonk.deadProperty.neverRead
+      path: src/Runtime/Attribute/Schema.php

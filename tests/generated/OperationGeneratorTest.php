@@ -90,13 +90,13 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: A 2xx JSON response body is deserialized into the typed Model
      * @source truth/specs/operation-generator.feature-260418.typ:56
      *
-     * Given Client is constructed with a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
+     * Given Client is constructed with a TransportInterface backed by a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
      * Then the return value is Model Order with id = 42 and status = 'placed'
      */
     public function testA2xxJSONResponseBodyIsDeserializedIntoTheTypedModel(): void
     {
-        $this->steps->givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(200, '{\"id\":42,\"status\":\"placed\"}');
+        $this->steps->givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(200, '{\"id\":42,\"status\":\"placed\"}');
         $this->steps->whenGetorderbyid42IsCalledOnClient();
         $this->steps->thenReturnValueIsModelOrderWithId42AndStatusPlaced();
     }
@@ -109,14 +109,14 @@ final class OperationGeneratorTest extends TestCase
      * Given Schema declares Operation GET /user/login with operationId: loginUser whose 200 response schema is type: string
      * When Generator runs against Profile
      * Then the emitted Client has a method whose return type is string
-     *   And Client's method body returns (string) $response->getBody() and never invokes self::hydrate
+     *   And Client's method body names the response shape ResponseType::string(), so the transport reads the body as a scalar instead of hydrating it into a Model
      */
     public function testAScalar2xxJSONResponseIsReturnedAsTheScalarPHPTypeWithoutHydration(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeString('GET /user/login', 'operationId: loginUser');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenEmittedClientHasAMethodWhoseReturnTypeIsString();
-        $this->steps->thenClientsMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate();
+        $this->steps->thenClientsMethodBodyNamesTheResponseShapeResponseTypeStringSoTheTransportReadsTheBodyAsAScalarInsteadOfHydratingItIntoAModel();
     }
 
 
@@ -127,14 +127,14 @@ final class OperationGeneratorTest extends TestCase
      * Given Schema declares Operation GET /store/inventory with operationId: getInventory whose 200 response schema is type: object with additionalProperties: integer
      * When Generator runs against Profile
      * Then the emitted Client has a method whose return type is array annotated @return array<string, int>
-     *   And Client's method body returns the json_decoded payload directly without invoking self::hydrate
+     *   And Client's method body names the response shape ResponseType::mapOf(ResponseType::int()), so the transport decodes the payload directly instead of hydrating it into a Model
      */
     public function testA2xxJSONResponseWithAdditionalPropertiesIsReturnedAsATypedAssociativeArray(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseSchemaIsTypeObjectWithMap('GET /store/inventory', 'operationId: getInventory', 'additionalProperties: integer');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt();
-        $this->steps->thenClientsMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate();
+        $this->steps->thenClientsMethodBodyNamesTheResponseShapeResponseTypeMapOfResponseTypeIntSoTheTransportDecodesThePayloadDirectlyInsteadOfHydratingItIntoAModel();
     }
 
 
@@ -185,14 +185,14 @@ final class OperationGeneratorTest extends TestCase
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
      * Then the emitted Client has a method deletePet(int $petId, ?string $apiKey = null): void
-     *   And Client's method calls $request->withHeader('api_key', $apiKey) only when $apiKey is not null
+     *   And Client's method calls ->header('api_key', $apiKey) unconditionally, with no if in the emitted body — the header is dropped before the request is sent when $apiKey is null
      */
     public function testAnOptionalHeaderParameterBecomesANullableTypedArgumentAndIsAttachedOnlyWhenNonNull(): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdAndAnOptionalHeaderParameterApiKeyString('DELETE /pet/{petId}', 'operationId: deletePet');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid();
-        $this->steps->thenClientsMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull();
+        $this->steps->thenClientsMethodCallsHeaderApiKeyApiKeyUnconditionallyWithNoIfInTheEmittedBodyTheHeaderIsDroppedBeforeTheRequestIsSentWhenApiKeyIsNull();
     }
 
 
@@ -300,7 +300,7 @@ final class OperationGeneratorTest extends TestCase
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
      * When Generator runs against Profile
      * Then Client's emitted method signature includes ?string $apiKey = null
-     *   And Client's method body attaches the api_key header only when $apiKey is not null
+     *   And Client's method body attaches ->header('api_key', $apiKey) unconditionally, with no if in the emitted body — the header is dropped before the request is sent when $apiKey is null
      */
     public function testAnOperationLevelRefToAHeaderComponentParameterBecomesAnOptionalTypedHeaderArgument(): void
     {
@@ -308,7 +308,7 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->givenOperationOpWithIdListsAParameterWhoseValueIsRef('GET /order', 'operationId: listOrders', '#/components/parameters/ApiKey');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenClientsEmittedMethodSignatureIncludesStringApiKeyNull();
-        $this->steps->thenClientsMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull();
+        $this->steps->thenClientsMethodBodyAttachesHeaderApiKeyApiKeyUnconditionallyWithNoIfInTheEmittedBodyTheHeaderIsDroppedBeforeTheRequestIsSentWhenApiKeyIsNull();
     }
 
 
@@ -458,7 +458,7 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
      * @source truth/specs/operation-generator.feature-260418.typ:269
      *
-     * Given Client is constructed with a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
+     * Given Client is constructed with a TransportInterface backed by a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client
      * Then the call on Client throws Generated\\ApiException
      *   And Client's exception's getStatusCode() returns 404
@@ -466,7 +466,7 @@ final class OperationGeneratorTest extends TestCase
      */
     public function testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException(): void
     {
-        $this->steps->givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(404, '{\"message\":\"not found\"}');
+        $this->steps->givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(404, '{\"message\":\"not found\"}');
         $this->steps->whenGetpetbyid999IsCalledOnClient();
         $this->steps->thenCallOnClientThrowsGeneratedApiException();
         $this->steps->thenClientsExceptionsGetStatusCodeReturns404();
@@ -484,7 +484,7 @@ final class OperationGeneratorTest extends TestCase
      *   And a top-level security: [{ apiKey: [] }] makes every Operation secured by default
      * When Generator runs against Profile
      * Then Client's emitted ApiClient constructor has a required string $apiKey promoted private argument placed after $transport
-     *   And each secured Operation's method body calls $request = $request->withHeader('X-API-Key', $this->apiKey); before sendRequest
+     *   And each secured Operation's method body attaches ->header('X-API-Key', $this->apiKey) to the request it builds and passes it to $this->transport->send(...)
      */
     public function testAnApiKeyHeaderSchemeBecomesAConstructorArgAttachedAsAHeaderOnSecuredOps(): void
     {
@@ -492,7 +492,7 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->givenTopLevelSecurityApiKeyMakesEveryOperationSecuredByDefault();
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenClientsEmittedApiClientConstructorHasARequiredStringApiKeyPromotedPrivateArgumentPlacedAfterTransport();
-        $this->steps->thenEachSecuredOperationsMethodBodyCallsRequestRequestWithHeaderXAPIKeyThisApiKeyBeforeSendRequest();
+        $this->steps->thenEachSecuredOperationsMethodBodyAttachesHeaderXAPIKeyThisApiKeyToTheRequestItBuildsAndPassesItToThisTransportSend();
     }
 
 
@@ -504,7 +504,7 @@ final class OperationGeneratorTest extends TestCase
      *   And Operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
      * When Generator runs against Profile
      * Then Client's emitted ApiClient constructor has a required string $bearerToken promoted private argument
-     *   And Client's placeOrder method body calls $request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken); before sendRequest
+     *   And Client's placeOrder method body attaches ->header('Authorization', 'Bearer ' . $this->bearerToken) to the request it builds and passes it to $this->transport->send(...)
      */
     public function testAnHttpBearerSchemeBecomesABearerTokenCtorArgAttachedAsAuthorization(): void
     {
@@ -512,7 +512,7 @@ final class OperationGeneratorTest extends TestCase
         $this->steps->givenOperationIdOverridesTheDefaultWithOperationLevelSecurityBearerAuth('operationId: placeOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenClientsEmittedApiClientConstructorHasARequiredStringBearerTokenPromotedPrivateArgument();
-        $this->steps->thenClientsPlaceOrderMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest();
+        $this->steps->thenClientsPlaceOrderMethodBodyAttachesHeaderAuthorizationBearerThisBearerTokenToTheRequestItBuildsAndPassesItToThisTransportSend();
     }
 
 

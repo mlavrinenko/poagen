@@ -71,6 +71,9 @@ final class MarshalRoundTripTest extends TestCase
         self::assertInstanceOf(DateTimeImmutable::class, $hydrated->shipDate);
         self::assertSame('2026-05-01T10:20:30+02:00', $hydrated->shipDate->format(DateTimeInterface::RFC3339));
         self::assertSame(Status::Approved, $hydrated->status);
+
+        $delivered = new Hydrator()->hydrate(Order::class, ['status' => 'delivered']);
+        self::assertSame(Status::Delivered, $delivered->status);
     }
 
     public function testListOfModelsRecurses(): void
@@ -90,6 +93,8 @@ final class MarshalRoundTripTest extends TestCase
             'tags' => [['id' => 1, 'name' => 'friendly'], ['id' => 2, 'name' => 'playful']],
         ]);
 
+        self::assertSame(1, $hydrated->id);
+        self::assertSame('Rex', $hydrated->name);
         self::assertSame(['https://example/a.jpg', 'https://example/b.jpg'], $hydrated->photoUrls);
         self::assertNotNull($hydrated->tags);
         self::assertCount(2, $hydrated->tags);
@@ -105,12 +110,18 @@ final class MarshalRoundTripTest extends TestCase
         ]);
 
         self::assertInstanceOf(Cat::class, $hydrated->creature);
+        // `petType` is the discriminator's wire field, and it maps onto the
+        // branch's own property like any other — not consumed only for
+        // branch selection.
+        self::assertSame('Cat', $hydrated->creature->petType);
         self::assertSame('purr', $hydrated->creature->meow);
 
         $hydratedDog = new Hydrator()->hydrate(Animal::class, [
             'creature' => ['petType' => 'Dog', 'bark' => 'woof'],
         ]);
         self::assertInstanceOf(Dog::class, $hydratedDog->creature);
+        self::assertSame('Dog', $hydratedDog->creature->petType);
+        self::assertSame('woof', $hydratedDog->creature->bark);
     }
 
     public function testMissingWireKeyOmitsArgument(): void

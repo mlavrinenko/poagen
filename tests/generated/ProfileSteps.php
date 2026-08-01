@@ -31,7 +31,6 @@ final class ProfileSteps
     private ?Throwable $loaderError = null;
     private ?string $tempFile = null;
 
-    private string $boundFormat = '';
     private string $valueObjectFqcn = '';
     /** @var list<string> */
     private array $discoverIn = [];
@@ -44,9 +43,11 @@ final class ProfileSteps
 
     public function givenValueObjectClassIsAnnotatedWithAttr(string $attr): void
     {
-        if (preg_match("/BindsFormat\\(['\"]([^'\"]+)['\"]\\)/", $attr, $m) === 1) {
-            $this->boundFormat = $m[1];
-        }
+        // The `#[BindsFormat(...)]` value itself is not read here — the
+        // `Then` step gets its own `$format` argument straight from the
+        // spec's placeholder, so parsing it a second time into a property
+        // would just be a second source of the same fact.
+        TestCase::assertMatchesRegularExpression("/BindsFormat\\(['\"][^'\"]+['\"]\\)/", $attr);
         $this->valueObjectFqcn = Email::class;
     }
 
