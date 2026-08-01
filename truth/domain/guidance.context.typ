@@ -5,6 +5,9 @@
 // What the consumer writes to steer generation. Every term names something the
 // user authors and paogen reads as data — never a template paogen expands, and
 // never code that reaches the people who consume the generated client.
+//
+// Why this is one of four bounded contexts rather than one: see
+// "bounded-contexts.md".
 
 #let Profile = entity("Profile", props: ())
 #let ValueObject = entity("Value Object", props: ())
