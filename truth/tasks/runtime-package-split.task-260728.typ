@@ -3,7 +3,7 @@
 #show: task.with(
   title: "Split the generated-code runtime out of the generator package",
   tags: ("packaging", "dx"),
-  priority: 6,
+  priority: 8,
   difficulty: 6,
   status: proposed(2026, 7, 28),
 )

@@ -3,7 +3,7 @@
 #show: task.with(
   title: "speconaut cannot read a MindTape config that MindTape itself writes",
   tags: ("speconaut", "mindtape", "interop", "upstream"),
-  priority: 6,
+  priority: 8,
   difficulty: 3,
   status: proposed(2026, 7, 29),
 )
