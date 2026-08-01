@@ -5,7 +5,7 @@
   tags: ("standards", "strictness", "phpstan"),
   priority: 9,
   difficulty: 6,
-  status: proposed(2026, 8, 1),
+  status: done(2026, 8, 1),
 )
 
 == Summary
