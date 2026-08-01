@@ -54,7 +54,13 @@ lint: tmpdir
     @echo -n 'cs-fixer phpstan phpstan-generated rector linecop jscpd jscpd-generated' | parallel --will-cite --halt now,fail=1 --delimiter=' ' just lint-{}
 
 # Check code style (PER-CS 2.0 + PHP 8.4)
-lint-cs-fixer:
+#
+# Needs `tmpdir`: php-cs-fixer spawns its parallel workers through PHP's
+# sys_get_temp_dir(), which is $TMPDIR (see the export at the top of this
+# file) — a bare `just lint-cs-fixer` in a fresh checkout dies with
+# "Failed creating temp file as sys_get_temp_dir=... is not writable"
+# without this dependency, dry-run or not.
+lint-cs-fixer: tmpdir
     php-cs-fixer fix --diff --verbose --dry-run
 
 # Static analysis on src/
@@ -177,11 +183,20 @@ lint-jscpd-generated:
     jscpd -c .jscpd.json --threshold 16.5 "${paths[@]}"
 
 # Auto-fix code style
-format:
+#
+# Needs `tmpdir` for the same reason `lint-cs-fixer` does — see its comment.
+# A fresh worktree that hasn't run `just check` yet dies with "Failed
+# creating temp file as sys_get_temp_dir=... is not writable" otherwise.
+format: tmpdir
     php-cs-fixer fix --diff --verbose
 
 # Apply Rector refactorings
-format-rector:
+#
+# Needs `tmpdir`: rector compiles its DI container into $TMPDIR (see the
+# export at the top of this file and `lint-rector`'s identical dependency);
+# without it a fresh worktree fails with `The path "..." is not a
+# directory.`
+format-rector: tmpdir
     rector
 
 # Run tests
@@ -189,7 +204,10 @@ test: tmpdir
     phpunit
 
 # Run tests with coverage
-test-coverage:
+#
+# Same `tmpdir` need as `test` — some integration tests (e.g.
+# tests/Support/GeneratedTreeSandbox.php) write through sys_get_temp_dir().
+test-coverage: tmpdir
     phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
 
 # Install dependencies and local git hooks
@@ -235,7 +253,12 @@ check-specs:
 # Proven to detect real drift rather than merely exiting 0: editing one
 # scenario's `#then` moves it to exit 1 and `content_mismatches: 1`, and
 # reverting returns it to 0.
-check-drift:
+#
+# Needs `tmpdir`: `lock` spawns the PHP adapter (speconaut-php-phpunit) to
+# audit traces, and that subprocess dies (exit 255) when $TMPDIR points at a
+# directory that doesn't exist yet — a bare `just check-drift` in a fresh
+# worktree hits this without the dependency.
+check-drift: tmpdir
     speconaut lock --check
 
 # Generate/update PHPUnit test stubs from specs (dogfooding)
@@ -245,7 +268,12 @@ check-drift:
 # the CLI entirely onto `.speconaut/config.toml`'s top-level `namespace`
 # key (a PHP namespace is backslash-separated; a shell-quoted CLI flag
 # can't carry that as safely as a TOML literal string can).
-generate-tests:
+#
+# Needs `tmpdir` for the same reason `check-drift` does (the PHP adapter)
+# and because it shells out to `just format`, which needs it too — a bare
+# `just generate-tests` in a fresh worktree fails with "sys_get_temp_dir is
+# not writable" otherwise.
+generate-tests: tmpdir
     speconaut generate-tests truth/ --adapter php-phpunit --output tests/generated
     just format
 
