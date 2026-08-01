@@ -156,7 +156,7 @@ lint-jscpd:
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
-    paths=(src tests examples/*/src)
+    paths=(src runtime/src tests examples/*/src)
     jscpd -c .jscpd.json --threshold 5.5 "${paths[@]}"
 
 # Duplication gate on generated fixtures + example trees (generated tier;
@@ -217,6 +217,13 @@ test: tmpdir
 # tests/Support/GeneratedTreeSandbox.php) write through sys_get_temp_dir().
 test-coverage: tmpdir
     phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
+
+# Prove a generated client installs and runs on mlavrinenko/paogen-runtime
+# alone, with the generator absent (runtime-package-split). Builds a scratch
+# composer project under build/ — not part of `just check`: it resolves
+# nyholm/psr7 from the network/cache, which the offline gate does not assume.
+verify-runtime-standalone: tmpdir
+    scripts/verify-runtime-standalone
 
 # Install dependencies and local git hooks
 install: install-hooks

@@ -5,16 +5,21 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "mlavrinenko/paogen": "@dev",
-        "nyholm/psr7": "^1.8",
-        "php-http/discovery": "^1.20",
-        "psr/http-client": "^1.0",
-        "psr/http-factory": "^1.1"
+        "mlavrinenko/paogen-runtime": "@dev",
+        "nyholm/psr7": "^1.8"
+    },
+    "require-dev": {
+        "mlavrinenko/paogen": "@dev"
     },
     "repositories": [
         {
             "type": "path",
             "url": "../..",
+            "options": {"symlink": true}
+        },
+        {
+            "type": "path",
+            "url": "../../runtime",
             "options": {"symlink": true}
         }
     ],

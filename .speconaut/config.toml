@@ -60,7 +60,7 @@ adapter = "php-phpunit"
 [check]
 
 # Roots the untraced-source finding walks.
-source-roots = ["src", "bin"]
+source-roots = ["src", "runtime/src", "bin"]
 
 # Behavioural specs live here. The spec-first gate treats a change under a
 # source root as needing a paired change under one of these.

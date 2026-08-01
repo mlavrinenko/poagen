@@ -23,7 +23,7 @@ testing remains an explicit **post-v0.1** follow-up.
 
 ## Phase 1 — Release blocker + `ScalarBinding` foundation
 
-Both tasks touch `src/Runtime/ScalarBinding` (introduced by task 004).
+Both tasks touch `runtime/src/ScalarBinding` (introduced by task 004).
 Land 004 first; 010 is the first in-tree consumer.
 
 - [x] **T-004** — Round-trip `BindsFormat` scalar value objects on send *and* receive. *(critical release blocker; `#[BindsFormat]` is unusable without it.)*

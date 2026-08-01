@@ -21,11 +21,8 @@
     "require": {
         "php": "^8.4",
         "cebe/php-openapi": "^1.7",
+        "mlavrinenko/paogen-runtime": "*@dev",
         "nette/php-generator": "^4.2",
-        "php-http/discovery": "^1.20",
-        "phpstan/phpdoc-parser": "^2.0",
-        "psr/http-client": "^1.0",
-        "psr/http-factory": "^1.1",
         "psr/http-message": "^2.0",
         "sebastian/diff": "^6.0 || ^7.0"
     },
@@ -40,6 +37,15 @@
         "rector/rector": "^2.3",
         "shipmonk/dead-code-detector": "^1.0"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "runtime",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true,
     "bin": ["bin/paogen"],

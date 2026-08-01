@@ -88,8 +88,8 @@ or directory` or a bare `Broken pipe`.
 ## Quality gates (`just check`)
 
 `just check` is `lint test check-specs`. Lint runs php-cs-fixer, PHPStan on
-`bin`/`src`/`tests`, PHPStan on the generated fixtures and example trees,
-rector, and linecop, in parallel.
+`bin`/`src`/`runtime/src`/`tests`, PHPStan on the generated fixtures and
+example trees, rector, and linecop, in parallel.
 
 - PHPStan runs at `level: max` with `phpstan-strict-rules`,
   `phpstan-deprecation-rules`, `shipmonk/dead-code-detector` and bleeding-edge,
@@ -191,10 +191,12 @@ This project runs MindTape's `gated` preset, which means:
 - Four sections are required on any non-terminal task: Summary, Acceptance
   criteria, Non-goals, Files. Acceptance criteria are conditions someone else
   can check without asking you.
-- `done` is reachable only from `needs-review`. No run of work closes itself.
-  If you did the work, flip to `needs-review` and let a human close it. This is
-  deliberate — agents report success they have not achieved and do not catch it
-  themselves.
+- `done` is reachable directly from `wip`, gated by a machine check rather than
+  a human state: run `scripts/gated-check`, not a bare `just check`, before
+  flipping — the `[[on.flip]]` predicate refuses without a freshly recorded
+  pass. A `needs-review` state shipped originally and was removed 2026-08-01
+  once it queued 38 already-shipped tasks against one reviewer; see
+  `review-gate-must-be-mechanical`.
 - `blocked`, `failed` and `cancelled` require a note saying why.
 - A leftover review comment in a task file fails `mt check`.
 
@@ -215,6 +217,13 @@ Work with no task behind it needs a task first.
 Output under `Generated/` is never hand-edited. There is no protected region,
 no marked insertion point, no inheritance hook — see the
 `generated-types-are-total` standard. If output is wrong, fix the emitter.
+
+`Generated/` imports only from `runtime/`, this repo's second composer
+package (`mlavrinenko/paogen-runtime`) — see
+`runtime-ships-as-a-separate-package`. Consumers install it as a normal
+dependency and the generator itself only as `require-dev`; anything the
+generator needs (the parser, the code printer, the differ) belongs in `src/`,
+never in `runtime/src/`.
 
 Every emitted file says so itself, in a header naming the profile it came from
 and the `paogen generate <profile>` that reproduces it, so the rule travels with

@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# verify-runtime-standalone — prove runtime-package-split's central claim: a
+# generated client installs and runs with mlavrinenko/paogen-runtime alone,
+# with the generator (mlavrinenko/paogen, cebe/php-openapi, nette/php-
+# generator, sebastian/diff) nowhere in vendor/.
+#
+# Builds a scratch composer project under build/ (git-ignored) that requires
+# only paogen-runtime and a PSR-7 implementation, drops in a copy of the
+# committed petstore example's generated tree, and drives one real operation
+# through a stub transport. Not part of `just check`: composer resolves
+# nyholm/psr7 from the network/cache, which the offline gate does not assume.
+set -eo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+scratch="$root/build/verify-runtime-standalone"
+
+rm -rf "$scratch"
+mkdir -p "$scratch/client"
+cp -r "$root/examples/petstore/generated/Generated" "$scratch/client/Generated"
+
+cat > "$scratch/composer.json" <<JSON
+{
+    "name": "scratch/verify-runtime-standalone",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "mlavrinenko/paogen-runtime": "@dev",
+        "nyholm/psr7": "^1.8"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "$root/runtime",
+            "options": {"symlink": true}
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Acme\\\\Petstore\\\\Generated\\\\": "client/Generated/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}
+JSON
+
+cat > "$scratch/run.php" <<'PHP'
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Acme\Petstore\Generated\ApiClient;
+use Acme\Petstore\Generated\Model\Pet;
+use Composer\InstalledVersions;
+use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+
+foreach (['mlavrinenko/paogen', 'cebe/php-openapi', 'nette/php-generator', 'sebastian/diff'] as $generatorOnly) {
+    if (InstalledVersions::isInstalled($generatorOnly)) {
+        fwrite(STDERR, "FAIL: {$generatorOnly} is installed — the generator is not absent\n");
+        exit(1);
+    }
+}
+
+if (!InstalledVersions::isInstalled('mlavrinenko/paogen-runtime')) {
+    fwrite(STDERR, "FAIL: mlavrinenko/paogen-runtime is not installed\n");
+    exit(1);
+}
+
+$transport = new class implements TransportInterface {
+    public function send(Endpoint $endpoint, ResponseType $expected): mixed
+    {
+        if ($endpoint->uri() !== '/pet/42') {
+            fwrite(STDERR, "FAIL: unexpected endpoint {$endpoint->uri()}\n");
+            exit(1);
+        }
+
+        return new Pet(name: 'Rex', photoUrls: []);
+    }
+};
+
+$pet = new ApiClient($transport)->pet()->getPetById(42);
+
+if ($pet->name !== 'Rex') {
+    fwrite(STDERR, "FAIL: expected hydrated Pet named Rex, got {$pet->name}\n");
+    exit(1);
+}
+
+echo "OK: generated client ran on mlavrinenko/paogen-runtime alone (generator absent)\n";
+PHP
+
+cd "$scratch"
+composer install --no-interaction --no-progress
+php run.php

@@ -2,6 +2,9 @@
 /vendor/
 /var/
 
+/runtime/vendor/
+/runtime/composer.lock
+
 /.devbox/
 /.direnv/
 

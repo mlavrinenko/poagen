@@ -5,7 +5,7 @@
   tags: ("packaging", "dx"),
   priority: 8,
   difficulty: 6,
-  status: proposed(2026, 7, 28),
+  status: wip(2026, 8, 1),
 )
 
 == Summary

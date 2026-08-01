@@ -10,6 +10,7 @@ parameters:
   paths:
     - bin
     - src
+    - runtime/src
     - tests
   excludePaths:
     # Generated code is checked by a separate config so the consumer's
@@ -46,8 +47,8 @@ parameters:
     # wiring generator emission and runtime consumption for that attribute,
     # not by writing to it from a test.
     - identifier: shipmonk.deadProperty.neverRead
-      path: src/Runtime/Attribute/AdditionalProperties.php
+      path: runtime/src/Attribute/AdditionalProperties.php
     - identifier: shipmonk.deadProperty.neverRead
-      path: src/Runtime/Attribute/Deprecated.php
+      path: runtime/src/Attribute/Deprecated.php
     - identifier: shipmonk.deadProperty.neverRead
-      path: src/Runtime/Attribute/Schema.php
+      path: runtime/src/Attribute/Schema.php
