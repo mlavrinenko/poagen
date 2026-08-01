@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
@@ -36,8 +34,7 @@ final class GeneratedSymbolShorteningTest extends TestCase
     {
         $output = self::makeSandboxDir('paogen-symbol-shortening-');
 
-        $generator = new Generator(new AttributeScanner(self::composerLoader()));
-        self::$plan = $generator->generate(new Profile(
+        self::$plan = self::generator()->generate(new Profile(
             schema: self::SCHEMA,
             output: $output,
             namespace: self::NAMESPACE,

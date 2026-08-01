@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
@@ -147,7 +145,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
         $outputDir = self::makeSandboxDir('paogen-response-degradation-');
 
         try {
-            new Generator(new AttributeScanner(self::composerLoader()))->generate(new Profile(
+            self::generator()->generate(new Profile(
                 schema: self::SCHEMA,
                 output: $outputDir,
                 namespace: self::NAMESPACE,
@@ -180,9 +178,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
      */
     private function plan(array $skip): GenerationPlan
     {
-        $generator = new Generator(new AttributeScanner(self::composerLoader()));
-
-        return $generator->plan(new Profile(
+        return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
             output: self::makeSandboxDir('paogen-response-degradation-'),
             namespace: self::NAMESPACE,

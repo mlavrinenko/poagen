@@ -151,13 +151,24 @@ lint-linecop:
 # output plus hand-written code measures neither. Measured 2026-08-01: 5.09%
 # duplicated lines (3.17% tokens), 92 clones.
 #
+# deduplicate-the-test-suite moved nine tests/Integration/ files onto
+# tests/Support/GeneratedTreeSandbox.php's shared sandbox-dir, composer-loader,
+# generator-construction and CLI-invocation helpers — repeated scaffolding
+# that never carried the schema, the profile or the expectation a test
+# actually asserted on, so pulling it out left every one of those visible at
+# the call site. What remained (tests/generated/, the emitted fixture trees,
+# a schema fixture, and a handful of same-shape assertions or test doubles
+# that ARE a test's subject) was left alone on purpose. Measured 2026-08-01:
+# 3.36% duplicated lines (2.38% tokens), 76 clones. 3.5% is set just above
+# that: green today, minimal slack, no license to add more duplication.
+#
 # RATCHET: this number only ever moves DOWN. Never raise it to admit a clone.
 lint-jscpd:
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
     paths=(src runtime/src tests examples/*/src)
-    jscpd -c .jscpd.json --threshold 5.5 "${paths[@]}"
+    jscpd -c .jscpd.json --threshold 3.5 "${paths[@]}"
 
 # Duplication gate on generated fixtures + example trees (generated tier;
 # jscpd-as-a-real-gate)

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
@@ -47,8 +45,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         $output = self::makeSandboxDir('paogen-queryapikey-');
 
-        $generator = new Generator(new AttributeScanner(self::composerLoader()));
-        $plan = $generator->generate(new Profile(
+        $plan = self::generator()->generate(new Profile(
             schema: self::SCHEMA,
             output: $output,
             namespace: self::NAMESPACE,
