@@ -49,6 +49,14 @@ check: tmpdir lint test check-specs check-drift check-generated-tests
 # Full pre-commit gate
 gate: check
 
+# Run the full gate and record that it passed against this worktree, so the
+# freshness predicate on `mt flip ... done` can assert it without re-running
+# the gate inside the flip. Prefer this over a bare `just check` when you are
+# about to close a task — a bare run proves the tree is good but records
+# nothing, and the flip will refuse for want of evidence rather than merit.
+gated-check: check
+    scripts/gate-fresh record
+
 # Run all linters in parallel
 lint: tmpdir
     @echo -n 'cs-fixer phpstan phpstan-generated rector linecop jscpd jscpd-generated' | parallel --will-cite --halt now,fail=1 --delimiter=' ' just lint-{}
