@@ -71,12 +71,18 @@ blocked on them.
 ## Adding a new example
 
 1. Create `examples/<vendor>/` with: `composer.json`, `README.md`,
-   `paogen.php`, `schemas/<vendor>-<version>.yaml`.
+   `paogen.php`, `schemas/<vendor>-<version>.yaml`, `Justfile`, and
+   `phpstan.neon` (copy an existing example's `Justfile` and
+   `phpstan.neon` verbatim — every example is held to the identical
+   consumer-view absolute; see `examples-check-themselves`). Add
+   `/build/` to the sub-directory's `.gitignore` for the PHPStan cache
+   the example's own `check` recipe creates.
 2. Run `composer install` once to prove the `path` repo resolves,
    then add the sub-directory's `composer.lock` / `vendor/` to the
    sub-directory's `.gitignore`.
 3. Run `paogen generate paogen.php`. If it succeeds, commit the
    `generated/` tree. If it fails with a spec-level gap, add a
    `.expected-failure` file explaining which task tracks the fix.
-4. Confirm `just check-examples` exits zero.
+4. Confirm `just check-examples` and `just lint-phpstan-generated`
+   (or, from inside the new directory, `just check`) exit zero.
 5. Add one line to the table at the top of this file.

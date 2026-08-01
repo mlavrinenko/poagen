@@ -1,0 +1,18 @@
+# Static analysis for this example alone (examples-check-themselves).
+#
+# Reuses ../../phpstan-generated.neon's rules and level rather than
+# duplicating them, so this example is held to the exact same consumer-view
+# absolute as every other one: max level, phpstan-strict-rules,
+# phpstan-deprecation-rules, bleeding-edge, no baseline, no excludePaths, no
+# ignoreErrors. Changing that absolute happens in one place, not four.
+#
+# No `paths:` here either, for the same reason the parent carries none:
+# PHPStan hard-errors on a listed path that doesn't exist, and this file is
+# shared by examples that do and don't have a generated/ tree. Running
+# `phpstan -c phpstan.neon` with no path handed to it on the CLI fails loudly
+# instead of silently analysing nothing — `just check` (this directory's
+# Justfile) decides the path set, skipping generated/ when it isn't there.
+includes:
+    - ../../phpstan-generated.neon
+parameters:
+    tmpDir: ./build/cache/phpstan
