@@ -610,7 +610,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: The root client hands out sub-clients and carries no flat operation methods
-     * @source truth/specs/operation-generator.feature-260418.typ:361
+     * @source truth/specs/operation-generator.feature-260418.typ:363
      *
      * Given Schema tags every Operation
      * When Generator runs against Profile
@@ -628,7 +628,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A sub-client is constructible without the root
-     * @source truth/specs/operation-generator.feature-260418.typ:371
+     * @source truth/specs/operation-generator.feature-260418.typ:373
      *
      * Given Generator has emitted a sub-client for a tag
      * When a consumer constructs Client directly
@@ -644,7 +644,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An untagged operation stays on the root and no DefaultApi type is invented
-     * @source truth/specs/operation-generator.feature-260418.typ:380
+     * @source truth/specs/operation-generator.feature-260418.typ:384
      *
      * Given Schema declares Operation carrying no tag
      * When Generator runs against Profile
@@ -662,7 +662,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation carrying several tags appears on every one of its sub-clients
-     * @source truth/specs/operation-generator.feature-260418.typ:390
+     * @source truth/specs/operation-generator.feature-260418.typ:394
      *
      * Given Operation carries two tags and Profile sets no tagChoice for it
      * When Generator runs against Profile
@@ -680,7 +680,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A tag that is not a legal readable identifier is transliterated deterministically
-     * @source truth/specs/operation-generator.feature-260418.typ:400
+     * @source truth/specs/operation-generator.feature-260418.typ:404
      *
      * Given Schema tags Operation Клиенты
      * When Generator runs against Profile
@@ -698,7 +698,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: The profile renames a tag, and a rename matching nothing fails the run
-     * @source truth/specs/operation-generator.feature-260418.typ:410
+     * @source truth/specs/operation-generator.feature-260418.typ:414
      *
      * Given Profile whose tagRenames map carries 'Клиенты' => 'Customers'
      * When Generator runs against Profile
@@ -716,7 +716,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A hand-written decorator implements a sub-client interface and delegates
-     * @source truth/specs/operation-generator.feature-260418.typ:420
+     * @source truth/specs/operation-generator.feature-260418.typ:424
      *
      * Given a consumer's own class implementing emitted Generated File StoreClientInterface and holding the generated implementation
      * When the consumer calls a method on their class, which Client declared

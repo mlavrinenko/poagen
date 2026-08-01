@@ -327,7 +327,7 @@
             "feature": "Model Generator",
             "scenario": "An explicit `renames` entry takes precedence over the auto-sanitiser",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 230,
+            "spec_line": 232,
             "stage": "unstable"
         },
         {
@@ -335,7 +335,7 @@
             "feature": "Model Generator",
             "scenario": "A pattern-gated strategy only handles names matching its pattern and falls through otherwise",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 242,
+            "spec_line": 244,
             "stage": "unstable"
         },
         {
@@ -343,7 +343,7 @@
             "feature": "Model Generator",
             "scenario": "A custom pipeline that returns null for every name aborts with a pointed diagnostic",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 253,
+            "spec_line": 257,
             "stage": "unstable"
         },
         {
@@ -351,7 +351,7 @@
             "feature": "Model Generator",
             "scenario": "Two raw component names that normalise to the same PHP class abort the run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 264,
+            "spec_line": 268,
             "stage": "unstable"
         },
         {
@@ -359,7 +359,7 @@
             "feature": "Model Generator",
             "scenario": "A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 277,
+            "spec_line": 281,
             "stage": "unstable"
         },
         {
@@ -367,7 +367,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `oneOf` with inline object branches emits an interface and one Model per branch",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 288,
+            "spec_line": 292,
             "stage": "unstable"
         },
         {
@@ -375,7 +375,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 299,
+            "spec_line": 303,
             "stage": "unstable"
         },
         {
@@ -383,7 +383,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `type: array` component emits a typed wrapper class",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 309,
+            "spec_line": 313,
             "stage": "unstable"
         },
         {
@@ -391,7 +391,7 @@
             "feature": "Model Generator",
             "scenario": "A document declaring no components still emits a model for every payload",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 321,
+            "spec_line": 325,
             "stage": "unstable"
         },
         {
@@ -399,7 +399,7 @@
             "feature": "Model Generator",
             "scenario": "An inline array of inline objects is typed at both ends",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 332,
+            "spec_line": 336,
             "stage": "unstable"
         },
         {
@@ -407,7 +407,7 @@
             "feature": "Model Generator",
             "scenario": "Nesting below a synthesised payload is reached by the same queue as nesting below a component",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 342,
+            "spec_line": 346,
             "stage": "unstable"
         },
         {
@@ -415,7 +415,7 @@
             "feature": "Model Generator",
             "scenario": "An inline enum inside a payload becomes a backed enum, wherever the payload came from",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 352,
+            "spec_line": 356,
             "stage": "unstable"
         },
         {
@@ -423,7 +423,7 @@
             "feature": "Model Generator",
             "scenario": "An inline object the document left unconstrained is passed as a map rather than dropping the operation",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 362,
+            "spec_line": 366,
             "stage": "unstable"
         },
         {
@@ -431,7 +431,7 @@
             "feature": "Model Generator",
             "scenario": "The profile pins the class name for a synthesised payload",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 372,
+            "spec_line": 376,
             "stage": "unstable"
         },
         {
@@ -439,7 +439,7 @@
             "feature": "Model Generator",
             "scenario": "A pin naming an operation absent from the document fails the run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 382,
+            "spec_line": 386,
             "stage": "unstable"
         },
         {
@@ -447,7 +447,7 @@
             "feature": "Model Generator",
             "scenario": "Two shapes deriving one class name fail the run rather than overwriting a file",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 392,
+            "spec_line": 396,
             "stage": "unstable"
         },
         {
@@ -455,7 +455,7 @@
             "feature": "Model Generator",
             "scenario": "Running the generator twice with the same inputs produces identical files",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 404,
+            "spec_line": 408,
             "stage": "unstable"
         },
         {
@@ -463,7 +463,7 @@
             "feature": "Model Generator",
             "scenario": "A component removed from the schema is pruned from Generated/ on the next run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 413,
+            "spec_line": 417,
             "stage": "unstable"
         },
         {
@@ -471,7 +471,7 @@
             "feature": "Model Generator",
             "scenario": "An emitted file opens with a header naming the profile and the command that reproduces it",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 425,
+            "spec_line": 429,
             "stage": "unstable"
         },
         {
@@ -479,7 +479,7 @@
             "feature": "Model Generator",
             "scenario": "The header carries nothing that moves between runs",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 436,
+            "spec_line": 440,
             "stage": "unstable"
         },
         {
@@ -487,7 +487,7 @@
             "feature": "Model Generator",
             "scenario": "Regenerating over an existing tree replaces it rather than failing on it",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 446,
+            "spec_line": 450,
             "stage": "unstable"
         },
         {
@@ -735,7 +735,7 @@
             "feature": "Operation Generator",
             "scenario": "The root client hands out sub-clients and carries no flat operation methods",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 361,
+            "spec_line": 363,
             "stage": "unstable"
         },
         {
@@ -743,7 +743,7 @@
             "feature": "Operation Generator",
             "scenario": "A sub-client is constructible without the root",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 371,
+            "spec_line": 373,
             "stage": "unstable"
         },
         {
@@ -751,7 +751,7 @@
             "feature": "Operation Generator",
             "scenario": "An untagged operation stays on the root and no DefaultApi type is invented",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 380,
+            "spec_line": 384,
             "stage": "unstable"
         },
         {
@@ -759,7 +759,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation carrying several tags appears on every one of its sub-clients",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 390,
+            "spec_line": 394,
             "stage": "unstable"
         },
         {
@@ -767,7 +767,7 @@
             "feature": "Operation Generator",
             "scenario": "A tag that is not a legal readable identifier is transliterated deterministically",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 400,
+            "spec_line": 404,
             "stage": "unstable"
         },
         {
@@ -775,7 +775,7 @@
             "feature": "Operation Generator",
             "scenario": "The profile renames a tag, and a rename matching nothing fails the run",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 410,
+            "spec_line": 414,
             "stage": "unstable"
         },
         {
@@ -783,7 +783,7 @@
             "feature": "Operation Generator",
             "scenario": "A hand-written decorator implements a sub-client interface and delegates",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 420,
+            "spec_line": 424,
             "stage": "unstable"
         }
     ]

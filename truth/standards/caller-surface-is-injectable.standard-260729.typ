@@ -6,6 +6,10 @@
   title: "Every emitted caller surface is an interface and arrives by injection",
   status: accepted(2026, 7, 29),
   contexts: (generation-context,),
+  requires-cases: (
+    "sub-client-interface-omits-constructor",
+    "sub-client-injects-transport-not-root",
+  ),
   rule: [
     Every #a(Client) paogen emits is declared by an interface it implements, and
     acquires its transport — and whatever credential #the(Schema) declares —

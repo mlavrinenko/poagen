@@ -406,7 +406,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
-     * @source truth/specs/model-generator.feature-260418.typ:230
+     * @source truth/specs/model-generator.feature-260418.typ:232
      *
      * Given Schema declares a component named version-2
      *   And Profile sets 'version-2' => 'Legacy_V2'
@@ -428,7 +428,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
-     * @source truth/specs/model-generator.feature-260418.typ:242
+     * @source truth/specs/model-generator.feature-260418.typ:244
      *
      * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
      *   And Schema declares components legacy_thing and modern-thing
@@ -448,7 +448,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
-     * @source truth/specs/model-generator.feature-260418.typ:253
+     * @source truth/specs/model-generator.feature-260418.typ:257
      *
      * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
      *   And Schema declares any component, e.g. anything
@@ -468,7 +468,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two raw component names that normalise to the same PHP class abort the run
-     * @source truth/specs/model-generator.feature-260418.typ:264
+     * @source truth/specs/model-generator.feature-260418.typ:268
      *
      * Given Schema declares components named foo-bar and foo_bar
      *   And Profile does not override nameNormaliser
@@ -490,7 +490,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Top-level components beyond `type: object` (T-026)
      *
      * Scenario: A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar
-     * @source truth/specs/model-generator.feature-260418.typ:277
+     * @source truth/specs/model-generator.feature-260418.typ:281
      *
      * Given Schema declares a component urn with string (no enum, no properties)
      * When Generator runs against Profile
@@ -510,7 +510,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with inline object branches emits an interface and one Model per branch
-     * @source truth/specs/model-generator.feature-260418.typ:288
+     * @source truth/specs/model-generator.feature-260418.typ:292
      *
      * Given Schema declares a component floating_ip_create whose schema is oneOf: [<inline object A with title "Assign to Droplet">, <inline object B with title "Reserve to Region">]
      * When Generator runs against Profile
@@ -530,7 +530,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`
-     * @source truth/specs/model-generator.feature-260418.typ:299
+     * @source truth/specs/model-generator.feature-260418.typ:303
      *
      * Given Schema declares components LabeledIssueEvent and UnlabeledIssueEvent (both type: object) and a component issue_event_for_issue whose schema is anyOf: [$ref LabeledIssueEvent, $ref UnlabeledIssueEvent]
      * When Generator runs against Profile
@@ -548,7 +548,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `type: array` component emits a typed wrapper class
-     * @source truth/specs/model-generator.feature-260418.typ:309
+     * @source truth/specs/model-generator.feature-260418.typ:313
      *
      * Given Schema declares a component tags_array whose schema is type: array, items.type: string
      * When Generator runs against Profile
@@ -568,7 +568,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Payloads the document declared inline become models too (inline-body-and-response-schemas)
      *
      * Scenario: A document declaring no components still emits a model for every payload
-     * @source truth/specs/model-generator.feature-260418.typ:321
+     * @source truth/specs/model-generator.feature-260418.typ:325
      *
      * Given Schema declares an empty components.schemas and Operation placeOrder whose application/json request body and 2xx response are each an inline type: object with declared properties
      * When Generator runs against Profile
@@ -588,7 +588,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline array of inline objects is typed at both ends
-     * @source truth/specs/model-generator.feature-260418.typ:332
+     * @source truth/specs/model-generator.feature-260418.typ:336
      *
      * Given Operation placeOrdersBulk whose request body and 2xx response are each type: array whose items is an inline type: object with declared properties
      * When Generator runs against Profile
@@ -606,7 +606,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Nesting below a synthesised payload is reached by the same queue as nesting below a component
-     * @source truth/specs/model-generator.feature-260418.typ:342
+     * @source truth/specs/model-generator.feature-260418.typ:346
      *
      * Given Operation placeOrder whose inline response carries an inline object property shipping and an array property lines whose items are an inline object
      * When Generator runs against Profile
@@ -624,7 +624,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline enum inside a payload becomes a backed enum, wherever the payload came from
-     * @source truth/specs/model-generator.feature-260418.typ:352
+     * @source truth/specs/model-generator.feature-260418.typ:356
      *
      * Given Operation placeOrder whose inline request body has a property channel with type: string and enum: [web, phone, store]
      * When Generator runs against Profile
@@ -642,7 +642,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline object the document left unconstrained is passed as a map rather than dropping the operation
-     * @source truth/specs/model-generator.feature-260418.typ:362
+     * @source truth/specs/model-generator.feature-260418.typ:366
      *
      * Given Operation ping whose application/json request body is type: object with no declared properties and no additionalProperties
      * When Generator runs against Profile
@@ -660,7 +660,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: The profile pins the class name for a synthesised payload
-     * @source truth/specs/model-generator.feature-260418.typ:372
+     * @source truth/specs/model-generator.feature-260418.typ:376
      *
      * Given Profile whose inlineModels map carries 'placeOrder.response' => 'PlacedOrder'
      * When Generator runs against Profile
@@ -678,7 +678,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pin naming an operation absent from the document fails the run
-     * @source truth/specs/model-generator.feature-260418.typ:382
+     * @source truth/specs/model-generator.feature-260418.typ:386
      *
      * Given Profile whose inlineModels map carries a key 'noSuchOperation.response'
      * When Generator runs against Profile
@@ -696,7 +696,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two shapes deriving one class name fail the run rather than overwriting a file
-     * @source truth/specs/model-generator.feature-260418.typ:392
+     * @source truth/specs/model-generator.feature-260418.typ:396
      *
      * Given Schema declares a component named PlaceOrderResponse and Operation placeOrder whose inline response derives that same name
      * When Generator runs against Profile
@@ -716,7 +716,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.feature-260418.typ:404
+     * @source truth/specs/model-generator.feature-260418.typ:408
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -732,7 +732,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.feature-260418.typ:413
+     * @source truth/specs/model-generator.feature-260418.typ:417
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed
@@ -752,7 +752,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Every emitted file declares itself generated
      *
      * Scenario: An emitted file opens with a header naming the profile and the command that reproduces it
-     * @source truth/specs/model-generator.feature-260418.typ:425
+     * @source truth/specs/model-generator.feature-260418.typ:429
      *
      * Given Profile was loaded from tests/fixtures/profiles/petstore.php
      * When Generator runs against Profile
@@ -772,7 +772,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: The header carries nothing that moves between runs
-     * @source truth/specs/model-generator.feature-260418.typ:436
+     * @source truth/specs/model-generator.feature-260418.typ:440
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again over same Schema and same Profile
@@ -790,7 +790,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Regenerating over an existing tree replaces it rather than failing on it
-     * @source truth/specs/model-generator.feature-260418.typ:446
+     * @source truth/specs/model-generator.feature-260418.typ:450
      *
      * Given Generator has already written Generated File tree into Profile's output
      * When Generator runs a second time into same Profile's output
