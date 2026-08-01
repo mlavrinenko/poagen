@@ -23,10 +23,11 @@ return new Profile(
      * four that carry meaning: `date time` and `data time` (both `date-time`
      * misspelled), `data` (`date` misspelled), and the invented `phone`.
      *
-     * `int` and `double` are left unbound on purpose. They are reported, and a
-     * consumer who wants a Money or Quantity type binds them the same way — the
-     * point of the report is that the opportunity is visible, not that every
-     * opportunity must be taken.
+     * `int` and `double` are left unbound. A binding is keyed on the format
+     * string document-wide, and `double` here means price, quantity, percentage
+     * and balance alike — a Money bound to it would type every non-money double
+     * as money too. See the README for the full reasoning and what a consumer
+     * can do instead.
      */
     discoverIn: [
         'Acme\\Kilbil\\ValueObject',

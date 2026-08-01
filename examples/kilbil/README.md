@@ -127,10 +127,24 @@ Three operation ids are deliberately absent from `methodRenames`, and one tag fr
 is a single word, and `Wallet` was already ASCII — listing any of them would hide
 whether the defaults work.
 
-`int` (172 uses) and `double` (94) stay unbound. Both are reported on stderr, and a
-consumer wanting a `Money` or `Quantity` type binds them the same way as the
-others. The report exists to make the opportunity visible, not to insist it be
-taken.
+`int` (172 uses) and `double` (94) stay unbound, and unlike the four formats above
+that is not free. A `#[BindsFormat]` binds a format string document-wide — one PHP
+type per format, everywhere it appears — and `double` here covers prices,
+quantities, rates and percentages alike: `goods_data/items/properties/price` is
+money, `quantity` on the same object is not, and `bonus_percent`,
+`discount_percent`, `purchases_sum` and the rest are neither. A `Money` bound to
+`double` would type every one of those as money too, with no way to exempt the
+ones that are not — a worse defect than the float price it was meant to fix. `int`
+is the same shape with less at stake, so it is decided the same way.
+
+`goods_data/items/properties/price` is the property where that is a real
+limitation, not a shrug: it reaches the consumer as a plain PHP `float`, and money
+in a `float` is a defect, not a style choice. There is no per-property fix while
+`double` still means several other things in this document. A consumer who needs
+`price` money-safe today has to do it after paogen: bind their own value object to
+`double` only if their own document spends that format on money alone, or narrow
+`price` to a `Money` type by hand right after hydration, leaving the rest of the
+document's doubles as floats.
 
 ## The wrapper, proven rather than described
 
