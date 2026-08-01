@@ -61,26 +61,30 @@ lint-cs-fixer:
 lint-phpstan: tmpdir
     phpstan analyse --memory-limit=512M
 
-# Static analysis on generated fixtures + example trees (consumer-view; ADR-004)
+# Static analysis on generated fixtures (consumer-view; ADR-004), plus a
+# fan-out into every example's own check (examples-check-themselves).
 #
-# phpstan-generated.neon has no `paths:` (PHPStan errors on a path that
-# doesn't exist, and not every examples/*/generated tree exists — some
-# examples are .expected-failure and have no generated/ dir). So the path
-# set is resolved here: tests/fixtures/generated is always analysed, and
-# examples/*/generated is glob-expanded to whichever example trees
-# currently exist (nullglob so a run with zero example trees still
-# analyses the fixtures instead of erroring on a literal unmatched glob).
+# tests/fixtures/generated isn't owned by any example, so it is analysed
+# directly, here, against phpstan-generated.neon exactly as before. Every
+# examples/*/ directory now carries its own Justfile and its own
+# phpstan.neon (which `includes:` this file, so it is held to the identical
+# no-baseline / no-excludePaths / no-ignoreErrors max-level absolute), and
+# decides its own path set — `generated/` when it exists, `src/` when it
+# exists (that tier assignment for hand-written consumer code is explained
+# in examples/<name>/Justfile, not here), skipped entirely when neither does
+# (the .expected-failure examples). This recipe no longer assembles that
+# path list itself: it just runs each example's own `check`, the same
+# recipe you'd run by hand from inside that directory, so a regression in
+# any example tree fails here exactly the way it fails standalone.
 lint-phpstan-generated: tmpdir
     #!/usr/bin/env bash
-    set -euo pipefail
-    shopt -s nullglob
-    # `examples/*/src` is hand-written consumer code, not output — the decorator
-    # that proves the wrapper architecture works lives there. It belongs in this
-    # tier rather than the generator's: it is exactly the code a consumer writes
-    # against an emitted interface, so it should be held to the standard their own
-    # project would hold it to.
-    paths=(tests/fixtures/generated examples/*/generated examples/*/src)
-    phpstan analyse -c phpstan-generated.neon --memory-limit=512M "${paths[@]}"
+    set -eo pipefail
+    phpstan analyse -c phpstan-generated.neon --memory-limit=512M tests/fixtures/generated
+    for dir in examples/*/; do
+        name=$(basename "$dir")
+        echo "== $name =="
+        (cd "$dir" && just check)
+    done
 
 # Check for Rector refactoring opportunities
 lint-rector: tmpdir

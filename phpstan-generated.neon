@@ -12,12 +12,13 @@ parameters:
   # No `paths:` here on purpose. PHPStan hard-errors when a listed path
   # does not exist, but not every examples/*/generated tree exists —
   # examples marked .expected-failure have no generated/ dir at all
-  # (see check-examples). The real path set — tests/fixtures/generated
-  # plus every examples/*/generated tree that currently exists — is
-  # glob-expanded and passed on the command line by
-  # `just lint-phpstan-generated`, so it grows automatically as more
-  # examples clear their .expected-failure marker. Running this config
-  # with no paths on the CLI fails loudly ("At least one path must be
-  # specified to analyse") instead of silently analysing nothing.
+  # (see check-examples). `just lint-phpstan-generated` passes
+  # tests/fixtures/generated on the command line directly (see that
+  # recipe). Every examples/*/ directory also `includes:` this file from
+  # its own phpstan.neon and passes its own path set — `generated/` when
+  # it exists, `src/` when it exists — on the command line the same way
+  # (see examples/<name>/Justfile). Running this config with no paths on
+  # the CLI fails loudly ("At least one path must be specified to
+  # analyse") instead of silently analysing nothing.
   scanDirectories:
     - tests/fixtures/profiles/value-objects

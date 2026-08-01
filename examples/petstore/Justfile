@@ -1,0 +1,37 @@
+set dotenv-load := false
+
+# List available recipes
+default:
+    @just --list
+
+# Analyse this example's own trees at the consumer-view absolute
+# (examples-check-themselves).
+#
+# phpstan.neon in this directory includes ../../phpstan-generated.neon, so
+# this example is held to the identical no-baseline / no-excludePaths /
+# no-ignoreErrors max-level standard as every other example and as
+# tests/fixtures/generated — reading phpstan.neon plus this recipe answers
+# the whole "what strictness is this example held to" question, with no
+# need to cross-reference the root Justfile.
+#
+# `generated/` is analysed when it exists. An `.expected-failure` example
+# (no generator output to check yet) is skipped HERE, by this recipe
+# noticing the directory's absence, rather than by the root Justfile
+# glob-expanding around it — the root recipe just calls `just check` in
+# every examples/*/ directory and this is where the decision actually lives.
+#
+# `src/` is hand-written consumer code, not output — see the root Justfile's
+# `lint-phpstan-generated` comment for why it belongs at this tier rather
+# than the generator's. Analysed when it exists; not every example has one.
+check:
+    #!/usr/bin/env bash
+    set -eo pipefail
+    paths=()
+    [[ -d generated ]] && paths+=(generated)
+    [[ -d src ]] && paths+=(src)
+    name=$(basename "$PWD")
+    if [[ ${#paths[@]} -eq 0 ]]; then
+        echo "$name: no generated/ or src/ tree to analyse yet (expected-failure)"
+        exit 0
+    fi
+    phpstan analyse -c phpstan.neon --memory-limit=512M "${paths[@]}"
