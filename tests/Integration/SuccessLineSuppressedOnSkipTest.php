@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Mlavrinenko\Paogen\GenerateCommand;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
-
-use function assert;
 
 /**
  * default-deny-on-degradation: `paogen generate`'s plain success line
@@ -49,20 +46,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
         $outputDir = self::makeSandboxDir('paogen-success-line-');
         $profilePath = $this->writeProfile($outputDir);
 
-        $stdout = fopen('php://memory', 'w+');
-        $stderr = fopen('php://memory', 'w+');
-        assert($stdout !== false && $stderr !== false);
-
-        $exit = GenerateCommand::run([$profilePath], self::composerLoader(), $stdout, $stderr);
-
-        rewind($stdout);
-        rewind($stderr);
-        $out = (string) stream_get_contents($stdout);
-        $err = (string) stream_get_contents($stderr);
-        fclose($stdout);
-        fclose($stderr);
-
-        return [$exit, $out, $err];
+        return self::runGenerateCommand([$profilePath]);
     }
 
     private function writeProfile(string $outputDir): string

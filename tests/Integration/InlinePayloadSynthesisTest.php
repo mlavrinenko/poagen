@@ -4,20 +4,12 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Composer\Autoload\ClassLoader;
-use FilesystemIterator;
 use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
+use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
-
-use function is_array;
 
 use const DIRECTORY_SEPARATOR;
 use const SORT_STRING;
@@ -36,22 +28,15 @@ use const SORT_STRING;
  */
 final class InlinePayloadSynthesisTest extends TestCase
 {
+    use GeneratedTreeSandbox;
+
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payloads-3.0.yaml';
     private const string COLLISION_SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payload-collision-3.0.yaml';
     private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlinePayloads';
 
-    /** @var list<string> */
-    private array $outputDirs = [];
-
-    protected function tearDown(): void
+    public static function tearDownAfterClass(): void
     {
-        foreach ($this->outputDirs as $dir) {
-            if (is_dir($dir)) {
-                $this->removeDirectory($dir);
-            }
-        }
-
-        parent::tearDown();
+        self::removeSandboxDirs();
     }
 
     public function testEveryOperationIsEmittedFromADocumentWithNoComponents(): void
@@ -183,9 +168,9 @@ final class InlinePayloadSynthesisTest extends TestCase
      */
     private function planFor(string $schema, array $inlineModels = []): GenerationPlan
     {
-        $output = $this->makeTempDir();
+        $output = self::makeSandboxDir('paogen-inline-');
 
-        return new Generator(new AttributeScanner($this->composerLoader()))->plan(new Profile(
+        return self::generator()->plan(new Profile(
             schema: $schema,
             output: $output,
             namespace: self::NAMESPACE,
@@ -245,51 +230,5 @@ final class InlinePayloadSynthesisTest extends TestCase
         sort($out, SORT_STRING);
 
         return $out;
-    }
-
-    private function makeTempDir(): string
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-inline-');
-        unlink($path);
-
-        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
-            self::fail("failed to create temporary directory: {$path}");
-        }
-
-        $this->outputDirs[] = $path;
-
-        return $path;
-    }
-
-    private function composerLoader(): ClassLoader
-    {
-        foreach (spl_autoload_functions() as $fn) {
-            if (is_array($fn) && $fn[0] instanceof ClassLoader) {
-                return $fn[0];
-            }
-        }
-
-        self::fail('Composer ClassLoader not found in autoload chain.');
-    }
-
-    private function removeDirectory(string $dir): void
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            if ($entry->isDir()) {
-                rmdir($entry->getPathname());
-
-                continue;
-            }
-
-            unlink($entry->getPathname());
-        }
-
-        rmdir($dir);
     }
 }

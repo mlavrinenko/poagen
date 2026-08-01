@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Composer\Autoload\ClassLoader;
 use FilesystemIterator;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
+use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
 use function dirname;
-use function is_array;
 use function strlen;
 
 /**
@@ -37,6 +34,8 @@ use function strlen;
  */
 final class ByteStabilityTest extends TestCase
 {
+    use GeneratedTreeSandbox;
+
     private const string PETSTORE_NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore';
 
     /**
@@ -57,20 +56,6 @@ final class ByteStabilityTest extends TestCase
         'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
     ];
 
-    private string $firstOutputDir = '';
-    private string $secondOutputDir = '';
-
-    protected function tearDown(): void
-    {
-        foreach ([$this->firstOutputDir, $this->secondOutputDir] as $dir) {
-            if ($dir !== '' && is_dir($dir)) {
-                $this->removeDirectory($dir);
-            }
-        }
-
-        parent::tearDown();
-    }
-
     public function testPetstoreGeneratorRunsAreByteIdenticalToEachOtherAndToTheGoldenTree(): void
     {
         $schema = dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml';
@@ -79,32 +64,32 @@ final class ByteStabilityTest extends TestCase
         self::assertFileExists($schema, 'petstore schema must exist for this integration test');
         self::assertDirectoryExists($goldenDir, 'petstore golden tree must exist for this integration test');
 
-        $this->firstOutputDir = $this->makeTempDir('paogen-bytestab-a-');
-        $this->secondOutputDir = $this->makeTempDir('paogen-bytestab-b-');
+        $firstOutputDir = self::makeSandboxDir('paogen-bytestab-a-');
+        $secondOutputDir = self::makeSandboxDir('paogen-bytestab-b-');
 
-        $generator = new Generator(new AttributeScanner($this->composerLoader()));
+        $generator = self::generator();
 
         // Use the same namespace as the golden tree so emitted source (which
         // embeds the namespace) is byte-comparable against it.
         $generator->generate(new Profile(
             schema: $schema,
-            output: $this->firstOutputDir,
+            output: $firstOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
             source: self::PETSTORE_PROFILE,
         ));
-        $firstSnapshot = $this->snapshot($this->firstOutputDir);
+        $firstSnapshot = $this->snapshot($firstOutputDir);
 
         $generator->generate(new Profile(
             schema: $schema,
-            output: $this->secondOutputDir,
+            output: $secondOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
             source: self::PETSTORE_PROFILE,
         ));
-        $secondSnapshot = $this->snapshot($this->secondOutputDir);
+        $secondSnapshot = $this->snapshot($secondOutputDir);
 
         self::assertNotEmpty($firstSnapshot, 'first generator run produced no files');
         self::assertSame(
@@ -119,20 +104,6 @@ final class ByteStabilityTest extends TestCase
             $firstSnapshot,
             'generator output must match the committed Petstore golden tree',
         );
-    }
-
-    private function makeTempDir(string $prefix): string
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), $prefix);
-
-        // `tempnam` creates a file — swap it for a directory of the same name.
-        unlink($path);
-
-        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
-            self::fail("failed to create temporary directory: {$path}");
-        }
-
-        return $path;
     }
 
     /**
@@ -161,37 +132,5 @@ final class ByteStabilityTest extends TestCase
         ksort($out);
 
         return $out;
-    }
-
-    private function composerLoader(): ClassLoader
-    {
-        foreach (spl_autoload_functions() as $fn) {
-            if (is_array($fn) && $fn[0] instanceof ClassLoader) {
-                return $fn[0];
-            }
-        }
-
-        self::fail('Composer ClassLoader not found in autoload chain.');
-    }
-
-    private function removeDirectory(string $dir): void
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            if ($entry->isDir()) {
-                rmdir($entry->getPathname());
-
-                continue;
-            }
-
-            unlink($entry->getPathname());
-        }
-
-        rmdir($dir);
     }
 }

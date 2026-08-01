@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Composer\Autoload\ClassLoader;
-use FilesystemIterator;
-use Mlavrinenko\Paogen\GenerateCommand;
+use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
-
-use function assert;
-use function is_array;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -29,25 +21,13 @@ use const DIRECTORY_SEPARATOR;
  */
 final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 {
+    use GeneratedTreeSandbox;
+
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/unrepresentable-3.0.yaml';
 
-    /** @var list<string> */
-    private array $paths = [];
-
-    protected function tearDown(): void
+    public static function tearDownAfterClass(): void
     {
-        foreach ($this->paths as $path) {
-            if (is_dir($path)) {
-                $this->removeDirectory($path);
-
-                continue;
-            }
-            if (is_file($path)) {
-                unlink($path);
-            }
-        }
-
-        parent::tearDown();
+        self::removeSandboxDirs();
     }
 
     public function testDryRunFailsWithNonZeroExitAndReportsTheProblem(): void
@@ -68,7 +48,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 
     public function testPlainGenerateFailsWithNonZeroExitAndWritesNothing(): void
     {
-        $outputDir = $this->makeOutputDir();
+        $outputDir = self::makeSandboxDir('paogen-unrepresentable-cli-');
         [$exit, $stdout, $stderr] = $this->invokeGenerate([], $outputDir);
 
         self::assertSame(1, $exit);
@@ -83,29 +63,16 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
      */
     private function invokeGenerate(array $extraArgs, ?string $outputDir = null): array
     {
-        $outputDir ??= $this->makeOutputDir();
+        $outputDir ??= self::makeSandboxDir('paogen-unrepresentable-cli-');
         $profilePath = $this->writeProfile($outputDir);
 
-        $stdout = fopen('php://memory', 'w+');
-        $stderr = fopen('php://memory', 'w+');
-        assert($stdout !== false && $stderr !== false);
-
-        $exit = GenerateCommand::run([$profilePath, ...$extraArgs], $this->composerLoader(), $stdout, $stderr);
-
-        rewind($stdout);
-        rewind($stderr);
-        $out = (string) stream_get_contents($stdout);
-        $err = (string) stream_get_contents($stderr);
-        fclose($stdout);
-        fclose($stderr);
-
-        return [$exit, $out, $err];
+        return self::runGenerateCommand([$profilePath, ...$extraArgs]);
     }
 
     private function writeProfile(string $outputDir): string
     {
-        $path = tempnam(sys_get_temp_dir(), 'paogen-unrepresentable-profile-') . '.php';
-        $this->paths[] = $path;
+        $dir = self::makeSandboxDir('paogen-unrepresentable-profile-');
+        $path = $dir . '/profile.php';
 
         $schema = var_export(self::SCHEMA, true);
         $output = var_export($outputDir, true);
@@ -122,46 +89,5 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
             PHP);
 
         return $path;
-    }
-
-    private function makeOutputDir(): string
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-unrepresentable-cli-');
-        unlink($path);
-        $this->paths[] = $path;
-
-        return $path;
-    }
-
-    private function composerLoader(): ClassLoader
-    {
-        foreach (spl_autoload_functions() as $fn) {
-            if (is_array($fn) && $fn[0] instanceof ClassLoader) {
-                return $fn[0];
-            }
-        }
-
-        self::fail('Composer ClassLoader not found in autoload chain.');
-    }
-
-    private function removeDirectory(string $dir): void
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            if ($entry->isDir()) {
-                rmdir($entry->getPathname());
-
-                continue;
-            }
-
-            unlink($entry->getPathname());
-        }
-
-        rmdir($dir);
     }
 }
