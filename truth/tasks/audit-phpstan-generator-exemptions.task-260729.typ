@@ -35,3 +35,55 @@ Nobody has checked them against the rule since the rule was written, and an unex
 - \`phpstan.neon.dist\`
 - \`truth/standards/analysis-runs-at-maximum-strictness.standard-260729.typ\`
 - \`src/Runtime/Attribute/\`
+
+== Result
+
+The audit changed no file, which is the finding. `revert-the-strictness-relaxation`
+had already paid down six of the eight real ignores earlier the same day, taking
+the file from seven entries to five and rewriting the standard's `structural:`
+slot to match; `runtime-package-split` then moved the attribute paths
+mechanically. What was left unproven was whether the five that survived are still
+load-bearing, and that is what this task establishes rather than assumes.
+
+Method: delete one entry, run `just lint-phpstan`, record what appears, restore.
+Five entries, five runs, no entry judged from its comment.
+
+#table(
+  columns: 3,
+  [*Entry*], [*Removing it alone produced*], [*Verdict*],
+
+  [`shipmonk.deadProperty.neverRead` on `tests/generated/*Steps.php`, matching `::$test is never read`],
+  [Four errors, one per generated Steps class: ModelGenerator, OperationGenerator, PaogenCLI, Profile.],
+  [Blind spot, kept. All four classes currently have zero unimplemented stubs, so nothing reads `$test` today — and whether anything does is a function of which specs lack a body, which speconaut's adapter controls, not this repository.],
+
+  [`property.onlyWritten` on the same path and property],
+  [The same four files, under a second rule identifier.],
+  [Blind spot, kept. Independently load-bearing rather than a duplicate of the first: removing either one alone still fails.],
+
+  [`shipmonk.deadProperty.neverRead` on `runtime/src/Attribute/AdditionalProperties.php`],
+  [One error: `$valueClass is never read`.],
+  [Debt, kept and labelled as debt. PHPStan is right — no emission site and no reflection read exists, unlike the three wired members.],
+
+  [Same, on `Deprecated.php`],
+  [One error: `$replacement is never read`.],
+  [Same.],
+
+  [Same, on `Schema.php`],
+  [One error: `$name is never read`.],
+  [Same.],
+)
+
+No entry suppressed nothing, so none was deleted. The `tests/generated` pair
+needed the empirical re-check the task asked for: four commits changed those
+files after the entries were written, and `implement-the-outrun-step-bodies`
+closed every pending stub — the exact condition under which a stale exemption
+would have started suppressing nothing.
+
+The three attribute entries are the ones the standard does not really sanction:
+the tool is not blind there, the finding is real, and the exemption records
+accepted-but-unbuilt design. They stay only because wiring or deleting the
+attributes is outside this task's non-goals, and that is now filed as
+`wire-or-drop-the-unwired-attributes` rather than left in a config comment.
+
+Final count: five, unchanged. The standard's `structural:` slot already describes
+exactly this split and needed no edit. `just check` passes.
