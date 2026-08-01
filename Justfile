@@ -51,7 +51,7 @@ gate: check
 
 # Run all linters in parallel
 lint: tmpdir
-    @echo -n 'cs-fixer phpstan phpstan-generated rector linecop' | parallel --will-cite --halt now,fail=1 --delimiter=' ' just lint-{}
+    @echo -n 'cs-fixer phpstan phpstan-generated rector linecop jscpd jscpd-generated' | parallel --will-cite --halt now,fail=1 --delimiter=' ' just lint-{}
 
 # Check code style (PER-CS 2.0 + PHP 8.4)
 lint-cs-fixer:
@@ -90,7 +90,7 @@ lint-rector: tmpdir
 lint-linecop:
     linecop
 
-# Duplication report on src/ and tests/ (report-only for now)
+# Duplication gate on src/ and tests/ (source tier; jscpd-as-a-real-gate)
 #
 # A file's preamble is repeated text that says nothing about duplicated
 # logic: two files importing the same eight symbols are not two copies of
@@ -104,31 +104,73 @@ lint-linecop:
 # The pattern is anchored to column 0 (`(?m)^`), so a trait `use` inside a
 # class body — which is real code — still counts. Only the preamble goes.
 #
-# NOT wired into `lint`: `lint` uses `parallel --halt now,fail=1`, and a
-# report-only recipe in there is noise nobody reads. This recipe reports
-# rather than fails because the duplication it finds has not been removed
-# yet — collapse-operations-onto-a-runtime-transport and
-# deduplicate-the-test-suite do that. Once they land, add `--exit-code 1`
-# here (always give --exit-code an explicit value — spelled bare it eats the
-# next positional argument) and fold this into `lint`.
+# `--threshold` gates on jscpd's own "Total duplicated lines" percentage
+# across every format it scans (json + php + yaml under src/ and tests/), the
+# same figure the console table prints. Measured on 2026-08-01: 4.99%
+# duplicated lines (3.13% duplicated tokens), 90 clones. 5.5% is set just
+# above that so the gate is green today and has a little room before it
+# trips on incidental noise, not to license new duplication.
+#
+# RATCHET: this number only ever moves DOWN, as real duplication (see
+# deduplicate-the-test-suite) is removed and the measured figure drops.
+# Raising it to let a change land is not a fix, it is disabling the gate —
+# fix the duplication or take it to the owner instead.
+#
+# Do not add `--exit-code` alongside `--threshold`: jscpd's `--exit-code`
+# fails on ANY clone found regardless of the threshold, so combining the two
+# would fail today even though 4.99% is under 5.5%. `--threshold` alone
+# already sets the exit code (0 under the limit, 1 over it) — verified by
+# probing 4.9 (fails: "found too many duplicates (5.0%) over threshold
+# (4.9%)") and 5.5 (passes) against the same tree. (If you do reach for
+# `--exit-code` on its own elsewhere, always give it an explicit value —
+# spelled bare it eats the next positional argument.)
+#
+# `examples/*/src` is hand-written consumer code and belongs in THIS tier, not
+# the generated one, even though lint-phpstan-generated puts it in that tier.
+# The two recipes divide the tree for different reasons: phpstan asks "whose
+# strictness standard applies", and consumer code answers "the consumer's".
+# jscpd asks "what is this number measuring", and a duplication figure over
+# output plus hand-written code measures neither. Measured 2026-08-01: 5.09%
+# duplicated lines (3.17% tokens), 92 clones.
+#
+# RATCHET: this number only ever moves DOWN. Never raise it to admit a clone.
 lint-jscpd:
-    jscpd -c .jscpd.json src/ tests/
+    #!/usr/bin/env bash
+    set -eo pipefail
+    shopt -s nullglob
+    paths=(src tests examples/*/src)
+    jscpd -c .jscpd.json --threshold 5.5 "${paths[@]}"
 
-# Duplication report on generated fixtures + example trees (report-only for now)
+# Duplication gate on generated fixtures + example trees (generated tier;
+# jscpd-as-a-real-gate)
 #
 # Resolves its path set the way lint-phpstan-generated does: not every
 # example has a generated/ directory (some are .expected-failure), so
 # nullglob keeps a run with zero example trees from erroring on a literal
 # unmatched glob instead of falling back to tests/fixtures/generated alone.
 #
-# NOT wired into `lint` — see lint-jscpd above for why, and which tasks flip
-# both recipes to failing.
+# Generated output legitimately duplicates more than hand-written source —
+# RequestAssembler/ResponseHandler-shaped code repeats per operation — so
+# this tier gets its own, looser threshold rather than sharing lint-jscpd's.
+#
+# The path set is emitted output ONLY. `examples/*/src` is hand-written and
+# lives in lint-jscpd; including it here diluted the figure to 15.11% and hid
+# that output alone was already at 16.01% — over the threshold that number had
+# been used to justify. A duplication gate whose denominator includes code the
+# generator did not write cannot measure the generator.
+#
+# Measured on 2026-08-01, emitted output alone: 16.01% duplicated lines
+# (32.11% duplicated tokens), 36 clones. 16.5% is set just above that: green
+# today, minimal slack, no license to add more duplication.
+#
+# RATCHET: this number only ever moves DOWN as emitted duplication is
+# collapsed further. Never raise it to accommodate a new clone.
 lint-jscpd-generated:
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -eo pipefail
     shopt -s nullglob
-    paths=(tests/fixtures/generated examples/*/generated examples/*/src)
-    jscpd -c .jscpd.json "${paths[@]}"
+    paths=(tests/fixtures/generated examples/*/generated)
+    jscpd -c .jscpd.json --threshold 16.5 "${paths[@]}"
 
 # Auto-fix code style
 format:
@@ -146,13 +188,26 @@ test: tmpdir
 test-coverage:
     phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
 
-# Install dependencies
-install:
+# Install dependencies and local git hooks
+install: install-hooks
     composer install
+
+# Point git at .githooks/ so commit-msg enforces the task-trailer policy
+# (require-a-task-trailer-on-every-commit). Idempotent — safe to re-run.
+install-hooks:
+    git config core.hooksPath .githooks
+    @echo "git hooks installed: core.hooksPath -> .githooks"
 
 # Update dependencies
 update:
     composer update
+
+# Verify every commit in a range carries a resolvable task reference
+# (require-a-task-trailer-on-every-commit). Same rule the commit-msg hook
+# enforces on new commits, run instead over existing history — for CI, or a
+# human auditing a branch. Usage: `just check-commit-trailers origin/main..HEAD`.
+check-commit-trailers range:
+    .githooks/check-task-trailers --range '{{ range }}'
 
 # Clean generated artifacts
 clean:

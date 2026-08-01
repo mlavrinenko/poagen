@@ -44,7 +44,7 @@ just test       # run PHPUnit
 | Code style        | [php-cs-fixer](https://cs.symfony.com) (PER-CS 2.0)     |
 | Static analysis   | [PHPStan](https://phpstan.org) at `max` + strict rules  |
 | Refactoring       | [Rector](https://getrector.com)                         |
-| Duplication       | [jscpd](https://github.com/kucherenko/jscpd) (report-only) |
+| Duplication       | [jscpd](https://github.com/kucherenko/jscpd) (ratchet: `just lint-jscpd`, `just lint-jscpd-generated`) |
 | Tests             | [PHPUnit](https://phpunit.de)                           |
 | Code generation   | [nette/php-generator](https://github.com/nette/php-generator) |
 
@@ -67,6 +67,24 @@ task and `truth/tasks/<slug>.task-*.typ` is always the matching artifact. List
 them with `mt ls`. A commit spanning several tasks repeats the trailer, one per
 line. Work with no task behind it needs a task first — that is the point of the
 trailer, not a formality it satisfies.
+
+A commit whose type is `dev:` or `chore:` is exempt from the trailer — those
+are process/tooling commits with no task of their own by design.
+
+This is enforced, not just documented. `just install` (or `just install-hooks`
+on its own) sets `core.hooksPath` to `.githooks`, and its `commit-msg` hook
+rejects a commit that has neither an exempt type nor a `Refs:` trailer whose
+slug resolves to a real `truth/tasks/<slug>.task-*.typ` — a trailer naming a
+task that does not exist fails the same way a missing trailer does. For
+emergency local WIP, `PAOGEN_SKIP_TASK_CHECK=1 git commit ...` bypasses the
+check for that one commit; the hook still runs and prints a warning, so the
+bypass is visible rather than silent, and the trailer is expected before the
+commit leaves your machine.
+
+To audit a range of existing history — in CI or by hand — run
+`just check-commit-trailers <rev-range>`, e.g.
+`just check-commit-trailers origin/main..HEAD`. It applies the identical rule
+commit by commit and is unaffected by `PAOGEN_SKIP_TASK_CHECK`.
 
 ### Pull Requests
 
