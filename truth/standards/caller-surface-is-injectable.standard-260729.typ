@@ -8,9 +8,12 @@
   contexts: (generation-context,),
   rule: [
     Every #a(Client) paogen emits is declared by an interface it implements, and
-    acquires each of its collaborators — the transport, the message factories,
-    the base address, the hydration machinery — through its constructor. Nothing
-    is resolved from a container, read from global state, or constructed
+    acquires its transport — and whatever credential #the(Schema) declares —
+    through its constructor, type-hinted against `TransportInterface` rather
+    than a concrete class. The message factories, the base address, and the
+    hydration machinery are not parameters of #the(Client) at all; they live one
+    level down, inside whatever implements `TransportInterface`. Nothing is
+    resolved from a container, read from global state, or constructed
     internally where a consumer might have wanted to supply it.
 
     The interface is what consumers type-hint against, which is what makes the

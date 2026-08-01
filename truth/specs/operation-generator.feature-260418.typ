@@ -57,7 +57,7 @@
       "A 2xx JSON response body is deserialized into the typed Model",
       stage: "unstable",
     )[
-      #given[#the(Client) is constructed with a PSR-18 HTTP client that returns status #p((code: "200")) with JSON body #p((body: "{\"id\":42,\"status\":\"placed\"}"))]
+      #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "200")) with JSON body #p((body: "{\"id\":42,\"status\":\"placed\"}"))]
       #when[`getOrderById(42)` is called on #the(Client)]
       #then[the return value is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
     ]
@@ -69,7 +69,7 @@
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /user/login")) with #p((id: "operationId: loginUser")) whose 200 response schema is `type: string`]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method whose return type is `string`]
-      #and_[#the(Client)'s method body returns `(string) $response->getBody()` and never invokes `self::hydrate`]
+      #and_[#the(Client)'s method body names the response shape `ResponseType::string()`, so the transport reads the body as a scalar instead of hydrating it into a Model]
     ]
 
     #scenario(
@@ -79,7 +79,7 @@
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /store/inventory")) with #p((id: "operationId: getInventory")) whose 200 response schema is `type: object` with #p((map: "additionalProperties: integer"))]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method whose return type is `array` annotated `@return array<string, int>`]
-      #and_[#the(Client)'s method body returns the `json_decode`d payload directly without invoking `self::hydrate`]
+      #and_[#the(Client)'s method body names the response shape `ResponseType::mapOf(ResponseType::int())`, so the transport decodes the payload directly instead of hydrating it into a Model]
     ]
   ]
 
@@ -113,7 +113,7 @@
       #given[#the(Schema) declares #a(Operation) #p((op: "DELETE /pet/{petId}")) with #p((id: "operationId: deletePet")) and an optional header parameter `api_key: string`]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $apiKey = null): void`]
-      #and_[#the(Client)'s method calls `$request->withHeader('api_key', $apiKey)` only when `$apiKey` is not `null`]
+      #and_[#the(Client)'s method calls `->header('api_key', $apiKey)` unconditionally, with no `if` in the emitted body — the header is dropped before the request is sent when `$apiKey` is `null`]
     ]
   ]
 
@@ -179,7 +179,7 @@
       #and_[#a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) lists a parameter whose value is #p((ref: "#/components/parameters/ApiKey"))]
       #when[#the(Generator) runs against #the(Profile)]
       #then[#the(Client)'s emitted method signature includes `?string $apiKey = null`]
-      #and_[#the(Client)'s method body attaches the `api_key` header only when `$apiKey` is not `null`]
+      #and_[#the(Client)'s method body attaches `->header('api_key', $apiKey)` unconditionally, with no `if` in the emitted body — the header is dropped before the request is sent when `$apiKey` is `null`]
     ]
 
     #scenario(
@@ -270,7 +270,7 @@
       "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
       stage: "unstable",
     )[
-      #given[#the(Client) is constructed with a PSR-18 HTTP client that returns status #p((code: "404")) with JSON body #p((body: "{\"message\":\"not found\"}"))]
+      #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "404")) with JSON body #p((body: "{\"message\":\"not found\"}"))]
       #when[`getPetById(999)` is called on #the(Client)]
       #then[the call on #the(Client) throws `Generated\\ApiException`]
       #and_[#the(Client)'s exception's `getStatusCode()` returns `404`]
@@ -287,7 +287,7 @@
       #and_[a top-level `security: [{ apiKey: [] }]` makes every #the(Operation) secured by default]
       #when[#the(Generator) runs against #the(Profile)]
       #then[#the(Client)'s emitted `ApiClient` constructor has a required `string $apiKey` promoted private argument placed after `$transport`]
-      #and_[each secured #the(Operation)'s method body calls `$request = $request->withHeader('X-API-Key', $this->apiKey);` before `sendRequest`]
+      #and_[each secured #the(Operation)'s method body attaches `->header('X-API-Key', $this->apiKey)` to the request it builds and passes it to `$this->transport->send(...)`]
     ]
 
     #scenario(
@@ -298,7 +298,7 @@
       #and_[#an(Operation) #p((id: "operationId: placeOrder")) overrides the default with operation-level `security: [{ bearerAuth: [] }]`]
       #when[#the(Generator) runs against #the(Profile)]
       #then[#the(Client)'s emitted `ApiClient` constructor has a required `string $bearerToken` promoted private argument]
-      #and_[#the(Client)'s `placeOrder` method body calls `$request = $request->withHeader('Authorization', 'Bearer ' . $this->bearerToken);` before `sendRequest`]
+      #and_[#the(Client)'s `placeOrder` method body attaches `->header('Authorization', 'Bearer ' . $this->bearerToken)` to the request it builds and passes it to `$this->transport->send(...)`]
     ]
 
     #scenario(

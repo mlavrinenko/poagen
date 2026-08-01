@@ -167,27 +167,6 @@ final class OperationGeneratorSteps
         );
     }
 
-    public function givenClientIsConstructedWithAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(
-        int $code,
-        string $body,
-    ): void {
-        // PHPUnit's argument pipeline strips outer quotes; re-unescape the
-        // spec's raw JSON so it becomes valid for the mock response.
-        // Same step services both the happy path (200) and the
-        // non-2xx ApiException scenario (404).
-        $normalized = str_replace('\\"', '"', $body);
-        TestCase::assertContains($code, [200, 404]);
-
-        $this->profile = $this->loadProfile('petstore');
-        $this->runGenerator($this->profile);
-
-        $this->http = new RecordingClient(
-            new Response($code, ['Content-Type' => 'application/json'], $normalized),
-        );
-
-        $this->client = $this->petstoreClient($this->http);
-    }
-
     public function whenGetorderbyid42IsCalledOnClient(): void
     {
         TestCase::assertNotNull($this->client);
@@ -587,31 +566,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEachSecuredOperationsMethodBodyCallsRequestRequestWithHeaderXAPIKeyThisApiKeyBeforeSendRequest(
-    ): void {
-        // `listOrders` inherits the schema-level requirement and carries
-        // the apiKey header; `getPetById` explicitly opts out via
-        // `security: []` and must NOT carry it — proves per-op override
-        // honours OpenAPI 3.0.3 §4.8.20.
-        $listOrders = $this->methodSlice('listOrders');
-        TestCase::assertStringContainsString("->header('X-API-Key', \$this->apiKey)", $listOrders);
-
-        $getPetById = $this->methodSlice('getPetById');
-        TestCase::assertStringNotContainsString('X-API-Key', $getPetById);
-        TestCase::assertStringNotContainsString('$this->apiKey', $getPetById);
-
-        // Live round-trip proof via RecordingClient: the generated client
-        // really attaches the header when `sendRequest` runs.
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '[]'),
-        );
-
-        $this->parametersClient($http, 'secret-key', 'unused-here')->listOrders();
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('secret-key', $http->lastRequest->getHeaderLine('X-API-Key'));
-    }
-
-
     public function givenSchemaDeclaresComponentsSecuritySchemesBearerAuthWithScheme(string $scheme): void
     {
         TestCase::assertSame('type: http, scheme: bearer', $scheme);
@@ -841,44 +795,11 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenClientsMethodBodyReturnsStringResponseGetBodyAndNeverInvokesSelfHydrate(): void
-    {
-        $body = $this->methodSlice('loginUser');
-        // The scalar shape is named, so the body is read as a string rather
-        // than decoded and hydrated.
-        TestCase::assertStringContainsString('ResponseType::string()', $body);
-        TestCase::assertStringNotContainsString('hydrate', $body);
-
-        $http = new RecordingClient(new Response(200, ['Content-Type' => 'text/plain'], 'session-token'));
-
-        TestCase::assertSame('session-token', $this->petstoreClient($http)->user()->loginUser('ada', 'pw'));
-    }
-
-
     public function thenEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt(): void
     {
         $body = $this->methodSlice('getInventory');
         TestCase::assertStringContainsString('public function getInventory(): array', $body);
         TestCase::assertStringContainsString('@return array<string, int>', $body);
-    }
-
-
-    public function thenClientsMethodBodyReturnsTheJsonDecodedPayloadDirectlyWithoutInvokingSelfHydrate(): void
-    {
-        $body = $this->methodSlice('getInventory');
-        // A map of the declared value type: decoded and handed back, never
-        // hydrated into a Model the document did not declare.
-        TestCase::assertStringContainsString('ResponseType::mapOf(ResponseType::int())', $body);
-        TestCase::assertStringNotContainsString('hydrate', $body);
-
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{"available":7,"sold":2}'),
-        );
-
-        TestCase::assertSame(
-            ['available' => 7, 'sold' => 2],
-            $this->petstoreClient($http)->store()->getInventory(),
-        );
     }
 
 
@@ -955,28 +876,6 @@ final class OperationGeneratorSteps
             'public function deletePet(int $petId, ?string $apiKey = null): void',
             $this->source,
         );
-    }
-
-
-    public function thenClientsMethodCallsRequestWithHeaderApiKeyApiKeyOnlyWhenApiKeyIsNotNull(): void
-    {
-        $body = $this->methodSlice('deletePet');
-        // No `if` in the emitted body: the value is passed as it is and a
-        // null drops itself at the boundary.
-        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
-        TestCase::assertStringNotContainsString('if (', $body);
-
-        $http = new RecordingClient(new Response(204, [], ''));
-        $this->petstoreClient($http)->pet()->deletePet(3);
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
-
-        $http = new RecordingClient(new Response(204, [], ''));
-        $this->petstoreClient($http)->pet()->deletePet(3, 'k-9');
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('k-9', $http->lastRequest->getHeaderLine('api_key'));
     }
 
 
@@ -1133,20 +1032,6 @@ final class OperationGeneratorSteps
             'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
             $this->source,
         );
-    }
-
-
-    public function thenClientsMethodBodyAttachesTheApiKeyHeaderOnlyWhenApiKeyIsNotNull(): void
-    {
-        $body = $this->methodSlice('listOrders');
-        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
-        TestCase::assertStringNotContainsString('if (', $body);
-
-        $http = new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '[]'));
-        $this->parametersClient($http, 'unused-here', 'unused-here')->listOrders();
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
     }
 
 
@@ -1378,29 +1263,6 @@ final class OperationGeneratorSteps
             'private string $bearerToken,',
             $this->source,
         );
-    }
-
-
-    public function thenClientsPlaceOrderMethodBodyCallsRequestRequestWithHeaderAuthorizationBearerThisBearerTokenBeforeSendRequest(
-    ): void {
-        $body = $this->methodSlice('placeOrder');
-        TestCase::assertStringContainsString(
-            "->header('Authorization', 'Bearer ' . \$this->bearerToken)",
-            $body,
-        );
-        // Bearer replaces (not augments) the inherited apiKey on placeOrder.
-        TestCase::assertStringNotContainsString('X-API-Key', $body);
-
-        // Round-trip via RecordingClient: Authorization header actually
-        // reaches the transport, prefixed with the literal "Bearer ".
-        $http = new RecordingClient(
-            new Response(200, ['Content-Type' => 'application/json'], '{"id":1}'),
-        );
-
-        $this->parametersClient($http, 'unused-here', 'tok-abc')->placeOrder(new ParametersOrder(id: 1));
-
-        TestCase::assertNotNull($http->lastRequest);
-        TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
     }
 
 
@@ -1785,6 +1647,145 @@ final class OperationGeneratorSteps
         $justfile = (string) file_get_contents($root . '/Justfile');
         TestCase::assertStringContainsString('examples/*/src', $justfile);
         TestCase::assertStringContainsString('phpstan analyse -c phpstan-generated.neon', $justfile);
+    }
+
+
+    public function givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(
+        int $code,
+        string $body,
+    ): void {
+        // PHPUnit's argument pipeline strips outer quotes; re-unescape the
+        // spec's raw JSON so it becomes valid for the mock response.
+        // Same step services both the happy path (200) and the
+        // non-2xx ApiException scenario (404).
+        $normalized = str_replace('\\"', '"', $body);
+        TestCase::assertContains($code, [200, 404]);
+
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+
+        $this->http = new RecordingClient(
+            new Response($code, ['Content-Type' => 'application/json'], $normalized),
+        );
+
+        $this->client = $this->petstoreClient($this->http);
+    }
+
+
+    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeStringSoTheTransportReadsTheBodyAsAScalarInsteadOfHydratingItIntoAModel(
+    ): void {
+        $body = $this->methodSlice('loginUser');
+        // The scalar shape is named, so the body is read as a string rather
+        // than decoded and hydrated.
+        TestCase::assertStringContainsString('ResponseType::string()', $body);
+        TestCase::assertStringNotContainsString('hydrate', $body);
+
+        $http = new RecordingClient(new Response(200, ['Content-Type' => 'text/plain'], 'session-token'));
+
+        TestCase::assertSame('session-token', $this->petstoreClient($http)->user()->loginUser('ada', 'pw'));
+    }
+
+
+    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeMapOfResponseTypeIntSoTheTransportDecodesThePayloadDirectlyInsteadOfHydratingItIntoAModel(
+    ): void {
+        $body = $this->methodSlice('getInventory');
+        // A map of the declared value type: decoded and handed back, never
+        // hydrated into a Model the document did not declare.
+        TestCase::assertStringContainsString('ResponseType::mapOf(ResponseType::int())', $body);
+        TestCase::assertStringNotContainsString('hydrate', $body);
+
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"available":7,"sold":2}'),
+        );
+
+        TestCase::assertSame(
+            ['available' => 7, 'sold' => 2],
+            $this->petstoreClient($http)->store()->getInventory(),
+        );
+    }
+
+
+    public function thenClientsMethodCallsHeaderApiKeyApiKeyUnconditionallyWithNoIfInTheEmittedBodyTheHeaderIsDroppedBeforeTheRequestIsSentWhenApiKeyIsNull(
+    ): void {
+        $body = $this->methodSlice('deletePet');
+        // No `if` in the emitted body: the value is passed as it is and a
+        // null drops itself at the boundary.
+        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
+        TestCase::assertStringNotContainsString('if (', $body);
+
+        $http = new RecordingClient(new Response(204, [], ''));
+        $this->petstoreClient($http)->pet()->deletePet(3);
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
+
+        $http = new RecordingClient(new Response(204, [], ''));
+        $this->petstoreClient($http)->pet()->deletePet(3, 'k-9');
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('k-9', $http->lastRequest->getHeaderLine('api_key'));
+    }
+
+
+    public function thenClientsMethodBodyAttachesHeaderApiKeyApiKeyUnconditionallyWithNoIfInTheEmittedBodyTheHeaderIsDroppedBeforeTheRequestIsSentWhenApiKeyIsNull(
+    ): void {
+        $body = $this->methodSlice('listOrders');
+        TestCase::assertStringContainsString("->header('api_key', \$apiKey)", $body);
+        TestCase::assertStringNotContainsString('if (', $body);
+
+        $http = new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '[]'));
+        $this->parametersClient($http, 'unused-here', 'unused-here')->listOrders();
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertFalse($http->lastRequest->hasHeader('api_key'));
+    }
+
+
+    public function thenEachSecuredOperationsMethodBodyAttachesHeaderXAPIKeyThisApiKeyToTheRequestItBuildsAndPassesItToThisTransportSend(
+    ): void {
+        // `listOrders` inherits the schema-level requirement and carries
+        // the apiKey header; `getPetById` explicitly opts out via
+        // `security: []` and must NOT carry it — proves per-op override
+        // honours OpenAPI 3.0.3 §4.8.20.
+        $listOrders = $this->methodSlice('listOrders');
+        TestCase::assertStringContainsString("->header('X-API-Key', \$this->apiKey)", $listOrders);
+
+        $getPetById = $this->methodSlice('getPetById');
+        TestCase::assertStringNotContainsString('X-API-Key', $getPetById);
+        TestCase::assertStringNotContainsString('$this->apiKey', $getPetById);
+
+        // Live round-trip proof via RecordingClient: the generated client
+        // really attaches the header when the transport sends the request.
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '[]'),
+        );
+
+        $this->parametersClient($http, 'secret-key', 'unused-here')->listOrders();
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('secret-key', $http->lastRequest->getHeaderLine('X-API-Key'));
+    }
+
+
+    public function thenClientsPlaceOrderMethodBodyAttachesHeaderAuthorizationBearerThisBearerTokenToTheRequestItBuildsAndPassesItToThisTransportSend(
+    ): void {
+        $body = $this->methodSlice('placeOrder');
+        TestCase::assertStringContainsString(
+            "->header('Authorization', 'Bearer ' . \$this->bearerToken)",
+            $body,
+        );
+        // Bearer replaces (not augments) the inherited apiKey on placeOrder.
+        TestCase::assertStringNotContainsString('X-API-Key', $body);
+
+        // Round-trip via RecordingClient: Authorization header actually
+        // reaches the transport, prefixed with the literal "Bearer ".
+        $http = new RecordingClient(
+            new Response(200, ['Content-Type' => 'application/json'], '{"id":1}'),
+        );
+
+        $this->parametersClient($http, 'unused-here', 'tok-abc')->placeOrder(new ParametersOrder(id: 1));
+
+        TestCase::assertNotNull($http->lastRequest);
+        TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
     }
 
 }
