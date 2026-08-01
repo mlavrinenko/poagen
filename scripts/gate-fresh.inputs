@@ -37,3 +37,9 @@ rector.php
 .linecop.yaml
 phpunit.xml.dist
 .speconaut/config.toml
+# `just check` runs `speconaut lock --check`, which reads this file, so a lock
+# that changes without the specs changing alters what the gate would say. Only
+# a deliberate `speconaut lock` writes it — `mt flip` never does — so hashing
+# it costs nothing and closes the case where a re-locked or hand-edited lock
+# leaves a recorded pass claiming to cover a tree the gate would now reject.
+.speconaut/state.lock
