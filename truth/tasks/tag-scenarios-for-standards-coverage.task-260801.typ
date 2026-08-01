@@ -5,7 +5,7 @@
   tags: ("truth", "specs", "standards"),
   priority: 6,
   difficulty: 3,
-  status: proposed(2026, 8, 1),
+  status: done(2026, 8, 1),
 )
 
 == Summary
