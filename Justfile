@@ -124,8 +124,22 @@ lint-linecop:
 # (4.9%)") and 5.5 (passes) against the same tree. (If you do reach for
 # `--exit-code` on its own elsewhere, always give it an explicit value —
 # spelled bare it eats the next positional argument.)
+#
+# `examples/*/src` is hand-written consumer code and belongs in THIS tier, not
+# the generated one, even though lint-phpstan-generated puts it in that tier.
+# The two recipes divide the tree for different reasons: phpstan asks "whose
+# strictness standard applies", and consumer code answers "the consumer's".
+# jscpd asks "what is this number measuring", and a duplication figure over
+# output plus hand-written code measures neither. Measured 2026-08-01: 5.09%
+# duplicated lines (3.17% tokens), 92 clones.
+#
+# RATCHET: this number only ever moves DOWN. Never raise it to admit a clone.
 lint-jscpd:
-    jscpd -c .jscpd.json --threshold 5.5 src/ tests/
+    #!/usr/bin/env bash
+    set -eo pipefail
+    shopt -s nullglob
+    paths=(src tests examples/*/src)
+    jscpd -c .jscpd.json --threshold 5.5 "${paths[@]}"
 
 # Duplication gate on generated fixtures + example trees (generated tier;
 # jscpd-as-a-real-gate)
@@ -138,19 +152,25 @@ lint-jscpd:
 # Generated output legitimately duplicates more than hand-written source —
 # RequestAssembler/ResponseHandler-shaped code repeats per operation — so
 # this tier gets its own, looser threshold rather than sharing lint-jscpd's.
-# Measured on 2026-08-01 (post transport-collapse): 15.11% duplicated lines
-# (27.24% duplicated tokens), 37 clones. 16% is set just above that for the
-# same reason as the source tier: green today, minimal slack, no license to
-# add more duplication.
+#
+# The path set is emitted output ONLY. `examples/*/src` is hand-written and
+# lives in lint-jscpd; including it here diluted the figure to 15.11% and hid
+# that output alone was already at 16.01% — over the threshold that number had
+# been used to justify. A duplication gate whose denominator includes code the
+# generator did not write cannot measure the generator.
+#
+# Measured on 2026-08-01, emitted output alone: 16.01% duplicated lines
+# (32.11% duplicated tokens), 36 clones. 16.5% is set just above that: green
+# today, minimal slack, no license to add more duplication.
 #
 # RATCHET: this number only ever moves DOWN as emitted duplication is
 # collapsed further. Never raise it to accommodate a new clone.
 lint-jscpd-generated:
     #!/usr/bin/env bash
-    set -euo pipefail
+    set -eo pipefail
     shopt -s nullglob
-    paths=(tests/fixtures/generated examples/*/generated examples/*/src)
-    jscpd -c .jscpd.json --threshold 16 "${paths[@]}"
+    paths=(tests/fixtures/generated examples/*/generated)
+    jscpd -c .jscpd.json --threshold 16.5 "${paths[@]}"
 
 # Auto-fix code style
 format:
