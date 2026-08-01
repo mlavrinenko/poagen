@@ -60,6 +60,8 @@ final class OperationGeneratorSteps
     private string $source = '';
     private ?string $abortMessage = null;
     private string $abortOutputDir = '';
+    private ?string $expectedSkipOperationId = null;
+    private ?string $expectedSkipContentType = null;
 
     private ?ApiClient $client = null;
     private ?RecordingClient $http = null;
@@ -326,9 +328,7 @@ final class OperationGeneratorSteps
                       content:
                         application/json:
                           schema:
-                            type: array
-                            items:
-                              type: string
+                            type: string
               /alpha-only:
                 get:
                   operationId: alphaOnly
@@ -349,6 +349,45 @@ final class OperationGeneratorSteps
                       description: ok
                       content:
                         application/json:
+                          schema:
+                            type: string
+            YAML);
+
+        return $path;
+    }
+
+    /**
+     * A single operation whose 200 response declares `text/plain` and no
+     * `application/json` — default-deny-on-degradation's response-side
+     * counterpart to `writeMultiTagSchema`'s request-body case. Written here
+     * because no committed fixture carries a response with a content type
+     * other than `application/json`.
+     */
+    private function writeResponseContentTypeSchema(): string
+    {
+        $dir = $this->makeScratchOutputDir('paogen-response-content-type-');
+        $path = $dir . '/response-content-type-3.0.yaml';
+
+        file_put_contents($path, <<<'YAML'
+            openapi: 3.0.3
+            info:
+              title: Non-JSON response
+              version: 1.0.0
+            paths:
+              /labels/{id}:
+                get:
+                  operationId: getLabel
+                  parameters:
+                    - name: id
+                      in: path
+                      required: true
+                      schema:
+                        type: integer
+                  responses:
+                    '200':
+                      description: ok
+                      content:
+                        text/plain:
                           schema:
                             type: string
             YAML);
@@ -596,6 +635,8 @@ final class OperationGeneratorSteps
         TestCase::assertSame('operationId: uploadFile', $id);
 
         $this->profile = $this->loadProfile('petstore');
+        $this->expectedSkipOperationId = 'uploadFile';
+        $this->expectedSkipContentType = 'application/octet-stream';
     }
 
 
@@ -1176,9 +1217,15 @@ final class OperationGeneratorSteps
     {
         $message = (string) $this->abortMessage;
 
-        TestCase::assertStringContainsString('uploadFile', $message);
-        TestCase::assertStringContainsString('application/octet-stream', $message);
-        // A diagnostic that does not say what to do next is a dead end.
+        TestCase::assertNotNull($this->expectedSkipOperationId, 'the given step never recorded which operation to expect');
+        TestCase::assertNotNull($this->expectedSkipContentType, 'the given step never recorded which content type to expect');
+        TestCase::assertStringContainsString($this->expectedSkipOperationId, $message);
+        TestCase::assertStringContainsString($this->expectedSkipContentType, $message);
+        // A diagnostic that does not say what to do next is a dead end. This
+        // remedy is generic — UnrepresentableConstructsException::forProblems()
+        // appends it to every problem it reports, request body or response
+        // body alike (default-deny-on-degradation: the same discipline
+        // applies uniformly).
         TestCase::assertStringContainsString('Profile::$skip', $message);
     }
 
@@ -1786,6 +1833,76 @@ final class OperationGeneratorSteps
 
         TestCase::assertNotNull($http->lastRequest);
         TestCase::assertSame('Bearer tok-abc', $http->lastRequest->getHeaderLine('Authorization'));
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsTextPlain(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('GET /labels/{id}', $op);
+        TestCase::assertSame('operationId: getLabel', $id);
+
+        $schema = $this->writeResponseContentTypeSchema();
+        $this->profile = new Profile(
+            schema: $schema,
+            output: $this->makeScratchOutputDir('paogen-response-content-type-out-'),
+            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseContentType',
+        );
+        $this->expectedSkipOperationId = 'getLabel';
+        $this->expectedSkipContentType = 'text/plain';
+    }
+
+
+    public function whenGeneratorRunsAgainstUnacceptedProfile(): void
+    {
+        TestCase::assertNotNull($this->profile);
+
+        // A pristine output directory, so "wrote nothing" is observable.
+        $this->abortOutputDir = sys_get_temp_dir() . '/paogen-abort-' . bin2hex(random_bytes(6));
+        $unaccepted = $this->profile->with(output: $this->abortOutputDir);
+
+        $this->abortMessage = null;
+
+        try {
+            $this->runGenerator($unaccepted);
+        } catch (UnrepresentableConstructsException $e) {
+            $this->abortMessage = $e->getMessage();
+        }
+    }
+
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationXml(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('GET /xml-label', $op);
+        TestCase::assertSame('operationId: getXmlLabel', $id);
+
+        // Reuses default-deny-on-degradation's shared fixture rather than
+        // writing another ad-hoc schema — xml-response-outcome's fixture,
+        // since neither committed corpus declares an application/xml
+        // response.
+        $this->profile = new Profile(
+            schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/response-degradation-3.0.yaml',
+            output: $this->makeScratchOutputDir('paogen-xml-response-out-'),
+            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\XmlResponse',
+        );
+        $this->expectedSkipOperationId = 'getXmlLabel';
+        $this->expectedSkipContentType = 'application/xml';
+    }
+
+
+    public function thenGeneratorDoesNotDecodeTheXMLBodyOrPassItThroughRawSeeDecisionsXmlResponsesRefusedAtGenerationTimeDecision260801Typ(
+    ): void {
+        $message = (string) $this->abortMessage;
+
+        // Refusal, not a silent void and not a raw-body passthrough — the
+        // diagnostic says exactly what paogen decodes, so a reader cannot
+        // mistake this for "XML worked but came back untyped".
+        TestCase::assertStringContainsString('paogen only decodes application/json', $message);
+        TestCase::assertDirectoryDoesNotExist($this->abortOutputDir . '/Generated');
     }
 
 }

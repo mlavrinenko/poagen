@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: Response Degradation Fixture
+  version: "1.0.0"
+  description: >
+    default-deny-on-degradation: every 2xx response shape the generator
+    cannot represent as a typed return must refuse the run rather than
+    fall back to `void` and silently throw the vendor's body away. Each
+    operation here is independently unrepresentable for a different
+    reason; `okOperation` is fully representable and proves a Profile::$skip
+    entry only affects what it names.
+
+    `getXmlLabel` is xml-response-outcome's fixture: neither kilbil nor
+    petstore declares an application/xml response, so nothing in the
+    committed corpora exercises this path without it. See
+    xml-responses-refused-at-generation-time — an application/xml response
+    refuses the same way any other non-application/json response does,
+    rather than being decoded or special-cased.
+paths:
+  /plain-text:
+    get:
+      operationId: getPlainText
+      responses:
+        '200':
+          description: ok
+          content:
+            text/plain:
+              schema:
+                type: string
+  /xml-label:
+    get:
+      operationId: getXmlLabel
+      responses:
+        '200':
+          description: ok
+          content:
+            application/xml:
+              schema:
+                type: string
+  /broken-ref:
+    get:
+      operationId: getBrokenRef
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/'
+  /inline-array:
+    get:
+      operationId: listInlineItems
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /ok:
+    get:
+      operationId: okOperation
+      responses:
+        '204':
+          description: ok

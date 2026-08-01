@@ -105,10 +105,25 @@ final class XmlRequestBodyTest extends TestCase
             $this->plan([]);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
+            $message = $e->getMessage();
+
             // A guessed root element does not fail visibly — it produces
             // well-formed XML the vendor rejects at runtime.
-            self::assertStringContainsString('goodsxml', $e->getMessage());
-            self::assertStringContainsString('application/xml', $e->getMessage());
+            self::assertStringContainsString('goodsxml', $message);
+            self::assertStringContainsString('application/xml', $message);
+
+            // default-deny-on-degradation: the diagnostic used to describe a
+            // limitation that no longer holds ("paogen supports
+            // application/json ... and application/x-www-form-urlencoded ...
+            // only") and pointed at the skip list, even though XML request
+            // bodies are implemented — the actual remedy is naming the root
+            // element in Profile::$xmlElements.
+            self::assertStringContainsString('Profile::$xmlElements', $message);
+            self::assertStringNotContainsString(
+                'paogen supports application/json',
+                $message,
+                'the stale "XML is unsupported" message should not resurface',
+            );
         }
     }
 

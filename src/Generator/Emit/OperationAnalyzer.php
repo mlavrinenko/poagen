@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
@@ -201,84 +200,28 @@ final readonly class OperationAnalyzer
     }
 
     /**
-     * @param Responses<Response|Reference>|null $responses
+     * @param  Responses<Response|Reference>|null $responses
+     * @return ReturnSpec|null                     null when the picked 2xx response sits outside
+     *                                              paogen's supported shapes — the caller must refuse
+     *                                              the operation (default-deny-on-degradation) rather
+     *                                              than fall back to `void`; see
+     *                                              {@see describeUnsupportedResponse()}
      */
-    public static function returnType(?Responses $responses, NameRegistry $registry): ReturnSpec
+    public static function returnType(?Responses $responses, NameRegistry $registry): ?ReturnSpec
     {
-        if (!$responses instanceof Responses) {
-            return ReturnSpec::void();
-        }
-
-        foreach ($responses->getResponses() as $status => $response) {
-            if (!str_starts_with((string) $status, '2')) {
-                continue;
-            }
-            if (!$response instanceof Response) {
-                continue;
-            }
-
-            return self::responseReturn($response, $registry);
-        }
-
-        return ReturnSpec::void();
+        return ResponseAnalyzer::resolve($responses, $registry);
     }
 
-    private static function responseReturn(Response $response, NameRegistry $registry): ReturnSpec
+    /**
+     * Explains why {@see returnType()} returned null — names the response
+     * status, the content type(s) found, and what would make the response
+     * acceptable. Only meaningful to call after {@see returnType()} has
+     * returned null.
+     *
+     * @param Responses<Response|Reference>|null $responses
+     */
+    public static function describeUnsupportedResponse(?Responses $responses): string
     {
-        $json = $response->content['application/json'] ?? null;
-
-        if (!$json instanceof MediaType) {
-            return ReturnSpec::void();
-        }
-
-        $schema = $json->schema;
-
-        if ($schema instanceof Reference) {
-            $ref = $schema->getReference();
-            $raw = ComponentName::rawFromRef($ref);
-
-            return $raw === '' ? ReturnSpec::void() : ReturnSpec::model(ComponentName::phpFromRef($ref, $registry));
-        }
-
-        if (!$schema instanceof Schema) {
-            return ReturnSpec::void();
-        }
-
-        $type = SchemaType::of($schema);
-
-        if ($type->is('array')) {
-            $items = $schema->items;
-
-            if ($items instanceof Reference) {
-                $ref = $items->getReference();
-                $raw = ComponentName::rawFromRef($ref);
-
-                return $raw === '' ? ReturnSpec::void() : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
-            }
-
-            return ReturnSpec::void();
-        }
-
-        if ($type->is('object')) {
-            $additional = $schema->additionalProperties;
-
-            if ($additional instanceof Schema) {
-                $valueType = SchemaType::of($additional)->scalarPhpType();
-
-                return $valueType === null ? ReturnSpec::map('mixed') : ReturnSpec::map($valueType);
-            }
-
-            // An inline object with declared properties never reaches here —
-            // InlinePayloadPlanner synthesised a Model for it. What is left is
-            // an object the document left unconstrained, and a map of unknown
-            // values is what it says. Returning void instead would drop a body
-            // the vendor declared, which is the shrink `silence-means-success`
-            // forbids.
-            return ReturnSpec::map('mixed');
-        }
-
-        $scalar = $type->scalarPhpType();
-
-        return $scalar === null ? ReturnSpec::void() : ReturnSpec::scalar($scalar);
+        return ResponseAnalyzer::describeUnsupported($responses);
     }
 }

@@ -36,11 +36,15 @@ use function is_string;
  *
  * Anything else — including `multipart/form-data` and
  * `application/octet-stream` bodies, which used to be emitted as a
- * throwing stub — returns an {@see EmitOutcome::skipped()} carrying a
+ * throwing stub, and a 2xx response declaring a content type other than
+ * `application/json` (or a JSON shape this emitter does not represent),
+ * which used to collapse to `void` and silently throw the vendor's body
+ * away — returns an {@see EmitOutcome::skipped()} carrying a
  * {@see SkippedOperation} with a full construct/location/remedy diagnostic,
  * so the caller can report *which* endpoint did not make it into the
- * client and *why* instead of emitting a method that only fails at call
- * time (T-025, abort-on-unrepresentable-constructs).
+ * client and *why* instead of emitting a method that only fails, or
+ * degrades, at call time (T-025, abort-on-unrepresentable-constructs,
+ * default-deny-on-degradation).
  */
 final readonly class OperationEmitter
 {
@@ -152,6 +156,15 @@ final readonly class OperationEmitter
 
         $return = $this->inlinePayloads->returnFor($rawOperationId)
             ?? OperationAnalyzer::returnType($operation->responses, $this->registry);
+
+        if (!$return instanceof ReturnSpec) {
+            return EmitOutcome::skipped(new SkippedOperation(
+                $httpMethod,
+                $pathUri,
+                $rawOperationId,
+                OperationAnalyzer::describeUnsupportedResponse($operation->responses),
+            ));
+        }
 
         $method = $class->addMethod($operationId)->setPublic();
 

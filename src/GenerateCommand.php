@@ -106,8 +106,18 @@ final class GenerateCommand
             }
 
             $plan = $generator->generate($profile);
-            fwrite($stdout, "paogen: generated into {$profile->output}\n");
             self::reportSkipped($plan, $stderr);
+
+            // The success line claims every operation and component made it
+            // into the client. That is only true when nothing was skipped —
+            // an accepted Profile::$skip entry is still an omission, and
+            // printing the plain success line ahead of (or instead of
+            // disclosing) it is exactly the "opens by announcing success"
+            // shape default-deny-on-degradation forbids.
+            if ($plan->skippedOperations === [] && $plan->skippedComponents === []) {
+                fwrite($stdout, "paogen: generated into {$profile->output}\n");
+            }
+
             return 0;
         } catch (UnrepresentableConstructsException $e) {
             fwrite($stderr, "paogen generate: {$e->getMessage()}\n");

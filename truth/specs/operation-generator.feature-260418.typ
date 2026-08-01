@@ -83,6 +83,32 @@
     ]
   ]
 
+  #rule("Non-JSON response bodies")[
+    #scenario(
+      "A response declaring an unsupported content type aborts the run",
+      stage: "unstable",
+      case: "unsupported-content-type-aborts-run",
+      standards: (link("../standards/silence-means-success.standard-260729.typ"),),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /labels/{id}")) with #p((id: "operationId: getLabel")) whose 200 response content type is `text/plain`]
+      #when[#the(Generator) runs against #the([unaccepted], Profile)]
+      #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
+      #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]
+    ]
+
+    #scenario(
+      "An application/xml response aborts the run the same way any other non-JSON response does",
+      stage: "unstable",
+      standards: (link("../standards/silence-means-success.standard-260729.typ"),),
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /xml-label")) with #p((id: "operationId: getXmlLabel")) whose 200 response content type is `application/xml`]
+      #when[#the(Generator) runs against #the([unaccepted], Profile)]
+      #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
+      #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]
+      #and_[#the(Generator) does not decode the XML body or pass it through raw — see #link("../decisions/xml-responses-refused-at-generation-time.decision-260801.typ")]
+    ]
+  ]
+
   #rule("Query parameters")[
     #scenario(
       "An inline enum query parameter becomes a synthesised backed enum method argument",

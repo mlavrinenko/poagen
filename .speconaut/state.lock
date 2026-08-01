@@ -215,7 +215,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:7e2fad8bc356d5680e467a805245cb6bcf4cc2543e6d0f4b8a4449e2c50b3343"
+spec-hash = "sha256:a0bd53b7c87f5aeca18da8f336bbdc3a6e3ce36b20b8b56237d9ccef7d13ace2"
 
 [features."Operation Generator".scenarios."A 2xx JSON response body is deserialized into the typed Model"]
 as-is-hash = "sha256:638f61669b2a360cf09da772147c51ab1c3298017ee9f5ad4c55c5a2e1d7eab6"
@@ -277,6 +277,11 @@ as-is-hash = "sha256:e45367fd01457cfb62343772df04b9c8b188fe6d686287bde921b04ced9
 as-is = "KLUv/QBYpQsAdhlIIzCP0wEDKISkXW1l/ynbUI6QUyVDZvGhmXWFZnhzdwsHrSwwPABBAD4Ay9gMggGGrZVDYU2t0/cWg9o30YrefDLoYY0ZHhzt1jXqs0reAnzPVaO+MlXh9v1z7SCrPcgGfjBsl2+Yvkg4EX0yoVQtFo0+WeyQEHEy3GuHGJzSwGZIQCLc7jwORWs9J4XoC0qZRRddAKxvt5onxvkKRmzGF8WtJsWPOxeMwomp/eP0XXxuFdg8LgTnlQNKWGvwauI5Z01Kc2N77fmI8wrCZkhAJG9uQBK6AYFYBJ5THuwdP5ICs1qsCKq3GjuJm3++oAcdTmJKPPCZrfWVxfRNrfOVOx2CcKKO1uYXquKydKPAoQEmcBLb6oAPK85P2F6tNUoBHQB5GKpJNgQMARgRM5pefblmezTp99345mZGsIMO9PKr3rYPjLsszNYMUwho+JmsDCJgsLFIctwLh2GeFFFyHmF0dDpuANhoXJTpGCZ/8VJR"
 stage = "unstable"
 
+[features."Operation Generator".scenarios."A response declaring an unsupported content type aborts the run"]
+as-is-hash = "sha256:c44df7b4a26015f399bc95d11962af4c193c0fb1d6783cb308f11dddb95a8e39"
+as-is = "KLUv/QBYNQgA1hE0IUCL0wb7GmU7AVrJW8yipE7IJpOQqYPusxwxdQfOKE50QSgALAAsAM/ym7XuSsV81bBe/GIuRt+VSj2Kj9HM4C1Ly5GvmEq/7DAjbxl+gQSIIN3sTfyAzkGh6YolhSMCD2Pe2roysN6cNwvE+IV72IgnxVbxMeOMLcRGYHjGmBWf5ZVr6/iH8Q2CjVBooHOioTLBeJaUYhm+1lssAnzNZuJ0xQr2jBkBDejOE4k7ht6V6ggdA0ZPtO45N0KzpjOJ8VlWgMhJch0YfdWXxfDxahIAhSvQxnWHC2JsxZ3MBKk1cKsBcJLBdZCuQAyqJwBsFwTj08JAQmLHWpndOJS8mmXBDA=="
+stage = "unstable"
+
 [features."Operation Generator".scenarios."A scalar 2xx JSON response is returned as the scalar PHP type without hydration"]
 as-is-hash = "sha256:b01d3c9ea59b2c42ea35e3540866e827b1b760572e34186a29cfeb5537185ea2"
 as-is = "KLUv/QBY5QkAtlQ7IjCrpg1AbrFrWuYtDS3NqZxhpINsDpCTZeL6dGvBwkGNFBUxADMAMABnUrFt1WW9J12NlZ906UMKILf6bFeXO/XtGX+cKvHtEx7OwS2Wxdcie/iNN4preY8TjKxQLH6sq/I9XnijDPSJkEaJPZ4SjxA4ftLjfGvRc+pGufU4z3tAx89cJLHmnN4cZO08fZTb2dY7D6OBq+tGyuWtCE50IW9ONMjOOe1X2/byHM9bDD/jwFB4BEPShkOJ2/wm0SlFuF078Y2HcqJXds2Jym7fqxKnbSsfIRDQNCddIgo/ydZRLH9RKmGAbPwM45WuHACzS7B8Ey7WgAoBFDHKYbeUbRS45QrbBm1rnKoIzko0x3I01kBoMVhlOSC25UZNeFwoWhf9L9aQC8yuzKqdjQh9WBbEIlcNc49Qew=="
@@ -300,6 +305,11 @@ stage = "unstable"
 [features."Operation Generator".scenarios."An apiKey header scheme becomes a constructor arg attached as a header on secured ops"]
 as-is-hash = "sha256:1d009663f489bf7c5f43595819b06e120a289e532a0bf949336bdbdb6c86d64c"
 as-is = "KLUv/QBYRQwAhtxOIzCtpgMDuG1SwtpKD7P9mra7K9nwdnOVnoSkxxdX78iMIsATQABJAEMAxl9Yga14U7lVhMzccjuxFfo0qyeUrsZ21rP6Srd7tuQ52yYoV7Eln/VOS6/4zldS59V9OfoBe84oMdNYHj5NAo7yl1v/cI4bJtxAMSNBMePmlzeOp63PCiW2omGA4ugHDoMEiYPBzJ1DNxhkbjB/ovVaFgHRR8sgunhsj9MSBMD6vCZd+ZyvNAnn711YPlbf5rR8FrYgy1WrJ4Mgnos9EqvvMudWxuJZQ2D8UmAOLRO8iuwsZ0UonW0vjy8wfi3Yim2gc7hyVGF7+QchAo/HI0DhNeJo62XWq95jhWdVDYMqXubVf63bWiDiULZ24QaDERBxWCPVKlZt7R0rY6X7ZnsUL3fh/Dqc1dM1jxfvQJYMGgAXU4BcybXs8oYNhLcKfiGD4F+iVyugaIVE3zLcsrl5217hOqGbGe6gqxcgg3PMmeMRrCq8jTaCH/m9LPeOyYG0jWEEYZJMqCg="
+stage = "unstable"
+
+[features."Operation Generator".scenarios."An application/xml response aborts the run the same way any other non-JSON response does"]
+as-is-hash = "sha256:dbbcd4cb961f08fd345f0564ccc141426e84278e80a8e2af698af3df49561e9b"
+as-is = "KLUv/QBYzQsAxhhKL4CnSQczMAMzBBPGVfoWibTFlvI8m0hLuxEI8RXX46MfMRp+BRPFNXbrBL2kgxACOgA/ADoAkVtFx44vtxAboc+UgAFyQMFEtzObfvD83MRvTtFpPrPWbRk5XzGZvnk1DwtMtYfUYuyMCnakaodHkEY0SEjKiQSWDFT57FkvfjERg9HwNZmF1TjsFzuSgTSzauL1yC1lNQ8LNxB4uJ0xWN9uoSdfcwZBjHegHjbiK2+eSN+WjDmKTuLNobcle0KFAk5PtK5q7oRnXeokCqBBSbIpcPqyI3ToeBXVLWdFp7nlXjv+YTyzwAHsWUUAxgCGgIaieKNWwVSLsqekqyN5U1QxlSr0tFAo/KshPIjgyTUzi5ONWa+y6jG39JMy4gUEDk+JnryJflIdAFbJwbShgUuAXtdBp81JVwhgoOruRRvt9ds55F5WmbGHa+BWA+Akg+sgrqDgs65G9QSc7YJmgPoMmejarHyAEeApKIkJmLvfajGtLXs="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An explicitly skipped operation is omitted rather than stubbed"]
