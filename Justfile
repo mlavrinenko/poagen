@@ -44,7 +44,13 @@ tmpdir:
 # names, their bodies rehomed, and the generated suite went 77 tests to 93
 # with no failures. The lockfile was refreshed the same day, first time
 # since April — 88 scenarios, 565 traces.
-check: tmpdir lint test check-specs check-drift check-generated-tests
+#
+# Runs `test-coverage`, not a bare `test` (coverage-floor-in-the-gate): the
+# suite under coverage takes ~9s against ~6s bare, so running it once here
+# with the floor enforced costs less than running it twice — once bare for
+# `check`, once under coverage for a recipe nothing else called. `just
+# test` stays the fast, uninstrumented path for local iteration.
+check: tmpdir lint test-coverage check-specs check-drift check-generated-tests
 
 # Full pre-commit gate
 gate: check
@@ -211,12 +217,64 @@ format-rector: tmpdir
 test: tmpdir
     phpunit
 
-# Run tests with coverage
+# Run tests with coverage and enforce the per-tier statement-coverage floor
+# (coverage-floor-in-the-gate). Same `tmpdir` need as `test` — some
+# integration tests (e.g. tests/Support/GeneratedTreeSandbox.php) write
+# through sys_get_temp_dir().
 #
-# Same `tmpdir` need as `test` — some integration tests (e.g.
-# tests/Support/GeneratedTreeSandbox.php) write through sys_get_temp_dir().
+# `-d pcov.directory=.` is not decoration. PCOV auto-detects `pcov.directory`
+# from the working directory, and that auto-detection lands on `<repo>/src`
+# — verified via `php -i | grep pcov.directory` under a bare `phpunit
+# --coverage-clover ...` invocation from the repo root. `runtime/src/` sits
+# outside that auto-detected root and is never instrumented, so an
+# unconfigured run reports it at a flat 0.00%: an artifact of the wrong
+# instrumentation root, not a fact about the runtime package's tests.
+# Setting `pcov.directory` to the repo root explicitly (with `vendor` and
+# `build` excluded, so vendored and generated code is never scanned) fixes
+# it for every tier phpunit.xml.dist's `<source>` lists. `composer
+# test:coverage` (which CI's coverage job runs) sets the same two flags for
+# the same reason — this is not the only place PCOV could silently regress
+# back to the broken default. It additionally runs under `env -u
+# PHP_INI_SCAN_DIR`: in this devbox environment, composer's own binary
+# leaks a stale `PHP_INI_SCAN_DIR` (pointing at an older, pcov-less
+# `php-with-extensions` build) into every script it spawns, which silently
+# drops pcov from the child `php` process even though `which php` still
+# resolves to the correct, current build — verified via `php -d
+# pcov.directory=. -m | grep pcov` under `composer test:coverage` with and
+# without the `env -u`. This recipe invokes `php` directly, not through
+# composer, so it never inherits that override and does not need the fix.
+#
+# Measured on 2026-08-01 with instrumentation fixed: src/ 87.50%,
+# runtime/src/ 88.39%, combined 87.64% (statement coverage, clover). The
+# same commit measured with the auto-detected (broken) directory: src/
+# 87.46%, runtime/src/ 0.00%, combined 73.35% — the gap is entirely the
+# instrumentation bug above, not a real difference in what either tier's
+# tests exercise.
+#
+# SCOPE (coverage-floor-in-the-gate decision): src/ and runtime/src/ count.
+# tests/fixtures/generated and examples/*/generated do not — emitted code is
+# tool product already gated by the generated-tier PHPStan config, the
+# byte-stability fixtures and `just check-examples`, and counting it would
+# inflate the figure with code no human wrote. phpunit.xml.dist's <source>
+# only lists src/ and runtime/src/, so emitted code never reaches the
+# clover report to begin with; nothing here has to exclude it a second time.
+#
+# TWO FLOORS, NOT ONE: runtime/src/ ships as its own package
+# (runtime-ships-as-a-separate-package), so it is measured and gated
+# separately from src/ — a single blended number would let a regression in
+# either tier hide behind the other's tests.
+#
+# RATCHET: these two floors only ever move UP, as real tests raise the
+# measured figure. Lowering one to let a change land is not a fix, it is
+# disabling the gate — write the missing test or take it to the owner
+# instead. Conversely, never raise either number by writing a test that
+# asserts nothing just to hit it (coverage-floor-in-the-gate's non-goal) —
+# a floor met that way is worse than no floor.
 test-coverage: tmpdir
-    phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
+    #!/usr/bin/env bash
+    set -eo pipefail
+    php -d pcov.directory=. -d 'pcov.exclude=~(vendor|build)~' vendor/bin/phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
+    scripts/coverage-floor build/logs/clover.xml src=87.0 runtime/src=88.0
 
 # Prove a generated client installs and runs on mlavrinenko/paogen-runtime
 # alone, with the generator absent (runtime-package-split). Builds a scratch

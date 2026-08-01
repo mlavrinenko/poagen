@@ -32,9 +32,10 @@ All tasks are exposed via [`just`](https://github.com/casey/just):
 
 ```bash
 just            # list recipes
-just check      # lint + test + speconaut check-specs
+just check      # lint + test-with-coverage-floor + speconaut check-specs
 just format     # auto-fix code style
-just test       # run PHPUnit
+just test       # run PHPUnit, fast, no coverage instrumentation
+just test-coverage  # run PHPUnit with coverage and enforce the floor
 ```
 
 ### Tooling
@@ -45,8 +46,54 @@ just test       # run PHPUnit
 | Static analysis   | [PHPStan](https://phpstan.org) at `max` + strict rules  |
 | Refactoring       | [Rector](https://getrector.com)                         |
 | Duplication       | [jscpd](https://github.com/kucherenko/jscpd) (ratchet: `just lint-jscpd`, `just lint-jscpd-generated`) |
+| Coverage          | [PHPUnit](https://phpunit.de) + [PCOV](https://github.com/krakjoe/pcov) (ratchet: `just test-coverage`, `scripts/coverage-floor`) |
 | Tests             | [PHPUnit](https://phpunit.de)                           |
 | Code generation   | [nette/php-generator](https://github.com/nette/php-generator) |
+
+### Coverage floor
+
+`just check` (and CI's dedicated coverage job) enforce a statement-coverage
+floor, per tier, over `src/` and `runtime/src/` — the two source trees a
+human writes. `tests/fixtures/generated` and `examples/*/generated` never
+count toward either figure: that is emitted output, already gated by the
+generated-tier PHPStan config, the byte-stability fixtures, and `just
+check-examples`, and counting it would inflate the number with code no
+human wrote. See `truth/decisions/coverage-floor-in-the-gate.decision-260801.typ`
+for the full reasoning, including why this does not reopen ADR-004's
+rejection of codecov.
+
+Two floors, not one: `src/` and `runtime/src/` are measured and gated
+independently, because the runtime ships as its own installable package
+(`runtime-ships-as-a-separate-package`) — a single blended number would let
+a regression in either tier hide behind the other's tests.
+
+The floor values live as arguments next to a `RATCHET` comment in the
+Justfile's `test-coverage` recipe (and mirrored in `composer.json`'s
+`test:coverage`), the same pattern `lint-jscpd`'s `--threshold` uses for
+duplication — one greppable place per number. They only ever move **up**,
+as real tests raise the measured figure. Lowering one to let a change land
+is not a fix, it disables the gate; conversely, never raise one by writing
+a test that asserts nothing just to hit the number — a floor met that way
+is worse than no floor.
+
+`scripts/coverage-floor` reads the clover report `just test-coverage`
+produces, sums statements per tier, and fails naming the tier, the
+measured percentage and the floor it missed.
+
+Run it locally:
+
+```bash
+just test-coverage        # or: composer test:coverage
+```
+
+PCOV auto-detects its instrumentation root (`pcov.directory`) from the
+working directory, and that auto-detection lands on `src/` alone —
+`runtime/src/` would silently report 0% forever if nothing corrected it.
+Both `just test-coverage` and `composer test:coverage` pass `-d
+pcov.directory=.` explicitly so every tier `phpunit.xml.dist`'s `<source>`
+lists is actually instrumented; verify this is still true after any
+toolchain change with `php -d pcov.directory=. -i | grep pcov.directory`
+under the exact command the recipe runs.
 
 ### Closing a task
 
