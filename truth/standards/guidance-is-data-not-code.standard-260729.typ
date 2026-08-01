@@ -6,6 +6,10 @@
   title: "Consumer guidance is data the generator reads, never code it runs",
   status: accepted(2026, 7, 29),
   contexts: (guidance-context,),
+  requires-cases: (
+    "default-pipeline-runs-without-guidance",
+    "name-normaliser-shapes-identifiers-only",
+  ),
   rule: [
     Everything #a(UserFile) contributes to generation — #a(Profile), #a(BindsFormat),
     the result of #an(AttributeScan) — is read by #the(Generator) as a value and

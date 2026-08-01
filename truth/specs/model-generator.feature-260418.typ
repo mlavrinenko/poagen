@@ -219,6 +219,8 @@
     #scenario(
       "A kebab-case component name becomes a PascalCase PHP class under the default pipeline",
       stage: "unstable",
+      case: "default-pipeline-runs-without-guidance",
+      standards: (link("../standards/guidance-is-data-not-code.standard-260729.typ"),),
     )[
       #given[#the(Schema) declares a component named #p((raw: "security-advisory-ecosystems"))]
       #and_[#the(Profile) does not override `nameNormaliser`]
@@ -242,6 +244,8 @@
     #scenario(
       "A pattern-gated strategy only handles names matching its pattern and falls through otherwise",
       stage: "unstable",
+      case: "name-normaliser-shapes-identifiers-only",
+      standards: (link("../standards/guidance-is-data-not-code.standard-260729.typ"),),
     )[
       #given[#the(Profile)'s `nameNormaliser` is #p((normaliser: "CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])"))]
       #and_[#the(Schema) declares components #p((first: "legacy_thing")) and #p((second: "modern-thing"))]

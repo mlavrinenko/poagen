@@ -350,6 +350,8 @@
     #scenario(
       "Each tag becomes a sub-client behind an interface declaring exactly its own methods",
       stage: "unstable",
+      case: "sub-client-interface-omits-constructor",
+      standards: (link("../standards/caller-surface-is-injectable.standard-260729.typ"),),
     )[
       #given[#the(Schema) declares #an(Operation) #p((id: "operationId: getOrderById")) tagged #p((tag: "store")) and another tagged #p((other: "pet"))]
       #when[#the(Generator) runs against #the(Profile)]
@@ -371,6 +373,8 @@
     #scenario(
       "A sub-client is constructible without the root",
       stage: "unstable",
+      case: "sub-client-injects-transport-not-root",
+      standards: (link("../standards/caller-surface-is-injectable.standard-260729.typ"),),
     )[
       #given[#the(Generator) has emitted a sub-client for a tag]
       #when[a consumer constructs #the(Client) directly]
