@@ -22,7 +22,7 @@
 == Non-goals
 
 - Inventing properties the specs do not already reference; \`props: ()\` is the honest default.
-- Splitting the vocabulary into several bounded contexts — one context is correct at this size.
+- ~~Splitting the vocabulary into several bounded contexts — one context is correct at this size.~~ Overtaken. Four contexts landed, not one, and the split is right: schema, generation, guidance and cli each answer to a different authority — the vendor's document, the generator, the consumer's profile, the operator. Every accepted standard's \`contexts:\` slot already leans on that division. The argument is written out in \`truth/domain/bounded-contexts.md\`, added by \`reword-the-domain-context-split\` after this task's own non-goal was found to contradict what shipped.
 - Touching the spec bodies beyond what the import path rename forces.
 
 == Files

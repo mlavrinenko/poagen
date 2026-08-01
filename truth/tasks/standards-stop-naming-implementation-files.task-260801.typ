@@ -5,7 +5,7 @@
   tags: ("standards", "speconaut", "portability"),
   priority: 5,
   difficulty: 4,
-  status: proposed(2026, 8, 1),
+  status: done(2026, 8, 1),
 )
 
 == Summary

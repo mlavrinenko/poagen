@@ -18,17 +18,20 @@ The pilot rewrote it to satisfy the rule's letter and flagged that the letter an
 
 === Decided 2026-07-31: it may
 
-A \`process-only\` decision may name a file. It is non-portable by construction —
-that is what the slot declares — so the rule was never aimed at it.
+The ruling now lives where a ruling belongs — as
+\`truth/decisions/process-only-decisions-may-name-a-file.decision-260801.typ\`,
+written by \`process-only-decisions-may-name-a-file\`. Read it there rather than
+here; a decision recorded only in the body of a closed task is one the next
+reader has no reason to look for.
 
-The exemption belongs upstream, keyed on the \`process-only:\` slot the checker
-already reads, not on a paogen allowlist entry: a blanket \`src/\` entry would
-re-exempt every artifact that should stay governed. Filed as
-\`code-refs-exempt-process-only-decisions\` in the speconaut repo.
+In short: a \`process-only\` decision may name a file, because it is non-portable
+by construction — that is what the slot declares — so the rule was never aimed
+at it. The exemption is keyed upstream on the \`process-only:\` slot the checker
+already reads, not on a paogen allowlist entry, since a blanket \`src/\` entry
+would re-exempt every artifact that should stay governed.
 
-Once that lands, restore the \`bin/paogen\` and \`src/Cli.php\` pointers that
-\`plain-getopt-for-the-cli\` lost, with the allowlist still narrowed to output
-vocabulary alone.
+The upstream change it waited on has landed, and the decision artifact names it
+explicitly so the dependency cannot silently expire.
 
 == Acceptance criteria
 
