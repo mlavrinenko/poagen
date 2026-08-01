@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# gated-check — run `just check` and, only on success, record that it passed
+# against the current worktree, so `scripts/gate-fresh is-fresh` (and the
+# `[[on.flip]]` predicate in .mindtape/config.toml that calls it on the way
+# into `done`) can assert freshness without re-running the gate.
+#
+# Run this instead of a bare `just check` before flipping a task to `done`.
+# A bare `just check` still lints and tests your work; it just does not
+# leave the freshness record `mt flip` looks for.
+# No `set -e` here on purpose: this script's whole job is to run a command
+# that is expected to sometimes fail and act on its exit status, which `-e`
+# would short-circuit past.
+set -o pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$root"
+
+just check
+status=$?
+
+if [[ "$status" -eq 0 ]]; then
+    exec scripts/gate-fresh record
+fi
+
+scripts/gate-fresh invalidate
+exit "$status"

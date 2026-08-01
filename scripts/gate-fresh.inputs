@@ -1,0 +1,39 @@
+# Paths `just check` reads. `scripts/gate-fresh` hashes exactly this set to
+# decide whether the last recorded pass (via `scripts/gated-check`) is still
+# valid for the current worktree — this is the freshness assertion the
+# `[[on.flip]]` predicate in .mindtape/config.toml points at, standing in for
+# `mmz --is-fresh -- just check` (mmz is not available in this environment;
+# see CONTRIBUTING.md).
+#
+# One path per line, relative to the repo root. A directory is walked
+# recursively. A line starting with `!` excludes a path (matched as an exact
+# path or a directory prefix) from an include already listed above it. Blank
+# lines and `#` comments are ignored.
+#
+# CRITICAL: truth/tasks is excluded and MUST STAY excluded. `mt flip` writes
+# the task file it is gating (the status field, the note), so if task
+# artifacts were part of this hash, recording a pass and then flipping a
+# single task would change the hash out from under itself and no second
+# flip could ever be fresh again. Every other input here is something only a
+# real change to the gate's own behaviour touches.
+
+bin
+src
+tests
+examples
+truth
+!truth/tasks
+
+composer.json
+composer.lock
+devbox.json
+devbox.lock
+Justfile
+phpstan.neon.dist
+phpstan-generated.neon
+rector.php
+.php-cs-fixer.dist.php
+.jscpd.json
+.linecop.yaml
+phpunit.xml.dist
+.speconaut/config.toml
