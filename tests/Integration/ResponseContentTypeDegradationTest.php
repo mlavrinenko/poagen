@@ -20,11 +20,13 @@ use const DIRECTORY_SEPARATOR;
  * body already does — not collapse to `ReturnSpec::void()` and silently throw
  * the vendor's body away.
  *
- * Fixture: tests/fixtures/schemas/response-degradation-3.0.yaml carries three
- * independently unrepresentable responses (a non-JSON content type, a broken
- * `$ref`, and an array of non-`$ref` items) plus one fully representable
- * operation (`okOperation`), so a single run proves the generator collects
- * every one of them and that `Profile::$skip` only affects what it names.
+ * Fixture: tests/fixtures/schemas/response-degradation-3.0.yaml carries four
+ * independently unrepresentable responses (two non-JSON content types —
+ * text/plain and application/xml, see xml-responses-refused-at-generation-time
+ * — a broken `$ref`, and an array of non-`$ref` items) plus one fully
+ * representable operation (`okOperation`), so a single run proves the
+ * generator collects every one of them and that `Profile::$skip` only
+ * affects what it names.
  */
 final class ResponseContentTypeDegradationTest extends TestCase
 {
@@ -48,6 +50,20 @@ final class ResponseContentTypeDegradationTest extends TestCase
 
             self::assertStringContainsString('getPlainText', $message);
             self::assertStringContainsString('text/plain', $message);
+            self::assertStringContainsString('application/json', $message);
+        }
+    }
+
+    public function testAnXmlResponseAbortsTheRunRatherThanBeingDecodedOrPassedThroughRaw(): void
+    {
+        try {
+            $this->plan($this->acceptAllExcept('getXmlLabel'));
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            $message = $e->getMessage();
+
+            self::assertStringContainsString('getXmlLabel', $message);
+            self::assertStringContainsString('application/xml', $message);
             self::assertStringContainsString('application/json', $message);
         }
     }
@@ -78,13 +94,13 @@ final class ResponseContentTypeDegradationTest extends TestCase
         }
     }
 
-    public function testAllThreeProblemsAreCollectedInOnePass(): void
+    public function testAllFourProblemsAreCollectedInOnePass(): void
     {
         try {
             $this->plan([]);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
-            self::assertStringContainsString('3 problems found', $e->getMessage());
+            self::assertStringContainsString('4 problems found', $e->getMessage());
         }
     }
 
@@ -93,6 +109,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
         try {
             $this->plan([
                 'getPlainText' => 'text/plain not decoded',
+                'getXmlLabel' => 'application/xml not decoded',
                 'getBrokenRef' => 'broken $ref, fix the schema',
                 'listInlineItems' => 'inline array items unsupported',
                 // okOperation was never unrepresentable — this entry has
@@ -110,15 +127,17 @@ final class ResponseContentTypeDegradationTest extends TestCase
     {
         $plan = $this->plan([
             'getPlainText' => 'text/plain not decoded',
+            'getXmlLabel' => 'application/xml not decoded',
             'getBrokenRef' => 'broken $ref, fix the schema',
             'listInlineItems' => 'inline array items unsupported',
         ]);
 
-        self::assertCount(3, $plan->skippedOperations);
+        self::assertCount(4, $plan->skippedOperations);
 
         $sources = implode("\n", array_values($plan->writes));
         self::assertStringContainsString('function okOperation(', $sources);
         self::assertStringNotContainsString('function getPlainText(', $sources);
+        self::assertStringNotContainsString('function getXmlLabel(', $sources);
         self::assertStringNotContainsString('function getBrokenRef(', $sources);
         self::assertStringNotContainsString('function listInlineItems(', $sources);
     }
@@ -146,6 +165,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
     {
         $all = [
             'getPlainText' => 'text/plain not decoded',
+            'getXmlLabel' => 'application/xml not decoded',
             'getBrokenRef' => 'broken $ref, fix the schema',
             'listInlineItems' => 'inline array items unsupported',
         ];

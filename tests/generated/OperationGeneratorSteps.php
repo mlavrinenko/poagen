@@ -1872,4 +1872,37 @@ final class OperationGeneratorSteps
     }
 
 
+
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationXml(
+        string $op,
+        string $id,
+    ): void {
+        TestCase::assertSame('GET /xml-label', $op);
+        TestCase::assertSame('operationId: getXmlLabel', $id);
+
+        // Reuses default-deny-on-degradation's shared fixture rather than
+        // writing another ad-hoc schema — xml-response-outcome's fixture,
+        // since neither committed corpus declares an application/xml
+        // response.
+        $this->profile = new Profile(
+            schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/response-degradation-3.0.yaml',
+            output: $this->makeScratchOutputDir('paogen-xml-response-out-'),
+            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\XmlResponse',
+        );
+        $this->expectedSkipOperationId = 'getXmlLabel';
+        $this->expectedSkipContentType = 'application/xml';
+    }
+
+
+    public function thenGeneratorDoesNotDecodeTheXMLBodyOrPassItThroughRawSeeDecisionsXmlResponsesRefusedAtGenerationTimeDecision260801Typ(
+    ): void {
+        $message = (string) $this->abortMessage;
+
+        // Refusal, not a silent void and not a raw-body passthrough — the
+        // diagnostic says exactly what paogen decodes, so a reader cannot
+        // mistake this for "XML worked but came back untyped".
+        TestCase::assertStringContainsString('paogen only decodes application/json', $message);
+        TestCase::assertDirectoryDoesNotExist($this->abortOutputDir . '/Generated');
+    }
+
 }

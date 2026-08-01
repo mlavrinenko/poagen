@@ -9,6 +9,13 @@ info:
     operation here is independently unrepresentable for a different
     reason; `okOperation` is fully representable and proves a Profile::$skip
     entry only affects what it names.
+
+    `getXmlLabel` is xml-response-outcome's fixture: neither kilbil nor
+    petstore declares an application/xml response, so nothing in the
+    committed corpora exercises this path without it. See
+    xml-responses-refused-at-generation-time — an application/xml response
+    refuses the same way any other non-application/json response does,
+    rather than being decoded or special-cased.
 paths:
   /plain-text:
     get:
@@ -18,6 +25,16 @@ paths:
           description: ok
           content:
             text/plain:
+              schema:
+                type: string
+  /xml-label:
+    get:
+      operationId: getXmlLabel
+      responses:
+        '200':
+          description: ok
+          content:
+            application/xml:
               schema:
                 type: string
   /broken-ref:

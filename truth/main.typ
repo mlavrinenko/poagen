@@ -111,6 +111,8 @@
 #include "decisions/review-gate-must-be-mechanical.decision-260801.typ"
 #pagebreak()
 #include "decisions/skip-is-the-only-opt-out.decision-260801.typ"
+#pagebreak()
+#include "decisions/xml-responses-refused-at-generation-time.decision-260801.typ"
 
 // --- Supplementary artefacts ---
 //

@@ -17,7 +17,7 @@ use function assert;
  * even a skip the profile explicitly accepted is still an omission — so a
  * run that skipped or degraded anything must not open by announcing success.
  *
- * Uses tests/fixtures/schemas/response-degradation-3.0.yaml with all three
+ * Uses tests/fixtures/schemas/response-degradation-3.0.yaml with all four
  * unrepresentable responses accepted via Profile::$skip, so the run
  * completes (exit 0) with a non-empty skippedOperations list.
  */
@@ -38,7 +38,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
 
         self::assertSame(0, $exit);
         self::assertStringNotContainsString('generated into', $stdout);
-        self::assertStringContainsString('3 operation(s) skipped', $stderr);
+        self::assertStringContainsString('4 operation(s) skipped', $stderr);
     }
 
     /**
@@ -83,6 +83,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
                 namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\SuccessLineSuppressed',
                 skip: [
                     'getPlainText' => 'text/plain not decoded',
+                    'getXmlLabel' => 'application/xml not decoded',
                     'getBrokenRef' => 'broken \$ref, fix the schema',
                     'listInlineItems' => 'inline array items unsupported',
                 ],
