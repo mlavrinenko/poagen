@@ -5,7 +5,7 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: status("needs-review", 2026, 7, 30),
+  status: done(2026, 8, 1),
 )
 
 == Summary
@@ -34,6 +34,8 @@ The generator understands JSON and form-encoded payloads, stubs multipart and oc
 - `src/Generator/Emit/BodyAttachmentEmitter.php` and `OperationOrder.php` (new — extracted so `RequestAssembler` and `InlinePayloadPlanner` stay under the linecop limit)
 - `src/Generator/Emit/BodySpec.php`, `InlinePayloadPlanner.php`, `RequestAssembler.php`, `RequestBodyParameterEmitter.php`
 - `src/Generator/Profile.php`
-- #link("../decisions/xml-request-bodies-are-serialised-not-refused.decision-260730.typ")
+- #link(
+    "../decisions/xml-request-bodies-are-serialised-not-refused.decision-260730.typ",
+  )
 - `examples/kilbil/paogen.php`
 - `tests/`

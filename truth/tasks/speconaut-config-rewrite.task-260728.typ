@@ -5,7 +5,7 @@
   tags: ("speconaut",),
   priority: 8,
   difficulty: 2,
-  status: status("needs-review", 2026, 7, 29),
+  status: done(2026, 8, 1),
 )
 
 == Summary

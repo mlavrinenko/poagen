@@ -5,7 +5,7 @@
   tags: ("runtime", "packaging", "dx"),
   priority: 7,
   difficulty: 7,
-  status: status("needs-review", 2026, 7, 30),
+  status: done(2026, 8, 1),
 )
 
 == Summary

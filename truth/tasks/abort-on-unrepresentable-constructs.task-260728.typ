@@ -5,7 +5,7 @@
   tags: ("strictness", "generator"),
   priority: 9,
   difficulty: 6,
-  status: status("needs-review", 2026, 7, 30),
+  status: done(2026, 8, 1),
 )
 
 == Summary
