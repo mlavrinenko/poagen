@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# git commit-msg hook: enforces the CONTRIBUTING.md rule that every commit
+# carries a resolvable `Refs: <task-slug>` trailer or a `dev:`/`chore:` type.
+# Installed by `just install` via `git config core.hooksPath .githooks` —
+# see require-a-task-trailer-on-every-commit.
+set -eo pipefail
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=./check-task-trailers
+source "$here/check-task-trailers"
+
+msg_file="$1"
+
+if [[ -n "${PAOGEN_SKIP_TASK_CHECK:-}" ]]; then
+    echo "task-trailer: SKIPPED (PAOGEN_SKIP_TASK_CHECK is set) — this commit" >&2
+    echo "will not reference a resolvable task. Emergency local WIP only;" >&2
+    echo "add a real Refs: trailer (or amend the type to dev:/chore:) before" >&2
+    echo "it leaves your machine." >&2
+    exit 0
+fi
+
+if ! check_message "commit message" < "$msg_file"; then
+    echo "" >&2
+    echo "task-trailer: every commit needs either a 'Refs: <task-slug>' trailer" >&2
+    echo "that resolves to truth/tasks/<slug>.task-*.typ, or a dev:/chore: type." >&2
+    echo "See CONTRIBUTING.md. Emergency bypass (visible, not silent):" >&2
+    echo "  PAOGEN_SKIP_TASK_CHECK=1 git commit ..." >&2
+    exit 1
+fi

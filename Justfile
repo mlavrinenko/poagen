@@ -168,13 +168,26 @@ test: tmpdir
 test-coverage:
     phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
 
-# Install dependencies
-install:
+# Install dependencies and local git hooks
+install: install-hooks
     composer install
+
+# Point git at .githooks/ so commit-msg enforces the task-trailer policy
+# (require-a-task-trailer-on-every-commit). Idempotent — safe to re-run.
+install-hooks:
+    git config core.hooksPath .githooks
+    @echo "git hooks installed: core.hooksPath -> .githooks"
 
 # Update dependencies
 update:
     composer update
+
+# Verify every commit in a range carries a resolvable task reference
+# (require-a-task-trailer-on-every-commit). Same rule the commit-msg hook
+# enforces on new commits, run instead over existing history — for CI, or a
+# human auditing a branch. Usage: `just check-commit-trailers origin/main..HEAD`.
+check-commit-trailers range:
+    .githooks/check-task-trailers --range '{{ range }}'
 
 # Clean generated artifacts
 clean:

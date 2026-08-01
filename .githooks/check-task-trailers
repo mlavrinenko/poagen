@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Core check behind require-a-task-trailer-on-every-commit: every commit
+# needs either a `Refs: <task-slug>` trailer (one per task it touches) or a
+# `dev:`/`chore:` conventional-commit type. A `Refs:` line is not enough by
+# itself — the slug must resolve to a real `truth/tasks/<slug>.task-*.typ`,
+# otherwise it is a trailer pointing at nothing, which is the failure mode
+# this exists to catch. See CONTRIBUTING.md for the policy this enforces.
+#
+# Used two ways:
+#
+#   As a git commit-msg hook (see .githooks/commit-msg), which sources this
+#   file and calls check_message on the message about to be committed.
+#
+#   Standalone, to audit a range of existing history — a human or CI can run:
+#     .githooks/check-task-trailers --range <rev-range>
+#     .githooks/check-task-trailers --range origin/main..HEAD
+#
+# Escape hatch: PAOGEN_SKIP_TASK_CHECK=1 skips the commit-msg hook for one
+# local commit (emergency WIP only — .githooks/commit-msg prints a warning
+# naming the bypass so it is never silent). It has no effect here: --range
+# always checks every commit in the range, so history review sees the truth
+# regardless of what any single commit was made with.
+set -eo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+tasks_dir="$repo_root/truth/tasks"
+
+slug_resolves() {
+    # Pure bash glob, not `compgen -G`: the devbox/nix bash this hook runs
+    # under in this repo's own dev shell is built without programmable
+    # completion, so `compgen` is not a builtin there and would silently
+    # make every slug look unresolved. Verified: `type compgen` fails under
+    # `direnv exec .` in this project, while `shopt -s nullglob` + a glob
+    # array works in any bash.
+    local slug="$1" matches
+    shopt -s nullglob
+    matches=("$tasks_dir/$slug".task-*.typ)
+    shopt -u nullglob
+    ((${#matches[@]} > 0))
+}
+
+# Reads a commit message on stdin, prints problems to stderr, returns 0 if
+# the message is acceptable and 1 otherwise. $1 is a label for messages.
+check_message() {
+    local label="$1"
+    local msg subject refs slug status
+    msg="$(cat)"
+    subject="$(printf '%s\n' "$msg" | head -n1)"
+
+    if printf '%s' "$subject" | grep -qE '^(dev|chore)(\([^)]*\))?!?:'; then
+        return 0
+    fi
+
+    refs="$(printf '%s\n' "$msg" | grep -E '^Refs:[[:space:]]*.+')" || true
+    if [[ -z "$refs" ]]; then
+        echo "task-trailer: $label has no 'Refs: <task-slug>' trailer and is not a dev:/chore: commit" >&2
+        return 1
+    fi
+
+    status=0
+    while IFS= read -r line; do
+        slug="$(printf '%s' "$line" | sed -E 's/^Refs:[[:space:]]*//')"
+        if ! slug_resolves "$slug"; then
+            echo "task-trailer: $label references '$slug', which does not resolve to truth/tasks/$slug.task-*.typ" >&2
+            status=1
+        fi
+    done <<< "$refs"
+
+    return "$status"
+}
+
+main() {
+    if [[ "${1:-}" != "--range" || -z "${2:-}" ]]; then
+        echo "usage: check-task-trailers --range <rev-range>" >&2
+        exit 2
+    fi
+    local range="$2" sha failed
+    failed=0
+    while IFS= read -r sha; do
+        if ! git log -1 --format=%B "$sha" | check_message "commit ${sha:0:12}"; then
+            failed=1
+        fi
+    done < <(git rev-list "$range")
+    exit "$failed"
+}
+
+# Only run main when executed directly — commit-msg sources this file to
+# reuse check_message and must not trigger the --range CLI.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
