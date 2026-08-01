@@ -5,7 +5,7 @@
   tags: ("generator", "cli", "policy"),
   priority: 9,
   difficulty: 7,
-  status: proposed(2026, 8, 1),
+  status: done(2026, 8, 1),
 )
 
 == Summary

@@ -5,7 +5,7 @@
   tags: ("generator", "xml", "policy"),
   priority: 7,
   difficulty: 5,
-  status: proposed(2026, 8, 1),
+  status: done(2026, 8, 1),
 )
 
 == Summary
