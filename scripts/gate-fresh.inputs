@@ -18,6 +18,7 @@
 # real change to the gate's own behaviour touches.
 
 bin
+scripts
 src
 runtime
 tests

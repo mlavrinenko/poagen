@@ -67,3 +67,28 @@ jobs:
         with:
           dependency-versions: "${{ matrix.composer-deps }}"
       - run: "composer test"
+
+  # Runs the suite once, with coverage, and enforces the per-tier floor
+  # (coverage-floor-in-the-gate). Deliberately one job, not a `coverage:
+  # "pcov"` leg added to the unit-tests matrix above: the floor is a
+  # property of the code, not of an OS/dependency-version combination, so
+  # measuring it once (ubuntu-latest, PHP 8.4, highest deps) is enough —
+  # running it four more times would multiply CI cost for no additional
+  # signal. `composer test:coverage` carries the floor values and the
+  # instrumentation fix (see its definition in composer.json and the
+  # matching `test-coverage` recipe in the Justfile for the full
+  # explanation, including the ratchet-only-moves-up rule).
+  coverage:
+    name: "Coverage floor"
+    needs: ["lint", "static-analysis"]
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.4"
+          coverage: "pcov"
+      - uses: "ramsey/composer-install@v3"
+        with:
+          dependency-versions: "highest"
+      - run: "composer test:coverage"

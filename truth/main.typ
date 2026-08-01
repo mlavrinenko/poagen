@@ -117,6 +117,8 @@
 #include "decisions/xml-responses-refused-at-generation-time.decision-260801.typ"
 #pagebreak()
 #include "decisions/runtime-ships-as-a-separate-package.decision-260801.typ"
+#pagebreak()
+#include "decisions/coverage-floor-in-the-gate.decision-260801.typ"
 
 // --- Supplementary artefacts ---
 //
