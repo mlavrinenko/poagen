@@ -58,4 +58,4 @@ that it stays flat. These three have no plan attached beyond the comment.
 - `src/Generator/Emit/ModelAttributeApplier.php`
 - `runtime/src/Marshal/DescriptorParser.php`
 - `phpstan.neon.dist`
-- `truth/standards/analysis-runs-at-maximum-strictness.standard-260729.typ`
+- #link("../standards/analysis-runs-at-maximum-strictness.standard-260729.typ")

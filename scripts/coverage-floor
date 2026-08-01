@@ -22,7 +22,7 @@ declare(strict_types=1);
  * or "runtime/src"). Every <file> element in the clover report is assigned
  * to the first configured tier whose prefix matches its path; a file
  * matching no configured tier is ignored. That is also how emitted code
- * stays out of the figure without a separate exclude list:phpunit.xml.dist's
+ * stays out of the figure without a separate exclude list: phpunit.xml.dist's
  * <source> only ever includes src/ and runtime/src/, so nothing under
  * tests/fixtures/generated or examples/*\/generated appears as a <file> in
  * the clover report to begin with (coverage-floor-in-the-gate decision).
