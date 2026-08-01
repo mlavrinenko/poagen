@@ -54,3 +54,33 @@ abort-on-unrepresentable-constructs closed having unified the request side. This
 - \`truth/decisions/\`
 - \`truth/specs/\`
 - \`tests/\`
+
+== Result
+
+Every degradation path found, and what became of it.
+
+#table(
+  columns: 2,
+  [*Where it lived*], [*What it did, and what it does now*],
+  [\`OperationAnalyzer::responseReturn()\`, line 226],
+  [Returned \`ReturnSpec::void()\` for any 2xx response without an \`application/json\` entry, an unresolved \`\$ref\`, or an inline array of non-\`\$ref\` items. The logic moved to a new \`ResponseAnalyzer\`, which returns \`null\` for anything unrepresentable and keeps \`void\` only for a genuinely empty response. \`OperationEmitter\` turns that \`null\` into a refusal through the same mechanism an unsupported request body already used.],
+  [\`GenerateCommand\`, lines 108-111],
+  [Printed the success line before reporting skips. The line is now suppressed entirely whenever anything was skipped, and the skip report comes first.],
+  [\`RequestBodyAnalyzer\`, lines 82-141],
+  [Claimed paogen supported only JSON and form-urlencoded, which stopped being true when XML request bodies landed, and named the skip list as the remedy for a construct paogen can emit. Now has an XML-specific branch naming the right remedy.],
+  [\`Profile::\$skip\` staleness],
+  [Already enforced by \`SkipListValidator\` from the request-side work, and it covers the newly-refused response constructs with no new logic. A skip that would now generate cleanly still fails the run.],
+)
+
+The inversion is the point rather than the three fixes: the analyzer's default was to degrade, so any construct nobody anticipated vanished by construction. It now refuses by default, and a shape nobody thought about stops the run instead of disappearing.
+
+Verified end to end on the merged tree rather than through the test suite alone. Generating against a schema carrying \`text/plain\`, \`application/xml\`, an unresolvable \`\$ref\` and an inline array of scalars exits 1, writes zero files, prints no success line, and names each construct with its JSON-pointer location and what would make it acceptable:
+
+\`\`\`
+paogen generate: 4 problems found; nothing was written:
+  - GET /plain-text (getPlainText) — 200 response
+    (/paths/~1plain-text/get/responses/200) content type(s) 'text/plain'
+    — paogen only decodes application/json responses ...
+\`\`\`
+
+One shape this surfaced that had been hiding: a generated-test fixture used an inline \`items: {type: string}\` for a response array, which neither the old nor the new code ever supported. The old code voided it silently, so nobody knew.
