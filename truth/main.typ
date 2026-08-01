@@ -107,6 +107,8 @@
 #include "decisions/operations-delegate-to-an-injected-transport.decision-260730.typ"
 #pagebreak()
 #include "decisions/a-header-not-a-chmod.decision-260731.typ"
+#pagebreak()
+#include "decisions/review-gate-must-be-mechanical.decision-260801.typ"
 
 // --- Supplementary artefacts ---
 //

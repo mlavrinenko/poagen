@@ -14,14 +14,23 @@
 # else — the ones with evidence, gated to non-terminal tasks so a closed task
 # is not held to a spec it has outgrown.
 #
-# A review state `done` cannot skip. Agents report success they have not
-# achieved, and they do not catch it themselves; in one study of real sessions,
-# inaccurate self-reporting was roughly a fifth of all misalignment episodes and
-# the overwhelming majority of corrections came from a human pushing back, not
-# from the agent noticing. Meanwhile the largest single category of rejected
-# agent pull requests was not a code defect at all — it was nobody reviewing
-# them. Making `done` unreachable from `wip` puts that review in the graph
-# instead of in a convention.
+# No human review state. This preset shipped with one — `done` was reachable
+# only from `needs-review`, on the reasoning that agents report success they
+# have not achieved and rarely catch it themselves. That reasoning is sound and
+# the measurement held: a fourteen-task audit of this backlog found four
+# acceptance criteria out of 110 that overshot what had landed, including one
+# real defect.
+#
+# The gate was removed anyway, on 2026-08-01, because it did not survive
+# contact with throughput. Thirty-eight tasks accumulated in `needs-review`
+# against a single human reviewer, and a queue nobody can service is not a gate
+# — it is a queue. Every task in it was already merged and shipping; the state
+# recorded an intention to review, not a review. See
+# `truth/decisions/review-gate-must-be-mechanical.decision-260801.typ`.
+#
+# What replaces it is the `[[on.flip]]` predicate at the bottom of this file:
+# the check that closes a task has to be one a machine runs, because that is the
+# only kind that still runs on the thirty-eighth task.
 #
 # A note required on `blocked`, `failed`, and `cancelled`. An unexplained flip
 # to `done` is not the only failure mode — an unexplained flip away from work
@@ -30,8 +39,8 @@
 # reason exactly on those three: why it stalled, what broke, why it was
 # dropped. `done` is deliberately left at the default (`note = "optional"`) —
 # a note is the one thing an agent will always fill plausibly, so requiring one
-# on every transition buys filler, not evidence; the review gate above is the
-# real check there.
+# on every transition buys filler, not evidence; the `[[on.flip]]` predicate
+# below is the real check there.
 #
 # No review comments left in the file. A human reading agent-authored work
 # leaves `// no, use X instead` inline; the agent is meant to reframe the task
@@ -72,14 +81,7 @@ to = ["wip", "cancelled"]
 value = "wip"
 glyph = "🔨"
 color = "yellow"
-to = ["needs-review", "blocked", "failed"]
-
-# The gate. `done` is reachable only from here, so no run of work closes itself.
-[[tasks.status]]
-value = "needs-review"
-glyph = "👀"
-color = "magenta"
-to = ["done", "wip", "failed"]
+to = ["done", "blocked", "failed"]
 
 [[tasks.status]]
 value = "blocked"
@@ -189,11 +191,13 @@ message = "Summary must precede Acceptance criteria"
 filter = "status == \"wip\""
 description = "In flight — keep this list at one"
 
-# `mt ls @review` is the queue a human owes an answer to.
-[views.review]
-filter = "status == \"needs-review\""
+# `mt ls @recent` is what closed lately — the reading a human does instead of
+# gating. Reviewing after the fact catches a wrong decision while it is still
+# cheap to reverse, and it does not stall the queue when nobody reads it.
+[views.recent]
+filter = "status == \"done\""
 sort = ["priority:desc"]
-description = "Waiting on human review before it can close"
+description = "Recently closed — read for decisions worth revisiting"
 
 # Flip hooks: what happens when a task changes status. `mt flip` is the only
 # command that runs these — `mt check`, `mt ls` and every other read execute
