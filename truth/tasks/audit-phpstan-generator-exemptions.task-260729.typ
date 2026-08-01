@@ -5,7 +5,7 @@
   tags: ("strictness", "quality-gates", "debt"),
   priority: 4,
   difficulty: 3,
-  status: wip(2026, 8, 1)[in flight],
+  status: done(2026, 8, 1),
 )
 
 == Summary
@@ -68,9 +68,7 @@ Five entries, five runs, no entry judged from its comment.
   [One error: `$replacement is never read`.],
   [Same.],
 
-  [Same, on `Schema.php`],
-  [One error: `$name is never read`.],
-  [Same.],
+  [Same, on `Schema.php`], [One error: `$name is never read`.], [Same.],
 )
 
 No entry suppressed nothing, so none was deleted. The `tests/generated` pair

@@ -5,7 +5,7 @@
   tags: ("quality", "tests"),
   priority: 6,
   difficulty: 4,
-  status: wip(2026, 8, 1)[in flight],
+  status: done(2026, 8, 1),
 )
 
 == Summary
@@ -94,7 +94,7 @@ The floor was proven to bite rather than assumed to: raising the `src` floor to
 
 \`\`\`
 coverage-floor: FAILED
-  - src: measured 87.46%, below the 99.0% floor
+- src: measured 87.46%, below the 99.0% floor
 \`\`\`
 
 ADR-004 is left standing. It declined a hosted service with no threshold behind

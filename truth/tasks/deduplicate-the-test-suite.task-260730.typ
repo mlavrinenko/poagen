@@ -5,7 +5,7 @@
   tags: ("testing", "quality"),
   priority: 5,
   difficulty: 4,
-  status: wip(2026, 8, 1)[in flight],
+  status: done(2026, 8, 1),
   links: depends-on("adopt-jscpd-duplication-gate.task-260730.typ"),
 )
 
@@ -45,7 +45,10 @@ this task asked for before any work:
 #table(
   columns: 3,
   [], [*Before*], [*After*],
-  [source tier (`lint-jscpd`'s path set)], [96 clones, 5.13% lines], [76 clones, 3.36% lines],
+  [source tier (`lint-jscpd`'s path set)],
+  [96 clones, 5.13% lines],
+  [76 clones, 3.36% lines],
+
   [`tests/` alone], [54 clones, 6.20% lines], [34 clones, 2.94% lines],
   [hand-written to hand-written clone pairs], [30], [10],
   [tests, assertions], [217, 1198], [217, 1198],
