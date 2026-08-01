@@ -5,7 +5,7 @@
   tags: ("testing", "quality"),
   priority: 5,
   difficulty: 4,
-  status: proposed(2026, 7, 30),
+  status: wip(2026, 8, 1)[in flight],
   links: depends-on("adopt-jscpd-duplication-gate.task-260730.typ"),
 )
 

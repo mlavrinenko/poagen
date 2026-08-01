@@ -5,7 +5,7 @@
   tags: ("strictness", "quality-gates", "debt"),
   priority: 4,
   difficulty: 3,
-  status: proposed(2026, 7, 29),
+  status: wip(2026, 8, 1)[in flight],
 )
 
 == Summary

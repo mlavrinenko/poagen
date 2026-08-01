@@ -5,7 +5,7 @@
   tags: ("quality", "tests"),
   priority: 6,
   difficulty: 4,
-  status: proposed(2026, 8, 1),
+  status: wip(2026, 8, 1)[in flight],
 )
 
 == Summary
