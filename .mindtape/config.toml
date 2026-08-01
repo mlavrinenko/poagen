@@ -244,11 +244,19 @@ actions = [{ list = "@wip", title = "Already in flight — finish these first:" 
 # $MINDTAPE_TASK_STATUS, so a script can inspect the artifact being closed —
 # the TODO check uses $MINDTAPE_TASK_FILE below.
 #
+# That check is anchored to `^- TODO: `, the exact shape the template's slot
+# defaults emit, rather than matching the bare string anywhere in the file.
+# Unanchored, it made any task DISCUSSING the placeholder unclosable — which
+# it promptly did to `flip-gate-asserts-the-real-check`, the task that built
+# this very gate, and to `speconaut-mindtape-config-skew`, whose acceptance
+# criterion quotes the placeholder it is meant to test for. A gate that fires
+# on a task for describing it accurately is one people learn to `--force`.
+#
 # `mt done --force` overrides a failing gate and records the override in the
 # status note — an escape hatch that leaves a trace.
 [[on.flip]]
 when = 'into("done")'
 actions = [
-  { run = '! grep -q "TODO:" "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
+  { run = '! grep -qE "^- TODO: " "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
   { run = 'scripts/gate-fresh is-fresh', gate = true, message = "the project gate has not passed against this worktree since your last change — run `scripts/gated-check` (wraps `just check`) and flip again" },
 ]
