@@ -5,6 +5,9 @@
 // What paogen does and what it leaves on disk. Every term names something the
 // generator owns end to end, which is why `never-edit-generated` can hold:
 // nothing here has a hand-written counterpart.
+//
+// Why this is one of four bounded contexts rather than one: see
+// "bounded-contexts.md".
 
 #let Generator = entity("Generator", props: ())
 #let ModelEmitter = entity("Model Emitter", props: ())

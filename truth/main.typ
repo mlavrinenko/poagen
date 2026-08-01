@@ -109,6 +109,8 @@
 #include "decisions/a-header-not-a-chmod.decision-260731.typ"
 #pagebreak()
 #include "decisions/review-gate-must-be-mechanical.decision-260801.typ"
+#pagebreak()
+#include "decisions/process-only-decisions-may-name-a-file.decision-260801.typ"
 
 // --- Supplementary artefacts ---
 //

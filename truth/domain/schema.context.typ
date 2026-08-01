@@ -5,6 +5,9 @@
 // What the vendor publishes and paogen only ever reads. Nothing here is ours
 // to change — the point of `real-world-schemas` is that the document arrives
 // exactly as published.
+//
+// Why this is one of four bounded contexts rather than one: see
+// "bounded-contexts.md".
 
 #let Schema = entity("Schema", props: ())
 #let Operation = entity("Operation", props: ())

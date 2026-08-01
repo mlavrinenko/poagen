@@ -5,5 +5,8 @@
 // The command surface a consumer actually runs. Thin by design: the CLI
 // resolves a profile and hands off, so `cheap-regeneration` stays one command
 // rather than a procedure.
+//
+// Why this is one of four bounded contexts rather than one: see
+// "bounded-contexts.md".
 
 #let PaogenCli = entity("paogen CLI", props: ())
