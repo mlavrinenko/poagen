@@ -139,10 +139,30 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
+     * Rule: Non-JSON response bodies
+     *
+     * Scenario: A response declaring an unsupported content type aborts the run
+     * @source truth/specs/operation-generator.feature-260418.typ:87
+     *
+     * Given Schema declares Operation GET /labels/{id} with operationId: getLabel whose 200 response content type is text/plain
+     * When Generator runs against unaccepted Profile
+     * Then Generator's run fails and emits no Generated File
+     *   And Generator's report names the operationId, the unsupported content type, and the remedy
+     */
+    public function testAResponseDeclaringAnUnsupportedContentTypeAbortsTheRun(): void
+    {
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsTextPlain('GET /labels/{id}', 'operationId: getLabel');
+        $this->steps->whenGeneratorRunsAgainstUnacceptedProfile();
+        $this->steps->thenGeneratorsRunFailsAndEmitsNoGeneratedFile();
+        $this->steps->thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
+    }
+
+
+    /**
      * Rule: Query parameters
      *
      * Scenario: An inline enum query parameter becomes a synthesised backed enum method argument
-     * @source truth/specs/operation-generator.feature-260418.typ:87
+     * @source truth/specs/operation-generator.feature-260418.typ:101
      *
      * Given Schema declares Operation GET /pet/findByStatus with operationId: findPetsByStatus and a required query parameter status whose schema is type: string with [available, pending, sold]
      * When Generator runs against Profile
@@ -160,7 +180,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An `explode: true` array query parameter is serialised as repeated `name=value` pairs
-     * @source truth/specs/operation-generator.feature-260418.typ:97
+     * @source truth/specs/operation-generator.feature-260418.typ:111
      *
      * Given Schema declares Operation GET /pet/findByTags with operationId: findPetsByTags and a required query parameter tags type: array, items.type: string, explode: true
      * When Generator runs against Profile
@@ -180,7 +200,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Header parameters
      *
      * Scenario: An optional header parameter becomes a nullable typed argument and is attached only when non-null
-     * @source truth/specs/operation-generator.feature-260418.typ:109
+     * @source truth/specs/operation-generator.feature-260418.typ:123
      *
      * Given Schema declares Operation DELETE /pet/{petId} with operationId: deletePet and an optional header parameter api_key: string
      * When Generator runs against Profile
@@ -200,7 +220,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Identifier normalisation
      *
      * Scenario: A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved
-     * @source truth/specs/operation-generator.feature-260418.typ:121
+     * @source truth/specs/operation-generator.feature-260418.typ:135
      *
      * Given Schema declares Operation POST /proxy with an optional header parameter named Content-Type
      * When Generator runs against Profile
@@ -218,7 +238,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operationId with non-identifier characters is camelCased into a PHP method name
-     * @source truth/specs/operation-generator.feature-260418.typ:131
+     * @source truth/specs/operation-generator.feature-260418.typ:145
      *
      * Given Schema declares Operation POST /proxy with operationId: monitoring_get_foo.yml
      * When Generator runs against Profile
@@ -236,7 +256,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: Profile.methodRenames overrides an operationId verbatim
-     * @source truth/specs/operation-generator.feature-260418.typ:141
+     * @source truth/specs/operation-generator.feature-260418.typ:155
      *
      * Given Profile whose methodRenames map carries 'monitoring_get_foo.yml' => 'forwardProxyRequest'
      * When Generator runs against Profile
@@ -254,7 +274,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
-     * @source truth/specs/operation-generator.feature-260418.typ:151
+     * @source truth/specs/operation-generator.feature-260418.typ:165
      *
      * Given Schema declares Operation operationId: uploadFile whose request body content type is application/octet-stream, which paogen does not emit
      * When Generator runs against Profile
@@ -274,7 +294,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Reference resolution and path-level parameters
      *
      * Scenario: An operation-level `$ref` to a component parameter is resolved to a typed method argument
-     * @source truth/specs/operation-generator.feature-260418.typ:163
+     * @source truth/specs/operation-generator.feature-260418.typ:177
      *
      * Given Schema declares #/components/parameters/Limit limit: integer, in: query, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/Limit
@@ -294,7 +314,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation-level `$ref` to a header component parameter becomes an optional typed header argument
-     * @source truth/specs/operation-generator.feature-260418.typ:174
+     * @source truth/specs/operation-generator.feature-260418.typ:188
      *
      * Given Schema declares #/components/parameters/ApiKey api_key: string, in: header, required: false
      *   And Operation GET /order with operationId: listOrders lists a parameter whose value is #/components/parameters/ApiKey
@@ -314,7 +334,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A `$ref` to a component requestBody is resolved to the expected Model body parameter
-     * @source truth/specs/operation-generator.feature-260418.typ:185
+     * @source truth/specs/operation-generator.feature-260418.typ:199
      *
      * Given Schema declares #/components/requestBodies/CreateOrder with application/json schema #/components/schemas/Order
      *   And Operation POST /order with operationId: placeOrder whose requestBody is a #/components/requestBodies/CreateOrder
@@ -334,7 +354,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A PathItem-level inline parameter is inherited by every operation under that path
-     * @source truth/specs/operation-generator.feature-260418.typ:196
+     * @source truth/specs/operation-generator.feature-260418.typ:210
      *
      * Given Schema declares a PathItem /store/{storeId}/items with a single PathItem-level parameter storeId: integer, in: path, required: true
      *   And two Operation entries under it — operationId: listStoreItems and operationId: clearStore — do not restate the parameter
@@ -354,7 +374,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation whose PathItem declares a `$ref` parameter is still emitted
-     * @source truth/specs/operation-generator.feature-260418.typ:207
+     * @source truth/specs/operation-generator.feature-260418.typ:221
      *
      * Given Schema declares #/components/parameters/PetId petId: integer, in: path, required: true
      *   And Operation GET /pet/{petId} with operationId: getPetById inherits a PathItem-level parameter whose value is #/components/parameters/PetId
@@ -374,7 +394,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()
-     * @source truth/specs/operation-generator.feature-260418.typ:218
+     * @source truth/specs/operation-generator.feature-260418.typ:232
      *
      * Given Schema declares #/components/schemas/SshKeyId as type: integer
      *   And Operation GET /keys/{ssh_key_id} with operationId: getSshKeyById and a path parameter ssh_key_id whose schema is #/components/schemas/SshKeyId
@@ -396,7 +416,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Non-JSON request bodies
      *
      * Scenario: A form-urlencoded body becomes typed params serialised with http_build_query
-     * @source truth/specs/operation-generator.feature-260418.typ:231
+     * @source truth/specs/operation-generator.feature-260418.typ:245
      *
      * Given Schema declares Operation POST /token with operationId: issueToken whose sole request-body content type is application/x-www-form-urlencoded and whose schema is type: object with grantType: string, clientId: string, scope: string and [grantType, clientId]
      * When Generator runs against Profile
@@ -416,7 +436,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An unsupported body content type aborts the run
-     * @source truth/specs/operation-generator.feature-260418.typ:242
+     * @source truth/specs/operation-generator.feature-260418.typ:256
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
      * When Generator runs against Profile declaring no skip entry for that Operation
@@ -434,7 +454,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicitly skipped operation is omitted rather than stubbed
-     * @source truth/specs/operation-generator.feature-260418.typ:254
+     * @source truth/specs/operation-generator.feature-260418.typ:268
      *
      * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
      *   And Profile declares a skip entry for that Operation carrying a reason
@@ -456,7 +476,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Error responses
      *
      * Scenario: A non-2xx response throws a typed ApiException instead of a generic RuntimeException
-     * @source truth/specs/operation-generator.feature-260418.typ:269
+     * @source truth/specs/operation-generator.feature-260418.typ:283
      *
      * Given Client is constructed with a TransportInterface backed by a PSR-18 HTTP client that returns status 404 with JSON body {"message":"not found"}
      * When getPetById(999) is called on Client
@@ -478,7 +498,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: Security schemes
      *
      * Scenario: An apiKey header scheme becomes a constructor arg attached as a header on secured ops
-     * @source truth/specs/operation-generator.feature-260418.typ:282
+     * @source truth/specs/operation-generator.feature-260418.typ:296
      *
      * Given Schema declares #/components/securitySchemes/apiKey with type: apiKey, in: header, name: X-API-Key
      *   And a top-level security: [{ apiKey: [] }] makes every Operation secured by default
@@ -498,7 +518,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization
-     * @source truth/specs/operation-generator.feature-260418.typ:293
+     * @source truth/specs/operation-generator.feature-260418.typ:307
      *
      * Given Schema declares #/components/securitySchemes/bearerAuth with type: http, scheme: bearer
      *   And Operation operationId: placeOrder overrides the default with operation-level security: [{ bearerAuth: [] }]
@@ -518,7 +538,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.feature-260418.typ:304
+     * @source truth/specs/operation-generator.feature-260418.typ:318
      *
      * Given Schema declares a scheme with type: http, scheme: basic
      * When Generator runs against Profile
@@ -533,7 +553,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
-     * @source truth/specs/operation-generator.feature-260418.typ:313
+     * @source truth/specs/operation-generator.feature-260418.typ:327
      *
      * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
      * When Generator runs against Profile
@@ -550,7 +570,7 @@ final class OperationGeneratorTest extends TestCase
      * Rule: The caller surface is grained by tag (emit-tagged-subclients-with-interfaces)
      *
      * Scenario: Each tag becomes a sub-client behind an interface declaring exactly its own methods
-     * @source truth/specs/operation-generator.feature-260418.typ:324
+     * @source truth/specs/operation-generator.feature-260418.typ:338
      *
      * Given Schema declares Operation operationId: getOrderById tagged store and another tagged pet
      * When Generator runs against Profile
@@ -570,7 +590,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: The root client hands out sub-clients and carries no flat operation methods
-     * @source truth/specs/operation-generator.feature-260418.typ:335
+     * @source truth/specs/operation-generator.feature-260418.typ:349
      *
      * Given Schema tags every Operation
      * When Generator runs against Profile
@@ -588,7 +608,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A sub-client is constructible without the root
-     * @source truth/specs/operation-generator.feature-260418.typ:345
+     * @source truth/specs/operation-generator.feature-260418.typ:359
      *
      * Given Generator has emitted a sub-client for a tag
      * When a consumer constructs Client directly
@@ -604,7 +624,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An untagged operation stays on the root and no DefaultApi type is invented
-     * @source truth/specs/operation-generator.feature-260418.typ:354
+     * @source truth/specs/operation-generator.feature-260418.typ:368
      *
      * Given Schema declares Operation carrying no tag
      * When Generator runs against Profile
@@ -622,7 +642,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: An operation carrying several tags appears on every one of its sub-clients
-     * @source truth/specs/operation-generator.feature-260418.typ:364
+     * @source truth/specs/operation-generator.feature-260418.typ:378
      *
      * Given Operation carries two tags and Profile sets no tagChoice for it
      * When Generator runs against Profile
@@ -640,7 +660,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A tag that is not a legal readable identifier is transliterated deterministically
-     * @source truth/specs/operation-generator.feature-260418.typ:374
+     * @source truth/specs/operation-generator.feature-260418.typ:388
      *
      * Given Schema tags Operation Клиенты
      * When Generator runs against Profile
@@ -658,7 +678,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: The profile renames a tag, and a rename matching nothing fails the run
-     * @source truth/specs/operation-generator.feature-260418.typ:384
+     * @source truth/specs/operation-generator.feature-260418.typ:398
      *
      * Given Profile whose tagRenames map carries 'Клиенты' => 'Customers'
      * When Generator runs against Profile
@@ -676,7 +696,7 @@ final class OperationGeneratorTest extends TestCase
 
     /**
      * Scenario: A hand-written decorator implements a sub-client interface and delegates
-     * @source truth/specs/operation-generator.feature-260418.typ:394
+     * @source truth/specs/operation-generator.feature-260418.typ:408
      *
      * Given a consumer's own class implementing emitted Generated File StoreClientInterface and holding the generated implementation
      * When the consumer calls a method on their class, which Client declared

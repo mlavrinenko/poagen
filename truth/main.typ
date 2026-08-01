@@ -109,6 +109,8 @@
 #include "decisions/a-header-not-a-chmod.decision-260731.typ"
 #pagebreak()
 #include "decisions/review-gate-must-be-mechanical.decision-260801.typ"
+#pagebreak()
+#include "decisions/skip-is-the-only-opt-out.decision-260801.typ"
 
 // --- Supplementary artefacts ---
 //

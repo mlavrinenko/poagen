@@ -20,7 +20,14 @@ use function sprintf;
 /**
  * Resolves the `requestBody` of an OpenAPI Operation into a {@see BodySpec}.
  *
- * Preference order:
+ * `application/xml` is handled earlier, by {@see InlinePayloadPlanner} — an
+ * inline object (or array of one) named in `Profile::$xmlElements` — so it
+ * never reaches this class as a success. It does reach {@see
+ * describeUnsupported()} when the planner declined it (missing element name,
+ * or a shape XML cannot serialise), which is why that method names the XML
+ * remedy rather than treating it as an unrecognised content type.
+ *
+ * Preference order for what this class resolves itself:
  *
  *   1. `application/json` with a `$ref`-to-Model or `list<$ref>` schema
  *      — produces a typed body parameter (JSON / JSON_LIST kinds).
@@ -30,9 +37,10 @@ use function sprintf;
  *      T-011). A `$ref`-to-Model form body is intentionally skipped to
  *      avoid flattening a whole Model into dozens of parameters; petstore's
  *      JSON+form pairings are already covered by the JSON branch.
- *   3. `null` otherwise — the caller skips the op entirely; {@see
+ *   3. `null` otherwise — the caller refuses the operation; {@see
  *      describeUnsupported()} explains why, for the operation to be
- *      reported instead of silently dropped (abort-on-unrepresentable-constructs).
+ *      reported instead of silently dropped (abort-on-unrepresentable-constructs,
+ *      default-deny-on-degradation).
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (ADR-004).
@@ -87,12 +95,14 @@ final readonly class RequestBodyAnalyzer
 
         if (isset($body->content['multipart/form-data'])) {
             return 'multipart/form-data request body' . $location
-                . ' — paogen emits JSON ($ref or list<$ref>) and application/x-www-form-urlencoded bodies only';
+                . ' — paogen emits JSON ($ref or list<$ref>), application/x-www-form-urlencoded, and '
+                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) bodies only';
         }
 
         if (isset($body->content['application/octet-stream'])) {
             return 'application/octet-stream request body' . $location
-                . ' — paogen emits JSON ($ref or list<$ref>) and application/x-www-form-urlencoded bodies only';
+                . ' — paogen emits JSON ($ref or list<$ref>), application/x-www-form-urlencoded, and '
+                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) bodies only';
         }
 
         if (isset($body->content['application/json'])) {
@@ -107,11 +117,20 @@ final readonly class RequestBodyAnalyzer
             return self::describeUnsupportedForm($form, $types, $location);
         }
 
+        if (isset($body->content['application/xml'])) {
+            return 'application/xml request body' . $location
+                . ' — paogen serialises an inline object (or an array of inline objects) schema declared '
+                . 'application/xml, naming the document root (and, for a list, the repeated item element) in '
+                . 'Profile::$xmlElements; add the missing entry, or — if the schema is a $ref, a scalar, or an '
+                . 'inline object with no declared properties — it cannot be named there and stays unrepresentable';
+        }
+
         $typeList = $types === [] ? '(none declared)' : implode(', ', $types);
 
         return sprintf(
-            "request body content type(s) '%s'%s — paogen supports application/json (\$ref/list<\$ref>) and "
-                . 'application/x-www-form-urlencoded as the sole content type with an inline object schema only',
+            "request body content type(s) '%s'%s — paogen supports application/json (\$ref/list<\$ref>), "
+                . 'application/x-www-form-urlencoded as the sole content type with an inline object schema, and '
+                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) only',
             $typeList,
             $location,
         );

@@ -215,7 +215,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:7e2fad8bc356d5680e467a805245cb6bcf4cc2543e6d0f4b8a4449e2c50b3343"
+spec-hash = "sha256:a0bd53b7c87f5aeca18da8f336bbdc3a6e3ce36b20b8b56237d9ccef7d13ace2"
 
 [features."Operation Generator".scenarios."A 2xx JSON response body is deserialized into the typed Model"]
 as-is-hash = "sha256:638f61669b2a360cf09da772147c51ab1c3298017ee9f5ad4c55c5a2e1d7eab6"
@@ -275,6 +275,11 @@ stage = "unstable"
 [features."Operation Generator".scenarios."A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()"]
 as-is-hash = "sha256:e45367fd01457cfb62343772df04b9c8b188fe6d686287bde921b04ced98f8a2"
 as-is = "KLUv/QBYpQsAdhlIIzCP0wEDKISkXW1l/ynbUI6QUyVDZvGhmXWFZnhzdwsHrSwwPABBAD4Ay9gMggGGrZVDYU2t0/cWg9o30YrefDLoYY0ZHhzt1jXqs0reAnzPVaO+MlXh9v1z7SCrPcgGfjBsl2+Yvkg4EX0yoVQtFo0+WeyQEHEy3GuHGJzSwGZIQCLc7jwORWs9J4XoC0qZRRddAKxvt5onxvkKRmzGF8WtJsWPOxeMwomp/eP0XXxuFdg8LgTnlQNKWGvwauI5Z01Kc2N77fmI8wrCZkhAJG9uQBK6AYFYBJ5THuwdP5ICs1qsCKq3GjuJm3++oAcdTmJKPPCZrfWVxfRNrfOVOx2CcKKO1uYXquKydKPAoQEmcBLb6oAPK85P2F6tNUoBHQB5GKpJNgQMARgRM5pefblmezTp99345mZGsIMO9PKr3rYPjLsszNYMUwho+JmsDCJgsLFIctwLh2GeFFFyHmF0dDpuANhoXJTpGCZ/8VJR"
+stage = "unstable"
+
+[features."Operation Generator".scenarios."A response declaring an unsupported content type aborts the run"]
+as-is-hash = "sha256:c44df7b4a26015f399bc95d11962af4c193c0fb1d6783cb308f11dddb95a8e39"
+as-is = "KLUv/QBYNQgA1hE0IUCL0wb7GmU7AVrJW8yipE7IJpOQqYPusxwxdQfOKE50QSgALAAsAM/ym7XuSsV81bBe/GIuRt+VSj2Kj9HM4C1Ly5GvmEq/7DAjbxl+gQSIIN3sTfyAzkGh6YolhSMCD2Pe2roysN6cNwvE+IV72IgnxVbxMeOMLcRGYHjGmBWf5ZVr6/iH8Q2CjVBooHOioTLBeJaUYhm+1lssAnzNZuJ0xQr2jBkBDejOE4k7ht6V6ggdA0ZPtO45N0KzpjOJ8VlWgMhJch0YfdWXxfDxahIAhSvQxnWHC2JsxZ3MBKk1cKsBcJLBdZCuQAyqJwBsFwTj08JAQmLHWpndOJS8mmXBDA=="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A scalar 2xx JSON response is returned as the scalar PHP type without hydration"]

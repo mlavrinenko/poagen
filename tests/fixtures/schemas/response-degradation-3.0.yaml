@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: Response Degradation Fixture
+  version: "1.0.0"
+  description: >
+    default-deny-on-degradation: every 2xx response shape the generator
+    cannot represent as a typed return must refuse the run rather than
+    fall back to `void` and silently throw the vendor's body away. Each
+    operation here is independently unrepresentable for a different
+    reason; `okOperation` is fully representable and proves a Profile::$skip
+    entry only affects what it names.
+paths:
+  /plain-text:
+    get:
+      operationId: getPlainText
+      responses:
+        '200':
+          description: ok
+          content:
+            text/plain:
+              schema:
+                type: string
+  /broken-ref:
+    get:
+      operationId: getBrokenRef
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/'
+  /inline-array:
+    get:
+      operationId: listInlineItems
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /ok:
+    get:
+      operationId: okOperation
+      responses:
+        '204':
+          description: ok

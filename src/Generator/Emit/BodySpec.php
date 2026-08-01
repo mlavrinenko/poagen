@@ -9,7 +9,7 @@ use cebe\openapi\spec\Schema;
 /**
  * Resolved request-body shape.
  *
- * Four distinct kinds, each with their own emitter branch:
+ * Six distinct kinds, each with their own emitter branch:
  *
  *   - KIND_JSON         a Model, by `$ref` or synthesised from an inline
  *                       object, sent as JSON
@@ -20,13 +20,23 @@ use cebe\openapi\spec\Schema;
  *   - KIND_FORM         inline `type: object` with declared properties,
  *                       sent as `application/x-www-form-urlencoded`
  *                       (T-011; OAuth2 / Stripe shape)
+ *   - KIND_XML          a Model synthesised from an inline object declared
+ *                       `application/xml`, sent with the root element named
+ *                       in `Profile::$xmlElements`
+ *   - KIND_XML_LIST     `list<Model>` from an inline array of objects
+ *                       declared `application/xml`, sent with the root and
+ *                       repeated-item elements both named in
+ *                       `Profile::$xmlElements`
  *
  * Anything else — `multipart/form-data`, `application/octet-stream`, a content
- * type outside the set, or a form body outside the shape above — never
- * produces a {@see BodySpec} at all: {@see RequestBodyAnalyzer::resolve()}
- * returns null, {@see InlinePayloadPlanner} declines it too, and the caller
- * reports the operation as unrepresentable instead of emitting a method whose
- * body only throws at call time (abort-on-unrepresentable-constructs).
+ * type outside the set, a form body outside the shape above, or an XML body
+ * whose schema is a `$ref`/scalar/property-less object, or whose element name
+ * is missing from `Profile::$xmlElements` — never produces a {@see BodySpec}
+ * at all: {@see RequestBodyAnalyzer::resolve()} returns null, {@see
+ * InlinePayloadPlanner} declines it too, and the caller reports the operation
+ * as unrepresentable instead of emitting a method whose body only throws, or
+ * silently degrades, at call time (abort-on-unrepresentable-constructs,
+ * default-deny-on-degradation).
  */
 final readonly class BodySpec
 {
