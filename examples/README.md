@@ -2,13 +2,17 @@
 
 Each sub-directory here is scaffolded like a standalone consumer
 project — its own `composer.json`, `README.md`, `paogen.php`,
-vendored schema, and (when generation succeeds) committed `generated/`
-output. Everything a user would have after dropping paogen into their
-own repo, minus `vendor/`.
+vendored schema, `Justfile`, `phpstan.neon`, and (when generation
+succeeds) committed `generated/` output. Everything a user would have
+after dropping paogen into their own repo, minus `vendor/`. Each
+example's own `Justfile` runs its own `check` at the consumer-view
+absolute; the root `Justfile` doesn't assemble a shared path list, it
+fans out into every example's `check` (see `lint-phpstan-generated`).
 
 ```
 examples/
 ├── petstore/          ✅ passes — small textbook schema
+├── kilbil/            ✅ passes — the real vendor schema paogen is proven against
 ├── digitalocean/      ⚠️  expected-failure (T-030) — no generated/ tree
 └── github/            ⚠️  expected-failure (T-030) — no generated/ tree
 ```
@@ -28,11 +32,17 @@ pointing at `../..`, so you always get the current working copy — no
 Packagist round-trip. `composer generate` is a one-line alias for
 `paogen generate paogen.php`.
 
-## The three examples
+## The examples
 
 - **`petstore/`** — the canonical Swagger Petstore 3.0 schema. A
   known-good end-to-end generation path: models, enums, an inline
   synthesised class, a small `ApiClient`, a `jsonSerialize` round-trip.
+- **`kilbil/`** — the real vendor schema (kilbil's loyalty API,
+  committed exactly as published), not one more sample schema.
+  paogen's claim to work is measured against this document rather
+  than against Petstore: it is what surfaced the transport collapse,
+  the sub-client split, and the XML request-body work. See
+  `kilbil/README.md` for the day-to-day list of what makes it hard.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
   (2.7 MB, 722 components). `.expected-failure`: a ref-only `oneOf`
   without `discriminator` trips ADR-010's generator-time error
