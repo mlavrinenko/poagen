@@ -216,33 +216,39 @@ description = "Recently closed — read for decisions worth revisiting"
 when = 'into("wip")'
 actions = [{ list = "@wip", title = "Already in flight — finish these first:" }]
 
-# On the way into `done`, an external check. The shipped one is the floor, not
-# the ceiling: it refuses a task whose body still carries this preset's TODO
-# placeholders, because a task nobody ever specified is a task nobody can have
-# finished. Replace the command with the one that actually proves your work —
-# `just check`, `cargo test`, your CI script. It receives $MINDTAPE_TASK_FILE,
-# $MINDTAPE_TASK_STEM and $MINDTAPE_TASK_STATUS, so a script can inspect the
-# artifact being closed.
+# On the way into `done`, two external checks — both gates, both stop the
+# flip on a non-zero exit.
+#
+# The first is the preset's original floor: it refuses a task whose body
+# still carries this preset's TODO placeholders, because a task nobody ever
+# specified is a task nobody can have finished. On its own that only catches
+# an unwritten task, not one whose work fails the project's own gate.
+#
+# The second is that missing check: it refuses the flip unless `just check`
+# has already passed against this worktree. `mmz` (a memoized command
+# runner, github:mlavrinenko/mmz — the option this comment used to point at)
+# is not available in this environment: not in devbox.json, not resolvable
+# on PATH. `scripts/gate-fresh` is the equivalent, built to the same rule —
+# it only ever ASSERTS a prior pass; it never runs `just check` itself, so a
+# flip stays fast. Its companion, `scripts/gated-check`, is what actually
+# runs `just check` and records the pass `is-fresh` looks for; run it (not a
+# bare `just check`) before flipping a task to `done`. See CONTRIBUTING.md.
+#
+# The inputs `gate-fresh` hashes are declared in scripts/gate-fresh.inputs
+# and deliberately exclude `truth/tasks`: `mt flip` writes the artifact it is
+# gating, so a rule keyed on the whole tree would go stale the instant a
+# status is stamped and could never pass again. Whatever replaces
+# `gate-fresh` here must keep that exclusion.
+#
+# It receives $MINDTAPE_TASK_FILE, $MINDTAPE_TASK_STEM and
+# $MINDTAPE_TASK_STATUS, so a script can inspect the artifact being closed —
+# the TODO check uses $MINDTAPE_TASK_FILE below.
 #
 # `mt done --force` overrides a failing gate and records the override in the
 # status note — an escape hatch that leaves a trace.
-#
-# MAKE THE GATE CHEAP. Pointing `run` straight at `just check` works, but a full
-# build inside `mt flip` is slow, fires at the least convenient moment, and
-# teaches an agent to reach for `--force` — which defeats the gate. Prefer
-# ASSERTING the check already passed against this worktree over running it:
-#
-#   run = "mmz --is-fresh -- just check"
-#
-# `mmz` (a memoized command runner, github:mlavrinenko/mmz) exits 0 only when
-# `just check` last passed with its declared inputs unchanged, and never runs
-# the wrapped command itself. It is one option, not a requirement — `run` is a
-# plain command, so any equivalent freshness check does. Whatever you use, scope
-# its inputs to exclude the task files themselves: `mt flip` writes the artifact
-# it is gating, so a rule keyed on the whole tree goes stale the instant a status
-# is stamped and the gate can never pass.
 [[on.flip]]
 when = 'into("done")'
 actions = [
   { run = '! grep -q "TODO:" "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
+  { run = 'scripts/gate-fresh is-fresh', gate = true, message = "the project gate has not passed against this worktree since your last change — run `scripts/gated-check` (wraps `just check`) and flip again" },
 ]

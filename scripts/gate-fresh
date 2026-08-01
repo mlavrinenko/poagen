@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# gate-fresh — assert, or record, that the project gate (`just check`) has
+# passed against the current worktree, without re-running it.
+#
+# Why this exists: the `[[on.flip]]` predicate in .mindtape/config.toml that
+# guards the way into `done` must refuse a task whose work has not passed
+# the gate, but a full `just check` inside `mt flip` is slow, fires at the
+# worst moment, and teaches whoever hits it to reach for `--force` — which
+# removes the gate entirely. So the predicate asserts freshness instead of
+# running anything, the same shape `mmz --is-fresh -- just check` would give
+# it (github:mlavrinenko/mmz). mmz is not installed in this environment (not
+# in devbox.json, not on PATH); this script is the equivalent asserted
+# without adding that dependency. See CONTRIBUTING.md.
+#
+# State: build/cache/gate-fresh.state (gitignored — build/ already is; this
+# is a claim about THIS worktree's files, never shared or committed). It
+# records the hash of every path in gate-fresh.inputs at the moment
+# `scripts/gated-check` last saw `just check` exit 0.
+#
+# `truth/tasks` is excluded from that input set on purpose and must stay
+# excluded — see the comment at the top of gate-fresh.inputs. Getting this
+# wrong makes the gate pass once and never again, because `mt flip` rewrites
+# the very file it is gating.
+set -eo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+manifest="$root/scripts/gate-fresh.inputs"
+state="$root/build/cache/gate-fresh.state"
+
+# Print the current hash of every input in gate-fresh.inputs. Reads the
+# manifest, resolves each include to files on disk (directories walked
+# recursively), drops anything under an exclude, then hashes the sorted
+# "path  sha256" listing — so the result changes if a file's content
+# changes, moves, is added, or is removed, and is otherwise stable across
+# runs and machines.
+hash_inputs() {
+    local -a includes=()
+    local -a excludes=()
+    local line trimmed
+
+    while IFS= read -r line; do
+        trimmed="${line%%#*}"
+        trimmed="${trimmed#"${trimmed%%[![:space:]]*}"}"
+        trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+        [[ -z "$trimmed" ]] && continue
+        if [[ "$trimmed" == !* ]]; then
+            excludes+=("${trimmed#!}")
+        else
+            includes+=("$trimmed")
+        fi
+    done <"$manifest"
+
+    local -a files=()
+    local inc p f
+    for inc in "${includes[@]}"; do
+        p="$root/$inc"
+        if [[ -d "$p" ]]; then
+            while IFS= read -r -d '' f; do
+                files+=("${f#"$root"/}")
+            done < <(find "$p" -type f -print0)
+        elif [[ -f "$p" ]]; then
+            files+=("$inc")
+        fi
+    done
+
+    local -a kept=()
+    local rel ex skip
+    for rel in "${files[@]}"; do
+        skip=0
+        for ex in "${excludes[@]}"; do
+            if [[ "$rel" == "$ex" || "$rel" == "$ex"/* ]]; then
+                skip=1
+                break
+            fi
+        done
+        [[ "$skip" -eq 0 ]] && kept+=("$rel")
+    done
+
+    printf '%s\n' "${kept[@]}" | LC_ALL=C sort -u |
+        (cd "$root" && xargs -d '\n' -- sha256sum) |
+        sha256sum | awk '{print $1}'
+}
+
+recorded_hash() {
+    [[ -f "$state" ]] || return 1
+    sed -n 's/.*"hash":"\([a-f0-9]*\)".*/\1/p' "$state"
+}
+
+usage() {
+    echo "usage: gate-fresh {record|is-fresh|invalidate|hash}" >&2
+    exit 2
+}
+
+cmd="${1:-}"
+case "$cmd" in
+record)
+    mkdir -p "$(dirname "$state")"
+    h="$(hash_inputs)"
+    printf '{"hash":"%s","recorded_at":"%s"}\n' "$h" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >"$state"
+    echo "gate-fresh: recorded $h"
+    ;;
+invalidate)
+    rm -f "$state"
+    echo "gate-fresh: invalidated"
+    ;;
+is-fresh)
+    recorded="$(recorded_hash)" || {
+        echo "gate-fresh: no recorded pass for this worktree — run \`scripts/gated-check\` (wraps \`just check\`) first" >&2
+        exit 1
+    }
+    current="$(hash_inputs)"
+    if [[ "$recorded" == "$current" ]]; then
+        echo "gate-fresh: fresh ($current)"
+        exit 0
+    fi
+    echo "gate-fresh: stale — recorded $recorded, current $current." >&2
+    echo "gate-fresh: run \`scripts/gated-check\` again before flipping to done." >&2
+    exit 1
+    ;;
+hash)
+    hash_inputs
+    ;;
+*)
+    usage
+    ;;
+esac

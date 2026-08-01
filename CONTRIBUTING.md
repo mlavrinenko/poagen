@@ -48,6 +48,50 @@ just test       # run PHPUnit
 | Tests             | [PHPUnit](https://phpunit.de)                           |
 | Code generation   | [nette/php-generator](https://github.com/nette/php-generator) |
 
+### Closing a task
+
+`truth/tasks/` is tracked with [MindTape](https://github.com/mlavrinenko/mindtape)
+(`mt`). Flipping a task to `done` (`mt done <task>`, or `mt flip done <task>`)
+runs an `[[on.flip]]` gate declared in `.mindtape/config.toml`: it refuses the
+flip unless `just check` has already passed against the current worktree.
+
+The gate does not run `just check` itself — that would make every close as
+slow as the full lint+test+spec suite, and slow gates get bypassed with
+`--force`. Instead it *asserts* a prior pass, via `scripts/gate-fresh
+is-fresh`, which hashes the files `just check` reads (declared in
+`scripts/gate-fresh.inputs`) and compares against the hash recorded the last
+time the gate actually ran and passed.
+
+So before flipping a task to `done`, run:
+
+```bash
+scripts/gated-check   # runs `just check`; on success, records the pass
+mt done <task>
+```
+
+A bare `just check` still lints and tests your work correctly; it just does
+not leave the record `mt flip`'s gate looks for, so the flip would be
+refused immediately afterward with a message telling you to run
+`scripts/gated-check`.
+
+This stands in for `mmz --is-fresh -- just check` (a memoized command
+runner, github:mlavrinenko/mmz) — the shape `.mindtape/config.toml`'s own
+comments recommend. `mmz` is not part of this repo's toolchain (not in
+`devbox.json`, not resolvable on `PATH`), so `scripts/gate-fresh` implements
+the same assertion directly rather than adding a dependency the project does
+not otherwise have. If `mmz` (or an equivalent) is ever added to
+`devbox.json`, it can replace `scripts/gate-fresh` in the `[[on.flip]]`
+`run` command with no other change needed.
+
+`scripts/gate-fresh.inputs` deliberately excludes `truth/tasks`: `mt flip`
+rewrites the status field (and note) of the task file it is closing, and
+`just check` does not read `truth/tasks` for anything the gate cares about,
+so including it would invalidate the freshness record on every flip and the
+gate could never pass a second time.
+
+`mt done --force <task>` bypasses a failing gate and records the override in
+the task's status note, so the bypass leaves a trace instead of vanishing.
+
 ### Commit Messages
 
 This project follows the [Conventional Commits][cc] specification. Keep commit
