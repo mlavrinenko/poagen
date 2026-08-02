@@ -10,32 +10,38 @@ use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
-use function is_array;
-
 /**
- * Resolution strategy for an inline `type: object` schema (T-013).
+ * Resolution strategy for an inline object schema (T-013).
  *
- * Three cases, in order:
+ * Two cases, and which one applies is decided by
+ * {@see self::isSynthesisable()}:
  *
  * 1. Declared `properties` → caller must synthesise a named class; this
  *    helper never returns an FQCN, it only classifies. {@see ModelEmitter}
  *    handles the synthesis because it owns the owning-class/property
- *    context used to build the synthesised name.
- * 2. Only `additionalProperties: <scalar>` and no declared properties →
- *    typed map `array<string, <scalar>>`.
- * 3. Anything else (both, opaque, or empty) → untyped map
- *    `array<string, mixed>` with a `@todo` near the property when
- *    both declared properties and non-trivial additionalProperties
- *    coexist.
+ *    context used to build the synthesised name. A value schema under
+ *    `additionalProperties` does not change that answer — the class carries
+ *    the declared properties *and* the extra keys, which
+ *    {@see AdditionalPropertyEmitter} adds as a typed map.
+ * 2. No declared properties → a string-keyed map, typed by
+ *    `additionalProperties` where the document supplied a schema for it
+ *    (`array<string, Pet>`) and `array<string, mixed>` where it did not.
+ *    A map is a collection, so a PHP array is what it is —
+ *    `declared-shapes-become-types` keeps those as arrays on purpose.
+ *
+ * The third case this file used to carry — declared properties *and* a
+ * non-trivial `additionalProperties`, answered with `array<string, mixed>`
+ * and a `@todo` — discarded every declared property. It is gone; case (1)
+ * covers it.
  *
  * @internal
  */
 final class InlineObjectResolver
 {
     /**
-     * Classify the inline-object case without synthesising a class.
-     * {@see ModelEmitter} calls {@see self::classify} before dispatching
-     * to this fallback so that case (1) never reaches here.
+     * Type an inline object with no declared properties as a string-keyed map.
+     * {@see ModelEmitter} calls {@see self::isSynthesisable} before dispatching
+     * to this fallback, so a schema with declared properties never reaches here.
      */
     public static function resolve(
         Schema $node,
@@ -45,40 +51,28 @@ final class InlineObjectResolver
         ?EnumCatalog $enums,
     ): TypeResolver {
         $nullable = (bool) $node->nullable;
-        $phpDoc = self::additionalPropertiesDoc($node, $bindings, $modelNamespace, $registry, $enums);
+        $phpDoc = self::valueMapDoc($node, $bindings, $modelNamespace, $registry, $enums);
 
         return new TypeResolver('array', $phpDoc, null, $nullable);
     }
 
     /**
-     * Classify an inline-object schema into one of three cases.
-     *
-     * Returns `'synthesise'` when the schema has declared properties and
-     * should be promoted to a named class; `'map-todo'` when it has both
-     * declared properties and non-trivial `additionalProperties` (fall
-     * back to `array<string, mixed>` with a `@todo`); otherwise
-     * `'typed-map'` (case 2 or 3).
-     *
-     * @return 'synthesise'|'map-todo'|'typed-map'
+     * True when the schema declares properties and should be promoted to a
+     * named class rather than flattened into a map.
      */
-    public static function classify(Schema $node): string
+    public static function isSynthesisable(Schema $node): bool
     {
-        $hasProperties = is_array($node->properties) && $node->properties !== [];
-        $additional = $node->additionalProperties;
-        $hasNonTrivialAdditional = $additional instanceof Schema || $additional instanceof Reference;
-
-        if ($hasProperties && $hasNonTrivialAdditional) {
-            return 'map-todo';
-        }
-
-        if ($hasProperties) {
-            return 'synthesise';
-        }
-
-        return 'typed-map';
+        return ObjectShape::hasProperties($node);
     }
 
-    private static function additionalPropertiesDoc(
+    /**
+     * `array<string, T>` for the schema's extra keys, where `T` is whatever
+     * `additionalProperties` declared — a `$ref` to a component, a nested
+     * object, a list, a scalar — resolved by the same {@see TypeResolver}
+     * every other position uses. `array<string, mixed>` when the document
+     * gave no schema for the values, which is the one honest `mixed`.
+     */
+    public static function valueMapDoc(
         Schema $node,
         Bindings $bindings,
         string $modelNamespace,

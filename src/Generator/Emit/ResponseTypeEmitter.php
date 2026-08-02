@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Http\ResponseDecoder;
 use Nette\PhpGenerator\PhpNamespace;
 
 use function sprintf;
@@ -12,10 +13,14 @@ use function sprintf;
 /**
  * Names the shape an operation was promised back.
  *
- * The five {@see ReturnSpec} kinds map one-to-one onto {@see ResponseType},
- * which is the whole of what used to be the emitted status branch, decode
- * and hydrate sequence. The emitted method still declares its own return
- * type; this is what makes the transport give back a value that matches it.
+ * The {@see ReturnSpec} kinds map one-to-one onto {@see ResponseType}, which
+ * is the whole of what used to be the emitted status branch, decode and
+ * hydrate sequence. The emitted method still declares its own return type;
+ * this is what makes the transport give back a value that matches it.
+ *
+ * A map's value is a spec of its own, so this recurses — `ResponseType` nests
+ * the same way and {@see ResponseDecoder}
+ * already reads it that way.
  *
  * @internal
  */
@@ -24,20 +29,50 @@ final readonly class ResponseTypeEmitter
     public function expr(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace): string
     {
         $namespace->addUse(ResponseType::class);
-        $type = $namespace->simplifyName(ResponseType::class);
 
+        return $this->value($namespace, $return, $modelNamespace, $namespace->simplifyName(ResponseType::class));
+    }
+
+    /**
+     * The PHPDoc type an emitted `@return` (or a nested map value) spells.
+     * FQCNs are left long here; {@see DocTypeSimplifier} shortens the finished
+     * string and registers the `use` statements it needs.
+     */
+    public function docType(ReturnSpec $return, string $modelNamespace): string
+    {
+        return match ($return->kind) {
+            ReturnSpec::KIND_MODEL => $this->fqcn($return, $modelNamespace),
+            ReturnSpec::KIND_LIST => 'list<' . $this->fqcn($return, $modelNamespace) . '>',
+            ReturnSpec::KIND_SCALAR => $return->scalarPhpType ?? 'string',
+            ReturnSpec::KIND_MAP => 'array<string, ' . $this->docType($return->mapValue ?? ReturnSpec::mixed(), $modelNamespace) . '>',
+            default => 'mixed',
+        };
+    }
+
+    private function value(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace, string $type): string
+    {
         return match ($return->kind) {
             ReturnSpec::KIND_MODEL => sprintf('%s::object(%s::class)', $type, $this->model($namespace, $return, $modelNamespace)),
             ReturnSpec::KIND_LIST => sprintf('%s::listOf(%s::class)', $type, $this->model($namespace, $return, $modelNamespace)),
             ReturnSpec::KIND_SCALAR => sprintf('%s::%s()', $type, $return->scalarPhpType ?? 'string'),
-            ReturnSpec::KIND_MAP => sprintf('%s::mapOf(%s::%s())', $type, $type, $return->mapValuePhpType ?? 'mixed'),
+            ReturnSpec::KIND_MAP => sprintf(
+                '%s::mapOf(%s)',
+                $type,
+                $this->value($namespace, $return->mapValue ?? ReturnSpec::mixed(), $modelNamespace, $type),
+            ),
+            ReturnSpec::KIND_MIXED => sprintf('%s::mixed()', $type),
             default => sprintf('%s::nothing()', $type),
         };
     }
 
+    private function fqcn(ReturnSpec $return, string $modelNamespace): string
+    {
+        return '\\' . trim($modelNamespace, '\\') . '\\' . $return->model;
+    }
+
     private function model(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace): string
     {
-        $fqcn = '\\' . trim($modelNamespace, '\\') . '\\' . $return->model;
+        $fqcn = $this->fqcn($return, $modelNamespace);
         $namespace->addUse(ltrim($fqcn, '\\'));
 
         return $namespace->simplifyName($fqcn);

@@ -44,6 +44,7 @@ final readonly class ModelEmitter
     public function __construct(
         private ModelAttributeApplier $attributes = new ModelAttributeApplier(),
         private PropertySynthesiser $properties = new PropertySynthesiser(),
+        private AdditionalPropertyEmitter $additional = new AdditionalPropertyEmitter(),
     ) {
         $this->printer = new PsrPrinter();
     }
@@ -111,11 +112,14 @@ final readonly class ModelEmitter
 
         /** @var list<SynthesisedModel> $children */
         $children = [];
+        /** @var list<string> $phpNames */
+        $phpNames = [];
 
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
             $isRequired = in_array($propName, $required, true);
             $phpName = $propertyRenames[$rawComponentName . '.' . $propName] ?? self::defaultPropertyName($propName);
+            $phpNames[] = $phpName;
 
             $resolved = $this->properties->resolve(
                 $className,
@@ -146,9 +150,12 @@ final readonly class ModelEmitter
                 $bindings,
                 $modelNamespace,
                 $registry,
-                $this->properties->todoFor($propSchema),
             );
         }
+
+        // Whatever the schema allowed beyond the declared properties, typed
+        // and carried rather than dropped (declared-shapes-become-types).
+        $this->additional->apply($namespace, $constructor, $schema, $phpNames, $bindings, $modelNamespace, $registry, $enums);
 
         return new ModelEmission($this->printer->printFile($file), $children);
     }
@@ -165,7 +172,6 @@ final readonly class ModelEmitter
         Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
-        ?string $todo = null,
     ): void {
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
@@ -192,9 +198,6 @@ final readonly class ModelEmitter
         if ($resolved->phpDoc !== null) {
             $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc);
             $constructor->addComment(sprintf('@param %s%s $%s', $isNullable ? '?' : '', $docType, $phpName));
-        }
-        if ($todo !== null) {
-            $constructor->addComment($todo);
         }
 
         // Hint use-statements for FQNs so the printed file uses short forms.

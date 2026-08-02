@@ -5,16 +5,10 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Operation;
-use cebe\openapi\spec\PathItem;
-use cebe\openapi\spec\Reference;
-use cebe\openapi\spec\RequestBody;
-use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
 
-use function is_array;
 use function is_string;
 use function sprintf;
 
@@ -54,7 +48,7 @@ final readonly class FormatAdvisor
         /** @var array<string,string> $firstSeen */
         $firstSeen = [];
 
-        foreach (self::schemasOf($openApi) as $schema) {
+        foreach (SchemaWalk::roots($openApi) as $schema) {
             self::walk($schema, $bindings, $counts, $firstSeen);
         }
 
@@ -98,24 +92,8 @@ final readonly class FormatAdvisor
             $firstSeen[$format] ??= SynthesisedModel::originOf($schema);
         }
 
-        foreach (is_array($schema->properties) ? $schema->properties : [] as $property) {
-            if ($property instanceof Schema) {
-                self::walk($property, $bindings, $counts, $firstSeen);
-            }
-        }
-
-        foreach ([$schema->items, $schema->additionalProperties] as $child) {
-            if ($child instanceof Schema) {
-                self::walk($child, $bindings, $counts, $firstSeen);
-            }
-        }
-
-        foreach ([$schema->allOf, $schema->oneOf, $schema->anyOf] as $branches) {
-            foreach (is_array($branches) ? $branches : [] as $branch) {
-                if ($branch instanceof Schema) {
-                    self::walk($branch, $bindings, $counts, $firstSeen);
-                }
-            }
+        foreach (SchemaWalk::children($schema) as $child) {
+            self::walk($child, $bindings, $counts, $firstSeen);
         }
     }
 
@@ -133,75 +111,4 @@ final readonly class FormatAdvisor
             || $bindings->formatType($format) !== null;
     }
 
-    /**
-     * Every schema root in the document: named components, and each operation's
-     * body, responses and parameters.
-     *
-     * @return list<Schema>
-     */
-    private static function schemasOf(OpenApi $openApi): array
-    {
-        $out = [];
-        $components = $openApi->components;
-
-        /** @var array<string,Schema|Reference> $schemas */
-        $schemas = $components === null ? [] : ($components->schemas ?? []);
-
-        foreach ($schemas as $schema) {
-            if ($schema instanceof Schema) {
-                $out[] = $schema;
-            }
-        }
-
-        $paths = $openApi->paths;
-
-        foreach ($paths ?? [] as $pathItem) {
-            if (!$pathItem instanceof PathItem) {
-                continue;
-            }
-
-            foreach ($pathItem->getOperations() as $operation) {
-                $out = [...$out, ...self::operationSchemas($operation)];
-            }
-        }
-
-        return $out;
-    }
-
-    /**
-     * @return list<Schema>
-     */
-    private static function operationSchemas(Operation $operation): array
-    {
-        $out = [];
-        $body = RequestBodyAnalyzer::resolveBody($operation->requestBody);
-
-        foreach ($body instanceof RequestBody ? $body->content : [] as $media) {
-            if ($media->schema instanceof Schema) {
-                $out[] = $media->schema;
-            }
-        }
-
-        $responses = $operation->responses;
-
-        foreach ($responses === null ? [] : $responses->getResponses() as $response) {
-            if (!$response instanceof Response) {
-                continue;
-            }
-
-            foreach ($response->content as $media) {
-                if ($media->schema instanceof Schema) {
-                    $out[] = $media->schema;
-                }
-            }
-        }
-
-        foreach ($operation->parameters ?? [] as $parameter) {
-            if (!$parameter instanceof Reference && $parameter->schema instanceof Schema) {
-                $out[] = $parameter->schema;
-            }
-        }
-
-        return $out;
-    }
 }

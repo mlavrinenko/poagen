@@ -14,8 +14,9 @@ use cebe\openapi\spec\Schema;
  * {@see \Mlavrinenko\Paogen\Generator\ModelPlanner} drains them all the same
  * way, re-running the emitter against each entry so it may queue grandchildren:
  *
- *   - {@see ModelEmitter} for a property whose schema is an inline
- *     `type: object` with declared properties, or an array of such (T-013);
+ *   - {@see ModelEmitter} for a property whose schema is an inline object with
+ *     declared properties — with or without the `type` keyword beside them,
+ *     see {@see ObjectShape} — or an array of such (T-013);
  *   - {@see ModelPlanner} for an inline `oneOf` / `anyOf` branch (T-026);
  *   - {@see InlinePayloadPlanner} for an operation's inline request or
  *     response payload (inline-body-and-response-schemas).
