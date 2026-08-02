@@ -60,10 +60,9 @@ explicit post-v0.1 follow-ups (see
 
 #### Runtime (de)serialisation
 
-- New `Marshaller` / `Hydrator` pair under `src/Runtime/Marshal/`
+- New `Marshaller` / `Hydrator` pair under `runtime/src/Marshal/`
   drives every (de)serialisation via phpdoc types plus a small set of
-  runtime attributes (`#[WireName]`, `#[Discriminator]`,
-  `#[AdditionalProperties]`, `#[Deprecated]`, `#[Format]`, `#[Schema]`).
+  runtime attributes (`#[WireName]`, `#[Discriminator]`, `#[Format]`).
   Generated `Model\*` classes are now plain `readonly` classes with
   promoted constructors and authoritative phpdoc — no `PROPERTY_MAP`
   const, no `JsonSerializable`, no hand-rolled hydration. `ApiClient`

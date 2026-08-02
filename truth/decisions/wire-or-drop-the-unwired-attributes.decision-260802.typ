@@ -61,12 +61,13 @@ means inventing both ends: a generator-side reader that has never existed,
 and a runtime-side consumer that has never existed either. The natural
 place to carry a per-property fact from `DescriptorParser` through to
 `Hydrator` / `Marshaller` is the `PropertyDescriptor` value object — the
-same carrier `Discriminator` already rides. That class sits outside
-`wire-or-drop-the-unwired-attributes`'s boundary, and a diagnostic built
-by reflecting the class a second time, independently of
-`PropertyDescriptor`, would only be duplicating `DescriptorParser`'s own
-reflection pass to reach the same fact by a parallel route — the exact
-"inventing a consumer" this decision declines.
+same carrier `Discriminator` already rides. A diagnostic that instead
+reflected the class a second time, independently of `PropertyDescriptor`,
+would only duplicate `DescriptorParser`'s own reflection pass to reach the
+same fact by a parallel route — the exact "inventing a consumer" this
+decision declines. Marking a property deprecated is a real thing a
+consumer might want; it is a feature with a producer, a carrier and a
+reader to design, not a constructor property left switched off.
 
 === Class-level `AdditionalProperties` — a generator-side fact with no runtime home
 
@@ -84,10 +85,10 @@ an `@todo` PHPDoc comment (`PropertySynthesiser.php`) rather than a typed
 slot. Making the attribute mean something at runtime — collecting
 undeclared wire keys somewhere a caller can reach them — needs a place on
 the generated class to hold them, and deciding that is
-`PropertySynthesiser`'s job: which properties #a(Model) gets. That file
-is out of this task's boundary on purpose, and for good reason — an
+`PropertySynthesiser`'s job: which properties #a(Model) gets. An
 open/extensible-object hydration feature is a design decision on its own,
-not a side effect of closing out three dead constructor properties.
+with its own consequences for #the(Model) surface — not a side effect of
+closing out three dead constructor properties.
 
 === Class-level `Schema` — trivially emittable, never consumed
 
@@ -126,11 +127,11 @@ either path, wiring `Schema` means building one from nothing, same as
 === Alternatives rejected
 
 - *Build the open/extensible-object feature `AdditionalProperties` implies,
-  as part of this change.* Rejected: needs a storage decision inside
-  `PropertySynthesiser`, which this task's boundary excludes on purpose,
-  and conflates a genuine feature (typed access to undeclared wire data)
-  with a dead-code cleanup. If a consumer needs this, it is its own task
-  with its own acceptance criteria.
+  as part of this change.* Rejected: it needs a storage decision inside
+  `PropertySynthesiser` about which properties a Model gets, and conflates
+  a genuine feature (typed access to undeclared wire data) with a dead-code
+  cleanup. If a consumer needs this, it is its own task with its own
+  acceptance criteria.
 - *Add a diagnostic for `Deprecated` by having `Hydrator` reflect the class
   a second time, independent of `DescriptorParser`.* Rejected: reaches the
   same fact through a second, parallel reflection pass instead of reusing
