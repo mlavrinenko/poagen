@@ -40,22 +40,45 @@ enabled = false
 #   manifest for rpc audit-traces against .../speconaut-rust: read manifest
 #   tests/generated/manifest.json: No such file or directory
 #
-# Naming the real adapter fixes *that* failure — the same command now
-# resolves `speconaut-php-phpunit` instead of `speconaut-rust` — but does
-# not, by itself, make `lock`/`status` succeed: `tests/generated/` has no
-# `manifest.json` (verified: `ls tests/generated/` today shows only the
-# committed `*Test.php`/`*Steps.php` files, no manifest), because these
-# recipes have never actually run `generate-tests` for real. The adapter's
-# `audit-traces` RPC has no fallback for a missing manifest by design (it
-# fails loud rather than reporting empty traces), so `lock`/`status` still
-# hard-error post this fix, just against the right binary. Producing that
-# manifest means running `generate-tests` for real, which appends the
-# ~200 outstanding `Implement:` step stubs `implement-the-outrun-step-
-# bodies` owns — out of this config change's scope. This line is still
-# correct and necessary; it is one of two preconditions, not the fix on
-# its own.
+# Naming the real adapter fixes that failure. The two paragraphs this
+# comment used to carry after it — that `tests/generated/` had no
+# `manifest.json` because these recipes had never really run, and that the
+# adapter's missing-manifest error was the open precondition — are stale as
+# of `restore-coverage-derived-traceability` (2026-08-02): `generate-tests`
+# has run for real, `tests/generated/manifest.json` is committed (verified:
+# `ls tests/generated/` shows it alongside the `*Test.php`/`*Steps.php`
+# files), and `speconaut audit-traces --adapter php-phpunit` gets past
+# manifest resolution to `96 scenario(s) checked`.
+#
+# What blocks it now is upstream, in the adapter itself, not in this repo:
+# `AuditTracesHandler` hardcodes the PHPUnit `--filter` namespace to
+# `Speconaut\Generated` and the RPC envelope carries no `namespace` field to
+# override it with — unlike `generate-tests`, which reads `namespace` above
+# and got exactly this fix in `carry-the-consumer-namespace-through-the-rpc-
+# envelope` (2026-07-31). Every one of the 96 scenarios therefore fails
+# identically with "phpunit exited with code 1" (verified by reproducing the
+# collector's own PHPUnit invocation by hand: `--filter
+# '/^Speconaut\\Generated\\...'` against a class actually declaring
+# `Mlavrinenko\Paogen\Tests\Generated` reports "No tests executed!" and exits
+# 1; the same invocation with the real namespace passes). Filed upstream as
+# `audit-traces-ignores-the-configured-namespace` in speconaut's own
+# `truth/tasks/` — this repo cannot work around it, since the namespace used
+# to build the filter never reaches the RPC params at all.
 [audit-traces]
 adapter = "php-phpunit"
+
+# `[audit-traces]` reads its own `source-roots` key — independent of
+# `[check].source-roots` below despite the identical name — and defaults to
+# `["src"]` alone when unset (`speconaut`'s `AuditTracesConfig::default()`).
+# Left unset, every `runtime/src/*.php` and `bin/*.php` file the coverage
+# collector reports gets silently dropped by the host's source-root filter
+# before it ever reaches the trace map or plumbing classification: measured
+# by running the collector against a locally-patched adapter with the
+# namespace bug above worked around — 96 scenarios produced zero
+# `runtime/src` files anywhere in the report even though a single scenario's
+# raw Clover output plainly covers `runtime/src/Attribute/Discriminator.php`
+# and others. Matching `[check].source-roots` here restores them.
+source-roots = ["src", "runtime/src", "bin"]
 
 [check]
 
