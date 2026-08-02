@@ -1,0 +1,163 @@
+openapi: 3.0.3
+info:
+  title: Parameter Shape Gate Fixture
+  version: "1.0.0"
+  description: >
+    path-parameters-run-through-no-shape-gate-at-all fixture. The path
+    position was the one of the three with no shape gate: `query` and
+    `header` refused a schema outside their supported subset, `path`
+    accepted anything the document declared and let TypeResolver decide,
+    so an inline object reached the emitter and a schema declaring no type
+    at all reached TypeResolver's `mixed` default — surfacing two layers
+    downstream as a PHPStan error against Endpoint::path(), inside
+    generated code a consumer reads as their own bug.
+
+    One operation per case, so a single run proves each independently and
+    Profile::$skip can accept one without disturbing the rest:
+
+      - getWidget       inline-object path parameter, the shape the task
+                        names. Refused.
+      - getWidgetTags   path parameter whose schema declares nothing at
+                        all — the literal `mixed` default. Refused.
+      - mergeWidget     path parameter spelled `allOf`, which nothing
+                        flattens in a parameter position. Refused.
+      - searchWidgets   inline-object query parameter. Refused before this
+                        task and after it, and its message is pinned so a
+                        shared predicate cannot make it vaguer.
+      - describeWidget  required header parameter, scalar schema. Refused
+                        on requiredness, not on shape — pinned for the
+                        same reason.
+      - trackWidget     `in: cookie`, a position paogen emits nothing for.
+                        Refused, and says which position it is.
+      - listWidgets     scalar path parameter, scalar query parameter,
+                        optional scalar header parameter. Emitted, so the
+                        gate is proven not to be blanket.
+      - getKey          path parameter spelled `anyOf` over two `$ref`s to
+                        scalar components — DigitalOcean's
+                        `ssh_key_identifier`, an id-or-fingerprint.
+                        Representable, and emitted.
+paths:
+  /widgets/{selector}:
+    get:
+      operationId: getWidget
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+              value:
+                type: string
+      responses:
+        '204':
+          description: ok
+  /widgets/{widget_id}/tags:
+    get:
+      operationId: getWidgetTags
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          schema: {}
+      responses:
+        '204':
+          description: ok
+  /widgets/{merged_id}/merge:
+    get:
+      operationId: mergeWidget
+      parameters:
+        - name: merged_id
+          in: path
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/WidgetId'
+      responses:
+        '204':
+          description: ok
+  /widgets/search:
+    get:
+      operationId: searchWidgets
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+      responses:
+        '204':
+          description: ok
+  /widgets/describe:
+    get:
+      operationId: describeWidget
+      parameters:
+        - name: X-Trace-Id
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+  /widgets/track:
+    get:
+      operationId: trackWidget
+      parameters:
+        - name: session
+          in: cookie
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+  /catalogues/{catalogue}/widgets:
+    get:
+      operationId: listWidgets
+      parameters:
+        - name: catalogue
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: X-Request-Id
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+  /keys/{key_identifier}:
+    get:
+      operationId: getKey
+      parameters:
+        - name: key_identifier
+          in: path
+          required: true
+          description: Either the id or the fingerprint of an existing key.
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/WidgetId'
+              - $ref: '#/components/schemas/WidgetSlug'
+      responses:
+        '204':
+          description: ok
+components:
+  schemas:
+    WidgetId:
+      type: integer
+      minimum: 1
+    WidgetSlug:
+      type: string
