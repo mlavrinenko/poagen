@@ -30,7 +30,8 @@ use function str_starts_with;
  * `content` is empty.
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
- * linecop limit (ADR-004), mirroring {@see RequestBodyAnalyzer}.
+ * linecop limit (`quality-gates-at-maximum-strictness`), mirroring
+ * {@see RequestBodyAnalyzer}.
  *
  * @internal
  */

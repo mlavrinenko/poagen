@@ -16,7 +16,7 @@ The \`adr()\` DSL function no longer exists in speconaut's library; it was repla
 
 - All ten files use \`decision.with(...)\` and carry the \`.decision-\<yymmdd>.typ\` sub-extension, dated from the decision's own date.
 - Status is the dated call form.
-- ADR-007's superseded representation section uses the \`supersedes:\` / superseded relationship the DSL provides rather than prose alone.
+- \`hydration-and-serialization-contract\`'s superseded representation section uses the \`supersedes:\` / superseded relationship the DSL provides rather than prose alone.
 - Every accepted decision cites at least one goal, and either a standard or a process-only reason, satisfying speconaut's own standard on the subject.
 - Cross-references from README, ROADMAP and the spec files resolve to the new filenames.
 

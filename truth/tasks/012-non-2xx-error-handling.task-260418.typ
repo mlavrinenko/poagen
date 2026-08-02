@@ -19,15 +19,16 @@ formalise what to throw.
 == Rationale
 
 Pre-release review P1 #11 — coverage gap; also called out in the
-"suggested ordering toward a credible 0.1.0 tag". ADR-009 (proposed)
-recommends a single generic `ApiException` as the v0.1 shape.
+"suggested ordering toward a credible 0.1.0 tag".
+`error-response-policy` (proposed) recommends a single generic
+`ApiException` as the v0.1 shape.
 
 == In scope
 
 + Promote the draft "non-2xx throws a typed exception" scenario on
   the Operation Generator to `stage: unstable` on implementation.
 + Emit a `Generated\\ApiException extends \\RuntimeException`
-  class per the interface sketched in ADR-009:
+  class per the interface sketched in `error-response-policy`:
   `getStatusCode()`, `getRequest()`, `getResponse()`,
   `getDecodedBody(): mixed`.
 + Teach every emitted operation method to branch on HTTP status:
@@ -37,16 +38,16 @@ recommends a single generic `ApiException` as the v0.1 shape.
   is `$ref`-to-Model: the hydrator *does not* attempt to construct
   the Model; it stays raw in `getDecodedBody()`.
 + Regenerate the Petstore golden fixture.
-+ Update ADR-009's status to `accepted` if the implementation
-  matches; otherwise supersede with the chosen shape.
++ Update `error-response-policy`'s status to `accepted` if the
+  implementation matches; otherwise supersede with the chosen shape.
 
 == Non-goals
 
-- Per-schema exception subclasses — explicitly rejected by ADR-009
-  for v0.1.
-- Result-type return (`Ok|Err`) — rejected by ADR-009.
+- Per-schema exception subclasses — explicitly rejected by
+  `error-response-policy` for v0.1.
+- Result-type return (`Ok|Err`) — rejected by `error-response-policy`.
 - Retry / backoff logic on 5xx — belongs to user-side decorators
-  (ADR-001).
+  (`profile-driven-generation`).
 
 == Acceptance criteria
 

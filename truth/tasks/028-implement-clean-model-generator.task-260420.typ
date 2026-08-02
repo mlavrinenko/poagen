@@ -2,7 +2,7 @@
 
 #show: task.with(
   id: "1521b30d-0c14-407e-997e-165e4ac533aa",
-  title: "Implement ADR-010: clean Model output, attribute + phpdoc-driven Marshaller/Hydrator",
+  title: "Implement attribute-and-phpdoc-driven-serialization: clean Model output, attribute + phpdoc-driven Marshaller/Hydrator",
   status: done(2026, 4, 20),
   priority: 7,
   x-paogen: (spec: "truth/specs/model-generator.typ", legacy-id: "T-028"),
@@ -10,7 +10,7 @@
 
 == Summary
 
-Realise ADR-010 end-to-end. Generated Model classes shed their
+Realise `attribute-and-phpdoc-driven-serialization` end-to-end. Generated Model classes shed their
 `PROPERTY_MAP` constant and `JsonSerializable` implementation. A new
 runtime `Marshaller`/`Hydrator` drives request/response
 (de)serialisation by reading native reflection + phpdoc + a small
@@ -21,7 +21,7 @@ be readable on its own terms.*
 
 == Rationale
 
-ADR-010 states the motivation. Quick recap:
+`attribute-and-phpdoc-driven-serialization` states the motivation. Quick recap:
 
 - Current Order.php includes a 10-line `PROPERTY_MAP` with a four-
   line PHPStan docblock describing the map's shape. Readers of the
@@ -31,7 +31,7 @@ ADR-010 states the motivation. Quick recap:
 - `JsonSerializable::jsonSerialize()` is a hidden contract the
   reader has to discover.
 
-The clean version (from ADR-010) is:
+The clean version (from `attribute-and-phpdoc-driven-serialization`) is:
 
 ```
 final readonly class Order
@@ -123,7 +123,7 @@ final readonly class Order
 
 - Runtime performance tuning (static caches beyond a simple per-class
   memoisation, opcache integration, dumped registry). File as a new
-  task post-ADR-010.
+  task post-`attribute-and-phpdoc-driven-serialization`.
 - Migration guide for users on older paogen builds. Since no paogen
   release has shipped, no user migration applies.
 - Revisiting typhoon/reflection. See
@@ -133,7 +133,8 @@ final readonly class Order
 == Prerequisites
 
 - *T-027* (perf-language audit) completes first so the spec
-  language reflects ADR-010 before we write code against it.
+  language reflects `attribute-and-phpdoc-driven-serialization` before we
+  write code against it.
 
 == Acceptance criteria
 
@@ -165,4 +166,5 @@ Dirty fixes that are *not* pre-approved:
 
 - Hand-editing generated trees or `tests/generated/*.php`. Per
   AGENT.md, these are tool-owned.
-- Skipping the spec update. ADR-010's acceptance depends on it.
+- Skipping the spec update.
+  `attribute-and-phpdoc-driven-serialization`'s acceptance depends on it.

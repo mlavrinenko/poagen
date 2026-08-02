@@ -283,9 +283,9 @@
             "stage": "unstable"
         },
         {
-            "test_id": "ModelGeneratorTest::testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsADR010",
+            "test_id": "ModelGeneratorTest::testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsAttributeAndPhpdocDrivenSerialization",
             "feature": "Model Generator",
-            "scenario": "Hydration recovers phpdoc types when opcache strips comments (ADR-010)",
+            "scenario": "Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
             "spec_line": 172,
             "stage": "unstable"
@@ -707,17 +707,17 @@
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign",
+            "test_id": "OperationGeneratorTest::testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingNoInheritanceNoProtectedRegionsRuntimeDesign",
             "feature": "Operation Generator",
-            "scenario": "An http basic scheme is left as a placeholder pending ADR-002 runtime design",
+            "scenario": "An http basic scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
             "spec_line": 330,
             "stage": "draft"
         },
         {
-            "test_id": "OperationGeneratorTest::testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign",
+            "test_id": "OperationGeneratorTest::testAnOauth2SchemeIsLeftAsAPlaceholderPendingNoInheritanceNoProtectedRegionsRuntimeDesign",
             "feature": "Operation Generator",
-            "scenario": "An oauth2 scheme is left as a placeholder pending ADR-002 runtime design",
+            "scenario": "An oauth2 scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
             "spec_line": 339,
             "stage": "draft"

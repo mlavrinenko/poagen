@@ -47,16 +47,17 @@ and decouples the generator from whatever replaces it later.
 ## Tracking
 
 The v0.1 release explicitly **defers** OpenAPI 3.1 support — see
-[`truth/decisions/008-openapi-31-strategy.typ`](../decisions/008-openapi-31-strategy.typ)
-(ADR-008, *accepted*). The three paths forward (parser swap, translator
+[`truth/decisions/openapi-31-strategy.decision-260419.typ`](../decisions/openapi-31-strategy.decision-260419.typ)
+(*accepted*). The three paths forward (parser swap, translator
 shim, fork) are catalogued there; this document stays as the user-facing
 "known limitation" note and the option analysis that feeds the
-post-v0.1 ADR that will supersede ADR-008 when 3.1 becomes a priority.
+post-v0.1 ADR that will supersede `openapi-31-strategy` when 3.1 becomes
+a priority.
 
 Post-v0.1 workflow:
 
 1. Re-open with a prototype under a new task (`017` or later) that
    picks one of options 1/2/3 below, gathers fixture evidence, and
    proposes a superseding ADR.
-2. Supersede ADR-008 with the chosen path.
+2. Supersede `openapi-31-strategy` with the chosen path.
 3. Remove this limitation note from `README.md`.

@@ -18,7 +18,7 @@ use function assert;
  * emitted ApiClient method.
  *
  * Extracted from {@see OperationEmitter} to keep that class under the
- * linecop limit (ADR-004).
+ * linecop limit (`quality-gates-at-maximum-strictness`).
  *
  * @internal
  */

@@ -328,21 +328,21 @@
     ]
 
     #scenario(
-      "An http basic scheme is left as a placeholder pending ADR-002 runtime design",
+      "An http basic scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
       stage: "draft",
     )[
       #given[#the(Schema) declares a scheme with #p((scheme: "type: http, scheme: basic"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002]
+      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per no-inheritance-no-protected-regions]
     ]
 
     #scenario(
-      "An oauth2 scheme is left as a placeholder pending ADR-002 runtime design",
+      "An oauth2 scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
       stage: "draft",
     )[
       #given[#the(Schema) declares a scheme with #p((scheme: "type: oauth2, flows: { clientCredentials: ... }"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002]
+      #then[the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per no-inheritance-no-protected-regions]
     ]
   ]
 

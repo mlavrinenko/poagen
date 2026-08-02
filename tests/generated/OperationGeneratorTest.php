@@ -557,30 +557,31 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: An http basic scheme is left as a placeholder pending ADR-002 runtime design
+     * Scenario: An http basic scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design
      * @source truth/specs/operation-generator.feature-260418.typ:330
      *
      * Given Schema declares a scheme with type: http, scheme: basic
      * When Generator runs against Profile
-     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
+     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per no-inheritance-no-protected-regions
      */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
-    public function testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
+    public function testAnHttpBasicSchemeIsLeftAsAPlaceholderPendingNoInheritanceNoProtectedRegionsRuntimeDesign(
+    ): void
     {
         self::markTestIncomplete('Scenario is draft');
     }
 
 
     /**
-     * Scenario: An oauth2 scheme is left as a placeholder pending ADR-002 runtime design
+     * Scenario: An oauth2 scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design
      * @source truth/specs/operation-generator.feature-260418.typ:339
      *
      * Given Schema declares a scheme with type: oauth2, flows: { clientCredentials: ... }
      * When Generator runs against Profile
-     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per ADR-002
+     * Then the operation generator must not surface the scheme yet — design deferred to the decorator-layer runtime per no-inheritance-no-protected-regions
      */
     #[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
-    public function testAnOauth2SchemeIsLeftAsAPlaceholderPendingADR002RuntimeDesign(): void
+    public function testAnOauth2SchemeIsLeftAsAPlaceholderPendingNoInheritanceNoProtectedRegionsRuntimeDesign(): void
     {
         self::markTestIncomplete('Scenario is draft');
     }

@@ -60,6 +60,6 @@ Each bullet gets its own scenario under
 - Petstore golden fixture at
   `tests/fixtures/generated/petstore/Generated/ApiClient.php`
   regenerated with every previously-skipped operation now emitted.
-- `OperationEmitter.php` stays under ADR-004's 250-line limit
+- `OperationEmitter.php` stays under `quality-gates-at-maximum-strictness`'s 250-line limit
   (split into `RequestAssembler` / `ResponseHandler` if needed).
 - `just check` green end-to-end.

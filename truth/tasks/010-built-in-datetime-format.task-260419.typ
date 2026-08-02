@@ -32,7 +32,8 @@ Pre-release review P1 #9 — coverage gap. Listed in the review's
   as using the date-only format on the wire).
 + Apply the mapping to operation parameters as well as Model
   properties.
-+ Route through the `ScalarBinding` contract from ADR-007 so the
++ Route through the `ScalarBinding` contract from
+  `hydration-and-serialization-contract` so the
   mapping is *the* first in-tree example of how built-ins and
   `#[BindsFormat]` compose.
 + Regenerate Petstore fixture (none of its schemas use `date-time`

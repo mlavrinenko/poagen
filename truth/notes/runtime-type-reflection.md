@@ -1,14 +1,15 @@
 # Runtime type reflection — library survey
 
-**Status:** exploration note feeding ADR-010
+**Status:** exploration note feeding `attribute-and-phpdoc-driven-serialization`
 **Date:** 2026-04-20
 **Author:** design session with project owner
 
 ## Purpose
 
-ADR-010 decides that paogen's runtime will parse PHPStan-style phpdoc
-annotations to drive hydration and marshalling, instead of the
-per-class `PROPERTY_MAP` constant introduced by ADR-007. This note
+`attribute-and-phpdoc-driven-serialization` decides that paogen's runtime
+will parse PHPStan-style phpdoc annotations to drive hydration and
+marshalling, instead of the per-class `PROPERTY_MAP` constant introduced by
+`hydration-and-serialization-contract`. This note
 captures the library survey that informed the choice between three
 candidate approaches, so future sessions do not redo the
 investigation:
@@ -45,7 +46,8 @@ Structural needs:
 
 Non-structural facts (format hints, wire-name overrides, discriminator
 fields) are carried by PHP attributes and do *not* need the phpdoc
-parser — see ADR-010's attribute vocabulary.
+parser — see `attribute-and-phpdoc-driven-serialization`'s attribute
+vocabulary.
 
 ## Candidate 1: typhoon/type + typhoon/reflection
 
@@ -132,7 +134,7 @@ nullable-union), a hand-rolled parser is maybe 80 LOC. Zero deps.
 
 Rejected on principle: we are not in the business of owning a parser
 the community maintains. The "dependencies pull their weight"
-policy in ADR-010 rules this out.
+policy in `attribute-and-phpdoc-driven-serialization` rules this out.
 
 ## Conclusion
 

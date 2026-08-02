@@ -18,7 +18,8 @@ return new Profile(
      * clear-example-expected-failures: this profile does NOT clear the
      * `.expected-failure` marker. Ten components carrying eleven
      * polymorphic properties this document leaves undiscriminated
-     * (ADR-010 / T-030) are deliberately left unresolved — each was checked
+     * (`attribute-and-phpdoc-driven-serialization` / T-030) are deliberately
+     * left unresolved — each was checked
      * branch-by-branch against the vendored schema for a field name common
      * to every branch, and none has one, so no `Profile::$discriminators`
      * entry could be honest. Skipping the ten components (the only

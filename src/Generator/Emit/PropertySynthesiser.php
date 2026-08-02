@@ -32,7 +32,7 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
  * types one and not the other has no contract a reader can rely on.
  *
  * Extracted from {@see ModelEmitter} to keep both under the linecop limit
- * (ADR-004).
+ * (`quality-gates-at-maximum-strictness`).
  *
  * @internal
  */

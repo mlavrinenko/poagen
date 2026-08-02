@@ -14,7 +14,7 @@
 
 That is worse than having no coverage tooling. A recipe that exists implies a number someone is watching, so nobody asks what the number is. Today nobody knows.
 
-ADR-004 dropped codecov deliberately, on the reasoning that a percentage threshold means little on a codegen project whose logic is exercised through generated fixtures. That reasoning still holds against a hosted service and a badge. It does not justify having no floor at all: the argument was against outsourcing the judgement, not against measuring.
+`quality-gates-at-maximum-strictness` dropped codecov deliberately, on the reasoning that a percentage threshold means little on a codegen project whose logic is exercised through generated fixtures. That reasoning still holds against a hosted service and a badge. It does not justify having no floor at all: the argument was against outsourcing the judgement, not against measuring.
 
 The owner wants 80% or better.
 
@@ -25,11 +25,11 @@ The owner wants 80% or better.
 - The floor starts at or just under the measured figure and ratchets UP, the mirror of the jscpd thresholds' ratchet-down. Never lower it to admit a regression.
 - 80% is the target the ratchet climbs toward; if today's figure is already above it, the floor starts above it rather than being set back down to 80.
 - The generated tier is handled deliberately rather than by accident: say in writing whether emitted code counts toward the figure, and why. Counting it inflates the number with code no human wrote; excluding it hides whether the emitter's own branches are exercised.
-- Whatever ADR-004 still gets right about hosted coverage services is left standing, and this task's departure from it is recorded rather than silently overriding it.
+- Whatever `quality-gates-at-maximum-strictness` still gets right about hosted coverage services is left standing, and this task's departure from it is recorded rather than silently overriding it.
 
 == Non-goals
 
-- Reinstating codecov or any hosted coverage service. ADR-004 declined those and this task does not reopen it.
+- Reinstating codecov or any hosted coverage service. `quality-gates-at-maximum-strictness` declined those and this task does not reopen it.
 - Mutation testing, which measures something different and has its own task.
 - Writing tests to hit a number. A floor that is met by asserting nothing is worth less than no floor.
 
@@ -97,7 +97,7 @@ coverage-floor: FAILED
 - src: measured 87.46%, below the 99.0% floor
 \`\`\`
 
-ADR-004 is left standing. It declined a hosted service with no threshold behind
+`quality-gates-at-maximum-strictness` is left standing. It declined a hosted service with no threshold behind
 it, and it named its own condition for revisiting — "when the code surface
 stabilises, a new decision may re-introduce a coverage threshold." This is that
 successor, and nothing here reinstates codecov.

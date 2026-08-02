@@ -18,7 +18,7 @@ use function var_export;
  *
  * Credential segments come last of their kind, after the declared parameters,
  * so request diffs stay predictable and auth reads as the transport policy
- * ADR-002 frames it as.
+ * `no-inheritance-no-protected-regions` frames it as.
  *
  * @internal
  */

@@ -7,7 +7,8 @@ namespace Mlavrinenko\Paogen\Generator;
 use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
 
 /**
- * User-supplied generation guidance. See ADR-001 / ADR-003.
+ * User-supplied generation guidance. See `profile-driven-generation` /
+ * `typed-profile-and-colocated-attributes`.
  *
  * Pure value object: parsed by the generator, never executed.
  */
@@ -23,11 +24,13 @@ final readonly class Profile
      * @param NameNormaliser|null   $nameNormaliser Custom normalisation pipeline. When null, paogen
      *                                              composes RenamesNormaliser($renames) + PascalCaseSanitiser.
      *                                              When set, paogen uses it verbatim — `$renames` is *not*
-     *                                              merged in automatically. See ADR-003 (T-023).
+     *                                              merged in automatically. See
+     *                                              `typed-profile-and-colocated-attributes` (T-023).
      * @param array<string,string>  $discriminators Override map for undiscriminated property-level
      *                                              `oneOf`/`anyOf`. Keys are raw `'<ComponentName>.<propertyName>'`
      *                                              (pre-normalisation); values are the wire field name that
-     *                                              selects the branch. ADR-010 + T-030.
+     *                                              selects the branch.
+     *                                              `attribute-and-phpdoc-driven-serialization` + T-030.
      * @param array<string,string>  $methodRenames  Map of raw operation id → desired PHP method name on the
      *                                              emitted client. This is the documented answer to an operation
      *                                              id with no word boundaries: `searchclient` has no algorithmic

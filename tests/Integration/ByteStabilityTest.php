@@ -28,8 +28,8 @@ use function strlen;
  * - asserts both runs match the committed golden tree under
  *   `tests/fixtures/generated/petstore/`.
  *
- * Lifting ADR-001's byte-stability promise out of the realm of
- * "trust me, the scenario covers it" and into an integration test
+ * Lifting `profile-driven-generation`'s byte-stability promise out of the
+ * realm of "trust me, the scenario covers it" and into an integration test
  * closes pre-release review P2 #23.
  */
 final class ByteStabilityTest extends TestCase
@@ -95,7 +95,7 @@ final class ByteStabilityTest extends TestCase
         self::assertSame(
             $firstSnapshot,
             $secondSnapshot,
-            'two Petstore generator runs must produce byte-identical output (ADR-001 byte-stability)',
+            'two Petstore generator runs must produce byte-identical output (profile-driven-generation byte-stability)',
         );
 
         $goldenSnapshot = $this->snapshot($goldenDir);

@@ -2,7 +2,7 @@
 
 #show: task.with(
   id: "001c5b17-bd65-4350-926e-e063c56822c8",
-  title: "Ship the paogen validate subcommand promised by ADR-006",
+  title: "Ship the paogen validate subcommand promised by plain-getopt-for-the-cli",
   status: done(2026, 4, 18),
   priority: 5,
   x-paogen: (spec: "truth/specs/cli.typ", decision: "truth/decisions/006-cli-tooling.typ", legacy-id: "T-018"),
@@ -10,7 +10,7 @@
 
 == Summary
 
-ADR-006 lists `paogen validate <schema>` as part of the tiny CLI
+`plain-getopt-for-the-cli` lists `paogen validate <schema>` as part of the tiny CLI
 surface. Only `generate`, `help`, and `version` exist today. Either
 ship `validate` or retire the promise — the review says ship it.
 

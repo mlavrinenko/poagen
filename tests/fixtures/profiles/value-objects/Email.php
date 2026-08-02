@@ -13,7 +13,7 @@ use function is_string;
 /**
  * Fixture: a user value object that opts in as the PHP type for `format: email`
  * and implements {@see ScalarBinding} so the generator round-trips it as a
- * plain string at the wire boundary (ADR-007).
+ * plain string at the wire boundary (`hydration-and-serialization-contract`).
  */
 #[BindsFormat('email')]
 final readonly class Email implements ScalarBinding

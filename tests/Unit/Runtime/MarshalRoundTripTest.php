@@ -21,8 +21,9 @@ use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Warehouse;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Direct unit coverage for {@see Marshaller} and {@see Hydrator}, indep-
- * endent of the generator pipeline. ADR-010 in scope.
+ * Direct unit coverage for {@see Marshaller} and {@see Hydrator},
+ * independent of the generator pipeline.
+ * `attribute-and-phpdoc-driven-serialization` in scope.
  */
 final class MarshalRoundTripTest extends TestCase
 {

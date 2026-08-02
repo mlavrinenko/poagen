@@ -47,7 +47,8 @@ composer generate
 
 `composer generate` is a thin alias for `paogen generate paogen.php`.
 The output writes to `./generated/` and is idempotent — regenerating
-against an unchanged schema produces byte-identical files (ADR-001).
+against an unchanged schema produces byte-identical files
+(`profile-driven-generation`).
 
 ## Using the generated client
 

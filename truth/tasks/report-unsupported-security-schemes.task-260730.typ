@@ -29,10 +29,11 @@ Neither is true here today.
 
 What the reaction should be is a real decision rather than an obvious one, and
 that is most of this task. `oauth2` genuinely is not the generator's business —
-ADR-002 puts token acquisition and refresh in the transport, and a generated
-client that took a bearer token it could not refresh would be worse than one
-that took nothing. `http basic` and `apiKey` `in: cookie`, by contrast, are
-one header each and are dropped only because nobody wrote them.
+`operations-delegate-to-an-injected-transport` puts token acquisition and
+refresh in the transport, and a generated client that took a bearer token it
+could not refresh would be worse than one that took nothing. `http basic` and
+`apiKey` `in: cookie`, by contrast, are one header each and are dropped only
+because nobody wrote them.
 
 So the reaction may differ per kind, but it may not be silence for any of them,
 and whatever is chosen has to be one of the reactions the project already

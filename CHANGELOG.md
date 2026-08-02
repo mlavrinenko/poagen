@@ -53,7 +53,7 @@ First consumable release. The OpenAPI 3.0 pipeline is correct, type-safe,
 and pleasant on real schemas. OpenAPI 3.1 and mutation testing are
 explicit post-v0.1 follow-ups (see
 [`ROADMAP.md`](ROADMAP.md#post-v01-follow-ups-not-release-gating) and
-[ADR-008](truth/decisions/008-openapi-31-strategy.typ)).
+[`openapi-31-strategy`](truth/decisions/openapi-31-strategy.decision-260419.typ)).
 
 ### Added
 
@@ -94,8 +94,8 @@ explicit post-v0.1 follow-ups (see
   const, no `JsonSerializable`, no hand-rolled hydration. `ApiClient`
   delegates to the shared runtime. Powered by `phpstan/phpdoc-parser`
   (added as a runtime dependency); see
-  [ADR-010](truth/decisions/010-attribute-and-phpdoc-driven-serialization.typ)
-  (T-028, supersedes the ADR-007 representation layer).
+  [`attribute-and-phpdoc-driven-serialization`](truth/decisions/attribute-and-phpdoc-driven-serialization.decision-260420.typ)
+  (T-028, supersedes the `hydration-and-serialization-contract` representation layer).
 - Marshaller/Hydrator falls back to a `token_get_all` phpdoc scan when
   `ReflectionClass::getDocComment()` returns `false` — keeps the
   runtime correct under `opcache.save_comments=0` (T-029).
@@ -111,13 +111,13 @@ explicit post-v0.1 follow-ups (see
   `getStatusCode()`, `getRequest()`, `getResponse()`, and a cached
   best-effort `getDecodedBody(): mixed`. Consumer code can narrow the
   decoded body via `instanceof` when an error schema is declared
-  (T-012, [ADR-009](truth/decisions/009-error-response-policy.typ)
+  (T-012, [`error-response-policy`](truth/decisions/error-response-policy.decision-260418.typ)
   accepted).
 - `securitySchemes` for `apiKey` (header) and `http bearer` surface as
   required constructor arguments on the generated `ApiClient`; every
   secured operation attaches the scheme's header. `http basic`,
   `oauth2`, and `openIdConnect` remain `draft` placeholders per
-  ADR-002 (T-014).
+  `no-inheritance-no-protected-regions` (T-014).
 - `application/x-www-form-urlencoded` request bodies expand to one
   typed method parameter per declared property; the request body is
   assembled via `http_build_query` in RFC1738 form (T-011).
@@ -141,7 +141,7 @@ explicit post-v0.1 follow-ups (see
 
 - Pluggable OpenAPI → PHP name-normalisation pipeline. Users compose
   strategies in their `Profile` (see
-  [ADR-003](truth/decisions/003-profile-and-attribute-dx.typ)); the
+  [`typed-profile-and-colocated-attributes`](truth/decisions/typed-profile-and-colocated-attributes.decision-260418.typ)); the
   default pipeline (`RenamesNormaliser` → `PascalCaseSanitiser`)
   handles every DigitalOcean and GitHub component name without
   per-schema tweaks (T-023).
@@ -164,7 +164,7 @@ explicit post-v0.1 follow-ups (see
     diff is non-empty.
 - `paogen validate <schema>` subcommand: parses a YAML or JSON OpenAPI
   document, runs `OpenApi::validate()`, and reports parse / validation
-  / usage errors on stderr (T-018, ADR-006).
+  / usage errors on stderr (T-018, `plain-getopt-for-the-cli`).
 - Generator prunes stale `.php` files under `Generated/` at the end of
   every run so the byte-stability promise holds on component
   rename / removal (T-007).
@@ -185,9 +185,10 @@ explicit post-v0.1 follow-ups (see
 
 ### Changed
 
-- ADR-007 ("Hydration & Serialization") representation section is
-  superseded by ADR-010. Truth-tree specs and decisions referencing
-  the pre-release `PROPERTY_MAP` + `JsonSerializable` shape were
+- `hydration-and-serialization-contract` ("Hydration & Serialization")
+  representation section is superseded by
+  `attribute-and-phpdoc-driven-serialization`. Truth-tree specs and decisions
+  referencing the pre-release `PROPERTY_MAP` + `JsonSerializable` shape were
   refreshed; no code changes landed with this audit (T-027).
 - `composer.json` `minimum-stability` is `stable`; all deps are already
   stable releases so this only tightens the invariant for downstream
@@ -209,4 +210,4 @@ explicit post-v0.1 follow-ups (see
   threshold and implied a gate that did not exist; the `code-coverage`
   CI job, `codecov.yml`, and `.gitattributes` export-ignore entry were
   removed. `composer test:coverage` and `just test-coverage` stay for
-  local use (T-020, ADR-004 updated).
+  local use (T-020, `quality-gates-at-maximum-strictness` updated).

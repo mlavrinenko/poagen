@@ -72,7 +72,8 @@ Run unscoped over every feature file, it did not come back empty, and that is
 the stronger result. Three candidates surfaced; `getDocComment` and `marshal`
 both settle as legitimate. `hydrate` does not: three steps in
 `model-generator.feature-260418.typ` still name the receiver
-`ApiClient::hydrate`, retired by ADR-010, while two steps in the same file
+`ApiClient::hydrate`, retired by
+`attribute-and-phpdoc-driven-serialization`, while two steps in the same file
 already say `(new Hydrator())->hydrate(...)`. Unrelated to the transport
 collapse, and missed by every sweep so far because none compared spec vocabulary
 against the emitted tree. The method found live drift on its first real run,

@@ -19,8 +19,8 @@ pretending.
 
 Pre-release review P2 #20 — packaging gap. Either decision is fine;
 the anti-pattern is "we have codecov wired but the number doesn't
-matter". ADR-004 governs quality gates; a coverage threshold belongs
-there once chosen.
+matter". `quality-gates-at-maximum-strictness` governs quality gates; a
+coverage threshold belongs there once chosen.
 
 == In scope
 
@@ -29,12 +29,14 @@ there once chosen.
     to start, with a documented step-up to 90% by v0.1) in
     `codecov.yml` *and* in the CI workflow (so the PR check is
     red, not just the codecov widget). Document the threshold in
-    ADR-004.
+    `quality-gates-at-maximum-strictness`.
   - *Drop.* Remove `codecov.yml`, remove the coverage upload step
-    from `continuous-integration.yml`, and note in ADR-004 that
-    coverage is not a v0.1 gate.
-+ Whichever direction is chosen, update ADR-004's "Consequences"
-  section to reflect it.
+    from `continuous-integration.yml`, and note in
+    `quality-gates-at-maximum-strictness` that coverage is not a v0.1
+    gate.
++ Whichever direction is chosen, update
+  `quality-gates-at-maximum-strictness`'s "Consequences" section to
+  reflect it.
 + No new spec scenarios needed — this is pure CI / policy.
 
 == Non-goals
@@ -45,7 +47,7 @@ there once chosen.
 
 == Acceptance criteria
 
-- ADR-004 reflects the chosen direction (and status stays
+- `quality-gates-at-maximum-strictness` reflects the chosen direction (and status stays
   `accepted`).
 - `.github/workflows/continuous-integration.yml` and
   `codecov.yml` match the chosen direction.

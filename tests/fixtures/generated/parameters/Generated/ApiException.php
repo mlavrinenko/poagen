@@ -65,7 +65,7 @@ final class ApiException extends RuntimeException implements ApiErrorInterface
     /**
      * Best-effort JSON decode of the response body.
      *
-     * Returns `null` for an empty body or any decode failure (per ADR-009).
+     * Returns `null` for an empty body or any decode failure (per `error-response-policy`).
      * Cached on first call.
      */
     public function getDecodedBody(): mixed

@@ -11,8 +11,8 @@ use Mlavrinenko\Paogen\Generator\Profile;
  *
  * Precedence: explicit `Profile::$nameNormaliser` wins and is used verbatim.
  * Otherwise the factory composes the profile's rename maps — each scoped to the
- * one {@see SymbolKind} it names — ahead of the two sanitisers. See ADR-003
- * (T-023).
+ * one {@see SymbolKind} it names — ahead of the two sanitisers. See
+ * `typed-profile-and-colocated-attributes` (T-023).
  *
  * The scoping matters because the maps answer different questions.
  * `$renames` names payload classes, `$methodRenames` names client methods; a

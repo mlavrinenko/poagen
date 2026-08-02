@@ -15,13 +15,14 @@ like a standalone consumer project: own `composer.json`, own
 `README.md`, own `paogen.php`, own `schemas/`, own committed
 `generated/` tree. Land three examples at creation:
 
-- `examples/petstore` — the ADR-005 PoC fixture, fully working.
-- `examples/digitalocean` — the ADR-005 validation-tier schema
-  (2.7 MB, 722 components, 2 invalid PHP names). Marked
+- `examples/petstore` — the `schema-fixture-policy` PoC fixture, fully
+  working.
+- `examples/digitalocean` — the `schema-fixture-policy` validation-tier
+  schema (2.7 MB, 722 components, 2 invalid PHP names). Marked
   `expected-failure` until T-023 lands.
-- `examples/github` — the ADR-005 validation-tier schema (8.8 MB,
-  918 components, 818 invalid PHP names). Marked `expected-failure`
-  until T-023 lands.
+- `examples/github` — the `schema-fixture-policy` validation-tier schema
+  (8.8 MB, 918 components, 818 invalid PHP names). Marked
+  `expected-failure` until T-023 lands.
 
 Add a `just check-examples` recipe that walks every `examples/*/`,
 invokes the generator, and reports pass/fail. The recipe is *not*
@@ -31,8 +32,8 @@ changes.
 
 == Rationale
 
-- ADR-005's validation-tier schemas have been listed as post-v0.1
-  follow-ups for weeks. Landing the scaffolding early means the
+- `schema-fixture-policy`'s validation-tier schemas have been listed as
+  post-v0.1 follow-ups for weeks. Landing the scaffolding early means the
   smallest possible diff the day T-023 unblocks them: flip a marker,
   regenerate, commit the golden tree.
 - Users opening the repo today get a `tests/fixtures/` tree that is

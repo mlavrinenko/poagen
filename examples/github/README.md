@@ -5,8 +5,9 @@ The full [GitHub REST API](https://docs.github.com/en/rest) OpenAPI
 YAML. This is the industry's "real client generator" torture test.
 
 > **Status: expected failure.** Eleven properties across ten components
-> are `oneOf`/`anyOf` ref unions with no `discriminator`; ADR-010 makes
-> that a generator-time error
+> are `oneOf`/`anyOf` ref unions with no `discriminator`;
+> `attribute-and-phpdoc-driven-serialization` makes that a generator-time
+> error
 > ([T-030](../../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
 > `clear-example-expected-failures` checked every one branch-by-branch
 > against the vendored schema and confirmed none admits an honest

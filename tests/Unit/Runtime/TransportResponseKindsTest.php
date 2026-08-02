@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * The five shapes a schema produces, decoded by the runtime rather than by
  * thirty-six copies of the same emitted branch.
  *
- * The failure case is here too: ADR-009 says a non-2xx response throws the
+ * The failure case is here too: `error-response-policy` says a non-2xx response throws the
  * profile's own `ApiException` carrying the original request and response,
  * and moving the status branch into the transport must not change that.
  */

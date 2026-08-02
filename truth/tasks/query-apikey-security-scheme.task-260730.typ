@@ -65,8 +65,9 @@ security as headers afterwards; a query-string credential has to join the
 - `http basic`, `oauth2` and `openIdConnect`. Those stay with
   `report-unsupported-security-schemes`, which decides what an unwireable
   scheme does rather than adding more kinds.
-- Moving authentication out of the generated client into a decorator. ADR-002
-  settled that transport concerns compose underneath; a declared credential the
+- Moving authentication out of the generated client into a decorator.
+  `no-inheritance-no-protected-regions` settled that transport concerns
+  compose underneath; a declared credential the
   schema names is still the client's to send.
 - Credential storage, refresh, or rotation.
 

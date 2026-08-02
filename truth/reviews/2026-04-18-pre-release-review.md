@@ -56,7 +56,7 @@ marshal/unmarshal in the hydrator.
 `OperationAnalyzer::pathParameters()` returns `null` as soon as it hits `Parameter|Reference`
 that is a Reference (`src/Generator/Emit/OperationAnalyzer.php:43-47`), causing
 `OperationEmitter::emit()` to silently skip the operation. Real-world schemas (GitHub,
-Kubernetes — both on ADR-005's validation list) ref common parameters extensively. Without
+Kubernetes — both on `schema-fixture-policy`'s validation list) ref common parameters extensively. Without
 inline-resolution, most of those operations will silently disappear.
 
 Fix: call `Reader::readFromYamlFile(..., resolveReferences: true)` for the operation/parameter
@@ -70,8 +70,8 @@ silent-skip class.
 ### 6. Stale output is never pruned
 `Generator::generate()` writes every file but never deletes files from prior runs that no
 longer correspond to a schema component. A schema rename (`Pet` → `Animal`) leaves `Pet.php`
-behind, and PHPStan on the consumer's side flags the orphan. The byte-stability ADR-001
-promise holds only in the add-only direction.
+behind, and PHPStan on the consumer's side flags the orphan. The byte-stability
+`profile-driven-generation` promise holds only in the add-only direction.
 
 Fix: diff the emitted set against what's on disk under `Generated/` and unlink leftovers.
 Guard the prune to the `Generated/` subtree so user code never gets touched.
@@ -112,7 +112,7 @@ loses its structure.
 
 ### 13. No security/auth scheme support
 OpenAPI `securitySchemes` / `security` are completely ignored. Users must decorate the client
-for auth — fine as a philosophy (ADR-002) but the generator should at least read auth
+for auth — fine as a philosophy (`no-inheritance-no-protected-regions`) but the generator should at least read auth
 headers/parameters out of the schema so they appear as method/constructor arguments.
 
 ### 14. OpenAPI 3.1 gap documented but open
@@ -144,7 +144,7 @@ version field. Needs either a build step that stamps a constant from the tag or 
 read from `Composer\InstalledVersions`.
 
 ### 18. Generator CLI is missing promised commands
-ADR-006 lists `paogen validate <schema>` as part of the tiny CLI surface; only `generate`,
+`plain-getopt-for-the-cli` lists `paogen validate <schema>` as part of the tiny CLI surface; only `generate`,
 `help`, `version` exist. Either ship `validate` or retire the promise in the ADR.
 
 ### 19. CLI lacks `--output`, `--dry-run`, `--diff`
@@ -189,7 +189,7 @@ boot in `phpunit.xml.dist` with a comment explaining why.
   `discoverIn` namespaces exist in Composer autoload, `renames` target real components) —
   currently only `schema` path is verified.
 - **Docs** — `README.md` usage section is "planned"; migrate to "current" once CLI is
-  stable. No "how decorator composition looks in practice" doc matching ADR-002's claim.
+  stable. No "how decorator composition looks in practice" doc matching `no-inheritance-no-protected-regions`'s claim.
 - **Benchmark on a large schema** (GitHub bundled ~5MB) before tagging: memory, wall-time,
   output size.
 
@@ -221,7 +221,7 @@ boot in `phpunit.xml.dist` with a comment explaining why.
    Without this, the generated client produces wrong data on realistic schemas.
 2. **Reference/inline resolution + path-item-level params** (P0 #4, #5). Without this, most
    real APIs lose operations silently.
-3. **Prune step** (P0 #6) — tiny but locks ADR-001's byte-stability contract.
+3. **Prune step** (P0 #6) — tiny but locks `profile-driven-generation`'s byte-stability contract.
 4. **Pick a path on `cebe/php-openapi`** (P2 #15) — fork or swap. This unblocks 3.1 work
    *and* removes the deprecation noise.
 5. **Ship enums + datetime built-ins** (P1 #8, #9) — low effort, huge DX.

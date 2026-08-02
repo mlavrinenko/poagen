@@ -11,7 +11,7 @@
 == Summary
 
 Golden-file testing is the only safety net outside per-feature tests.
-The "run the generator twice and diff" invariant from ADR-001 is
+The "run the generator twice and diff" invariant from `profile-driven-generation` is
 asserted as a spec scenario but not by an independent integration test
 against the Petstore fixture. Any drift between the fixture and a
 real invocation is caught only when `just check-generated-tests`
@@ -20,8 +20,8 @@ happens to notice.
 == Rationale
 
 Pre-release review P2 #23 — packaging gap. Cheap to add and lifts
-ADR-001's byte-stability promise out of the realm of "trust me" into
-the test matrix.
+`profile-driven-generation`'s byte-stability promise out of the realm of
+"trust me" into the test matrix.
 
 == In scope
 
@@ -41,7 +41,7 @@ the test matrix.
 == Non-goals
 
 - Running the check against schemas other than Petstore (future
-  work once the validation-tier schemas land per ADR-005).
+  work once the validation-tier schemas land per `schema-fixture-policy`).
 - Parallelising the two runs — serial is fine for v0.1.
 - Benchmarking wall-time / memory (P3 item).
 

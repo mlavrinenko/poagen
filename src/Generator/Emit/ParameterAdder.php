@@ -20,7 +20,7 @@ use Nette\PhpGenerator\PhpNamespace;
  * sanitised identifiers (`$contentType`).
  *
  * Extracted from {@see OperationEmitter} to keep that class under
- * ADR-004's 250-line limit.
+ * `quality-gates-at-maximum-strictness`'s 250-line limit.
  *
  * @internal
  */

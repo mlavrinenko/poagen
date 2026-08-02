@@ -19,8 +19,8 @@ Upstream 1.8.0 has not moved since May 2025.
 
 == Rationale
 
-Pre-release review P2 #15 — packaging gap. ADR-008 defers the 3.1
-question post-v0.1 and explicitly *decouples* this deprecation fix
+Pre-release review P2 #15 — packaging gap. `openapi-31-strategy` defers
+the 3.1 question post-v0.1 and explicitly *decouples* this deprecation fix
 from the parser-strategy question. We are staying on
 `cebe/php-openapi` 3.0 for the first release; the deprecation noise
 is a user-visible defect that must be silenced before the tag.
@@ -43,12 +43,13 @@ is a user-visible defect that must be silenced before the tag.
 
 == Non-goals
 
-- Adding OpenAPI 3.1 *support*. ADR-008 defers that post-v0.1. If
-  an upstream upgrade delivers 3.1 as a side effect, that is a
-  separate follow-up task and a new ADR superseding 008.
+- Adding OpenAPI 3.1 *support*. `openapi-31-strategy` defers that
+  post-v0.1. If an upstream upgrade delivers 3.1 as a side effect, that
+  is a separate follow-up task and a new ADR superseding
+  `openapi-31-strategy`.
 - Swapping parsers entirely (`devizzent/cebe-php-openapi`, fork,
-  etc.). Those were options (a)/(c) in ADR-008 and are rejected for
-  v0.1.
+  etc.). Those were options (a)/(c) in `openapi-31-strategy` and are
+  rejected for v0.1.
 
 == Acceptance criteria
 

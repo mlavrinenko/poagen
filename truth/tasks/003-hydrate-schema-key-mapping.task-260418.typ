@@ -29,7 +29,8 @@ together they form the "hydrator correctness" pair blocking 0.1.
   PHP name `photoUrls` *and* hydrates from / serialises to the wire
   key `photo_urls`.
 + Emit per-Model metadata pairing each PHP property name with its
-  original schema key (shape per ADR-007's `PROPERTY_MAP`).
+  original schema key (shape per
+  `hydration-and-serialization-contract`'s `PROPERTY_MAP`).
 + Use the metadata in both directions:
   - `hydrate()` consults it when reading from the decoded payload;
   - request-body emission uses it when serialising the typed Model
@@ -76,8 +77,8 @@ Landed together with task 002 (same PROPERTY_MAP work).
   them keyed by the wire name, so `json_encode($contact)` round-trips
   to `display-name` on the wire regardless of the PHP property name.
 - Regression under Model Generator > "Hydration and serialization
-  contract (ADR-007)": `A property with a non-identifier schema key
-  round-trips through PROPERTY_MAP`. Locked.
+  contract (`hydration-and-serialization-contract`)": `A property with a
+  non-identifier schema key round-trips through PROPERTY_MAP`. Locked.
 - `tests/fixtures/generated/contact/*` regenerated to include the
   new property and the emitted `PROPERTY_MAP` / `jsonSerialize()`.
 - `BindsFormat` scalar VOs (Email etc.) still do not round-trip

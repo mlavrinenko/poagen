@@ -82,4 +82,4 @@ high-value.
   that calls `Status::from($value)`.
 - Non-ScalarBinding user `#[BindsFormat]` VOs still beat the
   built-in enum resolution when the component `$ref` is present —
-  consistency with ADR-003's user-wins lookup order.
+  consistency with `typed-profile-and-colocated-attributes`'s user-wins lookup order.

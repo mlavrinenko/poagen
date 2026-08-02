@@ -45,7 +45,8 @@ Packagist round-trip. `composer generate` is a one-line alias for
   `kilbil/README.md` for the day-to-day list of what makes it hard.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
   (2.7 MB, 722 components). `.expected-failure`: a ref-only `oneOf`
-  without `discriminator` trips ADR-010's generator-time error
+  without `discriminator` trips `attribute-and-phpdoc-driven-serialization`'s
+  generator-time error
   ([T-030](../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
   No `generated/` tree is committed for it — see "`just check-examples`"
   below.

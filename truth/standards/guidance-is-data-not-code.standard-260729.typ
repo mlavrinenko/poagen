@@ -18,8 +18,9 @@
     control to what the consumer wrote.
 
     One exception is named here rather than folded into enforcement notes a
-    reader would not see: #a(Profile)'s name-normalising strategy (ADR-003) is
-    a consumer-authored callable #the(Generator) does call, to turn a raw
+    reader would not see: #a(Profile)'s name-normalising strategy
+    (`typed-profile-and-colocated-attributes`) is a consumer-authored
+    callable #the(Generator) does call, to turn a raw
     identifier into a PHP-legal name. It is bounded to that one job — it
     decides spelling only, never a field, a type, or a branch of
     #a(GeneratedFile) — and the built-in pipeline runs unchanged when the

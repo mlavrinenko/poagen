@@ -17,7 +17,8 @@ routinely use kebab-case (`security-advisory-ecosystems`,
 otherwise hostile names (`version-2`, `urn-2`). These produce invalid
 PHP and abort generation with a `Nette\PhpGenerator` exception.
 
-The `Profile::$renames` field documented in ADR-003 is *meant* to be the
+The `Profile::$renames` field documented in
+`typed-profile-and-colocated-attributes` is *meant* to be the
 escape hatch, but it is only consulted at one site
 (`Generator::emitModels()`, line 157) and is not threaded into
 `TypeResolver`, `PropertyShape`, `CompositionResolver`,
@@ -27,8 +28,8 @@ a bad name in `renames`, cross-class references resolve to the raw
 
 == Rationale
 
-Surfaced while building real-world examples for ADR-005's validation
-tier (DigitalOcean + GitHub).
+Surfaced while building real-world examples for
+`schema-fixture-policy`'s validation tier (DigitalOcean + GitHub).
 
 - *DigitalOcean* has 722 schema components, 2 invalid
   (`version-2`, `urn-2`). A short `renames` entry could in principle
@@ -241,9 +242,9 @@ the user who writes a custom pipeline takes full responsibility.
   valid PascalCase identifiers and the default pipeline is
   idempotent on those, so the diffs should be empty. If anything
   shifts, investigate before committing.
-+ ADR-003 amendment section documenting the `nameNormaliser` field
-  and precedence. If the amendment grows past a few paragraphs,
-  supersede with a dedicated ADR.
++ `typed-profile-and-colocated-attributes` amendment section documenting
+  the `nameNormaliser` field and precedence. If the amendment grows past
+  a few paragraphs, supersede with a dedicated ADR.
 + Unblock `examples/digitalocean` and `examples/github`: delete
   their `.expected-failure` markers, commit their
   `generated/` trees under the default pipeline.

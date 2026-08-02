@@ -28,7 +28,8 @@ use Attribute;
  *     final readonly class Timestamp implements ScalarBinding { ... }
  *
  * The generator's AttributeScanner discovers these on classes whose namespace
- * is listed in the Profile's `discoverIn`. See ADR-003.
+ * is listed in the Profile's `discoverIn`. See
+ * `typed-profile-and-colocated-attributes`.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 final readonly class BindsFormat

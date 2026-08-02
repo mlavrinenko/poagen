@@ -43,7 +43,7 @@ use function sprintf;
  *      default-deny-on-degradation).
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
- * linecop limit (ADR-004).
+ * linecop limit (`quality-gates-at-maximum-strictness`).
  *
  * @internal
  */

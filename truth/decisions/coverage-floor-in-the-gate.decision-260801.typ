@@ -11,26 +11,28 @@
 
 == Context
 
-`quality-gates-at-maximum-strictness` (ADR-004) dropped a coverage
-threshold deliberately: a hosted service was wired with no bar to clear,
-which implied a number nobody enforced, and much of paogen's logic was
+`quality-gates-at-maximum-strictness` dropped a coverage threshold
+deliberately: a hosted service was wired with no bar to clear, which
+implied a number nobody enforced, and much of paogen's logic was
 exercised through committed golden-output fixtures rather than assertions
 a line-coverage figure would credit. It named its own condition for
 revisiting that: "when the code surface stabilises, a new decision may
 re-introduce a coverage threshold." This is that decision, not a reversal
-of it — ADR-004's rejection of a hosted service, and its case against
-outsourcing the judgement to one, both still hold. Nothing here reinstates
-a hosted coverage service, and nothing here touches ADR-004's phpstan /
+of it — `quality-gates-at-maximum-strictness`'s rejection of a hosted
+service, and its case against outsourcing the judgement to one, both
+still hold. Nothing here reinstates a hosted coverage service, and
+nothing here touches `quality-gates-at-maximum-strictness`'s phpstan /
 cs-fixer / rector / linecop provisions, which stand exactly as written.
 
 What made this the moment to act: a coverage recipe already existed,
 called from nowhere — not `just check`, not CI, not any other recipe —
 and wrote an HTML report and a clover file nobody read. A recipe that
 exists implies a number someone is watching, so its mere presence
-answered the question ADR-004 left open without anyone actually deciding
-anything. That is worse than having no coverage tooling at all: it
-manufactures the appearance of a bar with nothing behind it, the same
-failure ADR-004 removed the hosted service for.
+answered the question `quality-gates-at-maximum-strictness` left open
+without anyone actually deciding anything. That is worse than having no
+coverage tooling at all: it manufactures the appearance of a bar with
+nothing behind it, the same failure
+`quality-gates-at-maximum-strictness` removed the hosted service for.
 
 Before picking any number, the existing figure had to be measured — and
 the measurement itself turned out to be wrong, not merely unread. PCOV
@@ -133,11 +135,12 @@ additional signal.
 - Any coverage figure implied by the old, unread recipe — informally or in
   conversation — should be discarded rather than compared against these
   floors: it was measuring the runtime package at a flat, fake 0.00%.
-- ADR-004 stands unmodified. Its case against a hosted coverage service,
-  and against phpstan / cs-fixer / rector / linecop baselines, is
-  untouched by this decision — this fills the gap ADR-004 explicitly left
-  for a future decision to fill, once the code surface had stabilised
-  enough for a percentage to mean something narrower than "everything,
-  forever."
+- `quality-gates-at-maximum-strictness` stands unmodified. Its case against
+  a hosted coverage service, and against phpstan / cs-fixer / rector /
+  linecop baselines, is untouched by this decision — this fills the gap
+  `quality-gates-at-maximum-strictness` explicitly left for a future
+  decision to fill, once the code surface had stabilised enough for a
+  percentage to mean something narrower than "everything, forever."
 - Mutation testing remains its own, separate, deferred task, exactly as
-  ADR-004 named it; nothing here substitutes for it or forecloses it.
+  `quality-gates-at-maximum-strictness` named it; nothing here substitutes
+  for it or forecloses it.

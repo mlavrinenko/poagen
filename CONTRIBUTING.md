@@ -59,8 +59,8 @@ count toward either figure: that is emitted output, already gated by the
 generated-tier PHPStan config, the byte-stability fixtures, and `just
 check-examples`, and counting it would inflate the number with code no
 human wrote. See `truth/decisions/coverage-floor-in-the-gate.decision-260801.typ`
-for the full reasoning, including why this does not reopen ADR-004's
-rejection of codecov.
+for the full reasoning, including why this does not reopen
+`quality-gates-at-maximum-strictness`'s rejection of codecov.
 
 Two floors, not one: `src/` and `runtime/src/` are measured and gated
 independently, because the runtime ships as its own installable package

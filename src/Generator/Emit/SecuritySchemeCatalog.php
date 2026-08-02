@@ -28,8 +28,8 @@ use const SORT_STRING;
  * We follow the same "`$ref`-resolves-at-the-boundary" pattern as
  * {@see ParameterCollector}: unresolvable references are ignored (the
  * scheme is simply not registered) rather than surfacing an error.
- * ADR-002 governs the decorator-layer; this class stops at classifying
- * schemes into the subset we wire up.
+ * `no-inheritance-no-protected-regions` governs the decorator-layer; this
+ * class stops at classifying schemes into the subset we wire up.
  *
  * @internal
  */

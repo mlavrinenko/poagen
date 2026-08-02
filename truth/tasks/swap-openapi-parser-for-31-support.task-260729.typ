@@ -14,7 +14,7 @@
 
 == Summary
 
-paogen parses OpenAPI through \`cebe/php-openapi\`, which is unmaintained enough that we carry \`patches/cebe-php-openapi-php84-nullable.patch\` to silence its PHP 8.4 deprecations. ADR-008 deferred 3.1 to post-v0.1 and named an external pre-processor as the interim answer; that interim is over, because the schemas worth generating against have moved to 3.1.
+paogen parses OpenAPI through \`cebe/php-openapi\`, which is unmaintained enough that we carry \`patches/cebe-php-openapi-php84-nullable.patch\` to silence its PHP 8.4 deprecations. \`openapi-31-strategy\` deferred 3.1 to post-v0.1 and named an external pre-processor as the interim answer; that interim is over, because the schemas worth generating against have moved to 3.1.
 
 Two claims that were in this task's first draft were wrong, and correcting them is why this is no longer a priority-9 blocker.
 

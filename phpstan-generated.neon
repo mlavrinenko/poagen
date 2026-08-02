@@ -1,4 +1,5 @@
-# Independent PHPStan config for the generated fixtures (ADR-004).
+# Independent PHPStan config for the generated fixtures
+# (`quality-gates-at-maximum-strictness`).
 # This is the *consumer view* — generated code must pass max as if a user
 # were running phpstan in their own project.
 includes:

@@ -19,7 +19,7 @@ scalars therefore go out malformed and responses fail to populate.
 == Rationale
 
 Pre-release review P0 #3 — release blocker. `#[BindsFormat]` is the
-advertised DX hook (ADR-003) for scalar formats; it is unusable until
+advertised DX hook (`typed-profile-and-colocated-attributes`) for scalar formats; it is unusable until
 round-trip is fixed.
 
 == In scope
@@ -28,7 +28,8 @@ round-trip is fixed.
   generated types" rule: serialising a Model with a `#[BindsFormat]`
   VO emits the underlying scalar; hydrating a Model from a payload
   containing the underlying scalar produces a VO instance.
-+ Introduce the `ScalarBinding` interface proposed in ADR-007 under
++ Introduce the `ScalarBinding` interface proposed in
+  `hydration-and-serialization-contract` under
   an appropriate namespace in `src/` (e.g. `src/Runtime/`).
 + Teach the Model emitter / hydrator / body-marshaller to route
   property values through `ScalarBinding::fromScalar()` and

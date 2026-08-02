@@ -13,13 +13,13 @@
 `Generator::generate()` writes every file but never deletes files from
 prior runs that no longer correspond to a schema component. Renaming
 `Pet` → `Animal` leaves an orphan `Pet.php` on disk, and the
-consumer's PHPStan flags it. ADR-001's byte-stability promise holds
-only in the add-only direction.
+consumer's PHPStan flags it. `profile-driven-generation`'s byte-stability
+promise holds only in the add-only direction.
 
 == Rationale
 
 Pre-release review P0 #6 — release blocker. Cheap to implement and
-essential for ADR-001's advertised contract. Without it, every rename
+essential for `profile-driven-generation`'s advertised contract. Without it, every rename
 is a silent half-migration.
 
 == In scope
@@ -42,7 +42,7 @@ is a silent half-migration.
 - `--dry-run` / `--check` reporting of what would be pruned — filed
   as task 019.
 - Cross-profile coordination when two profiles write to the same
-  `Generated/` directory (unsupported by ADR-001 anyway).
+  `Generated/` directory (unsupported by `profile-driven-generation` anyway).
 
 == Acceptance criteria
 

@@ -20,7 +20,8 @@ use function count;
  * `paogen generate` command handler.
  *
  * Split out of {@see Cli} so the dispatch helper in `Cli.php` stays tiny
- * (ADR-006 — hand-rolled CLI). Flag parsing is a manual loop; see T-019.
+ * (`plain-getopt-for-the-cli` — hand-rolled CLI). Flag parsing is a manual
+ * loop; see T-019.
  */
 final class GenerateCommand
 {
