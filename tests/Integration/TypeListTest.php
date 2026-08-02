@@ -134,6 +134,58 @@ final class TypeListTest extends TestCase
         self::assertStringContainsString('public ?array $requiredNullableObjectArray,', $model);
     }
 
+    /**
+     * three-more-sites-read-only-the-30-nullable-flag: an inline object with
+     * no declared `properties` types as a string-keyed map rather than a
+     * synthesised class, so it never reaches PropertySynthesiser's own
+     * nullability read — it goes through TypeResolver's `object` branch
+     * straight into InlineObjectResolver::resolve(), which used to read
+     * only the 3.0 `nullable` flag. Required, so the optional-property `?`
+     * blanket cannot mask the bug.
+     */
+    public function testARequiredNullableTypedMapWithNoDeclaredPropertiesStaysNullable(): void
+    {
+        $model = $this->modelSource('NullableShapesRequest');
+
+        self::assertStringContainsString(
+            '@param ?array<string, string> $requiredNullableTypedMap',
+            $model,
+        );
+        self::assertStringContainsString('public ?array $requiredNullableTypedMap,', $model);
+    }
+
+    /**
+     * three-more-sites-read-only-the-30-nullable-flag: a ref-only
+     * `oneOf` union resolved by CompositionResolver::resolveUnion(), which
+     * used to read only the 3.0 `nullable` flag. Required, so the
+     * optional-property `?` blanket cannot mask the bug.
+     */
+    public function testARequiredNullableRefOnlyUnionStaysNullable(): void
+    {
+        $model = $this->modelSource('NullableShapesRequest');
+
+        self::assertStringContainsString(
+            'public NullableUnionBranchOne|NullableUnionBranchTwo|null $requiredNullableRefUnion,',
+            $model,
+        );
+    }
+
+    /**
+     * three-more-sites-read-only-the-30-nullable-flag: an `anyOf` of inline
+     * scalar branches resolved by CompositionResolver::resolveScalarUnion(),
+     * which used to read only the 3.0 `nullable` flag. Required, so the
+     * optional-property `?` blanket cannot mask the bug.
+     */
+    public function testARequiredNullableComposedScalarUnionStaysNullable(): void
+    {
+        $model = $this->modelSource('NullableShapesRequest');
+
+        self::assertStringContainsString(
+            'public int|string|null $requiredNullableComposedScalarUnion,',
+            $model,
+        );
+    }
+
     public function testSeveralScalarMembersBecomeAPhpUnionRatherThanMixed(): void
     {
         $model = $this->modelSource('NullableShapesRequest');

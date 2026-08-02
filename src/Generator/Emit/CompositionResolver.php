@@ -55,7 +55,8 @@ final class CompositionResolver
         $union = implode('|', $fqcns);
 
         // Native union already expresses the alternative — no PHPDoc mirror.
-        return new TypeResolver($union, null, null, (bool) $node->nullable);
+        // nullableOf() reads both the 3.0 flag and the 3.1 type array.
+        return new TypeResolver($union, null, null, SchemaType::nullableOf($node));
     }
 
     /**
@@ -99,7 +100,8 @@ final class CompositionResolver
             }
         }
 
-        $type = SchemaType::ofMembers($members, (bool) $node->nullable);
+        // nullableOf() reads both the 3.0 flag and the 3.1 type array.
+        $type = SchemaType::ofMembers($members, SchemaType::nullableOf($node));
 
         if (!$type->isScalarUnion()) {
             return null;
