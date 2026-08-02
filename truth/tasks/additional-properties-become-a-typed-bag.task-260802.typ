@@ -32,6 +32,22 @@ The practical value is a vendor adding a field next quarter: a consumer on a
 schema that allows extras reads the new field the day it ships, instead of
 regenerating and hoping.
 
+=== One criterion landed early, 2026-08-02
+
+`close-the-three-sites-that-widen-a-declared-shape` implemented the third
+criterion below — a schema-valued `additionalProperties` alongside declared
+`properties` now emits both, at property and payload granularity, rather than
+discarding one half. It could not honestly stop short of that: it emitted the
+typed map property, so something had to fill it. `AdditionalPropertyEmitter`
+appends the property, `#[AdditionalProperties]` marks it, and `Hydrator` and
+`Marshaller` carry the extras in both directions.
+
+So the criterion stays in the list and stays checkable, but it is already
+satisfied. What remains for this task is the `true` case: the runtime bag
+class, which hangs off the mechanism that already exists rather than
+introducing a second one. Reuse `#[AdditionalProperties]`; do not add a
+sibling attribute for the untyped variant.
+
 == Acceptance criteria
 
 - `additionalProperties: true` on a schema with declared properties emits those
