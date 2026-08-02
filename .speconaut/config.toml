@@ -80,6 +80,54 @@ adapter = "php-phpunit"
 # and others. Matching `[check].source-roots` here restores them.
 source-roots = ["src", "runtime/src", "bin"]
 
+# Zero-statement plumbing overrides (zero-statement-files-pinned-as-plumbing,
+# 2026-08-02). Each of the three files below carries no executable PHP
+# statement of its own — a bare interface, a caseless enum, an empty
+# exception subclass — so PHPUnit line coverage has nothing of the file's
+# own to mark as hit, however thoroughly the behaviour it describes is
+# actually exercised. Pinned by hand rather than auto-classified by the
+# tool: speconaut already ships this exact mechanism for the identical
+# shape of problem in its own .speconaut/config.toml (main.rs,
+# cli_resolve.rs, and six more, each "transited but never directly hit"),
+# and reusing it needs no upstream change. Both gates — sha256 of the
+# file's exact contents, and line count at or below max-lines — must hold
+# for the override to apply; any edit invalidates the pin and forces
+# `speconaut audit-traces --refresh-plumbing` plus a fresh look at whether
+# the file still deserves it.
+
+# A bare interface. Its four concrete implementers (CompositeNormaliser.php,
+# NameRegistry.php, PascalCaseSanitiser.php, AsciiFolder.php) are covered by
+# the same scenario that named this file in its deleted hand-authored
+# trace. NameNormaliser itself is used only in phpdoc array-shape hints
+# (`array<NameNormaliser>`), never a native param type, so nothing forces
+# the autoloader to load it — and it has no executable line for coverage
+# to mark regardless.
+[[audit-traces.plumbing.files]]
+path = "src/Generator/Naming/NameNormaliser.php"
+sha256 = "45b8ace37440f40df801666edd2fc462ccfc8d22e85519d728a764f130d60834"
+max-lines = 30
+
+# A plain, caseless enum. Same story as NameNormaliser.php: used, never
+# autoloaded under a native type, zero executable lines.
+[[audit-traces.plumbing.files]]
+path = "src/Generator/Naming/SymbolKind.php"
+sha256 = "00d5f09c7dd020f21130caef4ad845c09a2099f647cc1673a77cf6246084654d"
+max-lines = 40
+
+# `final class InvalidProfileException extends RuntimeException {}` — no
+# body at all. The scenario that names it ("A PHP file that does not
+# return a Profile is rejected") still runs today and its coverage shows
+# only ProfileLoader.php; the exception is almost certainly thrown and
+# caught exactly as the scenario describes, but has nothing of its own to
+# mark as hit. Contrast ModelNameCollisionException.php, an equally
+# pure-data exception that IS auto-classified plumbing today, purely
+# because its static `between()` factory carries one executable `sprintf`
+# line — the only difference is that one happens to have a line to count.
+[[audit-traces.plumbing.files]]
+path = "src/Exception/InvalidProfileException.php"
+sha256 = "2241ff45b92fee5252387be7bb6a5780347a7b433f3d6f99b9a928d9fd8f3811"
+max-lines = 15
+
 [check]
 
 # Roots the untraced-source finding walks. runtime/src was here through
@@ -141,7 +189,11 @@ allowlist = [
 # silently loosen or tighten what paogen's own decisions and standards owe a
 # reader; the shape is a content contract this project chose, not an
 # accident of whatever speconaut ships. Confirmed a no-op against the current
-# tree: 15 decisions, 15 `== Context`/`== Choice`/`== Consequences`, in order.
+# tree: 27 decisions, 27 `== Context`/`== Choice`/`== Consequences`, in order
+# (re-verified 2026-08-02; an earlier version of this comment said 15, stale
+# by the time this line was next touched — the count drifts as decisions land
+# and is not meant as a standing guarantee, only as evidence the config was a
+# no-op the day it was written).
 [check.headers]
 enforce-order = true
 

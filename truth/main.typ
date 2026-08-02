@@ -127,6 +127,8 @@
 #include "decisions/untraced-source-is-a-ratcheted-warning.decision-260802.typ"
 #pagebreak()
 #include "decisions/runtime-src-excluded-from-untraced-source-check.decision-260802.typ"
+#pagebreak()
+#include "decisions/zero-statement-files-pinned-as-plumbing.decision-260802.typ"
 
 // --- Supplementary artefacts ---
 //
