@@ -70,3 +70,20 @@ time in production, with no prior test ever having run either method.
 - `tests/Unit/Runtime/Fixtures/` — possibly a new fixture class, if a
   phpdoc-driven property is used instead of a direct `PropertyType`
   construction
+
+== Result
+
+`MarshalRoundTripTest::testMapOfModelsRoundTrips()` constructs a `Warehouse`
+fixture whose `bins` property carries an `array<string, Tag>|null` phpdoc shape,
+driving `PropertyTypeResolver::resolveArrayLike()` to `PropertyType::mapOf(...)`
+exactly as a schema-derived model property would. It marshals a `Warehouse` with
+two `Tag` entries into its wire-shaped map, and separately hydrates a wire array
+back, asserting the recovered values are real `Tag` instances rather than a
+passthrough of raw arrays.
+
+Measured, not assumed. A raw `phpunit --coverage-clover` run puts both arms at
+`count=1` where both sat at `count=0` before: `Hydrator.php:70` and
+`Marshaller.php:61`. A filtered `infection run` over the two files leaves eight
+escaped mutants, none of them on a `KIND_MAP` line — the survivors are unrelated
+`default` and `KIND_PASSTHROUGH` arm removals. The map-kind round trip runs under
+a real assertion for the first time.

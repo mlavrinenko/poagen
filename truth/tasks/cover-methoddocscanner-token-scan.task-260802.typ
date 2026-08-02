@@ -71,3 +71,34 @@ is absent from the CLI SAPI.
   test file)
 - `tests/Unit/Runtime/Fixtures/` — likely a new fixture class carrying
   the multi-method, attributed shape the new assertions need
+
+== Result
+
+A new fixture, `DocScanTargets`, carries the three shapes in one file: a plain
+docblock, a docblock separated from its `function` keyword by a
+`#[Tagged(['a', 'b'])]` attribute with a nested-bracket argument, and a method
+with no docblock at all.
+`DescriptorParserFallbackTest::testScanRecoversDistinctDocsAcrossMethodsAttributesAndMissingDocs()`
+scans it through `MethodDocScanner::docFor()` and asserts each method's
+recovered doc individually, so a doc lost or mis-attributed on one method fails
+on its own rather than riding on another's assertion. No OPcache guard was
+needed: `docFor()` bypasses `DescriptorParser`'s opcache-conditional fallback and
+always runs its token scan, confirmed by the file running four of four tests
+with none skipped.
+
+Escaped mutants on `MethodDocScanner.php` fall from a baseline of 18 to a range
+of 7 to 10. The range is not sloppiness — the run was repeated four times against
+identical committed source to separate the stable core from the fringe, and the
+worst figure is the one reported. That variance is the same run-to-run noise
+`mutation-testing-stays-out-of-the-gate` already measured and is another reason
+it stays out of the gate.
+
+The survivors were judged case by case rather than forced to a kill, and each
+was argued equivalent: the line 92 `&&` mutants differ only by writing an
+explicit null where the key would be absent, which `docFor()`'s null-coalescing
+return cannot distinguish; the line 125, 144 and 152 index nudges land on
+whitespace or visibility tokens the scanner already treats as no-ops; and the
+line 127 and 152 `<` to `<=` mutants only diverge when the scan runs past the
+physical end of the token array, unreachable for any syntactically complete
+reflectable method. Two `++$i` flips time out under mutation testing regardless
+of this change and predate it.
