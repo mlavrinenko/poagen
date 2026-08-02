@@ -42,6 +42,12 @@ final class KilbilFixture
         $decoded = json_decode(self::raw($name), true, flags: JSON_THROW_ON_ERROR);
         assert(is_array($decoded));
 
-        return $decoded;
+        $out = [];
+
+        foreach ($decoded as $key => $value) {
+            $out[(string) $key] = $value;
+        }
+
+        return $out;
     }
 }

@@ -16,6 +16,18 @@ parameters:
     # Generated code is checked by a separate config so the consumer's
     # PHPStan setup is what gates it (ADR-004).
     - tests/fixtures/generated/*
+  # kilbil-recorded-response-proof: tests/Integration/Kilbil/* import
+  # Acme\Kilbil\Generated\* to drive the real, committed ApiClient over the
+  # real HttpTransport. That tree lives under examples/kilbil/generated and
+  # is analysed on its own, separate, consumer-view config (ADR-004, see
+  # examples/kilbil/phpstan.neon) — it is not this config's job to type-check
+  # it. scanDirectories only makes the symbols discoverable so this config's
+  # own analysis of tests/ doesn't report class.notFound on a class that does
+  # exist, one tier over; it does not put those files under analysis here
+  # (same split phpstan-generated.neon:23 already uses for
+  # tests/fixtures/profiles/value-objects).
+  scanDirectories:
+    - examples/kilbil/generated
   ignoreErrors:
     # speconaut-php-phpunit's StepStub::stubBody() appends
     # `$this->test->fail('Implement: ...')` for any spec step that does not
