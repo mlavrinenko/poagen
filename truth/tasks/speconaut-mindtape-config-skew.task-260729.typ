@@ -5,7 +5,7 @@
   tags: ("speconaut", "mindtape", "interop", "upstream"),
   priority: 8,
   difficulty: 3,
-  status: proposed(2026, 7, 29),
+  status: wip(2026, 8, 2),
 )
 
 == Summary
@@ -40,3 +40,53 @@ What is lost meanwhile: the \`into("wip")\` hook that lists what is already in f
 
 - \`~/projects/home/speconaut/\` (the actual fix)
 - \`.mindtape/config.toml\` (restoring the commented hooks once the fix lands)
+
+== Result
+
+No file changed here, because the fix had already landed upstream and nobody had
+checked. speconaut's Cargo workspace was repointed at the extracted sibling
+crates on 2026-07-31 — \`swhid-mint\` now resolves at \`../swhid-mint\` rather than
+the \`../mindtape/crates/swhid-mint\` path this task recorded as missing — so
+speconaut could rebuild against current mindtape again, and the installed binary
+stopped lagging. The hooks in \`.mindtape/config.toml\` are uncommented and have
+been for some time.
+
+The point of this entry is that "it passes now" was not accepted as proof. A
+check that silently skips the file it is meant to read passes exactly as
+convincingly as one that reads it, so the parse was made to fail on purpose
+before it was believed. Against a scratch copy of \`.mindtape/\`, \`.speconaut/\`
+and \`truth/\`:
+
+#table(
+  columns: 3,
+  [*Config under test*], [*Result*], [*What it proves*],
+
+  [The tree's own config, hooks uncommented],
+  [\`All specs valid (4 features)\`, exit 0],
+  [Nothing on its own. This is the reading the task would have accepted.],
+
+  [Plus an extra \`\[\[on.flip\]\]\` block on \`into("blocked")\`],
+  [\`All specs valid (4 features)\`, exit 0],
+  [The key whose rejection opened this task is understood, not merely tolerated — a second, previously unseen instance of it parses too.],
+
+  [Plus an unknown key under \`\[tasks\]\`],
+  [\`check failed: 2 error(s)\`, exit 1],
+  [The file is genuinely parsed and validated. A skipped file cannot produce this.],
+)
+
+\`tasks.comments\` — the second key the task warned was hiding behind \`on\` — is
+present in the live config that parses clean, so the version gap closed as a gap
+rather than one field at a time. \`mt check\` agrees on the same file: 107 tasks
+valid. And the gate the preset exists for was made to fire rather than assumed:
+a throwaway task carrying \`- TODO: \` placeholders was refused at
+\`mt done\` with exit 1 and the configured message, so the \`into("done")\` hook
+is live, not decorative.
+
+One criterion is deliberately left unmet: the note recording how speconaut's
+embedded mindtape and the separately-installed \`mt\` stay in step. That is a
+design call belonging to speconaut, the mechanism is not paogen's to choose, and
+speconaut's tree currently carries uncommitted changes that are not this
+session's. Filed as \`speconaut-mindtape-skew-guard\` rather than written badly
+from the outside. The defect this task names is fixed; the guard against its
+recurrence is not, and saying so is more useful than a note that invents a
+mechanism nobody agreed to.
