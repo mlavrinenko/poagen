@@ -420,6 +420,34 @@ generate-tests: tmpdir
 check-generated-tests:
     speconaut generate-tests truth/ --adapter php-phpunit --output tests/generated --check
 
+# Compare coverage-derived traces against declared scenarios
+# (restore-coverage-derived-traceability).
+#
+# NOT in `just check` yet. `AuditTracesHandler` in the `php-phpunit` adapter
+# hardcodes its PHPUnit `--filter` namespace to `Speconaut\Generated` and
+# the RPC envelope carries no `namespace` field to override it with —
+# unlike `generate-tests`, which already reads paogen's configured
+# `namespace` above. Every one of paogen's 96 checked scenarios therefore
+# fails identically with "phpunit exited with code 1" (verified by
+# reproducing the collector's own PHPUnit invocation by hand against a
+# class actually declaring `Mlavrinenko\Paogen\Tests\Generated`: "No tests
+# executed!", exit 1; the same invocation with the real namespace passes
+# and reports real coverage). Filed upstream as
+# `audit-traces-ignores-the-configured-namespace` in speconaut's own
+# `truth/tasks/` — this recipe starts working the moment that lands, with
+# no change needed here.
+#
+# Measured against a local, uncommitted workaround for the blocker above
+# (reverted before commit — see `untraced-source-is-a-ratcheted-warning`):
+# ~27s wall-clock for 96 scenarios, one PHPUnit boot per scenario. That is
+# fast enough to join `just check` once the blocker clears; it is not
+# joining today because it cannot pass today.
+#
+# Needs `tmpdir` for the same reason `check-drift` does: the PHP adapter
+# spawns PHPUnit, which dies on a `$TMPDIR` that does not exist yet.
+audit-traces: tmpdir
+    speconaut audit-traces --adapter php-phpunit
+
 # Run each examples/*/ profile through paogen; report pass / drift /
 # expected-failure. Deliberately NOT wired into `just check` — broken
 # examples are committed as targets for upcoming work (see T-024).
