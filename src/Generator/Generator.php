@@ -47,6 +47,7 @@ final readonly class Generator
         private PlanApplier $applier = new PlanApplier(),
         private SkipListValidator $skipListValidator = new SkipListValidator(),
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
+        private PropertyRenameValidator $propertyRenameValidator = new PropertyRenameValidator(),
         private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
@@ -153,6 +154,7 @@ final readonly class Generator
             $excludedComponents,
             $inlinePayloads->roots(),
             $ledger,
+            $profile->propertyRenames,
         );
         $tagRegistry = new NameRegistry($normaliser);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
@@ -169,6 +171,7 @@ final readonly class Generator
         $failures = [
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
+            ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
         ];
 
         if ($failures !== []) {
