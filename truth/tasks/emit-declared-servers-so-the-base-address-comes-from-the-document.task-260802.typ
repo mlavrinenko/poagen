@@ -5,7 +5,11 @@
   tags: ("generator", "dx"),
   priority: 6,
   difficulty: 3,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    2,
+  )[Landed as 02a4225, merged and re-gated on the integrated HEAD. Declared servers emit as public const string on the root client, named from description or position; a server-variable template refuses by name; the base address stays a transport constructor argument.],
 )
 
 == Summary

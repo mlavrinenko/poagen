@@ -71,6 +71,30 @@ it passed.** The pipeline reports the last command's status, so a red gate reads
 as exit 0 — verified on `linecop`, which exits 1 directly and 0 through `| head`.
 Redirect to a file and echo `$?`.
 
+### The parser's accessors lie in three measured ways
+
+`devizzent/cebe-php-openapi` reaches most of the document through magic
+getters, and three of them do not mean what their declaration says. Each was
+found the expensive way; check the accessor before you trust it.
+
+**`$openApi->servers` invents a server nobody declared.** The spec defaults an
+absent or empty `servers:` to a synthetic `url: /`, and the getter substitutes
+it, so a document that declares nothing is indistinguishable from one that
+declares `/`. `getSerializableData()` reflects only what the document itself
+set — that is how `ServerCatalog::declared()` tells them apart, and without it
+every fixture without a `servers:` block grows a useless `SERVER_1 = '/'`.
+
+**`allOf` / `oneOf` / `anyOf` are declared `Schema[]|Reference[]` and return
+`null` when the keyword is absent.** PHPStan believes the declaration, so it
+reads an `is_array` guard as redundant and a rector rewrite will happily drop
+it — straight into a fatal on most schemas. `SchemaWalk::compositionBranches()`
+holds the guard; go through it. Same shape as the widening in
+`SchemaType::rawType()`.
+
+**`$openApi->security` is a plain list, not a container.** The fork deleted the
+`SecurityRequirements` class cebe had; the scheme names are the requirement's
+own keys, read through `getSerializableData()`.
+
 ### speconaut and mt
 
 Both are on the system PATH. `speconaut` is a nix shim at
@@ -117,7 +141,16 @@ example trees, rector, and linecop, in parallel.
   is never read: use a plain, non-promoted constructor parameter instead
   (`tests/Unit/Runtime/Fixtures/Tagged.php`'s `$values`). Measured while
   writing both files, filed as
-  `reflection-only-fixtures-fight-the-lint-gate`.
+  `reflection-only-fixtures-fight-the-lint-gate`. `deadProperty.neverRead`
+  is not confined to that family: it fires on any ordinary fixture whose
+  property a test constructs and never reads.
+- Rector and PHPStan can put you in a loop. `ForeachToArrayAllRector`
+  rewrites a `foreach` over one of the parser's mis-declared array properties
+  into an `array_all` with an `array`-typed closure parameter, and PHPStan
+  then reports `function.alreadyNarrowedType` on the guard that rewrite just
+  made look redundant — remove the guard and it fatals at runtime. Neither
+  tool is wrong on its own terms. Break the loop by moving the guard behind a
+  named method; do not fight either tool head-on.
 - Linecop enforces line limits across the whole repo, not just `src/` —
   `.linecop.yaml` excludes `vendor`, `build`, `.devbox`, `.git`,
   `tests/generated`, `tests/fixtures` and `examples`, and caps PHP at 250 lines
