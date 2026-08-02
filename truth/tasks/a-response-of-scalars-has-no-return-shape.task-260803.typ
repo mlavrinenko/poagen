@@ -7,9 +7,11 @@
   difficulty: 4,
   links: (
     related("typed-error-responses.task-260729.typ"),
-    related("synthesise-a-model-for-inline-array-item-responses.task-260802.typ"),
+    related(
+      "synthesise-a-model-for-inline-array-item-responses.task-260802.typ",
+    ),
   ),
-  status: proposed(2026, 8, 3),
+  status: wip(2026, 8, 3),
 )
 
 == Summary
