@@ -65,6 +65,25 @@ derive-tags = true
 enabled = true
 collect = ["segments"]
 
+# Every task file in this root is named `<slug>.task-<yymmdd>.typ`, and the
+# sub-extension is load-bearing rather than decorative: CONTRIBUTING.md
+# defines a commit's `Refs:` slug as "the filename stem without the
+# `.task-<yymmdd>.typ` suffix", the commit-msg hook resolves a trailer by
+# globbing `truth/tasks/<slug>.task-*.typ`, and speconaut discovers tasks by
+# the same sub-extension. `mt add` does not mint it — the default stem
+# template is a bare `{slug}` — so every task filed here came out as
+# `<slug>.typ` and had to be renamed by hand afterwards, eight in a row on
+# 2026-08-02. A file that missed the rename is not merely untidy: it is
+# invisible to speconaut and unresolvable by the commit hook, so the trailer
+# naming it fails the same way a missing trailer does.
+#
+# Pinning the template makes the convention the tool's job instead of the
+# author's memory. The macros are mindtape's own (`{slug}`, `{yy}`, `{mm}`,
+# `{dd}`); this is the exact shape the existing 80-odd files already carry,
+# so it states what the tree says rather than introducing a convention.
+[tasks.naming]
+stem = "{slug}.task-{yy}{mm}{dd}"
+
 [[tasks.status]]
 value = "proposed"
 glyph = "💡"
