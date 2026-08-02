@@ -5,7 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 7,
   difficulty: 5,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    2,
+  )[Landed as 591ed69, merged and re-gated on the integrated HEAD. ObjectShape asks the object question once; response additionalProperties resolves through a nested ReturnSpec; UnconstrainedFieldAdvisor reports the four positions kilbil genuinely leaves unconstrained. kilbil and petstore byte-identical.],
 )
 
 == Summary
