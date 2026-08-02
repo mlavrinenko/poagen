@@ -23,6 +23,9 @@ paths:
                 - requiredNullableEnum
                 - requiredNullableObject
                 - requiredNullableObjectArray
+                - requiredNullableTypedMap
+                - requiredNullableRefUnion
+                - requiredNullableComposedScalarUnion
               properties:
                 requiredButNullable:
                   type:
@@ -77,6 +80,33 @@ paths:
                     - integer
                 untyped:
                   description: the document says nothing about this one
+                # three-more-sites-read-only-the-30-nullable-flag: each of
+                # these three is required and declares nullability only
+                # through the 3.1 type array, exercising a site that used to
+                # read only the 3.0 flag: InlineObjectResolver::resolve()
+                # (no declared properties, so it types as a map, not a
+                # synthesised class), CompositionResolver::resolveUnion()
+                # (a ref-only oneOf), and CompositionResolver::resolveScalarUnion()
+                # (an anyOf of inline scalars).
+                requiredNullableTypedMap:
+                  type:
+                    - object
+                    - "null"
+                  additionalProperties:
+                    type: string
+                requiredNullableRefUnion:
+                  type:
+                    - object
+                    - "null"
+                  oneOf:
+                    - $ref: '#/components/schemas/NullableUnionBranchOne'
+                    - $ref: '#/components/schemas/NullableUnionBranchTwo'
+                requiredNullableComposedScalarUnion:
+                  type:
+                    - "null"
+                  anyOf:
+                    - type: integer
+                    - type: string
       responses:
         '204':
           description: ok
@@ -102,3 +132,19 @@ paths:
       responses:
         '204':
           description: ok
+components:
+  schemas:
+    NullableUnionBranchOne:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+    NullableUnionBranchTwo:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string

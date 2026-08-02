@@ -50,7 +50,9 @@ final class InlineObjectResolver
         NameRegistry $registry,
         ?EnumCatalog $enums,
     ): TypeResolver {
-        $nullable = (bool) $node->nullable;
+        // 3.0 `nullable: true` or 3.1 `type: [T, "null"]` — read once, shared
+        // with TypeResolver and PropertySynthesiser via SchemaType.
+        $nullable = SchemaType::nullableOf($node);
         $phpDoc = self::valueMapDoc($node, $bindings, $modelNamespace, $registry, $enums);
 
         return new TypeResolver('array', $phpDoc, null, $nullable);
