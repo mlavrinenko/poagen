@@ -63,8 +63,9 @@ What was actually left was the one thing that note got right: 82 PHPStan
 `Acme\Kilbil\Generated\*` namespace the tests import. Closed with
 `scanDirectories` in `phpstan.neon.dist`, the same split
 `phpstan-generated.neon` already uses — the symbols become discoverable without
-the generated tree coming under this config's analysis, which stays ADR-004's
-consumer-view job. Not by loosening types in the harness, which is what the
+the generated tree coming under this config's analysis, which stays
+`quality-gates-at-maximum-strictness`'s consumer-view job. Not by loosening
+types in the harness, which is what the
 branch had been drifting toward. That surfaced one real unrelated error too: a
 `json_decode` result typed `array<string, mixed>` on the strength of
 `is_array()`, which only proves `array<mixed, mixed>`; narrowed by rebuilding

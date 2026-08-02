@@ -8,7 +8,7 @@ use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 
 /**
  * Resolves an OpenAPI `format` to a PHP type that is transparent at the wire
- * boundary per ADR-007. Unifies two sources:
+ * boundary per `hydration-and-serialization-contract`. Unifies two sources:
  *
  *   - user `#[BindsFormat]` value objects that implement {@see ScalarBinding}
  *     — treated as `scalar` bindings whose `fromScalar()` / `toScalar()`

@@ -4,9 +4,10 @@
 #   cebe/php-openapi 1.8.0 (the latest tagged release, May 2025) declares
 #   several parameters with the implicit-nullable shape
 #   `Type $param = null`. PHP 8.4 deprecates that syntax and every consumer
-#   sees the notice. Upstream has not moved since 1.8.0, and paogen ADR-008
-#   keeps us on cebe's 3.0 parser for v0.1, so we apply a local patch that
-#   adds the explicit `?` on each affected signature.
+#   sees the notice. Upstream has not moved since 1.8.0, and paogen's
+#   `openapi-31-strategy` decision keeps us on cebe's 3.0 parser for v0.1, so
+#   we apply a local patch that adds the explicit `?` on each affected
+#   signature.
 #
 # Upstream: https://github.com/php-openapi/php-openapi
 #           (was https://github.com/cebe/php-openapi, redirected)
@@ -15,7 +16,8 @@
 #   - a tagged cebe/php-openapi release ships these signatures with
 #     explicit `?Type` (or equivalent), and composer.json pins that
 #     release; OR
-#   - paogen swaps parsers (see truth/decisions/008-openapi-31-strategy.typ).
+#   - paogen swaps parsers (see
+#     truth/decisions/openapi-31-strategy.decision-260419.typ).
 #
 # Scope (9 signatures):
 #   src/SpecBaseObject.php:396       resolveReferences(?ReferenceContext ...)

@@ -9,12 +9,12 @@
     2026,
     8,
     2,
-  )[Unblocked, and the answer is neither branch this task offered. The owner reversed ADR-009's rejected option (c): an operation returns an envelope carrying the status code and the body the document declared for that status, typed. 2xx stops being a special case. The exception survives only for a response the document did not describe. See the ruling below.],
+  )[Unblocked, and the answer is neither branch this task offered. The owner reversed \`error-response-policy\`'s rejected option (c): an operation returns an envelope carrying the status code and the body the document declared for that status, typed. 2xx stops being a special case. The exception survives only for a response the document did not describe. See the ruling below.],
 )
 
 == Summary
 
-ADR-009 chose a single generic \`ApiException\` carrying the status code, the PSR-7 request and response, and a best-effort decoded body. It was the right call for a proof of concept, and it was recorded with an explicit upgrade path: revisit when a real schema justifies it.
+\`error-response-policy\` chose a single generic \`ApiException\` carrying the status code, the PSR-7 request and response, and a best-effort decoded body. It was the right call for a proof of concept, and it was recorded with an explicit upgrade path: revisit when a real schema justifies it.
 
 kilbil is that real schema, and the project's goals have moved since. \`typed-injectable-surface\` asks for a typed surface with no slacking, and \`getDecodedBody(): mixed\` is the least typed thing the generator emits — a consumer who wants a field from a declared error body has to re-parse an array the generator already knew the shape of.
 
@@ -36,14 +36,15 @@ whose body is that class, exactly as a 200 does. There is no branch in the
 generated method, no exception on the declared path, and no
 \`getDecodedBody(): mixed\` anywhere.
 
-The phrase "best-effort decoded body" in ADR-009 was not describing a schema
-that cannot be honoured. It was describing the consequence of ADR-009's own
-choice: one exception class for every status meant nothing carried the model
+The phrase "best-effort decoded body" in \`error-response-policy\` was not
+describing a schema that cannot be honoured. It was describing the
+consequence of \`error-response-policy\`'s own choice: one exception class
+for every status meant nothing carried the model
 to hydrate into, so the runtime could only run \`json_decode\` and hand back an
 array. Under this ruling the model is known per status, so the body is
 hydrated, not decoded-and-shrugged-at.
 
-ADR-009 rejected this as option (c), on the grounds that a \`Ok|Err\` union is
+\`error-response-policy\` rejected this as option (c), on the grounds that a \`Ok|Err\` union is
 non-idiomatic PHP and forces \`if (\$r instanceof Err)\` at every call site. That
 objection does not apply to what is being built here — a single envelope class
 is not a sum type, the call site reads \`->status\` and \`->body\`, and a consumer
@@ -98,7 +99,7 @@ by refusing to type the body.
   branch.
 - Identical inline response schemas collapse onto one emitted model. Proven on
   kilbil: its 36 identical 403 schemas produce exactly one error model, not 36.
-- A decision artifact supersedes \`error-response-policy\` (ADR-009), citing the
+- A decision artifact supersedes \`error-response-policy\`, citing the
   measured kilbil surface above as its evidence, and states what the envelope
   costs: every generated method's return type changes, and every consumer
   reads \`->body\` where they used to read a model directly.
@@ -125,7 +126,7 @@ by refusing to type the body.
 
 == Files
 
-- \`truth/decisions/\` (a new decision artifact superseding ADR-009)
+- \`truth/decisions/\` (a new decision artifact superseding \`error-response-policy\`)
 - \`runtime/src/Contract/TransportInterface.php\`
 - \`runtime/src/Contract/ResponseType.php\`
 - \`runtime/src/Http/HttpTransport.php\`

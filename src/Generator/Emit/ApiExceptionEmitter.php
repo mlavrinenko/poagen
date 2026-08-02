@@ -16,8 +16,9 @@ use RuntimeException;
  *
  * One class per generation run, sat alongside `ApiClient.php`. Thrown by every
  * emitted operation when the response status is outside the 2xx range. Carries
- * status, request, response, and a best-effort JSON-decoded body. Per ADR-009,
- * decode failures are swallowed (no `JSON_THROW_ON_ERROR`) and surface as
+ * status, request, response, and a best-effort JSON-decoded body. Per
+ * `error-response-policy`, decode failures are swallowed (no
+ * `JSON_THROW_ON_ERROR`) and surface as
  * `null` from `getDecodedBody()`.
  */
 final readonly class ApiExceptionEmitter
@@ -98,7 +99,7 @@ final readonly class ApiExceptionEmitter
             ->setReturnType('mixed');
         $decode->addComment('Best-effort JSON decode of the response body.');
         $decode->addComment('');
-        $decode->addComment('Returns `null` for an empty body or any decode failure (per ADR-009).');
+        $decode->addComment('Returns `null` for an empty body or any decode failure (per `error-response-policy`).');
         $decode->addComment('Cached on first call.');
         $decode->addBody(<<<'PHP'
             if ($this->decoded) {

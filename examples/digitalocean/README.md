@@ -6,7 +6,7 @@ OpenAPI 3.0 document — 722 schema components, hundreds of endpoints.
 > **Status: expected failure.** Four components (`database_config`,
 > `logsink_update`, `autoscale_pool`, `autoscale_pool_create`) carry a
 > ref-only `oneOf`/`anyOf` `config` property with no `discriminator`;
-> ADR-010 makes that a generator-time error
+> `attribute-and-phpdoc-driven-serialization` makes that a generator-time error
 > ([T-030](../../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
 > `clear-example-expected-failures` checked all four branch-by-branch
 > against the vendored schema and confirmed none admits an honest
@@ -50,7 +50,7 @@ This currently exits non-zero — see `.expected-failure`. Once the four
 discriminator components are resolved (upstream schema patch, or a
 generator change that lets a skipped component's dependents be skipped
 too), a successful run writes `./generated/`, byte-stable across
-repeats (ADR-001), and that run's diff commits the tree alongside
+repeats (`profile-driven-generation`), and that run's diff commits the tree alongside
 deleting the marker.
 
 ## Source of the schema

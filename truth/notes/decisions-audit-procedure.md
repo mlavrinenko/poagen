@@ -248,13 +248,15 @@ say `(new Hydrator())->hydrate(...)` (lines 147, 178). Step 4 —
 `rg -n 'ApiClient::hydrate' src runtime tests examples` — returns zero
 hits. Every executable path hydrates through a bare `Hydrator`
 instance instead, and `ModelGeneratorSteps.php`'s own doc comment says
-why: "Per ADR-010 this is a free function — the generated `ApiClient`
-no longer carries a private `hydrate()` helper." The derived step
+why: "Per `attribute-and-phpdoc-driven-serialization` this is a free
+function — the generated `ApiClient` no longer carries a private
+`hydrate()` helper." The derived step
 methods still encode the stale receiver in their names —
 `whenClientCallApiClientHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire`,
 `thenApiclientHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample`.
-This predates the transport refactor — ADR-010 retired
-`ApiClient::hydrate()` in
+This predates the transport refactor —
+`attribute-and-phpdoc-driven-serialization` retired `ApiClient::hydrate()`
+in
 `attribute-and-phpdoc-driven-serialization.decision-260420.typ` — and
 is unrelated to it. It is recorded here, not fixed here: fixing spec
 text is outside what this note does, same as it was outside what wrote

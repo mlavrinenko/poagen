@@ -86,8 +86,9 @@ final readonly class Generator
         // schema node responsible.
         $openApi->setDocumentContext($openApi, new JsonPointer(''));
 
-        // ADR-010 + T-030 + abort-on-unrepresentable-constructs: collect
-        // every property-level `oneOf`/`anyOf` union with no discriminator
+        // attribute-and-phpdoc-driven-serialization + T-030 +
+        // abort-on-unrepresentable-constructs: collect every property-level
+        // `oneOf`/`anyOf` union with no discriminator
         // (after applying any profile-level override), instead of failing
         // on the first one found.
         $discriminatorSkips = new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);

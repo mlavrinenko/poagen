@@ -23,7 +23,8 @@ final readonly class Bindings
 
     /**
      * Return the bound FQCN for `$format` only when that VO opts into the
-     * transparent scalar round-trip contract of ADR-007.
+     * transparent scalar round-trip contract of
+     * `hydration-and-serialization-contract`.
      *
      * @return class-string<ScalarBinding>|null
      */

@@ -116,13 +116,13 @@
     ]
   ]
 
-  #rule("Hydration and serialization contract (ADR-010)")[
+  #rule("Hydration and serialization contract (attribute-and-phpdoc-driven-serialization)")[
     #scenario(
       "A list-of-Model property hydrates each item into the declared class",
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` has a property `tags` whose schema is `type: array, items.$ref: #/components/schemas/Tag`]
-      #when[#the(Client)'s runtime `Hydrator` (ADR-010) runs against a payload whose `tags` is a list of two objects]
+      #when[#the(Client)'s runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `tags` is a list of two objects]
       #then[#the(Model)'s `$pet->tags[0]` is an instance of `Tag`]
       #and_[#the(Model)'s `$pet->tags[1]` is an instance of `Tag`]
     ]
@@ -132,7 +132,7 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` has a property `photoUrls` whose schema is `type: array, items.type: string`]
-      #when[#the(Client)'s runtime `Hydrator` (ADR-010) runs against a payload whose `photoUrls` is a list of plain strings]
+      #when[#the(Client)'s runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `photoUrls` is a list of plain strings]
       #then[each `$pet->photoUrls[$i]` on #the(Model) is the original string — no object wrapping]
     ]
 
@@ -141,7 +141,7 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Contact` declares a required property whose schema key is `display-name` (kebab-case)]
-      #when[#the(Generator) emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (ADR-010) process a payload containing the wire key `display-name`]
+      #when[#the(Generator) emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (attribute-and-phpdoc-driven-serialization) process a payload containing the wire key `display-name`]
       #then[#the(Model)'s constructor parameter is emitted as `$displayName` (camelCased PHP identifier)]
       #and_[#the(Model)'s property carries `#[WireName('display-name')]`, and the class has no `PROPERTY_MAP` constant]
       #and_[#the(Client)'s `(new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada'])` populates `$contact->displayName === 'Ada'`]
@@ -152,11 +152,11 @@
       "Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable",
       stage: "unstable",
     )[
-      #given[#a(Model) `Order` is emitted by #the(Generator) under ADR-010]
+      #given[#a(Model) `Order` is emitted by #the(Generator) under attribute-and-phpdoc-driven-serialization]
       #when[#a(GeneratedFile) `Generated/Model/Order.php` is read]
       #then[#the(GeneratedFile) contains no `PROPERTY_MAP` class constant and no `implements JsonSerializable`]
       #and_[#the(Model)'s class is `final readonly` with constructor-promoted properties only]
-      #and_[#the(Model)'s wire metadata (when needed) is carried by the small ADR-010 attribute set on each parameter]
+      #and_[#the(Model)'s wire metadata (when needed) is carried by the small attribute-and-phpdoc-driven-serialization attribute set on each parameter]
     ]
 
     #scenario(
@@ -164,13 +164,13 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` declares a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
-      #when[#a(GeneratedFile) `Pet.php` is read and the runtime `Hydrator` (ADR-010) runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
+      #when[#a(GeneratedFile) `Pet.php` is read and the runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
       #then[#the(Model)'s `kind` parameter carries `#[Discriminator(field: 'petType', map: ['Dog' => Dog::class, 'Cat' => Cat::class])]`]
       #and_[#the(Model)'s `$pet->kind` is an instance of `Cat`, independent of structural overlap with `Dog`]
     ]
 
     #scenario(
-      "Hydration recovers phpdoc types when opcache strips comments (ADR-010)",
+      "Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)",
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` declares a property `tags` with phpdoc `@param list<Tag>|null $tags`]
@@ -215,7 +215,7 @@
     ]
   ]
 
-  #rule("Component names are normalised through a configurable pipeline (ADR-003, T-023)")[
+  #rule("Component names are normalised through a configurable pipeline (typed-profile-and-colocated-attributes, T-023)")[
     #scenario(
       "A kebab-case component name becomes a PascalCase PHP class under the default pipeline",
       stage: "unstable",

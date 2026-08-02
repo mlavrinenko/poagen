@@ -47,7 +47,7 @@ The transport must be replaceable, not merely injected — see \`swappable-runti
 
 == Non-goals
 
-- Retry, backoff, caching, logging or any other transport policy. Those compose underneath the PSR client, per ADR-002.
+- Retry, backoff, caching, logging or any other transport policy. Those compose underneath the PSR client, per `no-inheritance-no-protected-regions`.
 - Changing the emitted method signatures, which are the consumer-facing contract.
 - Moving authentication out of the client into a decorator.
 - Publishing the runtime as its own package; \`runtime-package-split\` owns that.

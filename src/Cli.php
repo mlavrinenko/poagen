@@ -19,7 +19,7 @@ use const STDERR;
 use const STDOUT;
 
 /**
- * Minimal hand-rolled CLI entry point. See ADR-006.
+ * Minimal hand-rolled CLI entry point. See `plain-getopt-for-the-cli`.
  */
 final class Cli
 {

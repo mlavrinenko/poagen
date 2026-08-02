@@ -13,7 +13,8 @@ use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
  *
  * Everything else — `apiKey` in cookie, `http basic`, `oauth2`,
  * `openIdConnect` — is flagged {@see self::KIND_UNSUPPORTED} and left
- * to the decorator-layer runtime per ADR-002. Treating unsupported
+ * to the decorator-layer runtime per
+ * `operations-delegate-to-an-injected-transport`. Treating unsupported
  * schemes as first-class values (rather than null) keeps the catalog's
  * caller code uniform: it iterates over every named scheme and skips
  * unsupported ones at the emission site instead of the collection site.

@@ -31,7 +31,8 @@ schema produces incorrectly-typed data at runtime.
 + Extend the same rule with a scenario for #raw("list<string>") and
   #raw("list<int>") scalar-list properties — items remain scalars.
 + Teach the emitter to record a per-property item-type directive
-  (via the per-Model `PROPERTY_MAP` proposed in ADR-007, or a local
+  (via the per-Model `PROPERTY_MAP` proposed in
+  `hydration-and-serialization-contract`, or a local
   equivalent) so the hydrator no longer relies on reflection alone.
 + Rewire `ClientEmitter::hydrate()` to consult the directive when a
   property is `array`-typed and recurse into each element.
@@ -55,8 +56,8 @@ schema produces incorrectly-typed data at runtime.
   test.
 - `just check` green end-to-end (library checks + generated-code
   checks, including PHPStan max).
-- ADR-007 either confirmed (status flipped to `accepted`) or
-  superseded by the task's chosen shape.
+- `hydration-and-serialization-contract` either confirmed (status
+  flipped to `accepted`) or superseded by the task's chosen shape.
 
 == Resolution
 
@@ -75,11 +76,11 @@ Landed together with task 003 (same PROPERTY_MAP work). Highlights:
   `self::hydrate(...)`, so `list<Model>` payloads now produce real
   lists of typed objects instead of associative arrays.
 - Regression under Model Generator > "Hydration and serialization
-  contract (ADR-007)": `A list-of-Model property hydrates each item
+  contract (`hydration-and-serialization-contract`)": `A list-of-Model property hydrates each item
   into the declared class` + `A list-of-scalar property hydrates
   items untouched`, both locked. Tests invoke
   `ApiClient::hydrate(Pet::class, …)` via reflection.
-- ADR-007 flipped from `proposed` to `accepted`; the chosen shape is
-  the `PROPERTY_MAP` variant explicitly listed in the ADR's decision
-  §1.
+- `hydration-and-serialization-contract` flipped from `proposed` to
+  `accepted`; the chosen shape is the `PROPERTY_MAP` variant explicitly
+  listed in the ADR's decision §1.
 - `tests/fixtures/generated/petstore/*` regenerated.

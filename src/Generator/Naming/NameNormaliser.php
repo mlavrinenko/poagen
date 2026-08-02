@@ -7,8 +7,8 @@ namespace Mlavrinenko\Paogen\Generator\Naming;
 /**
  * Strategy that maps an OpenAPI symbol's raw name to a PHP identifier.
  *
- * See ADR-003 ("Name normalisation — `nameNormaliser`") for the
- * pipeline and precedence model. T-023.
+ * See `typed-profile-and-colocated-attributes` ("Name normalisation —
+ * `nameNormaliser`") for the pipeline and precedence model. T-023.
  */
 interface NameNormaliser
 {

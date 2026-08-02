@@ -46,22 +46,22 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 
 ## Phase 3 — Operation Generator coverage
 
-- [x] **ADR-009 confirm** — Accepted: single generic `Generated\ApiException` shape. See `truth/decisions/009-error-response-policy.typ` (status: accepted).
+- [x] **`error-response-policy` confirm** — Accepted: single generic `Generated\ApiException` shape. See `truth/decisions/error-response-policy.decision-260418.typ` (status: accepted).
 - [x] **T-012** — Throw typed `ApiException` on non-2xx responses.
 - [x] **T-014** — Surface `securitySchemes` (`apiKey`, `http bearer`) as constructor / method arguments; leave `basic`, `oauth2`, `openIdConnect` as `draft`.
 - [x] **T-011** — Support `application/x-www-form-urlencoded` request bodies; stub `multipart/form-data` with a throwing placeholder rather than silent skip.
 
 ## Phase 4 — Packaging / DX
 
-- [x] **T-016** — Silence `cebe/php-openapi` PHP 8.4 deprecation noise (composer-patch or upstream pin). *Decoupled from 3.1 by ADR-008.*
+- [x] **T-016** — Silence `cebe/php-openapi` PHP 8.4 deprecation noise (composer-patch or upstream pin). *Decoupled from 3.1 by `openapi-31-strategy`.*
 - [x] **T-022** — Byte-stability integration test against Petstore (runs generator twice; asserts identical output and match against the golden tree).
 - [x] **T-019** — `paogen generate` grows `--output`, `--dry-run`, `--diff` flags.
-- [x] **T-020** — Dropped codecov entirely (no meaningful threshold on a codegen project whose logic is exercised through generated fixtures). ADR-004 updated.
+- [x] **T-020** — Dropped codecov entirely (no meaningful threshold on a codegen project whose logic is exercised through generated fixtures). `quality-gates-at-maximum-strictness` updated.
 
 ## Phase 5 — Real-world schema shakedown (emerged 2026-04-19)
 
 Landing [`examples/`](examples/) made one pre-release-review item
-concrete: the ADR-005 validation-tier schemas (DigitalOcean, GitHub)
+concrete: the `schema-fixture-policy` validation-tier schemas (DigitalOcean, GitHub)
 aborted at code emission because the generator used raw OpenAPI
 component names as PHP class identifiers. Phase 5 replaced the
 hard-coded name handling with a pluggable pipeline (T-023) and then
@@ -77,18 +77,22 @@ both filed as follow-up tasks the release cut must now sequence.
 
 A 2026-04-20 design review with the project owner concluded the
 current Model output (`PROPERTY_MAP` const + `JsonSerializable`) is
-*ugly* and must be replaced before v0.1 ships. ADR-010 supersedes
-ADR-007's representation choice: phpdoc becomes authoritative for
-structural types, attributes carry non-structural metadata, and a
-new runtime `Marshaller`/`Hydrator` drives (de)serialisation via
-`phpstan/phpdoc-parser`. Runtime performance is explicitly
-deprioritised — see ADR-010 "Scope + priority policy".
+*ugly* and must be replaced before v0.1 ships.
+`attribute-and-phpdoc-driven-serialization` supersedes
+`hydration-and-serialization-contract`'s representation choice: phpdoc
+becomes authoritative for structural types, attributes carry
+non-structural metadata, and a new runtime `Marshaller`/`Hydrator` drives
+(de)serialisation via `phpstan/phpdoc-parser`. Runtime performance is
+explicitly deprioritised — see
+`attribute-and-phpdoc-driven-serialization` "Scope + priority policy".
 
 - [x] **T-027** — Audit `truth/specs/**` and `truth/decisions/**` for
-  performance-flavoured passages superseded by ADR-010; revise
-  wording. Supersede-mark ADR-007's representation section. No code
-  changes.
-- [x] **T-028** — Implement ADR-010 end-to-end: runtime attribute
+  performance-flavoured passages superseded by
+  `attribute-and-phpdoc-driven-serialization`; revise wording.
+  Supersede-mark `hydration-and-serialization-contract`'s representation
+  section. No code changes.
+- [x] **T-028** — Implement `attribute-and-phpdoc-driven-serialization`
+  end-to-end: runtime attribute
   classes, `Marshaller`, `Hydrator`, ModelEmitter rewrite,
   ClientEmitter rewrite, `phpstan/phpdoc-parser` added to runtime
   composer require, golden trees regenerated, specs updated.
@@ -98,7 +102,8 @@ deprioritised — see ADR-010 "Scope + priority policy".
   (`opcache.save_comments=0`). Filed as the documented dirty-fix
   follow-up from T-028.
 - [x] **T-030** — Generator-time error for `oneOf` without
-  `discriminator` (per ADR-010), with a profile-level discriminator
+  `discriminator` (per `attribute-and-phpdoc-driven-serialization`), with
+  a profile-level discriminator
   override. `DiscriminatorEnforcer` fails the run for property-level
   ref unions without a `discriminator` after applying
   `Profile::$discriminators` overrides; `UndiscriminatedUnionException`
@@ -115,7 +120,7 @@ All of the above checked, plus:
 - [ ] `just check` green on PHP 8.4 with **zero** deprecation notices.
 - [ ] Petstore golden fixture regenerated and committed after every scope change above.
 - [ ] `speconaut status` shows **no** pending tasks listed in this document.
-- [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `truth/notes/openapi-3.1-gap.md` and ADR-008.
+- [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `truth/notes/openapi-3.1-gap.md` and `openapi-31-strategy`.
 - [ ] `CHANGELOG.md` gains a `0.1.0` section.
 - [ ] `composer.json` stability flipped to `stable`.
 
@@ -136,11 +141,11 @@ These are deliberately out of scope for the first tag. They are
 tracked in the truth tree (ADRs / docs) but do **not** belong on
 v0.1's critical path.
 
-- **OpenAPI 3.1 support** — ADR-008 (`accepted`) defers the decision;
-  the three options (swap parser, write 3.1→3.0 shim, fork) are
+- **OpenAPI 3.1 support** — `openapi-31-strategy` (`accepted`) defers the
+  decision; the three options (swap parser, write 3.1→3.0 shim, fork) are
   catalogued at [`truth/notes/openapi-3.1-gap.md`](truth/notes/openapi-3.1-gap.md).
-  When revisited, produce a prototype task, supersede ADR-008, then
-  remove the README limitation note.
+  When revisited, produce a prototype task, supersede `openapi-31-strategy`,
+  then remove the README limitation note.
 - ~~**Mutation testing**~~ — resolved 2026-08-02, no longer an open
   follow-up. Task 021 was retired as `done` without wiring infection;
   `wire-mutation-testing` wired it, measured a 7-minute full run against
@@ -148,7 +153,7 @@ v0.1's critical path.
   `mutation-testing-stays-out-of-the-gate.decision-260802.typ`. Kept here,
   struck through, as history rather than deleted — see this file's intro
   note.
-- **Validation-tier fixtures** — ADR-005 calls out DigitalOcean and
+- **Validation-tier fixtures** — `schema-fixture-policy` calls out DigitalOcean and
   the GitHub 3.0 bundled variant. Land post-v0.1 once the generator
   is proven on Petstore plus the items above.
 - **`format: uuid`, `format: binary`** — file as a follow-up once a

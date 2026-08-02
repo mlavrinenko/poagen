@@ -207,20 +207,20 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
-     * Rule: Hydration and serialization contract (ADR-010)
+     * Rule: Hydration and serialization contract (attribute-and-phpdoc-driven-serialization)
      *
      * Scenario: A list-of-Model property hydrates each item into the declared class
      * @source truth/specs/model-generator.feature-260418.typ:120
      *
      * Given Model Pet has a property tags whose schema is type: array, items.$ref: #/components/schemas/Tag
-     * When Client's runtime Hydrator (ADR-010) runs against a payload whose tags is a list of two objects
+     * When Client's runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose tags is a list of two objects
      * Then Model's $pet->tags[0] is an instance of Tag
      *   And Model's $pet->tags[1] is an instance of Tag
      */
     public function testAListOfModelPropertyHydratesEachItemIntoTheDeclaredClass(): void
     {
         $this->steps->givenModelPetHasAPropertyTagsWhoseSchemaIsTypeArrayItemsRefComponentsSchemasTag();
-        $this->steps->whenClientsRuntimeHydratorADR010RunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects();
+        $this->steps->whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects();
         $this->steps->thenModelsPetTags0IsAnInstanceOfTag();
         $this->steps->thenModelsPetTags1IsAnInstanceOfTag();
     }
@@ -231,13 +231,13 @@ final class ModelGeneratorTest extends TestCase
      * @source truth/specs/model-generator.feature-260418.typ:130
      *
      * Given Model Pet has a property photoUrls whose schema is type: array, items.type: string
-     * When Client's runtime Hydrator (ADR-010) runs against a payload whose photoUrls is a list of plain strings
+     * When Client's runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose photoUrls is a list of plain strings
      * Then each $pet->photoUrls[$i] on Model is the original string — no object wrapping
      */
     public function testAListOfScalarPropertyHydratesItemsUntouched(): void
     {
         $this->steps->givenModelPetHasAPropertyPhotoUrlsWhoseSchemaIsTypeArrayItemsTypeString();
-        $this->steps->whenClientsRuntimeHydratorADR010RunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings();
+        $this->steps->whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings();
         $this->steps->thenEachPetPhotoUrlsIOnModelIsTheOriginalStringNoObjectWrapping();
     }
 
@@ -247,7 +247,7 @@ final class ModelGeneratorTest extends TestCase
      * @source truth/specs/model-generator.feature-260418.typ:139
      *
      * Given Model Contact declares a required property whose schema key is display-name (kebab-case)
-     * When Generator emits Contact.php and the runtime Marshaller / Hydrator (ADR-010) process a payload containing the wire key display-name
+     * When Generator emits Contact.php and the runtime Marshaller / Hydrator (attribute-and-phpdoc-driven-serialization) process a payload containing the wire key display-name
      * Then Model's constructor parameter is emitted as $displayName (camelCased PHP identifier)
      *   And Model's property carries #[WireName('display-name')], and the class has no PROPERTY_MAP constant
      *   And Client's (new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada']) populates $contact->displayName === 'Ada'
@@ -256,7 +256,7 @@ final class ModelGeneratorTest extends TestCase
     public function testAPropertyWithANonIdentifierSchemaKeyRoundTripsViaWireName(): void
     {
         $this->steps->givenModelContactDeclaresARequiredPropertyWhoseSchemaKeyIsDisplayNameKebabCase();
-        $this->steps->whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorADR010ProcessAPayloadContainingTheWireKeyDisplayName();
+        $this->steps->whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorAttributeAndPhpdocDrivenSerializationProcessAPayloadContainingTheWireKeyDisplayName();
         $this->steps->thenModelsConstructorParameterIsEmittedAsDisplayNameCamelCasedPHPIdentifier();
         $this->steps->thenModelsPropertyCarriesWireNameDisplayNameAndTheClassHasNoPROPERTYMAPConstant();
         $this->steps->thenClientsNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda();
@@ -268,19 +268,19 @@ final class ModelGeneratorTest extends TestCase
      * Scenario: Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable
      * @source truth/specs/model-generator.feature-260418.typ:151
      *
-     * Given Model Order is emitted by Generator under ADR-010
+     * Given Model Order is emitted by Generator under attribute-and-phpdoc-driven-serialization
      * When Generated File Generated/Model/Order.php is read
      * Then Generated File contains no PROPERTY_MAP class constant and no implements JsonSerializable
      *   And Model's class is final readonly with constructor-promoted properties only
-     *   And Model's wire metadata (when needed) is carried by the small ADR-010 attribute set on each parameter
+     *   And Model's wire metadata (when needed) is carried by the small attribute-and-phpdoc-driven-serialization attribute set on each parameter
      */
     public function testGeneratedModelsCarryNoPROPERTYMAPAndDoNotImplementJsonSerializable(): void
     {
-        $this->steps->givenModelOrderIsEmittedByGeneratorUnderADR010();
+        $this->steps->givenModelOrderIsEmittedByGeneratorUnderAttributeAndPhpdocDrivenSerialization();
         $this->steps->whenGeneratedFileGeneratedModelOrderPhpIsRead();
         $this->steps->thenGeneratedFileContainsNoPROPERTYMAPClassConstantAndNoImplementsJsonSerializable();
         $this->steps->thenModelsClassIsFinalReadonlyWithConstructorPromotedPropertiesOnly();
-        $this->steps->thenModelsWireMetadataWhenNeededIsCarriedByTheSmallADR010AttributeSetOnEachParameter();
+        $this->steps->thenModelsWireMetadataWhenNeededIsCarriedByTheSmallAttributeAndPhpdocDrivenSerializationAttributeSetOnEachParameter();
     }
 
 
@@ -289,21 +289,21 @@ final class ModelGeneratorTest extends TestCase
      * @source truth/specs/model-generator.feature-260418.typ:162
      *
      * Given Model Pet declares a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
-     * When Generated File Pet.php is read and the runtime Hydrator (ADR-010) runs against a payload whose kind.petType is 'Cat'
+     * When Generated File Pet.php is read and the runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose kind.petType is 'Cat'
      * Then Model's kind parameter carries #[Discriminator(field: 'petType', map: ['Dog' => Dog::class, 'Cat' => Cat::class])]
      *   And Model's $pet->kind is an instance of Cat, independent of structural overlap with Dog
      */
     public function testADiscriminatedOneOfHydratesToTheBranchNamedByTheWireTagViaDiscriminator(): void
     {
         $this->steps->givenModelPetDeclaresARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType();
-        $this->steps->whenGeneratedFilePetPhpIsReadAndTheRuntimeHydratorADR010RunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
+        $this->steps->whenGeneratedFilePetPhpIsReadAndTheRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
         $this->steps->thenModelsKindParameterCarriesDiscriminatorFieldPetTypeMapDogDogClassCatCatClass();
         $this->steps->thenModelsPetKindIsAnInstanceOfCatIndependentOfStructuralOverlapWithDog();
     }
 
 
     /**
-     * Scenario: Hydration recovers phpdoc types when opcache strips comments (ADR-010)
+     * Scenario: Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)
      * @source truth/specs/model-generator.feature-260418.typ:172
      *
      * Given Model Pet declares a property tags with phpdoc @param list<Tag>|null $tags
@@ -311,7 +311,8 @@ final class ModelGeneratorTest extends TestCase
      * When Client's (new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]]) runs
      * Then Client's runtime re-tokenises Pet.php via token_get_all, recovers the constructor's doc comment, and $pet->tags[0] is an instance of Tag — not a raw array
      */
-    public function testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsADR010(): void
+    public function testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsAttributeAndPhpdocDrivenSerialization(
+    ): void
     {
         $this->steps->givenModelPetDeclaresAPropertyTagsWithPhpdocParamListTagNullTags();
         $this->steps->givenClientsPHPProcessIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse();
@@ -383,7 +384,7 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
-     * Rule: Component names are normalised through a configurable pipeline (ADR-003, T-023)
+     * Rule: Component names are normalised through a configurable pipeline (typed-profile-and-colocated-attributes, T-023)
      *
      * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
      * @source truth/specs/model-generator.feature-260418.typ:219

@@ -11,7 +11,8 @@ use function sprintf;
 
 /**
  * Thrown when the configured `NameNormaliser` pipeline cannot map a
- * raw OpenAPI symbol name to a PHP identifier. See ADR-003 (T-023).
+ * raw OpenAPI symbol name to a PHP identifier. See
+ * `typed-profile-and-colocated-attributes` (T-023).
  */
 final class NameNormalisationException extends RuntimeException
 {

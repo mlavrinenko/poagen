@@ -34,7 +34,7 @@ use Acme\Petstore\Generated\StoreClientInterface;
  *
  * Note what is deliberately absent: retries, backoff, logging, authentication.
  * Those are transport concerns and compose underneath the client through the
- * PSR-18 handler (ADR-002), not here.
+ * PSR-18 handler (`no-inheritance-no-protected-regions`), not here.
  */
 final class CachingStoreClient implements StoreClientInterface
 {

@@ -15,8 +15,9 @@ use Mlavrinenko\Paogen\Generator\Generator;
 /**
  * Walks `components.schemas[*].properties[*]` and collects every
  * property-level ref-only `oneOf` / `anyOf` that lacks a `discriminator`
- * and is not resolved by a `Profile::$discriminators` override (ADR-010,
- * T-030). Mutates in place: when an override supplies a wire field, a
+ * and is not resolved by a `Profile::$discriminators` override
+ * (`attribute-and-phpdoc-driven-serialization`, T-030). Mutates in place:
+ * when an override supplies a wire field, a
  * synthetic `Discriminator` is attached to the property schema so the
  * downstream `ModelAttributeApplier` sees a uniform input.
  *

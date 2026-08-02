@@ -2,7 +2,7 @@
 
 #show: task.with(
   id: "a46c2eb6-be75-410f-b6a2-e1f1e4543acf",
-  title: "Generator-time error for `oneOf` without `discriminator` (per ADR-010)",
+  title: "Generator-time error for `oneOf` without `discriminator` (per attribute-and-phpdoc-driven-serialization)",
   status: done(2026, 4, 20),
   priority: 5,
   x-paogen: (spec: "truth/specs/model-generator.typ", legacy-id: "T-030"),
@@ -10,7 +10,7 @@
 
 == Summary
 
-ADR-010 declares: "`oneOf` / `anyOf` without a discriminator is treated
+`attribute-and-phpdoc-driven-serialization` declares: "`oneOf` / `anyOf` without a discriminator is treated
 as a generator-time error; users resolve it either by fixing the spec
 or by adding a profile-level discriminator override. Structural
 fallback is *not* implemented — silent mis-hydration is worse than a

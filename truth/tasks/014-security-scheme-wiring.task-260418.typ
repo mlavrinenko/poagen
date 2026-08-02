@@ -12,7 +12,7 @@
 
 OpenAPI `securitySchemes` / `security` are completely ignored. Users
 must decorate the client for auth today — fine as a philosophy
-(ADR-002) but the generator should at least read auth headers and
+(`no-inheritance-no-protected-regions`) but the generator should at least read auth headers and
 parameters out of the schema so they appear as constructor or method
 arguments.
 
@@ -34,7 +34,7 @@ the wiring without implementing any specific auth flow.
   `Authorization: Bearer <token>`.
 + Leave `http` `basic`, `oauth2`, and `openIdConnect` as
   `stage: draft` placeholders — they need decorator-layer design
-  that ADR-002 explicitly punts to runtime.
+  that `no-inheritance-no-protected-regions` explicitly punts to runtime.
 + Resolve `securitySchemes` via `$ref` (depends on task 005).
 
 == Non-goals

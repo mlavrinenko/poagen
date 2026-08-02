@@ -81,7 +81,8 @@ lint-cs-fixer: tmpdir
 lint-phpstan: tmpdir
     phpstan analyse --memory-limit=512M
 
-# Static analysis on generated fixtures (consumer-view; ADR-004), plus a
+# Static analysis on generated fixtures (consumer-view;
+# `quality-gates-at-maximum-strictness`), plus a
 # fan-out into every example's own check (examples-check-themselves).
 #
 # tests/fixtures/generated isn't owned by any example, so it is analysed
@@ -110,7 +111,7 @@ lint-phpstan-generated: tmpdir
 lint-rector: tmpdir
     rector --dry-run
 
-# Per-language line-count limits on src/ (ADR-004)
+# Per-language line-count limits on src/ (`quality-gates-at-maximum-strictness`)
 lint-linecop:
     linecop
 

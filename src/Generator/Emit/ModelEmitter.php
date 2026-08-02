@@ -27,7 +27,8 @@ use const SORT_STRING;
 /**
  * Emits a single `final readonly` PHP class for one OpenAPI named schema.
  *
- * Per ADR-010, generated Models are lean DTOs. Wire metadata moves out:
+ * Per `attribute-and-phpdoc-driven-serialization`, generated Models are lean
+ * DTOs. Wire metadata moves out:
  *   - phpdoc carries structural type information (`@param list<Tag>`);
  *   - `#[WireName] / #[Format] / #[Discriminator]` carry non-structural
  *     facts. The runtime `Marshaller` / `Hydrator` read both.

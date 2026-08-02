@@ -13,7 +13,7 @@
 `OperationAnalyzer::pathParameters()` returns `null` on the first
 `Reference` it encounters, causing `OperationEmitter::emit()` to
 silently skip the entire operation. Real-world schemas (GitHub,
-Kubernetes — both on ADR-005's validation list) `$ref` common
+Kubernetes — both on `schema-fixture-policy`'s validation list) `$ref` common
 parameters heavily. Without inline-resolution, most operations vanish.
 
 == Rationale

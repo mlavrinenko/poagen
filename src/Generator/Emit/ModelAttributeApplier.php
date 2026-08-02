@@ -22,8 +22,9 @@ use function is_string;
 /**
  * Attaches `#[WireName]` / `#[Format]` / `#[Discriminator]` to a promoted
  * constructor parameter. Extracted from {@see ModelEmitter} to keep that
- * file under linecop (ADR-004). ADR-010 keeps the attribute set small:
- * each attribute encodes one non-structural fact.
+ * file under linecop (`quality-gates-at-maximum-strictness`).
+ * `attribute-and-phpdoc-driven-serialization` keeps the attribute set
+ * small: each attribute encodes one non-structural fact.
  */
 final readonly class ModelAttributeApplier
 {

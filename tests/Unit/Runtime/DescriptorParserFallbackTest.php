@@ -20,7 +20,8 @@ use const PHP_BINARY;
 /**
  * Exercises the `token_get_all` fallback path that kicks in when
  * `ReflectionMethod::getDocComment()` returns `false` under
- * `opcache.save_comments=0`. See task 029 and ADR-010.
+ * `opcache.save_comments=0`. See task 029 and
+ * `attribute-and-phpdoc-driven-serialization`.
  */
 final class DescriptorParserFallbackTest extends TestCase
 {

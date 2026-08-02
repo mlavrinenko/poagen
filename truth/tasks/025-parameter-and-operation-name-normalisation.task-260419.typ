@@ -73,8 +73,8 @@ override.
   is its own thing. Revisit only if a real schema forces it.
 - Resolving `oneOf` branches whose target is a scalar schema. That
   is T-026 territory.
-- Dropping the path-item `$ref` parameter skip (ADR-005 fixtures
-  already exercise this; a `$ref` that doesn't resolve is a real
+- Dropping the path-item `$ref` parameter skip (`schema-fixture-policy`
+  fixtures already exercise this; a `$ref` that doesn't resolve is a real
   skip reason).
 
 == Acceptance criteria

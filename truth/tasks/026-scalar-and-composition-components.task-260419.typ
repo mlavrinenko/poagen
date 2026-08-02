@@ -43,7 +43,7 @@ on DigitalOcean trace back here.
   - *Scalar component* → emit a tiny `ScalarBinding`-style VO
     (`public readonly string $value` + `toScalar()` + `from()`).
     Downstream refs type as `\Model\Urn`; hydrator rehydrates via
-    `from()`. Already aligns with ADR-007.
+    `from()`. Already aligns with `hydration-and-serialization-contract`.
   - *Top-level `oneOf` / `anyOf`* → emit a PHP union type or a
     discriminator-backed synthetic class. The existing
     `CompositionResolver` already handles composition inside

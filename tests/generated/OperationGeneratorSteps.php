@@ -767,8 +767,9 @@ final class OperationGeneratorSteps
         // The emitted method says the body is JSON and hands over the model.
         TestCase::assertStringContainsString("Endpoint::post('/pet')->json(\$body)", $this->source);
 
-        // Proven at the wire rather than in the text: ADR-010 routes bodies
-        // through the runtime Marshaller before json_encode, so wire keys,
+        // Proven at the wire rather than in the text:
+        // attribute-and-phpdoc-driven-serialization routes bodies through
+        // the runtime Marshaller before json_encode, so wire keys,
         // ScalarBindings and date formats are normalised at the boundary
         // instead of inside Model::jsonSerialize.
         $http = new RecordingClient(

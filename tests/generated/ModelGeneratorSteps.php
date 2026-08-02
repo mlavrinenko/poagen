@@ -365,8 +365,8 @@ final class ModelGeneratorSteps
 
     /**
      * Hydrate a payload into the supplied class via the runtime
-     * {@see Hydrator}. Per ADR-010 this
-     * is a free function — the generated `ApiClient` no longer carries
+     * {@see Hydrator}. Per `attribute-and-phpdoc-driven-serialization`
+     * this is a free function — the generated `ApiClient` no longer carries
      * a private `hydrate()` helper. Regenerates the petstore fixture so
      * its models are on disk before invoking the hydrator on Petstore types.
      *
@@ -468,7 +468,7 @@ final class ModelGeneratorSteps
 
     /**
      * Hydrate a composition-fixture payload via the runtime
-     * {@see Hydrator} (ADR-010).
+     * {@see Hydrator} (`attribute-and-phpdoc-driven-serialization`).
      *
      * @param class-string $target
      * @param array<mixed> $payload
@@ -614,12 +614,6 @@ final class ModelGeneratorSteps
         $this->runGenerator($this->profile);
     }
 
-    public function givenModelOrderIsEmittedByGeneratorUnderADR010(): void
-    {
-        $this->profile = $this->loadProfile('petstore');
-        $this->runGenerator($this->profile);
-    }
-
     private ?\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet $hydratedDiscriminatedPet = null;
 
     public function givenModelPetDeclaresARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
@@ -762,8 +756,9 @@ final class ModelGeneratorSteps
     {
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
         TestCase::assertStringContainsString('?PetShipping $shipping', $source);
-        // ADR-010: synthesised child reference is carried by the native
-        // type only — no PROPERTY_MAP, no JsonSerializable in the file.
+        // attribute-and-phpdoc-driven-serialization: synthesised child
+        // reference is carried by the native type only — no PROPERTY_MAP,
+        // no JsonSerializable in the file.
         TestCase::assertStringNotContainsString('PROPERTY_MAP', $source);
         TestCase::assertStringNotContainsString('JsonSerializable', $source);
     }
@@ -859,22 +854,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientsRuntimeHydratorADR010RunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(): void
-    {
-        $this->hydratedPet = $this->invokeHydrate(
-            Pet::class,
-            [
-                'name' => 'doggie',
-                'photoUrls' => ['http://example/1.jpg'],
-                'tags' => [
-                    ['id' => 1, 'name' => 'friendly'],
-                    ['id' => 2, 'name' => 'playful'],
-                ],
-            ],
-        );
-    }
-
-
     public function thenModelsPetTags0IsAnInstanceOfTag(): void
     {
         assert($this->hydratedPet instanceof Pet);
@@ -901,39 +880,10 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientsRuntimeHydratorADR010RunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(): void
-    {
-        $this->hydratedPet = $this->invokeHydrate(
-            Pet::class,
-            [
-                'name' => 'doggie',
-                'photoUrls' => ['https://example/a.jpg', 'https://example/b.jpg'],
-            ],
-        );
-    }
-
-
     public function thenEachPetPhotoUrlsIOnModelIsTheOriginalStringNoObjectWrapping(): void
     {
         assert($this->hydratedPet instanceof Pet);
         TestCase::assertSame(['https://example/a.jpg', 'https://example/b.jpg'], $this->hydratedPet->photoUrls);
-    }
-
-
-    public function whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorADR010ProcessAPayloadContainingTheWireKeyDisplayName(
-    ): void {
-        $hydrator = new Hydrator();
-        $this->hydratedKebabContact = $hydrator->hydrate(
-            Contact::class,
-            [
-                'display-name' => 'Ada',
-                'email' => 'ada@example',
-            ],
-        );
-
-        $this->kebabMarshalled = (string) json_encode(
-            new Marshaller()->marshal($this->hydratedKebabContact),
-        );
     }
 
 
@@ -990,35 +940,6 @@ final class ModelGeneratorSteps
         TestCase::assertMatchesRegularExpression('/public function __construct\(\s+public/', $this->source);
     }
 
-
-    public function thenModelsWireMetadataWhenNeededIsCarriedByTheSmallADR010AttributeSetOnEachParameter(): void
-    {
-        // Petstore Order has no kebab-case keys and no non-default formats,
-        // so no attributes appear. Probe Contact (kebab-case) for proof
-        // that the WireName attribute is emitted when the schema demands it.
-        $contactProfile = $this->loadProfile('contact');
-        $this->runGenerator($contactProfile);
-        $contactSource = (string) file_get_contents(
-            $contactProfile->output . '/Generated/Model/Contact.php',
-        );
-        TestCase::assertStringContainsString(
-            'use Mlavrinenko\\Paogen\\Runtime\\Attribute\\WireName;',
-            $contactSource,
-        );
-        TestCase::assertStringContainsString("#[WireName('display-name')]", $contactSource);
-    }
-
-
-    public function whenGeneratedFilePetPhpIsReadAndTheRuntimeHydratorADR010RunsAgainstAPayloadWhoseKindPetTypeIsWire(
-        string $wire,
-    ): void {
-        $tag = trim($wire, "'\"");
-        $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
-        $this->hydratedDiscriminatedPet = new Hydrator()->hydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
-            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
-        );
-    }
 
 
     public function thenModelsKindParameterCarriesDiscriminatorFieldPetTypeMapDogDogClassCatCatClass(): void
@@ -1867,6 +1788,88 @@ final class ModelGeneratorSteps
         $this->hydratedOrder = $this->invokeHydrate(
             Order::class,
             ['shipDate' => $this->dateTimeWire],
+        );
+    }
+
+
+    public function whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(
+    ): void {
+        $this->hydratedPet = $this->invokeHydrate(
+            Pet::class,
+            [
+                'name' => 'doggie',
+                'photoUrls' => ['http://example/1.jpg'],
+                'tags' => [
+                    ['id' => 1, 'name' => 'friendly'],
+                    ['id' => 2, 'name' => 'playful'],
+                ],
+            ],
+        );
+    }
+
+
+    public function whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(
+    ): void {
+        $this->hydratedPet = $this->invokeHydrate(
+            Pet::class,
+            [
+                'name' => 'doggie',
+                'photoUrls' => ['https://example/a.jpg', 'https://example/b.jpg'],
+            ],
+        );
+    }
+
+
+    public function whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorAttributeAndPhpdocDrivenSerializationProcessAPayloadContainingTheWireKeyDisplayName(
+    ): void {
+        $hydrator = new Hydrator();
+        $this->hydratedKebabContact = $hydrator->hydrate(
+            Contact::class,
+            [
+                'display-name' => 'Ada',
+                'email' => 'ada@example',
+            ],
+        );
+
+        $this->kebabMarshalled = (string) json_encode(
+            new Marshaller()->marshal($this->hydratedKebabContact),
+        );
+    }
+
+
+    public function givenModelOrderIsEmittedByGeneratorUnderAttributeAndPhpdocDrivenSerialization(): void
+    {
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+    }
+
+
+    public function thenModelsWireMetadataWhenNeededIsCarriedByTheSmallAttributeAndPhpdocDrivenSerializationAttributeSetOnEachParameter(
+    ): void {
+        // Petstore Order has no kebab-case keys and no non-default formats,
+        // so no attributes appear. Probe Contact (kebab-case) for proof
+        // that the WireName attribute is emitted when the schema demands it.
+        $contactProfile = $this->loadProfile('contact');
+        $this->runGenerator($contactProfile);
+        $contactSource = (string) file_get_contents(
+            $contactProfile->output . '/Generated/Model/Contact.php',
+        );
+        TestCase::assertStringContainsString(
+            'use Mlavrinenko\\Paogen\\Runtime\\Attribute\\WireName;',
+            $contactSource,
+        );
+        TestCase::assertStringContainsString("#[WireName('display-name')]", $contactSource);
+    }
+
+
+    public function whenGeneratedFilePetPhpIsReadAndTheRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseKindPetTypeIsWire(
+        string $wire,
+    ): void {
+        $tag = trim($wire, "'\"");
+        $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
+        $this->hydratedDiscriminatedPet = new Hydrator()->hydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
         );
     }
 

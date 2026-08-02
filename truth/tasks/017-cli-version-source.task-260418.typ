@@ -13,7 +13,7 @@
 `src/Cli.php:25` hardcodes `VERSION = '0.1.0-dev'`. There is no sync
 with git tags, no `composer.json` `version` field. Every release would
 need a manual edit + commit, which is error-prone on a tool meant to
-be "boring and reliable" (ADR-006).
+be "boring and reliable" (`plain-getopt-for-the-cli`).
 
 == Rationale
 
