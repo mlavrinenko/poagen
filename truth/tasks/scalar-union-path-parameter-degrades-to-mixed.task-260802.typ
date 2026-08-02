@@ -5,7 +5,7 @@
   tags: ("generator", "strictness", "parameters"),
   priority: 6,
   difficulty: 4,
-  status: proposed(2026, 8, 2),
+  status: wip(2026, 8, 2),
 )
 
 == Summary

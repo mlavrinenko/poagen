@@ -5,11 +5,7 @@
   tags: ("testing", "examples"),
   priority: 8,
   difficulty: 4,
-  status: blocked(
-    2026,
-    8,
-    2,
-  )[Half done and preserved on branch kilbil-response-proof at 1a7d580, not merged. It answered its own question first: the client does not hydrate a spec-compliant null, which is filed as nullable-type-array-lost-in-property-synthesis. Resume by writing the fixture bodies from the vendor's documented example values and teaching PHPStan the generated namespace via scanDirectories. Not owner work.],
+  status: wip(2026, 8, 2),
 )
 
 == Summary
