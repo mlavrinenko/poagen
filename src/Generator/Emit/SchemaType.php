@@ -61,6 +61,20 @@ final readonly class SchemaType
         public array $members,
     ) {}
 
+    /**
+     * Build directly from an already-known member list, for a caller that
+     * assembled the members itself rather than reading `type:` off one
+     * schema — {@see CompositionResolver::resolveScalarUnion()}, which
+     * gathers one member per `anyOf`/`oneOf` branch instead of one `type`
+     * keyword.
+     *
+     * @param list<string> $members
+     */
+    public static function ofMembers(array $members, bool $nullable): self
+    {
+        return new self(count($members) === 1 ? $members[0] : null, $nullable, $members);
+    }
+
     public static function of(Schema $schema): self
     {
         $raw = self::rawType($schema);

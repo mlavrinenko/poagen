@@ -59,6 +59,58 @@ final class CompositionResolver
     }
 
     /**
+     * Resolve a schema whose `oneOf`/`anyOf` lists inline scalar schemas —
+     * e.g. `anyOf: [{type: integer}, {type: string}]`, DigitalOcean's
+     * `image_id` shape — into the PHP union those scalars share. This is
+     * the composition spelling of a scalar union; {@see
+     * SchemaType::isScalarUnion()} already covers the `type: [integer,
+     * string]` list spelling of the same idea, and this method exists so
+     * the two spellings resolve the same way instead of one of them
+     * falling through to `mixed`.
+     *
+     * Returns null — deferring to another strategy, or ultimately to
+     * `mixed` — for anything this narrow reading does not cover: a `$ref`
+     * branch, a branch that is not a single bare scalar type, or fewer
+     * than two branches.
+     */
+    public static function resolveScalarUnion(Schema $node): ?TypeResolver
+    {
+        $branches = self::rawBranches($node);
+
+        if (count($branches) < 2) {
+            return null;
+        }
+
+        $members = [];
+
+        foreach ($branches as $branch) {
+            if (!$branch instanceof Schema) {
+                return null;
+            }
+
+            $scalar = SchemaType::of($branch)->scalarName();
+
+            if ($scalar === null) {
+                return null;
+            }
+
+            if (!in_array($scalar, $members, true)) {
+                $members[] = $scalar;
+            }
+        }
+
+        $type = SchemaType::ofMembers($members, (bool) $node->nullable);
+
+        if (!$type->isScalarUnion()) {
+            return null;
+        }
+
+        // Nullability is already inside the union string — see
+        // SchemaType::unionPhpType().
+        return new TypeResolver($type->unionPhpType(), null, null, false);
+    }
+
+    /**
      * Build the PROPERTY_MAP shape tuple for a `oneOf`/`anyOf` union.
      * Returns null when the schema is not a ref-only union.
      *
@@ -155,6 +207,22 @@ final class CompositionResolver
     }
 
     /**
+     * The raw `oneOf` or `anyOf` branch list, `oneOf` preferred when a
+     * schema declares both. Empty when the schema uses neither keyword.
+     *
+     * @return array<Schema|Reference>
+     */
+    private static function rawBranches(Schema $node): array
+    {
+        /** @var array<Schema|Reference> $oneOf */
+        $oneOf = $node->oneOf ?? [];
+        /** @var array<Schema|Reference> $anyOf */
+        $anyOf = $node->anyOf ?? [];
+
+        return $oneOf !== [] ? $oneOf : $anyOf;
+    }
+
+    /**
      * Extract the branch list from a ref-only `oneOf` or `anyOf`. Returns
      * null when the schema doesn't model that shape.
      *
@@ -162,12 +230,7 @@ final class CompositionResolver
      */
     private static function unionBranches(Schema $node): ?array
     {
-        /** @var array<Schema|Reference> $oneOf */
-        $oneOf = $node->oneOf ?? [];
-        /** @var array<Schema|Reference> $anyOf */
-        $anyOf = $node->anyOf ?? [];
-
-        $branches = $oneOf !== [] ? $oneOf : $anyOf;
+        $branches = self::rawBranches($node);
 
         if ($branches === []) {
             return null;

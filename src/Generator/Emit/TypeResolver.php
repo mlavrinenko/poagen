@@ -80,6 +80,16 @@ final readonly class TypeResolver
             return new self($type->unionPhpType(), null, null, false);
         }
 
+        // `type: [integer, string]` and `anyOf: [{type: integer}, {type:
+        // string}]` say the same thing two different ways — the branch
+        // above already resolves the first spelling, this resolves the
+        // second (DigitalOcean's `image_id`, GitHub's equivalent).
+        $scalarUnion = CompositionResolver::resolveScalarUnion($node);
+
+        if ($scalarUnion instanceof self) {
+            return $scalarUnion;
+        }
+
         return match ($type->name) {
             'string' => new self('string', null, null, $nullable),
             'integer' => new self('int', null, null, $nullable),
