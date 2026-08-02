@@ -5,7 +5,11 @@
   tags: ("testing", "examples"),
   priority: 8,
   difficulty: 4,
-  status: wip(2026, 8, 2)[milestone: trust the instruments, then use them],
+  status: blocked(
+    2026,
+    8,
+    2,
+  )[Half done and preserved on branch kilbil-response-proof at 1a7d580, not merged. It answered its own question first: the client does not hydrate a spec-compliant null, which is filed as nullable-type-array-lost-in-property-synthesis. Resume by writing the fixture bodies from the vendor's documented example values and teaching PHPStan the generated namespace via scanDirectories. Not owner work.],
 )
 
 == Summary
@@ -37,3 +41,36 @@ The claim \`kilbil-loyalty-client-proof\` makes is that paogen produces a workin
 - \`examples/kilbil/\`
 - \`tests/Integration/\`
 - \`tests/fixtures/\`
+
+== Result
+
+Not finished. The agent building it hit a session limit mid-task, and what
+exists is preserved on branch `kilbil-response-proof` at `1a7d580` rather than
+merged: the harness and the defect probes, but not the recorded bodies. Nothing
+in it runs yet — `examples/kilbil/fixtures/responses/` was never written, and
+PHPStan does not know the `Acme\Kilbil\Generated` namespace the tests import.
+Treat the branch as a starting point, not a partial pass.
+
+It did establish the one thing this task existed to find out, and the answer is
+no. The generated kilbil client does not correctly hydrate a spec-compliant
+vendor payload. `PropertySynthesiser` computes a property's nullability from the
+OpenAPI 3.0 `nullable` flag alone and never consults the 3.1 `type: [T, "null"]`
+form that `TypeResolver` already reads, so a wire `null` for the `searchClient`
+response's `state` or `special_days_types` throws `TypeError` out of the
+constructor. Confirmed independently against both source sites before this was
+written. That is the gap `nullable-type-arrays` was meant to close, missed
+because it was fixed in one of the two paths and no test had ever hydrated a
+real payload — which is exactly this task's premise. Filed as
+`nullable-type-array-lost-in-property-synthesis`.
+
+The harness design is worth keeping as-is: it wires the real committed
+`ApiClient` over the real `HttpTransport` against a PSR-18 stub, so
+`PsrRequestBuilder`, `Marshaller`, `Hydrator` and `ResponseDecoder` all run end
+to end. The proof does not substitute a test runtime for the real one.
+
+Left to do: write the response bodies from the vendor's own 386 documented
+`example:` values, teach PHPStan the example's generated namespace via
+`scanDirectories` rather than by loosening types in the harness, and assert the
+remaining shapes — the nested list-of-object response, the value-object binding,
+the enum property, the 403 carrying request and response, and the `h` credential
+reaching the query string.

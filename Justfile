@@ -285,7 +285,7 @@ test-coverage: tmpdir
     #!/usr/bin/env bash
     set -eo pipefail
     php -d pcov.directory=. -d 'pcov.exclude=~(vendor|build)~' vendor/bin/phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
-    scripts/coverage-floor build/logs/clover.xml src=87.0 runtime/src=88.0
+    scripts/coverage-floor build/logs/clover.xml src=87.0 runtime/src=92.0
 
 # Mutation testing (wire-mutation-testing) against src/ and runtime/src/
 # together, via infection.json5. Deliberately NOT part of `just check` — see
