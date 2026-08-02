@@ -5,11 +5,11 @@
   tags: ("parser", "openapi-31", "generator"),
   priority: 6,
   difficulty: 5,
-  status: accepted(
+  status: done(
     2026,
     8,
     2,
-  )[Unblocked. The deferral rested on a claim measured wrongly — see the Correction below. kilbil is a 3.1 document by content, not only by version string, and this repo has spent four tasks hand-rolling the one construct it uses.],
+  )[Landed as 4745242. devizzent/cebe-php-openapi 1.1.5 in, patch and composer-patches wiring out; const/prefixItems/unevaluatedProperties/contentMediaType/webhooks abort by name with schema pointer and owner; kilbil and petstore byte-identical.],
 )
 
 == Summary
