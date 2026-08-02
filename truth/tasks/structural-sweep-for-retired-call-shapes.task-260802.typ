@@ -53,3 +53,30 @@ whatever vocabulary the next agent happens to guess.
 - \`truth/notes/decisions-audit-procedure.md\`, or a standard, or a note of
   its own — deciding which is part of the task.
 
+== Result
+
+The method is recorded as a new section of
+`truth/notes/decisions-audit-procedure.md`, beside the audit procedure it is a
+sibling of. It derives the call-shape vocabulary from the byte-stable emitted
+trees under `examples/*/generated` and `tests/fixtures/generated`, derives the
+same vocabulary from `truth/specs`, diffs the two with `comm`, and settles every
+surviving candidate by hand against `src`, `runtime`, `tests` and `examples`.
+Real commands, runnable as written, not a description of commands.
+
+Scoped to the file the transport refactor actually touched,
+`operation-generator.feature-260418.typ`, the diff comes back empty — the drift
+the two prior tasks chased stays fixed, which is what the third acceptance
+criterion asked for.
+
+Run unscoped over every feature file, it did not come back empty, and that is
+the stronger result. Three candidates surfaced; `getDocComment` and `marshal`
+both settle as legitimate. `hydrate` does not: three steps in
+`model-generator.feature-260418.typ` still name the receiver
+`ApiClient::hydrate`, retired by ADR-010, while two steps in the same file
+already say `(new Hydrator())->hydrate(...)`. Unrelated to the transport
+collapse, and missed by every sweep so far because none compared spec vocabulary
+against the emitted tree. The method found live drift on its first real run,
+against a refactor it was not written for. Filed as
+`specs-still-name-apiclient-hydrate`; fixing spec text sat outside this task's
+boundary.
+
