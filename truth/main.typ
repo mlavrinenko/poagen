@@ -125,6 +125,8 @@
 #include "decisions/mutation-testing-stays-out-of-the-gate.decision-260802.typ"
 #pagebreak()
 #include "decisions/untraced-source-is-a-ratcheted-warning.decision-260802.typ"
+#pagebreak()
+#include "decisions/runtime-src-excluded-from-untraced-source-check.decision-260802.typ"
 
 // --- Supplementary artefacts ---
 //

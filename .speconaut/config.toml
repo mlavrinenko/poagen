@@ -82,8 +82,25 @@ source-roots = ["src", "runtime/src", "bin"]
 
 [check]
 
-# Roots the untraced-source finding walks.
-source-roots = ["src", "runtime/src", "bin"]
+# Roots the untraced-source finding walks. runtime/src was here through
+# 2026-08-02, when runtime-src-excluded-from-untraced-source-check
+# measured a real audit-traces run (locally patched around the upstream
+# namespace blocker described above [audit-traces]) against it: 26 of 26
+# runtime/src files untraced across all 96 checked scenarios — not a
+# partial gap, all of them. The cause is structural, not a testing
+# shortfall: `speconaut audit-traces` only instruments the manifest-listed
+# `tests/generated/*Test.php` suite, and truth/specs/'s four features
+# describe the *generator's* own behaviour, never the separately-packaged
+# runtime library's (runtime-ships-as-a-separate-package) — so no scenario
+# this project's own spec scope could ever write would move that number.
+# runtime/src is fully tested, just outside the BDD loop
+# (tests/Unit/Runtime/*, tests/Integration/RuntimeSubstitutionTest.php).
+# Leaving it here would make the untraced-source ratchet
+# (untraced-source-is-a-ratcheted-warning) carry a permanent, un-movable
+# 26-file floor — the same "bar nobody is actually watching" failure mode
+# that decision already rejected once, for a different gate. See
+# runtime-src-excluded-from-untraced-source-check for the full reasoning.
+source-roots = ["src", "bin"]
 
 # Behavioural specs live here. The spec-first gate treats a change under a
 # source root as needing a paired change under one of these.
