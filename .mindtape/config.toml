@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/mlavrinenko/mindtape/main/schema/config.schema.json
+#:schema /home/tank/projects/home/mindtape/schema/config.schema.json
 # .mindtape/config.toml — the `gated` preset.
 #
 # For work handed to an AI coding agent. Strict, but only where the strictness
@@ -260,3 +260,6 @@ actions = [
   { run = '! grep -qE "^- TODO: " "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
   { run = 'scripts/gate-fresh is-fresh', gate = true, message = "the project gate has not passed against this worktree since your last change — run `scripts/gated-check` (wraps `just check`) and flip again" },
 ]
+
+[ls.columns.file]
+visibility = "visible"
