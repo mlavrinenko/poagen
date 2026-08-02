@@ -1620,6 +1620,13 @@ final class OperationGeneratorSteps
 
     public function givenConsumersOwnClassImplementingEmittedGeneratedFileStoreClientInterfaceAndHoldingTheGeneratedImplementation(
     ): void {
+        // Fresh output for this scenario's own read of Generated/StoreClient.php
+        // below — the class the seam is built against is still the composer-
+        // autoloaded golden fixture, since that FQCN is fixed at PSR-4 mapping
+        // time and cannot follow a scratch directory.
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+
         $this->seamInner = new RecordingStoreClient();
         $this->seamDecorator = new CachingStoreClient($this->seamInner);
 
@@ -1658,9 +1665,7 @@ final class OperationGeneratorSteps
 
         // No hook and no protected region: the generated class exposes no
         // extension point for a consumer to hang behaviour on.
-        $generated = (string) file_get_contents(
-            dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore/Generated/StoreClient.php',
-        );
+        $generated = (string) file_get_contents($this->outputDir . '/Generated/StoreClient.php');
         TestCase::assertStringNotContainsString('protected', $generated);
         TestCase::assertStringNotContainsString('abstract', $generated);
     }

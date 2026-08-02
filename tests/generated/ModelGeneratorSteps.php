@@ -800,10 +800,7 @@ final class ModelGeneratorSteps
     {
         TestCase::assertNotNull($this->profile);
         $this->runGenerator($this->profile);
-        $source = (string) file_get_contents(
-            dirname(__DIR__, 2)
-            . '/tests/fixtures/generated/composition/Generated/Model/Animal.php',
-        );
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Animal.php');
         TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
     }
 
