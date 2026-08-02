@@ -1,5 +1,12 @@
 # Backlog handoff, 2026-08-02
 
+> Superseded in three places by `session-resume-260803.md`, which also carries
+> the live state of an interrupted wave. Read that first. In short: the union
+> work comes before composition, because composition declares a real
+> `depends-on` against it; session 1 wave 2 below was never file-disjoint and
+> was run in sequence; and `ResponseType.php` is contended by the envelope
+> rather than reserved to it.
+
 Written at the end of the session that unblocked the backlog. Its job is to let
 three orchestrating sessions close the whole thing without re-deriving any of
 the rulings behind it.

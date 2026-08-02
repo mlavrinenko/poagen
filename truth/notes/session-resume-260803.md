@@ -1,0 +1,147 @@
+# Resume state, 2026-08-03
+
+Written at a hard pause, mid-wave. Read this before
+`backlog-handoff-260802.md`, which it corrects in three places.
+
+`main` is at `f7a749c`, working tree clean, `just check` and
+`just check-examples` both last exited 0 at `275e223` — the only commits since
+are task-status changes under `truth/tasks`, which the freshness hash excludes
+by design.
+
+## Three agents were interrupted. Their work is on disk, uncommitted.
+
+Do not run `git worktree prune`, do not remove these three worktrees, and do
+not delete their branches. Each holds real uncommitted work at its base commit.
+
+| Worktree | Branch | Base | Uncommitted | Task |
+|---|---|---|---|---|
+| `~/projects/home/paogen-wt/security-wiring` | `security-wiring` | `521390e` | 43 files | `report-unsupported-security-schemes` |
+| `~/projects/home/paogen-wt/additional-properties-bag` | `additional-properties-bag` | `f64b6c4` | 13 files | `additional-properties-become-a-typed-bag` |
+| `~/projects/home/paogen-wt/non-json-bodies` | `non-json-bodies` | `275e223` | 0 files | `represent-non-json-request-and-response-bodies`, then `a-response-of-scalars-has-no-return-shape` |
+
+On resume, per worktree: `git -C <path> status`, read the diff, and decide.
+The security and bag worktrees are far enough along to finish rather than
+restart. `non-json-bodies` had done nothing but `composer install`; restarting
+it costs nothing.
+
+All three tasks are `wip` on the board. That is honest — work exists — but if
+any is restarted from scratch, say so in its status note rather than letting
+`wip` imply continuity that isn't there.
+
+Each of the three needs the same rebase before it can merge: their bases are
+`521390e`, `f64b6c4` and `275e223`, and `main` has moved past all of them.
+
+## What landed this session
+
+Seven tasks, each merged into `main` and re-gated on the integrated HEAD
+rather than trusted from its branch.
+
+1. `swap-openapi-parser-for-31-support` — `devizzent/cebe-php-openapi`, the
+   PHP 8.4 patch and `composer-patches` wiring deleted. `const`,
+   `prefixItems`, `unevaluatedProperties`, `contentMediaType` and `webhooks`
+   abort by name with a schema pointer.
+2. `purge-stale-adr-numbers-from-the-truth-tree` — 109 files; `rg 'ADR-'`
+   returns only that task's own mapping table.
+3. `close-the-three-sites-that-widen-a-declared-shape` — `ObjectShape` asks
+   the object question once; `ReturnSpec` carries a map's value as a nested
+   `ReturnSpec`; `UnconstrainedFieldAdvisor` reports where `mixed` survives
+   because the vendor declared nothing.
+4. `emit-declared-servers-so-the-base-address-comes-from-the-document`.
+5. `three-more-sites-read-only-the-30-nullable-flag`.
+6. `path-parameters-run-through-no-shape-gate-at-all` — one shared
+   `ParameterShape` predicate, per-position subsets kept distinct.
+7. `synthesise-a-model-for-inline-array-item-responses`, re-scoped — see
+   below.
+
+Skip counts are unchanged at 100. Every task that removes skip entries
+(composition, parameter shapes, non-JSON, scalar lists) is either in flight or
+still queued. This session bought correctness in the type reader, not skip-list
+reduction; the reduction is the next session's.
+
+## Three corrections to the handoff
+
+**The union comes before composition.**
+`resolve-composition-schemas-in-bodies-and-responses` declares
+`depends-on(declare-an-undiscriminated-union-as-raw-data)` and the dependency
+is real: 9 of its 68 skips are GitHub responses typed `unspecified`, which are
+`oneOf`/`anyOf` payloads needing branch selection. The handoff put composition
+in session 1 and the union in session 2, inverting it. The union depends on
+nothing — it does not need the envelope.
+
+**Session 1 wave 2 was never parallel.** The handoff calls it "parallel,
+disjoint files" and the files overlap:
+`close-the-three-sites-that-widen-a-declared-shape` and
+`three-more-sites-read-only-the-30-nullable-flag` both write
+`InlineObjectResolver.php`; `close-the-three-sites` and
+`path-parameters-run-through-no-shape-gate-at-all` both write
+`TypeResolver.php`. They were run in sequence instead.
+
+**`ResponseType.php` is not reserved to the envelope the way the handoff
+implies.** It is a body-shape descriptor carrying a kind; the envelope wraps a
+status and headers around the body it describes, so a new kind is additive.
+What is real is contention — two agents must not write it at once — not
+dependency.
+
+## Decisions I owe, once the interrupted agents report
+
+- The four security buckets, and why `oauth2` is wired despite
+  `operations-delegate-to-an-injected-transport` putting token acquisition in
+  the transport. `report-unsupported-security-schemes` requires it.
+- The `application/octet-stream` request-body type: PSR-7 stream or resource.
+  `represent-non-json-request-and-response-bodies` requires it.
+
+## One question for the owner, not for an agent
+
+The owner ruled the envelope carries status, hydrated body and headers, with
+no PSR-7 object on it. A binary response body typed as a PSR-7
+`StreamInterface` puts a PSR-7 object in the envelope's body slot. The request
+direction has no such tension. The non-JSON agent was told to argue it
+explicitly rather than settle it quietly; if it concludes PSR-7 is the honest
+answer for the response body, that goes to the owner before any decision
+artifact is written.
+
+## Findings filed this session, all from measurement rather than review
+
+`skipped-operation-still-emits-its-payload-model`,
+`webhooks-refuse-with-no-opt-out`,
+`generated-tier-duplication-ratchet-blocks-new-golden-trees`,
+`form-urlencoded-body-requires-the-literal-type-object-keyword`,
+`gate-freshness-misses-the-files-linecop-lints`,
+`a-response-of-scalars-has-no-return-shape`,
+`ref-path-parameter-to-a-non-scalar-component-is-ungated`,
+`pathitem-level-parameters-are-invisible-to-the-document-wide-scan`.
+
+Two are worth knowing before planning:
+`generated-tier-duplication-ratchet-blocks-new-golden-trees` means no new
+golden fixture tree can be committed at all, so emitted shapes added from here
+on get no generated-tier analysis until it is fixed. And
+`clear-example-expected-failures` now records that both `.expected-failure`
+markers overstate what is left — two of their claims were fixed before this
+session began.
+
+## The measurement rule, stated for the third time
+
+Three plans in this backlog have now rested on an unmeasured claim about a
+large input file, and all three were wrong:
+
+- the skip messages naming the wrong gap (68 composition, not "inline
+  schema"),
+- the union classification coming out opposite under strict validation,
+- and this session's: three GitHub operations filed as arrays of inline
+  objects, which declare `items: {type: string}`.
+
+Each cost an agent. Measure the claim before designing around it — a wrong
+grep is indistinguishable from a true negative, and a skip message that is
+literally true can still read as the wrong shape.
+
+## Next wave, when the three in flight are integrated
+
+1. The union, alone. It needs `Profile.php`, `TypeResolver.php`,
+   `CompositionResolver.php`, `DiscriminatorEnforcer.php` and
+   `runtime/src/Marshal/Hydrator.php` — every one of them held by an
+   interrupted agent, which is why it never started.
+   Tripwire, unchanged from the handoff: if more than two unions land in the
+   refusal layer, stop and tell the owner before any profile entry is written.
+2. Composition, alone, on top of it. 68 skips.
+3. `support-the-parameter-shapes-real-documents-use`. 23 skips.
+4. The envelope, alone.

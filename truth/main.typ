@@ -148,5 +148,5 @@
 #pagebreak()
 #text(size: 16pt, weight: "bold", fill: rgb("#0F766E"))[= Supplementary artefacts]
 
-- Design notes: #link("notes/openapi-3.1-gap.md")[notes/openapi-3.1-gap.md], #link("notes/runtime-type-reflection.md")[notes/runtime-type-reflection.md], #link("notes/decisions-audit-procedure.md")[notes/decisions-audit-procedure.md], #link("notes/backlog-handoff-260802.md")[notes/backlog-handoff-260802.md].
+- Design notes: #link("notes/openapi-3.1-gap.md")[notes/openapi-3.1-gap.md], #link("notes/runtime-type-reflection.md")[notes/runtime-type-reflection.md], #link("notes/decisions-audit-procedure.md")[notes/decisions-audit-procedure.md], #link("notes/backlog-handoff-260802.md")[notes/backlog-handoff-260802.md], #link("notes/session-resume-260803.md")[notes/session-resume-260803.md].
 - Review archives: #link("reviews/2026-04-18-pre-release-review.md")[reviews/2026-04-18-pre-release-review.md], #link("reviews/2026-08-01-decisions-audit.md")[reviews/2026-08-01-decisions-audit.md].
