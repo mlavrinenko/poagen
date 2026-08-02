@@ -4,12 +4,15 @@ The full [GitHub REST API](https://docs.github.com/en/rest) OpenAPI
 3.0.3 document — ~1000 endpoints, ~918 schema components, 8.8 MB of
 YAML. This is the industry's "real client generator" torture test.
 
-> **Status: expected failure.** `integration.owner` (and others) is
-> `oneOf: [$ref simple-user, $ref enterprise]` with no
-> `discriminator`; ADR-010 makes that a generator-time error
+> **Status: expected failure.** Eleven properties across ten components
+> are `oneOf`/`anyOf` ref unions with no `discriminator`; ADR-010 makes
+> that a generator-time error
 > ([T-030](../../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
-> No `generated/` tree is committed — see `.expected-failure`.
-> Clearing the marker and committing a tree is one step, done together.
+> `clear-example-expected-failures` checked every one branch-by-branch
+> against the vendored schema and confirmed none admits an honest
+> `Profile::$discriminators` entry — see `.expected-failure` for the
+> full finding, including why skipping the ten components instead does
+> not clear this example either. No `generated/` tree is committed.
 
 ## What this demonstrates
 
@@ -45,9 +48,11 @@ composer install
 php -d memory_limit=4G vendor/bin/paogen generate paogen.php
 ```
 
-This currently exits non-zero — see `.expected-failure`. Once T-030 is
-addressed here, a successful run writes `./generated/`, and that run's
-diff commits the tree alongside deleting the marker.
+This currently exits non-zero — see `.expected-failure`. Once the ten
+discriminator components are resolved (upstream schema patch, or a
+generator change that lets a skipped component's dependents be skipped
+too), a successful run writes `./generated/`, and that run's diff
+commits the tree alongside deleting the marker.
 
 ## Source of the schema
 
@@ -65,17 +70,27 @@ enough — no bundling step required.
 
 ## Known limitations
 
-Two follow-up tasks track gaps exposed by this fixture.
+T-025 (parameter/operationId normalisation) and T-026 (scalar and
+top-level composition components) both closed in April 2026 and no
+longer describe an open gap here.
 
-- [`truth/tasks/025-parameter-and-operation-name-normalisation.typ`](../../truth/tasks/025-parameter-and-operation-name-normalisation.typ)
-  — some ops are skipped because their raw param names or
-  operationId aren't valid PHP identifiers. T-025 normalises them
-  while keeping the raw value on the wire.
-- [`truth/tasks/026-scalar-and-composition-components.typ`](../../truth/tasks/026-scalar-and-composition-components.typ)
-  — GitHub declares named scalar components and top-level
-  composition components that the generator references but does
-  not emit a file for. T-026 picks a strategy per shape.
+What blocks this example today, found by `clear-example-expected-failures`:
 
-Both describe gaps in the golden tree this example had before T-030
-started refusing undiscriminated `oneOf`; they apply again once T-030
-is resolved and a tree is committed.
+- Ten components carry eleven undiscriminated `oneOf`/`anyOf`
+  properties (see `.expected-failure`). Each was checked
+  branch-by-branch against the vendored schema; none shares a field
+  name across every branch, so no `Profile::$discriminators` entry
+  could be honest.
+- Skipping those ten components instead cascades into 231 dangling
+  `class.notFound` PHPStan errors across unrelated models — this
+  document is deeply cross-referential, and a skipped component's
+  dependents are not skipped along with it.
+- Independently of the above, a scalar-typed `anyOf`/`oneOf` path
+  parameter resolves to `mixed` instead of tripping the
+  "unsupported parameter shapes" abort, then fails PHPStan against
+  `Endpoint::path()`'s stricter signature.
+- `Profile::$skip` in `paogen.php` fully catalogues the forty-nine
+  unrelated operation-level gaps this document already had (inline
+  JSON request bodies, unsupported query-parameter shapes, non-JSON
+  response content types) and is verified clean on its own — only the
+  discriminator components above keep the marker in place.
