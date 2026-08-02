@@ -5,7 +5,7 @@
   tags: ("generator", "dx", "naming"),
   priority: 4,
   difficulty: 6,
-  status: proposed(2026, 7, 30),
+  status: accepted(2026, 8, 2),
 )
 
 == Summary
