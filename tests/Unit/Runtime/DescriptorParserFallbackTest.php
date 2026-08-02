@@ -6,6 +6,7 @@ namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
 use Mlavrinenko\Paogen\Runtime\Marshal\MethodDocScanner;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\DocScanTargets;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -43,6 +44,43 @@ final class DescriptorParserFallbackTest extends TestCase
         $reflection = new ReflectionMethod(DateTimeImmutable::class, '__construct');
 
         self::assertFalse(MethodDocScanner::docFor($reflection));
+    }
+
+    /**
+     * `scan()` re-tokenises the whole file and builds a doc-comment map for
+     * every method it contains, but the only prior coverage
+     * (testTokenScanRecoversConstructorPhpdocFromFile above) checks a
+     * single method against a single substring. Nothing asserted that the
+     * map is built correctly once a file has more than one method, or an
+     * attribute sitting between a docblock and its `function` keyword —
+     * `DocScanTargets` carries exactly those three shapes, and each
+     * method's recovered doc (or lack of one) is asserted individually so
+     * a mis-attributed or lost doc on any one of the three fails here
+     * rather than passing on the strength of another method's assertion.
+     */
+    public function testScanRecoversDistinctDocsAcrossMethodsAttributesAndMissingDocs(): void
+    {
+        $first = MethodDocScanner::docFor(new ReflectionMethod(DocScanTargets::class, 'first'));
+        $second = MethodDocScanner::docFor(new ReflectionMethod(DocScanTargets::class, 'second'));
+        $third = MethodDocScanner::docFor(new ReflectionMethod(DocScanTargets::class, 'third'));
+
+        self::assertIsString($first);
+        self::assertStringContainsString("First method's own doc comment.", $first);
+        self::assertStringNotContainsString('Second method', $first);
+
+        // `second`'s docblock sits above a `#[Tagged(['a', 'b'])]` attribute,
+        // which itself sits above `function`. Recovering the right text here
+        // proves skipAttributeGroup() walked past the attribute's own
+        // nested `[...]` argument without losing the pending docblock or
+        // misreading which method the `function` keyword that follows
+        // belongs to.
+        self::assertIsString($second);
+        self::assertStringContainsString("Second method's own, distinct doc comment.", $second);
+        self::assertStringNotContainsString('First method', $second);
+
+        // `third` has no docblock at all — the scanner must not carry
+        // `second`'s (or any) pending doc forward onto it.
+        self::assertFalse($third);
     }
 
     public function testHydratorRecoversListItemTypeWhenOpcacheStripsComments(): void
