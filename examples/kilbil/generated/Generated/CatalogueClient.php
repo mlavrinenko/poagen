@@ -69,7 +69,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
             Endpoint::post('/load/goodslistxml')
                 ->query('id', $id)
                 ->query('h', $this->h)
-                ->xmlList($body, 'goodslist', 'good'),
+                ->xmlList($body, 'goodslist', 'goodlist'),
             ResponseType::object(GoodsListXmlResponse::class),
         );
     }

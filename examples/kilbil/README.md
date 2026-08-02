@@ -75,6 +75,27 @@ generator heuristic.
 `goodslist`), and two take no body. Every response on every operation is
 `application/json`, so XML is request-only.
 
+Neither the schema nor `xml:` metadata name a root or item element for either
+body — this document carries no `xml:` metadata at all — but both request
+bodies carry a literal `example: |` block with a full XML sample, in
+`schemas/loyalty_v1.yaml` around line 4305 (`/load/goodsxml`) and line 4570
+(`/load/goodslistxml`). paogen never makes a live call to settle this kind of
+question, but the vendor document already answers it: `goodsxml` roots at
+`<goods>` with repeated item `<good>`, and `goodslistxml` roots at
+`<goodslist>` with repeated item `<goodlist>`. `examples/kilbil/paogen.php`'s
+`xmlElements` carried `goodslistxml.item => good` until this was checked
+against the sample — wrong, fixed to `goodlist`.
+
+Both samples nest one level further, an `<inside>` wrapper inside an item
+holding more items of the same element name. `xmlElements` cannot express
+that: it names one root and one item element per operation, and the
+generated client's `XmlWriter` unwraps a nested array property by repeating
+the property's own name, not by wrapping same-named children in a container.
+A request that populates `inside` would not serialise into the vendor's
+shape. This is a real limitation of the flat root/item mapping, not
+something this change fixes — see the profile comment above `xmlElements`
+in `paogen.php`.
+
 **Formats that are mostly not OpenAPI formats.** Nine distinct values across 292
 uses: `int` (166), `double` (94), `date time` (15), `date` (9), `phone` (4),
 `data time` (3), `time` (2), `email` (2), `data` (1). Only `date` matches a
@@ -120,7 +141,7 @@ to call. What is there, and why:
 | `discoverIn` + `src/ValueObject/` | Four of the nine format values: `date time`, `data time`, `data`, `phone`. 23 properties gain a real type. |
 | `methodRenames` (33 entries) | Operation ids with no word boundary. `getclientfullbalance` becomes `getClientFullBalance` — and so do its models. |
 | `tagRenames` (10 entries) | Russian tag names. `Клиенты` becomes `CustomersClient` rather than `KlientyClient`. |
-| `xmlElements` (4 entries) | The XML root and item elements OpenAPI supplies no default for. |
+| `xmlElements` (4 entries) | The XML root and item elements OpenAPI supplies no default for, confirmed against the vendor's own embedded XML samples (see "Two XML request bodies" above). |
 
 Three operation ids are deliberately absent from `methodRenames`, and one tag from
 `tagRenames`. `generate_promocode` and `legal_info` carry real separators, `goods`
