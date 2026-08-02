@@ -5,7 +5,11 @@
   tags: ("truth", "process"),
   priority: 5,
   difficulty: 2,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    2,
+  )[Landed as 40abe20, merged d1b8d95. 109 files; the ADR-002 token-acquisition claim now points at operations-delegate-to-an-injected-transport. rg 'ADR-' returns only this task's mapping table.],
 )
 
 == Summary
