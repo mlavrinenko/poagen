@@ -88,7 +88,8 @@ final readonly class ServerCatalog
                 "server #/servers/%d ('%s') declares variable(s) %s — paogen does not substitute server-variable "
                     . 'templates, and emitting the URL unresolved would produce a constant that looks like a usable '
                     . 'address and is not one. Replace the template in the server URL with a literal value in the '
-                    . 'document, or drop the variable.',
+                    . 'document, or drop the variable. Profile::$skip cannot accept it, because a skip entry names '
+                    . 'an operation under `paths` or a component, and a server is neither.',
                 $index,
                 (string) $server->url,
                 implode(', ', $names),

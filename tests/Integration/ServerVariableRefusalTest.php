@@ -48,6 +48,10 @@ final class ServerVariableRefusalTest extends TestCase
             self::assertStringContainsString('https://{region}.api.example.com', $message);
             self::assertStringContainsString("'region'", $message);
             self::assertStringContainsString('does not substitute', $message);
+            // Profile::$skip cannot accept this — a server is neither an
+            // operation nor a component — so the message says so rather
+            // than pointing a consumer at a remedy that will not work.
+            self::assertStringContainsString('Profile::$skip cannot accept it', $message);
         }
     }
 
