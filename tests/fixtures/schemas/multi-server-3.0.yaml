@@ -1,0 +1,28 @@
+openapi: 3.0.3
+info:
+  title: Multi Server Fixture
+  version: 1.0.0
+  description: >
+    Three declared servers, none of the vendored documents (kilbil, petstore,
+    DigitalOcean, GitHub) declare more than one. Proves
+    emit-declared-servers-so-the-base-address-comes-from-the-document's
+    "several declared servers all emit, in declaration order, distinguishable
+    by name or description" acceptance criterion: the first server is not
+    silently treated as the only one. Two servers carry a description, the
+    third does not, so both naming mechanisms (description-derived and
+    positional) are exercised in one document.
+
+servers:
+  - url: https://api.multi-server.example
+    description: production
+  - url: https://staging.multi-server.example
+    description: staging
+  - url: https://internal.multi-server.example
+
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '204':
+          description: ok

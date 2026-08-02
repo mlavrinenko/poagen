@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: Server Variable Fixture
+  version: 1.0.0
+  description: >
+    A `{region}`-style server variable template, with a declared enum and
+    default. No vendored document (kilbil, petstore, DigitalOcean, GitHub)
+    exercises server variables, so this fixture is what proves
+    emit-declared-servers-so-the-base-address-comes-from-the-document
+    refuses one by name instead of emitting a constant carrying an
+    unsubstituted template that looks like a usable URL.
+
+servers:
+  - url: https://{region}.api.example.com
+    description: Regional API endpoint
+    variables:
+      region:
+        enum:
+          - us
+          - eu
+        default: us
+
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '204':
+          description: ok

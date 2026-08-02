@@ -136,6 +136,28 @@ generated tree passes `just lint-phpstan-generated` — max level, no baseline, 
 `excludePaths`, no `ignoreErrors` — and two consecutive runs produce byte-identical
 output.
 
+## Using the generated client
+
+The document declares one server, `https://bonus.kilbil.ru`, and paogen reads
+it onto the client as a constant instead of leaving it for a consumer to copy
+out of the schema by hand:
+
+```php
+use Acme\Kilbil\Generated\ApiClient;
+use Acme\Kilbil\Generated\ApiException;
+use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
+
+$client = new ApiClient(
+    new HttpTransport(ApiClient::SERVER_1, ApiException::class),
+    h: getenv('KILBIL_API_KEY'),
+);
+```
+
+`ApiClient::SERVER_1` is a value, not wiring — the transport still takes the
+base address as a plain constructor argument, so a test server or a staging
+host is still a different string away. See "Authentication" below for what
+`$h` carries and why it is a constructor argument rather than a header.
+
 ## What the profile has to say, and what it does not
 
 `paogen.php` is the demonstration that guidance shapes output. Delete everything

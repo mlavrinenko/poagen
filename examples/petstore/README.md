@@ -57,11 +57,13 @@ use Acme\Petstore\Generated\ApiException;
 use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 
-// Two facts only you can supply: where the API lives, and which exception
-// this profile throws. The PSR-18 client, the PSR-17 factories and the
-// marshalling machinery all default to working implementations.
+// The base address is a constant paogen read off the document's own
+// `servers:` entry — ApiClient::SERVER_1 — rather than a value you retype
+// from the schema. It is still a plain constructor argument to the
+// transport: swap in a test server or a staging host by passing a
+// different string, same as before.
 $client = new ApiClient(new HttpTransport(
-    'https://petstore3.swagger.io/api/v3',
+    ApiClient::SERVER_1,
     ApiException::class,
 ));
 
@@ -77,7 +79,7 @@ collaborator as an interface:
 
 ```php
 $transport = new HttpTransport(
-    'https://petstore3.swagger.io/api/v3',
+    ApiClient::SERVER_1,
     ApiException::class,
     $guzzle,            // any PSR-18 client
     $requestFactory,    // PSR-17
