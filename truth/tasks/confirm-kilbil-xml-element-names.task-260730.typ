@@ -5,7 +5,7 @@
   tags: ("examples", "xml"),
   priority: 6,
   difficulty: 2,
-  status: proposed(2026, 7, 30),
+  status: wip(2026, 8, 2)[milestone: trust the instruments, then use them],
 )
 
 == Summary
