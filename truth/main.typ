@@ -119,6 +119,8 @@
 #include "decisions/runtime-ships-as-a-separate-package.decision-260801.typ"
 #pagebreak()
 #include "decisions/coverage-floor-in-the-gate.decision-260801.typ"
+#pagebreak()
+#include "decisions/mutation-testing-stays-out-of-the-gate.decision-260802.typ"
 
 // --- Supplementary artefacts ---
 //

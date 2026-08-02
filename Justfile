@@ -287,6 +287,50 @@ test-coverage: tmpdir
     php -d pcov.directory=. -d 'pcov.exclude=~(vendor|build)~' vendor/bin/phpunit --coverage-html build/coverage --coverage-clover build/logs/clover.xml
     scripts/coverage-floor build/logs/clover.xml src=87.0 runtime/src=88.0
 
+# Mutation testing (wire-mutation-testing) against src/ and runtime/src/
+# together, via infection.json5. Deliberately NOT part of `just check` — see
+# `truth/decisions/mutation-testing-stays-out-of-the-gate.decision-260802.typ`
+# for the full measurement. Two full runs on 2026-08-02 took 7m14s and 7m22s
+# wall-clock (19 threads on a 20-core box), 3049 mutants, MSI 87.77% then
+# 87.47% (src/ ~88%, runtime/src/ ~85-87%; both drift a couple of points
+# between runs — see the decision for why). Comfortably over the ~2 minute
+# gate budget, so it runs on its own, on purpose, when someone asks for it.
+#
+# Same PCOV workaround `test-coverage` needs (see its comment above): the
+# devbox-packaged composer leaks a stale `PHP_INI_SCAN_DIR` into script
+# subprocesses and silently drops PCOV even though `which php` resolves
+# correctly. This recipe invokes `php` and `vendor/bin/infection` directly,
+# never through composer, so `env -u PHP_INI_SCAN_DIR` is enough — but the
+# fix has to be threaded a second time via `--initial-tests-php-options`,
+# because flags on infection's own PHP invocation do not propagate to the
+# child PHP process infection spawns for its initial coverage-generating
+# test run. `-d memory_limit=2G` is for infection's own process: the
+# default 128M exhausts building the per-mutant test-runner command lines
+# once past roughly 1500 of this run's 3049 mutants.
+#
+# `just mutate` may leave untracked scratch directories at the repo root
+# (observed: literal dirs named after a corrupted CLI flag, e.g.
+# `--output=`) — a side effect of subprocess-based integration tests
+# running against deliberately-mutated CLI argument-parsing code, orphaned
+# when the mutated behaviour aborts the test before its own cleanup runs.
+# Harmless and untracked; `git status --porcelain` after a run and discard
+# anything unexpected before committing.
+mutate: tmpdir
+    env -u PHP_INI_SCAN_DIR php -d memory_limit=2G vendor/bin/infection run --threads=max --initial-tests-php-options="-d pcov.directory=. -d pcov.exclude=~(vendor|build)~"
+
+# Fast, changed-files-only mutation run for local iteration: mutates only
+# lines added or modified relative to `main`. Explicit `--git-diff-base=main`
+# rather than infection's own `git:default-base` guess, which resolves to
+# `origin/master` here — wrong on both counts, since this repository has no
+# `origin` remote configured and its trunk branch is `main`, not `master`.
+#
+# Timed on a single representative file (86 mutants, `src/Generator/Generator.php`)
+# at ~20s wall-clock including the initial coverage run, comfortably inside
+# the budget for routine use ahead of a full `just mutate`. Same PCOV
+# workaround as `mutate`, same reasons.
+mutate-fast: tmpdir
+    env -u PHP_INI_SCAN_DIR php -d memory_limit=2G vendor/bin/infection run --threads=max --git-diff-filter=AM --git-diff-base=main --initial-tests-php-options="-d pcov.directory=. -d pcov.exclude=~(vendor|build)~"
+
 # Prove a generated client installs and runs on mlavrinenko/paogen-runtime
 # alone, with the generator absent (runtime-package-split). Builds a scratch
 # composer project under build/ — not part of `just check`: it resolves

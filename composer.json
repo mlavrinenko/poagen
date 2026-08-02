@@ -29,6 +29,7 @@
     "require-dev": {
         "cweagans/composer-patches": "^1.7",
         "friendsofphp/php-cs-fixer": "^3.92",
+        "infection/infection": "^0.34.1",
         "nyholm/psr7": "^1.8",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
@@ -70,6 +71,7 @@
     "config": {
         "allow-plugins": {
             "cweagans/composer-patches": true,
+            "infection/extension-installer": true,
             "php-http/discovery": true
         },
         "sort-packages": true
