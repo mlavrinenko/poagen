@@ -1,15 +1,15 @@
 #import "@local/mindtape:0.2.0": *
 
 #show: task.with(
-  title: "Decide how a client surfaces a failure the vendor reports inside a 200 body",
+  title: "Record that a failure inside a 200 body stays the consumer's business",
   tags: ("generator", "errors", "decision"),
   priority: 5,
-  difficulty: 7,
-  status: blocked(
+  difficulty: 2,
+  status: accepted(
     2026,
     8,
     2,
-  )[Needs your ruling on scope: does the profile grow a way to declare a payload-level result envelope, or does this stay the consumer's business the way examples/kilbil already handles it by hand? The first adds a permanent public surface to the profile; the second leaves every kilbil caller one unchecked field away from a silent success. That trade is product direction and the repo cannot settle it. Pick one and the decision artifact plus any code follows.],
+  )[Owner ruled 2026-08-02: a payload-level result envelope stays entirely the consumer's business. What remains is the decision artifact and the README line.],
 )
 
 == Summary
@@ -26,12 +26,29 @@ The envelope is not a kilbil quirk; payload-level status codes are common in old
 
 This needs a decision artifact before code.
 
+=== Owner ruling, 2026-08-02
+
+A payload-level result envelope stays entirely the consumer's business. The
+profile grows no surface for it and the generator does nothing with it. What
+remains is writing that down: the decision artifact, and the line in the
+example's README where a reader first meets the field.
+
 == Acceptance criteria
 
-- A decision artifact under \`truth/decisions/\` records the choice, its options, and its consequences, citing at least one goal and one standard.
-- The options considered include at minimum: leave it to consumer wrappers as today; declare the envelope in the profile and have the generator throw; declare it and have the generator expose a typed predicate without throwing.
-- If the answer is "consumer's business", \`examples/kilbil/README.md\` says so where a reader meets \`result\_code\`, and the decision explains why a generator answer would be worse.
-- If the answer changes the emitter, \`guidance-is-data-not-code\` is honoured — the envelope is declared as data, never as a callback.
+- A decision artifact under \`truth/decisions/\` records the choice — consumer's
+  business — with its options and consequences, citing at least one goal and
+  one standard.
+- The options it weighs include at minimum: leave it to consumer wrappers as
+  today; declare the envelope in the profile and have the generator throw;
+  declare it and have the generator expose a typed predicate without throwing.
+- The decision states why a generator answer would be worse, and names what
+  would reopen it. The load-bearing reason: the vendor's own document never
+  marks the property, so the generator would be acting on guidance that is
+  pure vendor knowledge, and a wrong guess turns a success into a thrown
+  exception on an operation that worked.
+- \`examples/kilbil/README.md\` says so where a reader meets \`result\_code\`,
+  pointing at the wrapper the example already ships.
+- Nothing under \`src/\` or \`runtime/src/\` changes.
 
 == Non-goals
 
@@ -41,4 +58,4 @@ This needs a decision artifact before code.
 == Files
 
 - \`truth/decisions/\`
-- \`truth/tasks/\`
+- \`examples/kilbil/README.md\`

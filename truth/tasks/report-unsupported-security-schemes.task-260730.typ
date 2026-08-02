@@ -1,15 +1,15 @@
 #import "@local/mindtape:0.2.0": *
 
 #show: task.with(
-  title: "Report a security scheme the generator cannot wire instead of dropping it",
+  title: "Wire every security scheme that reduces to a credential; refuse the rest by name",
   tags: ("generator", "security", "strictness"),
   priority: 6,
-  difficulty: 3,
-  status: blocked(
+  difficulty: 5,
+  status: accepted(
     2026,
     8,
     2,
-  )[Needs your ruling on oauth2. ADR-002 puts token acquisition in the transport, so an oauth2 scheme paogen cannot wire is arguably not a degradation at all; treating it as one aborts petstore unless its profile carries an explicit opt-out. Both readings are defensible and the one you pick sets how paogen greets the commonest auth scheme in the wild. Choose: report-and-abort under the default-deny-on-degradation policy, or report-as-omission and never abort. Basic auth and cookie apiKey get wired either way, and the rest is implementation.],
+  )[Unblocked. The owner ruled the question away rather than picking one of its two branches: paogen does not implement transport, but it emits everything the document says that helps a consumer wire their own. Almost every scheme reduces to one credential on one request, oauth2 included, so almost every scheme gets wired. See the ruling below.],
 )
 
 == Summary
@@ -39,32 +39,127 @@ and whatever is chosen has to be one of the reactions the project already
 recognises — refuse, or a named omission in `Profile` carrying a reason — not a
 fourth undocumented one.
 
+=== Owner ruling, 2026-08-02
+
+The framing above assumed a scheme is either wired or refused, and asked which
+side oauth2 falls on. The ruling rejects the framing. paogen never implements
+transport, and it never drops anything silently — so for each scheme it emits
+whatever the document says that helps the consumer wire their own transport
+against a standard library. Where the document is ambiguous, the generator
+either picks the default that is right in almost every case, or errors and
+says exactly what to configure. It never guesses quietly.
+
+Applied per scheme kind, that resolves to four buckets. The first is much
+larger than this task assumed, because almost every scheme in OpenAPI reduces
+to one credential attached to one request:
+
+*Wired — one credential, one place on the wire.*
+
+- `apiKey` `in: header` — as today.
+- `apiKey` `in: query` — as today.
+- `apiKey` `in: cookie` — one constructor argument, sent as a `Cookie` header
+  carrying `name=value`.
+- `http basic` — two constructor arguments, sent as
+  `Authorization: Basic <base64 of user:pass>`.
+- `http bearer` — as today.
+- `http` with any other scheme token (`token`, a vendor word) — one argument,
+  sent verbatim as `Authorization: <SchemeToken> <credential>`. This is the
+  "sane default that works in almost every case": RFC 7235 says a credential
+  follows the scheme token, and every scheme that is not a challenge-response
+  handshake works this way.
+- `oauth2`, every flow — one constructor argument holding an access token,
+  sent as `Authorization: Bearer <token>`, which is what RFC 6750 says an
+  OAuth2 access token looks like on the wire for all four flows. paogen does
+  not acquire the token and does not refresh it; it never has to, because the
+  emitted client only ever sends one.
+- `openIdConnect` — identical to oauth2 at the wire.
+
+  For these last two the generator also emits, as generated constants and
+  docblock on the client, the flow metadata the document carries: each flow's
+  name, `authorizationUrl`, `tokenUrl`, `refreshUrl`, and the declared scope
+  names with their descriptions. That is the "help the consumer wire their own
+  transport" half — a consumer reaching for `league/oauth2-client` or any
+  other library gets the endpoints and scopes from the client they already
+  have, instead of re-reading the vendor's YAML. Where an operation's own
+  security requirement names scopes, those scopes appear in that method's
+  docblock.
+
+*Reported, nothing to wire.* `mutualTLS` is the one scheme with no
+request-level credential at all — the material lives in the TLS handshake, on
+the consumer's PSR-18 client. The run generates normally and exits zero,
+because nothing shrank, and prints a notice naming the scheme and where the
+certificate has to be configured; the same line appears on the emitted
+client's docblock. This is the notice channel `report-unrecognised-formats`
+established, not a new one.
+
+*Refused by name.* `http digest` and `http negotiate` need a challenge and a
+second request before a credential exists. paogen will not run a protocol.
+The run aborts naming the scheme and every operation that requires it, and
+says the opt-out is skipping those operations. Anything a future
+specification revision adds that paogen does not recognise lands here too:
+unknown means refused, never ignored.
+
+*Refused, and says what to configure.* A security requirement that names a
+scheme the document never declares. This is not hypothetical — the vendored
+petstore document requires `api_key` on two operations and declares only
+`petstore_auth`, so the emitted client authenticates neither. The document is
+invalid, the fixture may not be edited (`fixtures-are-unmodified-vendor-documents`),
+and the consumer does know what `api_key` is. So the generator errors, names
+the requirement and the operations, and asks for the missing declaration in
+the profile — which means `Profile` grows a map of scheme declarations that
+fill a gap the document left. That is the shape `real-world-schemas` calls for
+where a document is genuinely ambiguous: ask for guidance, say exactly what is
+needed.
+
 == Acceptance criteria
 
-- A declared security scheme the generator does not wire is reported, naming the
-  scheme key, its type, and where it is applied — globally or by which
-  operations.
-- Whether it is a hard failure follows the profile policy
-  `abort-on-unrepresentable-constructs` established, rather than inventing a
-  second policy.
+- Every scheme kind in the wired bucket above is emitted and attached to the
+  request, each proven by a fixture asserting the exact header or query
+  parameter the request carries.
+- `oauth2` and `openIdConnect` clients carry the flow metadata the document
+  declares — flow names, all three URLs, scope names and descriptions — as
+  generated constants readable without the schema in hand, and an operation's
+  required scopes appear on that operation's docblock.
+- `mutualTLS` produces a notice, exit status zero, and a docblock line on the
+  emitted client. It never produces an abort and never produces silence.
+- `http digest`, `http negotiate`, and any unrecognised scheme type abort the
+  run naming the scheme key, its type, and every operation that requires it —
+  globally-applied schemes named as such.
+- A security requirement naming an undeclared scheme aborts the run naming the
+  requirement and its operations, and the message names the profile key that
+  fixes it.
+- `Profile` accepts a declaration for a scheme the document omitted, keyed by
+  the requirement name, and the petstore example uses it to wire `api_key`
+  rather than skipping the two operations that require it.
 - A scheme that is declared but required by no operation and no global
-  requirement is not reported. An unused declaration costs the consumer nothing.
-- The choice per scheme kind is recorded in a decision citing the goals and
-  standards it serves, including the reasoning for treating `oauth2`
-  differently from `http basic` if that is where it lands.
-- A schema whose only scheme is unwireable does not emit a client that reports
-  success and sends nothing.
+  requirement is not reported. An unused declaration costs the consumer
+  nothing.
+- The four buckets and their reasoning are recorded in a decision citing the
+  goals and standards they serve, and that decision states plainly why oauth2
+  is wired despite `operations-delegate-to-an-injected-transport` putting
+  token acquisition in the transport: sending a token and obtaining one are
+  different jobs, and only the first is the client's.
+- No schema anywhere produces a client that reports success and sends no
+  credential where the document required one.
 
 == Non-goals
 
-- Implementing `oauth2` or `openIdConnect` flows. Token acquisition is
-  transport, per ADR-002.
-- Credential storage or refresh.
+- Acquiring, refreshing, storing, or validating any credential. paogen emits
+  the argument and puts it on the request; everything before that is the
+  consumer's transport, per `operations-delegate-to-an-injected-transport`.
+- Running any challenge-response handshake.
 - Re-opening `query-apikey-security-scheme`, which wires the query variant.
+- `sub-client-constructors-take-every-scheme-in-the-document`, which fixes
+  which sub-client receives which credential. This task decides what a
+  credential is; that one decides who gets one.
 
 == Files
 
 - `src/Generator/Emit/SecurityScheme.php`
 - `src/Generator/Emit/SecuritySchemeCatalog.php`
+- `src/Generator/Emit/SecurityEmitter.php`
+- `src/Generator/Emit/ClientConstructor.php`
+- `src/Generator/Profile.php`
 - `src/Generator/GenerationPlan.php`
+- `examples/petstore/`
 - `truth/decisions/`

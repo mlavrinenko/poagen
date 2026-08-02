@@ -5,13 +5,15 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: blocked(
+  status: accepted(
     2026,
     8,
     2,
-  )[Three emitter defects stand between the two large examples and a clear run, all filed and linked. The one that matters is the skip cascade: the profile cannot supply discriminators for these fifteen unions, because none of them has a field common to every branch, so skip is the only route and skip is broken. Not owner work — this is queued behind its own dependencies.],
+  )[Queued behind its dependencies rather than behind a ruling. The owner settled the one open question underneath it on 2026-08-02: the fifteen undiscriminated unions get a profile entry that hands the decoded value over, so these examples stop needing a skip they cannot express. Startable once the four linked tasks land.],
   links: (
+    depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),
     depends-on("skipped-component-leaves-dangling-references.task-260802.typ"),
+    depends-on("sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ"),
     depends-on("security-schemes-sharing-a-ctor-arg-collide.task-260802.typ"),
     depends-on("scalar-union-path-parameter-degrades-to-mixed.task-260802.typ"),
   ),
@@ -24,13 +26,20 @@ Both large example trees carry an expected-failure marker, left when property-le
 == Acceptance criteria
 
 - Both examples generate without a marker file.
-- The discriminators they need are supplied from their profiles, which is the documented mechanism.
+- The guidance they need is supplied from their profiles: a discriminator where
+  the schema has one, and a raw-data declaration where it does not. The second
+  criterion this task originally carried — that a discriminator is the
+  mechanism — was measured false and is replaced by
+  `declare-an-undiscriminated-union-as-raw-data`.
 - Both trees pass the strict analysis configured for generated output.
 - The check-examples recipe reports no stale markers.
+- Every profile entry either names a real construct or fails the run as stale,
+  so neither example carries permissions nobody re-examines.
 
 == Non-goals
 
-- Weakening the undiscriminated-union abort.
+- Weakening the undiscriminated-union abort. It stays the default; the
+  examples opt out of it by name, per property.
 - Adding discriminator inference.
 
 == Files

@@ -106,7 +106,14 @@ to = ["done", "blocked", "failed"]
 value = "blocked"
 glyph = "🔒"
 color = "red"
-to = ["wip", "cancelled", "failed"]
+# `accepted` is here because most of what blocks a task in this repo is an
+# owner ruling, not a dependency — six tasks sat in `blocked` on 2026-08-02
+# waiting for a decision only the owner could make. When such a ruling lands,
+# the task is ready to pick up, not started: it goes back to the queue, not
+# into `wip`. Without this edge the only legal moves were `wip` (which lies
+# about someone working it, and burns the one-at-a-time WIP convention) and
+# `--force` (which records a waiver for a transition that is entirely normal).
+to = ["accepted", "wip", "cancelled", "failed"]
 note = "required"
 
 [[tasks.status]]
