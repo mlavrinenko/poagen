@@ -101,7 +101,7 @@
       stage: "unstable",
     )[
       #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
-      #when[#the(Client) call `ApiClient::hydrate(Pet::class, $data)` runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
+      #when[#the(Client) call `(new Hydrator())->hydrate(Pet::class, $data)` runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
       #then[#the(Model)'s `$pet->kind` is an instance of `Cat`, independent of whether the payload's keys structurally match `Dog`]
     ]
 
@@ -199,7 +199,7 @@
       #and_[#a(Model) `Contact` declares a required property `email` with `format: email`]
       #when[`json_encode($contact)` runs against #a(Model) `Contact` whose `email` is an `Email('team@example')`]
       #then[#the(Model)'s emitted JSON contains `"email":"team@example"`, not a nested object]
-      #and_[`ApiClient::hydrate(Contact::class, ['email' => 'team@example', ...])` produces #a(Model) `Contact` whose `email` is an `Email` instance with `$value === 'team@example'`]
+      #and_[`(new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...])` produces #a(Model) `Contact` whose `email` is an `Email` instance with `$value === 'team@example'`]
     ]
 
     #scenario(
@@ -208,7 +208,7 @@
     )[
       #given[#a(Model) `Order` declares an optional property `shipDate` with `type: string` and `format: date-time`]
       #and_[no user binding for #a(BindsFormat) `#[BindsFormat('date-time')]` is registered]
-      #when[#the(Model) is emitted and the generated `ApiClient::hydrate(Order::class, ...)` runs against a payload whose `shipDate` is #p((wire: "'2026-04-18T12:34:56+00:00'"))]
+      #when[#the(Model) is emitted and the generated `(new Hydrator())->hydrate(Order::class, ...)` runs against a payload whose `shipDate` is #p((wire: "'2026-04-18T12:34:56+00:00'"))]
       #then[#the(Model)'s constructor parameter is typed `?\\DateTimeImmutable`]
       #and_[#the(Model)'s hydrated `Order::$shipDate` is an instance of `\\DateTimeImmutable` whose timestamp matches the parsed RFC-3339 string]
       #and_[#the(Client) call `json_encode($order)` with that `shipDate` emits `"shipDate":"2026-04-18T12:34:56+00:00"` on the wire, not a nested object]

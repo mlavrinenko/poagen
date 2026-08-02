@@ -838,20 +838,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientCallApiClientHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire(
-        string $wire,
-    ): void {
-        $tag = trim($wire, "'\"");
-        // Payload has both `bark` (so a bare structural match would prefer Dog)
-        // and `meow` (Cat's required field) — petType='Cat' must break the tie
-        // and select Cat regardless of the structural overlap.
-        $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
-            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
-        );
-    }
-
-
     public function thenModelsPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog(): void
     {
         assert($this->hydratedCompositionPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
@@ -1151,17 +1137,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenApiclientHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample(
-    ): void {
-        assert($this->hydratedContact instanceof Contact);
-        TestCase::assertInstanceOf(
-            Email::class,
-            $this->hydratedContact->email,
-        );
-        TestCase::assertSame('team@example', $this->hydratedContact->email->value);
-    }
-
-
     public function givenNoUserBindingForBindsFormatAttributeBindsFormatDateTimeIsRegistered(): void
     {
         // No user VO under `discoverIn` binds `date-time`. Observable proof:
@@ -1174,17 +1149,6 @@ final class ModelGeneratorSteps
         TestCase::assertStringContainsString('?DateTimeImmutable $shipDate', $source);
         TestCase::assertStringNotContainsString('#[Format', $source);
         TestCase::assertStringNotContainsString('ScalarBinding', $source);
-    }
-
-
-    public function whenModelIsEmittedAndTheGeneratedApiClientHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire(
-        string $wire,
-    ): void {
-        $this->dateTimeWire = trim($wire, "'\"");
-        $this->hydratedOrder = $this->invokeHydrate(
-            Order::class,
-            ['shipDate' => $this->dateTimeWire],
-        );
     }
 
 
@@ -1871,6 +1835,42 @@ final class ModelGeneratorSteps
     public function thenGeneratedFileTreeOnDiskIsByteIdenticalToTheTreeTheFirstRunLeft(): void
     {
         TestCase::assertSame($this->rerunFirstSnapshot, $this->snapshot($this->rerunOutputDir));
+    }
+
+
+    public function whenClientCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire(
+        string $wire,
+    ): void {
+        $tag = trim($wire, "'\"");
+        // Payload has both `bark` (so a bare structural match would prefer Dog)
+        // and `meow` (Cat's required field) — petType='Cat' must break the tie
+        // and select Cat regardless of the structural overlap.
+        $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
+            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
+        );
+    }
+
+
+    public function thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample(
+    ): void {
+        assert($this->hydratedContact instanceof Contact);
+        TestCase::assertInstanceOf(
+            Email::class,
+            $this->hydratedContact->email,
+        );
+        TestCase::assertSame('team@example', $this->hydratedContact->email->value);
+    }
+
+
+    public function whenModelIsEmittedAndTheGeneratedNewHydratorHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire(
+        string $wire,
+    ): void {
+        $this->dateTimeWire = trim($wire, "'\"");
+        $this->hydratedOrder = $this->invokeHydrate(
+            Order::class,
+            ['shipDate' => $this->dateTimeWire],
+        );
     }
 
 }

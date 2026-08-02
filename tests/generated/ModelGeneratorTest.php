@@ -177,13 +177,13 @@ final class ModelGeneratorTest extends TestCase
      * @source truth/specs/model-generator.feature-260418.typ:99
      *
      * Given Schema declares components Dog and Cat and Model Pet with a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
-     * When Client call ApiClient::hydrate(Pet::class, $data) runs against a payload whose kind.petType is 'Cat'
+     * When Client call (new Hydrator())->hydrate(Pet::class, $data) runs against a payload whose kind.petType is 'Cat'
      * Then Model's $pet->kind is an instance of Cat, independent of whether the payload's keys structurally match Dog
      */
     public function testAOneOfWithADiscriminatorPropertyNamePicksTheBranchByWireValue(): void
     {
         $this->steps->givenSchemaDeclaresComponentsDogAndCatAndModelPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType();
-        $this->steps->whenClientCallApiClientHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
+        $this->steps->whenClientCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
         $this->steps->thenModelsPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog();
     }
 
@@ -348,7 +348,7 @@ final class ModelGeneratorTest extends TestCase
      *   And Model Contact declares a required property email with format: email
      * When json_encode($contact) runs against Model Contact whose email is an Email('team@example')
      * Then Model's emitted JSON contains "email":"team@example", not a nested object
-     *   And ApiClient::hydrate(Contact::class, ['email' => 'team@example', ...]) produces Model Contact whose email is an Email instance with $value === 'team@example'
+     *   And (new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...]) produces Model Contact whose email is an Email instance with $value === 'team@example'
      */
     public function testABindsFormatScalarValueObjectRoundTripsThroughScalarBinding(): void
     {
@@ -356,7 +356,7 @@ final class ModelGeneratorTest extends TestCase
         $this->steps->givenModelContactDeclaresARequiredPropertyEmailWithFormatEmail();
         $this->steps->whenJsonEncodeContactRunsAgainstModelContactWhoseEmailIsAnEmailTeamExample();
         $this->steps->thenModelsEmittedJSONContainsEmailTeamExampleNotANestedObject();
-        $this->steps->thenApiclientHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample();
+        $this->steps->thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample();
     }
 
 
@@ -366,7 +366,7 @@ final class ModelGeneratorTest extends TestCase
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user binding for BindsFormat attribute #[BindsFormat('date-time')] is registered
-     * When Model is emitted and the generated ApiClient::hydrate(Order::class, ...) runs against a payload whose shipDate is '2026-04-18T12:34:56+00:00'
+     * When Model is emitted and the generated (new Hydrator())->hydrate(Order::class, ...) runs against a payload whose shipDate is '2026-04-18T12:34:56+00:00'
      * Then Model's constructor parameter is typed ?\\DateTimeImmutable
      *   And Model's hydrated Order::$shipDate is an instance of \\DateTimeImmutable whose timestamp matches the parsed RFC-3339 string
      *   And Client call json_encode($order) with that shipDate emits "shipDate":"2026-04-18T12:34:56+00:00" on the wire, not a nested object
@@ -375,7 +375,7 @@ final class ModelGeneratorTest extends TestCase
     {
         $this->steps->givenModelOrderDeclaresAnOptionalPropertyShipDateWithTypeStringAndFormatDateTime();
         $this->steps->givenNoUserBindingForBindsFormatAttributeBindsFormatDateTimeIsRegistered();
-        $this->steps->whenModelIsEmittedAndTheGeneratedApiClientHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire('\'2026-04-18T12:34:56+00:00\'');
+        $this->steps->whenModelIsEmittedAndTheGeneratedNewHydratorHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire('\'2026-04-18T12:34:56+00:00\'');
         $this->steps->thenModelsConstructorParameterIsTypedDateTimeImmutable();
         $this->steps->thenModelsHydratedOrderShipDateIsAnInstanceOfDateTimeImmutableWhoseTimestampMatchesTheParsedRFC3339String();
         $this->steps->thenClientCallJsonEncodeOrderWithThatShipDateEmitsShipDate20260418T1234560000OnTheWireNotANestedObject();

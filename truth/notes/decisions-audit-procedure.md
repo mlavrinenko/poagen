@@ -267,3 +267,27 @@ Marshaller())->marshal(...)` appears verbatim at nine call sites.
 Two of the three candidates from the wide run were noise — that's the
 price of widening past the tree the refactor under sweep actually
 touched, and step 4 exists to pay it.
+
+## `hydrate` settled, 2026-08-02
+
+`specs-still-name-apiclient-hydrate` fixed the three stale receivers
+above — lines 104, 202 and 211 of `model-generator.feature-260418.typ`
+now read `(new Hydrator())->hydrate(...)`, matching lines 147 and 178.
+Re-running the unscoped diff from step 3 still lists `hydrate` as a
+candidate (expected: it's a hand-written runtime collaborator, never
+in the emitted-vocab tree, same as `marshal`), but step 4 now settles
+it clean:
+
+```
+$ rg -n 'ApiClient::hydrate' src runtime tests examples
+$ # zero hits
+$ rg -n -e '->hydrate\(' src runtime tests examples | grep -v ModelGeneratorTest.php
+$ # every hit is on a Hydrator instance — runtime/src/Marshal/Hydrator.php,
+$ # runtime/src/Http/ResponseDecoder.php, tests/Support/RecordingRuntime.php,
+$ # tests/Unit/Runtime/*, tests/Integration/PropertyRenameTest.php,
+$ # tests/generated/ModelGeneratorSteps.php
+```
+
+`hydrate` moves to the settled column alongside `getDocComment` and
+`marshal`. The wide, unscoped run over every feature file now returns
+no drift for any of the three candidates it has ever surfaced.
