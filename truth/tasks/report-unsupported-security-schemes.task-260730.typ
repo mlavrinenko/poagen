@@ -5,11 +5,7 @@
   tags: ("generator", "security", "strictness"),
   priority: 6,
   difficulty: 5,
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Unblocked. The owner ruled the question away rather than picking one of its two branches: paogen does not implement transport, but it emits everything the document says that helps a consumer wire their own. Almost every scheme reduces to one credential on one request, oauth2 included, so almost every scheme gets wired. See the ruling below.],
+  status: wip(2026, 8, 2),
 )
 
 == Summary
