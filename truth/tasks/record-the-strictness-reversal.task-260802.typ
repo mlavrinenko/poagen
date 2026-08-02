@@ -5,7 +5,7 @@
   tags: ("strictness", "truth", "process"),
   priority: 6,
   difficulty: 3,
-  status: wip(2026, 8, 2)[milestone: trust the instruments, then use them],
+  status: done(2026, 8, 2),
 )
 
 == Summary
