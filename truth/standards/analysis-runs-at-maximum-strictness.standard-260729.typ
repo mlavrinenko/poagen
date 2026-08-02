@@ -5,6 +5,7 @@
   title: "Analysis runs at maximum strictness with nothing suppressed",
   status: accepted(2026, 7, 29),
   contexts: (generation-context,),
+  relates-to: (link("../decisions/strictness-relaxation-is-opt-in-not-opt-out.decision-260802.typ"),),
   rule: [
     Static analysis runs at its strictest available setting over both
     #the(Generator) and the tree it emits, and the two tiers are held to
