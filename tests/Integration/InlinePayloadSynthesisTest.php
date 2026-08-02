@@ -122,6 +122,25 @@ final class InlinePayloadSynthesisTest extends TestCase
         self::assertContains('PlacedOrderShipping', $models);
     }
 
+    /**
+     * synthesise-a-model-for-inline-array-item-responses: the `.response` pin
+     * works the same way when the response is an array of inline objects, not
+     * only when it is a single inline object — {@see
+     * testAProfilePinRenamesASynthesisedPayloadClass} covers the latter. Both
+     * go through {@see InlinePayloadPlanner::planResponse()}'s same `claim()`
+     * call, so one pin key covers both shapes; this pins that down for the
+     * list case specifically, since nothing else did.
+     */
+    public function testAProfilePinRenamesAnArrayItemResponseModel(): void
+    {
+        $plan = $this->plan(['placeOrdersBulk.response' => 'BulkOrderConfirmation']);
+        $models = $this->modelNames($plan);
+
+        self::assertContains('BulkOrderConfirmation', $models);
+        self::assertNotContains('PlaceOrdersBulkResponseItem', $models);
+        self::assertStringContainsString('@return list<BulkOrderConfirmation>', $this->clientSource($plan));
+    }
+
     public function testAPinNamingAnAbsentOperationIdFailsTheRun(): void
     {
         try {
