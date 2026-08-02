@@ -5,7 +5,7 @@
   tags: ("generator", "security"),
   priority: 6,
   difficulty: 3,
-  status: wip(2026, 8, 2),
+  status: done(2026, 8, 2),
 )
 
 == Summary
