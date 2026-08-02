@@ -50,16 +50,33 @@ return new Profile(
      * and this document carries no `xml:` metadata at all. paogen refuses to
      * invent either, because a wrong root element is a 400 from the vendor.
      *
-     * These names follow the vendor's own vocabulary: the endpoint loads
-     * "номенклатура" (catalogue items), and their description says the XML mirrors
-     * the JSON structure. Confirm them against the vendor's XML samples before
-     * sending a live request — paogen cannot, and the example makes no live call.
+     * paogen could not confirm these with a live call — the example still makes
+     * none — but the vendor document already had the answer. Both operations'
+     * `application/xml` request body in schemas/loyalty_v1.yaml carries a
+     * literal `example: |` block with a full XML sample: around line 4305, the
+     * `/load/goodsxml` request body shows root `<goods>` with repeated item
+     * `<good>`; around line 4570, the `/load/goodslistxml` request body shows
+     * root `<goodslist>` with repeated item `<goodlist>` — not `good`, which is
+     * what this mapping said until this change.
+     *
+     * Both samples nest one level further: a `<good>`/`<goodlist>` item can
+     * contain an `<inside>` wrapper holding more `<good>`/`<goodlist>` children,
+     * mirroring the schema's own `inside` array property. That shape is out of
+     * reach of this mapping. `xmlElements` names only a root and one item
+     * element per operation, and the runtime's XmlWriter unwraps a nested array
+     * by repeating the *property's* own name (`inside`) once per entry — it has
+     * no "wrap in a container of named items" mode. So a request that populates
+     * `inside` would serialise as sibling `<inside>` elements holding fields
+     * directly, not the vendor's single `<inside>` wrapping `<good>`/`<goodlist>`
+     * children. The root/item names below are confirmed and cover the outer
+     * envelope only; see README.md for this same limitation spelled out for a
+     * consumer.
      */
     xmlElements: [
         'goodsxml' => 'goods',
         'goodsxml.item' => 'good',
         'goodslistxml' => 'goodslist',
-        'goodslistxml.item' => 'good',
+        'goodslistxml.item' => 'goodlist',
     ],
 
     tagRenames: [
