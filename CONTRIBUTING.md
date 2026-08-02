@@ -95,6 +95,39 @@ lists is actually instrumented; verify this is still true after any
 toolchain change with `php -d pcov.directory=. -i | grep pcov.directory`
 under the exact command the recipe runs.
 
+### Regenerating a fixture golden tree
+
+`tests/fixtures/profiles/*.php` describe the generator's own test fixtures —
+`petstore`, `parameters`, `contact`, `composition`,
+`undiscriminated-oneof-resolved` — and each one's `output:` defaults to a
+scratch directory under `$TMPDIR`
+(`tests/fixtures/profiles/scratch-output.php`), never to the committed
+golden tree it has the same name as. A `just test` or `just check` run loads
+these profiles and generates from them, but it always writes to scratch and
+never touches `tests/fixtures/generated/<name>/`.
+
+That is deliberate: those directories are checked-in golden output, and
+`tests/Integration/ByteStabilityTest.php` (and any sibling that regenerates
+a fixture tree) compares fresh scratch output against them rather than
+overwriting them. A fixture profile that wrote straight into its own golden
+by default meant a test run silently regenerated the golden it was supposed
+to be checked against — harmless when the generator agrees with the golden
+byte for byte, and silent corruption the moment it does not. See
+`truth/tasks/fixtures-generate-to-a-scratch-tree.task-260802.typ`.
+
+Updating a golden on purpose — after an intentional generator change — is
+still supported, just explicit:
+
+```bash
+just regenerate-fixture parameters
+```
+
+which runs `paogen generate` against that profile with `--output` pointed at
+the real `tests/fixtures/generated/parameters` tree, overriding the
+profile's scratch default for that one invocation. Review the diff before
+committing; `git diff tests/fixtures/generated/parameters` is the whole
+review.
+
 ### Closing a task
 
 `truth/tasks/` is tracked with [MindTape](https://github.com/mlavrinenko/mindtape)
