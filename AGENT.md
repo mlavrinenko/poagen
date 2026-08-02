@@ -101,6 +101,23 @@ example trees, rector, and linecop, in parallel.
   permits an exemption only where the tool is provably blind, each one carrying
   an inline comment naming the blind spot. Adding an exemption for a real
   finding is forbidden.
+- A reflection-only fixture under `tests/Unit/Runtime/Fixtures` — read via
+  Reflection or `token_get_all`, never invoked — reads as dead code to three
+  separate tools, each acting on it before you see the real complaint. None
+  surfaces before the gate rejects the file, so budget for all three the
+  first time you write one, not one round at a time. Rector's
+  `RemoveEmptyClassMethodRector` deletes an empty method body, exactly the
+  body such a fixture wants: throw instead
+  (`tests/Unit/Runtime/Fixtures/DocScanTargets.php`'s three methods each
+  throw). php-cs-fixer's `modifier_keywords` rule force-adds `public` to a
+  bare method, rewriting the token stream a token-scan fixture is pinning
+  down: write `public` yourself rather than let the fixer rewrite it under
+  you (same file). PHPStan's shipmonk `deadProperty.neverRead` flags a
+  constructor-promoted property that exists only to carry a phpdoc type and
+  is never read: use a plain, non-promoted constructor parameter instead
+  (`tests/Unit/Runtime/Fixtures/Tagged.php`'s `$values`). Measured while
+  writing both files, filed as
+  `reflection-only-fixtures-fight-the-lint-gate`.
 - Linecop enforces line limits across the whole repo, not just `src/` —
   `.linecop.yaml` excludes `vendor`, `build`, `.devbox`, `.git`,
   `tests/generated`, `tests/fixtures` and `examples`, and caps PHP at 250 lines
