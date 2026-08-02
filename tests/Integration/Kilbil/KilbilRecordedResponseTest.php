@@ -85,21 +85,23 @@ final class KilbilRecordedResponseTest extends TestCase
         self::assertSame(SearchClientResponseInterfacesItemInterfaceType::_0, $interface->interface_type);
 
         // A second nested list, doubly nested under `_bill_data`.
-        self::assertCount(2, $response->_bill_data->items);
-        self::assertSame('2137', $response->_bill_data->items[0]->code);
-        self::assertSame(130.0, $response->_bill_data->items[0]->price);
-        self::assertNull($response->_bill_data->items[0]->new_price_action_id);
-        self::assertSame(32243, $response->_bill_data->items[1]->new_price_action_id);
+        $billItems = $response->_bill_data->items ?? [];
+        self::assertCount(2, $billItems);
+        self::assertSame('2137', $billItems[0]->code);
+        self::assertSame(130.0, $billItems[0]->price);
+        self::assertNull($billItems[0]->new_price_action_id);
+        self::assertSame(32243, $billItems[1]->new_price_action_id);
     }
 
     public function testANestedListItemsOwnNullableDateHydratesBothWays(): void
     {
         $response = $this->searchClientFound();
 
-        self::assertCount(2, $response->special_days_types);
-        self::assertInstanceOf(DateTimeImmutable::class, $response->special_days_types[0]->value);
-        self::assertSame('2017-07-07', $response->special_days_types[0]->value->format('Y-m-d'));
-        self::assertNull($response->special_days_types[1]->value);
+        $specialDays = $response->special_days_types ?? [];
+        self::assertCount(2, $specialDays);
+        self::assertInstanceOf(DateTimeImmutable::class, $specialDays[0]->value);
+        self::assertSame('2017-07-07', $specialDays[0]->value->format('Y-m-d'));
+        self::assertNull($specialDays[1]->value);
     }
 
     public function testAPropertyBoundToAConsumerValueObjectHydrates(): void

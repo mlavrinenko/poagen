@@ -56,7 +56,12 @@ final readonly class PropertySynthesiser
         }
 
         $preferred = $ownerClassName . $this->suffixFor($phpPropName);
-        $nullable = (bool) $propSchema->nullable;
+        // Same derivation as TypeResolver::resolve() — the 3.0 `nullable`
+        // flag or the 3.1 `type: [T, "null"]` array — shared via
+        // SchemaType::nullableOf() so the three branches below (synthesised
+        // enum, synthesised object, array item) agree with TypeResolver
+        // rather than reimplementing half its reading.
+        $nullable = SchemaType::nullableOf($propSchema);
 
         $enumFqcn = $this->synthesiseEnum($preferred, $propSchema, $enums);
 

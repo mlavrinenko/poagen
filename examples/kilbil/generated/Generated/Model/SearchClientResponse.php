@@ -32,7 +32,7 @@ use Mlavrinenko\Paogen\Runtime\Attribute\Format;
 final readonly class SearchClientResponse
 {
     /**
-     * @param list<SearchClientResponseSpecialDaysTypesItem> $special_days_types
+     * @param ?list<SearchClientResponseSpecialDaysTypesItem> $special_days_types
      * @param ?list<string> $tags
      * @param ?list<string> $top_sales
      * @param ?list<SearchClientResponseCardsItem> $cards
@@ -50,7 +50,7 @@ final readonly class SearchClientResponse
         public ?string $card_barcode,
         public ?string $card_code,
         public ?string $card_id,
-        public SearchClientResponseCardState $card_state,
+        public ?SearchClientResponseCardState $card_state,
         public string $client_email,
         public ?string $client_id,
         public string $discount,
@@ -72,7 +72,7 @@ final readonly class SearchClientResponse
         public SearchClientResponseOnlyWithCards $only_with_cards,
         public ?int $outer_systems_interface_type,
         public ?PhoneNumber $phone,
-        public SearchClientResponsePhoneIsFree $phone_is_free,
+        public ?SearchClientResponsePhoneIsFree $phone_is_free,
         public string $program_name,
         public SearchClientResponseProgramType $program_type,
         public ?string $program_write_off_type,
@@ -82,10 +82,10 @@ final readonly class SearchClientResponse
         public SearchClientResponseReplaceCardType $replace_card_type,
         public string $result_code,
         public string $result_text,
-        public SearchClientResponseSex $sex,
+        public ?SearchClientResponseSex $sex,
         public float $sms_code_sum,
-        public array $special_days_types,
-        public SearchClientResponseState $state,
+        public ?array $special_days_types,
+        public ?SearchClientResponseState $state,
         public ?string $status_name,
         public ?string $sum_to_next_status,
         public ?array $tags,

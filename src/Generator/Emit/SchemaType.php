@@ -75,6 +75,19 @@ final readonly class SchemaType
         return new self(count($members) === 1 ? $members[0] : null, $nullable, $members);
     }
 
+    /**
+     * True when the schema is nullable under either spelling: the OpenAPI
+     * 3.0 `nullable: true` flag, or the 3.1 `type: [T, "null"]` array form
+     * {@see self::of()} already reads. `TypeResolver` and
+     * `PropertySynthesiser` both need this fact and both used to compute it
+     * separately — the latter without the type-array half — so it is read
+     * once here instead of reimplemented per caller.
+     */
+    public static function nullableOf(Schema $schema): bool
+    {
+        return (bool) $schema->nullable || self::of($schema)->nullable;
+    }
+
     public static function of(Schema $schema): self
     {
         $raw = self::rawType($schema);
