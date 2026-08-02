@@ -5,7 +5,7 @@
   tags: ("runtime", "strictness", "debt"),
   priority: 4,
   difficulty: 5,
-  status: wip(2026, 8, 2),
+  status: done(2026, 8, 2),
 )
 
 == Summary
@@ -72,27 +72,27 @@ would terminate in a consumer that already exists. None did.
 
   [`Deprecated`],
   [No producer and no consumer. Nothing in `src/` reads OpenAPI's `deprecated`
-   keyword at all, so wiring it means inventing both ends.],
+    keyword at all, so wiring it means inventing both ends.],
   [Deleted. Marking a property deprecated is a real feature with a producer, a
-   carrier and a reader to design — not a constructor property left switched
-   off.],
+    carrier and a reader to design — not a constructor property left switched
+    off.],
 
   [`AdditionalProperties`],
   [Genuinely read generator-side (`InlineObjectResolver`, `PropertySynthesiser`,
-   `ResponseAnalyzer`, `TypeListScanner`, `FormatAdvisor`), but only as
-   generation-time bookkeeping about types. `Hydrator::hydrate()` builds its
-   argument list strictly from declared descriptors and drops every other wire
-   key.],
+    `ResponseAnalyzer`, `TypeListScanner`, `FormatAdvisor`), but only as
+    generation-time bookkeeping about types. `Hydrator::hydrate()` builds its
+    argument list strictly from declared descriptors and drops every other wire
+    key.],
   [Deleted. Giving it runtime meaning needs somewhere on the generated class to
-   hold undeclared data, which is an open-object hydration feature and its own
-   design decision.],
+    hold undeclared data, which is an open-object hydration feature and its own
+    design decision.],
 
   [`Schema`],
   [Trivially emittable — `ModelEmitter` already knows the component name — but
-   both consumers its docblock named evaporate. `ModelAttributeApplier` bakes
-   every discriminator branch's FQCN into a literal array at generation time, so
-   `Hydrator` never re-derives a class from a schema name; the "doc generation"
-   tool does not exist.],
+    both consumers its docblock named evaporate. `ModelAttributeApplier` bakes
+    every discriminator branch's FQCN into a literal array at generation time, so
+    `Hydrator` never re-derives a class from a schema name; the "doc generation"
+    tool does not exist.],
   [Deleted. Easy to emit is not the same as read by anything.],
 )
 
