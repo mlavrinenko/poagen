@@ -5,7 +5,7 @@
   tags: ("process", "tests", "dx"),
   priority: 3,
   difficulty: 2,
-  status: wip(2026, 8, 2),
+  status: done(2026, 8, 2),
 )
 
 == Summary
