@@ -36,19 +36,3 @@ parameters:
     - identifier: property.onlyWritten
       path: tests/generated/*Steps.php
       message: '#::\$test is never read, only written\.$#'
-    # attribute-and-phpdoc-driven-serialization (2026-04-20) commits the
-    # runtime's attribute vocabulary to exactly six members, of which only
-    # WireName, Format and Discriminator are wired: ModelAttributeApplier
-    # emits them and DescriptorParser/Hydrator read them back. The other
-    # three below are accepted design with no implementation behind them
-    # yet — the generator never emits them onto a Model and nothing reads
-    # them via reflection, so this is not a tool blind spot like the wired
-    # three; it is debt against an accepted decision. Remove each line by
-    # wiring generator emission and runtime consumption for that attribute,
-    # not by writing to it from a test.
-    - identifier: shipmonk.deadProperty.neverRead
-      path: runtime/src/Attribute/AdditionalProperties.php
-    - identifier: shipmonk.deadProperty.neverRead
-      path: runtime/src/Attribute/Deprecated.php
-    - identifier: shipmonk.deadProperty.neverRead
-      path: runtime/src/Attribute/Schema.php
