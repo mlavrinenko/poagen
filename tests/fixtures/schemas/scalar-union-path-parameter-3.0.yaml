@@ -1,0 +1,28 @@
+openapi: 3.0.3
+info:
+  title: Scalar Union Path Parameter Fixture
+  version: "1.0.0"
+  description: >
+    scalar-union-path-parameter-degrades-to-mixed fixture. Mirrors
+    DigitalOcean's images_get `image_id` shape (id-or-slug) and GitHub's
+    equivalent: a required path parameter whose schema is `anyOf` two
+    inline scalar schemas rather than a `type: [integer, string]` list.
+    Both spellings mean the same thing and must resolve the same way —
+    to a real `int|string` PHP union — instead of one of them silently
+    widening to `mixed` on the most caller-facing position there is.
+paths:
+  /images/{image_id}:
+    get:
+      operationId: getImage
+      parameters:
+        - name: image_id
+          in: path
+          required: true
+          description: A unique number (id) or string (slug) identifying the image.
+          schema:
+            anyOf:
+              - type: integer
+              - type: string
+      responses:
+        '204':
+          description: ok
