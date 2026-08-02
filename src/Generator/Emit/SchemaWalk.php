@@ -1,0 +1,164 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mlavrinenko\Paogen\Generator\Emit;
+
+use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\Operation;
+use cebe\openapi\spec\PathItem;
+use cebe\openapi\spec\Reference;
+use cebe\openapi\spec\RequestBody;
+use cebe\openapi\spec\Response;
+use cebe\openapi\spec\Schema;
+
+use function is_array;
+
+/**
+ * Where a document's schema nodes are, and what hangs below each one.
+ *
+ * Three passes asked the same two questions and each answered them itself:
+ * {@see SchemaScan} for the refusal probes, {@see FormatAdvisor} for the
+ * unrecognised-format report, {@see UnconstrainedFieldAdvisor} for the
+ * unconstrained-value report. The copies were identical, which meant three
+ * places to forget `anyOf` in — and the copy that forgets is always the one
+ * nobody is looking at. The traversal lives here; each caller keeps only what
+ * it does per node.
+ *
+ * References are not followed, so a walk cannot cycle: a `$ref` node is a leaf
+ * and the component it names is a root of its own.
+ *
+ * @internal
+ */
+final readonly class SchemaWalk
+{
+    /**
+     * Every schema root in the document: named components, and each
+     * operation's body, responses and parameters.
+     *
+     * @return list<Schema>
+     */
+    public static function roots(OpenApi $openApi): array
+    {
+        $out = [];
+        $components = $openApi->components;
+
+        /** @var array<string,Schema|Reference> $schemas */
+        $schemas = $components === null ? [] : ($components->schemas ?? []);
+
+        foreach ($schemas as $schema) {
+            if ($schema instanceof Schema) {
+                $out[] = $schema;
+            }
+        }
+
+        foreach ($openApi->paths ?? [] as $pathItem) {
+            if (!$pathItem instanceof PathItem) {
+                continue;
+            }
+
+            foreach ($pathItem->getOperations() as $operation) {
+                $out = [...$out, ...self::operationRoots($operation)];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Every schema node one operation carries directly: request-body media
+     * types, every response's media types, and every parameter.
+     *
+     * @return list<Schema>
+     */
+    public static function operationRoots(Operation $operation): array
+    {
+        $out = [];
+        $body = RequestBodyAnalyzer::resolveBody($operation->requestBody);
+
+        foreach ($body instanceof RequestBody ? $body->content : [] as $media) {
+            if ($media->schema instanceof Schema) {
+                $out[] = $media->schema;
+            }
+        }
+
+        $responses = $operation->responses;
+
+        foreach ($responses === null ? [] : $responses->getResponses() as $response) {
+            if (!$response instanceof Response) {
+                continue;
+            }
+
+            foreach ($response->content as $media) {
+                if ($media->schema instanceof Schema) {
+                    $out[] = $media->schema;
+                }
+            }
+        }
+
+        foreach ($operation->parameters ?? [] as $parameter) {
+            if (!$parameter instanceof Reference && $parameter->schema instanceof Schema) {
+                $out[] = $parameter->schema;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * The schema nodes hanging directly below one node, in the order a reader
+     * would meet them: declared properties, the item and value schemas, then
+     * every composition branch.
+     *
+     * @return list<Schema>
+     */
+    public static function children(Schema $schema): array
+    {
+        $out = [];
+
+        foreach (is_array($schema->properties) ? $schema->properties : [] as $property) {
+            if ($property instanceof Schema) {
+                $out[] = $property;
+            }
+        }
+
+        foreach ([$schema->items, $schema->additionalProperties] as $child) {
+            if ($child instanceof Schema) {
+                $out[] = $child;
+            }
+        }
+
+        foreach (self::compositionBranches($schema) as $branch) {
+            if ($branch instanceof Schema) {
+                $out[] = $branch;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Every `allOf` / `oneOf` / `anyOf` branch on one node, in that order.
+     *
+     * `devizzent/cebe-php-openapi` declares all three as `Schema[]|Reference[]`,
+     * and the accessor answers `null` for a keyword the document never wrote —
+     * the same gap {@see SchemaType::rawType()} widens for `type`. A reader
+     * that trusted the declaration would drop the `is_array` guard and fatal on
+     * the first schema with no composition, which is most of them. The guard is
+     * here once so no caller has to know that.
+     *
+     * @return list<Schema|Reference>
+     */
+    public static function compositionBranches(Schema $schema): array
+    {
+        $out = [];
+
+        foreach ([$schema->allOf, $schema->oneOf, $schema->anyOf] as $branches) {
+            if (is_array($branches)) {
+                $out = [...$out, ...array_values($branches)];
+            }
+        }
+
+        return $out;
+    }
+}

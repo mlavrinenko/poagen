@@ -25,6 +25,7 @@ use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
+use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
@@ -173,6 +174,10 @@ final readonly class Generator
         $notices = [
             ...OperationIdAdvisor::notices($openApi, $profile->methodRenames),
             ...FormatAdvisor::notices($openApi, $bindings),
+            // Where a `mixed` survives, the vendor declared nothing there and
+            // the run says so — `declared-shapes-become-types` tolerates that
+            // one `mixed` only while it is visible.
+            ...UnconstrainedFieldAdvisor::notices($openApi),
         ];
         $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$schemaSkips['components']];
 

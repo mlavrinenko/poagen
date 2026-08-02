@@ -270,7 +270,10 @@ final readonly class OperationEmitter
 
             case ReturnSpec::KIND_MAP:
                 $method->setReturnType('array');
-                $method->addComment('@return ' . DocTypeSimplifier::shorten($namespace, 'array<string, ' . $return->mapValuePhpType . '>'));
+                $method->addComment('@return ' . DocTypeSimplifier::shorten(
+                    $namespace,
+                    $this->responseTypes->docType($return, $this->modelNamespace),
+                ));
 
                 return;
         }

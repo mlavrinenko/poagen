@@ -128,12 +128,11 @@ final readonly class InlinePayloadPlanner
             return BodySpec::jsonList($name);
         }
 
-        // An inline `type: object` the document left unconstrained — no
-        // declared properties to synthesise a class from. The map is what the
-        // schema says, so it is what the caller passes; dropping the operation
-        // for want of a class name would shrink the client over a body the
-        // vendor deliberately left open.
-        if (SchemaType::of($schema)->is('object')) {
+        // An inline object with no declared properties to synthesise a class
+        // from. The map is what the schema says, so it is what the caller
+        // passes; dropping the operation for want of a class name would shrink
+        // the client over a body the vendor deliberately left open.
+        if (ObjectShape::is($schema)) {
             return BodySpec::jsonMap($schema);
         }
 
@@ -238,7 +237,7 @@ final readonly class InlinePayloadPlanner
 
     private static function isSynthesisableObject(Schema $schema): bool
     {
-        return SchemaType::of($schema)->is('object') && InlineObjectResolver::classify($schema) === 'synthesise';
+        return ObjectShape::is($schema) && InlineObjectResolver::isSynthesisable($schema);
     }
 
     /**

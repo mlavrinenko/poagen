@@ -20,8 +20,10 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
  *
  *   1. an inline enum paogen can back → a synthesised enum on the surrounding
  *      class plus property (`SearchClientRequestSearchMode`);
- *   2. an inline `type: object` with declared properties → a synthesised model
- *      class (`SearchClientResponseSettings`);
+ *   2. an inline object with declared properties → a synthesised model class
+ *      (`SearchClientResponseSettings`). {@see ObjectShape} decides what
+ *      counts as an object, so a schema that declared properties and left the
+ *      redundant `type` keyword off gets the same class it would with it;
  *   3. an inline array whose items are either of the above → the same, suffixed
  *      `Item`, with a `list<...>` phpdoc over it;
  *   4. anything else → {@see TypeResolver}, unchanged.
@@ -87,25 +89,6 @@ final readonly class PropertySynthesiser
     }
 
     /**
-     * Build the `@todo` comment for a property whose inline-object schema
-     * mixes declared properties with non-trivial `additionalProperties`
-     * (T-013 case 3; out of scope). Returns null when no todo applies.
-     */
-    public function todoFor(Schema|Reference $propSchema): ?string
-    {
-        if (!$propSchema instanceof Schema || !SchemaType::of($propSchema)->is('object')) {
-            return null;
-        }
-
-        if (InlineObjectResolver::classify($propSchema) !== 'map-todo') {
-            return null;
-        }
-
-        return '@todo Inline object mixes declared properties with additionalProperties'
-            . '; emitted as array<string, mixed>. See T-013 out-of-scope.';
-    }
-
-    /**
      * The FQCN for an inline array's item class, or null when the items need
      * no class of their own and {@see TypeResolver} should handle the array.
      *
@@ -141,7 +124,7 @@ final readonly class PropertySynthesiser
 
     private function isSynthesisableObject(Schema $schema): bool
     {
-        return SchemaType::of($schema)->is('object') && InlineObjectResolver::classify($schema) === 'synthesise';
+        return ObjectShape::is($schema) && InlineObjectResolver::isSynthesisable($schema);
     }
 
     /**

@@ -164,8 +164,8 @@ final readonly class ResponseAnalyzer
             return self::fromArray($schema, $registry);
         }
 
-        if ($type->is('object')) {
-            return self::fromObject($schema);
+        if (ObjectShape::is($schema)) {
+            return self::fromObject($schema, $registry);
         }
 
         $scalar = $type->scalarPhpType();
@@ -187,23 +187,64 @@ final readonly class ResponseAnalyzer
         return $raw === '' ? null : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
     }
 
-    private static function fromObject(Schema $schema): ReturnSpec
+    /**
+     * An object response, as the map its `additionalProperties` describes.
+     *
+     * The comment that stood here claimed an inline object with declared
+     * properties never reached this method because `InlinePayloadPlanner`
+     * had synthesised a Model for it. That was false: the planner declined
+     * any schema mixing declared properties with a non-trivial
+     * `additionalProperties`, and every such response landed here and lost
+     * its properties without a word. The planner now synthesises that shape
+     * too, so what arrives here really is an object with no properties to
+     * name — but the claim is stated as a consequence of the planner's rule
+     * rather than as a promise, because it was believed once already.
+     */
+    private static function fromObject(Schema $schema, NameRegistry $registry): ReturnSpec
     {
-        $additional = $schema->additionalProperties;
+        return ReturnSpec::map(self::mapValue($schema->additionalProperties, $registry));
+    }
 
-        if ($additional instanceof Schema) {
-            $valueType = SchemaType::of($additional)->scalarPhpType();
+    /**
+     * The shape of one map's values, resolved to whatever the document
+     * declared for them: a component, a list of components, a scalar, or a
+     * nested map. The request side has resolved all of these through
+     * {@see TypeResolver} since it was written; reading only
+     * `scalarPhpType()` here is what made the same construct answer `Pet` in
+     * a body and `mixed` in a response.
+     *
+     * `mixed` survives exactly where the document said nothing about the
+     * values, which {@see UnconstrainedFieldAdvisor} reports on the run.
+     */
+    private static function mapValue(Schema|Reference|bool $additional, NameRegistry $registry): ReturnSpec
+    {
+        if ($additional instanceof Reference) {
+            $raw = ComponentName::rawFromRef($additional->getReference());
 
-            return ReturnSpec::map($valueType ?? 'mixed');
+            return $raw === '' ? ReturnSpec::mixed() : ReturnSpec::model(ComponentName::phpFromRef($additional->getReference(), $registry));
         }
 
-        // An inline object with declared properties never reaches here —
-        // InlinePayloadPlanner synthesised a Model for it. What is left is
-        // an object the document left unconstrained, and a map of unknown
-        // values is what it says. Returning void instead would drop a body
-        // the vendor declared, which is the shrink `silence-means-success`
-        // forbids.
-        return ReturnSpec::map('mixed');
+        if (!$additional instanceof Schema) {
+            return ReturnSpec::mixed();
+        }
+
+        $scalar = SchemaType::of($additional)->scalarPhpType();
+
+        if ($scalar !== null) {
+            return ReturnSpec::scalar($scalar);
+        }
+
+        if (SchemaType::of($additional)->is('array')) {
+            $items = $additional->items;
+
+            return $items instanceof Reference
+                ? ReturnSpec::listOf(ComponentName::phpFromRef($items->getReference(), $registry))
+                : ReturnSpec::mixed();
+        }
+
+        return ObjectShape::is($additional)
+            ? ReturnSpec::map(self::mapValue($additional->additionalProperties, $registry))
+            : ReturnSpec::mixed();
     }
 
     /**

@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: Widened shapes
+  version: 1.0.0
+  description: >
+    Every shape the generator used to answer with `mixed` or a bare array,
+    declared directly. No vendored document reaches these three paths, so this
+    fixture is the only thing that does.
+paths:
+  /widget:
+    get:
+      operationId: getWidget
+      responses:
+        '200':
+          description: one widget
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+  /catalogue:
+    get:
+      operationId: getCatalogue
+      responses:
+        '200':
+          description: parts by sku
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Part'
+  /catalogue/nested:
+    get:
+      operationId: getNestedCatalogue
+      responses:
+        '200':
+          description: labels by part by sku
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    type: string
+  /catalogue/lists:
+    get:
+      operationId: getPartLists
+      responses:
+        '200':
+          description: parts by bin
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Part'
+  /profile:
+    post:
+      operationId: saveProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                handle:
+                  type: string
+              additionalProperties:
+                $ref: '#/components/schemas/Part'
+      responses:
+        '200':
+          description: saved
+          content:
+            application/json:
+              schema:
+                properties:
+                  saved:
+                    type: boolean
+  /opaque:
+    get:
+      operationId: getOpaque
+      responses:
+        '200':
+          description: the vendor declared nothing about this body
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    Part:
+      type: object
+      properties:
+        sku:
+          type: string
+    Widget:
+      type: object
+      required:
+        - dimensions
+        - labels
+      properties:
+        dimensions:
+          description: declared properties, and no type keyword beside them
+          properties:
+            width:
+              type: integer
+            height:
+              type: integer
+        labels:
+          description: declared properties AND a schema for whatever else arrives
+          type: object
+          properties:
+            primary:
+              type: string
+          additionalProperties:
+            type: string
+        notes:
+          description: the one mixed the goal permits - nothing declared at all

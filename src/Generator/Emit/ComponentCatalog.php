@@ -111,7 +111,7 @@ final class ComponentCatalog
 
         $type = SchemaType::of($schema);
 
-        if ($type->is('object') || (is_array($schema->properties) && $schema->properties !== [])) {
+        if (ObjectShape::is($schema)) {
             return new ComponentShape(ComponentShape::KIND_OBJECT, $phpName, schema: $schema);
         }
 

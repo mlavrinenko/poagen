@@ -97,11 +97,21 @@ final readonly class TypeResolver
             'boolean' => new self('bool', null, null, $nullable),
             'array' => self::resolveArray($node, $bindings, $modelNamespace, $registry, $enums, $nullable),
             'object' => InlineObjectResolver::resolve($node, $bindings, $modelNamespace, $registry, $enums),
-            // The document said nothing about the type, so neither can the
-            // emitted property. `mixed` is declared rather than left off: an
-            // untyped promoted property fails analysis at max level, and
-            // `mixed` already admits null so it is never marked nullable.
-            default => new self('mixed', null, null, false),
+            // No `type` keyword, which is not the same as no shape: a node
+            // declaring `properties` or a value schema for its extra keys
+            // described an object and left the redundant keyword off, and
+            // `ComponentCatalog` has always read it that way. Answering
+            // `mixed` here made one schema a class in the component position
+            // and a bag everywhere else.
+            default => ObjectShape::is($node)
+                ? InlineObjectResolver::resolve($node, $bindings, $modelNamespace, $registry, $enums)
+                // The document said nothing about the type, so neither can the
+                // emitted property. `mixed` is declared rather than left off: an
+                // untyped promoted property fails analysis at max level, and
+                // `mixed` already admits null so it is never marked nullable.
+                // `UnconstrainedFieldAdvisor` reports every node that lands
+                // here, so the silence is visible rather than merely permitted.
+                : new self('mixed', null, null, false),
         };
     }
 

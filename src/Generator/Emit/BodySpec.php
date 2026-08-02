@@ -14,9 +14,11 @@ use cebe\openapi\spec\Schema;
  *   - KIND_JSON         a Model, by `$ref` or synthesised from an inline
  *                       object, sent as JSON
  *   - KIND_JSON_LIST    `list<Model>`, from either source, sent as JSON
- *   - KIND_JSON_MAP     an inline `type: object` the document left without
- *                       declared properties, sent as JSON — the map is what
- *                       the schema says, so it is what the caller passes
+ *   - KIND_JSON_MAP     an inline object the document left without declared
+ *                       properties, sent as JSON — the map is what the schema
+ *                       says, so it is what the caller passes. Object-ness is
+ *                       {@see ObjectShape}'s question, not the `type` keyword's:
+ *                       a body typed only by `additionalProperties` is one too
  *   - KIND_FORM         inline `type: object` with declared properties,
  *                       sent as `application/x-www-form-urlencoded`
  *                       (T-011; OAuth2 / Stripe shape)
