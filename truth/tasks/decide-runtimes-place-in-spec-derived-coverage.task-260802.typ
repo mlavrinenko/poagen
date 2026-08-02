@@ -81,3 +81,31 @@ tree, not in the generator's own process.
 
 - `.speconaut/config.toml`
 - `truth/decisions/` — if the choice needs recording
+
+== Result
+
+Dropped. `.speconaut/config.toml`'s `[check].source-roots` is now
+`("src", "bin")`, and the comment above it records both the measurement and the
+structural reason. All 26 of `runtime/src`'s files were untraced across every
+one of 96 checked scenarios — not a partial gap, a complete one, because
+`speconaut audit-traces` only instruments the manifest-listed generated-test
+suite while `truth/specs/`'s four features describe the generator's own
+behaviour and never the separately-packaged runtime library's. No scenario
+inside this project's spec scope would ever move that number, so leaving the
+root configured would have handed the untraced-source ratchet a permanent
+26-file floor nobody intends to drive down — the failure
+`untraced-source-is-a-ratcheted-warning` already rejected once.
+
+`[audit-traces].source-roots` deliberately keeps `runtime/src`, and does not
+match `[check]`'s. The two keys answer different questions: one asks which files
+a scenario's coverage may be attributed to, the other asks which files it is a
+finding to have no scenario for. Keep the data, drop the nag. That distinction
+is now written into the config beside both keys, since an identical key name
+across two tables is exactly what a later reader mistakes for a typo and
+"fixes".
+
+Recorded as `runtime-src-excluded-from-untraced-source-check.decision-260802`,
+weighed against `runtime-ships-as-a-separate-package` and the two rejected
+alternatives. `runtime/src`'s own coverage, through `tests/Unit/Runtime/` and
+`tests/Integration/RuntimeSubstitutionTest.php`, is untouched — this changes
+what the traceability check reports, not what is tested.

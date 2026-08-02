@@ -77,7 +77,15 @@ adapter = "php-phpunit"
 # namespace bug above worked around — 96 scenarios produced zero
 # `runtime/src` files anywhere in the report even though a single scenario's
 # raw Clover output plainly covers `runtime/src/Attribute/Discriminator.php`
-# and others. Matching `[check].source-roots` here restores them.
+# and others. Naming the roots explicitly here restores them.
+#
+# This deliberately does NOT match `[check].source-roots`, which dropped
+# `runtime/src` (see `runtime-src-excluded-from-untraced-source-check`). The
+# two keys answer different questions. This one asks which files a scenario's
+# coverage may be attributed to: keep `runtime/src`, so a scenario that really
+# does execute the runtime still records that fact. `[check]`'s asks which
+# files it is a finding to have no scenario at all: drop `runtime/src`, because
+# none of them will ever have one by design. Keep the data, drop the nag.
 source-roots = ["src", "runtime/src", "bin"]
 
 # Zero-statement plumbing overrides (zero-statement-files-pinned-as-plumbing,

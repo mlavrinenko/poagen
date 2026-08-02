@@ -81,3 +81,26 @@ indistinguishable from a real gap.
 == Files
 
 - `.speconaut/config.toml` — if the human-pin route is chosen
+
+== Result
+
+Pinned by hand, not fixed in the tool. `.speconaut/config.toml` gained three
+`[[audit-traces.plumbing.files]]` entries — `NameNormaliser.php`,
+`SymbolKind.php`, `InvalidProfileException.php` — each gated on a sha256 of the
+file's exact contents and a tight `max-lines` ceiling, each carrying its own
+comment for why it is plumbing.
+
+The contrast with `ModelNameCollisionException.php` decided it. That file is an
+equally pure-data exception and it is auto-classified plumbing today, purely
+because its one static factory carries an executable `sprintf` line for coverage
+to count. The only difference between a file the classifier handles and one it
+drops is whether it happens to have a line — a coverage-tool artifact, not a
+judgement, and not something a human pin is wrong to override.
+
+The human-pin route won over teaching speconaut a new auto-classification rule
+because speconaut already ships this exact hash-gated mechanism for the same
+"transited but never directly hit" shape in its own config, so reusing it needed
+no upstream change and landed entirely inside paogen's tree. Recorded as
+`zero-statement-files-pinned-as-plumbing.decision-260802`. Any edit to one of the
+three invalidates its pin and forces a fresh look before it counts as plumbing
+again, which is the property that keeps the override honest.
