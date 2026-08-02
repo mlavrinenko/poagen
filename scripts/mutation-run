@@ -1,39 +1,47 @@
 #!/usr/bin/env bash
 #
-# Run infection, and guarantee it does not leave mutated generator output
-# committed-looking in the tree.
+# Run infection, and fail loudly if it ever leaves mutated generator output
+# looking committed.
 #
-# Why this exists. The fixture profiles under tests/fixtures/profiles/ point
-# their `output:` at the committed golden trees themselves — e.g.
-# parameters.php writes to tests/fixtures/generated/parameters. That is fine
+# Why this exists. The fixture profiles under tests/fixtures/profiles/ used
+# to point their `output:` at the committed golden trees themselves — e.g.
+# parameters.php wrote to tests/fixtures/generated/parameters. That was fine
 # for a normal test run, where the generator is correct and rewrites the tree
-# byte-identically. Under mutation testing it is not: a mutant that changes
-# emitted output makes the test rewrite the GOLDEN with the mutant's output,
-# and the corruption survives the run.
+# byte-identically. Under mutation testing it was not: a mutant that changed
+# emitted output made the test rewrite the GOLDEN with the mutant's output,
+# and the corruption survived the run.
 #
 # Observed on 2026-08-02 with a single-file run against SecurityScheme.php: a
 # mutant of `camelize()` left tests/fixtures/generated/parameters/Generated/
 # ApiClient.php carrying `$ApiKey` instead of `$apiKey`, as a tracked
 # modification. A `git commit -a` after a mutation run would have shipped
-# mutated output as the golden truth, and every byte-stability assertion would
-# then have agreed with it.
+# mutated output as the golden truth, and every byte-stability assertion
+# would then have agreed with it.
 #
-# So: refuse to start dirty (otherwise there is no way to tell a mutant's
-# damage from your own work in progress), and restore the generated trees
-# afterwards whatever the exit status. The restore is deliberately narrow —
-# only paths a generator run can write — so real edits elsewhere are never
-# discarded.
+# fixtures-generate-to-a-scratch-tree fixed the actual cause: every profile
+# under tests/fixtures/profiles/ now defaults `output:` to a scratch
+# directory (see tests/fixtures/profiles/scratch-output.php), so a test run
+# — mutated generator or not — has no default path back into
+# tests/fixtures/generated/ at all. Regenerating a golden tree is still
+# possible, but only on purpose, via `just regenerate-fixture <name>`'s
+# explicit `--output` override, which nothing a mutated test run reaches.
 #
-# This is a guard, not the fix. A golden tree that tests write into in place
-# cannot survive a run with a deliberately broken generator; generating to a
-# scratch directory and diffing is the durable answer. See the task
-# `fixtures-generate-to-a-scratch-tree`.
+# So this script no longer restores those trees afterwards — the restore was
+# the guard, not the fix, and the fix now makes it unreachable in normal
+# operation. What it still does: refuse to start dirty (otherwise there is
+# no way to tell a mutant's damage from your own work in progress), and
+# check the same paths again afterwards, FAILING rather than silently
+# `git checkout --`ing them if either is dirty. If that check ever trips,
+# the scratch-output fix regressed and the dirty tree is evidence to look
+# at, not noise to discard.
 
 set -eo pipefail
 
 cd "$(dirname "$0")/.."
 
-# Paths a generator run under test can write. Restored after every run.
+# Paths a generator run under test should never be able to write. Checked
+# before and after every run; see the header for why nothing restores them
+# any more.
 GENERATED_PATHS=(tests/fixtures/generated examples)
 
 # Only the generated trees have to be clean, not the whole tree — the point
@@ -43,9 +51,8 @@ GENERATED_PATHS=(tests/fixtures/generated examples)
 if [[ -n "$(git status --porcelain -- "${GENERATED_PATHS[@]}")" ]]; then
     echo "mutation-run: refusing to start — a generated tree is already dirty." >&2
     echo >&2
-    echo "A mutation run rewrites these trees in place, so starting dirty makes a" >&2
-    echo "mutant's damage indistinguishable from your own changes — and the restore" >&2
-    echo "at the end would discard your work along with the mutant's." >&2
+    echo "A generated tree should never be dirty going in — starting dirty makes a" >&2
+    echo "mutant's damage indistinguishable from your own changes." >&2
     echo "Commit or discard these first:" >&2
     echo >&2
     git status --short -- "${GENERATED_PATHS[@]}" >&2
@@ -61,10 +68,14 @@ set -e
 
 dirty="$(git status --porcelain -- "${GENERATED_PATHS[@]}")"
 if [[ -n "$dirty" ]]; then
-    echo
-    echo "mutation-run: restoring generated trees a mutant rewrote:"
-    echo "$dirty"
-    git checkout -- "${GENERATED_PATHS[@]}"
+    echo >&2
+    echo "mutation-run: a generated tree changed during the run — this should be" >&2
+    echo "impossible now that tests/fixtures/profiles/ default to a scratch output" >&2
+    echo "directory (see tests/fixtures/profiles/scratch-output.php). Investigate" >&2
+    echo "before doing anything else; do not just discard this:" >&2
+    echo >&2
+    echo "$dirty" >&2
+    exit 1
 fi
 
 # Scratch directories the CLI's own argument parsing creates when a mutant

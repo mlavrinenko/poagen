@@ -308,15 +308,24 @@ test-coverage: tmpdir
 # default 128M exhausts building the per-mutant test-runner command lines
 # once past roughly 1500 of this run's 3049 mutants.
 #
-# Both recipes go through `scripts/mutation-run`, which refuses to start on
-# a dirty tree and restores the generated trees afterwards. That is not
-# tidiness: the fixture profiles write their `output:` INTO the committed
-# golden trees, so a mutant that changes emitted output rewrites the golden
-# with the mutant's version and leaves it as a tracked modification.
-# Observed, not theorised — a single-file run against SecurityScheme.php
-# left `$ApiKey` for `$apiKey` in the parameters fixture's ApiClient. The
-# script's header carries the full account, including the untracked scratch
-# directories a mutated CLI argument parser leaves at the repo root.
+# Both recipes go through `scripts/mutation-run`, which refuses to start on a
+# dirty tree. That guard predates fixtures-generate-to-a-scratch-tree, which
+# closed the failure mode it was really about: the fixture profiles used to
+# write their `output:` INTO the committed golden trees, so a mutant that
+# changed emitted output rewrote the golden with the mutant's version and
+# left it as a tracked modification — observed, not theorised, a single-file
+# run against SecurityScheme.php left `$ApiKey` for `$apiKey` in the
+# parameters fixture's ApiClient. Every profile under tests/fixtures/profiles/
+# now defaults to a scratch directory instead (see
+# tests/fixtures/profiles/scratch-output.php), so a test run — mutated
+# generator or not — has no default path back into
+# tests/fixtures/generated/. The dirty-tree check in scripts/mutation-run
+# stays as a loud, fail-fast assertion of that guarantee; the script no
+# longer silently restores on the way out, since a restore firing at all
+# would mean the guarantee broke and deserves investigation, not a quiet
+# `git checkout --`. The script's header carries the full account, including
+# the untracked scratch directories a mutated CLI argument parser leaves at
+# the repo root.
 mutate: tmpdir
     scripts/mutation-run --threads=max
 
@@ -339,6 +348,22 @@ mutate-fast: tmpdir
 # nyholm/psr7 from the network/cache, which the offline gate does not assume.
 verify-runtime-standalone: tmpdir
     scripts/verify-runtime-standalone
+
+# Regenerate one committed fixture golden tree on purpose
+# (fixtures-generate-to-a-scratch-tree).
+#
+# tests/fixtures/profiles/*.php default `output:` to a scratch directory
+# under $TMPDIR (see tests/fixtures/profiles/scratch-output.php) — a test
+# run never writes into tests/fixtures/generated/<name> any more. This is
+# the one supported way to update a golden on purpose: the CLI's own
+# `--output` override (`GenerateCommand::withOutput()`, covered by
+# `OutputOverrideCarriesEveryProfileFieldTest`) redirects that profile's
+# write back onto its real tree. Review the diff before committing —
+# `paogen generate --diff` first is not a bad habit.
+#
+# Usage: just regenerate-fixture parameters
+regenerate-fixture name:
+    php bin/paogen generate tests/fixtures/profiles/{{ name }}.php --output=tests/fixtures/generated/{{ name }}
 
 # Install dependencies and local git hooks
 install: install-hooks
