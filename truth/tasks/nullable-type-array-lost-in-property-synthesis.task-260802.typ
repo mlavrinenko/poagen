@@ -5,7 +5,7 @@
   tags: ("generator", "openapi-31", "strictness"),
   priority: 8,
   difficulty: 4,
-  status: wip(2026, 8, 2),
+  status: done(2026, 8, 2),
 )
 
 == Summary
