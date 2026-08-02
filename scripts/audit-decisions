@@ -1,0 +1,210 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * audit-decisions — gather the deterministic INPUT a decisions audit reads,
+ * for the tasks an `mt` filter selects.
+ *
+ * The gate this project removed (`needs-review`) tried to make a human read
+ * code. What worked instead, once, was reading only the DECISIONS buried in
+ * already-closed tasks — improvised, on 2026-08-01, and lost the moment the
+ * session ended. This script is the repeatable half of redoing that: it
+ * gathers the brief, it never judges. Turning the brief into a ranked audit
+ * is a reading task governed by the rubric in
+ * truth/notes/decisions-audit-procedure.md — read that before applying this
+ * script's output to anything.
+ *
+ * For every task the filter selects, prints: the slug and title, its status,
+ * its Summary / Acceptance criteria / Result sections verbatim, the commits
+ * whose `Refs:` trailer names that slug (subject line plus diffstat, per
+ * CONTRIBUTING.md's trailer policy), and which `truth/` decisions, standards
+ * or specs those commits touched — matched by filename sub-extension
+ * (`.decision-`, `.standard-`, `.feature-`), the same classification
+ * AGENT.md's knowledge-tree table uses, not by directory.
+ *
+ * Usage:
+ *   scripts/audit-decisions [<mt-filter-expression>]
+ *   scripts/audit-decisions --help
+ *
+ * With no argument, filters on `@recent` (done tasks; see
+ * `[views.recent]` in .mindtape/config.toml). Any `mt ls` filter expression
+ * works, quoted as one shell argument — `mt ls --help` documents the syntax.
+ *
+ * Read-only like scripts/coverage-floor and scripts/gate-fresh: shells out to
+ * `mt` and `git` against the current worktree and prints to stdout. Writes
+ * nothing, records nothing, gates nothing — exits non-zero only on a usage or
+ * tooling failure, never on what it finds.
+ */
+
+const PROCEDURE = 'truth/notes/decisions-audit-procedure.md';
+
+function usage(): string
+{
+    $procedure = PROCEDURE;
+    return <<<TXT
+        usage: scripts/audit-decisions [<mt-filter-expression>]
+
+        Prints a brief for every task an `mt` filter selects (default:
+        @recent — done tasks): slug, title, status, its Summary /
+        Acceptance criteria / Result sections, the commits whose `Refs:`
+        trailer names it, and which truth/ decisions, standards or specs
+        those commits touched. Read-only; writes nothing.
+
+        Turning the brief into a ranked audit is a reading task — the rubric
+        and output contract live in {$procedure}, read that first.
+        TXT;
+}
+
+function runOrFail(array $cmd, string $cwd): string
+{
+    $proc = @proc_open($cmd, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $cwd);
+    if (!\is_resource($proc)) {
+        fwrite(STDERR, 'audit-decisions: failed to start `' . implode(' ', $cmd) . "`\n");
+        exit(2);
+    }
+    $out = stream_get_contents($pipes[1]);
+    $err = stream_get_contents($pipes[2]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $status = proc_close($proc);
+    if ($status !== 0) {
+        fwrite(STDERR, 'audit-decisions: `' . implode(' ', $cmd) . "` failed:\n{$err}");
+        exit(2);
+    }
+    return $out;
+}
+
+// Slice a task body into its `== Header` sections, keyed by header text
+// exactly as written. Order in the file does not matter to the caller —
+// Result, when present, is written last by convention but read by name.
+function extractSections(string $body): array
+{
+    if (preg_match_all('/^==\s+(.+?)\s*$/m', $body, $matches, PREG_OFFSET_CAPTURE) === 0) {
+        return [];
+    }
+    $sections = [];
+    $count = \count($matches[0]);
+    for ($i = 0; $i < $count; $i++) {
+        $name = $matches[1][$i][0];
+        $start = $matches[0][$i][1] + \strlen($matches[0][$i][0]);
+        $end = $i + 1 < $count ? $matches[0][$i + 1][1] : \strlen($body);
+        $sections[$name] = trim(substr($body, $start, $end - $start));
+    }
+    return $sections;
+}
+
+// The filename stem without the `.task-<yymmdd>.typ` suffix — the exact
+// algorithm CONTRIBUTING.md's trailer section documents, so this always
+// derives the same slug `Refs:` is checked against.
+function slugFromFile(string $file): string
+{
+    return preg_replace('/\.task-\d{6}\.typ$/', '', basename($file));
+}
+
+// `git show --name-only` on a merge commit prints nothing by default (its
+// combined diff only lists lines that differ from every parent, which is
+// usually none for an ordinary non-conflicting merge) while `--stat` still
+// shows one — the two would disagree about whether a merge touched truth/ at
+// all. Diffing explicitly against the first parent (the empty tree for a
+// root commit, which `--parents` prints alone with none) makes both agree
+// and matches how `--first-parent` history reading treats a merge: what it
+// brought onto the branch it landed on.
+function diffBaseOf(string $sha, string $repoRoot): string
+{
+    $parents = explode(' ', trim(runOrFail(['git', 'rev-list', '--parents', '-n', '1', $sha], $repoRoot)));
+    return $parents[1] ?? '4b825dc642cb6eb9a060e54bf8d69288fbee4904'; // git's empty-tree object
+}
+
+// Commits whose `Refs:` trailer names $slug on its own line — the exact
+// shape the commit-msg hook enforces — newest first, each with its subject,
+// its diffstat, and which decision/standard/spec files (by sub-extension,
+// not directory) it touched.
+function findCommits(string $slug, string $repoRoot): array
+{
+    $pattern = '^Refs: ' . preg_quote($slug, '/') . '$';
+    $log = runOrFail(['git', 'log', '--format=%H', '-E', '--grep', $pattern], $repoRoot);
+    $shas = array_filter(explode("\n", trim($log)));
+
+    $commits = [];
+    foreach ($shas as $sha) {
+        $subject = trim(runOrFail(['git', 'log', '-1', '--format=%s', $sha], $repoRoot));
+        $base = diffBaseOf($sha, $repoRoot);
+        $diffstat = trim(runOrFail(['git', 'diff', '--stat', $base, $sha], $repoRoot));
+        $names = array_filter(explode("\n", trim(
+            runOrFail(['git', 'diff', '--name-only', $base, $sha], $repoRoot)
+        )));
+        $truthFiles = array_values(array_filter(
+            $names,
+            static fn (string $name): bool => (bool) preg_match('/\.(decision|standard|feature)-\d{6}\.typ$/', $name)
+        ));
+        $commits[] = ['sha' => $sha, 'subject' => $subject, 'diffstat' => $diffstat, 'truth' => $truthFiles];
+    }
+    return $commits;
+}
+
+function printBrief(string $filter, array $tasks, string $repoRoot): void
+{
+    printf("audit-decisions brief — filter: %s — %d task(s)\n", $filter, \count($tasks));
+    foreach ($tasks as $task) {
+        $slug = slugFromFile($task['file']);
+        $sections = extractSections((string) $task['body']);
+        $status = $task['status'] ?? [];
+
+        echo str_repeat('=', 80), "\n";
+        printf(
+            "%s  [%s %s]  %s\n%s\n\n",
+            $slug,
+            $status['name'] ?? '?',
+            $status['date'] ?? '?',
+            $task['file'],
+            $task['title'] ?? ''
+        );
+
+        foreach (['Summary', 'Acceptance criteria', 'Result'] as $name) {
+            printf("-- %s --\n%s\n\n", $name, $sections[$name] ?? ($name === 'Result' ? '(none — no Result section)' : '(missing)'));
+        }
+
+        $commits = findCommits($slug, $repoRoot);
+        printf("-- Commits (Refs: %s) --\n", $slug);
+        if ($commits === []) {
+            echo "(none found)\n\n";
+            continue;
+        }
+        foreach ($commits as $commit) {
+            printf("%s %s\n", substr($commit['sha'], 0, 7), $commit['subject']);
+            foreach (explode("\n", $commit['diffstat']) as $line) {
+                echo "    {$line}\n";
+            }
+            echo $commit['truth'] === []
+                ? "    truth/ touched: (none)\n"
+                : '    truth/ touched: ' . implode(', ', $commit['truth']) . "\n";
+        }
+        echo "\n";
+    }
+}
+
+$repoRoot = rtrim(\dirname(__DIR__), '/');
+$args = \array_slice($argv, 1);
+
+if (\in_array('--help', $args, true) || \in_array('-h', $args, true)) {
+    echo usage(), "\n";
+    exit(0);
+}
+if (\count($args) > 1) {
+    fwrite(STDERR, "audit-decisions: expected at most one filter argument\n\n" . usage() . "\n");
+    exit(2);
+}
+
+$filter = $args[0] ?? '@recent';
+$tasksJson = runOrFail(['mt', 'ls', $filter, '--format', 'json'], $repoRoot);
+$decoded = json_decode($tasksJson, true, 512, JSON_THROW_ON_ERROR);
+$tasks = $decoded['tasks'] ?? [];
+
+if ($tasks === []) {
+    echo "audit-decisions: no tasks matched '{$filter}'\n";
+    exit(0);
+}
+
+printBrief($filter, $tasks, $repoRoot);

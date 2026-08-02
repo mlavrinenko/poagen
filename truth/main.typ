@@ -128,5 +128,5 @@
 #pagebreak()
 #text(size: 16pt, weight: "bold", fill: rgb("#0F766E"))[= Supplementary artefacts]
 
-- Design notes: #link("notes/openapi-3.1-gap.md")[notes/openapi-3.1-gap.md], #link("notes/runtime-type-reflection.md")[notes/runtime-type-reflection.md].
-- Review archives: #link("reviews/2026-04-18-pre-release-review.md")[reviews/2026-04-18-pre-release-review.md].
+- Design notes: #link("notes/openapi-3.1-gap.md")[notes/openapi-3.1-gap.md], #link("notes/runtime-type-reflection.md")[notes/runtime-type-reflection.md], #link("notes/decisions-audit-procedure.md")[notes/decisions-audit-procedure.md].
+- Review archives: #link("reviews/2026-04-18-pre-release-review.md")[reviews/2026-04-18-pre-release-review.md], #link("reviews/2026-08-01-decisions-audit.md")[reviews/2026-08-01-decisions-audit.md].
