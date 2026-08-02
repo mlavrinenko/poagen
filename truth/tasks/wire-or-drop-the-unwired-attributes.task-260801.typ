@@ -5,7 +5,7 @@
   tags: ("runtime", "strictness", "debt"),
   priority: 4,
   difficulty: 5,
-  status: proposed(2026, 8, 1),
+  status: wip(2026, 8, 2),
 )
 
 == Summary
