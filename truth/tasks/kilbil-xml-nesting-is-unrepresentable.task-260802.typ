@@ -3,9 +3,13 @@
 #show: task.with(
   title: "kilbil xml nesting is unrepresentable",
   tags: ("examples", "xml", "generator"),
-  priority: 5,
+  priority: 7,
   difficulty: 5,
-  status: proposed(2026, 8, 2),
+  status: accepted(
+    2026,
+    8,
+    2,
+  )[Owner ruled 2026-08-02: paogen learns nested XML containers rather than refusing the two operations. Where a document describes a structure, the client carries that structure. Priority raised — this is a wrong request body shipping today, not a missing feature.],
 )
 
 == Summary

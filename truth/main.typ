@@ -42,6 +42,8 @@
 #pagebreak()
 #include "goals/cheap-regeneration.goal.typ"
 #pagebreak()
+#include "goals/declared-shapes-become-types.goal.typ"
+#pagebreak()
 
 // --- Standards ---
 

@@ -10,6 +10,7 @@
     link("goals/fail-loud-never-silent.goal.typ"),
     link("goals/real-world-schemas.goal.typ"),
     link("goals/cheap-regeneration.goal.typ"),
+    link("goals/declared-shapes-become-types.goal.typ"),
   ),
 )
 
