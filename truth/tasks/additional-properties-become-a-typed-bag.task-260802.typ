@@ -5,7 +5,7 @@
   tags: ("generator", "runtime", "dx"),
   priority: 6,
   difficulty: 5,
-  status: accepted(2026, 8, 2),
+  status: wip(2026, 8, 2),
 )
 
 == Summary
