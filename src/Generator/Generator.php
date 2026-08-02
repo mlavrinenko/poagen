@@ -22,6 +22,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
+use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
@@ -184,6 +185,7 @@ final readonly class Generator
 
         $failures = [
             ...UnsupportedKeywordScanner::webhookFailures($openApi),
+            ...ServerCatalog::variableProblems($openApi),
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),

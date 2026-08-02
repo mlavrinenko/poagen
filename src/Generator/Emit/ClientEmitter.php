@@ -86,7 +86,9 @@ final class ClientEmitter
             $live[] = $group;
         }
 
-        return $written + $this->emitRoot($clientNamespace, $rootDir, $rootGroup, $live, $bindings, $securityCatalog, $writes);
+        $servers = ServerCatalog::resolve($openApi);
+
+        return $written + $this->emitRoot($clientNamespace, $rootDir, $rootGroup, $live, $bindings, $securityCatalog, $servers, $writes);
     }
 
     /**
@@ -105,6 +107,7 @@ final class ClientEmitter
 
     /**
      * @param list<TagGroup>       $live
+     * @param list<ResolvedServer> $servers
      * @param array<string,string> $writes
      */
     private function emitRoot(
@@ -114,6 +117,7 @@ final class ClientEmitter
         array $live,
         Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
+        array $servers,
         array &$writes,
     ): int {
         // With no tags and nothing untagged there is no client to emit at all.
@@ -128,6 +132,7 @@ final class ClientEmitter
             'ApiClientInterface',
             $securityCatalog,
         );
+        ServerConstantEmitter::addTo($class, $servers);
 
         $outcome = $this->subClients->addOperations($class, $namespace, $group, $bindings, $securityCatalog);
         $this->skipped = [...$this->skipped, ...$outcome['skipped']];

@@ -21,6 +21,8 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKe
 
 final readonly class ApiClient implements ApiClientInterface
 {
+    public const string SERVER_1 = 'https://parameters.example/api/v1';
+
     public function __construct(
         private TransportInterface $transport,
         private string $apiKey,

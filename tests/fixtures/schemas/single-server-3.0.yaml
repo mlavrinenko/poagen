@@ -1,0 +1,21 @@
+openapi: 3.0.3
+info:
+  title: Single Server Fixture
+  version: 1.0.0
+  description: >
+    One declared server, no description, no security scheme — the common
+    shape (kilbil, petstore, GitHub all declare exactly one undescribed
+    server). Proves the base constant-emission path in isolation from the
+    security-scheme wiring `colliding-bearer-3.0.yaml` and
+    `query-apikey-3.0.yaml` already cover.
+
+servers:
+  - url: https://single-server.example/api/v1
+
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '204':
+          description: ok

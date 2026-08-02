@@ -15,6 +15,8 @@ use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ApiClient implements ApiClientInterface
 {
+    public const string SERVER_1 = 'https://petstore3.swagger.io/api/v3';
+
     public function __construct(
         private TransportInterface $transport,
     ) {

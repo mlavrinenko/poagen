@@ -15,6 +15,8 @@ use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ApiClient implements ApiClientInterface
 {
+    public const string SERVER_1 = 'https://bonus.kilbil.ru';
+
     public function __construct(
         private TransportInterface $transport,
         private string $h,
