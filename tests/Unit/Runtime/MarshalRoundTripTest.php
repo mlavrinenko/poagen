@@ -17,6 +17,7 @@ use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Order;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Status;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Warehouse;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -101,6 +102,58 @@ final class MarshalRoundTripTest extends TestCase
         self::assertInstanceOf(Tag::class, $hydrated->tags[0]);
         self::assertSame(1, $hydrated->tags[0]->id);
         self::assertSame('playful', $hydrated->tags[1]->name);
+    }
+
+    public function testMapOfModelsRoundTrips(): void
+    {
+        // `Warehouse::$bins` is `array<string, Tag>|null` in phpdoc — the
+        // two-argument generic array shape `PropertyTypeResolver::
+        // resolveArrayLike()` resolves to `PropertyType::KIND_MAP`. Nothing
+        // in the fixture tree exercised that arm before this test: both
+        // `Marshaller::encode()` and `Hydrator::decode()`'s `KIND_MAP` match
+        // arms ran zero times across the whole suite.
+        $warehouse = new Warehouse(
+            name: 'north',
+            bins: ['a' => new Tag(1, 'friendly'), 'b' => new Tag(2, 'playful')],
+        );
+
+        $array = new Marshaller()->marshal($warehouse);
+
+        self::assertSame(
+            [
+                'name' => 'north',
+                'bins' => [
+                    'a' => ['id' => 1, 'name' => 'friendly'],
+                    'b' => ['id' => 2, 'name' => 'playful'],
+                ],
+            ],
+            $array,
+        );
+
+        $hydrated = new Hydrator()->hydrate(Warehouse::class, [
+            'name' => 'south',
+            'bins' => [
+                'x' => ['id' => 3, 'name' => 'quiet'],
+                'y' => ['id' => 4, 'name' => 'loud'],
+            ],
+        ]);
+
+        self::assertSame('south', $hydrated->name);
+        self::assertNotNull($hydrated->bins);
+        self::assertCount(2, $hydrated->bins);
+
+        // The recovered values must be typed `Tag` instances (proving
+        // `decodeMap()` ran its item-type recursion), not a passthrough of
+        // the raw wire arrays.
+        self::assertArrayHasKey('x', $hydrated->bins);
+        self::assertInstanceOf(Tag::class, $hydrated->bins['x']);
+        self::assertSame(3, $hydrated->bins['x']->id);
+        self::assertSame('quiet', $hydrated->bins['x']->name);
+
+        self::assertArrayHasKey('y', $hydrated->bins);
+        self::assertInstanceOf(Tag::class, $hydrated->bins['y']);
+        self::assertSame(4, $hydrated->bins['y']->id);
+        self::assertSame('loud', $hydrated->bins['y']->name);
     }
 
     public function testDiscriminatedUnionPicksTheCorrectBranch(): void
