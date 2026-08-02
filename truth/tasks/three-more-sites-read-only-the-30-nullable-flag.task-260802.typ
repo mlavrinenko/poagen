@@ -5,7 +5,11 @@
   tags: ("generator", "openapi-31", "strictness"),
   priority: 7,
   difficulty: 3,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    2,
+  )[Landed as 04526a4, merged and re-gated on the integrated HEAD. All three sites derive nullability through SchemaType::nullableOf(); the bare flag cast survives only in nullableOf()'s own body. Reverting the fix fails exactly the three new assertions.],
 )
 
 == Summary
