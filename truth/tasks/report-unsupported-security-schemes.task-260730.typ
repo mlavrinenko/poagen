@@ -5,7 +5,11 @@
   tags: ("generator", "security", "strictness"),
   priority: 6,
   difficulty: 3,
-  status: proposed(2026, 7, 30),
+  status: blocked(
+    2026,
+    8,
+    2,
+  )[Needs your ruling on oauth2. ADR-002 puts token acquisition in the transport, so an oauth2 scheme paogen cannot wire is arguably not a degradation at all; treating it as one aborts petstore unless its profile carries an explicit opt-out. Both readings are defensible and the one you pick sets how paogen greets the commonest auth scheme in the wild. Choose: report-and-abort under the default-deny-on-degradation policy, or report-as-omission and never abort. Basic auth and cookie apiKey get wired either way, and the rest is implementation.],
 )
 
 == Summary

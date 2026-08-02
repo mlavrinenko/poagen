@@ -5,7 +5,11 @@
   tags: ("generator", "errors", "decision"),
   priority: 5,
   difficulty: 7,
-  status: proposed(2026, 7, 30),
+  status: blocked(
+    2026,
+    8,
+    2,
+  )[Needs your ruling on scope: does the profile grow a way to declare a payload-level result envelope, or does this stay the consumer's business the way examples/kilbil already handles it by hand? The first adds a permanent public surface to the profile; the second leaves every kilbil caller one unchecked field away from a silent success. That trade is product direction and the repo cannot settle it. Pick one and the decision artifact plus any code follows.],
 )
 
 == Summary

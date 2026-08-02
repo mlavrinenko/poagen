@@ -5,7 +5,11 @@
   tags: ("errors", "dx", "generator", "deferred"),
   priority: 4,
   difficulty: 6,
-  status: proposed(2026, 7, 29),
+  status: blocked(
+    2026,
+    8,
+    2,
+  )[Needs your ruling: do declared error schemas become typed exception classes, or does the single generic ApiException stand? The deferral condition is met, since kilbil now generates end to end. This sets the permanent public shape of every client paogen emits, which is yours to set rather than derivable. Reaffirm ADR-009 or supersede it, and the enumeration plus implementation follows.],
 )
 
 == Summary

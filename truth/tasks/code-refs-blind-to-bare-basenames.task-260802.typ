@@ -5,7 +5,11 @@
   tags: ("truth", "speconaut", "process"),
   priority: 6,
   difficulty: 4,
-  status: proposed(2026, 8, 2),
+  status: blocked(
+    2026,
+    8,
+    2,
+  )[Needs your ruling: should the code-refs check reject a bare implementation-file basename in a structural slot, or stay scoped to path-shaped references on purpose? Widening it protects truth-tree portability but will fire on any domain noun that happens to share a class name, and how much of that noise you will accept is not derivable from the repo. Say which way, and the rest is implementation.],
 )
 
 == Summary
