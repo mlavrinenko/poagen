@@ -5,7 +5,7 @@
   tags: ("speconaut", "traceability", "regression"),
   priority: 5,
   difficulty: 5,
-  status: proposed(2026, 7, 29),
+  status: wip(2026, 8, 2),
 )
 
 == Summary
