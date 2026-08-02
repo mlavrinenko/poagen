@@ -59,3 +59,61 @@ that it stays flat. These three have no plan attached beyond the comment.
 - `runtime/src/Marshal/DescriptorParser.php`
 - `phpstan.neon.dist`
 - #link("../standards/analysis-runs-at-maximum-strictness.standard-260729.typ")
+
+== Result
+
+All three are deleted, none wired — three separate rulings that happened to
+agree, not one blanket sweep. The test each had to pass was whether wiring it
+would terminate in a consumer that already exists. None did.
+
+#table(
+  columns: 3,
+  [*Attribute*], [*What tracing it found*], [*Ruling*],
+
+  [`Deprecated`],
+  [No producer and no consumer. Nothing in `src/` reads OpenAPI's `deprecated`
+   keyword at all, so wiring it means inventing both ends.],
+  [Deleted. Marking a property deprecated is a real feature with a producer, a
+   carrier and a reader to design — not a constructor property left switched
+   off.],
+
+  [`AdditionalProperties`],
+  [Genuinely read generator-side (`InlineObjectResolver`, `PropertySynthesiser`,
+   `ResponseAnalyzer`, `TypeListScanner`, `FormatAdvisor`), but only as
+   generation-time bookkeeping about types. `Hydrator::hydrate()` builds its
+   argument list strictly from declared descriptors and drops every other wire
+   key.],
+  [Deleted. Giving it runtime meaning needs somewhere on the generated class to
+   hold undeclared data, which is an open-object hydration feature and its own
+   design decision.],
+
+  [`Schema`],
+  [Trivially emittable — `ModelEmitter` already knows the component name — but
+   both consumers its docblock named evaporate. `ModelAttributeApplier` bakes
+   every discriminator branch's FQCN into a literal array at generation time, so
+   `Hydrator` never re-derives a class from a schema name; the "doc generation"
+   tool does not exist.],
+  [Deleted. Easy to emit is not the same as read by anything.],
+)
+
+`phpstan.neon.dist` loses all three `ignoreErrors` entries with nothing replacing
+them — the finding is gone because the dead code is gone, not because it is
+hidden again. `analysis-runs-at-maximum-strictness`'s `structural:` count drops
+from five to two, and the two that remain are the genuine
+`tests/generated/*Steps.php` blind spots.
+`attribute-and-phpdoc-driven-serialization` is amended rather than rewritten,
+following the superseded-section pattern `openapi-31-strategy` set, and now
+records a vocabulary of three: `WireName`, `Format`, `Discriminator`.
+
+Two artifacts the deletion made stale were caught afterwards and fixed in the
+same change. `CHANGELOG.md`'s `0.1.0` section — unreleased, so it describes what
+will ship rather than history — still advertised all six attributes and put the
+marshal pair at `src/Runtime/Marshal/`, a path the runtime package split had
+already moved. And the decision artifact justified two deletions partly by what
+lay outside the implementing task's file boundary; a boundary is a work-splitting
+device that does not outlive the task, so those passages were rewritten onto the
+design reason that was already underneath them.
+
+Coverage rose on both tiers rather than falling, since the deleted properties
+carried none: `src/` 87.46%, `runtime/src/` 88.91%, against floors of 87.0 and
+88.0.
