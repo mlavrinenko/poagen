@@ -11,6 +11,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 use function in_array;
+use function is_array;
 
 /**
  * Resolution strategy for composition keywords `oneOf`, `anyOf`, `allOf`
@@ -134,6 +135,23 @@ final class CompositionResolver
             'properties' => $merged,
             'required' => $required,
         ]);
+    }
+
+    /**
+     * {@see flattenAllOf}, but a no-op `allOf` (missing or empty) returns the
+     * node itself rather than null — the caller (T-008's own {@see
+     * \Mlavrinenko\Paogen\Generator\ModelPlanner} dispatch, and {@see
+     * \Mlavrinenko\Paogen\Generator\PropertyRenameValidator} mirroring the
+     * same dispatch for `Profile::$propertyRenames`) wants "the effective
+     * schema", and an object with no `allOf` is already its own answer.
+     */
+    public static function materialiseAllOf(Schema $schema, OpenApi $openApi): ?Schema
+    {
+        if (!is_array($schema->allOf) || $schema->allOf === []) {
+            return $schema;
+        }
+
+        return self::flattenAllOf($schema, $openApi);
     }
 
     /**

@@ -23,7 +23,6 @@ use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 use function in_array;
-use function is_array;
 use function is_string;
 
 use const DIRECTORY_SEPARATOR;
@@ -53,6 +52,7 @@ final readonly class ModelPlanner
      *                                                    payloads {@see InlinePayloadPlanner}
      *                                                    found. They join the same queue as inline children, so nesting
      *                                                    below them is reached by the machinery that was already there.
+     * @param array<string,string>   $propertyRenames    Profile::$propertyRenames, unsliced
      */
     public function plan(
         OpenApi $openApi,
@@ -66,6 +66,7 @@ final readonly class ModelPlanner
         array $excludedComponents = [],
         array $extraRoots = [],
         ?ModelNameLedger $ledger = null,
+        array $propertyRenames = [],
     ): void {
         $ledger ??= new ModelNameLedger();
         $rawNames = array_keys($components->all());
@@ -91,7 +92,7 @@ final readonly class ModelPlanner
                 $ledger->claim($shape->phpName, 'components.schemas/' . $rawName);
             }
 
-            $this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending);
+            $this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending, $propertyRenames);
         }
 
         $this->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $ledger);
@@ -100,6 +101,7 @@ final readonly class ModelPlanner
     /**
      * @param array<string,string>   $writes
      * @param list<SynthesisedModel> $pending
+     * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
      */
     private function emitShape(
         string $rawName,
@@ -113,6 +115,7 @@ final readonly class ModelPlanner
         ComponentCatalog $components,
         array &$writes,
         array &$pending,
+        array $propertyRenames = [],
     ): void {
         $path = $modelDir . DIRECTORY_SEPARATOR . $shape->phpName . '.php';
 
@@ -123,18 +126,18 @@ final readonly class ModelPlanner
 
             case ComponentShape::KIND_OBJECT:
                 $effective = $shape->schema ?? throw new LogicException('object shape missing schema');
-                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending);
+                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames);
 
                 return;
 
             case ComponentShape::KIND_ALLOF_OBJECT:
-                $effective = $this->materialiseAllOf($shape->schema ?? throw new LogicException('allOf shape missing schema'), $openApi);
+                $effective = CompositionResolver::materialiseAllOf($shape->schema ?? throw new LogicException('allOf shape missing schema'), $openApi);
 
                 if (!$effective instanceof Schema) {
                     return;
                 }
 
-                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending);
+                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames);
 
                 return;
 
@@ -159,6 +162,7 @@ final readonly class ModelPlanner
     /**
      * @param array<string,string>   $writes
      * @param list<SynthesisedModel> $pending
+     * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
      */
     private function emitObject(
         Schema $effective,
@@ -172,6 +176,7 @@ final readonly class ModelPlanner
         string $path,
         array &$writes,
         array &$pending,
+        array $propertyRenames = [],
     ): void {
         $emission = $this->emitter->emit(
             $modelNamespace,
@@ -181,6 +186,8 @@ final readonly class ModelPlanner
             $enums,
             $registry,
             $components->interfacesFor($rawName),
+            $propertyRenames,
+            $rawName,
         );
 
         $writes[$path] = $emission->source;
@@ -229,20 +236,6 @@ final readonly class ModelPlanner
         }
 
         return 'Branch' . $index;
-    }
-
-    /**
-     * Flatten a top-level `allOf` schema into a single object-type Schema
-     * whose `properties`/`required` are the union of its branches (T-008).
-     * Returns null when no object branches were mergeable — caller drops it.
-     */
-    private function materialiseAllOf(Schema $schema, OpenApi $openApi): ?Schema
-    {
-        if (!is_array($schema->allOf) || $schema->allOf === []) {
-            return $schema;
-        }
-
-        return CompositionResolver::flattenAllOf($schema, $openApi);
     }
 
     /**

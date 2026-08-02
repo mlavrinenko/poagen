@@ -70,6 +70,30 @@ final readonly class Profile
      *                                              two above, fails the run. When a vendor renames an operation
      *                                              id, moving the pin to the new id keeps the class name the
      *                                              consumer's own callers already reference.
+     * @param array<string,string>  $propertyRenames Map of `'<RawComponentName>.<wirePropertyName>'` → desired
+     *                                              PHP property name, for a model property whose vendor spelling
+     *                                              is not one a consumer wants to read on every access —
+     *                                              `result_code`, `client_id`, `goods_data`. $methodRenames and
+     *                                              $tagRenames already answer this for operation ids and tags;
+     *                                              this is the same answer one level down, on the properties
+     *                                              those methods hand back. The wire name still has to survive —
+     *                                              hydration and marshalling both key on it — so a rename here
+     *                                              only changes the PHP-facing name: the emitted constructor
+     *                                              parameter takes the desired name and carries `#[WireName]`
+     *                                              pointing at the original, the same split
+     *                                              `attribute-and-phpdoc-driven-serialization` already uses for
+     *                                              a property that keeps its wire spelling for other reasons.
+     *                                              The key is dotted rather than a nested array, matching
+     *                                              `$xmlElements` and `$inlineModels`, so a rename is scoped to
+     *                                              the one model it belongs to and never touches every `id` in
+     *                                              the document at once. There is deliberately no automatic
+     *                                              snake_case-to-camelCase conversion: that would be a guess,
+     *                                              and it would silently move names between runs whenever the
+     *                                              vendor edited a schema. A key naming a component absent from
+     *                                              the document, or a property absent from that component,
+     *                                              fails the run, matching `$inlineModels` and `$tagChoice`. A
+     *                                              rename that collides with another property already in the
+     *                                              same model — renamed or not — fails the run naming both.
      * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
      *                                              skip-listed item is omitted from the output instead of
      *                                              failing the run. An entry that no longer matches a problem
@@ -101,6 +125,7 @@ final readonly class Profile
         public array $tagChoice = [],
         public array $xmlElements = [],
         public array $inlineModels = [],
+        public array $propertyRenames = [],
         public string $source = 'paogen.php',
     ) {}
 
@@ -134,6 +159,7 @@ final readonly class Profile
             tagChoice: $this->tagChoice,
             xmlElements: $this->xmlElements,
             inlineModels: $this->inlineModels,
+            propertyRenames: $this->propertyRenames,
             source: $source ?? $this->source,
         );
     }

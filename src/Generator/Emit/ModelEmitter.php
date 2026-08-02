@@ -8,7 +8,9 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Mlavrinenko\Paogen\Generator\ModelPlanner;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\PropertyRenameValidator;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
@@ -46,7 +48,20 @@ final readonly class ModelEmitter
     }
 
     /**
-     * @param list<string> $implements short PHP interface names, defined in $modelNamespace (T-026)
+     * @param list<string>          $implements       short PHP interface names, defined in $modelNamespace (T-026)
+     * @param array<string,string>  $propertyRenames  Profile::$propertyRenames, unsliced — keyed
+     *                                                 `'<RawComponentName>.<wirePropertyName>'`. Looked up here as
+     *                                                 `"$rawComponentName.$propName"` per property, so a
+     *                                                 synthesised model — called with `$rawComponentName = ''`,
+     *                                                 which no document component name is — never matches an
+     *                                                 entry. Unmatched keys and collisions are the caller's
+     *                                                 problem: {@see PropertyRenameValidator}
+     *                                                 catches both against the same schema before this runs, so a
+     *                                                 rename reaching here is known to name a real property and
+     *                                                 land on a name nothing else in the model uses.
+     * @param string                 $rawComponentName the raw `components.schemas` key this model came from, or
+     *                                                 `''` for a class {@see ModelPlanner}
+     *                                                 synthesised itself
      */
     public function emit(
         string $modelNamespace,
@@ -56,6 +71,8 @@ final readonly class ModelEmitter
         ?EnumCatalog $enums = null,
         ?NameRegistry $registry = null,
         array $implements = [],
+        array $propertyRenames = [],
+        string $rawComponentName = '',
     ): ModelEmission {
         assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         $modelNamespace = trim($modelNamespace, '\\');
@@ -97,7 +114,7 @@ final readonly class ModelEmitter
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
             $isRequired = in_array($propName, $required, true);
-            $phpName = $this->phpName($propName);
+            $phpName = $propertyRenames[$rawComponentName . '.' . $propName] ?? self::defaultPropertyName($propName);
 
             $resolved = $this->properties->resolve(
                 $className,
@@ -192,7 +209,15 @@ final readonly class ModelEmitter
         $this->attributes->apply($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
     }
 
-    private function phpName(string $openApiName): string
+    /**
+     * The property name paogen would emit for a raw wire name with no
+     * `Profile::$propertyRenames` entry — a valid PHP identifier verbatim,
+     * or a `camelCase` derivation for one that is not. Public and static so
+     * {@see PropertyRenameValidator} can
+     * compute the same collision surface a real emission would produce,
+     * without a second copy of the derivation to keep in step.
+     */
+    public static function defaultPropertyName(string $openApiName): string
     {
         if (preg_match('/^[a-zA-Z_]\w*$/', $openApiName) === 1) {
             return $openApiName;
