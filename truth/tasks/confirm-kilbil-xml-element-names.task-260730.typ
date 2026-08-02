@@ -31,3 +31,27 @@ A wrong root element is a 400 from the vendor on 2 of 36 operations. Right now n
 
 - \`examples/kilbil/paogen.php\`
 - \`examples/kilbil/README.md\`
+
+== Result
+
+The task's premise was wrong, and correcting it settled the question outright.
+The committed vendor document embeds a literal XML sample under each of the two
+XML request bodies — `loyalty_v1.yaml` around line 4305 for `/load/goodsxml` and
+around line 4570 for `/load/goodslistxml` — so the names were confirmable
+against a vendor artefact all along, without a live call. Three of the four
+guesses held: root `goods` with item `good`, and root `goodslist`. The fourth
+was wrong. The profile keyed `goodslistxml.item` to `good` where the vendor's
+own sample says `goodlist`, which would have been a malformed body on one of the
+two XML operations. That entry is corrected and the tree regenerated; the blast
+radius was exactly one literal in `CatalogueClient.php`'s `xmlList` call. Both
+the profile comment and the README now cite the file and line region behind each
+name.
+
+Confirming the names surfaced a second gap that naming cannot close. Both
+samples nest a container one level deeper — a `good` holds an `inside` which
+holds further `good` elements — and neither the profile's flat root/item keying
+nor `XmlWriter::appendArray`, which unwraps a nested array by repeating the
+property's own name, can express it. paogen would emit a run of sibling
+`inside` elements where the vendor expects one `inside` wrapping several
+children. That is recorded honestly in the profile and README rather than
+implied to work, and filed as `kilbil-xml-nesting-is-unrepresentable`.
