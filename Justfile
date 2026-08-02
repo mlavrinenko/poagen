@@ -417,3 +417,24 @@ check-examples:
     fi
     echo ""
     echo "check-examples: all examples in expected state"
+
+# Gather the input for a decisions audit over a set of closed tasks.
+#
+# Deliberately NOT in `just check`, and not a gate of any kind: it reads,
+# prints, and exits 0 whatever it finds. The human review gate this
+# replaces died of being a queue nobody could service
+# (review-gate-must-be-mechanical), so this one blocks nothing — it
+# assembles what a reader needs and stops there.
+#
+# The brief is the input, not the audit. `truth/notes/decisions-audit-
+# procedure.md` carries the rubric that turns one into the other, and
+# `scripts/audit-decisions --help` points at it.
+#
+# The argument is an `mt` filter expression, so any view works:
+# `just audit-decisions '@recent'`, or an explicit set. Note `mt`'s filter
+# grammar has no field for the date a status was reached, so "everything
+# closed on a given day" is not expressible as a filter — the 2026-08-01
+# validation run derived its set from `mt ls @recent --format json` and
+# passed it explicitly; the report records the command.
+audit-decisions filter='@recent':
+    scripts/audit-decisions '{{ filter }}'

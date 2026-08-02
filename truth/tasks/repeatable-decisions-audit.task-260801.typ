@@ -42,3 +42,49 @@ The distinction that made the second one usable is the one to preserve: the owne
 - \`Justfile\`
 - \`AGENT.md\`
 - \`truth/decisions/\`
+
+== Result
+
+Two artifacts, because the audit is a reading and only its input can be made
+mechanical. \`scripts/audit-decisions\` gathers that input for any \`mt\` filter,
+defaulting to \`\@recent\`: slug, title, status, the Summary / Acceptance criteria
+/ Result sections, the commits whose \`Refs:\` trailer names the task, and which
+\`truth/\` decisions, standards or specs those commits touched. It reads only —
+never writes, never gates, exits 0 whatever it finds. \`just audit-decisions\`
+wraps it.
+
+The rubric that turns a brief into a ranked report lives in
+\`truth/notes/decisions-audit-procedure.md\`, not in the agent guide: that file
+was already at 299 lines against linecop's 300-line cap, measured before writing
+rather than discovered by tripping the gate, and \`truth/notes/\` is where this
+project already puts process documentation that is not a decision.
+\`--help\` points at it.
+
+Validated against the 58 tasks closed on 2026-08-01, with the report committed
+at \`truth/reviews/2026-08-01-decisions-audit.md\`. It met the pass condition the
+task set: it surfaced the pre-transport spec drift. \`two-more-pre-transport-
+claims\` closed carrying an acceptance criterion that demanded proof its renamed
+step method kept its hand-written body, and none of its four commits touch
+\`tests/generated/\` at all — the regeneration happened later, inside a different
+task. Its hand-picked search vocabulary also missed seven of the nine stale
+passages the same-day follow-up caught, one of them a step body asserting the
+literal negation of the scenario it implemented.
+
+Two further findings, both verified against the current tree rather than
+inferred from the brief: the PHPStan strictness reversal was never recorded as
+the decision its own acceptance criteria demanded, and
+\`standards-stop-naming-implementation-files\` left its required scope question
+unanswered while the detection gap that caused it — a code-ref check blind to a
+bare implementation-file basename — is still open. 54 of the 58 tasks settled
+nothing new, and the report says so in one line each rather than padding.
+
+All three findings are now tasks: \`record-the-strictness-reversal\`,
+\`code-refs-blind-to-bare-basenames\` and
+\`structural-sweep-for-retired-call-shapes\`. Filing them is the audit's output;
+ruling on the first two is the owner's.
+
+One limit worth recording, since the audit states what it cannot check: \`mt\`'s
+filter grammar has no field for the date a status was reached, so "everything
+closed on a given day" is not expressible as a filter. The validation set was
+derived once from \`mt ls \@recent --format json\` and passed explicitly; the
+report carries the reproducing command.
