@@ -39,3 +39,24 @@ The direction is to revert the relaxation rather than patch its symptoms. The st
 - \`phpstan.neon.dist\`
 - \`truth/tasks/audit-phpstan-generator-exemptions.task-260729.typ\`
 - \`truth/decisions/\`
+
+== Result
+
+Backfilled on 2026-08-02 by `record-the-strictness-reversal`, which found this
+task closed without the Result its own second criterion asked for. The wording
+revert and the exemption paydown both landed in `b78fa67`; the count fell
+further to two in `926191e` under `wire-or-drop-the-unwired-attributes`, after
+this task had closed.
+
+The inventory this task owed, verified against `phpstan.neon.dist` at the time
+of backfill rather than reconstructed from memory: two `ignoreErrors` entries
+remain, both scoped to `tests/generated/*Steps.php`, one on
+`shipmonk.deadProperty.neverRead` and one on `property.onlyWritten`, both
+matching the exact message `::$test is never read` rather than the whole file,
+and both carrying the inline comment naming the tool's blind spot. A scoping
+that tight is what let the removed `$boundFormat` case in `ProfileSteps.php`
+still fail rather than hide behind the same entry.
+
+The decision artifact this task's first criterion also asked for is
+`strictness-relaxation-is-opt-in-not-opt-out.decision-260802.typ`, written three
+days late by the task that noticed the gap.

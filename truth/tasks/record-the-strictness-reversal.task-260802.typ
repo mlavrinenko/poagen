@@ -56,3 +56,28 @@ less welcome than that one was.
 - \`truth/standards/analysis-runs-at-maximum-strictness.standard-260729.typ\`
 - \`truth/tasks/revert-the-strictness-relaxation.task-260801.typ\`
 
+
+== Result
+
+`strictness-relaxation-is-opt-in-not-opt-out.decision-260802.typ` records it,
+citing the whole episode by full commit hash: `312cd5f` relaxed the standard
+inside `rewrite-agent-guide-for-mindtape`, `b78fa67` reverted the wording under
+`revert-the-strictness-relaxation`, and `926191e` paid the exemption count down
+from five to two afterwards under `wire-or-drop-the-unwired-attributes`. Hashes
+rather than task names, so a reader can `git show` the relaxation instead of
+taking the artifact's word for what it said.
+
+`analysis-runs-at-maximum-strictness.standard-260729.typ` gained a `relates-to:`
+pointer at the decision and nothing else — its rule text is untouched, which is
+what the third acceptance criterion required.
+
+The second criterion was tested rather than assumed. An agent arriving at the
+relaxing commit reaches the standard by `git blame`, finds the pointer beside
+the rule, and lands on a decision that narrates the reversal and states the
+opt-in rule directly; `revert-the-strictness-relaxation`'s own Summary
+corroborates it independently. Two cross-linked paths to the same conclusion.
+
+The exemption count was measured, not changed: two `ignoreErrors` entries,
+both in `phpstan.neon.dist`, both scoped to `tests/generated/*Steps.php` and to
+the exact `::$test is never read` property rather than to the file, and both
+already carrying the inline blind-spot comment the standard demands.
