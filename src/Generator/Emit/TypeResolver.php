@@ -52,7 +52,7 @@ final readonly class TypeResolver
         $format = $node->format;
         // `nullable: true` is the 3.0 spelling and `type: [T, "null"]` the 3.1
         // one; a document may use either, so honour both.
-        $nullable = (bool) $node->nullable || $type->nullable;
+        $nullable = SchemaType::nullableOf($node);
 
         if (is_string($format) && $format !== '') {
             $scalarFormat = $bindings->scalarFormat($format);

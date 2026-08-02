@@ -20,11 +20,37 @@ paths:
               type: object
               required:
                 - requiredButNullable
+                - requiredNullableEnum
+                - requiredNullableObject
+                - requiredNullableObjectArray
               properties:
                 requiredButNullable:
                   type:
                     - integer
                     - "null"
+                requiredNullableEnum:
+                  type:
+                    - string
+                    - "null"
+                  enum:
+                    - draft
+                    - live
+                requiredNullableObject:
+                  type:
+                    - object
+                    - "null"
+                  properties:
+                    inner:
+                      type: string
+                requiredNullableObjectArray:
+                  type:
+                    - array
+                    - "null"
+                  items:
+                    type: object
+                    properties:
+                      inner:
+                        type: string
                 optionalNullableString:
                   type:
                     - string

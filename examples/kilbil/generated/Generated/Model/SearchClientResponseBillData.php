@@ -14,10 +14,10 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class SearchClientResponseBillData
 {
     /**
-     * @param list<SearchClientResponseBillDataItemsItem> $items
+     * @param ?list<SearchClientResponseBillDataItemsItem> $items
      */
     public function __construct(
-        public array $items,
+        public ?array $items,
     ) {
     }
 }

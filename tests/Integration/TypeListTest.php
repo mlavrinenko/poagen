@@ -82,6 +82,58 @@ final class TypeListTest extends TestCase
         );
     }
 
+    /**
+     * nullable-type-array-lost-in-property-synthesis: the three branches
+     * PropertySynthesiser resolves itself — synthesised enum, synthesised
+     * object, array item — each used to read only the 3.0 `nullable` flag
+     * and miss the 3.1 `type: [T, "null"]` array TypeResolver already
+     * honoured. A required property stayed non-nullable despite its schema
+     * saying otherwise; only an optional property's blanket `?` masked it
+     * (see testASingleElementListReadsAsThatTypeWithoutNullability above).
+     * These three properties are required and nullable, so the mask does not
+     * apply and the bug would otherwise surface as a missing `?`.
+     */
+    public function testARequiredNullableEnumSynthesisedInlineStaysNullable(): void
+    {
+        $plan = $this->plan(['refusedShapes' => 'out of scope for this assertion']);
+        $model = $this->sourceOf($plan, 'NullableShapesRequest');
+
+        self::assertStringContainsString(
+            'public ?NullableShapesRequestRequiredNullableEnum $requiredNullableEnum,',
+            $model,
+        );
+        self::assertStringContainsString(
+            "case Draft = 'draft';",
+            $this->sourceOf($plan, 'NullableShapesRequestRequiredNullableEnum'),
+        );
+    }
+
+    public function testARequiredNullableObjectSynthesisedInlineStaysNullable(): void
+    {
+        $plan = $this->plan(['refusedShapes' => 'out of scope for this assertion']);
+        $model = $this->sourceOf($plan, 'NullableShapesRequest');
+
+        self::assertStringContainsString(
+            'public ?NullableShapesRequestRequiredNullableObject $requiredNullableObject,',
+            $model,
+        );
+        self::assertStringContainsString(
+            'public ?string $inner = null,',
+            $this->sourceOf($plan, 'NullableShapesRequestRequiredNullableObject'),
+        );
+    }
+
+    public function testARequiredNullableArrayOfSynthesisedObjectsStaysNullable(): void
+    {
+        $model = $this->modelSource('NullableShapesRequest');
+
+        self::assertStringContainsString(
+            '@param ?list<NullableShapesRequestRequiredNullableObjectArrayItem> $requiredNullableObjectArray',
+            $model,
+        );
+        self::assertStringContainsString('public ?array $requiredNullableObjectArray,', $model);
+    }
+
     public function testSeveralScalarMembersBecomeAPhpUnionRatherThanMixed(): void
     {
         $model = $this->modelSource('NullableShapesRequest');
