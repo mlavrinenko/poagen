@@ -1,0 +1,32 @@
+// Mutation testing config (wire-mutation-testing). Run via `just mutate` or
+// `just mutate-fast`, never bare `infection` — both recipes carry the PCOV
+// coverage-driver workaround this repo's other coverage tooling needs (see
+// the Justfile's `test-coverage` comment): `env -u PHP_INI_SCAN_DIR` plus
+// `-d pcov.directory=. -d pcov.exclude=~(vendor|build)~` on the initial
+// coverage-generating test run, passed via `--initial-tests-php-options`.
+// Without that, the devbox-packaged composer's stale `PHP_INI_SCAN_DIR`
+// silently drops PCOV from the child PHP process infection spawns, and the
+// run reports zero mutants covered rather than failing loudly.
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "timeout": 15,
+    "source": {
+        "directories": [
+            "src",
+            "runtime/src"
+        ]
+    },
+    "logs": {
+        "text": "build/logs/infection.log",
+        "summary": "build/logs/infection-summary.log",
+        "json": "build/logs/infection.json",
+        "perMutator": "build/logs/infection-per-mutator.md"
+    },
+    "tmpDir": "build/cache/infection",
+    "phpUnit": {
+        "configDir": "."
+    },
+    "mutators": {
+        "@default": true
+    }
+}

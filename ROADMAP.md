@@ -5,12 +5,16 @@
 > records what has to be true before a `0.1.0` tag, and retires on that
 > tag. Closing it out is tracked as `v01-release-exit-criteria`.
 >
-> Two things below are now out of date and left in place as history
+> Three things below are now out of date and left in place as history
 > rather than silently rewritten. OpenAPI 3.1 is no longer a post-v0.1
 > follow-up — the `openapi-31-through-a-maintained-parser` decision
 > supersedes that, because every schema worth generating against is 3.1.
-> And the `T-NNN` identifiers predate the move to task slugs; the
-> corresponding artifacts are `truth/tasks/<slug>.task-<yymmdd>.typ`.
+> Mutation testing is no longer an open follow-up either — it is wired,
+> measured, and deliberately kept out of `just check`; see
+> `mutation-testing-stays-out-of-the-gate.decision-260802.typ` for the
+> numbers behind that. And the `T-NNN` identifiers predate the move to
+> task slugs; the corresponding artifacts are
+> `truth/tasks/<slug>.task-<yymmdd>.typ`.
 
 This file was **derived** from the truth tree and the 2026-04-18
 pre-release review at
@@ -19,7 +23,9 @@ pre-release review at
 **Scope policy.** v0.1 is the first consumable release, not feature
 parity with mature generators. We ship what makes the pipeline
 *correct*, *type-safe*, and *pleasant* to use on real schemas. Mutation
-testing remains an explicit **post-v0.1** follow-up.
+testing is wired (`just mutate`) but runs outside `just check` — a full
+run takes seven-plus minutes, well past this project's gate budget; see
+`mutation-testing-stays-out-of-the-gate.decision-260802.typ`.
 
 ## Phase 1 — Release blocker + `ScalarBinding` foundation
 
@@ -135,8 +141,13 @@ v0.1's critical path.
   catalogued at [`truth/notes/openapi-3.1-gap.md`](truth/notes/openapi-3.1-gap.md).
   When revisited, produce a prototype task, supersede ADR-008, then
   remove the README limitation note.
-- **Mutation testing** — task 021 was retired as `done` without
-  wiring infection; revisit once the code surface stabilises.
+- ~~**Mutation testing**~~ — resolved 2026-08-02, no longer an open
+  follow-up. Task 021 was retired as `done` without wiring infection;
+  `wire-mutation-testing` wired it, measured a 7-minute full run against
+  `src/` and `runtime/src/`, and recorded the gate decision in
+  `mutation-testing-stays-out-of-the-gate.decision-260802.typ`. Kept here,
+  struck through, as history rather than deleted — see this file's intro
+  note.
 - **Validation-tier fixtures** — ADR-005 calls out DigitalOcean and
   the GitHub 3.0 bundled variant. Land post-v0.1 once the generator
   is proven on Petstore plus the items above.
