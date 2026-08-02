@@ -308,15 +308,17 @@ test-coverage: tmpdir
 # default 128M exhausts building the per-mutant test-runner command lines
 # once past roughly 1500 of this run's 3049 mutants.
 #
-# `just mutate` may leave untracked scratch directories at the repo root
-# (observed: literal dirs named after a corrupted CLI flag, e.g.
-# `--output=`) — a side effect of subprocess-based integration tests
-# running against deliberately-mutated CLI argument-parsing code, orphaned
-# when the mutated behaviour aborts the test before its own cleanup runs.
-# Harmless and untracked; `git status --porcelain` after a run and discard
-# anything unexpected before committing.
+# Both recipes go through `scripts/mutation-run`, which refuses to start on
+# a dirty tree and restores the generated trees afterwards. That is not
+# tidiness: the fixture profiles write their `output:` INTO the committed
+# golden trees, so a mutant that changes emitted output rewrites the golden
+# with the mutant's version and leaves it as a tracked modification.
+# Observed, not theorised — a single-file run against SecurityScheme.php
+# left `$ApiKey` for `$apiKey` in the parameters fixture's ApiClient. The
+# script's header carries the full account, including the untracked scratch
+# directories a mutated CLI argument parser leaves at the repo root.
 mutate: tmpdir
-    env -u PHP_INI_SCAN_DIR php -d memory_limit=2G vendor/bin/infection run --threads=max --initial-tests-php-options="-d pcov.directory=. -d pcov.exclude=~(vendor|build)~"
+    scripts/mutation-run --threads=max
 
 # Fast, changed-files-only mutation run for local iteration: mutates only
 # lines added or modified relative to `main`. Explicit `--git-diff-base=main`
@@ -327,9 +329,9 @@ mutate: tmpdir
 # Timed on a single representative file (86 mutants, `src/Generator/Generator.php`)
 # at ~20s wall-clock including the initial coverage run, comfortably inside
 # the budget for routine use ahead of a full `just mutate`. Same PCOV
-# workaround as `mutate`, same reasons.
+# workaround and same fixture guard as `mutate`, same reasons.
 mutate-fast: tmpdir
-    env -u PHP_INI_SCAN_DIR php -d memory_limit=2G vendor/bin/infection run --threads=max --git-diff-filter=AM --git-diff-base=main --initial-tests-php-options="-d pcov.directory=. -d pcov.exclude=~(vendor|build)~"
+    scripts/mutation-run --threads=max --git-diff-filter=AM --git-diff-base=main
 
 # Prove a generated client installs and runs on mlavrinenko/paogen-runtime
 # alone, with the generator absent (runtime-package-split). Builds a scratch

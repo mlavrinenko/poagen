@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+#
+# Run infection, and guarantee it does not leave mutated generator output
+# committed-looking in the tree.
+#
+# Why this exists. The fixture profiles under tests/fixtures/profiles/ point
+# their `output:` at the committed golden trees themselves — e.g.
+# parameters.php writes to tests/fixtures/generated/parameters. That is fine
+# for a normal test run, where the generator is correct and rewrites the tree
+# byte-identically. Under mutation testing it is not: a mutant that changes
+# emitted output makes the test rewrite the GOLDEN with the mutant's output,
+# and the corruption survives the run.
+#
+# Observed on 2026-08-02 with a single-file run against SecurityScheme.php: a
+# mutant of `camelize()` left tests/fixtures/generated/parameters/Generated/
+# ApiClient.php carrying `$ApiKey` instead of `$apiKey`, as a tracked
+# modification. A `git commit -a` after a mutation run would have shipped
+# mutated output as the golden truth, and every byte-stability assertion would
+# then have agreed with it.
+#
+# So: refuse to start dirty (otherwise there is no way to tell a mutant's
+# damage from your own work in progress), and restore the generated trees
+# afterwards whatever the exit status. The restore is deliberately narrow —
+# only paths a generator run can write — so real edits elsewhere are never
+# discarded.
+#
+# This is a guard, not the fix. A golden tree that tests write into in place
+# cannot survive a run with a deliberately broken generator; generating to a
+# scratch directory and diffing is the durable answer. See the task
+# `fixtures-generate-to-a-scratch-tree`.
+
+set -eo pipefail
+
+cd "$(dirname "$0")/.."
+
+# Paths a generator run under test can write. Restored after every run.
+GENERATED_PATHS=(tests/fixtures/generated examples)
+
+# Only the generated trees have to be clean, not the whole tree — the point
+# is to be able to attribute what is dirty AFTERWARDS to a mutant. Blocking
+# on unrelated work in progress would make `mutate-fast`, whose whole purpose
+# is iterating on uncommitted changes, impossible to run.
+if [[ -n "$(git status --porcelain -- "${GENERATED_PATHS[@]}")" ]]; then
+    echo "mutation-run: refusing to start — a generated tree is already dirty." >&2
+    echo >&2
+    echo "A mutation run rewrites these trees in place, so starting dirty makes a" >&2
+    echo "mutant's damage indistinguishable from your own changes — and the restore" >&2
+    echo "at the end would discard your work along with the mutant's." >&2
+    echo "Commit or discard these first:" >&2
+    echo >&2
+    git status --short -- "${GENERATED_PATHS[@]}" >&2
+    exit 1
+fi
+
+set +e
+env -u PHP_INI_SCAN_DIR php -d memory_limit=2G vendor/bin/infection run \
+    --initial-tests-php-options="-d pcov.directory=. -d pcov.exclude=~(vendor|build)~" \
+    "$@"
+status=$?
+set -e
+
+dirty="$(git status --porcelain -- "${GENERATED_PATHS[@]}")"
+if [[ -n "$dirty" ]]; then
+    echo
+    echo "mutation-run: restoring generated trees a mutant rewrote:"
+    echo "$dirty"
+    git checkout -- "${GENERATED_PATHS[@]}"
+fi
+
+# Scratch directories the CLI's own argument parsing creates when a mutant
+# breaks it mid-run (`--output=/` and friends land as literal directory names).
+# Only ever removed when untracked, and only at the repository root.
+while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    rm -rf -- "$path"
+    echo "mutation-run: removed scratch path left by a mutated CLI run: $path"
+done < <(git ls-files --others --exclude-standard --directory | grep -E '^(=|--output=|tmp/)' || true)
+
+exit "$status"
