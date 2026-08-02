@@ -10,12 +10,16 @@
     <ini name="memory_limit" value="1G"/>
   </php>
   <!--
-        Scope deprecation tracking to `src/`. This keeps PHP 8.4 implicit-nullable
-        deprecations emitted by `cebe/php-openapi` (P2 #15 in the pre-release review,
-        tracked under truth/tasks/) out of PHPUnit's summary without hiding any
-        deprecations that we trigger ourselves.
+        Deprecation tracking is scoped to our own code and nothing is ignored.
+        `ignoreIndirectDeprecations="true"` used to sit here for one reason: the
+        PHP 8.4 implicit-nullable deprecations `cebe/php-openapi` emitted (P2 #15
+        in the pre-release review), the same ones the deleted
+        `patches/cebe-php-openapi-php84-nullable.patch` existed to silence.
+        `devizzent/cebe-php-openapi` fixed those signatures upstream, so the
+        suppression was removed and the suite runs clean without it — measured,
+        not assumed. Put it back only with a new reason written next to it.
     -->
-  <source restrictNotices="true" restrictWarnings="true" ignoreIndirectDeprecations="true">
+  <source restrictNotices="true" restrictWarnings="true">
     <include>
       <directory suffix=".php">./src</directory>
       <directory suffix=".php">./runtime/src</directory>

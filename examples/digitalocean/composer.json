@@ -32,7 +32,6 @@
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
-            "cweagans/composer-patches": true,
             "php-http/discovery": true
         }
     },

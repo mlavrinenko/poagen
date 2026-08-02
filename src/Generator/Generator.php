@@ -21,9 +21,11 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
+use Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
@@ -92,9 +94,15 @@ final readonly class Generator
         // on the first one found.
         $discriminatorSkips = new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
 
-        // Same discipline, one construct further out: a `type` list naming
-        // several types PHP cannot express as one (nullable-type-arrays).
-        $typeListSkips = TypeListScanner::scan($openApi);
+        // Same discipline, one walk further out: a `type` list naming several
+        // types PHP cannot express as one (nullable-type-arrays), and a JSON
+        // Schema 2020-12 keyword no emitter implements
+        // (swap-openapi-parser-for-31-support). One walk, two probes, so an
+        // operation reports one reason rather than a pile of them.
+        $schemaSkips = SchemaScan::run($openApi, [
+            TypeListScanner::probe(...),
+            UnsupportedKeywordScanner::probe(...),
+        ]);
 
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
         $modelNamespace = $rootNamespace . '\\Model';
@@ -125,13 +133,13 @@ final readonly class Generator
         $excludedComponents = array_fill_keys(
             array_map(
                 static fn(SkippedComponent $c): string => $c->rawName,
-                [...$discriminatorSkips, ...$typeListSkips['components']],
+                [...$discriminatorSkips, ...$schemaSkips['components']],
             ),
             true,
         );
         $preScannedSkips = [];
 
-        foreach ($typeListSkips['operations'] as $skip) {
+        foreach ($schemaSkips['operations'] as $skip) {
             $preScannedSkips[$skip->operationId] = $skip->reason;
         }
 
@@ -166,9 +174,10 @@ final readonly class Generator
             ...OperationIdAdvisor::notices($openApi, $profile->methodRenames),
             ...FormatAdvisor::notices($openApi, $bindings),
         ];
-        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$typeListSkips['components']];
+        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$schemaSkips['components']];
 
         $failures = [
+            ...UnsupportedKeywordScanner::webhookFailures($openApi),
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),

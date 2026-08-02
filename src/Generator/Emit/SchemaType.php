@@ -121,11 +121,13 @@ final readonly class SchemaType
     }
 
     /**
-     * cebe declares `Schema::$type` as `string` in the magic-property docblock
-     * it resolves properties through, but JSON Schema allows a list and the
-     * parser hands the list over verbatim as a PHP array. Widening at this one
-     * boundary is what lets the reader above narrow honestly, instead of the
-     * analyser insisting the array branch is unreachable.
+     * `devizzent/cebe-php-openapi` declares `Schema::$type` as
+     * `string|string[]`, so both spellings are in the declared type and the
+     * array branch above no longer needs arguing for. What the declaration
+     * still leaves out is the schema that declares no `type` at all: the same
+     * accessor answers `null` for it, and a reader that trusted the
+     * declaration would never write the branch that handles it. Widening at
+     * this one boundary is what lets the reader above narrow honestly.
      */
     private static function rawType(Schema $schema): mixed
     {

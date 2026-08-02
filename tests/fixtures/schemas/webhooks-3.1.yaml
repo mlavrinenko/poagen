@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: Webhooks Fixture
+  version: "1.0.0"
+  description: >
+    swap-openapi-parser-for-31-support fixture. `webhooks` is an OpenAPI 3.1
+    top-level keyword with no 3.0 equivalent: it describes calls the vendor
+    makes to the consumer, which is the opposite direction from everything
+    paogen emits. It is a non-goal to implement, so a document carrying one has
+    to be refused by name rather than generated as if the webhook were not
+    there — an emitted client that silently omits half of what the document
+    describes is the outcome this project exists to prevent.
+
+    Measured before the swap: cebe/php-openapi 1.8.0 kept the keyword — it
+    reads back as an array with the `memberCreated` key, since an unrecognised
+    top-level key lands in the same property bag a recognised one does — but
+    left it as raw arrays rather than path items, and paogen never looked. The
+    document parsed clean and produced a client for `/pings` alone, with
+    nothing anywhere saying half the document had gone missing.
+paths:
+  /pings:
+    post:
+      operationId: sendPing
+      responses:
+        '204':
+          description: ok
+webhooks:
+  memberCreated:
+    post:
+      operationId: onMemberCreated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        '200':
+          description: ok

@@ -31,17 +31,23 @@ which part of the original claim held.
 
 The part that held: paogen has no version gate. It never inspects
 `$openApi->openapi` and never calls `validate()`, so the document parses
-cleanly and reaches the emitters. The parser swap is not what blocks this
-client, and `swap-openapi-parser-for-31-support` stays postponed.
+cleanly and reaches the emitters. The parser swap was never what blocked this
+client.
 
 The part that did not: this file previously asserted "no `type: [T, "null"]`"
 in as many words, and structurally called it a 3.0 document. It is not one.
-`cebe/php-openapi` hands the list over verbatim as a PHP array while declaring
+`cebe/php-openapi` handed the list over verbatim as a PHP array while declaring
 `Schema::$type` as `string`, so every `is_string($schema->type)` guard in the
 generator missed it and 87 properties the vendor had typed fell through to
 `mixed` — with 11 inline enums lost on the same guard. Reading the list needed
 no parser swap, only for paogen to read what the parser already handed over;
-`nullable-type-arrays` is that work.
+`nullable-type-arrays` is that work, and it landed before the swap did.
+
+The swap has since landed anyway (`swap-openapi-parser-for-31-support`):
+paogen parses through `devizzent/cebe-php-openapi`, which declares
+`Schema::$type` as `string|string[]` — the shape this document was always
+using. Every type above is emitted byte-identically before and after,
+which is how the swap was checked.
 
 **No named components at all.** `components/schemas` is empty. Every payload is
 declared inline at its use site: 29 inline JSON request bodies and 71 inline

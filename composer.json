@@ -20,14 +20,13 @@
     ],
     "require": {
         "php": "^8.4",
-        "cebe/php-openapi": "^1.7",
+        "devizzent/cebe-php-openapi": "^1.1",
         "mlavrinenko/paogen-runtime": "*@dev",
         "nette/php-generator": "^4.2",
         "psr/http-message": "^2.0",
         "sebastian/diff": "^6.0 || ^7.0"
     },
     "require-dev": {
-        "cweagans/composer-patches": "^1.7",
         "friendsofphp/php-cs-fixer": "^3.92",
         "infection/infection": "^0.34.1",
         "nyholm/psr7": "^1.8",
@@ -70,18 +69,10 @@
     },
     "config": {
         "allow-plugins": {
-            "cweagans/composer-patches": true,
             "infection/extension-installer": true,
             "php-http/discovery": true
         },
         "sort-packages": true
-    },
-    "extra": {
-        "patches": {
-            "cebe/php-openapi": {
-                "PHP 8.4: explicit nullable parameters (T-016)": "patches/cebe-php-openapi-php84-nullable.patch"
-            }
-        }
     },
     "scripts": {
         "lint": [

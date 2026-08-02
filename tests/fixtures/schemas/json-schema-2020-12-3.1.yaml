@@ -1,0 +1,129 @@
+openapi: 3.1.0
+info:
+  title: JSON Schema 2020-12 Constructs Fixture
+  version: "1.0.0"
+  description: >
+    swap-openapi-parser-for-31-support fixture. A document that genuinely uses
+    JSON Schema 2020-12, so the parser swap has something to be measured
+    against. One operation is representable — `type: [T, "null"]` and a scalar
+    union, which paogen reads — and the rest each carry exactly one construct
+    the emitters do not implement, so each can be named on its own in the
+    refusal and accepted on its own from Profile::$skip.
+
+    Recorded behaviour of cebe/php-openapi 1.8.0, the parser this swap
+    replaced, measured against this file before the swap: it parsed it without
+    complaint and kept every one of these keywords verbatim — `const`,
+    `prefixItems`, `unevaluatedProperties` and `contentMediaType` all read back
+    through its magic accessor, because an unrecognised key lands in the same
+    property bag a recognised one does. Its `validate()` refused the document
+    ("Unsupported openapi version: 3.1.0"), which paogen never called and so
+    never saw. So the old parser did not hide these; nothing asked it for them.
+    Each property carrying one was emitted as its bare declared type, the
+    constraint dropped and nothing said. That silent third outcome — read,
+    misinterpreted, emitted as something else — is the regression this fixture
+    guards.
+paths:
+  /coupons:
+    post:
+      operationId: createCoupon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - redeemedCount
+              properties:
+                code:
+                  type:
+                    - string
+                    - "null"
+                redeemedCount:
+                  type:
+                    - integer
+                    - "null"
+                identifier:
+                  type:
+                    - string
+                    - integer
+      responses:
+        '204':
+          description: ok
+  /badges:
+    post:
+      operationId: createBadge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  type: string
+                  const: badge
+      responses:
+        '204':
+          description: ok
+  /tuples:
+    post:
+      operationId: createTuple
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                point:
+                  type: array
+                  prefixItems:
+                    - type: number
+                    - type: number
+      responses:
+        '204':
+          description: ok
+  /profiles:
+    post:
+      operationId: createProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+              unevaluatedProperties: false
+      responses:
+        '204':
+          description: ok
+  /avatars:
+    post:
+      operationId: createAvatar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  contentMediaType: image/png
+      responses:
+        '204':
+          description: ok
+components:
+  schemas:
+    Pennant:
+      type: object
+      required:
+        - kind
+      properties:
+        kind:
+          type: string
+          const: pennant

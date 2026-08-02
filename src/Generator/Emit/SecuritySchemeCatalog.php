@@ -8,8 +8,8 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\SecurityRequirement;
-use cebe\openapi\spec\SecurityRequirements;
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
+use stdClass;
 
 use function is_string;
 
@@ -87,10 +87,11 @@ final readonly class SecuritySchemeCatalog
      */
     private function operationRequirementNames(Operation $operation): array
     {
-        // Absent `security` on an Operation means "inherit the global".
-        // Cebe presents `$operation->security` as `null` in that case
-        // (per attributeDefaults); distinguishing "absent" from "empty
-        // list" therefore needs an instance check, not count-by-length.
+        // Absent `security` on an Operation means "inherit the global",
+        // and `security: []` means "no auth here" — two different facts
+        // that both read as an empty name list. The parser presents the
+        // absent one as `null` (per attributeDefaults) and the empty one
+        // as `[]`, so telling them apart needs `isset`, not a count.
         if (!isset($operation->security)) {
             return $this->globalRequirementNames;
         }
@@ -207,33 +208,43 @@ final readonly class SecuritySchemeCatalog
     }
 
     /**
-     * Cebe declares `$openApi->security` / `$operation->security` in its
-     * docblock as `SecurityRequirement[]` even though the runtime value is
-     * a `SecurityRequirements` instance (or `null` on an absent Operation
-     * override). Accept the docblock type, then narrow via `instanceof`.
+     * A security requirement names its schemes as its own keys — a
+     * `SecurityRequirement` has no fixed attribute list, so
+     * `{"apiKey": []}` is one object whose single key is the scheme name.
      *
-     * @param array<SecurityRequirement>|SecurityRequirements|null $security
+     * `devizzent/cebe-php-openapi` hands `$openApi->security` and
+     * `$operation->security` over as a plain list of those objects, which
+     * is what its docblock says. The parser this replaced wrapped the list
+     * in a `SecurityRequirements` container with a `getRequirements()`
+     * accessor and declared the same docblock type anyway; that class does
+     * not exist in the fork
+     * (`vendor/devizzent/cebe-php-openapi/src/spec/` has
+     * `SecurityRequirement` only). `getSerializableData()` is the public
+     * way to read the keys of an object with no fixed attributes.
+     *
+     * `null` is the absent-override case on an Operation, kept separate
+     * from an empty list by {@see operationRequirementNames}.
+     *
+     * @param array<SecurityRequirement>|null $security
      *
      * @return list<string>
      */
-    private function namesFromMagicProperty(
-        array|SecurityRequirements|null $security,
-    ): array {
-        if (!$security instanceof SecurityRequirements) {
-            return [];
-        }
-
-        /** @var array<string, SecurityRequirement>|null $raw */
-        $raw = $security->getRequirements();
-
-        if ($raw === null) {
-            return [];
-        }
-
+    private function namesFromMagicProperty(?array $security): array
+    {
         $out = [];
 
-        foreach (array_keys($raw) as $name) {
-            if (is_string($name)) {
+        foreach ($security ?? [] as $requirement) {
+            if (!$requirement instanceof SecurityRequirement) {
+                continue;
+            }
+
+            $data = $requirement->getSerializableData();
+
+            if (!$data instanceof stdClass) {
+                continue;
+            }
+
+            foreach (array_keys(get_object_vars($data)) as $name) {
                 $out[] = $name;
             }
         }

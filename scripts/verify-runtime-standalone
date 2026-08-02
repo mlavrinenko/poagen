@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # verify-runtime-standalone — prove runtime-package-split's central claim: a
 # generated client installs and runs with mlavrinenko/paogen-runtime alone,
-# with the generator (mlavrinenko/paogen, cebe/php-openapi, nette/php-
+# with the generator (mlavrinenko/paogen, devizzent/cebe-php-openapi, nette/php-
 # generator, sebastian/diff) nowhere in vendor/.
 #
 # Builds a scratch composer project under build/ (git-ignored) that requires
@@ -64,7 +64,7 @@ use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
-foreach (['mlavrinenko/paogen', 'cebe/php-openapi', 'nette/php-generator', 'sebastian/diff'] as $generatorOnly) {
+foreach (['mlavrinenko/paogen', 'devizzent/cebe-php-openapi', 'nette/php-generator', 'sebastian/diff'] as $generatorOnly) {
     if (InstalledVersions::isInstalled($generatorOnly)) {
         fwrite(STDERR, "FAIL: {$generatorOnly} is installed — the generator is not absent\n");
         exit(1);

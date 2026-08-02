@@ -1,0 +1,79 @@
+openapi: 3.1.0
+info:
+  title: Nullable Idiom Fixture
+  version: "1.0.0"
+  description: >
+    swap-openapi-parser-for-31-support fixture, one of a pair. The 3.0
+    `nullable: true` flag and the 3.1 `type: [T, "null"]` list are the same
+    statement about the same property, so they must reach the consumer as the
+    same PHP type. The two files in this pair differ in nothing but which
+    spelling they use and the version string that licenses it — a test rewrites
+    one into the other and asserts they match. The nullable sites are spread
+    over a model property, an array property, a synthesised inline object and a
+    query parameter, because each of those resolved its own nullability before
+    `SchemaType` became the single reader.
+paths:
+  /members/{memberId}:
+    get:
+      operationId: getMember
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: since
+          in: query
+          required: false
+          schema:
+            type:
+              - string
+              - "null"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+components:
+  schemas:
+    Member:
+      type: object
+      required:
+        - id
+        - nickname
+        - address
+      properties:
+        id:
+          type: integer
+        nickname:
+          type:
+            - string
+            - "null"
+        score:
+          type:
+            - number
+            - "null"
+        tags:
+          type:
+            - array
+            - "null"
+          items:
+            type: string
+        address:
+          type:
+            - object
+            - "null"
+          properties:
+            city:
+              type:
+                - string
+                - "null"
+        tier:
+          type:
+            - string
+            - "null"
+          enum:
+            - bronze
+            - silver

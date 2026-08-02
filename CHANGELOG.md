@@ -20,6 +20,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Profile::$source` names the profile in that header. `ProfileLoader` fills it
   with the path the run was given, relative to the working directory; a profile
   built in code keeps the conventional `paogen.php` unless it says otherwise.
+- A JSON Schema 2020-12 keyword no emitter implements — `const`, `prefixItems`,
+  `unevaluatedProperties`, `contentMediaType` — stops the run and names itself,
+  the JSON pointer to the node that used it, and the operation or component
+  carrying that node. An OpenAPI 3.1 `webhooks` entry does the same. None of
+  them is emitted as something else and none produces a smaller client.
+
+### Changed
+
+- OpenAPI documents are parsed through
+  [`devizzent/cebe-php-openapi`](https://github.com/DEVizzent/cebe-php-openapi)
+  instead of `cebe/php-openapi`. The fork is maintained, declares
+  `replace: cebe/php-openapi`, keeps the identical `cebe\openapi\` PSR-4
+  namespace, and models OpenAPI 3.1 — including `type` as a list, which the
+  document paogen is built against uses 87 times. See
+  [the decision](truth/decisions/openapi-31-through-a-maintained-parser.decision-260729.typ).
+- The 3.0 `nullable: true` idiom and the 3.1 `type: [T, "null"]` idiom emit the
+  same PHP type, proven by a fixture pair that differs in nothing else and
+  generates byte-identical output.
+
+### Removed
+
+- `patches/cebe-php-openapi-php84-nullable.patch` and the
+  `cweagans/composer-patches` wiring that applied it. The fork ships the
+  explicit-nullable signatures, so nothing is patched at install time any more.
+- `ignoreIndirectDeprecations` in `phpunit.xml.dist`, which existed for the same
+  PHP 8.4 deprecations. The suite runs clean without it.
 
 ## 0.1.0 - TBD
 
