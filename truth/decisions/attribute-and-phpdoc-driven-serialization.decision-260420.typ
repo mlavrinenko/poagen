@@ -228,3 +228,30 @@ final readonly class Pet
 - *Attribute-only (no phpdoc reading) — e.g. `#[ItemType(Tag::class)]`.*
   Rejected: duplicates information phpdoc already carries, and the
   class-name duplication is exactly the noise we are trying to delete.
+
+=== Amendment (2026-08-02)
+
+Everything above is left as written — it is the record of what was decided
+on 2026-04-20 — but one fact in it is no longer current. The Choice section
+above names a six-member attribute vocabulary: `WireName`, `Format`,
+`Discriminator`, `Deprecated`, class-level `Schema`, and class-level
+`AdditionalProperties`. Only the first three were ever wired: emitted by
+`ModelAttributeApplier` and read back by `DescriptorParser` / `Hydrator`.
+The other three sat unimplemented — no emission site, no reflection
+reader — long enough that PHPStan's dead-code detector flagged each
+constructor property as never read, and `phpstan.neon.dist` carried one
+`ignoreErrors` entry per class to keep the gate green while treating the
+gap as recorded debt rather than a tool blind spot. `audit-phpstan-
+generator-exemptions` (2026-08-01) confirmed all three were still
+load-bearing findings, not stale exemptions.
+
+#link("wire-or-drop-the-unwired-attributes.decision-260802.typ")[Delete the three unwired runtime attributes rather than build consumers for them] resolved that debt by deleting
+`Deprecated`, class-level `Schema`, and class-level `AdditionalProperties`
+rather than building the consumers that would have made them live. Read
+that decision for the per-attribute reasoning. Nothing about the
+architecture above changes: phpdoc still carries structural types,
+attributes still carry non-structural facts, `Hydrator` and `Marshaller`
+are unchanged in shape. What changes is the count — the vocabulary this
+decision closed at six is closed at three: `WireName`, `Format`,
+`Discriminator`. A future attribute reopens it only by naming, at
+proposal time, the runtime consumer that will read it back.

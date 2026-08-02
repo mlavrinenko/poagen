@@ -36,16 +36,18 @@
   structural: "enforced by phpstan-generated.neon, which analyses the emitted
     tree at max level with no baseline, no excludePaths and no ignoreErrors;
     and by phpstan.neon.dist, which analyses the generator at max level with
-    five ignoreErrors entries recorded as debt, each verified to still be
-    load-bearing (removing it alone reproduces a real finding): two, scoped
+    two ignoreErrors entries recorded as debt, each verified to still be
+    load-bearing (removing it alone reproduces a real finding): both, scoped
     by message to the exact property rather than the whole file, cover every
     generated *Steps.php class's constructor-injected \$test, which only
     speconaut-php-phpunit's stub bodies read (StepStub::stubBody() emits
     \$this->test->fail(...) for a spec step with no hand-written body yet) —
     structurally present whether or not any step in that class is currently
-    unimplemented; three cover AdditionalProperties.php, Deprecated.php and
-    Schema.php, whose properties attribute-and-phpdoc-driven-serialization
-    commits the runtime to but which neither the generator emits nor the
-    runtime reads yet, unlike the three wired members of the same attribute
-    vocabulary (WireName, Format, Discriminator)",
+    unimplemented. The three entries that used to cover
+    AdditionalProperties.php, Deprecated.php and Schema.php are gone:
+    wire-or-drop-the-unwired-attributes (2026-08-02) deleted all three
+    classes rather than build the runtime consumers that would have made
+    them live, closing attribute-and-phpdoc-driven-serialization's
+    vocabulary at the three members that were already wired (WireName,
+    Format, Discriminator)",
 )
