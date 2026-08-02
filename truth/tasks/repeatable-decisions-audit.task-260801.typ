@@ -5,7 +5,7 @@
   tags: ("process", "mindtape"),
   priority: 7,
   difficulty: 5,
-  status: wip(2026, 8, 2),
+  status: done(2026, 8, 2),
 )
 
 == Summary
@@ -48,7 +48,7 @@ The distinction that made the second one usable is the one to preserve: the owne
 Two artifacts, because the audit is a reading and only its input can be made
 mechanical. \`scripts/audit-decisions\` gathers that input for any \`mt\` filter,
 defaulting to \`\@recent\`: slug, title, status, the Summary / Acceptance criteria
-/ Result sections, the commits whose \`Refs:\` trailer names the task, and which
+/ Result sections, the commits whose \`Refs: \` trailer names the task, and which
 \`truth/\` decisions, standards or specs those commits touched. It reads only —
 never writes, never gates, exits 0 whatever it finds. \`just audit-decisions\`
 wraps it.
