@@ -23,6 +23,26 @@
 
 Both large example trees carry an expected-failure marker, left when property-level unions without a discriminator became a generation-time abort. The abort is correct and deliberate; the markers are the unpaid half of that change. While they stand, the two schemas that exercise the generator hardest are not actually exercised, and the release criteria that depend on them cannot be met.
 
+=== Two claims in the markers are already stale, 2026-08-03
+
+Measured while closing `path-parameters-run-through-no-shape-gate-at-all`. Both
+markers, and `examples/digitalocean/README.md:90` and
+`examples/github/README.md:91` which echo them, still say a scalar-union path
+parameter resolves to `mixed` instead of tripping the unsupported-shapes abort
+— three PHPStan errors on DigitalOcean, eight on GitHub.
+`scalar-union-path-parameters-resolve-not-refuse` closed that before this
+session began: `images_get`'s `image_id` and `actions/get-workflow`'s
+`workflow_id` both resolve to `int|string` today, and neither operation is
+refused.
+
+DigitalOcean's marker also still describes its two `http bearer` schemes
+colliding on one `bearerToken` constructor argument, which
+`distinct-ctor-args-for-colliding-schemes` decided and closed.
+
+So the markers overstate what is left. Whoever clears them re-measures every
+claim in both rather than trusting the text — that is the point of this
+section, not the two corrections themselves.
+
 == Acceptance criteria
 
 - Both examples generate without a marker file.

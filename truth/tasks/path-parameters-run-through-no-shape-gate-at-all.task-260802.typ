@@ -5,7 +5,11 @@
   tags: ("generator", "strictness", "parameters"),
   priority: 6,
   difficulty: 4,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as 4920476, merged and re-gated on the integrated HEAD. One shared ParameterShape predicate, per-position subsets kept distinct; all three refusals gained the JSON pointer the criterion wrongly assumed query and header already carried. int|string still resolves on both vendor documents.],
 )
 
 == Summary

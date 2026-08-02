@@ -6,7 +6,7 @@
   priority: 5,
   difficulty: 4,
   links: (
-    depends-on("typed-error-responses.task-260729.typ"),
+    related("typed-error-responses.task-260729.typ"),
     related("synthesise-a-model-for-inline-array-item-responses.task-260802.typ"),
   ),
   status: proposed(2026, 8, 3),
@@ -20,7 +20,7 @@ Split out of synthesise-a-model-for-inline-array-item-responses on 2026-08-03. T
 
 The gap is that a list return shape assumes a hydratable model class throughout: ReturnSpec KIND\_LIST, ResponseType listOf and ResponseDecoder listOf all resolve a class name and hydrate it. There is no way to say list of string. A scalar in a response is not otherwise unrepresentable — a scalar property hydrates fine — so this is a hole in the return contract specifically.
 
-Sequenced after typed-error-responses, which replaces that return contract wholesale. Building a list-of-scalar shape on the contract being retired is work that gets thrown away.
+This was first filed as depending on typed-error-responses, on the belief that the envelope replaces the return contract wholesale. Checked against the code, that is wrong and the link is now related rather than depends-on: ResponseType is a body-shape descriptor carrying a kind, and the envelope wraps a status and headers around the body it describes. A new kind is additive to it either way. What is real is contention, not dependency — the two tasks write the same two files, so they must not run at the same time.
 
 == Acceptance criteria
 
