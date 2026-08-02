@@ -44,10 +44,13 @@ final readonly class SecurityScheme
      *
      * `$name` is the key under `components.securitySchemes`; it drives the
      * PHP-safe constructor argument name for apiKey schemes. Bearer schemes
-     * always use the fixed arg name `bearerToken` since there is one
-     * Authorization header per request — differentiating on the scheme's
-     * user-supplied key would generate confusing constructor signatures
-     * when two schemas happen to share the same JWT mechanic.
+     * propose the fixed arg name `bearerToken` since there is usually one
+     * Authorization header per request and one credential behind it. That
+     * proposal is not final: {@see SecuritySchemeCatalog} sees every scheme
+     * in the document at once and falls back to a name-derived ctorArg (via
+     * {@see self::camelize()}) whenever two schemes — bearer or otherwise —
+     * would otherwise collide. See
+     * `truth/decisions/distinct-ctor-args-for-colliding-schemes.decision-260802.typ`.
      */
     public static function fromCebe(string $name, CebeSecurityScheme $scheme): self
     {
@@ -102,8 +105,12 @@ final readonly class SecurityScheme
      * Turn a scheme key like `apiKey_scheme` or `api-key` into a PHP-safe
      * camelCase identifier. Leading non-letters are dropped; otherwise
      * preserves existing camelCase segments.
+     *
+     * Public because {@see SecuritySchemeCatalog} reuses it to derive a
+     * collision-breaking ctorArg for schemes whose kind-default name isn't
+     * unique in the document.
      */
-    private static function camelize(string $name): string
+    public static function camelize(string $name): string
     {
         $split = preg_split('/[^A-Za-z0-9]+/', $name);
         $parts = $split === false ? [] : $split;

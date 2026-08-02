@@ -14,10 +14,6 @@ use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-use function class_exists;
-use function get_declared_classes;
-use function str_ends_with;
-
 /**
  * property-name-renaming-guidance (T-260730): `Profile::$propertyRenames` is
  * the property-level answer `$methodRenames` and `$tagRenames` already gave
@@ -58,7 +54,7 @@ final class PropertyRenameTest extends TestCase
         self::assertFileExists($path);
         require $path;
 
-        $class = $this->declaredClassEnding('\\Generated\\Model\\Contact');
+        $class = self::declaredClassEnding(self::NAMESPACE . '\\Generated\\Model\\Contact');
         $reflection = new ReflectionClass($class);
 
         // The PHP surface: the promoted constructor parameter takes the
@@ -155,28 +151,5 @@ final class PropertyRenameTest extends TestCase
     private function propertyValue(ReflectionClass $reflection, object $model, string $property): mixed
     {
         return $reflection->getProperty($property)->getValue($model);
-    }
-
-    /**
-     * The class dynamically written into the sandbox and `require`d has no
-     * compile-time literal FQCN for PHPStan to check — see
-     * `QueryApiKeySecuritySchemeTest::clientClassName()` for the same trap.
-     * Scanning `get_declared_classes()` after the `require` hands back a
-     * genuine, checkable class name instead.
-     *
-     * @return class-string
-     */
-    private function declaredClassEnding(string $suffix): string
-    {
-        $needle = self::NAMESPACE . $suffix;
-
-        foreach (get_declared_classes() as $declared) {
-            if (str_ends_with($declared, $needle) && class_exists($declared)) {
-                /** @var class-string $declared */
-                return $declared;
-            }
-        }
-
-        self::fail("expected a class ending in {$needle} to be declared after requiring the generated file");
     }
 }

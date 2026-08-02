@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
@@ -13,8 +12,6 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-
-use function strlen;
 
 /**
  * query-apikey-security-scheme (T-260730): an `apiKey` scheme declared
@@ -43,63 +40,12 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $output = self::makeSandboxDir('paogen-queryapikey-');
-
-        $plan = self::generator()->generate(new Profile(
-            schema: self::SCHEMA,
-            output: $output,
-            namespace: self::NAMESPACE,
-        ));
-
-        foreach ($plan->writes as $path => $source) {
-            if (basename($path) === 'ApiClient.php') {
-                self::$clientSource = $source;
-            }
-        }
-
-        self::assertNotSame('', self::$clientSource, 'the plan wrote no ApiClient.php');
-
         // Real files on disk, not just in-memory plan text, so the generated class
         // can be required and executed — proving the credential reaches the wire
         // rather than only the constructor argument list.
-        $exceptionPath = $output . '/Generated/ApiException.php';
-        $interfacePath = $output . '/Generated/ApiClientInterface.php';
-        $clientPath = $output . '/Generated/ApiClient.php';
-
-        self::assertFileExists($exceptionPath);
-        // The client implements an emitted interface, so load the contract first.
-        self::assertFileExists($interfacePath);
-        self::assertFileExists($clientPath);
-
-        require $exceptionPath;
-        require $interfacePath;
-        require $clientPath;
-
-        self::$clientReflection = new ReflectionClass(self::clientClassName());
-    }
-
-    /**
-     * `self::NAMESPACE . '...'` is a compile-time literal, so PHPStan will not
-     * widen it to plain `class-string`. Looking the same name up in
-     * `get_declared_classes()` hands back a genuine, non-literal one, which is
-     * also what makes `ReflectionClass<object>` the right type for
-     * {@see self::$clientReflection}.
-     *
-     * @return class-string
-     */
-    private static function clientClassName(): string
-    {
-        $suffix = self::NAMESPACE . '\\Generated\\ApiClient';
-
-        foreach (get_declared_classes() as $declared) {
-            // `str_ends_with`, not `===`: PHPStan calls a `class-string`
-            // vs. one literal `===` comparison unreachable.
-            if (str_ends_with($declared, $suffix)) {
-                return $declared;
-            }
-        }
-
-        self::fail("expected a class ending in {$suffix} to be declared after requiring the generated ApiClient.php");
+        $result = self::generateRootClient(self::SCHEMA, self::NAMESPACE, 'paogen-queryapikey-');
+        self::$clientSource = $result['source'];
+        self::$clientReflection = $result['reflection'];
     }
 
     public static function tearDownAfterClass(): void
@@ -118,14 +64,14 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public function testAnOperationWithNoQueryParamsOfItsOwnStillGetsTheCredentialAppended(): void
     {
-        $body = $this->methodSlice('getStatus');
+        $body = self::methodSlice(self::$clientSource, 'getStatus');
 
         // The credential is one query key like any other, and unconditional:
         // an active scheme is always sent, so it carries no null branch.
         self::assertStringContainsString("->query('k', \$this->queryKey)", $body);
 
         $client = $this->buildClient(queryKey: 'a&b=c', headerKey: 'unused');
-        $this->invoke($client['client'], 'getStatus');
+        self::invokeGenerated($this->reflection(), $client['client'], 'getStatus');
 
         self::assertNotNull($client['http']->lastRequest);
         // urlencoded: the raw value contains '&' and '=', which would
@@ -135,7 +81,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public function testAnOperationWithItsOwnQueryParametersGetsOneQueryStringNotTwo(): void
     {
-        $body = $this->methodSlice('listItems');
+        $body = self::methodSlice(self::$clientSource, 'listItems');
 
         // The credential joins the operation's own keys in one chain, so
         // there is one query string to build rather than two to splice.
@@ -144,7 +90,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         self::assertStringContainsString("->query('k', \$this->queryKey)", $body);
 
         $client = $this->buildClient(queryKey: 'sekret', headerKey: 'unused');
-        $this->invoke($client['client'], 'listItems', 5, 'abc');
+        self::invokeGenerated($this->reflection(), $client['client'], 'listItems', 5, 'abc');
 
         self::assertNotNull($client['http']->lastRequest);
         $uri = $client['http']->lastRequest->getUri();
@@ -161,13 +107,13 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public function testAnOperationLevelSecurityEmptyArrayDisablesTheCredentialEntirely(): void
     {
-        $body = $this->methodSlice('disabledAuth');
+        $body = self::methodSlice(self::$clientSource, 'disabledAuth');
 
         self::assertStringNotContainsString('->query(', $body);
         self::assertStringNotContainsString('queryKey', $body);
 
         $client = $this->buildClient(queryKey: 'should-not-appear', headerKey: 'unused');
-        $this->invoke($client['client'], 'disabledAuth');
+        self::invokeGenerated($this->reflection(), $client['client'], 'disabledAuth');
 
         self::assertNotNull($client['http']->lastRequest);
         self::assertSame('', $client['http']->lastRequest->getUri()->getQuery());
@@ -175,13 +121,13 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
 
     public function testAnOperationLevelRequirementNamingADifferentSchemeOverridesTheGlobalOne(): void
     {
-        $body = $this->methodSlice('overrideAuth');
+        $body = self::methodSlice(self::$clientSource, 'overrideAuth');
 
         self::assertStringNotContainsString('queryKey', $body);
         self::assertStringContainsString("->header('X-Different-Key', \$this->headerKey)", $body);
 
         $client = $this->buildClient(queryKey: 'unused', headerKey: 'header-secret');
-        $this->invoke($client['client'], 'overrideAuth');
+        self::invokeGenerated($this->reflection(), $client['client'], 'overrideAuth');
 
         self::assertNotNull($client['http']->lastRequest);
         self::assertSame('', $client['http']->lastRequest->getUri()->getQuery());
@@ -193,13 +139,13 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         // Regression guard: this task owns `in: query` only. `in: cookie`
         // must stay untouched — still silently unwired, not rerouted
         // into the query string this change adds.
-        $body = $this->methodSlice('cookieSchemeUnaffected');
+        $body = self::methodSlice(self::$clientSource, 'cookieSchemeUnaffected');
 
         self::assertStringNotContainsString('->query(', $body);
         self::assertStringNotContainsString('Cookie', $body);
 
         $client = $this->buildClient(queryKey: 'unused', headerKey: 'unused');
-        $this->invoke($client['client'], 'cookieSchemeUnaffected');
+        self::invokeGenerated($this->reflection(), $client['client'], 'cookieSchemeUnaffected');
 
         self::assertNotNull($client['http']->lastRequest);
         self::assertSame('', $client['http']->lastRequest->getUri()->getQuery());
@@ -213,9 +159,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         $factory = new Psr17Factory();
         $http = new RecordingClient(new Response(204, [], ''));
 
-        self::assertInstanceOf(ReflectionClass::class, self::$clientReflection);
-
-        $client = self::$clientReflection->newInstanceArgs([
+        $client = $this->reflection()->newInstanceArgs([
             'transport' => new HttpTransport(
                 self::BASE_URI,
                 new StubErrorFactory(),
@@ -231,31 +175,12 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     }
 
     /**
-     * Calls a method on the dynamically-generated client through
-     * reflection rather than `$client->$method(...)` — the class is
-     * synthesised into a throwaway namespace at test run time, so static
-     * analysis has no way to know its method surface.
+     * @return ReflectionClass<object>
      */
-    private function invoke(object $client, string $method, mixed ...$args): mixed
+    private function reflection(): ReflectionClass
     {
         self::assertInstanceOf(ReflectionClass::class, self::$clientReflection);
 
-        return self::$clientReflection->getMethod($method)->invoke($client, ...$args);
+        return self::$clientReflection;
     }
-
-    /**
-     * The full text of one method in the emitted `ApiClient`, from its
-     * signature line up to (not including) the blank line PsrPrinter
-     * inserts before the next class member.
-     */
-    private function methodSlice(string $method): string
-    {
-        $start = strpos(self::$clientSource, "\n    public function {$method}(");
-        self::assertNotFalse($start, "method {$method} not found in emitted client");
-
-        $end = strpos(self::$clientSource, "\n\n", $start);
-
-        return substr(self::$clientSource, $start, ($end === false ? strlen(self::$clientSource) : $end) - $start);
-    }
-
 }
