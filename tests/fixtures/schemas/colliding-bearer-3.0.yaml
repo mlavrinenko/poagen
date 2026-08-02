@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Colliding Bearer Fixture
+  version: 1.0.0
+  description: >
+    Two named `http bearer` security schemes, each with a genuinely
+    different credential behind it — the shape that surfaced
+    security-schemes-sharing-a-ctor-arg-collide against the real
+    DigitalOcean document (`bearer_auth` for its OAuth-based
+    control-plane API, `inference_bearer_auth` for a separate Inference
+    API key). Both schemes classify as `SecurityScheme::KIND_BEARER`,
+    whose default ctorArg is the fixed name `bearerToken` regardless of
+    the scheme's own name, so an undeduplicated catalog would emit the
+    SAME promoted constructor parameter twice against a two-parameter
+    signature. Reproduced as a fixture so the regression test does not
+    depend on the vendor document at all.
+
+servers:
+  - url: https://colliding-bearer.example/api/v1
+
+security:
+  - controlPlaneAuth: []
+
+paths:
+  /control-plane:
+    get:
+      # Uses the global (first) scheme.
+      operationId: getControlPlane
+      responses:
+        '204':
+          description: ok
+
+  /inference:
+    get:
+      # Operation-level override selects the SECOND bearer scheme —
+      # proves the two credentials stay independently addressable
+      # rather than one overwriting the other.
+      operationId: getInference
+      security:
+        - inferenceAuth: []
+      responses:
+        '204':
+          description: ok
+
+components:
+  securitySchemes:
+    controlPlaneAuth:
+      type: http
+      scheme: bearer
+      description: OAuth token for the control-plane API.
+    inferenceAuth:
+      type: http
+      scheme: bearer
+      description: Separate API key for the Inference API.

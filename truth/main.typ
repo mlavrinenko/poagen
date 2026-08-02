@@ -131,6 +131,8 @@
 #include "decisions/zero-statement-files-pinned-as-plumbing.decision-260802.typ"
 #pagebreak()
 #include "decisions/strictness-relaxation-is-opt-in-not-opt-out.decision-260802.typ"
+#pagebreak()
+#include "decisions/distinct-ctor-args-for-colliding-schemes.decision-260802.typ"
 
 // --- Supplementary artefacts ---
 //

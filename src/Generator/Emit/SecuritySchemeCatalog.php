@@ -46,7 +46,7 @@ final readonly class SecuritySchemeCatalog
 
     public function __construct(OpenApi $openApi)
     {
-        $this->byName = $this->collectSchemes($openApi);
+        $this->byName = $this->disambiguateCtorArgs($this->collectSchemes($openApi));
         $this->globalRequirementNames = $this->namesFromMagicProperty($openApi->security);
         $this->supportedInEmissionOrder = $this->orderSupported($this->byName);
     }
@@ -146,6 +146,50 @@ final readonly class SecuritySchemeCatalog
             }
 
             $out[$name] = SecurityScheme::fromCebe($name, $resolved);
+        }
+
+        return $out;
+    }
+
+    /**
+     * A scheme's default ctorArg is fixed per kind — `bearerToken` for every
+     * http bearer scheme — so two schemes of the same kind collide unless
+     * something breaks the tie. DigitalOcean's document is the case that
+     * forced this: `bearer_auth` and `inference_bearer_auth` are both http
+     * bearer, and per the document's own description are two genuinely
+     * different credentials (an OAuth token and a separate Inference API
+     * key), not one credential declared twice. See
+     * `truth/decisions/distinct-ctor-args-for-colliding-schemes.decision-260802.typ`.
+     *
+     * A document where a kind appears once never collides, so its ctorArg
+     * is untouched and output is unchanged from before this method existed.
+     *
+     * @param array<string, SecurityScheme> $byName
+     *
+     * @return array<string, SecurityScheme>
+     */
+    private function disambiguateCtorArgs(array $byName): array
+    {
+        $counts = [];
+
+        foreach ($byName as $scheme) {
+            if ($scheme->isSupported()) {
+                $counts[$scheme->ctorArg] = ($counts[$scheme->ctorArg] ?? 0) + 1;
+            }
+        }
+
+        $out = [];
+
+        foreach ($byName as $name => $scheme) {
+            $collides = $scheme->isSupported() && ($counts[$scheme->ctorArg] ?? 0) > 1;
+
+            $out[$name] = $collides
+                ? new SecurityScheme(
+                    kind: $scheme->kind,
+                    wireName: $scheme->wireName,
+                    ctorArg: SecurityScheme::camelize($name),
+                )
+                : $scheme;
         }
 
         return $out;
