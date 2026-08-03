@@ -50,14 +50,24 @@ binary is `paogen` and whose namespace is `Paogen\` leaves two spellings of one
 name differing by a swap, in a project whose whole argument is that a declared
 shape is not silently altered.
 
-The owner has not ruled on the tool's own name and this task must not guess it.
-Put the question to them before the rename runs, as a second one-word answer:
-does the binary, the repository and the prose follow the vendor to `poagen`, or
-does the tool stay `paogen` deliberately? Either is defensible — a vendor org
-distinct from the tool it publishes is a normal shape — but it has to be chosen,
-not fall out of a diff. The rename is cheapest to run once, over both strings at
-the same time, which is the practical reason to ask before starting rather than
-after.
+Asked, and answered on 2026-08-04: `paogen` is a typo and should be replaced
+everywhere. The tool follows the vendor. When the rename is finished the only
+surviving occurrences of `paogen` should be inside `truth/tasks/`.
+
+So this is one rename over two strings, not a vendor rename with a tool left
+behind. Everything moves: the binary, the repository, the PHP namespace
+segment, the CLI's own name, prose in `truth/` outside the tasks folder,
+`README.md`, `CONTRIBUTING.md`, `AGENT.md`, `AGENT_HAZARDS.md`, the example
+profiles' filenames if they carry it, and the emitted trees by regeneration.
+
+`truth/tasks/` is the deliberate exception, and it is worth saying why rather
+than treating it as an oversight. A task artifact is a record of what was
+decided and when, in the words used at the time. Rewriting `paogen` out of a
+task that argued about the spelling would destroy the evidence for the ruling
+this section records. History keeps its own spelling; everything a reader
+consumes today gets the corrected one. That also gives the rename a clean
+verification: after it runs, `rg paogen` outside `truth/tasks/` should return
+nothing, which is a mechanical check rather than a judgment call.
 
 === The rename is Rector's job, not a find-and-replace
 
@@ -97,19 +107,22 @@ DI cache belongs to whichever worktree wrote it last.
 - `just verify-runtime-standalone` passes against the renamed runtime.
 - `CHANGELOG.md` records the rename as a breaking change with the old and new
   names, so a reader who finds the old one knows where it went.
-- The `paogen` binary's own name is decided explicitly — kept, or renamed with
-  the package — rather than left to fall out of the diff. This now needs a
-  second one-word answer from the owner, because their reason for `poagen`
-  makes `paogen` the transposition rather than the other way round. Get it
-  before the rename runs; running Rector twice over the same symbols is the
-  avoidable cost.
+- The binary, the repository and the prose are renamed with the package. Ruled
+  2026-08-04: `paogen` is a typo everywhere it appears.
+- `rg paogen` returns matches only under `truth/tasks/`, and nothing else in
+  the tree. That is the completion check for this task, and it is mechanical.
+- `CHANGELOG.md` names the old spelling deliberately, so a reader who has the
+  old package installed can find where it went. That entry is the one place
+  outside `truth/tasks/` the old string is allowed to survive; the criterion
+  above is read against the tree with it excluded.
 
 == Non-goals
 
 - Publishing. `publish-the-runtime-package-to-packagist` and the generator's
   own publication own that, and both come after this.
-- Renaming the project in prose where it means the tool rather than the
-  package. If the tool stays `paogen`, `truth/` keeps saying `paogen`.
+- Rewriting `truth/tasks/`. Those artifacts keep the spelling they were
+  written in, for the reason given above: they are the record of the decision,
+  including the one that changed the spelling.
 - Moving anything between the two packages. This renames; it does not
   re-split.
 - The kilbil client's namespace, which belongs to its own repository and its
