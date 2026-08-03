@@ -9,7 +9,7 @@
     2026,
     8,
     3,
-  )[Landed as cf9b528, merged and re-gated on the integrated HEAD. union-pin-is-a-second-opt-out amends skip-is-the-only-opt-out through relates-to rather than superseding it, since $skip's own shape never changed and only the word "only" was false. The amended decision keeps its slug and corrects its title. It also sharpens the danger: a pin does not compile clean and fail when called, it answers wrong without failing at all, which is a worse shape than the one that decision was written against.],
+  )[Landed as cf9b528, merged and re-gated on the integrated HEAD. union-pin-is-a-second-opt-out amends skip-is-the-only-opt-out through relates-to rather than superseding it, since the `$skip` map's own shape never changed and only the word "only" was false. The amended decision keeps its slug and corrects its title. It also sharpens the danger: a pin does not compile clean and fail when called, it answers wrong without failing at all, which is a worse shape than the one that decision was written against.],
 )
 
 == Summary
