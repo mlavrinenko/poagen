@@ -5,7 +5,7 @@
   tags: ("examples", "gate"),
   priority: 6,
   difficulty: 3,
-  status: accepted(2026, 8, 2),
+  status: wip(2026, 8, 3),
   links: (depends-on("clear-example-expected-failures.task-260728.typ"),),
 )
 

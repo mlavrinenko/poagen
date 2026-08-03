@@ -5,15 +5,13 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Queued behind its dependencies rather than behind a ruling. The owner settled the one open question underneath it on 2026-08-02: the fifteen undiscriminated unions get a profile entry that hands the decoded value over, so these examples stop needing a skip they cannot express. Startable once the four linked tasks land.],
+  status: wip(2026, 8, 3),
   links: (
     depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),
     depends-on("skipped-component-leaves-dangling-references.task-260802.typ"),
-    depends-on("sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ"),
+    depends-on(
+      "sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ",
+    ),
     depends-on("security-schemes-sharing-a-ctor-arg-collide.task-260802.typ"),
     depends-on("scalar-union-path-parameter-degrades-to-mixed.task-260802.typ"),
   ),
@@ -68,6 +66,29 @@ section, not the two corrections themselves.
 - \`examples/github/\`
 
 == Result
+
+=== Both cleared, 2026-08-03
+
+The account below is the first attempt and it stands as written — every
+measurement in it was true when taken. What changed is the mechanism, not the
+facts: `declare-an-undiscriminated-union-as-raw-data` landed, and all fifteen
+unions resolve without a single one needing the per-branch tag this task
+originally assumed. Eight are decided by a discriminating field computed from
+the branches, three by a tag on the enclosing object, two by the closed-shape
+predicate, and two by a pin.
+
+So the answer was never a `#[Discriminator]` entry per property, which is what
+the attempt below correctly proved impossible. Both markers are gone, both
+trees are committed, and all four examples generate cleanly.
+
+Two of the three dependencies were closed on the way —
+`sub-client-constructors-take-every-scheme-in-the-document` and
+`security-schemes-sharing-a-ctor-arg-collide`.
+`skipped-component-leaves-dangling-references` stays open and is no longer
+blocking: nothing is skipped at component granularity any more, so the cascade
+gap it describes has no live trigger in either example.
+
+=== First attempt, 2026-08-02
 
 Neither example cleared, and the task's own premise turned out to be wrong.
 Its second criterion says the discriminators these schemas need are supplied
