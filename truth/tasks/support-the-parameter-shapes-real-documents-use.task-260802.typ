@@ -5,7 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 7,
   difficulty: 5,
-  status: accepted(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    4,
+  )[Landed as 6e6dc6e, merged and re-gated on the integrated HEAD. Skip list 43 to 20, the full 23 entries, 7 DigitalOcean and 16 GitHub, counted by removed key. One resolver serves path, query and header. The scalar-or-list ruling is honoured natively, with the PHPStan annotation carrying what native PHP loses. Two criteria were unimplemented when the interrupted work was audited: nothing read style or explode at all, so a serialisation refusal plus a generation-time notice naming every list-valued query parameter that relies on the OpenAPI default were built to make the claim literally true rather than incidentally true.],
 )
 
 == Summary

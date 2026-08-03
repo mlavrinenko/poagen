@@ -5,11 +5,11 @@
   tags: ("generator", "strictness", "parameters"),
   priority: 4,
   difficulty: 4,
-  status: accepted(
+  status: done(
     2026,
     8,
-    3,
-  )[Scheduled by the owner into this session, paired in one agent with support-the-parameter-shapes-real-documents-use. Both need the same reference resolution in ParameterShape, and this task's own criterion forbids a second resolver, so splitting them across two agents would force one to build what the other's criterion rules out.],
+    4,
+  )[Landed as 7e44f08, merged and re-gated on the integrated HEAD. Found entirely unimplemented when the interrupted worktree was audited: supportsPath still carried the unconditional Reference short-circuit the task names as the bug, and isRefUnion never resolved either. Both now resolve through the same resolvedSchema() the query and header positions use, which is the single resolver the criteria require, and a ref resolving to a non-scalar refuses by name.],
 )
 
 == Summary
