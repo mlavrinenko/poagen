@@ -17,6 +17,7 @@ use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedDirection;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedSort;
 use Acme\GitHub\Generated\Enum\AppsListWebhookDeliveriesStatus;
 use Acme\GitHub\Generated\Model\AppsCheckTokenRequest;
+use Acme\GitHub\Generated\Model\AppsCreateFromManifestResponse;
 use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequest;
 use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequest;
 use Acme\GitHub\Generated\Model\AppsDeleteTokenRequest;
@@ -48,6 +49,8 @@ use Acme\GitHub\Generated\Model\WebhookConfig;
 interface AppsClientInterface
 {
     public function appsGetAuthenticated(): Integration;
+
+    public function appsCreateFromManifest(string $code): AppsCreateFromManifestResponse;
 
     public function appsGetWebhookConfigForApp(): WebhookConfig;
 

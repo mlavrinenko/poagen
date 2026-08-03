@@ -107,9 +107,17 @@ final readonly class UnconstrainedFieldAdvisor
         }
 
         if (ObjectShape::is($schema)) {
-            return ObjectShape::hasProperties($schema) || ObjectShape::hasValueSchema($schema)
-                ? null
-                : self::NO_VALUES;
+            if (ObjectShape::hasProperties($schema) || ObjectShape::hasValueSchema($schema)) {
+                return null;
+            }
+
+            // `type: object` beside a bare `allOf` is the widening
+            // `merge-allof-members-into-one-model` fixed: the node's own
+            // properties are empty, but its members' are not, so this is not
+            // the vendor's silence either — mirrors the composition-branch
+            // exemption `saysNothing()` already gives a node with no `type`
+            // keyword at all.
+            return SchemaWalk::compositionBranches($schema) === [] ? self::NO_VALUES : null;
         }
 
         return self::saysNothing($schema) ? self::SILENT : null;

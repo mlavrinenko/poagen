@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
+
 /**
  * The contract for the `VPC Peerings` endpoints.
  *
@@ -22,9 +25,8 @@ interface VpcPeeringsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
-     * @param array<string, mixed> $body
      */
-    public function vpcPeeringsCreate(array $body): void;
+    public function vpcPeeringsCreate(VpcPeeringsCreateRequest $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:read`.
@@ -38,7 +40,6 @@ interface VpcPeeringsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
-     * @param array<string, mixed> $body
      */
-    public function vpcPeeringsPatch(string $vpcPeeringId, array $body): void;
+    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequest $body): void;
 }

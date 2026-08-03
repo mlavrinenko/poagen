@@ -64,20 +64,31 @@ return new Profile(
     ],
 
     /*
-     * Thirty-eight operations this document could already not represent
-     * before any of the union work (an inline (non-$ref) JSON request body,
-     * or a query/header parameter shape outside paogen's supported set).
-     * These were silently dropped by the pre-`abort-on-unrepresentable-
-     * constructs` generator (`examples/digitalocean/README.md`'s "Known
-     * limitations" already named this gap under T-025/T-026); since that
-     * task (and `default-deny-on-degradation`) unified every unrepresentable
-     * construct into the same generator-time abort this profile refuses to
-     * weaken, they now block the run too and need the same skip-list
-     * treatment `uploadFile` already gets in the petstore example.
-     * Regenerated from `bin/paogen generate --dry-run`'s own diagnostic.
+     * Twenty operations this document could already not represent before any
+     * of the union work (an inline (non-$ref) JSON request body with no
+     * `allOf` to merge, or a query/header parameter shape outside paogen's
+     * supported set). These were silently dropped by the pre-`abort-on-
+     * unrepresentable-constructs` generator (`examples/digitalocean/README.md`'s
+     * "Known limitations" already named this gap under T-025/T-026); since
+     * that task (and `default-deny-on-degradation`) unified every
+     * unrepresentable construct into the same generator-time abort this
+     * profile refuses to weaken, they now block the run too and need the
+     * same skip-list treatment `uploadFile` already gets in the petstore
+     * example. Regenerated from `bin/paogen generate --dry-run`'s own
+     * diagnostic.
+     *
+     * `merge-allof-members-into-one-model` removed eighteen entries this list
+     * used to carry — every one of them was an `allOf` node (`allOf: [$ref]`
+     * plus a sibling `required`, `allOf: [$ref, inline]`, `allOf: [$ref,
+     * $ref]`, or a member whose own target nests `allOf` again), and the
+     * merge this task added now resolves all eighteen instead of refusing
+     * them. `uptime_create_check` is new here for the opposite reason: it
+     * used to *silently widen* to `array $body` — `RequestBodyAnalyzer` read
+     * its `type: object` and, finding no properties of its own, emitted a
+     * bare map — and the merge that fixed the widening surfaced a genuine
+     * vendor defect underneath it, which the entry below names.
      */
     skip: [
-        'addons_create' => 'application/json request body with an inline (non-$ref) schema',
         'apps_list_job_invocations' => 'parameter \'job_names\' (in: query, type: array) is outside paogen\'s supported parameter shapes',
         'volumeActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'volumeActions_post_byId' => 'application/json request body with an inline (non-$ref) schema',
@@ -85,35 +96,26 @@ return new Profile(
         'volumes_create' => 'application/json request body with an inline (non-$ref) schema',
         'volumes_delete_byName' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'certificates_create' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_create_cluster' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_update_cluster_metrics_credentials' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_create_logsink' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_create_replica' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_create_kafka_schema' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_create_kafka_topic' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_update_kafka_topic' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_add_user' => 'application/json request body with an inline (non-$ref) schema',
-        'databases_update_user' => 'application/json request body with an inline (non-$ref) schema',
         'domains_create_record' => 'application/json request body with an inline (non-$ref) schema',
         'dropletActions_post_byTag' => 'application/json request body with an inline (non-$ref) schema',
         'dropletActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'autoscalepools_delete_dangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
         'droplets_create' => 'application/json request body with an inline (non-$ref) schema',
         'droplets_destroy_withAssociatedResourcesDangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
-        'firewalls_create' => 'application/json request body with an inline (non-$ref) schema',
-        'firewalls_update' => 'application/json request body with an inline (non-$ref) schema',
-        'firewalls_add_rules' => 'application/json request body with an inline (non-$ref) schema',
-        'firewalls_delete_rules' => 'application/json request body with an inline (non-$ref) schema',
         'floatingIPsAction_post' => 'application/json request body with an inline (non-$ref) schema',
         'imageActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'monitoring_list_sinks' => 'parameter \'resource_id\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'nfs_create_action' => 'application/json request body with an inline (non-$ref) schema',
-        'projects_create' => 'application/json request body with an inline (non-$ref) schema',
-        'projects_update_default' => 'application/json request body with an inline (non-$ref) schema',
-        'projects_update' => 'application/json request body with an inline (non-$ref) schema',
         'reservedIPsActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'reservedIPv6Actions_post' => 'application/json request body with an inline (non-$ref) schema',
-        'vpcs_patch' => 'application/json request body with an inline (non-$ref) schema',
         'vpcPeerings_list' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
+        // The vendor's own defect, not paogen's: `check_updatable` (this
+        // operation's sole allOf member) declares `name`, `type`, `target`,
+        // `regions`, `enabled` — never `method` — yet the request body's own
+        // `required` list demands it. No member anywhere in the merge
+        // declares it, so the honest answer is to stop and say so rather
+        // than emit a model that promises a field no branch supplies.
+        'uptime_create_check' => 'allOf requires \'method\' but no member declares it as a property — members '
+            . 'searched: #/components/schemas/check_updatable',
     ],
 );

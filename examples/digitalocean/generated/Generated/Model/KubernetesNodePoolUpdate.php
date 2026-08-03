@@ -20,13 +20,13 @@ final readonly class KubernetesNodePoolUpdate
      * @param ?list<KubernetesNodePoolTaint> $taints
      */
     public function __construct(
+        public int $count,
+        public string $name,
         public ?bool $auto_scale = null,
-        public ?int $count = null,
         public ?string $id = null,
         public ?array $labels = null,
         public ?int $max_nodes = null,
         public ?int $min_nodes = null,
-        public ?string $name = null,
         public ?array $nodes = null,
         public ?array $tags = null,
         public ?array $taints = null,

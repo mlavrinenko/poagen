@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AddonsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequest;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchRequest;
 
@@ -31,6 +32,11 @@ interface AddOnsClientInterface
      * Requires `bearer_auth` scopes: `addon:read`.
      */
     public function addonsList(): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `addon:create`.
+     */
+    public function addonsCreate(AddonsCreateRequest $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.

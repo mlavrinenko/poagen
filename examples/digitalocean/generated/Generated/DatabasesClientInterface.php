@@ -18,12 +18,21 @@ use Acme\DigitalOcean\Generated\Model\DatabaseAutoscaleParams;
 use Acme\DigitalOcean\Generated\Model\DatabaseClusterResize;
 use Acme\DigitalOcean\Generated\Model\DatabaseConfig;
 use Acme\DigitalOcean\Generated\Model\DatabaseMaintenanceWindow;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddUserRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateClusterRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchemaRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopicRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsinkRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplicaRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesResetAuthRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateClusterMetricsCredentialsRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateEvictionPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateFirewallRulesRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfigRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfigRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopicRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateRegionRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUserRequest;
 use Acme\DigitalOcean\Generated\Model\LogsinkUpdate;
 use Acme\DigitalOcean\Generated\Model\SourceDatabase;
 use Acme\DigitalOcean\Generated\Model\SqlMode;
@@ -44,9 +53,21 @@ interface DatabasesClientInterface
     public function databasesListClusters(?string $tagName = null): void;
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateCluster(DatabasesCreateClusterRequest $body): void;
+
+    /**
      * Requires `bearer_auth` scopes: `database:update`, `database:view_credentials`.
      */
     public function databasesGetClusterMetricsCredentials(): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateClusterMetricsCredentials(
+        DatabasesUpdateClusterMetricsCredentialsRequest $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
@@ -165,6 +186,11 @@ interface DatabasesClientInterface
     public function databasesListLogsink(string $databaseClusterUuid): void;
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateLogsink(string $databaseClusterUuid, DatabasesCreateLogsinkRequest $body): void;
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): void;
@@ -242,6 +268,11 @@ interface DatabasesClientInterface
     public function databasesListReplicas(string $databaseClusterUuid): void;
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateReplica(string $databaseClusterUuid, DatabasesCreateReplicaRequest $body): void;
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): void;
@@ -265,6 +296,14 @@ interface DatabasesClientInterface
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesListKafkaSchemas(string $databaseClusterUuid): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateKafkaSchema(
+        string $databaseClusterUuid,
+        DatabasesCreateKafkaSchemaRequest $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
@@ -328,9 +367,26 @@ interface DatabasesClientInterface
     public function databasesListKafkaTopics(string $databaseClusterUuid): void;
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateKafkaTopic(
+        string $databaseClusterUuid,
+        DatabasesCreateKafkaTopicRequest $body,
+    ): void;
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateKafkaTopic(
+        string $databaseClusterUuid,
+        string $topicName,
+        DatabasesUpdateKafkaTopicRequest $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
@@ -348,9 +404,23 @@ interface DatabasesClientInterface
     public function databasesListUsers(string $databaseClusterUuid): void;
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequest $body): void;
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetUser(string $databaseClusterUuid, string $username): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateUser(
+        string $databaseClusterUuid,
+        string $username,
+        DatabasesUpdateUserRequest $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.

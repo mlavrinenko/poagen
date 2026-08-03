@@ -19,6 +19,7 @@ final readonly class AppStaticSiteSpec
      * @param ?list<AppRouteSpec> $routes
      */
     public function __construct(
+        public string $name,
         public ?AppsBitbucketSourceSpec $bitbucket = null,
         public ?string $build_command = null,
         public ?string $catchall_document = null,
@@ -33,7 +34,6 @@ final readonly class AppStaticSiteSpec
         public ?AppsImageSourceSpec $image = null,
         public ?string $index_document = null,
         public ?array $log_destinations = null,
-        public ?string $name = null,
         public ?string $output_dir = null,
         public ?array $routes = null,
         public ?string $run_command = null,

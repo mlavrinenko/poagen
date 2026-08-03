@@ -138,7 +138,8 @@ final readonly class OperationEmitter
                 $httpMethod,
                 $pathUri,
                 $rawOperationId,
-                $this->describeUnsupportedBody($operation->requestBody),
+                $this->inlinePayloads->requestRefusalFor($rawOperationId)
+                    ?? $this->describeUnsupportedBody($operation->requestBody),
             ));
         }
 
@@ -162,7 +163,8 @@ final readonly class OperationEmitter
                 $httpMethod,
                 $pathUri,
                 $rawOperationId,
-                OperationAnalyzer::describeUnsupportedResponse($operation->responses),
+                $this->inlinePayloads->responseRefusalFor($rawOperationId)
+                    ?? OperationAnalyzer::describeUnsupportedResponse($operation->responses),
             ));
         }
 

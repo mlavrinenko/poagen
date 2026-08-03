@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -25,14 +27,13 @@ final readonly class VpcPeeringsClient implements VpcPeeringsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
-     * @param array<string, mixed> $body
      */
-    public function vpcPeeringsCreate(array $body): void
+    public function vpcPeeringsCreate(VpcPeeringsCreateRequest $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/vpc_peerings')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -65,15 +66,14 @@ final readonly class VpcPeeringsClient implements VpcPeeringsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
-     * @param array<string, mixed> $body
      */
-    public function vpcPeeringsPatch(string $vpcPeeringId, array $body): void
+    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequest $body): void
     {
         $this->transport->send(
             Endpoint::patch('/v2/vpc_peerings/{vpc_peering_id}')
                 ->path('vpc_peering_id', $vpcPeeringId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }

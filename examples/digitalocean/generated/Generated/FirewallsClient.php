@@ -11,10 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddTagsRequest;
 use Acme\DigitalOcean\Generated\Model\FirewallsAssignDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsCreateInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsCreateOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteTagsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsUpdateInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsUpdateOutboundRules;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -42,6 +50,19 @@ final readonly class FirewallsClient implements FirewallsClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `firewall:create`.
+     */
+    public function firewallsCreate(FirewallsCreateInboundRules|FirewallsCreateOutboundRules $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/firewalls')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `firewall:read`.
      */
     public function firewallsGet(string $firewallId): void
@@ -50,6 +71,22 @@ final readonly class FirewallsClient implements FirewallsClientInterface
             Endpoint::get('/v2/firewalls/{firewall_id}')
                 ->path('firewall_id', $firewallId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsUpdate(
+        string $firewallId,
+        FirewallsUpdateInboundRules|FirewallsUpdateOutboundRules $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::put('/v2/firewalls/{firewall_id}')
+                ->path('firewall_id', $firewallId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -88,6 +125,38 @@ final readonly class FirewallsClient implements FirewallsClientInterface
     {
         $this->transport->send(
             Endpoint::delete('/v2/firewalls/{firewall_id}/droplets')
+                ->path('firewall_id', $firewallId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsAddRules(
+        string $firewallId,
+        FirewallsAddRulesInboundRules|FirewallsAddRulesOutboundRules $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/firewalls/{firewall_id}/rules')
+                ->path('firewall_id', $firewallId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsDeleteRules(
+        string $firewallId,
+        FirewallsDeleteRulesInboundRules|FirewallsDeleteRulesOutboundRules $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::delete('/v2/firewalls/{firewall_id}/rules')
                 ->path('firewall_id', $firewallId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),

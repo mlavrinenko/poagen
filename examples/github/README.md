@@ -90,8 +90,9 @@ What blocks this example today, found by `clear-example-expected-failures`:
   parameter resolves to `mixed` instead of tripping the
   "unsupported parameter shapes" abort, then fails PHPStan against
   `Endpoint::path()`'s stricter signature.
-- `Profile::$skip` in `paogen.php` fully catalogues the forty-nine
+- `Profile::$skip` in `paogen.php` fully catalogues the thirty-nine
   unrelated operation-level gaps this document already had (inline
-  JSON request bodies, unsupported query-parameter shapes, non-JSON
-  response content types) and is verified clean on its own — only the
-  discriminator components above keep the marker in place.
+  JSON request bodies with no `allOf` to merge, unsupported
+  query-parameter shapes, non-JSON response content types) and is
+  verified clean on its own — only the discriminator components above
+  keep the marker in place.

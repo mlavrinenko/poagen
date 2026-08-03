@@ -104,9 +104,10 @@ return new Profile(
     ],
 
     /*
-     * Forty operations this document could already not represent before any
-     * of the union work: inline request bodies, unsupported query-parameter
-     * shapes, and response schemas of unrepresentable shape.
+     * Thirty-nine operations this document could already not represent
+     * before any of the union work: inline request bodies with no `allOf` to
+     * merge, unsupported query-parameter shapes, and response schemas of
+     * unrepresentable shape.
      *
      * It was forty-nine. `represent-non-json-request-and-response-bodies`
      * took six — five refused for their media type alone (`text/html`,
@@ -126,12 +127,17 @@ return new Profile(
      * profile refuses to weaken, so they need the same skip-list treatment
      * `uploadFile` already gets in the petstore example. Regenerated from
      * `bin/paogen generate --dry-run`'s own diagnostic.
+     *
+     * `merge-allof-members-into-one-model` took the fortieth:
+     * `apps/create-from-manifest`'s 201 response is `allOf: [$ref integration,
+     * inline]` — two members, no collision, no `oneOf`/`anyOf` — and the merge
+     * this task added resolves it to a synthesised `AppsCreateFromManifestResponse`
+     * instead of refusing it as a response "of type 'unspecified'".
      */
     skip: [
         'actions/review-custom-gates-for-run' => 'application/json request body with an inline (non-$ref) schema',
         'activity/list-stargazers-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'activity/list-repos-starred-by-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'apps/create-from-manifest' => '201 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'campaigns/list-org-campaigns' => 'parameter \'state\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'code-scanning/list-alerts-for-org' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'code-scanning/list-alerts-for-repo' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
