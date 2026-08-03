@@ -16,6 +16,28 @@ So editing one of them past the cap breaks the gate without touching anything th
 
 Found while adding two measured parser traps to AGENT.md, which took it to 281 of the 300-line cap. Nothing is broken today; the hole is that nothing would say so.
 
+=== The same mismatch, pointing the other way, 2026-08-03
+
+Met while closing out a session: writing `truth/notes/session-resume-260803b.md`
+invalidated a freshly recorded pass, and `mt flip done` then refused three
+tasks whose work was merged and green.
+
+That refusal is correct on its own terms — `gate-fresh.inputs` lists `truth`
+and excludes only `truth/tasks`, so a note is a hashed input — and it is
+pointless, because nothing `just check` runs reads a note. `speconaut check`
+validates artifacts under `truth/`; a Markdown note is included in
+`truth/main.typ` for reachability and never parsed for content.
+
+So the input set is wrong in both directions at once, and they are one defect
+rather than two: it hashes `truth/notes`, which the gate does not check, and it
+misses `AGENT.md`, `README.md` and `CONTRIBUTING.md`, which linecop does. The
+fix is the same in both cases — derive the set from what the gate actually
+reads, rather than maintaining a second list beside it that drifts.
+
+Cost when it bites: a full gate re-run to record a pass that was already true,
+or an `mt done --force` that records a waiver for a transition nobody should
+have had to waive.
+
 == Acceptance criteria
 
 - Every path just check reads is either in scripts/gate-fresh.inputs or excluded there on purpose with a comment saying why. The file's own header already states that rule; this makes it true.
