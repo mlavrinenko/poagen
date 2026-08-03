@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Union Selection Fixture
+  version: "1.0.0"
+  description: >
+    declare-an-undiscriminated-union-as-raw-data. One document carrying every
+    layer of branch selection at once, so a single generated tree pins all of
+    them against each other.
+
+    `Sighting.creature` is layer three read the other way round: `Dog` and
+    `Cat` declare disjoint required fields, so paogen computes a
+    discriminating field and needs no guidance. `Enclosure.occupant` adds the
+    closed-shape predicate — `Vacant` declares no properties and closes itself,
+    so it is selected by an empty payload where `Dog` is selected by `bark`.
+    `Habitat.resident` carries the tag on the enclosing object rather than
+    inside the value, which is what `Profile::$unionTags` answers.
+    `Reading.sample` is genuinely undecidable and is pinned.
+paths: {}
+components:
+  schemas:
+    Dog:
+      type: object
+      required:
+        - bark
+      properties:
+        bark:
+          type: string
+
+    Cat:
+      type: object
+      required:
+        - meow
+      properties:
+        meow:
+          type: string
+
+    Vacant:
+      type: object
+      additionalProperties: false
+      properties: {}
+
+    Sighting:
+      type: object
+      required:
+        - creature
+      properties:
+        creature:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Cat'
+
+    Enclosure:
+      type: object
+      required:
+        - occupant
+      properties:
+        occupant:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Vacant'
+
+    Habitat:
+      type: object
+      required:
+        - species
+        - resident
+      properties:
+        species:
+          type: string
+          enum:
+            - dog
+            - cat
+        resident:
+          oneOf:
+            - $ref: '#/components/schemas/Dog'
+            - $ref: '#/components/schemas/Cat'
+
+    # Two branches declaring the same single optional field. Neither requires
+    # anything, so no payload names one — the refusal layer three exists for.
+    Celsius:
+      type: object
+      properties:
+        degrees:
+          type: number
+
+    Fahrenheit:
+      type: object
+      properties:
+        degrees:
+          type: number
+
+    Reading:
+      type: object
+      required:
+        - sample
+      properties:
+        sample:
+          oneOf:
+            - $ref: '#/components/schemas/Celsius'
+            - $ref: '#/components/schemas/Fahrenheit'

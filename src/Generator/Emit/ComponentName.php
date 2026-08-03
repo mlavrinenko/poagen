@@ -25,14 +25,28 @@ final readonly class ComponentName
 
     public static function phpFromRef(string $ref, NameRegistry $registry): string
     {
-        return $registry->resolve(
-            self::rawFromRef($ref),
-            new NormalisationContext(SymbolKind::SchemaComponent),
-        );
+        return self::phpFromRaw(self::rawFromRef($ref), $registry);
+    }
+
+    /**
+     * The same resolution starting from the raw `components.schemas` key rather
+     * than from a `$ref` string. A branch named in guidance — `Profile::$unionTags`,
+     * `Profile::$unionPins` — arrives as the raw name, and round-tripping it
+     * through a synthesised `$ref` just to get back here would be a second
+     * spelling of the pointer format to keep in step.
+     */
+    public static function phpFromRaw(string $raw, NameRegistry $registry): string
+    {
+        return $registry->resolve($raw, new NormalisationContext(SymbolKind::SchemaComponent));
     }
 
     public static function fqcnFromRef(string $ref, string $modelNamespace, NameRegistry $registry): string
     {
-        return '\\' . trim($modelNamespace, '\\') . '\\' . self::phpFromRef($ref, $registry);
+        return self::fqcnFromRaw(self::rawFromRef($ref), $modelNamespace, $registry);
+    }
+
+    public static function fqcnFromRaw(string $raw, string $modelNamespace, NameRegistry $registry): string
+    {
+        return '\\' . trim($modelNamespace, '\\') . '\\' . self::phpFromRaw($raw, $registry);
     }
 }

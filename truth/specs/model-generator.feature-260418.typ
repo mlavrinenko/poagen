@@ -75,14 +75,48 @@
     ]
 
     #scenario(
-      "An undiscriminated `oneOf` aborts the run with a pointed diagnostic",
+      "A `oneOf` whose branches share every discriminating field aborts the run, naming both",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares components `Dog` and `Cat` and a component `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
-      #and_[#the(Profile) has no `discriminators` override for #p((key: "Pet.kind"))]
+      #given[#the(Schema) declares components `Celsius` and `Fahrenheit` that declare the same single optional property and require nothing, and a component `Reading` with a required property `sample` whose schema is `oneOf: [$ref Celsius, $ref Fahrenheit]` with no `discriminator`]
+      #and_[#the(Profile) names no tag on the enclosing object and pins no branch for #p((key: "Reading.sample"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#the(Generator)'s run aborts with #p((error: "UnrepresentableConstructsException")) whose message names `Pet.kind`]
+      #then[#the(Generator)'s run aborts with #p((error: "UnrepresentableConstructsException")) whose message names `Reading.sample` and both branches]
+      #and_[#the(Generator)'s message names what would resolve it: a `discriminator` in #the(Schema), a `unionTags` entry on #the(Profile), or a `unionPins` entry on #the(Profile)]
       #and_[no files are written under #the(Profile)'s `output`]
+    ]
+
+    #scenario(
+      "A `oneOf` whose branches require disjoint fields becomes a PHP union with a computed selector",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares components `Dog` (required `bark`) and `Cat` (required `meow`) and a component `Sighting` with a required property `creature` whose schema is `oneOf: [$ref Dog, $ref Cat]` with no `discriminator`]
+      #and_[#the(Profile) names no tag on the enclosing object and pins no branch for #p((key: "Sighting.creature"))]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Model)'s `creature` parameter is typed `Dog|Cat` — neither `mixed` nor an array]
+      #and_[#the(Model)'s `creature` parameter carries `#[BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class])]`]
+      #and_[#the(Generator) reports which field it will discriminate on for that union, before anything runs]
+    ]
+
+    #scenario(
+      "A branch that closes itself and declares nothing is selected by an empty payload",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares a component `Vacant` with `additionalProperties: false` and no properties, and a component `Enclosure` with a required property `occupant` whose schema is `oneOf: [$ref Dog, $ref Vacant]` with no `discriminator`]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Model)'s `occupant` parameter carries a `#[BranchSelector]` naming `Vacant` as the branch an empty payload selects]
+      #and_[#the(Model)'s `occupant` parameter is typed `Dog|Vacant`]
+    ]
+
+    #scenario(
+      "A pinned branch types the property as that single class",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares a component `Reading` whose required property `sample` is an undecidable `oneOf: [$ref Celsius, $ref Fahrenheit]`]
+      #and_[#the(Profile) pins #p((branch: "Celsius")) for `Reading.sample` with a written reason]
+      #when[#the(Generator) runs against #the(Profile)]
+      #then[#the(Model)'s `sample` parameter is typed `Celsius` and carries no branch-selection attribute]
+      #and_[#the(Generator) reports the pin on every run, naming the branches it made unreachable]
     ]
 
     #scenario(
@@ -167,6 +201,29 @@
       #when[#a(GeneratedFile) `Pet.php` is read and the runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
       #then[#the(Model)'s `kind` parameter carries `#[Discriminator(field: 'petType', map: ['Dog' => Dog::class, 'Cat' => Cat::class])]`]
       #and_[#the(Model)'s `$pet->kind` is an instance of `Cat`, independent of structural overlap with `Dog`]
+    ]
+
+    #scenario(
+      "A payload matching zero branches, or two, raises rather than picking one",
+      stage: "unstable",
+    )[
+      #given[#a(Model) `Sighting` declares a required property `creature` typed `Dog|Cat`, carrying a `#[BranchSelector]` computed from the branches' disjoint required fields]
+      #when[#the(Client)'s runtime `Hydrator` runs against a payload whose `creature` carries neither `bark` nor `meow`]
+      #then[#the(Client)'s hydration raises, naming the property and the keys the payload carried]
+      #and_[#the(Client)'s hydration also raises when `creature` carries both `bark` and `meow`, naming both branches it matched]
+      #and_[#the(Client) never resolves either case by taking the first branch — that is what makes computing the selector safe]
+    ]
+
+    #scenario(
+      "A tag on the enclosing object selects the branch through #[Discriminator(onParent: true)]",
+      stage: "unstable",
+    )[
+      #given[#a(Model) `Habitat` declares a required property `resident` typed `Dog|Cat` and a sibling property `species` enumerating `dog` and `cat`]
+      #and_[#the(Profile) maps those two values to the two branches for `Habitat.resident`]
+      #when[#the(Client)'s runtime `Hydrator` runs against a payload whose `species` is #p((wire: "'cat'"))]
+      #then[#the(Model)'s `resident` parameter carries `#[Discriminator(field: 'species', map: ['cat' => Cat::class, 'dog' => Dog::class], onParent: true)]`]
+      #and_[#the(Model)'s `$habitat->resident` is an instance of `Cat`, read from the enclosing payload rather than from the value]
+      #and_[#the(Client)'s hydration raises when `species` is absent, and when it carries a value the map does not name]
     ]
 
     #scenario(

@@ -211,11 +211,35 @@
             "stage": "unstable"
         },
         {
-            "test_id": "ModelGeneratorTest::testAnUndiscriminatedOneOfAbortsTheRunWithAPointedDiagnostic",
+            "test_id": "ModelGeneratorTest::testAOneOfWhoseBranchesShareEveryDiscriminatingFieldAbortsTheRunNamingBoth",
             "feature": "Model Generator",
-            "scenario": "An undiscriminated `oneOf` aborts the run with a pointed diagnostic",
+            "scenario": "A `oneOf` whose branches share every discriminating field aborts the run, naming both",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
             "spec_line": 77,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAOneOfWhoseBranchesRequireDisjointFieldsBecomesAPHPUnionWithAComputedSelector",
+            "feature": "Model Generator",
+            "scenario": "A `oneOf` whose branches require disjoint fields becomes a PHP union with a computed selector",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 89,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testABranchThatClosesItselfAndDeclaresNothingIsSelectedByAnEmptyPayload",
+            "feature": "Model Generator",
+            "scenario": "A branch that closes itself and declares nothing is selected by an empty payload",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 101,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPinnedBranchTypesThePropertyAsThatSingleClass",
+            "feature": "Model Generator",
+            "scenario": "A pinned branch types the property as that single class",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 111,
             "stage": "unstable"
         },
         {
@@ -223,7 +247,7 @@
             "feature": "Model Generator",
             "scenario": "A profile-level `discriminators` override resolves an otherwise-undiscriminated `oneOf`",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 88,
+            "spec_line": 122,
             "stage": "unstable"
         },
         {
@@ -231,7 +255,7 @@
             "feature": "Model Generator",
             "scenario": "A `oneOf` with a `discriminator.propertyName` picks the branch by wire value",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 99,
+            "spec_line": 133,
             "stage": "unstable"
         },
         {
@@ -239,7 +263,7 @@
             "feature": "Model Generator",
             "scenario": "An `allOf` that merges two object schemas becomes a single Model with the union of properties",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 108,
+            "spec_line": 142,
             "stage": "unstable"
         },
         {
@@ -247,7 +271,7 @@
             "feature": "Model Generator",
             "scenario": "A list-of-Model property hydrates each item into the declared class",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 120,
+            "spec_line": 154,
             "stage": "unstable"
         },
         {
@@ -255,7 +279,7 @@
             "feature": "Model Generator",
             "scenario": "A list-of-scalar property hydrates items untouched",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 130,
+            "spec_line": 164,
             "stage": "unstable"
         },
         {
@@ -263,7 +287,7 @@
             "feature": "Model Generator",
             "scenario": "A property with a non-identifier schema key round-trips via #[WireName]",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 139,
+            "spec_line": 173,
             "stage": "unstable"
         },
         {
@@ -271,7 +295,7 @@
             "feature": "Model Generator",
             "scenario": "Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 151,
+            "spec_line": 185,
             "stage": "unstable"
         },
         {
@@ -279,7 +303,23 @@
             "feature": "Model Generator",
             "scenario": "A discriminated `oneOf` hydrates to the branch named by the wire tag via #[Discriminator]",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 162,
+            "spec_line": 196,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testAPayloadMatchingZeroBranchesOrTwoRaisesRatherThanPickingOne",
+            "feature": "Model Generator",
+            "scenario": "A payload matching zero branches, or two, raises rather than picking one",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 206,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "ModelGeneratorTest::testATagOnTheEnclosingObjectSelectsTheBranchThroughDiscriminatorOnParentTrue",
+            "feature": "Model Generator",
+            "scenario": "A tag on the enclosing object selects the branch through #[Discriminator(onParent: true)]",
+            "spec_file": "truth/specs/model-generator.feature-260418.typ",
+            "spec_line": 217,
             "stage": "unstable"
         },
         {
@@ -287,7 +327,7 @@
             "feature": "Model Generator",
             "scenario": "Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 172,
+            "spec_line": 229,
             "stage": "unstable"
         },
         {
@@ -295,7 +335,7 @@
             "feature": "Model Generator",
             "scenario": "A property with a format that has a BindsFormat binding uses the user class",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 184,
+            "spec_line": 241,
             "stage": "unstable"
         },
         {
@@ -303,7 +343,7 @@
             "feature": "Model Generator",
             "scenario": "A BindsFormat scalar value object round-trips through ScalarBinding",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 194,
+            "spec_line": 251,
             "stage": "unstable"
         },
         {
@@ -311,7 +351,7 @@
             "feature": "Model Generator",
             "scenario": "A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 205,
+            "spec_line": 262,
             "stage": "unstable"
         },
         {
@@ -319,7 +359,7 @@
             "feature": "Model Generator",
             "scenario": "A kebab-case component name becomes a PascalCase PHP class under the default pipeline",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 219,
+            "spec_line": 276,
             "stage": "unstable"
         },
         {
@@ -327,7 +367,7 @@
             "feature": "Model Generator",
             "scenario": "An explicit `renames` entry takes precedence over the auto-sanitiser",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 232,
+            "spec_line": 289,
             "stage": "unstable"
         },
         {
@@ -335,7 +375,7 @@
             "feature": "Model Generator",
             "scenario": "A pattern-gated strategy only handles names matching its pattern and falls through otherwise",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 244,
+            "spec_line": 301,
             "stage": "unstable"
         },
         {
@@ -343,7 +383,7 @@
             "feature": "Model Generator",
             "scenario": "A custom pipeline that returns null for every name aborts with a pointed diagnostic",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 257,
+            "spec_line": 314,
             "stage": "unstable"
         },
         {
@@ -351,7 +391,7 @@
             "feature": "Model Generator",
             "scenario": "Two raw component names that normalise to the same PHP class abort the run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 268,
+            "spec_line": 325,
             "stage": "unstable"
         },
         {
@@ -359,7 +399,7 @@
             "feature": "Model Generator",
             "scenario": "A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 281,
+            "spec_line": 338,
             "stage": "unstable"
         },
         {
@@ -367,7 +407,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `oneOf` with inline object branches emits an interface and one Model per branch",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 292,
+            "spec_line": 349,
             "stage": "unstable"
         },
         {
@@ -375,7 +415,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 303,
+            "spec_line": 360,
             "stage": "unstable"
         },
         {
@@ -383,7 +423,7 @@
             "feature": "Model Generator",
             "scenario": "A top-level `type: array` component emits a typed wrapper class",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 313,
+            "spec_line": 370,
             "stage": "unstable"
         },
         {
@@ -391,7 +431,7 @@
             "feature": "Model Generator",
             "scenario": "A document declaring no components still emits a model for every payload",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 325,
+            "spec_line": 382,
             "stage": "unstable"
         },
         {
@@ -399,7 +439,7 @@
             "feature": "Model Generator",
             "scenario": "An inline array of inline objects is typed at both ends",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 336,
+            "spec_line": 393,
             "stage": "unstable"
         },
         {
@@ -407,7 +447,7 @@
             "feature": "Model Generator",
             "scenario": "Nesting below a synthesised payload is reached by the same queue as nesting below a component",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 346,
+            "spec_line": 403,
             "stage": "unstable"
         },
         {
@@ -415,7 +455,7 @@
             "feature": "Model Generator",
             "scenario": "An inline enum inside a payload becomes a backed enum, wherever the payload came from",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 356,
+            "spec_line": 413,
             "stage": "unstable"
         },
         {
@@ -423,7 +463,7 @@
             "feature": "Model Generator",
             "scenario": "An inline object the document left unconstrained is passed as a map rather than dropping the operation",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 366,
+            "spec_line": 423,
             "stage": "unstable"
         },
         {
@@ -431,7 +471,7 @@
             "feature": "Model Generator",
             "scenario": "The profile pins the class name for a synthesised payload",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 376,
+            "spec_line": 433,
             "stage": "unstable"
         },
         {
@@ -439,7 +479,7 @@
             "feature": "Model Generator",
             "scenario": "A pin naming an operation absent from the document fails the run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 386,
+            "spec_line": 443,
             "stage": "unstable"
         },
         {
@@ -447,7 +487,7 @@
             "feature": "Model Generator",
             "scenario": "Two shapes deriving one class name fail the run rather than overwriting a file",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 396,
+            "spec_line": 453,
             "stage": "unstable"
         },
         {
@@ -455,7 +495,7 @@
             "feature": "Model Generator",
             "scenario": "Running the generator twice with the same inputs produces identical files",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 408,
+            "spec_line": 465,
             "stage": "unstable"
         },
         {
@@ -463,7 +503,7 @@
             "feature": "Model Generator",
             "scenario": "A component removed from the schema is pruned from Generated/ on the next run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 417,
+            "spec_line": 474,
             "stage": "unstable"
         },
         {
@@ -471,7 +511,7 @@
             "feature": "Model Generator",
             "scenario": "An emitted file opens with a header naming the profile and the command that reproduces it",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 429,
+            "spec_line": 486,
             "stage": "unstable"
         },
         {
@@ -479,7 +519,7 @@
             "feature": "Model Generator",
             "scenario": "The header carries nothing that moves between runs",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 440,
+            "spec_line": 497,
             "stage": "unstable"
         },
         {
@@ -487,7 +527,7 @@
             "feature": "Model Generator",
             "scenario": "Regenerating over an existing tree replaces it rather than failing on it",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
-            "spec_line": 450,
+            "spec_line": 507,
             "stage": "unstable"
         },
         {

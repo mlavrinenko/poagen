@@ -110,6 +110,41 @@ final readonly class Profile
      *                                              undeclared requirement aborts the run naming this key. An entry
      *                                              for a scheme the document does declare, or one no requirement
      *                                              asks for, fails the run the same way a stale `$skip` entry does.
+     * @param array<string,array{field:string,map:array<string,string>}> $unionTags Layer one for a property-level
+     *                                              `oneOf`/`anyOf` whose selecting tag lives on the *enclosing*
+     *                                              object rather than inside the value. Keyed by raw
+     *                                              `'<ComponentName>.<propertyName>'`; `field` names a property of
+     *                                              that component, and `map` sends each wire value of that field to
+     *                                              the raw component name of the branch it selects. GitHub's
+     *                                              `event.payload` is the case this exists for: sixteen branches
+     *                                              chosen by the sibling `event.type`, with one branch
+     *                                              (`public-event`) declaring no properties at all, so nothing
+     *                                              inside the value could ever select it. Every part is checked
+     *                                              against the document — the component, the property, the union,
+     *                                              the field, each branch, and each tag value against the field's
+     *                                              `enum` where it declares one. A tag refines what paogen would
+     *                                              otherwise compute rather than suppressing anything, so unlike
+     *                                              $skip and $unionPins it is not stale-checked: an entry that
+     *                                              stays true of the document stays valid even once the branches
+     *                                              grow a computable discriminating field.
+     * @param array<string,array{branch:string,reason:string}> $unionPins Layer three. Where two branches share
+     *                                              every discriminating field the run refuses; this narrows the
+     *                                              property to one branch instead, typing it as that single class.
+     *                                              Keyed the same way; `branch` is the raw component name and
+     *                                              `reason` is the written justification $skip entries also carry.
+     *                                              This is an opt-out in the sense
+     *                                              `skip-is-the-only-opt-out` means: it is the only guidance key
+     *                                              whose *absence* changes the exit status, so it is stale-checked
+     *                                              exactly as $skip is — a pin on a union the run can now decide
+     *                                              fails until it is deleted. It is also reported on every run,
+     *                                              because it is worse than a skip rather than milder: a skip
+     *                                              leaves nothing to be wrong with, while a pinned property
+     *                                              hydrates a discarded branch's payload into the pinned class
+     *                                              with no error at all, those branches accepting each other's
+     *                                              payloads being why the union was undecidable in the first
+     *                                              place. There is deliberately no preference-order form: picking
+     *                                              the first of several matches is the silent guess the whole
+     *                                              design exists to refuse.
      * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
      *                                              skip-listed item is omitted from the output instead of
      *                                              failing the run. An entry that no longer matches a problem
@@ -134,6 +169,8 @@ final readonly class Profile
         public array $renames = [],
         public ?NameNormaliser $nameNormaliser = null,
         public array $discriminators = [],
+        public array $unionTags = [],
+        public array $unionPins = [],
         public array $skip = [],
         public array $methodRenames = [],
         public array $tagRenames = [],
@@ -169,6 +206,8 @@ final readonly class Profile
             renames: $this->renames,
             nameNormaliser: $this->nameNormaliser,
             discriminators: $this->discriminators,
+            unionTags: $this->unionTags,
+            unionPins: $this->unionPins,
             skip: $this->skip,
             methodRenames: $this->methodRenames,
             tagRenames: $this->tagRenames,

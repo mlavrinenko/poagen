@@ -53,6 +53,7 @@ final readonly class Generator
         private SkipListValidator $skipListValidator = new SkipListValidator(),
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
         private PropertyRenameValidator $propertyRenameValidator = new PropertyRenameValidator(),
+        private UnionGuidanceValidator $unionGuidance = new UnionGuidanceValidator(),
         private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
         $this->modelPlanner = new ModelPlanner($modelEmitter);
@@ -99,12 +100,16 @@ final readonly class Generator
         $profileSecurityFailures = ProfileSecuritySchemes::apply($openApi, $profile->securitySchemes);
         $security = SecurityAudit::of($openApi);
 
-        // attribute-and-phpdoc-driven-serialization + T-030 +
-        // abort-on-unrepresentable-constructs: collect every property-level
-        // `oneOf`/`anyOf` union with no discriminator
-        // (after applying any profile-level override), instead of failing
-        // on the first one found.
-        $discriminatorSkips = new DiscriminatorEnforcer($profile->discriminators)->enforce($openApi);
+        // declare-an-undiscriminated-union-as-raw-data: resolve every
+        // property-level `oneOf`/`anyOf` through the four layers — a tag in the
+        // value, a tag on the enclosing object, a discriminating field computed
+        // from the branches, a profile pin — and collect what none of them
+        // reaches instead of failing on the first
+        // (abort-on-unrepresentable-constructs). Mutates the document, so it
+        // runs before anything reads a property's branch list, and rides to the
+        // emitters on $bindings.
+        $unions = new DiscriminatorEnforcer($profile->discriminators, $profile)->enforce($openApi);
+        $bindings = $bindings->withUnions($unions);
 
         // Same discipline, one walk further out: a `type` list naming several
         // types PHP cannot express as one (nullable-type-arrays), and a JSON
@@ -145,7 +150,7 @@ final readonly class Generator
         $excludedComponents = array_fill_keys(
             array_map(
                 static fn(SkippedComponent $c): string => $c->rawName,
-                [...$discriminatorSkips, ...$schemaSkips['components']],
+                [...$unions->failures(), ...$schemaSkips['components']],
             ),
             true,
         );
@@ -189,9 +194,14 @@ final readonly class Generator
             // the run says so — `declared-shapes-become-types` tolerates that
             // one `mixed` only while it is visible.
             ...UnconstrainedFieldAdvisor::notices($openApi),
+            // One line per union naming what it will discriminate on, so the
+            // rule is visible before anything runs rather than discovered in
+            // production — and so a pin's narrowing is reprinted on every run,
+            // not only the one that added it.
+            ...$unions->notices(),
             ...$security->notices,
         ];
-        $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$schemaSkips['components']];
+        $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components']];
 
         $failures = [
             ...$profileSecurityFailures,
@@ -201,6 +211,7 @@ final readonly class Generator
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
+            ...$this->unionGuidance->validate($openApi, $profile, $unions),
         ];
 
         if ($failures !== []) {
