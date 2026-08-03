@@ -5,11 +5,11 @@
   tags: ("tooling", "gates"),
   priority: 3,
   difficulty: 2,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Scheduled by the owner into this session's second wave. It is also the defect that taxes every session's close-out, since writing a note invalidates a pass the note cannot affect.],
+  )[Landed as 6368d84, merged and re-gated on the integrated HEAD. The read set is derived from the recipes rather than patched: seven root Markdown docs and `devbox.d/php/php.ini` were untracked and are now in, and linecop's skip of every dot-directory was proved by probe rather than assumed. `truth/notes` and `truth/reviews` are tracked by path only, since `main.typ` links them rather than including them, so content edits stop invalidating a pass they cannot affect. Criterion two proved by doing: an over-cap README made `is-fresh` exit 1, and a byte-exact revert restored it.],
 )
 
 == Summary
