@@ -5,10 +5,18 @@
   tags: ("generator", "security", "strictness"),
   priority: 6,
   difficulty: 5,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as 9f69da9, merged 3dfd3aa after the two dependencies it uncovered were closed. Four buckets: wired, reported, refused by name, refused with instructions. Profile::securitySchemes fills a gap the document left, and petstore wires api\_key instead of skipping two operations.],
   links: (
-    depends-on("sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ"),
-    depends-on("generated-tier-duplication-ratchet-blocks-new-golden-trees.task-260802.typ"),
+    depends-on(
+      "sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ",
+    ),
+    depends-on(
+      "generated-tier-duplication-ratchet-blocks-new-golden-trees.task-260802.typ",
+    ),
   ),
 )
 

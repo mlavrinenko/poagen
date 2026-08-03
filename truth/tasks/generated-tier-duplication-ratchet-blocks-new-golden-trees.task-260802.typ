@@ -5,7 +5,11 @@
   tags: ("tooling", "gates"),
   priority: 6,
   difficulty: 4,
-  status: proposed(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as a0ead9e, merged and re-gated on the integrated HEAD. The tier measures one emitted tree at a time with PHPDoc stripped: worst tree 1.67 percent against a 2.0 threshold, down from a corpus 16.02 against 16.5. Both dropped golden trees are committed; generated-tier PHPStan analyses 67 files where it analysed 47.],
 )
 
 == Summary

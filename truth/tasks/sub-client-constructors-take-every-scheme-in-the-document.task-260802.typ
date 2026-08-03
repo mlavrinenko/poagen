@@ -5,7 +5,11 @@
   tags: ("generator", "security", "emitter"),
   priority: 5,
   difficulty: 6,
-  status: proposed(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as 4e9d286, merged 3dfd3aa and re-gated on the integrated HEAD. Scoping decided once in SecuritySchemeCatalog::constructorSchemesFor, built on the existing requirement resolution so the constructor and the request chain cannot disagree. property.onlyWritten 3 to 0; every committed tree but petstore byte-identical.],
 )
 
 == Summary
