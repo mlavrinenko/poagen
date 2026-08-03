@@ -1,5 +1,9 @@
 {
   "minTokens": 50,
   "ignorePattern": ["(?m)^(declare|namespace|use)\\b.*;$"],
+  "ignore": [
+    "**/tests/fixtures/generated/**",
+    "**/examples/*/generated/**"
+  ],
   "reporters": ["console"]
 }

@@ -122,7 +122,7 @@ or directory` or a bare `Broken pipe`.
 
 `just check` is `lint test check-specs`. Lint runs php-cs-fixer, PHPStan on
 `bin`/`src`/`runtime/src`/`tests`, PHPStan on the generated fixtures and
-example trees, rector, and linecop, in parallel.
+example trees, rector, linecop, and both jscpd duplication tiers, in parallel.
 
 - PHPStan runs at `level: max` with `phpstan-strict-rules`,
   `phpstan-deprecation-rules`, `shipmonk/dead-code-detector` and bleeding-edge,

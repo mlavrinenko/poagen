@@ -10,7 +10,7 @@ declare(strict_types=1);
  * This is lint-jscpd's ratchet run backwards: jscpd's `--threshold` caps a
  * percentage that must only fall (duplication); this script floors a
  * percentage that must only rise (coverage). The floor VALUES live where
- * `--threshold 5.5` lives for jscpd — as arguments next to a RATCHET
+ * `--threshold 3.0` lives for jscpd — as arguments next to a RATCHET
  * comment at the call site (see the Justfile's `test-coverage` recipe) —
  * not in here, so this script stays generic over tier and floor and there
  * is exactly one greppable place per number.

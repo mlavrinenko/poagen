@@ -36,6 +36,7 @@ phpstan-generated.neon
 rector.php
 .php-cs-fixer.dist.php
 .jscpd.json
+.jscpd.generated.json
 .linecop.yaml
 phpunit.xml.dist
 .speconaut/config.toml

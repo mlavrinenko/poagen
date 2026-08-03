@@ -99,8 +99,9 @@ under the exact command the recipe runs.
 
 `tests/fixtures/profiles/*.php` describe the generator's own test fixtures —
 `petstore`, `parameters`, `contact`, `composition`,
-`undiscriminated-oneof-resolved` — and each one's `output:` defaults to a
-scratch directory under `$TMPDIR`
+`undiscriminated-oneof-resolved`, `widened-shapes`, `open-shapes`, and
+`ls tests/fixtures/profiles/` is the copy of that list which cannot go stale.
+Each one's `output:` defaults to a scratch directory under `$TMPDIR`
 (`tests/fixtures/profiles/scratch-output.php`), never to the committed
 golden tree it has the same name as. A `just test` or `just check` run loads
 these profiles and generates from them, but it always writes to scratch and

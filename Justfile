@@ -115,7 +115,7 @@ lint-rector: tmpdir
 lint-linecop:
     linecop
 
-# Duplication gate on src/ and tests/ (source tier; jscpd-as-a-real-gate)
+# Duplication gate on hand-written code (source tier; jscpd-as-a-real-gate)
 #
 # A file's preamble is repeated text that says nothing about duplicated
 # logic: two files importing the same eight symbols are not two copies of
@@ -129,45 +129,55 @@ lint-linecop:
 # The pattern is anchored to column 0 (`(?m)^`), so a trait `use` inside a
 # class body — which is real code — still counts. Only the preamble goes.
 #
-# `--threshold` gates on jscpd's own "Total duplicated lines" percentage
-# across every format it scans (json + php + yaml under src/ and tests/), the
-# same figure the console table prints. Measured on 2026-08-01: 4.99%
-# duplicated lines (3.13% duplicated tokens), 90 clones. 5.5% is set just
-# above that so the gate is green today and has a little room before it
-# trips on incidental noise, not to license new duplication.
-#
-# RATCHET: this number only ever moves DOWN, as real duplication (see
-# deduplicate-the-test-suite) is removed and the measured figure drops.
-# Raising it to let a change land is not a fix, it is disabling the gate —
-# fix the duplication or take it to the owner instead.
-#
-# Do not add `--exit-code` alongside `--threshold`: jscpd's `--exit-code`
-# fails on ANY clone found regardless of the threshold, so combining the two
-# would fail today even though 4.99% is under 5.5%. `--threshold` alone
-# already sets the exit code (0 under the limit, 1 over it) — verified by
-# probing 4.9 (fails: "found too many duplicates (5.0%) over threshold
-# (4.9%)") and 5.5 (passes) against the same tree. (If you do reach for
-# `--exit-code` on its own elsewhere, always give it an explicit value —
-# spelled bare it eats the next positional argument.)
-#
 # `examples/*/src` is hand-written consumer code and belongs in THIS tier, not
 # the generated one, even though lint-phpstan-generated puts it in that tier.
 # The two recipes divide the tree for different reasons: phpstan asks "whose
 # strictness standard applies", and consumer code answers "the consumer's".
 # jscpd asks "what is this number measuring", and a duplication figure over
-# output plus hand-written code measures neither. Measured 2026-08-01: 5.09%
-# duplicated lines (3.17% tokens), 92 clones.
+# output plus hand-written code measures neither.
+#
+# That same reading is why `.jscpd.json` carries an `ignore` for
+# `tests/fixtures/generated/**` and `examples/*/generated/**`. This recipe
+# scans `tests`, and the emitted golden trees live inside it, so until
+# 2026-08-03 every golden tree was counted here as well as in the generated
+# tier — the mirror image of the mistake the paragraph above describes, and
+# invisible because nobody was looking for emitted output on this side.
+# Committing the widened-shapes and open-shapes goldens moved this tier from
+# 3.20% to 3.68% and turned it red against its 3.5% threshold, which is how
+# the double-count was finally found.
+#
+# `--threshold` gates on jscpd's own "Total duplicated lines" percentage
+# across every format it scans (json + php + yaml), the same figure the
+# console table's **Total** row prints — not the per-format row. Verified by
+# probing on 2026-08-03: 3.1 fails ("found too many duplicates (3.2%) over
+# threshold (3.1%)") and 3.3 passes, against a tree whose php row alone read
+# 3.42%.
+#
+# Do not add `--exit-code` alongside `--threshold`: jscpd's `--exit-code`
+# fails on ANY clone found regardless of the threshold, so combining the two
+# would fail today even though the measured figure is under the limit.
+# `--threshold` alone already sets the exit code (0 under the limit, 1 over
+# it). (If you do reach for `--exit-code` on its own elsewhere, always give it
+# an explicit value — spelled bare it eats the next positional argument.)
 #
 # deduplicate-the-test-suite moved nine tests/Integration/ files onto
 # tests/Support/GeneratedTreeSandbox.php's shared sandbox-dir, composer-loader,
 # generator-construction and CLI-invocation helpers — repeated scaffolding
 # that never carried the schema, the profile or the expectation a test
 # actually asserted on, so pulling it out left every one of those visible at
-# the call site. What remained (tests/generated/, the emitted fixture trees,
-# a schema fixture, and a handful of same-shape assertions or test doubles
-# that ARE a test's subject) was left alone on purpose. Measured 2026-08-01:
-# 3.36% duplicated lines (2.38% tokens), 76 clones. 3.5% is set just above
-# that: green today, minimal slack, no license to add more duplication.
+# the call site. What remained (tests/generated/, a schema fixture, and a
+# handful of same-shape assertions or test doubles that ARE a test's subject)
+# was left alone on purpose.
+#
+# Measured 2026-08-03, hand-written code alone: 2.82% duplicated lines (1.73%
+# duplicated tokens), 83 clones over 230 files. 3.0% is set just above that:
+# green today, minimal slack, no license to add more duplication.
+#
+# Every measured figure this comment carried before was stale, and each was
+# true when written: 4.99%/90 and 5.09%/92 predate deduplicate-the-test-suite,
+# a "5.5%" threshold outlived its own recipe (the argument had read 3.5 for
+# two days), and the 3.36%/76 recorded on 2026-08-01 measured 3.20%/92 on the
+# tree that replaced it. Re-measure before you cite one.
 #
 # RATCHET: this number only ever moves DOWN. Never raise it to admit a clone.
 lint-jscpd:
@@ -175,38 +185,102 @@ lint-jscpd:
     set -eo pipefail
     shopt -s nullglob
     paths=(src runtime/src tests examples/*/src)
-    jscpd -c .jscpd.json --threshold 3.5 "${paths[@]}"
+    jscpd -c .jscpd.json --threshold 3.0 "${paths[@]}"
 
-# Duplication gate on generated fixtures + example trees (generated tier;
-# jscpd-as-a-real-gate)
+# Duplication gate on emitted output, ONE TREE AT A TIME (generated tier;
+# generated-tier-duplication-ratchet-blocks-new-golden-trees)
 #
-# Resolves its path set the way lint-phpstan-generated does: not every
-# example has a generated/ directory (some are .expected-failure), so
-# nullglob keeps a run with zero example trees from erroring on a literal
-# unmatched glob instead of falling back to tests/fixtures/generated alone.
+# WHAT THE NUMBER MEANS: the highest duplication ratio any single emitted
+# client reaches, measured inside that client alone. It is not a figure over
+# the corpus of trees, and it does not move when a tree is added or removed.
 #
-# Generated output legitimately duplicates more than hand-written source —
-# RequestAssembler/ResponseHandler-shaped code repeats per operation — so
-# this tier gets its own, looser threshold rather than sharing lint-jscpd's.
+# It used to be a corpus figure, and that is what made it unusable. Every
+# emitted tree carries its own ApiException.php — 96 lines, 73 of them
+# identical across trees, and deliberately so: the class is namespaced into
+# the consumer's package and is "the type a caller catches for this API" (its
+# own emitted docblock says so), which is exactly why it cannot be factored
+# into runtime/. Four copies existed, so a corpus figure rose whenever a
+# golden tree was added, for a reason no emitter change could ever fix. Two
+# tasks paid for that: close-the-three-sites-that-widen-a-declared-shape and
+# additional-properties-become-a-typed-bag both dropped their golden trees
+# rather than touch this threshold, leaving the shapes they introduced with no
+# generated-tier PHPStan analysis at all — the one tier held to no baseline,
+# no excludePaths and no ignoreErrors. Committing both trees on 2026-08-03
+# took the corpus figure from 16.02% to 17.68% against a 16.5% threshold.
 #
-# The path set is emitted output ONLY. `examples/*/src` is hand-written and
-# lives in lint-jscpd; including it here diluted the figure to 15.11% and hid
-# that output alone was already at 16.01% — over the threshold that number had
-# been used to justify. A duplication gate whose denominator includes code the
-# generator did not write cannot measure the generator.
+# Per tree is not a loosening, it is a large tightening. The corpus figure was
+# 16.02% under a 16.5% threshold. Measured the same day, the worst SINGLE tree
+# is examples/kilbil/generated at 1.67% and every other tree reads 0.00%. The
+# ~14 points that vanished were cross-tree artefacts: the four ApiException
+# copies, plus examples/petstore/generated being the same document as
+# tests/fixtures/generated/petstore emitted twice. Neither is duplicated logic
+# inside one client, which is the only thing this tier was ever meant to catch
+# — "the same 12-to-15 token-identical lines repeating across every operation
+# in an emitted client".
 #
-# Measured on 2026-08-01, emitted output alone: 16.01% duplicated lines
-# (32.11% duplicated tokens), 36 clones. 16.5% is set just above that: green
-# today, minimal slack, no license to add more duplication.
+# Consequence, stated here rather than discovered later: this tier no longer
+# sees duplication BETWEEN trees. Deliberate. Two trees emitted from two
+# documents share the generator's fixed scaffolding by construction, and no
+# emitter change removes it.
+#
+# `.jscpd.generated.json` is a sibling of `.jscpd.json`, not a copy: it adds
+# one `ignorePattern` entry that drops PHPDoc blocks, and the source tier
+# deliberately does NOT get it. A duplicated docblock in hand-written code
+# means someone copied a class, and a human can fix that. In emitted output
+# the emitter writes the docblock from the document, two operations guarded by
+# the same security scope must both say so, and PHP offers nowhere to factor a
+# docblock to — so counting it measures the document, not the generator. Same
+# reading that already drops the import block: repeated text that says nothing
+# about duplicated logic. It costs the tier nothing real, measured: of
+# kilbil's 16 intra-tree clones under the old config, 14 were the fixed
+# sub-client interface docblock ("The contract for the `X` endpoints...")
+# repeating once per sub-client. The 2 that survive are genuine code clones —
+# Model/GoodsRequestItem vs Model/GoodsXmlRequestItem, and
+# Model/ProcessSaleRequestGoodsDataItem vs
+# Model/SearchClientRequestGoodsDataItem — two pairs of identically-shaped
+# models the emitter really does write out twice.
+#
+# The emitted `// Generated by paogen` header needs no pattern of its own: it
+# tokenises to 11 tokens, far under `minTokens: 50`, so it cannot form a clone
+# by itself. Measured with a two-file probe, not assumed.
+#
+# Resolves its path set the way lint-phpstan-generated does: not every example
+# has a generated/ directory (some are .expected-failure), so nullglob keeps a
+# run with zero example trees from erroring on a literal unmatched glob. An
+# empty tree list is a hard failure rather than a silent pass, for the reason
+# phpstan-generated.neon spells out about analysing nothing.
+#
+# One threshold for every tree rather than a per-tree table: a table would
+# need a new row for each new golden, which is precisely the friction this
+# task removed. The single number is therefore a ceiling on the WORST tree,
+# and it is set from the worst tree.
+#
+# Measured 2026-08-03, worst single tree (examples/kilbil/generated, 2209
+# lines after the preamble and PHPDoc strips): 1.67% duplicated lines, 2
+# clones, 37 lines. Every other tree — including both goldens added that day —
+# measures 0.00%. 2.0% is set just above the worst: 44 lines at kilbil's size,
+# so about 7 lines of slack, less than one `minTokens: 50` clone. Green today,
+# minimal slack, no license to add more duplication.
 #
 # RATCHET: this number only ever moves DOWN as emitted duplication is
-# collapsed further. Never raise it to accommodate a new clone.
+# collapsed further. It does not move when a golden tree is added — that is
+# the whole point of measuring per tree — so "a new fixture pushed it up" is
+# never an argument for raising it. Never raise it to accommodate a clone.
 lint-jscpd-generated:
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
-    paths=(tests/fixtures/generated examples/*/generated)
-    jscpd -c .jscpd.json --threshold 16.5 "${paths[@]}"
+    trees=(tests/fixtures/generated/*/ examples/*/generated/)
+    if [ ${#trees[@]} -eq 0 ]; then
+        echo "lint-jscpd-generated: no emitted trees found — refusing a silent pass" >&2
+        exit 1
+    fi
+    status=0
+    for tree in "${trees[@]}"; do
+        echo "== ${tree%/} =="
+        jscpd -c .jscpd.generated.json --threshold 2.0 "$tree" || status=1
+    done
+    exit $status
 
 # Auto-fix code style
 #
