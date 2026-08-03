@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Support;
 
 use Composer\Autoload\ClassLoader;
-use FilesystemIterator;
 use Mlavrinenko\Paogen\GenerateCommand;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\Assert;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use ReflectionClass;
-use SplFileInfo;
 
 use function assert;
 use function basename;
@@ -33,11 +29,20 @@ use function substr;
  * helpers, which is a good share of the duplication `adopt-jscpd-duplication-gate`
  * measures in the suite. This is the shared one; `deduplicate-the-test-suite`
  * moves the remaining tests onto it.
+ *
+ * The scratch-directory half lives in {@see SandboxDirectories}, composed in
+ * below so a test still writes one `use` and reaches everything. That is the
+ * linecop 250-line cap on PHP, not a second concept.
  */
 trait GeneratedTreeSandbox
 {
-    /** @var list<string> */
-    private static array $sandboxDirs = [];
+    use SandboxDirectories;
+
+    /** The emitted `ApiClient.php` source from {@see generateRootClientOnce}. */
+    private static string $rootClientSource = '';
+
+    /** @var ReflectionClass<object>|null the class {@see generateRootClientOnce} required */
+    private static ?ReflectionClass $rootClientReflection = null;
 
     /**
      * A `Generator` wired to the live autoload chain — the one piece of
@@ -79,24 +84,6 @@ trait GeneratedTreeSandbox
     }
 
     /**
-     * A fresh scratch directory, remembered so {@see removeSandboxDirs} can
-     * take it away again.
-     */
-    private static function makeSandboxDir(string $prefix): string
-    {
-        $path = (string) tempnam(sys_get_temp_dir(), $prefix);
-        unlink($path);
-
-        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
-            Assert::fail("failed to create temporary directory: {$path}");
-        }
-
-        self::$sandboxDirs[] = $path;
-
-        return $path;
-    }
-
-    /**
      * The live Composer loader, so a generated namespace can be mapped onto
      * the scratch directory it was just written to.
      */
@@ -109,38 +96,6 @@ trait GeneratedTreeSandbox
         }
 
         Assert::fail('Composer ClassLoader not found in autoload chain.');
-    }
-
-    private static function removeSandboxDirs(): void
-    {
-        foreach (self::$sandboxDirs as $dir) {
-            if (is_dir($dir)) {
-                self::removeDirectory($dir);
-            }
-        }
-
-        self::$sandboxDirs = [];
-    }
-
-    private static function removeDirectory(string $dir): void
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        /** @var SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            if ($entry->isDir()) {
-                rmdir($entry->getPathname());
-
-                continue;
-            }
-
-            unlink($entry->getPathname());
-        }
-
-        rmdir($dir);
     }
 
     /**
@@ -207,6 +162,47 @@ trait GeneratedTreeSandbox
         Assert::assertNotSame('', $source, 'the plan wrote no ApiClient.php');
 
         return ['source' => $source, 'reflection' => self::requireGeneratedClient($output, $namespace)];
+    }
+
+    /**
+     * {@see generateRootClient} into the trait's own two static slots, so a
+     * test's `setUpBeforeClass` is one line and does not grow its own copy
+     * of the pair of properties plus the reflection accessor that goes with
+     * them. That triplet is the next-largest clone family in the suite after
+     * the four helpers this trait already collapsed — see
+     * `deduplicate-the-test-suite`.
+     */
+    private static function generateRootClientOnce(string $schema, string $namespace, string $sandboxPrefix): void
+    {
+        $result = self::generateRootClient($schema, $namespace, $sandboxPrefix);
+        self::$rootClientSource = $result['source'];
+        self::$rootClientReflection = $result['reflection'];
+    }
+
+    /**
+     * @return ReflectionClass<object>
+     */
+    private static function rootClientReflection(): ReflectionClass
+    {
+        Assert::assertInstanceOf(ReflectionClass::class, self::$rootClientReflection);
+
+        return self::$rootClientReflection;
+    }
+
+    /**
+     * One emitted file's source out of a plan, by the class it declares.
+     *
+     * @param array<string,string> $writes {@see GenerationPlan::$writes}
+     */
+    private static function plannedSource(array $writes, string $class): string
+    {
+        foreach ($writes as $path => $source) {
+            if (basename($path, '.php') === $class) {
+                return $source;
+            }
+        }
+
+        Assert::fail("the plan wrote no {$class}.php");
     }
 
     /**

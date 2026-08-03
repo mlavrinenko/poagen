@@ -51,7 +51,7 @@ final readonly class SubClientEmitter
         Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
-        [$file, $namespace, $class] = $this->openClass($clientNamespace, $group->phpName, $group->interfaceName(), $securityCatalog);
+        [$file, $namespace, $class] = $this->openSubClass($clientNamespace, $group->phpName, $group->interfaceName(), $securityCatalog);
         $outcome = $this->addOperations($class, $namespace, $group, $bindings, $securityCatalog);
 
         if ($outcome['emitted'] === 0) {
@@ -78,12 +78,46 @@ final readonly class SubClientEmitter
     }
 
     /**
+     * Start the ROOT client's file — everything {@see openSubClass} does,
+     * plus the document-level security metadata {@see SecurityDocs} carries
+     * across: the oauth2 / openIdConnect flow constants and the docblock
+     * that reads them, and the `mutualTLS` line saying where the client
+     * certificate is configured.
+     *
+     * The root is the only client that carries them, which is why this is a
+     * separate entry point rather than a flag: the metadata is a fact about
+     * the document rather than about a tag, and the root is the composition
+     * root — where a consumer wires their transport, which is exactly when a
+     * token endpoint is what they need. `ClientEmitter::emitRoot()` is the
+     * one caller.
+     *
+     * @return array{0:PhpFile, 1:PhpNamespace, 2:ClassType}
+     */
+    public function openClass(
+        string $clientNamespace,
+        string $className,
+        string $interfaceName,
+        SecuritySchemeCatalog $securityCatalog,
+    ): array {
+        $opened = $this->openSubClass($clientNamespace, $className, $interfaceName, $securityCatalog);
+        $comment = SecurityDocs::clientComment($securityCatalog);
+
+        if ($comment !== '') {
+            $opened[2]->addComment($comment);
+        }
+
+        SecurityDocs::addConstants($opened[2], $securityCatalog);
+
+        return $opened;
+    }
+
+    /**
      * Start a client file: the class, its interface declaration, the shared
      * constructor and the same-namespace `ApiException` import.
      *
      * @return array{0:PhpFile, 1:PhpNamespace, 2:ClassType}
      */
-    public function openClass(
+    private function openSubClass(
         string $clientNamespace,
         string $className,
         string $interfaceName,

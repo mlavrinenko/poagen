@@ -37,7 +37,11 @@ final class RuntimeSubstitutionTest extends TestCase
         $pet = new Pet(name: 'Rex', photoUrls: []);
         $transport = new RecordingTransport([$pet]);
 
-        $returned = new ApiClient($transport)->pet()->getPetById(42);
+        // Petstore requires `api_key` and `petstore_auth` on this operation,
+        // so the emitted constructor takes both credentials after the
+        // transport. Neither reaches a substitute transport, which never
+        // builds a request — that is the point of substituting it.
+        $returned = new ApiClient($transport, 'unused-api-key', 'unused-access-token')->pet()->getPetById(42);
 
         // The substitute was called, and what it returned is what the caller
         // got — no generated file was edited to make that true.
@@ -100,7 +104,7 @@ final class RuntimeSubstitutionTest extends TestCase
             hydrator: $runtime,
             xmlWriter: $runtime,
             descriptors: $runtime,
-        ));
+        ), 'unused-api-key', 'unused-access-token');
 
         $client->pet()->addPet(new Pet(name: 'Rex', photoUrls: []));
 
@@ -117,12 +121,14 @@ final class RuntimeSubstitutionTest extends TestCase
 
     public function testAConsumerWhoReplacesNothingWiresNothingBeyondTheAddressAndTheErrorType(): void
     {
-        // Two facts only the consumer can supply: where the API lives, and
-        // which exception this profile throws. Everything else — the PSR
-        // factories, the hydrator, the marshaller, the XML writer, the
-        // descriptor parser — defaults to a working implementation.
+        // Two facts only the consumer can supply about the transport: where
+        // the API lives, and which exception this profile throws. Everything
+        // else — the PSR factories, the hydrator, the marshaller, the XML
+        // writer, the descriptor parser — defaults to a working
+        // implementation. The credentials beside it are the third kind of
+        // fact only the consumer has, and the document names each one.
         $transport = new HttpTransport('https://petstore.example/api/v3', ApiException::class);
-        $client = new ApiClient($transport);
+        $client = new ApiClient($transport, 'unused-api-key', 'unused-access-token');
 
         self::assertInstanceOf(TransportInterface::class, $transport);
         // A PSR-18 client is discovered on first send, not in the

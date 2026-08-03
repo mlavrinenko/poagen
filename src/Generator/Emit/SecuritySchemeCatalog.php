@@ -7,9 +7,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Reference;
-use cebe\openapi\spec\SecurityRequirement;
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
-use stdClass;
 
 use function is_string;
 
@@ -19,17 +17,16 @@ use const SORT_STRING;
  * One-shot lookup over `components.securitySchemes` plus the resolution
  * rules that govern which schemes apply to a given operation.
  *
- * OpenAPI 3.0.3 §4.8.20:
- *   - an operation-level `security: []` (empty array) overrides and
- *     disables the global requirement;
- *   - an absent operation-level `security` inherits the global;
- *   - a non-empty operation-level `security` replaces the global.
- *
  * We follow the same "`$ref`-resolves-at-the-boundary" pattern as
  * {@see ParameterCollector}: unresolvable references are ignored (the
- * scheme is simply not registered) rather than surfacing an error.
- * `no-inheritance-no-protected-regions` governs the decorator-layer; this
- * class stops at classifying schemes into the subset we wire up.
+ * scheme is simply not registered) rather than surfacing an error — which
+ * then shows up as an undeclared requirement if anything asked for it,
+ * so the fact still reaches the consumer.
+ *
+ * Classification lives in {@see SecuritySchemeClassifier}, requirement
+ * parsing in {@see SecurityRequirements}, and the who-requires-what index
+ * in {@see SecurityUsage}. What is left here is the document-wide view the
+ * emitters ask questions of.
  *
  * @internal
  */
@@ -38,81 +35,100 @@ final readonly class SecuritySchemeCatalog
     /** @var array<string, SecurityScheme> */
     private array $byName;
 
-    /** @var list<string> */
-    private array $globalRequirementNames;
+    /** @var array<string, list<string>> */
+    private array $globalRequirements;
 
     /** @var list<SecurityScheme> */
-    private array $supportedInEmissionOrder;
+    private array $wiredInEmissionOrder;
+
+    private SecurityUsage $usage;
 
     public function __construct(OpenApi $openApi)
     {
         $this->byName = $this->disambiguateCtorArgs($this->collectSchemes($openApi));
-        $this->globalRequirementNames = $this->namesFromMagicProperty($openApi->security);
-        $this->supportedInEmissionOrder = $this->orderSupported($this->byName);
+        $this->globalRequirements = SecurityRequirements::read($openApi->security);
+        $this->wiredInEmissionOrder = $this->orderWired($this->byName);
+        $this->usage = SecurityUsage::scan($openApi);
     }
 
     /**
-     * The supported schemes present in the schema, in constructor-arg
-     * emission order (by scheme name, ascending). Drives the ApiClient
-     * constructor's promoted-parameter list.
+     * The wired schemes present in the schema, in constructor-arg emission
+     * order (by scheme name, ascending). Drives the client constructor's
+     * promoted-parameter list.
      *
      * @return list<SecurityScheme>
      */
     public function constructorSchemes(): array
     {
-        return $this->supportedInEmissionOrder;
+        return $this->wiredInEmissionOrder;
     }
 
     /**
-     * The schemes applied to one operation, after resolving operation-
-     * level overrides against the global default. Unsupported schemes are
-     * filtered out so the emitter can iterate the list blindly.
+     * The schemes applied to one operation, after resolving operation-level
+     * overrides against the global default. Only wired schemes come back,
+     * so the emitter can iterate the list blindly: a reported or refused
+     * scheme has already been accounted for by {@see SecurityAudit} before
+     * a plan is allowed to return.
      *
      * An operation-level `security: []` disables auth entirely and is
-     * honoured here — the returned list will be empty even if the global
-     * requirement named a supported scheme.
+     * honoured here — the returned list is empty even if the global
+     * requirement named a wired scheme.
      *
      * @return list<SecurityScheme>
      */
     public function activeSchemesFor(Operation $operation): array
     {
-        $names = $this->operationRequirementNames($operation);
+        $out = [];
 
-        return $this->filterSupportedByName($names);
-    }
+        foreach (array_keys($this->requirementsFor($operation)) as $name) {
+            $scheme = $this->byName[$name] ?? null;
 
-    /**
-     * @return list<string> may be empty (auth disabled) or equal to the
-     *                      global default when the op does not override
-     */
-    private function operationRequirementNames(Operation $operation): array
-    {
-        // Absent `security` on an Operation means "inherit the global",
-        // and `security: []` means "no auth here" — two different facts
-        // that both read as an empty name list. The parser presents the
-        // absent one as `null` (per attributeDefaults) and the empty one
-        // as `[]`, so telling them apart needs `isset`, not a count.
-        if (!isset($operation->security)) {
-            return $this->globalRequirementNames;
+            if ($scheme instanceof SecurityScheme && $scheme->isWired()) {
+                $out[] = $scheme;
+            }
         }
 
-        return $this->namesFromMagicProperty($operation->security);
+        return $out;
     }
 
     /**
-     * @param list<string> $names
+     * One operation's requirements as the document states them: scheme name
+     * → the scopes that requirement asks for.
+     *
+     * @return array<string, list<string>>
+     */
+    public function requirementsFor(Operation $operation): array
+    {
+        return SecurityRequirements::forOperation($operation, $this->globalRequirements);
+    }
+
+    public function scheme(string $name): ?SecurityScheme
+    {
+        return $this->byName[$name] ?? null;
+    }
+
+    public function usage(): SecurityUsage
+    {
+        return $this->usage;
+    }
+
+    /**
+     * Every declared scheme some requirement actually names, in the same
+     * ascending-name order the constructor uses. An unused declaration is
+     * left out on purpose — see {@see SecurityUsage}.
      *
      * @return list<SecurityScheme>
      */
-    private function filterSupportedByName(array $names): array
+    public function requiredSchemes(): array
     {
+        $names = array_keys($this->byName);
+        sort($names, SORT_STRING);
+
         $out = [];
 
         foreach ($names as $name) {
-            $scheme = $this->byName[$name] ?? null;
-
-            if ($scheme instanceof SecurityScheme && $scheme->isSupported()) {
-                $out[] = $scheme;
+            if ($this->usage->isRequired($name)) {
+                $out[] = $this->byName[$name];
             }
         }
 
@@ -146,7 +162,7 @@ final readonly class SecuritySchemeCatalog
                 continue;
             }
 
-            $out[$name] = SecurityScheme::fromCebe($name, $resolved);
+            $out[$name] = SecuritySchemeClassifier::classify($name, $resolved);
         }
 
         return $out;
@@ -154,12 +170,13 @@ final readonly class SecuritySchemeCatalog
 
     /**
      * A scheme's default ctorArg is fixed per kind — `bearerToken` for every
-     * http bearer scheme — so two schemes of the same kind collide unless
-     * something breaks the tie. DigitalOcean's document is the case that
-     * forced this: `bearer_auth` and `inference_bearer_auth` are both http
-     * bearer, and per the document's own description are two genuinely
-     * different credentials (an OAuth token and a separate Inference API
-     * key), not one credential declared twice. See
+     * http bearer scheme, `basicUser`/`basicPassword` for every http basic
+     * one — so two schemes of the same kind collide unless something breaks
+     * the tie. DigitalOcean's document is the case that forced this:
+     * `bearer_auth` and `inference_bearer_auth` are both http bearer, and
+     * per the document's own description are two genuinely different
+     * credentials (an OAuth token and a separate Inference API key), not one
+     * credential declared twice. See
      * `truth/decisions/distinct-ctor-args-for-colliding-schemes.decision-260802.typ`.
      *
      * A document where a kind appears once never collides, so its ctorArg
@@ -174,7 +191,7 @@ final readonly class SecuritySchemeCatalog
         $counts = [];
 
         foreach ($byName as $scheme) {
-            if ($scheme->isSupported()) {
+            if ($scheme->isWired()) {
                 $counts[$scheme->ctorArg] = ($counts[$scheme->ctorArg] ?? 0) + 1;
             }
         }
@@ -182,15 +199,8 @@ final readonly class SecuritySchemeCatalog
         $out = [];
 
         foreach ($byName as $name => $scheme) {
-            $collides = $scheme->isSupported() && ($counts[$scheme->ctorArg] ?? 0) > 1;
-
-            $out[$name] = $collides
-                ? new SecurityScheme(
-                    kind: $scheme->kind,
-                    wireName: $scheme->wireName,
-                    ctorArg: SecurityScheme::camelize($name),
-                )
-                : $scheme;
+            $collides = $scheme->isWired() && ($counts[$scheme->ctorArg] ?? 0) > 1;
+            $out[$name] = $collides ? $scheme->withCtorArgBase(SecurityScheme::camelize($name)) : $scheme;
         }
 
         return $out;
@@ -208,56 +218,11 @@ final readonly class SecuritySchemeCatalog
     }
 
     /**
-     * A security requirement names its schemes as its own keys — a
-     * `SecurityRequirement` has no fixed attribute list, so
-     * `{"apiKey": []}` is one object whose single key is the scheme name.
-     *
-     * `devizzent/cebe-php-openapi` hands `$openApi->security` and
-     * `$operation->security` over as a plain list of those objects, which
-     * is what its docblock says. The parser this replaced wrapped the list
-     * in a `SecurityRequirements` container with a `getRequirements()`
-     * accessor and declared the same docblock type anyway; that class does
-     * not exist in the fork
-     * (`vendor/devizzent/cebe-php-openapi/src/spec/` has
-     * `SecurityRequirement` only). `getSerializableData()` is the public
-     * way to read the keys of an object with no fixed attributes.
-     *
-     * `null` is the absent-override case on an Operation, kept separate
-     * from an empty list by {@see operationRequirementNames}.
-     *
-     * @param array<SecurityRequirement>|null $security
-     *
-     * @return list<string>
-     */
-    private function namesFromMagicProperty(?array $security): array
-    {
-        $out = [];
-
-        foreach ($security ?? [] as $requirement) {
-            if (!$requirement instanceof SecurityRequirement) {
-                continue;
-            }
-
-            $data = $requirement->getSerializableData();
-
-            if (!$data instanceof stdClass) {
-                continue;
-            }
-
-            foreach (array_keys(get_object_vars($data)) as $name) {
-                $out[] = $name;
-            }
-        }
-
-        return $out;
-    }
-
-    /**
      * @param array<string, SecurityScheme> $byName
      *
      * @return list<SecurityScheme>
      */
-    private function orderSupported(array $byName): array
+    private function orderWired(array $byName): array
     {
         $names = array_keys($byName);
         sort($names, SORT_STRING);
@@ -267,7 +232,7 @@ final readonly class SecuritySchemeCatalog
         foreach ($names as $name) {
             $scheme = $byName[$name];
 
-            if ($scheme->isSupported()) {
+            if ($scheme->isWired()) {
                 $out[] = $scheme;
             }
         }

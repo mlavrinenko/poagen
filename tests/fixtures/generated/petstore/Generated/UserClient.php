@@ -20,6 +20,8 @@ final readonly class UserClient implements UserClientInterface
 {
     public function __construct(
         private TransportInterface $transport,
+        private string $apiKey,
+        private string $petstoreAuth,
     ) {
     }
 

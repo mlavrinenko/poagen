@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Tests\Integration;
 use FilesystemIterator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -77,6 +78,7 @@ final class ByteStabilityTest extends TestCase
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,
         ));
         $firstSnapshot = $this->snapshot($firstOutputDir);
@@ -87,6 +89,7 @@ final class ByteStabilityTest extends TestCase
             namespace: self::PETSTORE_NAMESPACE,
             discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,
         ));
         $secondSnapshot = $this->snapshot($secondOutputDir);

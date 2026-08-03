@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Tests\Integration;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,6 +43,7 @@ final class GeneratedSymbolShorteningTest extends TestCase
             // application/octet-stream body is unrepresentable — see
             // abort-on-unrepresentable-constructs. Irrelevant to this test.
             skip: ['uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies'],
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         ));
     }
 

@@ -168,6 +168,13 @@ final readonly class OperationEmitter
 
         $method = $class->addMethod($operationId)->setPublic();
 
+        // First, ahead of every `@param` and the `@return`: the scopes this
+        // operation's own requirement asks for are prose about the call, not
+        // an annotation on one of its arguments. Added after any of them and
+        // it lands *between* tags, where a doc parser reads it as the tail of
+        // the preceding `@param` description rather than as its own sentence.
+        SecurityDocs::addOperationComment($method, $securityCatalog, $operation);
+
         $this->paramAdder->addPath($method, $namespace, $pathParams, $bindings, $rawOperationId);
         $this->paramAdder->addQuery($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $rawOperationId);
 

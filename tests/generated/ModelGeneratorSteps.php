@@ -31,6 +31,7 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
+use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -309,6 +310,7 @@ final class ModelGeneratorSteps
             // the run unless accepted. This scenario is about pruning, so
             // accept it here rather than exercise the refusal.
             skip: ['uploadFile' => 'application/octet-stream request body — out of scope for the prune scenario'],
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         );
 
         $this->runGenerator($profile);
@@ -1414,6 +1416,7 @@ final class ModelGeneratorSteps
             output: $base,
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ComponentEnum',
             skip: ['uploadFile' => 'application/octet-stream request body — not what this scenario is about'],
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         ));
 
         $enum = $base . '/Generated/Enum/OrderStatus.php';

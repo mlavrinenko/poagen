@@ -44,9 +44,14 @@ final readonly class ClientConstructor
         $ctor->addPromotedParameter('transport')->setType(TransportInterface::class)->setPrivate();
 
         // Security-scheme args sit AFTER the transport so a schema that gains
-        // a scheme does not reorder the existing signature.
+        // a scheme does not reorder the existing signature. A scheme claims
+        // one argument, except `http basic`, whose credential is genuinely
+        // two values — a user and a password that meet as base64(user:pass)
+        // and nowhere else.
         foreach ($schemes as $scheme) {
-            $ctor->addPromotedParameter($scheme->ctorArg)->setType('string')->setPrivate();
+            foreach ($scheme->ctorArgs() as $arg) {
+                $ctor->addPromotedParameter($arg)->setType('string')->setPrivate();
+            }
         }
     }
 
@@ -62,7 +67,9 @@ final readonly class ClientConstructor
         $args = ['$this->transport'];
 
         foreach ($schemes as $scheme) {
-            $args[] = '$this->' . $scheme->ctorArg;
+            foreach ($scheme->ctorArgs() as $arg) {
+                $args[] = '$this->' . $arg;
+            }
         }
 
         return $args;

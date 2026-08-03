@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Every security scheme that reduces to a credential
+  version: 1.0.0
+  description: >
+    One operation per wired scheme kind, so a test can assert the exact
+    header or query parameter each one puts on the request. Also carries
+    the one scheme with nothing to wire (mutualTLS) and two declarations
+    nothing requires, which must stay silent.
+servers:
+  - url: https://security-kinds.example/api/v1
+paths:
+  /cookie:
+    get:
+      operationId: cookieScheme
+      security:
+        - cookieKey: []
+      responses:
+        '204':
+          description: no content
+  /basic:
+    get:
+      operationId: basicScheme
+      security:
+        - basicAuth: []
+      responses:
+        '204':
+          description: no content
+  /token:
+    get:
+      operationId: tokenScheme
+      security:
+        - tokenAuth: []
+      responses:
+        '204':
+          description: no content
+  /oauth:
+    get:
+      operationId: oauthScheme
+      security:
+        - oauthAuth:
+            - 'read:things'
+            - 'write:things'
+      responses:
+        '204':
+          description: no content
+  /oidc:
+    get:
+      operationId: oidcScheme
+      security:
+        - oidcAuth: []
+      responses:
+        '204':
+          description: no content
+  /mtls:
+    get:
+      operationId: mutualTlsScheme
+      security:
+        - mtls: []
+      responses:
+        '204':
+          description: no content
+components:
+  securitySchemes:
+    cookieKey:
+      type: apiKey
+      in: cookie
+      name: session
+    basicAuth:
+      type: http
+      scheme: basic
+    tokenAuth:
+      type: http
+      scheme: Token
+    oauthAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://security-kinds.example/oauth/authorize
+          tokenUrl: https://security-kinds.example/oauth/token
+          refreshUrl: https://security-kinds.example/oauth/refresh
+          scopes:
+            'read:things': read the things
+            'write:things': change the things
+        clientCredentials:
+          tokenUrl: https://security-kinds.example/oauth/machine-token
+          scopes:
+            'read:things': read the things
+    oidcAuth:
+      type: openIdConnect
+      openIdConnectUrl: https://security-kinds.example/.well-known/openid-configuration
+    mtls:
+      type: mutualTLS
+    unusedDigest:
+      type: http
+      scheme: digest
+    unusedTls:
+      type: mutualTLS

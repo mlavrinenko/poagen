@@ -20,6 +20,8 @@ final readonly class StoreClient implements StoreClientInterface
 {
     public function __construct(
         private TransportInterface $transport,
+        private string $apiKey,
+        private string $petstoreAuth,
     ) {
     }
 
@@ -29,7 +31,7 @@ final readonly class StoreClient implements StoreClientInterface
     public function getInventory(): array
     {
         return $this->transport->send(
-            Endpoint::get('/store/inventory'),
+            Endpoint::get('/store/inventory')->header('api_key', $this->apiKey),
             ResponseType::mapOf(ResponseType::int()),
         );
     }

@@ -21,71 +21,105 @@ final readonly class PetClient implements PetClientInterface
 {
     public function __construct(
         private TransportInterface $transport,
+        private string $apiKey,
+        private string $petstoreAuth,
     ) {
     }
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function updatePet(Pet $body): Pet
     {
         return $this->transport->send(
-            Endpoint::put('/pet')->json($body),
-            ResponseType::object(Pet::class),
-        );
-    }
-
-    public function addPet(Pet $body): Pet
-    {
-        return $this->transport->send(
-            Endpoint::post('/pet')->json($body),
+            Endpoint::put('/pet')
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
+                ->json($body),
             ResponseType::object(Pet::class),
         );
     }
 
     /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
+    public function addPet(Pet $body): Pet
+    {
+        return $this->transport->send(
+            Endpoint::post('/pet')
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
+                ->json($body),
+            ResponseType::object(Pet::class),
+        );
+    }
+
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @return list<Pet>
      */
     public function findPetsByStatus(FindPetsByStatusStatus $status): array
     {
         return $this->transport->send(
-            Endpoint::get('/pet/findByStatus')->query('status', $status),
+            Endpoint::get('/pet/findByStatus')
+                ->query('status', $status)
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
             ResponseType::listOf(Pet::class),
         );
     }
 
     /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @param list<string> $tags
      * @return list<Pet>
      */
     public function findPetsByTags(array $tags): array
     {
         return $this->transport->send(
-            Endpoint::get('/pet/findByTags')->query('tags', $tags),
+            Endpoint::get('/pet/findByTags')
+                ->query('tags', $tags)
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
             ResponseType::listOf(Pet::class),
         );
     }
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function getPetById(int $petId): Pet
     {
         return $this->transport->send(
-            Endpoint::get('/pet/{petId}')->path('petId', $petId),
+            Endpoint::get('/pet/{petId}')
+                ->path('petId', $petId)
+                ->header('api_key', $this->apiKey)
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
             ResponseType::object(Pet::class),
         );
     }
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet
     {
         return $this->transport->send(
             Endpoint::post('/pet/{petId}')
                 ->path('petId', $petId)
                 ->query('name', $name)
-                ->query('status', $status),
+                ->query('status', $status)
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
             ResponseType::object(Pet::class),
         );
     }
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function deletePet(int $petId, ?string $apiKey = null): void
     {
         $this->transport->send(
-            Endpoint::delete('/pet/{petId}')->path('petId', $petId)->header('api_key', $apiKey),
+            Endpoint::delete('/pet/{petId}')
+                ->path('petId', $petId)
+                ->header('api_key', $apiKey)
+                ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
             ResponseType::nothing(),
         );
     }
