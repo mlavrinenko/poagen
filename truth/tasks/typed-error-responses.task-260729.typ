@@ -5,6 +5,7 @@
   tags: ("errors", "dx", "generator"),
   priority: 8,
   difficulty: 8,
+  links: (depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),),
   status: accepted(
     2026,
     8,
@@ -68,10 +69,14 @@ worried about, confirmed rather than assumed — and it is still strictly more
 than \`mixed\`.
 
 The cost this ruling carries is also now measured rather than feared. Thirty-six
-identical inline error schemas would emit thirty-six identical model classes
-unless identical inline shapes collapse onto one. That is the "complexity
-balloons" objection, and it is answered by structural deduplication rather than
-by refusing to type the body.
+identical inline error schemas emit thirty-six identical model classes unless
+someone merges them. That is the "complexity balloons" objection, and the answer
+is \`name-inline-schemas-by-operation-and-status\`'s \`Profile::\$inlineModels\`
+surface: the run reports the group and prints the profile block that collapses
+it, and the consumer pastes it. Automatic structural deduplication was
+considered and rejected by the owner on 2026-08-02 — two endpoints returning
+\`{id, name}\` may be returning a tag and a user, and merging them invents a
+domain relationship the document never stated.
 
 == Acceptance criteria
 
@@ -97,8 +102,16 @@ by refusing to type the body.
 - No generated method throws for a status the document declared. kilbil's 403
   becomes a body, not an exception, and the emitted tree contains no 2xx-range
   branch.
-- Identical inline response schemas collapse onto one emitted model. Proven on
-  kilbil: its 36 identical 403 schemas produce exactly one error model, not 36.
+- Identical inline response schemas do NOT collapse on their own. This
+  criterion said the opposite until 2026-08-03 and was superseded four weeks
+  after it was written, by \`name-inline-schemas-by-operation-and-status\`'s
+  owner ruling of 2026-08-02: thirty-six identical bodies produce thirty-six
+  classes unless a human says otherwise, because structural identity is not
+  identity of meaning. So kilbil's 36 identical 403 schemas emit 36 classes,
+  the run reports the group on the notice channel with the profile block that
+  would merge them, and \`Profile::\$inlineModels\` is where a consumer asks for
+  one \`KilbilError\`. That task owns both the naming and the merge surface and
+  should land first; this one consumes them.
 - A decision artifact supersedes \`error-response-policy\`, citing the
   measured kilbil surface above as its evidence, and states what the envelope
   costs: every generated method's return type changes, and every consumer
