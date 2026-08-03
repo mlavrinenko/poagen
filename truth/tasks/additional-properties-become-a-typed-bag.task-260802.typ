@@ -5,7 +5,11 @@
   tags: ("generator", "runtime", "dx"),
   priority: 6,
   difficulty: 5,
-  status: wip(2026, 8, 2),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as b03a96b, merged and re-gated on the integrated HEAD. additionalProperties: true emits a runtime AdditionalPropertyBag; omission and false measured byte-identical across kilbil, petstore and all five golden trees by patching the reading down to the naive one and regenerating.],
 )
 
 == Summary

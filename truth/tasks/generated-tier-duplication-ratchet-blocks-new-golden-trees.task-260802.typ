@@ -18,11 +18,26 @@ The agent dropped its golden rather than touch the ratchet, which is the right c
 
 Anyone who adds a golden tree next hits the same wall.
 
+=== It bit a second time the same day
+
+`additional-properties-become-a-typed-bag` hit it too. Because no `open-shapes`
+golden tree can be committed, the emitted bag code reaches no tier of the gate
+at all: `lint-phpstan-generated` sees only `tests/fixtures/generated` and the
+example trees, and none of them contains a bag. The agent closed the hole by
+hand — generated the tree into a scratch directory and ran
+`phpstan analyse -c phpstan-generated.neon` over it, exit 0 across 11 files —
+and said plainly that the check is manual and will not repeat itself.
+
+So the cost is now measured rather than predicted: every emitted shape added
+from here on is unanalysed by the one tier held to no baseline, no
+`excludePaths` and no `ignoreErrors`, until this lands. Two tasks have paid it.
+
 == Acceptance criteria
 
 - Adding a golden fixture tree no longer raises the generated tier's duplication figure by the mere fact of existing. Either the shared emitted preamble is excluded from the tier the way a file's import block already is, or the tier is measured per-tree rather than across the corpus, or the ratchet's rule gains a stated exception with a reason.
 - Whatever is chosen keeps the ratchet meaningful for real duplication inside a single emitted tree. A gate loosened until it passes is not a gate.
 - The golden tree dropped by close-the-three-sites-that-widen-a-declared-shape is committed, and the generated tier analyses its map-valued response types and its additional-properties attribute at max level.
+- The open-shapes tree that additional-properties-become-a-typed-bag could only analyse by hand, in a scratch directory, is committed too, so that check runs on every gate rather than once.
 - The threshold's comment says what the number means after this change, since the current one says it only ever moves down.
 
 == Non-goals
