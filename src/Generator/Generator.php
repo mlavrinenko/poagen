@@ -178,8 +178,8 @@ final readonly class Generator
         );
         $tagRegistry = new NameRegistry($normaliser);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
-        $this->emitApiException($rootNamespace, $rootDir, $writes);
-        $this->emitEnums($enums, $enumDir, $writes);
+        $this->apiExceptionEmitter->emitInto($rootNamespace, $rootDir, $writes);
+        $this->enumEmitter->emitAllInto($enums, $enumDir, $writes);
 
         $prunes = $this->prunePlanner->plan($rootDir, $writes);
         $notices = [
@@ -216,24 +216,6 @@ final readonly class Generator
         $writes = array_map($header->stamp(...), $writes);
 
         return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, $notices);
-    }
-
-    /**
-     * @param array<string,string> $writes
-     */
-    private function emitEnums(EnumCatalog $enums, string $enumDir, array &$writes): void
-    {
-        $specs = $enums->all();
-
-        if ($specs === []) {
-            return;
-        }
-
-        foreach ($specs as $spec) {
-            $code = $this->enumEmitter->emit($enums->enumNamespace, $spec);
-            $path = $enumDir . DIRECTORY_SEPARATOR . $spec->name . '.php';
-            $writes[$path] = $code;
-        }
     }
 
     /**
@@ -275,17 +257,6 @@ final readonly class Generator
         $emitter->emit($rootNamespace, $rootDir, $openApi, $bindings, $profile, $tagRegistry, $writes);
 
         return $emitter->drainSkipped();
-    }
-
-    /** @param array<string,string> $writes */
-    private function emitApiException(string $rootNamespace, string $rootDir, array &$writes): void
-    {
-        // Only emit when ApiClient was emitted: the exception has no
-        // referent without at least one operation that throws it.
-        if (!isset($writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
-            return;
-        }
-        $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiException.php'] = $this->apiExceptionEmitter->emit($rootNamespace);
     }
 
 }

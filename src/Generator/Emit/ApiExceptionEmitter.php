@@ -30,6 +30,24 @@ final readonly class ApiExceptionEmitter
         $this->printer = new PsrPrinter();
     }
 
+    /**
+     * Emit into a write set, or not at all.
+     *
+     * Only emits when `ApiClient` was emitted: the exception has no referent
+     * without at least one operation that throws it. The rule lives here
+     * rather than in the generator so it travels with the class it governs.
+     *
+     * @param array<string,string> $writes
+     */
+    public function emitInto(string $clientNamespace, string $rootDir, array &$writes): void
+    {
+        if (!isset($writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClient.php'])) {
+            return;
+        }
+
+        $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiException.php'] = $this->emit($clientNamespace);
+    }
+
     public function emit(string $clientNamespace): string
     {
         $clientNamespace = trim($clientNamespace, '\\');

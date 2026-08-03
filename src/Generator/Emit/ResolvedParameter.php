@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Parameter;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
+use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
 /**
  * One OpenAPI parameter paired with the PHP identifier the emitter
@@ -25,6 +28,24 @@ final readonly class ResolvedParameter
         public Parameter $param,
         public string $phpName,
     ) {}
+
+    /**
+     * Pair every parameter with the PHP identifier the registry gives it.
+     *
+     * @param  list<Parameter>         $params
+     * @return list<ResolvedParameter>
+     */
+    public static function resolveAll(array $params, NameRegistry $registry): array
+    {
+        $context = new NormalisationContext(SymbolKind::ParameterName);
+        $out = [];
+
+        foreach ($params as $param) {
+            $out[] = new self($param, $registry->resolve($param->name, $context));
+        }
+
+        return $out;
+    }
 
     public function rawName(): string
     {

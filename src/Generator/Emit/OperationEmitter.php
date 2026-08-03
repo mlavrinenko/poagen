@@ -148,9 +148,9 @@ final readonly class OperationEmitter
         assert($this->paramNormaliser instanceof NameNormaliser);
         $paramRegistry = new NameRegistry($this->paramNormaliser);
 
-        $pathParams = $this->resolveParameters($rawPathParams, $paramRegistry);
-        $queryParams = $this->resolveParameters(OperationAnalyzer::queryParameters($operation, $pathItem), $paramRegistry);
-        $headerParams = $this->resolveParameters(OperationAnalyzer::headerParameters($operation, $pathItem), $paramRegistry);
+        $pathParams = ResolvedParameter::resolveAll($rawPathParams, $paramRegistry);
+        $queryParams = ResolvedParameter::resolveAll(OperationAnalyzer::queryParameters($operation, $pathItem), $paramRegistry);
+        $headerParams = ResolvedParameter::resolveAll(OperationAnalyzer::headerParameters($operation, $pathItem), $paramRegistry);
         $requiredQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => $p->param->required));
         $optionalQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
@@ -244,22 +244,6 @@ final readonly class OperationEmitter
         return $resolved instanceof RequestBody
             ? RequestBodyAnalyzer::describeUnsupported($resolved)
             : 'request body $ref does not resolve to a component requestBody — fix the $ref or inline the body';
-    }
-
-    /**
-     * @param  list<Parameter>         $params
-     * @return list<ResolvedParameter>
-     */
-    private function resolveParameters(array $params, NameRegistry $paramRegistry): array
-    {
-        $context = new NormalisationContext(SymbolKind::ParameterName);
-        $out = [];
-
-        foreach ($params as $param) {
-            $out[] = new ResolvedParameter($param, $paramRegistry->resolve($param->name, $context));
-        }
-
-        return $out;
     }
 
     private function applyReturnType(Method $method, PhpNamespace $namespace, ReturnSpec $return): void
