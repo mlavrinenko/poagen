@@ -30,7 +30,7 @@ return new Profile(
      * finding and why the marker stays.
      *
      * What follows is real, verified progress on a separate, larger
-     * surface: forty-three operations this document could already not
+     * surface: forty operations this document could already not
      * represent before T-030 ever ran (inline request bodies, unsupported
      * query-parameter shapes, response schemas of unrepresentable shape).
      * It was forty-nine until
@@ -40,7 +40,13 @@ return new Profile(
      * a `text/plain, text/x-markdown` request body and an
      * `application/octet-stream` upload — and the sixth,
      * `orgs/enable-or-disable-security-product-on-all-org-repos`, had gone
-     * stale on its own and generated cleanly already. `abort-on-unrepresentable-
+     * stale on its own and generated cleanly already. Then
+     * `a-response-of-scalars-has-no-return-shape` took three more:
+     * `gitignore/get-all-templates` and
+     * `repos/get-all-status-check-contexts` return `items: {type: string}`,
+     * and `meta/get-all-versions` returns `{type: string, format: date}`.
+     * Every list return shape resolved a model class and hydrated it, so
+     * an array of scalars had no way to be said at all. `abort-on-unrepresentable-
      * constructs` and `default-deny-on-degradation` (both 2026-08-01)
      * unified every one of these into the same generator-time abort this
      * profile already refuses to weaken, so they need the same skip-list
@@ -65,14 +71,12 @@ return new Profile(
         'dependabot/list-alerts-for-enterprise' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'dependabot/list-alerts-for-org' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'dependabot/list-alerts-for-repo' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'gitignore/get-all-templates' => '200 response is a JSON array whose items are an inline (non-$ref) schema',
         'interactions/get-restrictions-for-org' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-authenticated-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'issues/set-labels' => 'application/json request body with an inline (non-$ref) schema',
         'issues/add-labels' => 'application/json request body with an inline (non-$ref) schema',
         'licenses/get-for-repo' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'meta/get-all-versions' => '200 response is a JSON array whose items are an inline (non-$ref) schema',
         'projects/add-field-for-org' => 'application/json request body with an inline (non-$ref) schema',
         'projects/list-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/get-org-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
@@ -81,7 +85,6 @@ return new Profile(
         'projects/list-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/get-user-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/list-view-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'repos/get-all-status-check-contexts' => '200 response is a JSON array whose items are an inline (non-$ref) schema',
         'repos/set-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',
         'repos/add-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',
         'repos/remove-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',

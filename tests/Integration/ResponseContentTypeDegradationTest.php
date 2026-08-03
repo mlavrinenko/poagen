@@ -97,7 +97,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
         }
     }
 
-    public function testAResponseWithAnInlineNonRefArrayItemAbortsTheRun(): void
+    public function testAResponseWithAnArrayItemThatDeclaresNothingAbortsTheRun(): void
     {
         try {
             $this->plan($this->acceptAllExcept('listInlineItems'));
@@ -107,6 +107,9 @@ final class ResponseContentTypeDegradationTest extends TestCase
 
             self::assertStringContainsString('listInlineItems', $message);
             self::assertStringContainsString('array', $message);
+            // An inline item is fine now if it declares a scalar type; what
+            // is left unrepresentable is an item that declares nothing.
+            self::assertStringContainsString('scalar `type`', $message);
         }
     }
 

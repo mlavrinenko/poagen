@@ -25,6 +25,13 @@ info:
     coming back. `getBinaryBlob` took its place in the count — a
     `format: binary` body is a stream, and the return contract cannot name
     one yet.
+
+    `listInlineItems` declared `items: {type: string}` until
+    a-response-of-scalars-has-no-return-shape made exactly that shape
+    representable. It now declares `items: {}` — nothing at all — because
+    what this fixture needs from it is an array item the generator genuinely
+    cannot type, and a list of mixed is the widening
+    declared-shapes-become-types refuses.
 paths:
   /plain-text:
     get:
@@ -77,8 +84,7 @@ paths:
             application/json:
               schema:
                 type: array
-                items:
-                  type: string
+                items: {}
   /ok:
     get:
       operationId: okOperation

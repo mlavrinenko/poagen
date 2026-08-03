@@ -9,8 +9,11 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
 
+use function is_string;
 use function str_starts_with;
 
 /**
@@ -42,7 +45,7 @@ final readonly class ResponseAnalyzer
     /**
      * @param Responses<Response|Reference>|null $responses
      */
-    public static function resolve(?Responses $responses, NameRegistry $registry): ?ReturnSpec
+    public static function resolve(?Responses $responses, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
     {
         $picked = self::pick2xx($responses);
 
@@ -50,7 +53,7 @@ final readonly class ResponseAnalyzer
             return ReturnSpec::void();
         }
 
-        return self::fromResponse($picked[1], $registry);
+        return self::fromResponse($picked[1], $registry, $bindings ?? new Bindings([]));
     }
 
     /**
@@ -73,7 +76,7 @@ final readonly class ResponseAnalyzer
         return ResponseRefusal::describe($status, $response, $response->content ?? []);
     }
 
-    private static function fromResponse(Response $response, NameRegistry $registry): ?ReturnSpec
+    private static function fromResponse(Response $response, NameRegistry $registry, Bindings $bindings): ?ReturnSpec
     {
         $content = $response->content ?? [];
 
@@ -103,7 +106,7 @@ final readonly class ResponseAnalyzer
         $type = SchemaType::of($schema);
 
         if ($type->is('array')) {
-            return self::fromArray($schema, $registry);
+            return self::fromArray($schema, $registry, $bindings);
         }
 
         if (ObjectShape::is($schema)) {
@@ -137,18 +140,68 @@ final readonly class ResponseAnalyzer
         return BodyMediaType::firstText($content) === null ? null : ReturnSpec::scalar('string');
     }
 
-    private static function fromArray(Schema $schema, NameRegistry $registry): ?ReturnSpec
+    /**
+     * A JSON array response, as a list of whatever its items declare.
+     *
+     * A `$ref` item is a Model and the list is hydrated, byte-identically to
+     * before. An inline item that declares a scalar type is a scalar, and the
+     * list carries it without any model class at all — GitHub returns three
+     * such arrays (`items: {type: string}` twice, and once with
+     * `format: date`), and until this branch existed every one of them was
+     * refused for want of a class to hydrate into.
+     *
+     * An item that declares nothing still refuses: `mixed` in a list is the
+     * widening `declared-shapes-become-types` exists to resist, and
+     * {@see ResponseRefusal} names the gap so the document's silence is
+     * visible rather than tolerated.
+     */
+    private static function fromArray(Schema $schema, NameRegistry $registry, Bindings $bindings): ?ReturnSpec
     {
         $items = $schema->items;
 
-        if (!$items instanceof Reference) {
+        if ($items instanceof Reference) {
+            $ref = $items->getReference();
+            $raw = ComponentName::rawFromRef($ref);
+
+            return $raw === '' ? null : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
+        }
+
+        if (!$items instanceof Schema) {
             return null;
         }
 
-        $ref = $items->getReference();
-        $raw = ComponentName::rawFromRef($ref);
+        $item = self::scalarItem($items, $bindings);
 
-        return $raw === '' ? null : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
+        return $item instanceof ReturnSpec ? ReturnSpec::scalarListOf($item) : null;
+    }
+
+    /**
+     * One inline array item, when the document declared a scalar for it.
+     *
+     * The `format` is read through the same {@see Bindings} a model property
+     * consults, so `{type: string, format: date}` arrives as whatever a
+     * date-formatted string binds to elsewhere — `\DateTimeImmutable` by
+     * default, or the consumer's own value object where they registered one.
+     * A format nobody bound leaves the item as its base scalar, which is what
+     * the same annotation does on a property.
+     */
+    private static function scalarItem(Schema $items, Bindings $bindings): ?ReturnSpec
+    {
+        $scalar = SchemaType::of($items)->scalarPhpType();
+
+        if ($scalar === null) {
+            return null;
+        }
+
+        $format = $items->format;
+
+        if (!is_string($format) || $format === '') {
+            return ReturnSpec::scalar($scalar);
+        }
+
+        $bound = $bindings->scalarFormat($format);
+
+        return $bound instanceof ScalarFormat ? ReturnSpec::boundScalar($bound) : ReturnSpec::scalar($scalar);
     }
 
     /**

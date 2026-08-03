@@ -140,8 +140,9 @@ final readonly class ResponseRefusal
         }
 
         return sprintf(
-            '%s is a JSON array whose items are an inline (non-$ref) schema — paogen only emits a typed list '
-                . 'for items that are a $ref to a component schema; move the item schema into components.schemas',
+            '%s is a JSON array whose items declare neither a $ref nor a scalar `type` — paogen emits a typed '
+                . 'list for items that are a $ref to a component schema, and a list of scalars for items that '
+                . 'declare one; give the items a `type`, or move the item schema into components.schemas',
             $prefix,
         );
     }

@@ -155,7 +155,7 @@ final readonly class OperationEmitter
         $optionalQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
         $return = $this->inlinePayloads->returnFor($rawOperationId)
-            ?? OperationAnalyzer::returnType($operation->responses, $this->registry);
+            ?? OperationAnalyzer::returnType($operation->responses, $this->registry, $bindings);
 
         if (!$return instanceof ReturnSpec) {
             return EmitOutcome::skipped(new SkippedOperation(
@@ -269,6 +269,7 @@ final readonly class OperationEmitter
                 return;
 
             case ReturnSpec::KIND_MAP:
+            case ReturnSpec::KIND_SCALAR_LIST:
                 $method->setReturnType('array');
                 $method->addComment('@return ' . DocTypeSimplifier::shorten(
                     $namespace,

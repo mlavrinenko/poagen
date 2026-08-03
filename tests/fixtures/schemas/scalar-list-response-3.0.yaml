@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: Scalar List Response Fixture
+  version: "1.0.0"
+  description: >
+    a-response-of-scalars-has-no-return-shape: every list return shape
+    resolved a class name and hydrated it, so a 2xx response declared as an
+    array of scalars could not be said at all and refused.
+
+    The shapes are read off the vendored GitHub document rather than
+    invented. `listTemplates` is gitignore/get-all-templates and
+    repos/get-all-status-check-contexts (`items: {type: string}`);
+    `listVersions` is meta/get-all-versions (`items: {type: string,
+    format: date}`), which must arrive as whatever a date-formatted string
+    binds to on a model property, not as a raw string.
+
+    `listEmails` pins the other half of that rule: a consumer's own
+    `#[BindsFormat]` value object wins over paogen's built-in, in a response
+    list exactly as it does on a property. `listPets` is the pre-existing
+    array-of-$ref shape, here to prove it still hydrates. `listAnything`
+    declares no item type at all and must stay refused rather than widen to
+    a list of mixed.
+paths:
+  /templates:
+    get:
+      operationId: listTemplates
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /versions:
+    get:
+      operationId: listVersions
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: date
+  /emails:
+    get:
+      operationId: listEmails
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: email
+  /counts:
+    get:
+      operationId: listCounts
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+  /pets:
+    get:
+      operationId: listPets
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+  /anything:
+    get:
+      operationId: listAnything
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        name:
+          type: string
