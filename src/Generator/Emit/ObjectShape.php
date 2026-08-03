@@ -6,7 +6,9 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use stdClass;
 
+use function get_object_vars;
 use function is_array;
 
 /**
@@ -68,5 +70,47 @@ final readonly class ObjectShape
         $additional = $schema->additionalProperties;
 
         return $additional instanceof Schema || $additional instanceof Reference;
+    }
+
+    /**
+     * True only when the document itself wrote `additionalProperties: true`.
+     *
+     * A fourth accessor that does not mean what it says, alongside the three
+     * in AGENT.md. JSON Schema defaults the keyword to `true` and the parser
+     * substitutes that default in `attributeDefaults()`, so
+     * `$schema->additionalProperties` reads back `true` for a document that
+     * declared nothing exactly as it does for one that wrote the word —
+     * measured against `devizzent/cebe-php-openapi`'s `spec/Schema.php`, which
+     * lists `'additionalProperties' => true` among its defaults.
+     *
+     * Reading it through the accessor would therefore put an extras bag on
+     * every object paogen has ever emitted — 107 models in the kilbil example
+     * alone — for a permission nobody granted. `getSerializableData()` reflects
+     * only what the document set, before the substitution, and is how
+     * {@see ServerCatalog} tells the same two states apart for `servers:`.
+     *
+     * An author who wrote nothing said nothing. `false` is a third state again
+     * and stays the signal that closes a shape.
+     */
+    public static function declaresOpenExtras(Schema $schema): bool
+    {
+        // Rules out `false` and the schema form only. It does *not* spare the
+        // serialisation below on the common node, and an earlier version of
+        // this comment claimed it did: the defaulted case is the vast
+        // majority and reads back `true`, so it falls straight through.
+        // Measured on `examples/github/schemas/api.github.com.yaml` — 894 of
+        // 918 components read `true` through the accessor, 6 wrote it. The
+        // serialisation is kept anyway because it is the only public reading
+        // (`hasPropertyValue()` is protected) and it is cheap enough:
+        // `declaresOpenExtras` over that document's 809 object components
+        // costs 0.11s, and kilbil's whole generation is unchanged at 0.37s.
+        if ($schema->additionalProperties !== true) {
+            return false;
+        }
+
+        $raw = $schema->getSerializableData();
+        $rawVars = $raw instanceof stdClass ? get_object_vars($raw) : [];
+
+        return ($rawVars['additionalProperties'] ?? null) === true;
     }
 }

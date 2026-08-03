@@ -1,0 +1,105 @@
+openapi: 3.0.3
+info:
+  title: Open shapes
+  version: 1.0.0
+  description: >
+    The three states of `additionalProperties` beside declared `properties`,
+    in one document so a single run answers all three.
+
+    JSON Schema defaults the keyword to `true` and the parser substitutes that
+    default, so an omitted keyword and an explicit `true` are indistinguishable
+    through `Schema::$additionalProperties`. They are not the same declaration,
+    and this fixture exists to hold them apart: `Open` wrote the word, `Silent`
+    wrote nothing, `Closed` wrote `false`. Only the first carries a bag.
+paths:
+  /open:
+    post:
+      operationId: saveOpen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              required:
+                - handle
+              properties:
+                handle:
+                  type: string
+      responses:
+        '200':
+          description: the same three states, at payload granularity
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                properties:
+                  saved:
+                    type: boolean
+components:
+  schemas:
+    Part:
+      type: object
+      properties:
+        sku:
+          type: string
+    Open:
+      description: >
+        the vendor wrote the word, so the extras are the consumer's. `parts`
+        is here because a declared property carrying a phpdoc type sits in the
+        same constructor docblock the bag deliberately writes no line into —
+        the two have to coexist, and the runtime has to keep typing `parts`
+        off that docblock while typing the bag off its native type alone.
+      type: object
+      additionalProperties: true
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Part'
+    Silent:
+      description: >
+        the vendor wrote nothing. JSON Schema would default this to `true`;
+        paogen does not read a default as a declaration, so this emits exactly
+        what it emitted before extras were carried at all.
+      type: object
+      properties:
+        name:
+          type: string
+    Closed:
+      description: >
+        `false` closes the shape and keeps meaning that — the union work reads
+        it as the signal that a shape admits nothing further.
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+    Typed:
+      description: >
+        a schema for the extra values, which types them; a typed map is a
+        collection of a declared shape and stays a PHP array.
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Part'
+      properties:
+        name:
+          type: string
+    Colliding:
+      description: >
+        a vendor is free to declare a property literally called
+        `additionalProperties`, and it wins — it is the one with a wire name
+        behind it.
+      type: object
+      additionalProperties: true
+      properties:
+        additionalProperties:
+          type: string
