@@ -157,6 +157,29 @@ on get no generated-tier analysis until it is fixed. And
 markers overstate what is left — two of their claims were fixed before this
 session began.
 
+## A blast radius nobody maps: specs that use the refused construct as their example
+
+Found by the non-JSON agent, and it is a scoping lesson rather than a defect.
+
+`represent-non-json-request-and-response-bodies` makes `text/plain` and
+`application/octet-stream` representable. Four scenarios in
+`truth/specs/operation-generator.feature-260418.typ` — lines 88, 178, 269 and
+281 — used exactly those two constructs as their worked examples of a
+construct that is *not* representable. The rules those scenarios assert all
+still hold; only their examples became false. Nothing in the task's `Files`
+list, and nothing in the boundary the orchestrator drew, pointed at that spec.
+
+It is worse than an ordinary doc-drift dependent, because the fix is not a
+text edit: the scenario text compiles into `tests/generated/*Test.php`, so
+changing it forces `speconaut generate-tests`, rehoming the renamed step
+bodies, and `speconaut lock` — a blast radius well outside the file list.
+
+The rule: when a task makes a construct representable, grep the specs for that
+construct before drawing the boundary. A scenario that uses it as an example of
+refusal is part of the change, and the substitute example must be something the
+task's own non-goals keep refused, so the scenario keeps testing its rule. Here
+that was `multipart/form-data`.
+
 ## The measurement rule, stated for the third time
 
 Three plans in this backlog have now rested on an unmeasured claim about a
