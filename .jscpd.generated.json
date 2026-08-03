@@ -1,0 +1,8 @@
+{
+  "minTokens": 50,
+  "ignorePattern": [
+    "(?m)^(declare|namespace|use)\\b.*;$",
+    "(?s)/\\*\\*.*?\\*/"
+  ],
+  "reporters": ["console"]
+}
