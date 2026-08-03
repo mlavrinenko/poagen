@@ -232,6 +232,27 @@ final class TypeListTest extends TestCase
         self::assertStringNotContainsString('public function refusedShapes(', $this->clientSource($plan));
     }
 
+    /**
+     * skipped-operation-still-emits-its-payload-model: `refusedShapes` is the
+     * only operation that names this schema, so accepting its skip has to
+     * drop the request model along with the method — otherwise the emitted
+     * tree carries a class nothing calls, referencing nothing else either.
+     * The nested branch class `InlinePayloadPlanner` would have queued while
+     * draining `RefusedShapesRequest` — `RefusedShapesRequestEitherObjectOrString`
+     * — never gets discovered once the root itself is never queued.
+     */
+    public function testTheSkippedOperationsPayloadModelDoesNotEmitEither(): void
+    {
+        $plan = $this->plan(['refusedShapes' => 'a `type: [object, string]` body — narrowing it needs the vendor']);
+        $classNames = array_map(
+            static fn(string $path): string => basename($path, '.php'),
+            array_keys($plan->writes),
+        );
+
+        self::assertNotContains('RefusedShapesRequest', $classNames);
+        self::assertNotContains('RefusedShapesRequestEitherObjectOrString', $classNames);
+    }
+
     private function modelSource(string $class): string
     {
         return $this->sourceOf($this->plan(['refusedShapes' => 'out of scope for this assertion']), $class);

@@ -18,6 +18,11 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
  * {@see RequestBodyAnalyzer} and {@see OperationAnalyzer}, so the two paths are
  * disjoint and the caller can consult this one first without ambiguity.
  *
+ * An operation the document-wide schema scan already refused has no entry
+ * here at all — {@see InlinePayloadPlanner::build()} never queries it, so its
+ * absence is indistinguishable from an operation that declared no inline
+ * payload in the first place (skipped-operation-still-emits-its-payload-model).
+ *
  * @internal
  */
 final readonly class InlinePayloadCatalog

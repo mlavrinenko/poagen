@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info:
+  title: Skipped Operation Shared Payload Fixture
+  version: "1.0.0"
+  description: >
+    skipped-operation-still-emits-its-payload-model: an operation named in
+    Profile::$skip drops the payload model synthesised solely for it, but a
+    model reachable from a second, surviving operation must still emit —
+    reachability decides, not the skip entry alone.
+
+    `keepsShared` and `dropsShared` both `$ref` the same
+    `components.requestBodies` entry, so the request schema is the same
+    document node for both, and both are pinned (Profile::$inlineModels) to
+    the same class name. `dropsShared` also carries an unrepresentable
+    nested `type` list in its own response (nullable-type-arrays), which
+    gets it refused and skip-covered independent of the body it shares with
+    `keepsShared`. Accepting that skip must drop `dropsShared`'s method
+    without dropping the shared request model `keepsShared` still needs.
+paths:
+  /alive:
+    post:
+      operationId: keepsShared
+      requestBody:
+        $ref: '#/components/requestBodies/SharedPayload'
+      responses:
+        '204':
+          description: ok
+  /doomed:
+    post:
+      operationId: dropsShared
+      requestBody:
+        $ref: '#/components/requestBodies/SharedPayload'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - eitherObjectOrString
+                properties:
+                  eitherObjectOrString:
+                    type:
+                      - object
+                      - string
+                    properties:
+                      inner:
+                        type: string
+components:
+  requestBodies:
+    SharedPayload:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              inner:
+                type: string
