@@ -167,6 +167,7 @@ use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+use Psr\Http\Message\StreamInterface;
 
 final readonly class ReposClient implements ReposClientInterface
 {
@@ -697,6 +698,20 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('branch', $branch)
                 ->json($body),
             ResponseType::object(StatusCheckPolicy::class),
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): array
+    {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->path('branch', $branch),
+            ResponseType::scalarListOf(ResponseType::string()),
         );
     }
 
@@ -2345,6 +2360,26 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page),
             ResponseType::listOf(ReleaseAsset::class),
+        );
+    }
+
+    public function reposUploadReleaseAsset(
+        string $owner,
+        string $repo,
+        int $releaseId,
+        string $name,
+        StreamInterface $body,
+        ?string $label = null,
+    ): ReleaseAsset {
+        return $this->transport->send(
+            Endpoint::post('/repos/{owner}/{repo}/releases/{release_id}/assets')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->path('release_id', $releaseId)
+                ->query('name', $name)
+                ->query('label', $label)
+                ->binary($body, 'application/octet-stream'),
+            ResponseType::object(ReleaseAsset::class),
         );
     }
 

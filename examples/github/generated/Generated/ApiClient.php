@@ -231,6 +231,14 @@ final readonly class ApiClient implements ApiClientInterface
     }
 
     /**
+     * The `markdown` endpoints.
+     */
+    public function markdown(): MarkdownClientInterface
+    {
+        return new MarkdownClient($this->transport);
+    }
+
+    /**
      * The `meta` endpoints.
      */
     public function meta(): MetaClientInterface

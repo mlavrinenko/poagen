@@ -149,6 +149,11 @@ interface ApiClientInterface
     public function licenses(): LicensesClientInterface;
 
     /**
+     * The `markdown` endpoints.
+     */
+    public function markdown(): MarkdownClientInterface;
+
+    /**
      * The `meta` endpoints.
      */
     public function meta(): MetaClientInterface;

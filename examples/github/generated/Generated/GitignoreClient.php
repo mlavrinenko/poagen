@@ -23,6 +23,17 @@ final readonly class GitignoreClient implements GitignoreClientInterface
     ) {
     }
 
+    /**
+     * @return list<string>
+     */
+    public function gitignoreGetAllTemplates(): array
+    {
+        return $this->transport->send(
+            Endpoint::get('/gitignore/templates'),
+            ResponseType::scalarListOf(ResponseType::string()),
+        );
+    }
+
     public function gitignoreGetTemplate(string $name): GitignoreTemplate
     {
         return $this->transport->send(

@@ -22,5 +22,10 @@ use Acme\GitHub\Generated\Model\GitignoreTemplate;
  */
 interface GitignoreClientInterface
 {
+    /**
+     * @return list<string>
+     */
+    public function gitignoreGetAllTemplates(): array;
+
     public function gitignoreGetTemplate(string $name): GitignoreTemplate;
 }

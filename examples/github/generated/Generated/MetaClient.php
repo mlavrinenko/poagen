@@ -13,6 +13,7 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\ApiOverview;
 use Acme\GitHub\Generated\Model\Root;
+use DateTimeImmutable;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -37,6 +38,33 @@ final readonly class MetaClient implements MetaClientInterface
         return $this->transport->send(
             Endpoint::get('/meta'),
             ResponseType::object(ApiOverview::class),
+        );
+    }
+
+    public function metaGetOctocat(?string $s = null): string
+    {
+        return $this->transport->send(
+            Endpoint::get('/octocat')->query('s', $s),
+            ResponseType::string(),
+        );
+    }
+
+    /**
+     * @return list<DateTimeImmutable>
+     */
+    public function metaGetAllVersions(): array
+    {
+        return $this->transport->send(
+            Endpoint::get('/versions'),
+            ResponseType::scalarListOf(ResponseType::dateTime()),
+        );
+    }
+
+    public function metaGetZen(): string
+    {
+        return $this->transport->send(
+            Endpoint::get('/zen'),
+            ResponseType::string(),
         );
     }
 }

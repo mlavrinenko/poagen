@@ -163,6 +163,7 @@ use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\Topic;
 use Acme\GitHub\Generated\Model\ViewTraffic;
 use Acme\GitHub\Generated\Model\WebhookConfig;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * The contract for the `repos` endpoints.
@@ -354,6 +355,11 @@ interface ReposClientInterface
         string $branch,
         ReposUpdateStatusCheckProtectionRequest $body,
     ): StatusCheckPolicy;
+
+    /**
+     * @return list<string>
+     */
+    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): array;
 
     public function reposGetAccessRestrictions(string $owner, string $repo, string $branch): BranchRestrictionPolicy;
 
@@ -956,6 +962,15 @@ interface ReposClientInterface
         ?int $perPage = null,
         ?int $page = null,
     ): array;
+
+    public function reposUploadReleaseAsset(
+        string $owner,
+        string $repo,
+        int $releaseId,
+        string $name,
+        StreamInterface $body,
+        ?string $label = null,
+    ): ReleaseAsset;
 
     /**
      * @return list<RepositoryRuleDetailed>

@@ -13,6 +13,7 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\ApiOverview;
 use Acme\GitHub\Generated\Model\Root;
+use DateTimeImmutable;
 
 /**
  * The contract for the `meta` endpoints.
@@ -26,4 +27,13 @@ interface MetaClientInterface
     public function metaRoot(): Root;
 
     public function metaGet(): ApiOverview;
+
+    public function metaGetOctocat(?string $s = null): string;
+
+    /**
+     * @return list<DateTimeImmutable>
+     */
+    public function metaGetAllVersions(): array;
+
+    public function metaGetZen(): string;
 }
