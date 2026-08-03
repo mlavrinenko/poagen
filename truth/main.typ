@@ -139,6 +139,10 @@
 #include "decisions/scalar-union-path-parameters-resolve-not-refuse.decision-260802.typ"
 #pagebreak()
 #include "decisions/distinct-ctor-args-for-colliding-schemes.decision-260802.typ"
+#pagebreak()
+#include "decisions/every-credential-scheme-is-wired-not-refused.decision-260803.typ"
+#pagebreak()
+#include "decisions/a-binary-body-is-a-psr-7-stream.decision-260803.typ"
 
 // --- Supplementary artefacts ---
 //
