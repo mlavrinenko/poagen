@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\ApiErrorInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -197,6 +200,29 @@ final class TransportResponseKindsTest extends TestCase
         self::assertCount(2, $emails);
         self::assertInstanceOf(Email::class, $emails[0]);
         self::assertSame('a@example.test', $emails[0]->value);
+    }
+
+    /**
+     * `ResponseType::union()` directly, sixth of the shapes this class
+     * proves and the one `a-union-response-selects-its-branch` added.
+     * {@see ResponseUnionSelectionTest}
+     * drives the same runtime through the emitted `union-response` fixture;
+     * this pins the bare {@see ResponseType} contract on its own, the way
+     * every other kind above already is.
+     */
+    public function testAUnionResponseIsHydratedIntoTheBranchItsPresentFieldNames(): void
+    {
+        $transport = $this->transport(
+            new Response(200, ['Content-Type' => 'application/json'], '{"bark":"woof"}'),
+        );
+
+        $dog = $transport->send(
+            Endpoint::get('/creatures'),
+            ResponseType::union(null, new BranchSelector(['bark' => Dog::class, 'meow' => Cat::class]), 'creature'),
+        );
+
+        self::assertInstanceOf(Dog::class, $dog);
+        self::assertSame('woof', $dog->bark);
     }
 
     private function transport(?Response $response, ?RecordingClient $http = null): HttpTransport

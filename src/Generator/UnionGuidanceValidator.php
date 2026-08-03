@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator;
 
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentName;
 use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\EffectiveShape;
+use Mlavrinenko\Paogen\Generator\Emit\ResponseUnionGuidanceIndex;
 use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\UnionResolution;
+use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 use function implode;
 use function in_array;
-use function is_array;
-use function is_string;
 use function sprintf;
 
 /**
@@ -50,9 +48,9 @@ final readonly class UnionGuidanceValidator
     /**
      * @return list<string> failure lines; empty means the run may proceed
      */
-    public function validate(OpenApi $openApi, Profile $profile, UnionCatalog $unions): array
+    public function validate(OpenApi $openApi, Profile $profile, UnionCatalog $unions, NameRegistry $operationIdRegistry): array
     {
-        $index = $this->index($openApi);
+        $index = $this->index($openApi, $operationIdRegistry);
 
         return [
             ...$this->validateTags($profile, $index, $openApi),
@@ -61,7 +59,7 @@ final readonly class UnionGuidanceValidator
     }
 
     /**
-     * @param array<string,array{0:Schema,1:Schema,2:list<string>}> $index
+     * @param array<string,array{0:?Schema,1:Schema,2:list<string>}> $index
      *
      * @return list<string>
      */
@@ -73,7 +71,7 @@ final readonly class UnionGuidanceValidator
             $union = $index[$key] ?? null;
 
             if ($union === null) {
-                $failures[] = $this->absent('$unionTags', (string) $key);
+                $failures[] = UnionTagGuidanceChecks::absent('$unionTags', (string) $key);
 
                 continue;
             }
@@ -83,16 +81,16 @@ final readonly class UnionGuidanceValidator
             /** @var array<string,string> $map */
             $map = $entry['map'] ?? [];
 
-            $failures = [...$failures, ...$this->checkField((string) $key, $field, $parent)];
-            $failures = [...$failures, ...$this->checkBranches((string) $key, $map, $branches)];
-            $failures = [...$failures, ...$this->checkTagValues((string) $key, $field, $map, $parent, $openApi)];
+            $failures = [...$failures, ...UnionTagGuidanceChecks::field((string) $key, $field, $parent)];
+            $failures = [...$failures, ...UnionTagGuidanceChecks::branches((string) $key, $map, $branches)];
+            $failures = [...$failures, ...UnionTagGuidanceChecks::tagValues((string) $key, $field, $map, $parent, $openApi)];
         }
 
         return $failures;
     }
 
     /**
-     * @param array<string,array{0:Schema,1:Schema,2:list<string>}> $index
+     * @param array<string,array{0:?Schema,1:Schema,2:list<string>}> $index
      *
      * @return list<string>
      */
@@ -104,7 +102,7 @@ final readonly class UnionGuidanceValidator
             $union = $index[$key] ?? null;
 
             if ($union === null) {
-                $failures[] = $this->absent('$unionPins', (string) $key);
+                $failures[] = UnionTagGuidanceChecks::absent('$unionPins', (string) $key);
 
                 continue;
             }
@@ -149,122 +147,24 @@ final readonly class UnionGuidanceValidator
     }
 
     /**
-     * @return list<string>
+     * Every union the document carries, keyed the way the profile keys it —
+     * `'<ComponentName>.<propertyName>'` for a property-level one, and
+     * `'<rawOperationId>.response'` for a whole 2xx response
+     * ({@see ResponseUnionGuidanceIndex}, `a-union-response-selects-its-branch`).
+     * A response union carries no parent Schema — {@see UnionTagGuidanceChecks::field()}
+     * is what turns that into a clear failure rather than a null-pointer.
+     *
+     * @return array<string,array{0:?Schema,1:Schema,2:list<string>}>
      */
-    private function checkField(string $key, string $field, Schema $parent): array
+    private function index(OpenApi $openApi, NameRegistry $operationIdRegistry): array
     {
-        /** @var array<string,Schema|Reference> $properties */
-        $properties = $parent->properties ?? [];
-
-        if ($field !== '' && isset($properties[$field])) {
-            return [];
-        }
-
-        return [sprintf(
-            "Profile::\$unionTags['%s'] names the tag field '%s', which the enclosing component does not declare. "
-                . 'The tag has to be a sibling of the union — one of %s.',
-            $key,
-            $field,
-            implode(', ', array_map(strval(...), array_keys($properties))),
-        )];
+        return [...$this->indexProperties($openApi), ...ResponseUnionGuidanceIndex::build($openApi, $operationIdRegistry)];
     }
 
     /**
-     * @param array<string,string> $map
-     * @param list<string>         $branches
-     *
-     * @return list<string>
-     */
-    private function checkBranches(string $key, array $map, array $branches): array
-    {
-        $failures = [];
-
-        if ($map === []) {
-            return [sprintf(
-                "Profile::\$unionTags['%s'] carries no value-to-branch map, so it names a tag field and no branches "
-                    . 'for it to select.',
-                $key,
-            )];
-        }
-
-        foreach ($map as $tag => $branch) {
-            if (!in_array($branch, $branches, true)) {
-                $failures[] = sprintf(
-                    "Profile::\$unionTags['%s'] maps '%s' to '%s', which is not one of that union's branches (%s).",
-                    $key,
-                    $tag,
-                    $branch,
-                    implode(', ', $branches),
-                );
-            }
-        }
-
-        return $failures;
-    }
-
-    /**
-     * A tag value outside the field's own `enum` is a claim the document
-     * contradicts. An enum value the map does not cover is not — the run
-     * reports it as a notice, because permitting a shape nobody typed is the
-     * vendor's choice rather than the consumer's mistake.
-     *
-     * @param array<string,string> $map
-     *
-     * @return list<string>
-     */
-    private function checkTagValues(string $key, string $field, array $map, Schema $parent, OpenApi $openApi): array
-    {
-        /** @var array<string,Schema|Reference> $properties */
-        $properties = $parent->properties ?? [];
-        $node = $properties[$field] ?? null;
-        $schema = $node === null ? null : EffectiveShape::resolve($node, $openApi);
-
-        if (!$schema instanceof Schema || !is_array($schema->enum) || $schema->enum === []) {
-            return [];
-        }
-
-        $permitted = [];
-
-        foreach ($schema->enum as $value) {
-            if (is_string($value)) {
-                $permitted[] = $value;
-            }
-        }
-
-        $failures = [];
-
-        foreach (array_keys($map) as $tag) {
-            if (!in_array((string) $tag, $permitted, true)) {
-                $failures[] = sprintf(
-                    "Profile::\$unionTags['%s'] maps the value '%s', which '%s' does not enumerate (%s).",
-                    $key,
-                    $tag,
-                    $field,
-                    implode(', ', $permitted),
-                );
-            }
-        }
-
-        return $failures;
-    }
-
-    private function absent(string $property, string $key): string
-    {
-        return sprintf(
-            "Profile::%s['%s'] names no property-level `oneOf`/`anyOf` in the document — the key is "
-                . "'<ComponentName>.<propertyName>', and that component either does not exist, does not declare that "
-                . 'property, or declares it as something other than a union of `$ref` branches.',
-            $property,
-            $key,
-        );
-    }
-
-    /**
-     * Every union the document carries, keyed the way the profile keys it.
-     *
      * @return array<string,array{0:Schema,1:Schema,2:list<string>}>
      */
-    private function index(OpenApi $openApi): array
+    private function indexProperties(OpenApi $openApi): array
     {
         $out = [];
 

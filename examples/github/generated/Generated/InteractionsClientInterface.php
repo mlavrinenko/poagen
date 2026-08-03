@@ -13,6 +13,9 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\InteractionLimit;
 use Acme\GitHub\Generated\Model\InteractionLimitResponse;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForOrgResponseBranch2;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForRepoResponseBranch2;
 
 /**
  * The contract for the `interactions` endpoints.
@@ -23,9 +26,18 @@ use Acme\GitHub\Generated\Model\InteractionLimitResponse;
  */
 interface InteractionsClientInterface
 {
+    public function interactionsGetRestrictionsForOrg(
+        string $org,
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2;
+
     public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): InteractionLimitResponse;
 
     public function interactionsRemoveRestrictionsForOrg(string $org): void;
+
+    public function interactionsGetRestrictionsForRepo(
+        string $owner,
+        string $repo,
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2;
 
     public function interactionsSetRestrictionsForRepo(
         string $owner,
@@ -34,6 +46,9 @@ interface InteractionsClientInterface
     ): InteractionLimitResponse;
 
     public function interactionsRemoveRestrictionsForRepo(string $owner, string $repo): void;
+
+    public function interactionsGetRestrictionsForAuthenticatedUser(
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
 
     public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): InteractionLimitResponse;
 

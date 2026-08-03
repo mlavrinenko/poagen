@@ -29,6 +29,7 @@ use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
@@ -161,12 +162,13 @@ final readonly class Generator
             $preScannedSkips[$skip->operationId] = $skip->reason;
         }
 
-        // Payload classes are named before anything is emitted, because both
-        // halves of the run need the same answer: the model planner emits them,
-        // and the operation emitter points its parameters and return types at
-        // them (inline-body-and-response-schemas).
+        // Payload classes are named before anything is emitted: the model planner emits them, and
+        // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
         $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, $profile->inlineModels, $ledger, $profile->xmlElements, $preScannedSkips);
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, $profile->inlineModels, $ledger, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
+
+        // See UnionCatalog::merge() for why the response-position half waits for this walk.
+        $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());
 
         $this->modelPlanner->plan(
             $openApi,
@@ -217,7 +219,7 @@ final readonly class Generator
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
-            ...$this->unionGuidance->validate($openApi, $profile, $unions),
+            ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];
 
         if ($failures !== []) {

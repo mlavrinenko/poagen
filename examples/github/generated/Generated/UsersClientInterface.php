@@ -18,6 +18,7 @@ use Acme\GitHub\Generated\Model\Hovercard;
 use Acme\GitHub\Generated\Model\Key;
 use Acme\GitHub\Generated\Model\KeySimple;
 use Acme\GitHub\Generated\Model\PrivateUser;
+use Acme\GitHub\Generated\Model\PublicUser;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Acme\GitHub\Generated\Model\SocialAccount;
 use Acme\GitHub\Generated\Model\SshSigningKey;
@@ -43,6 +44,8 @@ use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequest;
  */
 interface UsersClientInterface
 {
+    public function usersGetAuthenticated(): PrivateUser|PublicUser;
+
     public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequest $body): PrivateUser;
 
     /**
@@ -142,10 +145,14 @@ interface UsersClientInterface
 
     public function usersDeleteSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): void;
 
+    public function usersGetById(int $accountId): PrivateUser|PublicUser;
+
     /**
      * @return list<SimpleUser>
      */
     public function usersList(?int $since = null, ?int $perPage = null): array;
+
+    public function usersGetByUsername(string $username): PrivateUser|PublicUser;
 
     public function usersListAttestationsBulk(
         string $username,

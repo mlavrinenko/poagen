@@ -32,17 +32,32 @@ final readonly class UnionResolution
     public const string KIND_PIN = 'pin';
 
     /**
-     * @param array<string,string> $map wire tag => raw branch component name
+     * @param array<string,string> $map      wire tag => raw branch component name
+     * @param string                $position where this union sits — a JSON pointer into the document,
+     *                                        the same string every factory already threads into `$notice`.
+     *                                        Kept as its own field too: {@see ResponseTypeEmitter} needs
+     *                                        it standalone, to label a response union's runtime picking
+     *                                        failure without re-parsing the prose sentence.
      */
     private function __construct(
         public string $kind,
         public string $notice,
+        public string $position = '',
         public ?string $field = null,
         public array $map = [],
         public ?BranchSelectors $selectors = null,
     ) {}
 
-    public static function tagInValue(string $position, string $field, int $branches): self
+    /**
+     * @param array<string,string> $map wire tag => raw branch identity, read from the document's own
+     *                                  `discriminator.mapping` (or the implicit identity mapping OpenAPI
+     *                                  defines when a `discriminator` carries none). Empty for the
+     *                                  property position, which does not thread this through to the
+     *                                  runtime picker; {@see ResponseUnionPlanner}
+     *                                  is the caller that needs it, because a response union has no
+     *                                  attribute-reflection path to re-derive it from branch class names.
+     */
+    public static function tagInValue(string $position, string $field, int $branches, array $map = []): self
     {
         return new self(
             self::KIND_TAG_IN_VALUE,
@@ -53,7 +68,9 @@ final readonly class UnionResolution
                 $field,
                 $branches,
             ),
+            position: $position,
             field: $field,
+            map: $map,
         );
     }
 
@@ -73,6 +90,7 @@ final readonly class UnionResolution
                 count($map),
                 $unmapped,
             ),
+            position: $position,
             field: $field,
             map: $map,
         );
@@ -88,6 +106,7 @@ final readonly class UnionResolution
                 $position,
                 $selectors->describe(),
             ),
+            position: $position,
             selectors: $selectors,
         );
     }
@@ -108,6 +127,7 @@ final readonly class UnionResolution
                 $discarded,
                 $branch,
             ),
+            position: $position,
         );
     }
 }

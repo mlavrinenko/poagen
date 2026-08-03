@@ -160,13 +160,25 @@ return new Profile(
      * to refuse outright; `fields` (six) is a `oneOf` of a bare scalar and
      * an array of one, now the native union `string|array` plus a
      * `string|list<string>` annotation.
+     *
+     * `a-union-response-selects-its-branch` took the remaining eight, every
+     * one of them a response whose 200 is a `oneOf`/`anyOf` the analyser
+     * used to see only as a schema "of type 'unspecified'". All eight
+     * resolve with no profile guidance at all: `users/get-authenticated`,
+     * `users/get-by-id` and `users/get-by-username` carry the document's
+     * own `discriminator` — with an explicit `mapping` whose wire values
+     * (`public`/`private`) are not either branch's class name, the one
+     * reading no property-position union in this document has ever
+     * exercised. `interactions/get-restrictions-for-*` anyOf a `$ref`
+     * against an inline closed empty object, decided by the absence of
+     * fields the same way `commit.author`'s `empty-object` branch already
+     * is. `activity/list-stargazers-for-repo` and
+     * `activity/list-repos-starred-by-user` anyOf two *array* shapes of
+     * different `$ref` items — resolved as `list<SimpleUser|Stargazer>`
+     * and `list<StarredRepository|Repository>` rather than as a union of
+     * two list types, which cannot be written as a native PHP type at all.
      */
     skip: [
-        'activity/list-stargazers-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'activity/list-repos-starred-by-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'interactions/get-restrictions-for-org' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'interactions/get-restrictions-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'interactions/get-restrictions-for-authenticated-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         // issues/set-labels and issues/add-labels: request body is a `oneOf`
         // whose branches mix an object with a bare `array` — `body` is
         // `array<string>` (a list of label names), which paogen cannot union
@@ -203,7 +215,6 @@ return new Profile(
             . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/get-content' => 'application/json request body with an inline (non-$ref) schema',
-        'users/get-authenticated' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         // users/add-email-for-authenticated-user and
         // users/delete-email-for-authenticated-user: request body is
         // `oneOf: [inline object, {type: array, items: string}, {type:
@@ -215,7 +226,5 @@ return new Profile(
         'users/delete-email-for-authenticated-user' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
             . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
-        'users/get-by-id' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'users/get-by-username' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
     ],
 );

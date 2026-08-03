@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use Mlavrinenko\Paogen\Generator\Generator;
+
 /**
  * What {@see InlinePayloadPlanner} decided about the operations whose payloads
  * the document declared inline rather than naming.
@@ -38,6 +40,13 @@ final readonly class InlinePayloadCatalog
      *                                                    never attempted the merge and so cannot name it
      * @param array<string,string>     $responseRefusals keyed by raw operationId, mirrors $requestRefusals
      *                                                    for the response side
+     * @param UnionCatalog              $responseUnions   how every response-position union resolved —
+     *                                                    {@see Generator}
+     *                                                    merges this into the property-position catalog
+     *                                                    {@see DiscriminatorEnforcer}
+     *                                                    built, so `Profile::$unionTags`/`$unionPins`
+     *                                                    staleness and the per-run notice both cover
+     *                                                    both positions from one object
      */
     public function __construct(
         private array $bodies = [],
@@ -45,6 +54,7 @@ final readonly class InlinePayloadCatalog
         private array $roots = [],
         private array $requestRefusals = [],
         private array $responseRefusals = [],
+        private UnionCatalog $responseUnions = new UnionCatalog(),
     ) {}
 
     public function bodyFor(string $rawOperationId): ?BodySpec
@@ -73,5 +83,10 @@ final readonly class InlinePayloadCatalog
     public function roots(): array
     {
         return $this->roots;
+    }
+
+    public function responseUnions(): UnionCatalog
+    {
+        return $this->responseUnions;
     }
 }

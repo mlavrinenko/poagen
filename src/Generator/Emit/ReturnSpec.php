@@ -52,10 +52,33 @@ final readonly class ReturnSpec
     public const string KIND_MIXED = 'mixed';
 
     /**
-     * @param ScalarFormat|null $scalarFormat set on a KIND_SCALAR the document gave a `format`
-     *                                        paogen binds to a type — the binding a model
-     *                                        property with the same `format` already honours
-     * @param self|null         $listItem     the item shape, set for KIND_SCALAR_LIST
+     * A response whose whole schema is a `oneOf`/`anyOf` — the incoming
+     * direction `a-union-response-selects-its-branch` wires into the same
+     * `UnionCatalog`/`BranchSelectors`/`UnionBranchPicker` path a union
+     * property already uses. `$models` names every branch; `$unionResolution`
+     * carries how the runtime picks one of them, in the same shape
+     * {@see UnionCatalog} already carries
+     * for a property. A resolution of kind `KIND_PIN` never reaches here —
+     * a pin types the response as its single branch directly, `KIND_MODEL`,
+     * exactly as a pinned property carries no union at all.
+     *
+     * The array-of-two-item-shapes case
+     * (`activity/list-stargazers-for-repo`) is not a fifth kind: it is a
+     * `KIND_SCALAR_LIST` whose `$listItem` is itself a `KIND_UNION` —
+     * `ResponseTypeEmitter`/`ResponseDecoder` already recurse into a list
+     * item's own spec, so nesting a union there needed no new list kind,
+     * only a spec that was not a bare scalar before.
+     */
+    public const string KIND_UNION = 'union';
+
+    /**
+     * @param ScalarFormat|null    $scalarFormat set on a KIND_SCALAR the document gave a `format`
+     *                                           paogen binds to a type — the binding a model
+     *                                           property with the same `format` already honours
+     * @param self|null            $listItem     the item shape, set for KIND_SCALAR_LIST — a bare
+     *                                           scalar, or (as of this task) a KIND_UNION
+     * @param list<string>|null    $models       every branch's model name, in document order, set for KIND_UNION
+     * @param UnionResolution|null $unionResolution how the branch is picked, set for KIND_UNION
      */
     public function __construct(
         public string $kind,
@@ -64,6 +87,8 @@ final readonly class ReturnSpec
         public ?self $mapValue = null,
         public ?ScalarFormat $scalarFormat = null,
         public ?self $listItem = null,
+        public ?array $models = null,
+        public ?UnionResolution $unionResolution = null,
     ) {}
 
     public static function void(): self
@@ -122,5 +147,13 @@ final readonly class ReturnSpec
     public static function mixed(): self
     {
         return new self(self::KIND_MIXED);
+    }
+
+    /**
+     * @param list<string> $models
+     */
+    public static function union(array $models, UnionResolution $unionResolution): self
+    {
+        return new self(self::KIND_UNION, models: $models, unionResolution: $unionResolution);
     }
 }

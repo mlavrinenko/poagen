@@ -92,10 +92,15 @@ final readonly class UnionTagBinding
      * A document `discriminator` may carry an explicit `mapping`; without one,
      * OpenAPI's default is that the tag equals the component name.
      *
+     * Public because {@see ResponseUnionPlanner}
+     * needs the identical reading for a response-position tag-in-value
+     * union — the same document keyword, read the same way, regardless of
+     * which position it discriminates.
+     *
      * @param  list<Reference>      $refs
      * @return array<string,string>
      */
-    private static function mappingOf(Discriminator $discriminator, array $refs): array
+    public static function mappingOf(Discriminator $discriminator, array $refs): array
     {
         $mapping = $discriminator->mapping;
         $out = [];
