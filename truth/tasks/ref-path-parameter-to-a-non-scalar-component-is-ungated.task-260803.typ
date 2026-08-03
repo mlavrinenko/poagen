@@ -5,7 +5,11 @@
   tags: ("generator", "strictness", "parameters"),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 8, 3),
+  status: accepted(
+    2026,
+    8,
+    3,
+  )[Scheduled by the owner into this session, paired in one agent with support-the-parameter-shapes-real-documents-use. Both need the same reference resolution in ParameterShape, and this task's own criterion forbids a second resolver, so splitting them across two agents would force one to build what the other's criterion rules out.],
 )
 
 == Summary
