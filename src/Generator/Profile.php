@@ -97,6 +97,19 @@ final readonly class Profile
      *                                              fails the run, matching `$inlineModels` and `$tagChoice`. A
      *                                              rename that collides with another property already in the
      *                                              same model — renamed or not — fails the run naming both.
+     * @param array<string,array<string,mixed>> $securitySchemes Declarations for schemes a `security` requirement
+     *                                              names and `components.securitySchemes` never declares. Keyed by
+     *                                              the requirement name; the value is the `securityScheme` object
+     *                                              the document should have carried, spelled exactly as it would be
+     *                                              in the schema — `['type' => 'apiKey', 'in' => 'header',
+     *                                              'name' => 'api_key']`. The vendored petstore document is the
+     *                                              case: it requires `api_key` on two operations and declares only
+     *                                              `petstore_auth`, so without an entry here those two operations
+     *                                              authenticate with nothing. paogen will not guess the header name
+     *                                              — a wrong guess is a 401 the consumer debugs at runtime — so an
+     *                                              undeclared requirement aborts the run naming this key. An entry
+     *                                              for a scheme the document does declare, or one no requirement
+     *                                              asks for, fails the run the same way a stale `$skip` entry does.
      * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
      *                                              skip-listed item is omitted from the output instead of
      *                                              failing the run. An entry that no longer matches a problem
@@ -129,6 +142,7 @@ final readonly class Profile
         public array $xmlElements = [],
         public array $inlineModels = [],
         public array $propertyRenames = [],
+        public array $securitySchemes = [],
         public string $source = 'paogen.php',
     ) {}
 
@@ -163,6 +177,7 @@ final readonly class Profile
             xmlElements: $this->xmlElements,
             inlineModels: $this->inlineModels,
             propertyRenames: $this->propertyRenames,
+            securitySchemes: $this->securitySchemes,
             source: $source ?? $this->source,
         );
     }

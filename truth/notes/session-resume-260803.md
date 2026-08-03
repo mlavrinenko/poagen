@@ -180,6 +180,20 @@ refusal is part of the change, and the substitute example must be something the
 task's own non-goals keep refused, so the scenario keeps testing its rule. Here
 that was `multipart/form-data`.
 
+## A second stale-cache symptom, same family as the rector one
+
+PHPStan died with `Deserialization failure` out of shipmonk's dead-code
+collector, mid-session, on a tree that was fine. Cause: a stale
+`build/cache/phpstan/resultCache.php` left by an earlier run in the same
+session. Clearing `build/cache/phpstan` fixed it — the directory is
+per-checkout and gitignored, so nothing is lost by deleting it.
+
+This is the same shape as the rector-DI-cache trap `AGENT.md` already
+records, and the same reading applies: an opaque tool error that names
+serialization, a process pool, or a phar path is a stale cache, not a broken
+change. It belongs in the guide next to the rector one, which is blocked on
+`agent-guide-is-nine-lines-from-its-own-cap`.
+
 ## The measurement rule, stated for the third time
 
 Three plans in this backlog have now rested on an unmeasured claim about a

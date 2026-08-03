@@ -25,4 +25,14 @@ return new Profile(
         // abort-on-unrepresentable-constructs.
         'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
     ],
+    securitySchemes: [
+        // The document requires `api_key` on getPetById and getInventory
+        // and declares only `petstore_auth`, so those two operations name a
+        // credential nothing describes. The fixture is an unmodified vendor
+        // document (`fixtures-are-unmodified-vendor-documents`) and paogen
+        // will not guess a header name, so the declaration the document is
+        // missing is supplied here instead. Swagger's own petstore sends it
+        // as the `api_key` request header.
+        'api_key' => ['type' => 'apiKey', 'in' => 'header', 'name' => 'api_key'],
+    ],
 );

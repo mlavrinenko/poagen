@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Security schemes paogen refuses by name
+  version: 1.0.0
+  description: >
+    `http digest` and `http negotiate` need a challenge and a second
+    request before a credential exists, and `saml` is not a scheme type the
+    specification defines. All three abort the run naming themselves and
+    every operation that requires them; the negotiate one is applied
+    globally and is named as such instead.
+servers:
+  - url: https://refused-security.example/api/v1
+security:
+  - negotiateAuth: []
+paths:
+  /digest-one:
+    get:
+      operationId: digestOne
+      security:
+        - digestAuth: []
+      responses:
+        '204':
+          description: no content
+  /digest-two:
+    get:
+      operationId: digestTwo
+      security:
+        - digestAuth: []
+      responses:
+        '204':
+          description: no content
+  /invented:
+    get:
+      operationId: inventedScheme
+      security:
+        - inventedAuth: []
+      responses:
+        '204':
+          description: no content
+  /inherits-global:
+    get:
+      operationId: inheritsGlobal
+      responses:
+        '204':
+          description: no content
+components:
+  securitySchemes:
+    digestAuth:
+      type: http
+      scheme: digest
+    negotiateAuth:
+      type: http
+      scheme: negotiate
+    inventedAuth:
+      type: saml

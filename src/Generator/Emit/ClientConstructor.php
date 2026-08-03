@@ -34,9 +34,32 @@ use Nette\PhpGenerator\PhpNamespace;
 final readonly class ClientConstructor
 {
     /**
+     * Add the constructor and put it back at the head of the class.
+     *
+     * Which credentials a client takes is only known once its operations have
+     * been emitted — a scheme required solely by an operation that turned out
+     * to be unrepresentable is not one this client needs — so the constructor
+     * is built last and moved first, rather than guessed at before the class
+     * has any methods. The emitted member order is unchanged: constructor,
+     * then operations, then whatever the root adds after them.
+     *
      * @param list<SecurityScheme> $schemes
      */
-    public static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
+    public static function addFirst(ClassType $class, PhpNamespace $namespace, array $schemes): void
+    {
+        self::addTo($class, $namespace, $schemes);
+
+        $methods = $class->getMethods();
+        $constructor = $methods['__construct'];
+        unset($methods['__construct']);
+
+        $class->setMethods([$constructor, ...array_values($methods)]);
+    }
+
+    /**
+     * @param list<SecurityScheme> $schemes
+     */
+    private static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
     {
         $namespace->addUse(TransportInterface::class);
 
@@ -44,9 +67,14 @@ final readonly class ClientConstructor
         $ctor->addPromotedParameter('transport')->setType(TransportInterface::class)->setPrivate();
 
         // Security-scheme args sit AFTER the transport so a schema that gains
-        // a scheme does not reorder the existing signature.
+        // a scheme does not reorder the existing signature. A scheme claims
+        // one argument, except `http basic`, whose credential is genuinely
+        // two values — a user and a password that meet as base64(user:pass)
+        // and nowhere else.
         foreach ($schemes as $scheme) {
-            $ctor->addPromotedParameter($scheme->ctorArg)->setType('string')->setPrivate();
+            foreach ($scheme->ctorArgs() as $arg) {
+                $ctor->addPromotedParameter($arg)->setType('string')->setPrivate();
+            }
         }
     }
 
@@ -62,7 +90,9 @@ final readonly class ClientConstructor
         $args = ['$this->transport'];
 
         foreach ($schemes as $scheme) {
-            $args[] = '$this->' . $scheme->ctorArg;
+            foreach ($scheme->ctorArgs() as $arg) {
+                $args[] = '$this->' . $arg;
+            }
         }
 
         return $args;

@@ -14,7 +14,8 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
- * query-apikey-security-scheme (T-260730): an `apiKey` scheme declared
+ * query-apikey-security-scheme (T-260730), plus the cookie variant
+ * report-unsupported-security-schemes added later: an `apiKey` scheme declared
  * with `in: query` used to classify as `KIND_UNSUPPORTED`, so
  * `SecuritySchemeCatalog` silently dropped it from both the constructor
  * and every operation's active schemes — no diagnostic (the kilbil
@@ -57,9 +58,10 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     {
         self::assertStringContainsString('private string $queryKey,', self::$clientSource);
         self::assertStringContainsString('private string $headerKey,', self::$clientSource);
-        // `in: cookie` stays unsupported (report-unsupported-security-schemes'
-        // job, not this one) — no constructor argument at all for it.
-        self::assertStringNotContainsString('$cookieKey', self::$clientSource);
+        // `in: cookie` was the one apiKey variant this task left unwired.
+        // report-unsupported-security-schemes wired it, so it takes an
+        // argument now like the other two.
+        self::assertStringContainsString('private string $cookieKey,', self::$clientSource);
     }
 
     public function testAnOperationWithNoQueryParamsOfItsOwnStillGetsTheCredentialAppended(): void
@@ -134,27 +136,29 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         self::assertSame('header-secret', $client['http']->lastRequest->getHeaderLine('X-Different-Key'));
     }
 
-    public function testACookieApiKeySchemeStaysUnwiredRatherThanBeingRepurposedAsQuery(): void
+    public function testACookieApiKeySchemeTravelsInACookieHeaderNotTheQueryString(): void
     {
-        // Regression guard: this task owns `in: query` only. `in: cookie`
-        // must stay untouched — still silently unwired, not rerouted
-        // into the query string this change adds.
+        // `in: cookie` was left unwired when this fixture was written and is
+        // wired now (report-unsupported-security-schemes). The half of the
+        // original guard that still holds is that it must not be rerouted
+        // into the query string the query variant uses.
         $body = self::methodSlice(self::$clientSource, 'cookieSchemeUnaffected');
 
         self::assertStringNotContainsString('->query(', $body);
-        self::assertStringNotContainsString('Cookie', $body);
+        self::assertStringContainsString("->header('Cookie', 'session=' . \$this->cookieKey)", $body);
 
-        $client = $this->buildClient(queryKey: 'unused', headerKey: 'unused');
+        $client = $this->buildClient(queryKey: 'unused', headerKey: 'unused', cookieKey: 'abc123');
         self::invokeGenerated($this->reflection(), $client['client'], 'cookieSchemeUnaffected');
 
         self::assertNotNull($client['http']->lastRequest);
         self::assertSame('', $client['http']->lastRequest->getUri()->getQuery());
+        self::assertSame('session=abc123', $client['http']->lastRequest->getHeaderLine('Cookie'));
     }
 
     /**
      * @return array{client: object, http: RecordingClient}
      */
-    private function buildClient(string $queryKey, string $headerKey): array
+    private function buildClient(string $queryKey, string $headerKey, string $cookieKey = 'unused'): array
     {
         $factory = new Psr17Factory();
         $http = new RecordingClient(new Response(204, [], ''));
@@ -167,8 +171,9 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
                 $factory,
                 $factory,
             ),
-            'queryKey' => $queryKey,
+            'cookieKey' => $cookieKey,
             'headerKey' => $headerKey,
+            'queryKey' => $queryKey,
         ]);
 
         return ['client' => $client, 'http' => $http];

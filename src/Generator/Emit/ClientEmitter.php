@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\Operation;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Profile;
@@ -64,7 +65,13 @@ final class ClientEmitter
         $written = 0;
         $rootGroup = null;
 
-        /** @var list<TagGroup> $live groups that emitted at least one method */
+        /**
+         * Groups that emitted at least one method, each with the operations it
+         * actually emitted — which is what says the credentials that group's
+         * client takes, and so what the root has to hand it.
+         *
+         * @var list<array{group:TagGroup, operations:list<Operation>}> $live
+         */
         $live = [];
 
         foreach ($groups as $group) {
@@ -83,7 +90,7 @@ final class ClientEmitter
             $writes[$rootDir . DIRECTORY_SEPARATOR . $group->phpName . '.php'] = $result['source'];
             $writes[$rootDir . DIRECTORY_SEPARATOR . $group->interfaceName() . '.php'] = $result['interface'];
             $written += 2;
-            $live[] = $group;
+            $live[] = ['group' => $group, 'operations' => $result['operations']];
         }
 
         $servers = ServerCatalog::resolve($openApi);
@@ -106,9 +113,9 @@ final class ClientEmitter
     }
 
     /**
-     * @param list<TagGroup>       $live
-     * @param list<ResolvedServer> $servers
-     * @param array<string,string> $writes
+     * @param list<array{group:TagGroup, operations:list<Operation>}> $live
+     * @param list<ResolvedServer>                                    $servers
+     * @param array<string,string>                                    $writes
      */
     private function emitRoot(
         string $clientNamespace,
@@ -141,16 +148,32 @@ final class ClientEmitter
             return 0;
         }
 
-        $args = implode(', ', ClientConstructor::forwardedArgs($securityCatalog->constructorSchemes()));
+        // The root holds every credential it has to hand out, plus whatever its
+        // own untagged operations send: it is the composition root, so it is
+        // the one client a consumer builds with the document's full set. Each
+        // sub-client is then handed only its own share.
+        $reachable = $outcome['operations'];
 
         foreach ($live as $sub) {
-            $namespace->addUse($clientNamespace . '\\' . $sub->phpName);
-            $namespace->addUse($clientNamespace . '\\' . $sub->interfaceName());
+            $reachable = [...$reachable, ...$sub['operations']];
+        }
 
-            $accessor = $class->addMethod($sub->accessor())->setPublic();
-            $accessor->setReturnType($clientNamespace . '\\' . $sub->interfaceName());
-            $accessor->addComment('The `' . $sub->rawTag . '` endpoints.');
-            $accessor->setBody('return new ' . $sub->phpName . '(' . $args . ');');
+        ClientConstructor::addFirst($class, $namespace, $securityCatalog->constructorSchemesFor($reachable));
+
+        foreach ($live as $sub) {
+            $subGroup = $sub['group'];
+            $namespace->addUse($clientNamespace . '\\' . $subGroup->phpName);
+            $namespace->addUse($clientNamespace . '\\' . $subGroup->interfaceName());
+
+            $args = implode(
+                ', ',
+                ClientConstructor::forwardedArgs($securityCatalog->constructorSchemesFor($sub['operations'])),
+            );
+
+            $accessor = $class->addMethod($subGroup->accessor())->setPublic();
+            $accessor->setReturnType($clientNamespace . '\\' . $subGroup->interfaceName());
+            $accessor->addComment('The `' . $subGroup->rawTag . '` endpoints.');
+            $accessor->setBody('return new ' . $subGroup->phpName . '(' . $args . ');');
         }
 
         $writes[$rootDir . DIRECTORY_SEPARATOR . 'ApiClient.php'] = $this->printer->printFile($file);

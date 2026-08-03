@@ -13,12 +13,36 @@ namespace Acme\Petstore\Generated;
 
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
+/**
+ * `petstore_auth` (oauth2) — one access token, sent as `Authorization: Bearer <token>`.
+ *   implicit flow:
+ *     authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+ *     scope `write:pets` — modify pets in your account
+ *     scope `read:pets` — read your pets
+ *   Also readable as self::PETSTORE_AUTH_*.
+ *
+ * paogen never acquires, refreshes, stores or validates a credential. It
+ * puts the value you pass to the constructor on the request; obtaining
+ * one is your transport's job.
+ */
 final readonly class ApiClient implements ApiClientInterface
 {
+    /** The flows `petstore_auth` declares, as the document declares them. */
+    public const array PETSTORE_AUTH_FLOWS = [
+        'implicit' => [
+            'authorizationUrl' => 'https://petstore3.swagger.io/oauth/authorize',
+            'tokenUrl' => null,
+            'refreshUrl' => null,
+            'scopes' => ['write:pets' => 'modify pets in your account', 'read:pets' => 'read your pets'],
+        ],
+    ];
+
     public const string SERVER_1 = 'https://petstore3.swagger.io/api/v3';
 
     public function __construct(
         private TransportInterface $transport,
+        private string $apiKey,
+        private string $petstoreAuth,
     ) {
     }
 
@@ -27,7 +51,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function pet(): PetClientInterface
     {
-        return new PetClient($this->transport);
+        return new PetClient($this->transport, $this->apiKey, $this->petstoreAuth);
     }
 
     /**
@@ -35,7 +59,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function store(): StoreClientInterface
     {
-        return new StoreClient($this->transport);
+        return new StoreClient($this->transport, $this->apiKey);
     }
 
     /**

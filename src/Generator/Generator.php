@@ -22,6 +22,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
+use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
 use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
@@ -89,6 +90,14 @@ final readonly class Generator
         // reference resolution — so diagnostics can point at the exact
         // schema node responsible.
         $openApi->setDocumentContext($openApi, new JsonPointer(''));
+
+        // A `security` requirement naming a scheme the document never
+        // declared is a gap only the consumer can fill, so their declaration
+        // is merged in before anything reads the document. The audit then
+        // judges what is still undeclared, what paogen refuses to wire, and
+        // what it can only report.
+        $profileSecurityFailures = ProfileSecuritySchemes::apply($openApi, $profile->securitySchemes);
+        $security = SecurityAudit::of($openApi);
 
         // attribute-and-phpdoc-driven-serialization + T-030 +
         // abort-on-unrepresentable-constructs: collect every property-level
@@ -180,10 +189,13 @@ final readonly class Generator
             // the run says so — `declared-shapes-become-types` tolerates that
             // one `mixed` only while it is visible.
             ...UnconstrainedFieldAdvisor::notices($openApi),
+            ...$security->notices,
         ];
         $skippedComponents = [...$components->skipped(), ...$discriminatorSkips, ...$schemaSkips['components']];
 
         $failures = [
+            ...$profileSecurityFailures,
+            ...$security->failures,
             ...UnsupportedKeywordScanner::webhookFailures($openApi),
             ...ServerCatalog::variableProblems($openApi),
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),

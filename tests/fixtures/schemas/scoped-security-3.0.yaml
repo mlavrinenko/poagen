@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: Two sub-clients, two different credentials
+  version: 1.0.0
+  description: >
+    sub-client-constructors-take-every-scheme-in-the-document. Two tags whose
+    operations authenticate differently, so a constructor scoped to the whole
+    document and one scoped to a client's own operations cannot both be right.
+    Also pins the three ways OpenAPI 3.0.3 4.8.20 resolves an operation's
+    security against the document default: inherit it, replace it, or clear it.
+servers:
+  - url: https://scoped-security.example/v2
+security:
+  - sharedKey: []
+paths:
+  /vault/entries:
+    get:
+      operationId: vaultInheritsDefault
+      tags: [vault]
+      responses:
+        '204':
+          description: done
+  /vault/rotate:
+    post:
+      operationId: vaultReplacesDefault
+      tags: [vault]
+      security:
+        - vaultKey: []
+      responses:
+        '204':
+          description: done
+  /ledger/entries:
+    get:
+      operationId: ledgerUsesItsOwnToken
+      tags: [ledger]
+      security:
+        - ledgerToken: []
+      responses:
+        '204':
+          description: done
+  /ledger/health:
+    get:
+      operationId: ledgerClearsSecurity
+      tags: [ledger]
+      security: []
+      responses:
+        '204':
+          description: done
+components:
+  securitySchemes:
+    sharedKey:
+      type: apiKey
+      in: header
+      name: X-Shared-Key
+    vaultKey:
+      type: apiKey
+      in: header
+      name: X-Vault-Key
+    ledgerToken:
+      type: http
+      scheme: bearer
+    neverRequired:
+      type: apiKey
+      in: header
+      name: X-Never-Required

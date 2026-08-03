@@ -99,7 +99,7 @@ final readonly class EndpointChainEmitter
             );
         }
 
-        foreach ($this->security->headerSegments($activeSchemes) as $segment) {
+        foreach ($this->security->headerSegments($activeSchemes, $namespace) as $segment) {
             $segments[] = $segment;
         }
 

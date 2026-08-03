@@ -5,7 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 6,
   difficulty: 3,
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as b45f2fc, merged and re-gated on the integrated HEAD. The payload planner filters on the document-wide schema-scan refusals before claiming a root; reachability falls out of per-operation claim independence, so a model shared with a surviving operation still emits.],
 )
 
 == Summary

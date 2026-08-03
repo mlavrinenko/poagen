@@ -23,24 +23,41 @@ use Acme\Petstore\Generated\Model\Pet;
  */
 interface PetClientInterface
 {
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function updatePet(Pet $body): Pet;
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function addPet(Pet $body): Pet;
 
     /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @return list<Pet>
      */
     public function findPetsByStatus(FindPetsByStatusStatus $status): array;
 
     /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @param list<string> $tags
      * @return list<Pet>
      */
     public function findPetsByTags(array $tags): array;
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function getPetById(int $petId): Pet;
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet;
 
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
     public function deletePet(int $petId, ?string $apiKey = null): void;
 }

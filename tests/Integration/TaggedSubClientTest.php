@@ -8,6 +8,7 @@ use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -44,7 +45,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testEachTagBecomesAClassAndAnInterfaceDeclaringExactlyItsOwnMethods(): void
     {
-        $plan = $this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']);
+        $plan = $this->petstorePlan();
         $names = $this->emittedNames($plan);
 
         foreach (['PetClient', 'StoreClient', 'UserClient'] as $client) {
@@ -62,7 +63,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testTheRootExposesOneAccessorPerTagAndNoFlatOperationMethods(): void
     {
-        $root = $this->sourceOf($this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']), 'ApiClient');
+        $root = $this->sourceOf($this->petstorePlan(), 'ApiClient');
 
         self::assertStringContainsString('public function pet(): PetClientInterface', $root);
         self::assertStringContainsString('public function store(): StoreClientInterface', $root);
@@ -76,7 +77,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testASubClientIsConstructibleWithoutTheRoot(): void
     {
-        $sub = $this->sourceOf($this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']), 'StoreClient');
+        $sub = $this->sourceOf($this->petstorePlan(), 'StoreClient');
 
         // Its own transport — nothing that requires the root object to exist,
         // and an interface rather than an implementation, so a consumer can
@@ -130,10 +131,25 @@ final class TaggedSubClientTest extends TestCase
     }
 
     /**
-     * @param array<string,string> $skip
-     * @param array<string,string> $tagRenames
+     * Petstore's octet-stream upload is unrepresentable and its `api_key`
+     * requirement names a scheme the document never declares; both stop the
+     * run unless accepted, and neither is what the tag scenarios are about.
      */
-    private function plan(string $schema, array $skip = [], array $tagRenames = []): GenerationPlan
+    private function petstorePlan(): GenerationPlan
+    {
+        return $this->plan(
+            self::PETSTORE,
+            skip: ['uploadFile' => 'octet-stream body'],
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
+        );
+    }
+
+    /**
+     * @param array<string,string>              $skip
+     * @param array<string,string>              $tagRenames
+     * @param array<string,array<string,mixed>> $securitySchemes
+     */
+    private function plan(string $schema, array $skip = [], array $tagRenames = [], array $securitySchemes = []): GenerationPlan
     {
         return self::generator()->plan(new Profile(
             schema: $schema,
@@ -141,6 +157,7 @@ final class TaggedSubClientTest extends TestCase
             namespace: self::NAMESPACE,
             skip: $skip,
             tagRenames: $tagRenames,
+            securitySchemes: $securitySchemes,
         ));
     }
 

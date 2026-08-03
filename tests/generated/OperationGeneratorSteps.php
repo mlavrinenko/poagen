@@ -29,6 +29,7 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClient;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -133,7 +134,10 @@ final class OperationGeneratorSteps
 
     /**
      * The petstore fixture client, wired to a recording PSR-18 client and
-     * otherwise to the runtime's own defaults.
+     * otherwise to the runtime's own defaults. The document declares an
+     * `api_key` header scheme (through the profile, which fills the gap the
+     * document left) and the `petstore_auth` OAuth2 token, so both follow
+     * the transport in the emitted signature.
      */
     private function petstoreClient(RecordingClient $http): ApiClient
     {
@@ -145,7 +149,7 @@ final class OperationGeneratorSteps
             $http,
             $factory,
             $factory,
-        ));
+        ), 'test-api-key', 'test-access-token');
     }
 
     /**
@@ -225,13 +229,15 @@ final class OperationGeneratorSteps
      *
      * @param array<string,string> $skip
      * @param array<string,string> $tagRenames
-     * @param array<string,string> $tagChoice
+     * @param array<string,string>              $tagChoice
+     * @param array<string,array<string,mixed>> $securitySchemes
      */
     private function taggedProfile(
         string $schema,
         array $skip = [],
         array $tagRenames = [],
         array $tagChoice = [],
+        array $securitySchemes = [],
     ): Profile {
         $this->tagOutputDir = $this->makeScratchOutputDir('paogen-tagged-');
         $this->outputDir = $this->tagOutputDir;
@@ -243,6 +249,7 @@ final class OperationGeneratorSteps
             skip: $skip,
             tagRenames: $tagRenames,
             tagChoice: $tagChoice,
+            securitySchemes: $securitySchemes,
         );
     }
 
@@ -765,7 +772,11 @@ final class OperationGeneratorSteps
     public function thenClientsMethodJSONEncodesBodyAndAttachesItAsTheRequestBody(): void
     {
         // The emitted method says the body is JSON and hands over the model.
-        TestCase::assertStringContainsString("Endpoint::post('/pet')->json(\$body)", $this->source);
+        // `addPet` requires `petstore_auth`, so a credential segment sits
+        // between the verb and the body — the body segment still comes last,
+        // which is the part this step is about.
+        TestCase::assertStringContainsString("Endpoint::post('/pet')", $this->source);
+        TestCase::assertStringContainsString('->json($body),', $this->source);
 
         // Proven at the wire rather than in the text:
         // attribute-and-phpdoc-driven-serialization routes bodies through
@@ -1323,7 +1334,11 @@ final class OperationGeneratorSteps
         TestCase::assertSame('store', $tag);
         TestCase::assertSame('pet', $other);
 
-        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+        $this->profile = $this->taggedProfile(
+            self::PETSTORE_SCHEMA,
+            self::PETSTORE_SKIP,
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
+        );
     }
 
 
@@ -1361,7 +1376,11 @@ final class OperationGeneratorSteps
         // Petstore's operations are tagged without exception, which is this
         // scenario's premise — asserted rather than assumed, because an
         // untagged one would land on the root and quietly weaken the `then`.
-        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+        $this->profile = $this->taggedProfile(
+            self::PETSTORE_SCHEMA,
+            self::PETSTORE_SKIP,
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
+        );
 
         TestCase::assertSame([], $this->untaggedOperationIds(self::PETSTORE_SCHEMA));
     }
@@ -1402,7 +1421,11 @@ final class OperationGeneratorSteps
         // The committed petstore fixture tree is real generator output and is
         // autoloadable, which the next step needs: it constructs the emitted
         // class rather than reading it as text.
-        $this->profile = $this->taggedProfile(self::PETSTORE_SCHEMA, self::PETSTORE_SKIP);
+        $this->profile = $this->taggedProfile(
+            self::PETSTORE_SCHEMA,
+            self::PETSTORE_SKIP,
+            securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
+        );
         $this->runGenerator($this->profile);
 
         TestCase::assertFileExists($this->tagOutputDir . '/Generated/StoreClient.php');
@@ -1412,7 +1435,11 @@ final class OperationGeneratorSteps
 
     public function whenConsumerConstructsClientDirectly(): void
     {
-        // Directly: one argument, no root object anywhere in reach.
+        // Directly: a transport plus the credentials this client's OWN
+        // operations send, and no root object anywhere in reach. `getInventory`
+        // requires `api_key` and nothing else, so that is the whole of it —
+        // the `petstore_auth` token the pet endpoints need never reaches here
+        // (sub-client-constructors-take-every-scheme-in-the-document).
         $factory = new Psr17Factory();
 
         $this->subClient = new StoreClient(new HttpTransport(
@@ -1421,7 +1448,7 @@ final class OperationGeneratorSteps
             new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '{}')),
             $factory,
             $factory,
-        ));
+        ), 'test-api-key');
     }
 
 
@@ -1437,10 +1464,12 @@ final class OperationGeneratorSteps
             $constructor->getParameters(),
         );
 
-        // Petstore declares no security scheme, so the transport is the whole
-        // signature. The type is the interface, never an implementation —
-        // injecting a final class is not substitution.
-        TestCase::assertSame([TransportInterface::class], $types);
+        // The transport plus one string per credential THIS client's own
+        // operations send — `getInventory` requires `api_key` alone, so the
+        // signature names one credential rather than every scheme in the
+        // document. The transport's type is the interface, never an
+        // implementation: injecting a final class is not substitution.
+        TestCase::assertSame([TransportInterface::class, 'string'], $types);
 
         // And never the root: a sub-client that needed `ApiClient` to exist
         // would not be separately injectable, which is the point of the grain.
