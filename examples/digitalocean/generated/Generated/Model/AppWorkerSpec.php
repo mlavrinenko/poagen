@@ -18,6 +18,7 @@ final readonly class AppWorkerSpec
      * @param ?list<AppLogDestinationDefinition> $log_destinations
      */
     public function __construct(
+        public string $name,
         public ?AppWorkerSpecAutoscaling $autoscaling = null,
         public ?AppsBitbucketSourceSpec $bitbucket = null,
         public ?string $build_command = null,
@@ -32,7 +33,6 @@ final readonly class AppWorkerSpec
         public mixed $instance_size_slug = null,
         public ?AppHealthCheckSpec $liveness_health_check = null,
         public ?array $log_destinations = null,
-        public ?string $name = null,
         public ?string $run_command = null,
         public ?string $source_dir = null,
         public ?AppWorkerSpecTermination $termination = null,

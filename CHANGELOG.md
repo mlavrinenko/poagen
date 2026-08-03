@@ -28,6 +28,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `allOf` merges recursively — reading the node's own `properties`/`required`
+  alongside every member's, and recursing into a member whose own `$ref`
+  target is itself `allOf` — instead of the one-level, later-wins flatten T-008
+  shipped with. A member that is a `oneOf`/`anyOf` of expressible branches
+  becomes one synthesised model per branch and a native PHP union across
+  them, both for a request body (a response `allOf` merges to a single
+  object only; a response branch union refuses by name rather than guessing
+  how to hydrate an incoming body into the right branch). A property
+  declared twice with two different schemas, a branch set that is not all
+  object shapes, and a `required` name nothing declares all refuse the
+  operation by name instead of silently overwriting or dropping the
+  constraint. `RequestBodyAnalyzer`/`InlinePayloadPlanner` also stop reading
+  a `type: object` `allOf` node with no properties of its own as an
+  unconstrained map (`array $body`) — the fourth site of the widening
+  `close-the-three-sites-that-widen-a-declared-shape` closed at the other
+  three (`merge-allof-members-into-one-model`).
 - OpenAPI documents are parsed through
   [`devizzent/cebe-php-openapi`](https://github.com/DEVizzent/cebe-php-openapi)
   instead of `cebe/php-openapi`. The fork is maintained, declares

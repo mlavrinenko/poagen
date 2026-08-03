@@ -17,12 +17,12 @@ use Acme\DigitalOcean\Generated\Enum\RegionSlug;
 final readonly class ImageNewCustom
 {
     public function __construct(
+        public ImageName $name,
+        public RegionSlug $region,
+        public string $url,
         public ?ImageDescription $description = null,
         public ?Distribution $distribution = null,
-        public ?ImageName $name = null,
-        public ?RegionSlug $region = null,
         public ?TagsArray $tags = null,
-        public ?string $url = null,
     ) {
     }
 }

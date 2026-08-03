@@ -11,10 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddTagsRequest;
 use Acme\DigitalOcean\Generated\Model\FirewallsAssignDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsCreateInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsCreateOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteTagsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsUpdateInboundRules;
+use Acme\DigitalOcean\Generated\Model\FirewallsUpdateOutboundRules;
 
 /**
  * The contract for the `Firewalls` endpoints.
@@ -31,9 +39,22 @@ interface FirewallsClientInterface
     public function firewallsList(?int $perPage = null, ?int $page = null): void;
 
     /**
+     * Requires `bearer_auth` scopes: `firewall:create`.
+     */
+    public function firewallsCreate(FirewallsCreateInboundRules|FirewallsCreateOutboundRules $body): void;
+
+    /**
      * Requires `bearer_auth` scopes: `firewall:read`.
      */
     public function firewallsGet(string $firewallId): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsUpdate(
+        string $firewallId,
+        FirewallsUpdateInboundRules|FirewallsUpdateOutboundRules $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:delete`.
@@ -49,6 +70,22 @@ interface FirewallsClientInterface
      * Requires `bearer_auth` scopes: `firewall:update`.
      */
     public function firewallsDeleteDroplets(string $firewallId, FirewallsDeleteDropletsRequest $body): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsAddRules(
+        string $firewallId,
+        FirewallsAddRulesInboundRules|FirewallsAddRulesOutboundRules $body,
+    ): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `firewall:update`.
+     */
+    public function firewallsDeleteRules(
+        string $firewallId,
+        FirewallsDeleteRulesInboundRules|FirewallsDeleteRulesOutboundRules $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.

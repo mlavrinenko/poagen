@@ -28,14 +28,23 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 final readonly class InlinePayloadCatalog
 {
     /**
-     * @param array<string,BodySpec>   $bodies  keyed by raw operationId
-     * @param array<string,ReturnSpec> $returns keyed by raw operationId
-     * @param list<SynthesisedModel>   $roots   payload classes to emit, in document order
+     * @param array<string,BodySpec>   $bodies           keyed by raw operationId
+     * @param array<string,ReturnSpec> $returns          keyed by raw operationId
+     * @param list<SynthesisedModel>   $roots            payload classes to emit, in document order
+     * @param array<string,string>     $requestRefusals  keyed by raw operationId — the specific reason
+     *                                                    an `allOf`/`anyOf` merge in the request body could
+     *                                                    not resolve, preferred over
+     *                                                    {@see RequestBodyAnalyzer}'s generic diagnosis, which
+     *                                                    never attempted the merge and so cannot name it
+     * @param array<string,string>     $responseRefusals keyed by raw operationId, mirrors $requestRefusals
+     *                                                    for the response side
      */
     public function __construct(
         private array $bodies = [],
         private array $returns = [],
         private array $roots = [],
+        private array $requestRefusals = [],
+        private array $responseRefusals = [],
     ) {}
 
     public function bodyFor(string $rawOperationId): ?BodySpec
@@ -46,6 +55,16 @@ final readonly class InlinePayloadCatalog
     public function returnFor(string $rawOperationId): ?ReturnSpec
     {
         return $this->returns[$rawOperationId] ?? null;
+    }
+
+    public function requestRefusalFor(string $rawOperationId): ?string
+    {
+        return $this->requestRefusals[$rawOperationId] ?? null;
+    }
+
+    public function responseRefusalFor(string $rawOperationId): ?string
+    {
+        return $this->responseRefusals[$rawOperationId] ?? null;
     }
 
     /**

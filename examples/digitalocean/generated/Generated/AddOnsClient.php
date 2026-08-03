@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AddonsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequest;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchRequest;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -52,6 +53,19 @@ final readonly class AddOnsClient implements AddOnsClientInterface
         $this->transport->send(
             Endpoint::get('/v2/add-ons/saas')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `addon:create`.
+     */
+    public function addonsCreate(AddonsCreateRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/add-ons/saas')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

@@ -14,6 +14,8 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
+use function is_array;
+
 /**
  * Names a model class for every operation payload the document declared inline.
  *
@@ -69,6 +71,8 @@ final readonly class InlinePayloadPlanner
         $bodies = [];
         $returns = [];
         $roots = [];
+        $requestRefusals = [];
+        $responseRefusals = [];
 
         foreach (OperationOrder::inEmissionOrder($openApi) as [, , $operation]) {
             $rawId = (string) ($operation->operationId ?? '');
@@ -83,25 +87,27 @@ final readonly class InlinePayloadPlanner
 
             $base = ucfirst($operationIdRegistry->resolve($rawId, new NormalisationContext(SymbolKind::OperationId)));
 
-            $body = self::planRequest($operation, $rawId, $base, $pins, $ledger, $roots, $xmlElements);
+            $body = self::planRequest($operation, $rawId, $base, $pins, $ledger, $roots, $openApi, $requestRefusals, $xmlElements);
 
             if ($body instanceof BodySpec) {
                 $bodies[$rawId] = $body;
             }
 
-            $return = self::planResponse($operation, $rawId, $base, $pins, $ledger, $roots);
+            $return = self::planResponse($operation, $rawId, $base, $pins, $ledger, $roots, $openApi, $responseRefusals);
 
             if ($return instanceof ReturnSpec) {
                 $returns[$rawId] = $return;
             }
         }
 
-        return new InlinePayloadCatalog($bodies, $returns, $roots);
+        return new InlinePayloadCatalog($bodies, $returns, $roots, $requestRefusals, $responseRefusals);
     }
 
     /**
      * @param array<string,string>   $pins
      * @param list<SynthesisedModel> $roots
+     * @param array<string,string>   $refusals    keyed by raw operationId — an `allOf`/`anyOf` merge's
+     *                                             specific reason, out-parameter for {@see build()}
      * @param array<string,string>   $xmlElements
      */
     private static function planRequest(
@@ -111,6 +117,8 @@ final readonly class InlinePayloadPlanner
         array $pins,
         ModelNameLedger $ledger,
         array &$roots,
+        OpenApi $openApi,
+        array &$refusals,
         array $xmlElements = [],
     ): ?BodySpec {
         $resolved = RequestBodyAnalyzer::resolveBody($operation->requestBody);
@@ -127,6 +135,17 @@ final readonly class InlinePayloadPlanner
             // only reached when it is the only one on offer — which is why
             // pairing the two warns about nothing.
             return InlineXmlRequestPlanner::plan($resolved, $rawId, $base, $pin, $ledger, $roots, $xmlElements);
+        }
+
+        if (is_array($schema->allOf) && $schema->allOf !== []) {
+            $refusal = null;
+            $body = InlineAllOfPlanner::planRequest($schema, $base, $pin, $openApi, $ledger, $roots, $refusal);
+
+            if ($refusal !== null) {
+                $refusals[$rawId] = $refusal;
+            }
+
+            return $body;
         }
 
         if (self::isSynthesisableObject($schema)) {
@@ -157,6 +176,7 @@ final readonly class InlinePayloadPlanner
     /**
      * @param array<string,string>   $pins
      * @param list<SynthesisedModel> $roots
+     * @param array<string,string>   $refusals keyed by raw operationId, mirrors {@see planRequest()}'s
      */
     private static function planResponse(
         Operation $operation,
@@ -165,6 +185,8 @@ final readonly class InlinePayloadPlanner
         array $pins,
         ModelNameLedger $ledger,
         array &$roots,
+        OpenApi $openApi,
+        array &$refusals,
     ): ?ReturnSpec {
         $schema = self::successResponseSchema($operation);
 
@@ -173,6 +195,17 @@ final readonly class InlinePayloadPlanner
         }
 
         $pin = $pins[$rawId . '.' . self::ROLE_RESPONSE] ?? null;
+
+        if (is_array($schema->allOf) && $schema->allOf !== []) {
+            $refusal = null;
+            $return = InlineAllOfPlanner::planResponse($schema, $base, $pin, $openApi, $ledger, $roots, $refusal);
+
+            if ($refusal !== null) {
+                $refusals[$rawId] = $refusal;
+            }
+
+            return $return;
+        }
 
         if (self::isSynthesisableObject($schema)) {
             $name = self::claim($pin ?? $base . 'Response', $schema, $ledger, $roots);
@@ -196,11 +229,18 @@ final readonly class InlinePayloadPlanner
      * same ledger for the one content type this class does not plan itself.
      *
      * @param list<SynthesisedModel> $roots
+     * @param string|null            $origin a {@see ModelNameLedger} collision diagnostic normally
+     *                                        points at `$schema`'s own document position, but an
+     *                                        `allOf` merge synthesises a fresh `Schema` with none —
+     *                                        {@see InlineAllOfPlanner} passes the original node's
+     *                                        position here so the diagnostic still points at the
+     *                                        document rather than reading "(no document position)"
      */
-    public static function claim(string $name, Schema $schema, ModelNameLedger $ledger, array &$roots): string
+    public static function claim(string $name, Schema $schema, ModelNameLedger $ledger, array &$roots, ?string $origin = null): string
     {
-        $ledger->claim($name, SynthesisedModel::originOf($schema));
-        $roots[] = SynthesisedModel::forNode($name, $schema);
+        $origin ??= SynthesisedModel::originOf($schema);
+        $ledger->claim($name, $origin);
+        $roots[] = new SynthesisedModel($name, $schema, [], $origin);
 
         return $name;
     }

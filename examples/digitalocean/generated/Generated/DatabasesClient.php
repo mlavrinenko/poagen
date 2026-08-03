@@ -18,12 +18,21 @@ use Acme\DigitalOcean\Generated\Model\DatabaseAutoscaleParams;
 use Acme\DigitalOcean\Generated\Model\DatabaseClusterResize;
 use Acme\DigitalOcean\Generated\Model\DatabaseConfig;
 use Acme\DigitalOcean\Generated\Model\DatabaseMaintenanceWindow;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddUserRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateClusterRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchemaRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopicRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsinkRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplicaRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesResetAuthRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateClusterMetricsCredentialsRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateEvictionPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateFirewallRulesRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfigRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfigRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopicRequest;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateRegionRequest;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUserRequest;
 use Acme\DigitalOcean\Generated\Model\LogsinkUpdate;
 use Acme\DigitalOcean\Generated\Model\SourceDatabase;
 use Acme\DigitalOcean\Generated\Model\SqlMode;
@@ -54,6 +63,19 @@ final readonly class DatabasesClient implements DatabasesClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateCluster(DatabasesCreateClusterRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/databases')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `database:update`, `database:view_credentials`.
      */
     public function databasesGetClusterMetricsCredentials(): void
@@ -61,6 +83,20 @@ final readonly class DatabasesClient implements DatabasesClientInterface
         $this->transport->send(
             Endpoint::get('/v2/databases/metrics/credentials')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateClusterMetricsCredentials(
+        DatabasesUpdateClusterMetricsCredentialsRequest $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::put('/v2/databases/metrics/credentials')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -363,6 +399,20 @@ final readonly class DatabasesClient implements DatabasesClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateLogsink(string $databaseClusterUuid, DatabasesCreateLogsinkRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/databases/{database_cluster_uuid}/logsink')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): void
@@ -563,6 +613,20 @@ final readonly class DatabasesClient implements DatabasesClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateReplica(string $databaseClusterUuid, DatabasesCreateReplicaRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/databases/{database_cluster_uuid}/replicas')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): void
@@ -627,6 +691,22 @@ final readonly class DatabasesClient implements DatabasesClientInterface
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateKafkaSchema(
+        string $databaseClusterUuid,
+        DatabasesCreateKafkaSchemaRequest $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/databases/{database_cluster_uuid}/schema-registry')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -779,6 +859,22 @@ final readonly class DatabasesClient implements DatabasesClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesCreateKafkaTopic(
+        string $databaseClusterUuid,
+        DatabasesCreateKafkaTopicRequest $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/databases/{database_cluster_uuid}/topics')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): void
@@ -788,6 +884,24 @@ final readonly class DatabasesClient implements DatabasesClientInterface
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('topic_name', $topicName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateKafkaTopic(
+        string $databaseClusterUuid,
+        string $topicName,
+        DatabasesUpdateKafkaTopicRequest $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::put('/v2/databases/{database_cluster_uuid}/topics/{topic_name}')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->path('topic_name', $topicName)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -834,6 +948,20 @@ final readonly class DatabasesClient implements DatabasesClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `database:create`.
+     */
+    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/databases/{database_cluster_uuid}/users')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `database:read`.
      */
     public function databasesGetUser(string $databaseClusterUuid, string $username): void
@@ -843,6 +971,24 @@ final readonly class DatabasesClient implements DatabasesClientInterface
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('username', $username)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `database:update`.
+     */
+    public function databasesUpdateUser(
+        string $databaseClusterUuid,
+        string $username,
+        DatabasesUpdateUserRequest $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::put('/v2/databases/{database_cluster_uuid}/users/{username}')
+                ->path('database_cluster_uuid', $databaseClusterUuid)
+                ->path('username', $username)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

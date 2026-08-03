@@ -12,7 +12,13 @@ use cebe\openapi\spec\Schema;
  * Six distinct kinds, each with their own emitter branch:
  *
  *   - KIND_JSON         a Model, by `$ref` or synthesised from an inline
- *                       object, sent as JSON
+ *                       object (including one flattened from `allOf`), sent
+ *                       as JSON
+ *   - KIND_JSON_UNION    an `allOf` whose one `oneOf`/`anyOf` member
+ *                       synthesised N branch Models — the parameter is the
+ *                       native PHP union across them, sent as JSON as
+ *                       whichever branch the caller instantiated (`ruling:
+ *                       an anyOf member becomes a union of branches`)
  *   - KIND_JSON_LIST    `list<Model>`, from either source, sent as JSON
  *   - KIND_JSON_MAP     an inline object the document left without declared
  *                       properties, sent as JSON — the map is what the schema
@@ -48,6 +54,7 @@ use cebe\openapi\spec\Schema;
 final readonly class BodySpec
 {
     public const string KIND_JSON = 'json';
+    public const string KIND_JSON_UNION = 'json_union';
     public const string KIND_JSON_LIST = 'json_list';
     public const string KIND_JSON_MAP = 'json_map';
     public const string KIND_XML = 'xml';
@@ -66,6 +73,8 @@ final readonly class BodySpec
      * @param string          $contentType  the content type to send, set for KIND_TEXT and
      *                                      KIND_BINARY — the document declares it and, where it
      *                                      declared several, this is the one paogen picked
+     * @param list<string>    $models       the branch class names, set when kind is KIND_JSON_UNION —
+     *                                      the parameter type is their `|`-join
      */
     public function __construct(
         public string $kind,
@@ -75,6 +84,7 @@ final readonly class BodySpec
         public string $rootElement = '',
         public string $itemElement = '',
         public string $contentType = '',
+        public array $models = [],
     ) {}
 
     public static function xml(string $model, string $rootElement): self
@@ -90,6 +100,15 @@ final readonly class BodySpec
     public static function json(string $model): self
     {
         return new self(self::KIND_JSON, model: $model);
+    }
+
+    /**
+     * @param list<string> $models at least two branch class names, in
+     *                             `oneOf`/`anyOf` declaration order
+     */
+    public static function jsonUnion(array $models): self
+    {
+        return new self(self::KIND_JSON_UNION, models: $models);
     }
 
     public static function jsonList(string $model): self

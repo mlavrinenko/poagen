@@ -12,6 +12,10 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequest;
 
 /**
  * The contract for the `VPCs` endpoints.
@@ -29,9 +33,8 @@ interface VPCsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc:create`.
-     * @param array<string, mixed> $body
      */
-    public function vpcsCreate(array $body): void;
+    public function vpcsCreate(VpcsCreateRequest $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
@@ -40,14 +43,18 @@ interface VPCsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
-     * @param array<string, mixed> $body
      */
-    public function vpcsUpdate(string $vpcId, array $body): void;
+    public function vpcsUpdate(string $vpcId, VpcsUpdateRequest $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:delete`.
      */
     public function vpcsDelete(string $vpcId): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `vpc:update`.
+     */
+    public function vpcsPatch(string $vpcId, VpcsPatchRequest $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
@@ -71,7 +78,6 @@ interface VPCsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
-     * @param array<string, mixed> $body
      */
-    public function vpcsPatchPeerings(string $vpcId, string $vpcPeeringId, array $body): void;
+    public function vpcsPatchPeerings(string $vpcId, string $vpcPeeringId, VpcsPatchPeeringsRequest $body): void;
 }

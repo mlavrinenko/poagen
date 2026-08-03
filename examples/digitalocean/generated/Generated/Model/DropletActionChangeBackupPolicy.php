@@ -16,8 +16,8 @@ use Acme\DigitalOcean\Generated\Enum\DropletActionChangeBackupPolicyType;
 final readonly class DropletActionChangeBackupPolicy
 {
     public function __construct(
+        public mixed $backup_policy,
         public DropletActionChangeBackupPolicyType $type,
-        public mixed $backup_policy = null,
     ) {
     }
 }

@@ -13,6 +13,7 @@ use Nette\PhpGenerator\PhpNamespace;
 use Psr\Http\Message\StreamInterface;
 
 use function assert;
+use function implode;
 
 /**
  * Materialises a {@see BodySpec} as zero-or-more method parameters on an
@@ -41,6 +42,11 @@ final readonly class RequestBodyParameterEmitter
             case BodySpec::KIND_XML:
             case BodySpec::KIND_XML_LIST:
                 $this->addJsonBodyParam($method, $namespace, $body);
+
+                return;
+
+            case BodySpec::KIND_JSON_UNION:
+                $this->addJsonUnionBodyParam($method, $namespace, $body);
 
                 return;
 
@@ -96,6 +102,27 @@ final readonly class RequestBodyParameterEmitter
         }
 
         $phpParam->setType($fqcn);
+    }
+
+    /**
+     * The PHP union across an `allOf`'s synthesised `oneOf`/`anyOf` branch
+     * classes — one native union type, no PHPStan annotation needed, per
+     * `ruling: an anyOf member becomes a union of branches`. Nette's
+     * `Parameter::setType()` already accepts a `|`-joined string; a
+     * property-level `oneOf`/`anyOf` of `$ref`s goes through the same call
+     * via {@see CompositionResolver::resolveUnion} and {@see ParameterAdder}.
+     */
+    private function addJsonUnionBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body): void
+    {
+        $fqcns = [];
+
+        foreach ($body->models as $model) {
+            $fqcn = '\\' . trim($this->modelNamespace, '\\') . '\\' . $model;
+            $namespace->addUse(ltrim($fqcn, '\\'));
+            $fqcns[] = $fqcn;
+        }
+
+        $method->addParameter('body')->setType(implode('|', $fqcns));
     }
 
     /**

@@ -17,6 +17,7 @@ use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedDirection;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedSort;
 use Acme\GitHub\Generated\Enum\AppsListWebhookDeliveriesStatus;
 use Acme\GitHub\Generated\Model\AppsCheckTokenRequest;
+use Acme\GitHub\Generated\Model\AppsCreateFromManifestResponse;
 use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequest;
 use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequest;
 use Acme\GitHub\Generated\Model\AppsDeleteTokenRequest;
@@ -54,6 +55,14 @@ final readonly class AppsClient implements AppsClientInterface
         return $this->transport->send(
             Endpoint::get('/app'),
             ResponseType::object(Integration::class),
+        );
+    }
+
+    public function appsCreateFromManifest(string $code): AppsCreateFromManifestResponse
+    {
+        return $this->transport->send(
+            Endpoint::post('/app-manifests/{code}/conversions')->path('code', $code),
+            ResponseType::object(AppsCreateFromManifestResponse::class),
         );
     }
 

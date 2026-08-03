@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequest;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequest;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequest;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -38,20 +41,6 @@ final readonly class UptimeClient implements UptimeClientInterface
     }
 
     /**
-     * Requires `bearer_auth` scopes: `uptime:create`.
-     * @param array<string, mixed> $body
-     */
-    public function uptimeCreateCheck(array $body): void
-    {
-        $this->transport->send(
-            Endpoint::post('/v2/uptime/checks')
-                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
-            ResponseType::nothing(),
-        );
-    }
-
-    /**
      * Requires `bearer_auth` scopes: `uptime:read`.
      */
     public function uptimeGetCheck(string $checkId): void
@@ -66,15 +55,14 @@ final readonly class UptimeClient implements UptimeClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
-     * @param array<string, mixed> $body
      */
-    public function uptimeUpdateCheck(string $checkId, array $body): void
+    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequest $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -109,15 +97,14 @@ final readonly class UptimeClient implements UptimeClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `uptime:create`, `uptime:update`.
-     * @param array<string, mixed> $body
      */
-    public function uptimeCreateAlert(string $checkId, array $body): void
+    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequest $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/uptime/checks/{check_id}/alerts')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -138,16 +125,15 @@ final readonly class UptimeClient implements UptimeClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
-     * @param array<string, mixed> $body
      */
-    public function uptimeUpdateAlert(string $checkId, string $alertId, array $body): void
+    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequest $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}/alerts/{alert_id}')
                 ->path('check_id', $checkId)
                 ->path('alert_id', $alertId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }

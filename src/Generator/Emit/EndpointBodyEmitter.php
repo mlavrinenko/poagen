@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+
 use function sprintf;
 use function var_export;
 
@@ -11,9 +13,14 @@ use function var_export;
  * The chain segment that gives an {@see Endpoint} its request body.
  *
  * Each body kind names itself and hands over the value the caller already
- * holds — a Model, a list of Models, an array of declared fields. Marshalling,
- * encoding and the content-type header are the transport's, which is why
- * every kind is one call here rather than three emitted lines each.
+ * holds — a Model, a list of Models, an array of declared fields.
+ * Marshalling reads the value's own runtime class
+ * ({@see Marshaller::marshal()} takes a
+ * bare `object`), so `KIND_JSON_UNION` — one of an `allOf`'s synthesised
+ * `oneOf`/`anyOf` branch classes — needs no branch of its own here and falls
+ * through the same `->json($body)` call `KIND_JSON` does. Encoding and the
+ * content-type header are the transport's, which is why every other kind is
+ * one call here rather than three emitted lines each.
  *
  * @internal
  */

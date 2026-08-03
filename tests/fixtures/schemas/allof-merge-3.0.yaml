@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: allOf Merge Fixture
+  version: "1.0.0"
+  description: >
+    merge-allof-members-into-one-model fixture. Neither vendor document
+    drives a property collision, an un-unionable anyOf branch set, or a
+    required name nothing declares, so this fixture is the only proof for
+    those three refusals. The other operations mirror the shapes the
+    DigitalOcean corpus actually has: a recursive merge whose requirements
+    sit on the node and whose properties sit two levels down
+    (mergeRecursive), a widened `type: object` + `allOf` body that used to
+    silently become `array $body` (mergeWidened), and an `anyOf` member of
+    required-only branches becoming a PHP union (mergeUnion).
+components:
+  schemas:
+    widget_core:
+      type: object
+      required:
+        - sku
+      properties:
+        sku:
+          type: string
+    widget_extra:
+      type: object
+      properties:
+        color:
+          type: string
+    widget:
+      allOf:
+        - $ref: '#/components/schemas/widget_core'
+        - $ref: '#/components/schemas/widget_extra'
+    scalar_a:
+      type: string
+    scalar_b:
+      type: integer
+paths:
+  /widgets/recursive:
+    post:
+      operationId: mergeRecursive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - color
+              allOf:
+                - $ref: '#/components/schemas/widget'
+      responses:
+        '204':
+          description: ok
+  /widgets/widened:
+    post:
+      operationId: mergeWidened
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/widget_core'
+                - $ref: '#/components/schemas/widget_extra'
+      responses:
+        '204':
+          description: ok
+  /widgets/union:
+    post:
+      operationId: mergeUnion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # sku comes from widget_core, required and declared there — the
+              # node's own properties (weight, volume) are what each anyOf
+              # branch's own extra requirement points at, mirroring
+              # firewalls_create's `firewall` member declaring inbound_rules/
+              # outbound_rules that the anyOf member's branches then require.
+              properties:
+                weight:
+                  type: number
+                volume:
+                  type: number
+              allOf:
+                - $ref: '#/components/schemas/widget_core'
+                - anyOf:
+                    - title: By Weight
+                      required:
+                        - weight
+                    - title: By Volume
+                      required:
+                        - volume
+      responses:
+        '204':
+          description: ok
+  /widgets/collision:
+    post:
+      operationId: mergeCollision
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    sku:
+                      type: string
+                - type: object
+                  properties:
+                    sku:
+                      type: integer
+      responses:
+        '204':
+          description: ok
+  /widgets/branch-not-object:
+    post:
+      operationId: mergeBranchNotObject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/widget_core'
+                - anyOf:
+                    - $ref: '#/components/schemas/scalar_a'
+                    - $ref: '#/components/schemas/scalar_b'
+      responses:
+        '204':
+          description: ok
+  /widgets/missing-required:
+    post:
+      operationId: mergeMissingRequired
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - warehouse
+              allOf:
+                - $ref: '#/components/schemas/widget_core'
+      responses:
+        '204':
+          description: ok

@@ -8,10 +8,14 @@ use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use LogicException;
+use Mlavrinenko\Paogen\Generator\ModelPlanner;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\PropertyRenameValidator;
 
 use function in_array;
 use function is_array;
+use function sprintf;
 
 /**
  * Resolution strategy for composition keywords `oneOf`, `anyOf`, `allOf`
@@ -137,67 +141,76 @@ final class CompositionResolver
     }
 
     /**
-     * Merge an `allOf` branch list into a single synthetic `Schema` whose
-     * `properties`/`required` are the union of the branches. Later entries
-     * win on conflict. `$ref` branches are resolved against
-     * `$openApi->components->schemas`; non-object branches are ignored.
+     * Merge an `allOf` list — recursively, reading the node's own
+     * `properties`/`required` too — into a single synthetic `Schema`, or a
+     * PHP-union-of-branches when exactly one member is a `oneOf`/`anyOf` of
+     * expressible branches. See {@see AllOfMerger} for the algorithm and
+     * {@see AllOfMerge} for the three-shaped result.
+     *
+     * Returns null when the node has no `allOf` at all, so a caller can tell
+     * "not an allOf" apart from "an allOf that merged, or refused" —
+     * {@see AllOfMerge::isRefused()} carries the second distinction the
+     * pre-recursion `flattenAllOf` used to erase by returning null for both.
+     */
+    public static function mergeAllOf(Schema $node, OpenApi $openApi): ?AllOfMerge
+    {
+        if (!is_array($node->allOf) || $node->allOf === []) {
+            return null;
+        }
+
+        return AllOfMerger::merge($node, $openApi);
+    }
+
+    /**
+     * {@see mergeAllOf}, narrowed to the single-object shape a named
+     * component's `allOf` needs — neither of this method's two callers
+     * (T-008's own {@see ModelPlanner}
+     * dispatch, and {@see PropertyRenameValidator}
+     * mirroring the same dispatch for `Profile::$propertyRenames`) has a
+     * `ModelNameLedger` to register branch classes against, so a component
+     * whose `allOf` merges to a `oneOf`/`anyOf` union — none in either
+     * vendored corpus today — throws rather than silently picking a branch;
+     * {@see InlinePayloadPlanner} is the
+     * caller that can actually synthesise the branch classes an operation
+     * payload's `allOf` needs.
+     *
+     * Returns null only when the node has no `allOf`; a present `allOf`
+     * that cannot merge throws rather than returning null, closing the gap
+     * where "no allOf" and "an allOf that merged to nothing" were the same
+     * answer.
      */
     public static function flattenAllOf(Schema $node, OpenApi $openApi): ?Schema
     {
-        /** @var array<Schema|Reference> $branches */
-        $branches = $node->allOf ?? [];
+        $merge = self::mergeAllOf($node, $openApi);
 
-        if ($branches === []) {
+        if (!$merge instanceof AllOfMerge) {
             return null;
         }
 
-        /** @var array<string,Schema|Reference> $merged */
-        $merged = [];
-        /** @var list<string> $required */
-        $required = [];
-
-        foreach ($branches as $branch) {
-            $target = self::resolveBranchSchema($branch, $openApi);
-
-            if (!$target instanceof Schema) {
-                continue;
-            }
-
-            /** @var array<string,Schema|Reference> $props */
-            $props = $target->properties ?? [];
-
-            foreach ($props as $k => $v) {
-                $merged[$k] = $v;
-            }
-
-            /** @var list<string> $req */
-            $req = $target->required ?? [];
-
-            foreach ($req as $name) {
-                if (!in_array($name, $required, true)) {
-                    $required[] = $name;
-                }
-            }
+        if ($merge->isRefused()) {
+            throw new LogicException(sprintf(
+                'allOf at %s could not be merged: %s',
+                SynthesisedModel::originOf($node),
+                $merge->refusal ?? '',
+            ));
         }
 
-        if ($merged === []) {
-            return null;
+        if ($merge->isUnion()) {
+            throw new LogicException(sprintf(
+                'allOf at %s has a oneOf/anyOf member; a named component cannot synthesise the branch classes a '
+                    . 'union body needs — see InlinePayloadPlanner for the operation-payload path that can',
+                SynthesisedModel::originOf($node),
+            ));
         }
 
-        return new Schema([
-            'type' => 'object',
-            'properties' => $merged,
-            'required' => $required,
-        ]);
+        return $merge->schema;
     }
 
     /**
      * {@see flattenAllOf}, but a no-op `allOf` (missing or empty) returns the
-     * node itself rather than null — the caller (T-008's own {@see
-     * \Mlavrinenko\Paogen\Generator\ModelPlanner} dispatch, and {@see
-     * \Mlavrinenko\Paogen\Generator\PropertyRenameValidator} mirroring the
-     * same dispatch for `Profile::$propertyRenames`) wants "the effective
-     * schema", and an object with no `allOf` is already its own answer.
+     * node itself rather than null — the two callers named on
+     * {@see flattenAllOf} want "the effective schema", and an object with no
+     * `allOf` is already its own answer.
      */
     public static function materialiseAllOf(Schema $schema, OpenApi $openApi): ?Schema
     {
@@ -265,29 +278,5 @@ final class CompositionResolver
         }
 
         return $out;
-    }
-
-    private static function resolveBranchSchema(Schema|Reference $branch, OpenApi $openApi): ?Schema
-    {
-        if ($branch instanceof Schema) {
-            return $branch;
-        }
-
-        $name = ComponentName::rawFromRef($branch->getReference());
-        $components = $openApi->components;
-
-        if ($components === null) {
-            return null;
-        }
-
-        /** @var array<string,Schema|Reference> $schemas */
-        $schemas = $components->schemas ?? [];
-        $target = $schemas[$name] ?? null;
-
-        if ($target instanceof Schema) {
-            return $target;
-        }
-
-        return null;
     }
 }

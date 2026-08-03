@@ -12,6 +12,9 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\Project;
+use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequest;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequest;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -39,6 +42,19 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `project:create`.
+     */
+    public function projectsCreate(ProjectsCreateRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/projects')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `project:read`.
      */
     public function projectsGetDefault(): void
@@ -46,6 +62,19 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         $this->transport->send(
             Endpoint::get('/v2/projects/default')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `project:update`.
+     */
+    public function projectsUpdateDefault(ProjectsUpdateDefaultRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::put('/v2/projects/default')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
@@ -72,6 +101,20 @@ final readonly class ProjectsClient implements ProjectsClientInterface
             Endpoint::get('/v2/projects/{project_id}')
                 ->path('project_id', $projectId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `project:update`.
+     */
+    public function projectsUpdate(string $projectId, ProjectsUpdateRequest $body): void
+    {
+        $this->transport->send(
+            Endpoint::put('/v2/projects/{project_id}')
+                ->path('project_id', $projectId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

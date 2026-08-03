@@ -89,8 +89,11 @@ What blocks this example today, found by `clear-example-expected-failures`:
   `anyOf: [integer, string]`, which resolves to `mixed` instead of
   tripping the "unsupported parameter shapes" abort, then fails
   PHPStan against `Endpoint::path()`'s stricter signature.
-- `Profile::$skip` in `paogen.php` fully catalogues the fifty
+- `Profile::$skip` in `paogen.php` fully catalogues the twenty-one
   unrelated operation-level gaps this document already had (inline
-  JSON request bodies, unsupported query/header parameter shapes) and
-  is verified clean on its own — only the discriminator components
-  above keep the marker in place.
+  JSON request bodies with no `allOf` to merge, unsupported
+  query/header parameter shapes, and the one `allOf` `required` name
+  the vendor document itself never declares — see
+  `merge-allof-members-into-one-model`) and is verified clean on its
+  own — only the discriminator components above keep the marker in
+  place.
