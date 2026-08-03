@@ -5,7 +5,11 @@
   tags: ("docs", "process"),
   priority: 3,
   difficulty: 2,
-  status: proposed(2026, 8, 3),
+  status: accepted(
+    2026,
+    8,
+    3,
+  )[Scheduled by the owner into this session. Sequenced after gate-freshness-misses-the-files-linecop-lints so whatever file the split creates lands in a freshness input set that already covers the root Markdown docs linecop lints.],
 )
 
 == Summary
