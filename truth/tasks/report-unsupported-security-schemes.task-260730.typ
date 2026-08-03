@@ -6,6 +6,10 @@
   priority: 6,
   difficulty: 5,
   status: wip(2026, 8, 2),
+  links: (
+    depends-on("sub-client-constructors-take-every-scheme-in-the-document.task-260802.typ"),
+    depends-on("generated-tier-duplication-ratchet-blocks-new-golden-trees.task-260802.typ"),
+  ),
 )
 
 == Summary
@@ -107,6 +111,34 @@ the profile — which means `Profile` grows a map of scheme declarations that
 fill a gap the document left. That is the shape `real-world-schemas` calls for
 where a document is genuinely ambiguous: ask for guidance, say exactly what is
 needed.
+
+=== Two dependencies nobody recorded, found by doing the work, 2026-08-03
+
+Both surfaced only once a scheme was actually wired onto a tagged document,
+and both make this task un-landable on its own. Recorded here because neither
+is visible from either task's text.
+
+`sub-client-constructors-take-every-scheme-in-the-document` becomes mandatory
+the moment anything is wired. Before this task, petstore had no wired scheme
+at all, so no sub-client took a credential and the uniform-wiring defect had
+nothing to show. Wiring `api_key` and `petstore_auth` produces three
+`property.onlyWritten` findings — `StoreClient::$petstoreAuth`,
+`UserClient::$apiKey`, `UserClient::$petstoreAuth` — under a generated-tier
+config with no baseline and no `ignoreErrors`. That is verbatim the other
+task's second acceptance criterion, and there is no in-scope way to land this
+green without it.
+
+`generated-tier-duplication-ratchet-blocks-new-golden-trees` blocks it for a
+different reason. The criterion above requiring an operation's scopes on that
+operation's docblock costs 112 duplicated lines, because the petstore document
+requires the identical scope pair on all seven pet operations and the same
+output is committed twice. That takes the generated tier from 16.41% to
+18.55% against a 16.5% threshold. Measured by disabling that one call and
+regenerating; everything else in the change is green at 16.41%.
+
+The second is the more interesting failure: jscpd counts doc comments, so the
+gate penalises the generator for documenting its output faithfully — for
+emitting exactly what an acceptance criterion demands.
 
 == Acceptance criteria
 

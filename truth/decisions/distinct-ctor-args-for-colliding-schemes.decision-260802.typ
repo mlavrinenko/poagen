@@ -108,3 +108,22 @@ particular document.
 - `oauth2` and `openIdConnect` schemes are untouched — they classify as
   `KIND_UNSUPPORTED` before any ctorArg is proposed, so they were never in
   scope and stay that way per this task's own non-goals.
+
+=== Correction, 2026-08-03
+
+Two statements above have since become false. The choice this decision made
+is unaffected; only the facts it cited about the surrounding code have moved,
+and they are corrected here rather than edited away, because what the decision
+was reasoning about at the time is part of why it reads as it does.
+
+The Context cites `{@see SecurityScheme::fromCebe}`. That method no longer
+exists: `report-unsupported-security-schemes` moved classification to
+`SecuritySchemeClassifier::classify`.
+
+The last Consequences bullet says `oauth2` and `openIdConnect` classify as
+`KIND_UNSUPPORTED` and stay out of scope. The same task wired both — each
+takes one access token and sends `Authorization: Bearer <token>` — so both now
+propose a ctorArg and both participate in the collision disambiguation this
+decision describes. That is a widening of what disambiguation covers, not a
+change to how it works: a name proposed by one scheme is still untouched, and a
+name proposed by several is still replaced for every scheme in the group.
