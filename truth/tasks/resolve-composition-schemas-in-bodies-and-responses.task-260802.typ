@@ -5,8 +5,14 @@
   tags: ("generator", "strictness"),
   priority: 8,
   difficulty: 7,
-  status: accepted(2026, 8, 2),
-  links: (depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),),
+  status: cancelled(
+    2026,
+    8,
+    3,
+  )[Split into four, because it bundled four independent mechanisms behind one stale count. Its 68 operations was measured when the skip lists held 100 entries; they hold 78 now, and the composition half is 55: merge-allof-members-into-one-model (19, plus 9 operations it un-widens), a-union-request-body-takes-a-union-parameter (27), a-union-response-selects-its-branch (8), a-media-type-with-no-schema-takes-a-raw-body (1). Its fourth shape, properties with no type keyword, was already closed by close-the-three-sites-that-widen-a-declared-shape and its named example kubernetes\_upgrade\_cluster generates today.],
+  links: (
+    depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),
+  ),
 )
 
 == Summary
