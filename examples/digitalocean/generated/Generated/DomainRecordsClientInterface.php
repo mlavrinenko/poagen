@@ -13,6 +13,15 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DomainsListRecordsType;
 use Acme\DigitalOcean\Generated\Model\DomainRecord;
+use Acme\DigitalOcean\Generated\Model\DomainRecordA;
+use Acme\DigitalOcean\Generated\Model\DomainRecordAaaa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordCaa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordCname;
+use Acme\DigitalOcean\Generated\Model\DomainRecordMx;
+use Acme\DigitalOcean\Generated\Model\DomainRecordNs;
+use Acme\DigitalOcean\Generated\Model\DomainRecordSoa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordSrv;
+use Acme\DigitalOcean\Generated\Model\DomainRecordTxt;
 
 /**
  * The contract for the `Domain Records` endpoints.
@@ -32,6 +41,14 @@ interface DomainRecordsClientInterface
         ?DomainsListRecordsType $type = null,
         ?int $perPage = null,
         ?int $page = null,
+    ): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `domain:create`, `domain:update`.
+     */
+    public function domainsCreateRecord(
+        string $domainName,
+        DomainRecordA|DomainRecordAaaa|DomainRecordCaa|DomainRecordCname|DomainRecordMx|DomainRecordNs|DomainRecordSoa|DomainRecordSrv|DomainRecordTxt $body,
     ): void;
 
     /**

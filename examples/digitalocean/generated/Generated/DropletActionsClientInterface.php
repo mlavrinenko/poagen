@@ -11,6 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\DropletAction;
+use Acme\DigitalOcean\Generated\Model\DropletActionChangeBackupPolicy;
+use Acme\DigitalOcean\Generated\Model\DropletActionChangeKernel;
+use Acme\DigitalOcean\Generated\Model\DropletActionEnableBackups;
+use Acme\DigitalOcean\Generated\Model\DropletActionRebuild;
+use Acme\DigitalOcean\Generated\Model\DropletActionRename;
+use Acme\DigitalOcean\Generated\Model\DropletActionResize;
+use Acme\DigitalOcean\Generated\Model\DropletActionRestore;
+use Acme\DigitalOcean\Generated\Model\DropletActionSnapshot;
+
 /**
  * The contract for the `Droplet Actions` endpoints.
  *
@@ -21,9 +31,22 @@ namespace Acme\DigitalOcean\Generated;
 interface DropletActionsClientInterface
 {
     /**
+     * Requires `bearer_auth` scopes: `droplet:update`.
+     */
+    public function dropletActionsPostByTag(DropletAction|DropletActionSnapshot $body, ?string $tagName = null): void;
+
+    /**
      * Requires `bearer_auth` scopes: `droplet:read`.
      */
     public function dropletActionsList(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:update`.
+     */
+    public function dropletActionsPost(
+        int $dropletId,
+        DropletAction|DropletActionEnableBackups|DropletActionChangeBackupPolicy|DropletActionRestore|DropletActionResize|DropletActionRebuild|DropletActionRename|DropletActionChangeKernel|DropletActionSnapshot $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.

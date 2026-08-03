@@ -120,6 +120,8 @@ use Acme\GitHub\Generated\Model\OidcCustomSubRepo;
 use Acme\GitHub\Generated\Model\OrganizationActionsSecret;
 use Acme\GitHub\Generated\Model\OrganizationActionsVariable;
 use Acme\GitHub\Generated\Model\PendingDeployment;
+use Acme\GitHub\Generated\Model\ReviewCustomGatesCommentRequired;
+use Acme\GitHub\Generated\Model\ReviewCustomGatesStateRequired;
 use Acme\GitHub\Generated\Model\Runner;
 use Acme\GitHub\Generated\Model\RunnerApplication;
 use Acme\GitHub\Generated\Model\RunnerGroupsOrg;
@@ -791,6 +793,13 @@ interface ActionsClientInterface
     ): void;
 
     public function actionsCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject;
+
+    public function actionsReviewCustomGatesForRun(
+        string $owner,
+        string $repo,
+        int $runId,
+        ReviewCustomGatesCommentRequired|ReviewCustomGatesStateRequired $body,
+    ): void;
 
     public function actionsForceCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject;
 

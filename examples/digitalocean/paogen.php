@@ -87,27 +87,22 @@ return new Profile(
      * its `type: object` and, finding no properties of its own, emitted a
      * bare map — and the merge that fixed the widening surfaced a genuine
      * vendor defect underneath it, which the entry below names.
+     *
+     * `a-union-request-body-takes-a-union-parameter` removed thirteen more:
+     * every one of them was a request body whose whole schema is a `oneOf`
+     * (`certificates_create`, `droplets_create`, `dropletActions_post_byTag`)
+     * or `anyOf` (the rest) of `$ref` branches. Each now emits one method
+     * parameter typed as the native PHP union across the branches — no
+     * branch selection needed outgoing, since the caller already holds a
+     * concrete instance of one of them.
      */
     skip: [
         'apps_list_job_invocations' => 'parameter \'job_names\' (in: query, type: array) is outside paogen\'s supported parameter shapes',
-        'volumeActions_post' => 'application/json request body with an inline (non-$ref) schema',
-        'volumeActions_post_byId' => 'application/json request body with an inline (non-$ref) schema',
         'volumes_list' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'volumes_create' => 'application/json request body with an inline (non-$ref) schema',
         'volumes_delete_byName' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'certificates_create' => 'application/json request body with an inline (non-$ref) schema',
-        'domains_create_record' => 'application/json request body with an inline (non-$ref) schema',
-        'dropletActions_post_byTag' => 'application/json request body with an inline (non-$ref) schema',
-        'dropletActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'autoscalepools_delete_dangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
-        'droplets_create' => 'application/json request body with an inline (non-$ref) schema',
         'droplets_destroy_withAssociatedResourcesDangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
-        'floatingIPsAction_post' => 'application/json request body with an inline (non-$ref) schema',
-        'imageActions_post' => 'application/json request body with an inline (non-$ref) schema',
         'monitoring_list_sinks' => 'parameter \'resource_id\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'nfs_create_action' => 'application/json request body with an inline (non-$ref) schema',
-        'reservedIPsActions_post' => 'application/json request body with an inline (non-$ref) schema',
-        'reservedIPv6Actions_post' => 'application/json request body with an inline (non-$ref) schema',
         'vpcPeerings_list' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         // The vendor's own defect, not paogen's: `check_updatable` (this
         // operation's sole allOf member) declares `name`, `type`, `target`,

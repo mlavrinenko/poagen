@@ -174,6 +174,11 @@ interface ApiClientInterface
     public function nFS(): NFSClientInterface;
 
     /**
+     * The `NFS Actions` endpoints.
+     */
+    public function nfsActions(): NfsActionsClientInterface;
+
+    /**
      * The `Partner Network Connect` endpoints.
      */
     public function partnerNetworkConnect(): PartnerNetworkConnectClientInterface;
@@ -202,6 +207,11 @@ interface ApiClientInterface
      * The `Reserved IPs` endpoints.
      */
     public function reservedIps(): ReservedIpsClientInterface;
+
+    /**
+     * The `Reserved IPv6 Actions` endpoints.
+     */
+    public function reservedIpv6Actions(): ReservedIpv6ActionsClientInterface;
 
     /**
      * The `Reserved IPv6` endpoints.

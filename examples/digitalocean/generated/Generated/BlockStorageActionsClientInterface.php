@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostAttach;
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostDetach;
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostResize;
+
 /**
  * The contract for the `Block Storage Actions` endpoints.
  *
@@ -21,9 +25,28 @@ namespace Acme\DigitalOcean\Generated;
 interface BlockStorageActionsClientInterface
 {
     /**
+     * Requires `bearer_auth` scopes: `block_storage_action:create`, `api:write`.
+     */
+    public function volumeActionsPost(
+        VolumeActionPostAttach|VolumeActionPostDetach $body,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void;
+
+    /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
      */
     public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `block_storage_action:create`.
+     */
+    public function volumeActionsPostById(
+        string $volumeId,
+        VolumeActionPostAttach|VolumeActionPostDetach|VolumeActionPostResize $body,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.

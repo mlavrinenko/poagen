@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ReservedIpActionAssign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpActionUnassign;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -32,6 +34,22 @@ final readonly class ReservedIpActionsClient implements ReservedIpActionsClientI
             Endpoint::get('/v2/reserved_ips/{reserved_ip}/actions')
                 ->path('reserved_ip', $reservedIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     */
+    public function reservedIpsActionsPost(
+        string $reservedIp,
+        ReservedIpActionUnassign|ReservedIpActionAssign $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/reserved_ips/{reserved_ip}/actions')
+                ->path('reserved_ip', $reservedIp)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

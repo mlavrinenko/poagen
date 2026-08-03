@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VolumesExt4;
+use Acme\DigitalOcean\Generated\Model\VolumesXfs;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -22,6 +24,19 @@ final readonly class BlockStorageClient implements BlockStorageClientInterface
         private TransportInterface $transport,
         private string $bearerAuth,
     ) {
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
+     */
+    public function volumesCreate(VolumesExt4|VolumesXfs $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/volumes')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
     }
 
     /**

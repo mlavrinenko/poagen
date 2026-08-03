@@ -65,6 +65,8 @@ use Acme\GitHub\Generated\Model\OrgsCreateInvitationRequest;
 use Acme\GitHub\Generated\Model\OrgsCreateWebhookRequest;
 use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequest;
 use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequest;
+use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch1;
+use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch2;
 use Acme\GitHub\Generated\Model\OrgsEnableOrDisableSecurityProductOnAllOrgReposRequest;
 use Acme\GitHub\Generated\Model\OrgsGetImmutableReleasesSettingsRepositoriesResponse;
 use Acme\GitHub\Generated\Model\OrgsListAppInstallationsResponse;
@@ -223,15 +225,14 @@ final readonly class OrgsClient implements OrgsClientInterface
         );
     }
 
-    /**
-     * @param array<string, mixed> $body
-     */
-    public function orgsDeleteAttestationsBulk(string $org, array $body): void
-    {
+    public function orgsDeleteAttestationsBulk(
+        string $org,
+        OrgsDeleteAttestationsBulkBranch1|OrgsDeleteAttestationsBulkBranch2 $body,
+    ): void {
         $this->transport->send(
             Endpoint::post('/orgs/{org}/attestations/delete-request')
                 ->path('org', $org)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }

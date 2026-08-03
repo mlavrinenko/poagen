@@ -25,6 +25,8 @@ use Acme\GitHub\Generated\Model\UsersAddSocialAccountForAuthenticatedUserRequest
 use Acme\GitHub\Generated\Model\UsersCreateGpgKeyForAuthenticatedUserRequest;
 use Acme\GitHub\Generated\Model\UsersCreatePublicSshKeyForAuthenticatedUserRequest;
 use Acme\GitHub\Generated\Model\UsersCreateSshSigningKeyForAuthenticatedUserRequest;
+use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch1;
+use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch2;
 use Acme\GitHub\Generated\Model\UsersDeleteSocialAccountForAuthenticatedUserRequest;
 use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequest;
 use Acme\GitHub\Generated\Model\UsersListAttestationsBulkResponse;
@@ -341,15 +343,14 @@ final readonly class UsersClient implements UsersClientInterface
         );
     }
 
-    /**
-     * @param array<string, mixed> $body
-     */
-    public function usersDeleteAttestationsBulk(string $username, array $body): void
-    {
+    public function usersDeleteAttestationsBulk(
+        string $username,
+        UsersDeleteAttestationsBulkBranch1|UsersDeleteAttestationsBulkBranch2 $body,
+    ): void {
         $this->transport->send(
             Endpoint::post('/users/{username}/attestations/delete-request')
                 ->path('username', $username)
-                ->jsonRaw($body),
+                ->json($body),
             ResponseType::nothing(),
         );
     }

@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Union Request Body Fixture
+  version: "1.0.0"
+  description: >
+    a-union-request-body-takes-a-union-parameter fixture. DigitalOcean and
+    GitHub prove the successful paths (`examples/digitalocean`,
+    `examples/github`) but every operation there is either a pure `$ref`
+    union or, once mixed, refuses on the first unnameable branch — this
+    fixture drives all three shapes end to end without a vendor document:
+    a `oneOf` of two named components (unionRefs, mirrors
+    `certificates_create`), a `type: object` body with no properties of its
+    own whose `oneOf` branches are inline objects (unionWidened, mirrors
+    the `orgs/delete-attestations-bulk` widening this task fixes), and a
+    `oneOf` mixing a synthesisable object with a bare `array` (unionMixed,
+    mirrors `issues/set-labels`'s known refusal).
+components:
+  schemas:
+    gadget_by_weight:
+      type: object
+      required:
+        - weight
+      properties:
+        weight:
+          type: number
+    gadget_by_volume:
+      type: object
+      required:
+        - volume
+      properties:
+        volume:
+          type: number
+paths:
+  /gadgets:
+    post:
+      operationId: unionRefs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/gadget_by_weight'
+                - $ref: '#/components/schemas/gadget_by_volume'
+      responses:
+        '204':
+          description: ok
+  /gadgets/widened:
+    post:
+      operationId: unionWidened
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # No properties of its own — the whole shape comes from the
+              # oneOf branches. Before this task, RequestBodyAnalyzer read
+              # `type: object` with no declared properties and emitted a
+              # bare `array $body`, discarding the oneOf.
+              type: object
+              oneOf:
+                - required:
+                    - alpha_items
+                  properties:
+                    alpha_items:
+                      type: array
+                      items:
+                        type: string
+                - required:
+                    - beta_items
+                  properties:
+                    beta_items:
+                      type: array
+                      items:
+                        type: string
+      responses:
+        '204':
+          description: ok
+  /gadgets/mixed:
+    post:
+      operationId: unionMixed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required:
+                    - names
+                  properties:
+                    names:
+                      type: array
+                      items:
+                        type: string
+                - type: array
+                  items:
+                    type: string
+      responses:
+        '204':
+          description: ok

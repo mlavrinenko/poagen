@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ReservedIpActionAssign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpActionUnassign;
+
 /**
  * The contract for the `Reserved IP Actions` endpoints.
  *
@@ -24,6 +27,14 @@ interface ReservedIpActionsClientInterface
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
      */
     public function reservedIpsActionsList(string $reservedIp): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     */
+    public function reservedIpsActionsPost(
+        string $reservedIp,
+        ReservedIpActionUnassign|ReservedIpActionAssign $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.

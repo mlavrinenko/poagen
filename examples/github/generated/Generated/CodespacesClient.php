@@ -15,6 +15,8 @@ use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
 use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequest;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequest;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest;
@@ -439,6 +441,15 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->query('page', $page)
                 ->query('repository_id', $repositoryId),
             ResponseType::object(CodespacesListForAuthenticatedUserResponse::class),
+        );
+    }
+
+    public function codespacesCreateForAuthenticatedUser(
+        CodespacesCreateForAuthenticatedUserBranch1|CodespacesCreateForAuthenticatedUserBranch2 $body,
+    ): Codespace {
+        return $this->transport->send(
+            Endpoint::post('/user/codespaces')->json($body),
+            ResponseType::object(Codespace::class),
         );
     }
 

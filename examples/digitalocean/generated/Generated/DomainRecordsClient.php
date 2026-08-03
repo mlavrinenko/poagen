@@ -13,6 +13,15 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DomainsListRecordsType;
 use Acme\DigitalOcean\Generated\Model\DomainRecord;
+use Acme\DigitalOcean\Generated\Model\DomainRecordA;
+use Acme\DigitalOcean\Generated\Model\DomainRecordAaaa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordCaa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordCname;
+use Acme\DigitalOcean\Generated\Model\DomainRecordMx;
+use Acme\DigitalOcean\Generated\Model\DomainRecordNs;
+use Acme\DigitalOcean\Generated\Model\DomainRecordSoa;
+use Acme\DigitalOcean\Generated\Model\DomainRecordSrv;
+use Acme\DigitalOcean\Generated\Model\DomainRecordTxt;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -43,6 +52,22 @@ final readonly class DomainRecordsClient implements DomainRecordsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `domain:create`, `domain:update`.
+     */
+    public function domainsCreateRecord(
+        string $domainName,
+        DomainRecordA|DomainRecordAaaa|DomainRecordCaa|DomainRecordCname|DomainRecordMx|DomainRecordNs|DomainRecordSoa|DomainRecordSrv|DomainRecordTxt $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/domains/{domain_name}/records')
+                ->path('domain_name', $domainName)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }
