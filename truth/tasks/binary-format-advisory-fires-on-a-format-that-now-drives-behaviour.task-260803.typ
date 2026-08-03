@@ -5,7 +5,11 @@
   tags: ("generator", "dx"),
   priority: 2,
   difficulty: 2,
-  status: proposed(2026, 8, 3),
+  status: accepted(
+    2026,
+    8,
+    4,
+  )[Last of this session's skip-list work. Run alone rather than paired: its Files list names src/Generator/Emit/FormatAdvisor.php and src/Generator/Bindings.php, so it cannot share a wave with another generator agent.],
 )
 
 == Summary
