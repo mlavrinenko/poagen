@@ -10,6 +10,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector as BranchSelectorAttr;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator as DiscriminatorAttr;
 use Mlavrinenko\Paogen\Runtime\Attribute\Format;
 use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
@@ -52,19 +53,60 @@ final readonly class ModelAttributeApplier
             }
         }
 
-        $this->applyDiscriminator($namespace, $param, $propSchema, $modelNamespace, $registry);
+        $this->applyUnion($namespace, $param, $propSchema, $bindings, $modelNamespace, $registry);
     }
 
-    private function applyDiscriminator(
+    /**
+     * How this property's union names a branch, as
+     * {@see DiscriminatorEnforcer} resolved it against the whole document. A
+     * pin needs no attribute — the branch list was rewritten to one ref, so the
+     * property is already typed as that single class.
+     */
+    private function applyUnion(
         PhpNamespace $namespace,
         PromotedParameter $param,
         Schema|Reference $propSchema,
+        Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
     ): void {
         if (!$propSchema instanceof Schema) {
             return;
         }
+
+        $resolution = $bindings->unions->for($propSchema);
+
+        if ($resolution?->kind === UnionResolution::KIND_STRUCTURAL) {
+            $this->applySelector($namespace, $param, $resolution, $modelNamespace, $registry);
+
+            return;
+        }
+
+        if ($resolution?->kind === UnionResolution::KIND_TAG_ON_PARENT) {
+            $this->applyTag($namespace, $param, $resolution, $modelNamespace, $registry, true);
+
+            return;
+        }
+
+        if ($resolution?->kind === UnionResolution::KIND_PIN) {
+            return;
+        }
+
+        $this->applyDeclaredDiscriminator($namespace, $param, $propSchema, $modelNamespace, $registry);
+    }
+
+    /**
+     * The tag-inside-the-value case, keyed by each branch's own short PHP class
+     * name. Unchanged from before the layered resolution existed, so a document
+     * that always worked keeps emitting the same bytes.
+     */
+    private function applyDeclaredDiscriminator(
+        PhpNamespace $namespace,
+        PromotedParameter $param,
+        Schema $propSchema,
+        string $modelNamespace,
+        NameRegistry $registry,
+    ): void {
         $discriminator = $propSchema->discriminator;
         if (!$discriminator instanceof Discriminator) {
             return;
@@ -81,8 +123,7 @@ final readonly class ModelAttributeApplier
 
         foreach ($branches as $fqcn) {
             $short = substr((string) strrchr('\\' . $fqcn, '\\'), 1);
-            $namespace->addUse(ltrim($fqcn, '\\'));
-            $map[$short] = new Literal($namespace->simplifyName($fqcn) . '::class');
+            $map[$short] = $this->classLiteral($namespace, $fqcn);
         }
 
         $namespace->addUse(DiscriminatorAttr::class);
@@ -90,5 +131,66 @@ final readonly class ModelAttributeApplier
             'field' => $discriminator->propertyName,
             'map' => $map,
         ]);
+    }
+
+    private function applyTag(
+        PhpNamespace $namespace,
+        PromotedParameter $param,
+        UnionResolution $resolution,
+        string $modelNamespace,
+        NameRegistry $registry,
+        bool $onParent,
+    ): void {
+        $map = [];
+
+        foreach ($resolution->map as $tag => $branch) {
+            $map[$tag] = $this->classLiteral($namespace, ComponentName::fqcnFromRaw($branch, $modelNamespace, $registry));
+        }
+
+        $namespace->addUse(DiscriminatorAttr::class);
+        $param->addAttribute(DiscriminatorAttr::class, [
+            'field' => (string) $resolution->field,
+            'map' => $map,
+            'onParent' => $onParent,
+        ]);
+    }
+
+    private function applySelector(
+        PhpNamespace $namespace,
+        PromotedParameter $param,
+        UnionResolution $resolution,
+        string $modelNamespace,
+        NameRegistry $registry,
+    ): void {
+        $selectors = $resolution->selectors;
+
+        if (!$selectors instanceof BranchSelectors) {
+            return;
+        }
+
+        $fields = [];
+
+        foreach ($selectors->fields as $branch => $field) {
+            $fields[$field] = $this->classLiteral($namespace, ComponentName::fqcnFromRaw($branch, $modelNamespace, $registry));
+        }
+
+        $arguments = ['fields' => $fields];
+
+        if ($selectors->empty !== null) {
+            $arguments['empty'] = $this->classLiteral(
+                $namespace,
+                ComponentName::fqcnFromRaw($selectors->empty, $modelNamespace, $registry),
+            );
+        }
+
+        $namespace->addUse(BranchSelectorAttr::class);
+        $param->addAttribute(BranchSelectorAttr::class, $arguments);
+    }
+
+    private function classLiteral(PhpNamespace $namespace, string $fqcn): Literal
+    {
+        $namespace->addUse(ltrim($fqcn, '\\'));
+
+        return new Literal($namespace->simplifyName($fqcn) . '::class');
     }
 }

@@ -12,6 +12,7 @@ use Mlavrinenko\Paogen\Exception\NameNormalisationException;
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\AttributeScanner;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
+use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Naming\CompositeNormaliser;
 use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
@@ -24,12 +25,16 @@ use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
 use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
 use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchException;
 use Mlavrinenko\Paogen\Runtime\ScalarBinding;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Cat as UnionSelectionCat;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Habitat;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Sighting;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
@@ -80,6 +85,17 @@ final class ModelGeneratorSteps
     private ?Throwable $caught = null;
 
     private bool $expectGeneratorAbort = false;
+
+    /**
+     * The last plan {@see runGenerator} produced. The union scenarios assert on
+     * its `notices`, which is where the per-union report the run prints lives —
+     * reading stdout would test the CLI's formatting rather than what the
+     * generator decided.
+     */
+    private ?GenerationPlan $plan = null;
+
+    /** The hydrated Habitat from the tag-on-the-enclosing-object scenario. */
+    private ?Habitat $habitat = null;
 
     public function __construct(TestCase $test)
     {
@@ -183,7 +199,52 @@ final class ModelGeneratorSteps
 
     private function runGenerator(Profile $profile): void
     {
-        new Generator(new AttributeScanner($this->composerLoader()))->generate($profile);
+        $this->plan = new Generator(new AttributeScanner($this->composerLoader()))->generate($profile);
+    }
+
+    /**
+     * The one notice mentioning `$needle`, or a failure naming what was there
+     * instead — a missing report line should say which lines the run did print.
+     */
+    private function noticeMatching(string $needle): string
+    {
+        TestCase::assertNotNull($this->plan);
+
+        foreach ($this->plan->notices as $notice) {
+            if (str_contains($notice, $needle)) {
+                return $notice;
+            }
+        }
+
+        TestCase::fail("no notice mentioning '{$needle}'; the run printed: " . implode(' | ', $this->plan->notices));
+    }
+
+    /**
+     * A committed golden file from the union-selection tree. The runtime
+     * scenarios hydrate the emitted classes rather than a scratch copy, so the
+     * attribute under assertion is the one a consumer would actually get.
+     */
+    private function unionSelectionSource(string $model): string
+    {
+        return (string) file_get_contents(
+            dirname(__DIR__, 2) . "/tests/fixtures/generated/union-selection/Generated/Model/{$model}.php",
+        );
+    }
+
+    /**
+     * Hydrates and returns whatever was raised, or null when nothing was. The
+     * union scenarios assert on the exception in a later `then` step, so the
+     * `when` step may not fail on it.
+     */
+    private function catchHydration(callable $hydration): ?Throwable
+    {
+        try {
+            $hydration();
+
+            return null;
+        } catch (Throwable $error) {
+            return $error;
+        }
     }
 
     // ---- inline-body-and-response-schemas ------------------------------
@@ -677,14 +738,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function givenProfileHasNoDiscriminatorsOverrideForKey(string $key): void
-    {
-        $this->profile = $this->loadProfile('undiscriminated-oneof');
-        TestCase::assertArrayNotHasKey($key, $this->profile->discriminators);
-        $this->expectGeneratorAbort = true;
-    }
-
-
     public function givenProfileSetsDiscriminators(string $discriminators): void
     {
         $this->profile = $this->loadProfile('undiscriminated-oneof-resolved');
@@ -798,22 +851,6 @@ final class ModelGeneratorSteps
         $this->runGenerator($this->profile);
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Animal.php');
         TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
-    }
-
-
-    public function thenGeneratorsRunAbortsWithErrorWhoseMessageNamesPetKind(string $error): void
-    {
-        // Unified refusal: an undiscriminated union is reported through the
-        // same collected-problems exception as every other unrepresentable
-        // construct. UndiscriminatedUnionException survives only as the
-        // factory that phrases this particular diagnostic.
-        TestCase::assertInstanceOf(
-            UnrepresentableConstructsException::class,
-            $this->caught,
-            "Expected {$error}, got " . get_debug_type($this->caught),
-        );
-        TestCase::assertStringContainsString('Pet', $this->caught->getMessage());
-        TestCase::assertStringContainsString('kind', $this->caught->getMessage());
     }
 
 
@@ -1872,6 +1909,269 @@ final class ModelGeneratorSteps
             \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
             ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
         );
+    }
+
+
+    public function givenSchemaDeclaresComponentsCelsiusAndFahrenheitThatDeclareTheSameSingleOptionalPropertyAndRequireNothingAndAComponentReadingWithARequiredPropertySampleWhoseSchemaIsOneOfRefCelsiusRefFahrenheitWithNoDiscriminator(
+    ): void {
+        // tests/fixtures/schemas/union-selection-3.0.yaml declares exactly
+        // that shape. The profile the next given-step picks decides whether
+        // Reading.sample is guided or left to refuse.
+    }
+
+
+    public function givenProfileNamesNoTagOnTheEnclosingObjectAndPinsNoBranchForKey(string $key): void
+    {
+        // Two sibling profiles over one schema. `-refused` supplies no
+        // guidance at all, which is what leaves `Reading.sample` unresolvable;
+        // the other guides only the two unions that need it, so every other
+        // union in that document still reaches the generator unguided.
+        $undecidable = $key === 'Reading.sample';
+        $this->profile = $this->loadProfile($undecidable ? 'union-selection-refused' : 'union-selection');
+        TestCase::assertArrayNotHasKey($key, $this->profile->unionTags);
+        TestCase::assertArrayNotHasKey($key, $this->profile->unionPins);
+        $this->expectGeneratorAbort = $undecidable;
+    }
+
+
+    public function thenGeneratorsRunAbortsWithErrorWhoseMessageNamesReadingSampleAndBothBranches(string $error): void
+    {
+        // Unified refusal: an undecidable union is reported through the same
+        // collected-problems exception as every other unrepresentable
+        // construct, so one run names all of them at once.
+        TestCase::assertInstanceOf(
+            UnrepresentableConstructsException::class,
+            $this->caught,
+            "Expected {$error}, got " . get_debug_type($this->caught),
+        );
+        $message = $this->caught->getMessage();
+        TestCase::assertStringContainsString('Reading.sample', $message);
+        TestCase::assertStringContainsString('Celsius', $message);
+        TestCase::assertStringContainsString('Fahrenheit', $message);
+    }
+
+
+    public function thenGeneratorsMessageNamesWhatWouldResolveItADiscriminatorInSchemaAUnionTagsEntryOnProfileOrAUnionPinsEntryOnProfile(
+    ): void {
+        TestCase::assertNotNull($this->caught);
+        $message = $this->caught->getMessage();
+        TestCase::assertStringContainsString('adding a `discriminator` to the document', $message);
+        TestCase::assertStringContainsString("Profile::\$unionTags['Reading.sample']", $message);
+        TestCase::assertStringContainsString("Profile::\$unionPins['Reading.sample']", $message);
+    }
+
+
+    public function givenSchemaDeclaresComponentsDogRequiredBarkAndCatRequiredMeowAndAComponentSightingWithARequiredPropertyCreatureWhoseSchemaIsOneOfRefDogRefCatWithNoDiscriminator(
+    ): void {
+        // Dog requires `bark`, Cat requires `meow`, and neither declares the
+        // other's field — the disjointness the discriminating-field rule needs.
+    }
+
+
+    public function thenModelsCreatureParameterIsTypedDogCatNeitherMixedNorAnArray(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Sighting.php');
+        TestCase::assertStringContainsString('public Dog|Cat $creature', $source);
+        TestCase::assertStringNotContainsString('mixed $creature', $source);
+        TestCase::assertStringNotContainsString('array $creature', $source);
+    }
+
+
+    public function thenModelsCreatureParameterCarriesBranchSelectorFieldsBarkDogClassMeowCatClass(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Sighting.php');
+        TestCase::assertStringContainsString(
+            "#[BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class])]",
+            $source,
+        );
+    }
+
+
+    public function thenGeneratorReportsWhichFieldItWillDiscriminateOnForThatUnionBeforeAnythingRuns(): void
+    {
+        $notice = $this->noticeMatching('/components/schemas/Sighting/properties/creature');
+        TestCase::assertStringContainsString('selects by discriminating field', $notice);
+        TestCase::assertStringContainsString('`bark` -> Dog', $notice);
+        TestCase::assertStringContainsString('`meow` -> Cat', $notice);
+    }
+
+
+    public function givenSchemaDeclaresAComponentVacantWithAdditionalPropertiesFalseAndNoPropertiesAndAComponentEnclosureWithARequiredPropertyOccupantWhoseSchemaIsOneOfRefDogRefVacantWithNoDiscriminator(
+    ): void {
+        $this->profile = $this->loadProfile('union-selection');
+    }
+
+
+    public function thenModelsOccupantParameterCarriesABranchSelectorNamingVacantAsTheBranchAnEmptyPayloadSelects(
+    ): void {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Enclosure.php');
+        TestCase::assertStringContainsString(
+            "#[BranchSelector(fields: ['bark' => Dog::class], empty: Vacant::class)]",
+            $source,
+        );
+    }
+
+
+    public function thenModelsOccupantParameterIsTypedDogVacant(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Enclosure.php');
+        TestCase::assertStringContainsString('public Dog|Vacant $occupant', $source);
+    }
+
+
+    public function givenSchemaDeclaresAComponentReadingWhoseRequiredPropertySampleIsAnUndecidableOneOfRefCelsiusRefFahrenheit(
+    ): void {
+        // Celsius and Fahrenheit declare the same single optional property and
+        // require nothing, so no payload could ever name one of them.
+    }
+
+
+    public function givenProfilePinsBranchForReadingSampleWithAWrittenReason(string $branch): void
+    {
+        $this->profile = $this->loadProfile('union-selection');
+        $pin = $this->profile->unionPins['Reading.sample'] ?? null;
+        TestCase::assertIsArray($pin);
+        TestCase::assertSame($branch, $pin['branch']);
+        TestCase::assertNotSame('', trim($pin['reason']));
+    }
+
+
+    public function thenModelsSampleParameterIsTypedCelsiusAndCarriesNoBranchSelectionAttribute(): void
+    {
+        $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Reading.php');
+        TestCase::assertStringContainsString('public Celsius $sample', $source);
+        // A pin narrows the branch list before anything types the property, so
+        // there is no union left to select within and nothing to annotate.
+        TestCase::assertStringNotContainsString('BranchSelector', $source);
+        TestCase::assertStringNotContainsString('Discriminator', $source);
+    }
+
+
+    public function thenGeneratorReportsThePinOnEveryRunNamingTheBranchesItMadeUnreachable(): void
+    {
+        $notice = $this->noticeMatching('/components/schemas/Reading/properties/sample');
+        TestCase::assertStringContainsString('is pinned to `Celsius`', $notice);
+        TestCase::assertStringContainsString('unreachable through this property', $notice);
+        TestCase::assertStringContainsString('printed on every run', $notice);
+    }
+
+
+    public function givenModelSightingDeclaresARequiredPropertyCreatureTypedDogCatCarryingABranchSelectorComputedFromTheBranchesDisjointRequiredFields(
+    ): void {
+        // The committed golden tree, not a hand-written stand-in: the attribute
+        // asserted on here is the one the generator actually emits.
+        TestCase::assertStringContainsString('#[BranchSelector(', $this->unionSelectionSource('Sighting'));
+    }
+
+
+    public function whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseCreatureCarriesNeitherBarkNorMeow(): void
+    {
+        $this->caught = $this->catchHydration(
+            static fn(): object => new Hydrator()->hydrate(Sighting::class, ['creature' => ['scales' => 'green']]),
+        );
+    }
+
+
+    public function thenClientsHydrationRaisesNamingThePropertyAndTheKeysThePayloadCarried(): void
+    {
+        TestCase::assertInstanceOf(UnionBranchException::class, $this->caught);
+        TestCase::assertStringContainsString("property 'creature'", $this->caught->getMessage());
+        TestCase::assertStringContainsString('the keys scales', $this->caught->getMessage());
+    }
+
+
+    public function thenClientsHydrationAlsoRaisesWhenCreatureCarriesBothBarkAndMeowNamingBothBranchesItMatched(
+    ): void {
+        $both = $this->catchHydration(
+            static fn(): object => new Hydrator()->hydrate(
+                Sighting::class,
+                ['creature' => ['bark' => 'woof', 'meow' => 'mrrp']],
+            ),
+        );
+
+        TestCase::assertInstanceOf(UnionBranchException::class, $both);
+        TestCase::assertStringContainsString('matched 2 union branches at once', $both->getMessage());
+        TestCase::assertStringContainsString('Dog', $both->getMessage());
+        TestCase::assertStringContainsString('Cat', $both->getMessage());
+    }
+
+
+    public function thenClientNeverResolvesEitherCaseByTakingTheFirstBranchThatIsWhatMakesComputingTheSelectorSafe(
+    ): void {
+        // Dog is the first branch of the union in document order, so "took the
+        // first match" and "raised" are distinguishable outcomes: assert both
+        // ambiguous payloads produce no object at all.
+        foreach ([['scales' => 'green'], ['bark' => 'woof', 'meow' => 'mrrp']] as $payload) {
+            $result = null;
+            $raised = $this->catchHydration(static function () use ($payload, &$result): void {
+                $result = new Hydrator()->hydrate(Sighting::class, ['creature' => $payload]);
+            });
+
+            TestCase::assertInstanceOf(UnionBranchException::class, $raised);
+            TestCase::assertNull($result);
+        }
+    }
+
+
+    public function givenModelHabitatDeclaresARequiredPropertyResidentTypedDogCatAndASiblingPropertySpeciesEnumeratingDogAndCat(
+    ): void {
+        TestCase::assertStringContainsString('public Dog|Cat $resident', $this->unionSelectionSource('Habitat'));
+    }
+
+
+    public function givenProfileMapsThoseTwoValuesToTheTwoBranchesForHabitatResident(): void
+    {
+        $profile = $this->loadProfile('union-selection');
+        $tag = $profile->unionTags['Habitat.resident'] ?? null;
+        TestCase::assertIsArray($tag);
+        TestCase::assertSame('species', $tag['field']);
+        TestCase::assertSame(['cat' => 'Cat', 'dog' => 'Dog'], $tag['map']);
+    }
+
+
+    public function whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseSpeciesIsWire(string $wire): void
+    {
+        $this->habitat = new Hydrator()->hydrate(Habitat::class, [
+            'species' => trim($wire, "'"),
+            'resident' => ['meow' => 'mrrp'],
+        ]);
+    }
+
+
+    public function thenModelsResidentParameterCarriesDiscriminatorFieldSpeciesMapCatCatClassDogDogClassOnParentTrue(
+    ): void {
+        TestCase::assertStringContainsString(
+            "#[Discriminator(field: 'species', map: ['cat' => Cat::class, 'dog' => Dog::class], onParent: true)]",
+            $this->unionSelectionSource('Habitat'),
+        );
+    }
+
+
+    public function thenModelsHabitatResidentIsAnInstanceOfCatReadFromTheEnclosingPayloadRatherThanFromTheValue(
+    ): void {
+        TestCase::assertNotNull($this->habitat);
+        // The union-selection tree's Cat, not the composition fixture's — the
+        // two share a short name and only one of them is this union's branch.
+        TestCase::assertInstanceOf(UnionSelectionCat::class, $this->habitat->resident);
+    }
+
+
+    public function thenClientsHydrationRaisesWhenSpeciesIsAbsentAndWhenItCarriesAValueTheMapDoesNotName(): void
+    {
+        $absent = $this->catchHydration(
+            static fn(): object => new Hydrator()->hydrate(Habitat::class, ['resident' => ['meow' => 'mrrp']]),
+        );
+        TestCase::assertInstanceOf(UnionBranchException::class, $absent);
+        TestCase::assertStringContainsString('absent from the enclosing payload', $absent->getMessage());
+
+        $unmapped = $this->catchHydration(
+            static fn(): object => new Hydrator()->hydrate(
+                Habitat::class,
+                ['species' => 'ferret', 'resident' => ['meow' => 'mrrp']],
+            ),
+        );
+        TestCase::assertInstanceOf(UnionBranchException::class, $unmapped);
+        TestCase::assertStringContainsString('no branch is mapped to', $unmapped->getMessage());
     }
 
 }

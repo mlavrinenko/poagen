@@ -64,7 +64,8 @@
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/",
             "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\": "tests/fixtures/generated/composition/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Parameters\\": "tests/fixtures/generated/parameters/"
+            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Parameters\\": "tests/fixtures/generated/parameters/",
+            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\UnionSelection\\": "tests/fixtures/generated/union-selection/"
         }
     },
     "config": {

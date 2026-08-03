@@ -113,4 +113,22 @@ final readonly class ObjectShape
 
         return ($rawVars['additionalProperties'] ?? null) === true;
     }
+
+    /**
+     * True only when the document wrote `additionalProperties: false` — the
+     * third state {@see declaresOpenExtras} names, and the one the parser never
+     * substitutes: its default is `true`, so `false` can only have been written.
+     * No serialisation round-trip is needed to tell it apart from silence.
+     *
+     * A closed shape with no declared properties accepts `{}` and nothing else,
+     * which is what makes it selectable inside a union by the *absence* of
+     * fields where every other branch is selectable by their presence. Exactly
+     * one of the fifty-two branch schemas across both large vendor documents
+     * declares it — GitHub's `empty-object` — and
+     * `declare-an-undiscriminated-union-as-raw-data` measured that.
+     */
+    public static function declaresClosedShape(Schema $schema): bool
+    {
+        return $schema->additionalProperties === false;
+    }
 }

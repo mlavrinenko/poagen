@@ -275,10 +275,41 @@ lint-jscpd-generated:
         echo "lint-jscpd-generated: no emitted trees found — refusing a silent pass" >&2
         exit 1
     fi
+    baselines=scripts/jscpd-generated-baselines
     status=0
+
+    # A row naming a tree that no longer exists is a baseline outliving what
+    # it gates — the shape of stale guidance this repo refuses everywhere
+    # else, so it fails here too rather than sitting unread.
+    while read -r tree_path _; do
+        [ -d "$tree_path" ] || {
+            echo "lint-jscpd-generated: $baselines names '$tree_path', which does not exist — delete the row or restore the tree" >&2
+            status=1
+        }
+    done < <(grep -vE '^\s*(#|$)' "$baselines")
+
     for tree in "${trees[@]}"; do
-        echo "== ${tree%/} =="
-        jscpd -c .jscpd.generated.json --threshold 2.0 "$tree" || status=1
+        tree=${tree%/}
+        # Fixture goldens are ours, small and hand-made: one uniform ceiling,
+        # no row to add when a new one lands. Example trees are emitted from
+        # real vendor documents whose scale differs by an order of magnitude,
+        # so each carries its own measured ceiling. See the baselines file for
+        # why that is a line about ownership rather than about size.
+        threshold=$(awk -v t="$tree" '$1 == t { print $2; found = 1 } END { if (!found) print "" }' <(grep -vE '^\s*(#|$)' "$baselines"))
+
+        if [ -z "$threshold" ]; then
+            case "$tree" in
+                examples/*/generated)
+                    echo "lint-jscpd-generated: $tree has no row in $baselines — measure it and record a ceiling, do not let it pass unmeasured" >&2
+                    status=1
+                    continue
+                    ;;
+                *) threshold=2.0 ;;
+            esac
+        fi
+
+        echo "== $tree (ceiling ${threshold}%) =="
+        jscpd -c .jscpd.generated.json --threshold "$threshold" "$tree" || status=1
     done
     exit $status
 

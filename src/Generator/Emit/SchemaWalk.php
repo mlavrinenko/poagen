@@ -161,4 +161,27 @@ final readonly class SchemaWalk
 
         return $out;
     }
+
+    /**
+     * Just the alternation branches — `oneOf` when a schema declares it,
+     * `anyOf` otherwise — with the same `is_array` guard, and never `allOf`.
+     *
+     * {@see compositionBranches} deliberately flattens all three, which is what
+     * a walk wants and what a branch *selector* must not have: folding `allOf`
+     * in would treat a schema's own composed parts as alternatives to each
+     * other. Both readings are needed, so both live here rather than one caller
+     * re-deriving the keywords and re-learning the null.
+     *
+     * @return list<Schema|Reference>
+     */
+    public static function oneOfOrAnyOf(Schema $schema): array
+    {
+        $oneOf = is_array($schema->oneOf) ? array_values($schema->oneOf) : [];
+
+        if ($oneOf !== []) {
+            return $oneOf;
+        }
+
+        return is_array($schema->anyOf) ? array_values($schema->anyOf) : [];
+    }
 }
