@@ -5,11 +5,20 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
+use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Http\ResponseDecoder;
+use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchPicker;
+use Nette\PhpGenerator\Dumper;
+use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
 
+use function array_map;
+use function assert;
+use function implode;
 use function sprintf;
+use function var_export;
 
 /**
  * Names the shape an operation was promised back.
@@ -35,6 +44,29 @@ final readonly class ResponseTypeEmitter
     }
 
     /**
+     * A `@var` type for an intermediate variable, or null when the call
+     * expression's own inferred type already matches the declared return —
+     * true of every kind except a union, top-level or nested inside a list.
+     *
+     * `TransportInterface::send()`'s generic return follows a single
+     * `class-string<T>` for every other kind, but a union names several
+     * branch classes at once and PHPStan's generics have no way to combine
+     * them into `A|B` on their own — the same reason
+     * {@see OperationEmitter} cannot just declare the method `: A|B` and
+     * trust the call expression to match it. This names that one exception
+     * rather than adding a suppression: a fact the generator already knows
+     * and PHPStan cannot derive, stated once, the way a `@return` on a
+     * scalar list already is.
+     */
+    public function varType(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace): ?string
+    {
+        $isUnion = $return->kind === ReturnSpec::KIND_UNION
+            || ($return->kind === ReturnSpec::KIND_SCALAR_LIST && $return->listItem?->kind === ReturnSpec::KIND_UNION);
+
+        return $isUnion ? DocTypeSimplifier::shorten($namespace, $this->docType($return, $modelNamespace)) : null;
+    }
+
+    /**
      * The PHPDoc type an emitted `@return` (or a nested map value) spells.
      * FQCNs are left long here; {@see DocTypeSimplifier} shortens the finished
      * string and registers the `use` statements it needs.
@@ -47,8 +79,23 @@ final readonly class ResponseTypeEmitter
             ReturnSpec::KIND_SCALAR => $return->scalarPhpType ?? 'string',
             ReturnSpec::KIND_SCALAR_LIST => 'list<' . $this->docType($return->listItem ?? ReturnSpec::mixed(), $modelNamespace) . '>',
             ReturnSpec::KIND_MAP => 'array<string, ' . $this->docType($return->mapValue ?? ReturnSpec::mixed(), $modelNamespace) . '>',
+            ReturnSpec::KIND_UNION => $this->unionDocType($return, $modelNamespace),
             default => 'mixed',
         };
+    }
+
+    /**
+     * The native PHP union spelling across every branch — `A|B` — which is
+     * also the whole native return type for a top-level union response; a
+     * union nested inside a `KIND_SCALAR_LIST` item spells the same string
+     * one level down, inside `list<...>`.
+     */
+    private function unionDocType(ReturnSpec $return, string $modelNamespace): string
+    {
+        return implode('|', array_map(
+            fn(string $model): string => '\\' . trim($modelNamespace, '\\') . '\\' . $model,
+            $return->models ?? [],
+        ));
     }
 
     private function value(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace, string $type): string
@@ -68,6 +115,7 @@ final readonly class ResponseTypeEmitter
                 $this->value($namespace, $return->mapValue ?? ReturnSpec::mixed(), $modelNamespace, $type),
             ),
             ReturnSpec::KIND_MIXED => sprintf('%s::mixed()', $type),
+            ReturnSpec::KIND_UNION => $this->union($namespace, $return, $modelNamespace, $type),
             default => sprintf('%s::nothing()', $type),
         };
     }
@@ -110,5 +158,76 @@ final readonly class ResponseTypeEmitter
         $namespace->addUse(ltrim($fqcn, '\\'));
 
         return $namespace->simplifyName($fqcn);
+    }
+
+    /**
+     * `ResponseType::union()`, carrying exactly the piece
+     * {@see UnionBranchPicker} needs —
+     * a `Discriminator` for a tag-in-value resolution, a `BranchSelector`
+     * for a structural one, never both. A pin never reaches here: {@see
+     * \Mlavrinenko\Paogen\Generator\Emit\ResponseUnionPlanner} types a
+     * pinned response as its single branch directly, `KIND_MODEL`, the same
+     * way a pinned property carries no union at all.
+     */
+    private function union(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace, string $type): string
+    {
+        $resolution = $return->unionResolution;
+        assert($resolution instanceof UnionResolution);
+
+        $discriminator = $resolution->kind === UnionResolution::KIND_TAG_IN_VALUE
+            ? $this->discriminatorExpr($namespace, $resolution, $modelNamespace)
+            : 'null';
+        $selector = $resolution->kind === UnionResolution::KIND_STRUCTURAL
+            ? $this->selectorExpr($namespace, $resolution, $modelNamespace)
+            : 'null';
+
+        return sprintf('%s::union(%s, %s, %s)', $type, $discriminator, $selector, var_export($resolution->position, true));
+    }
+
+    private function discriminatorExpr(PhpNamespace $namespace, UnionResolution $resolution, string $modelNamespace): string
+    {
+        $namespace->addUse(Discriminator::class);
+        $map = [];
+
+        foreach ($resolution->map as $tag => $model) {
+            $map[$tag] = $this->classLiteral($namespace, $model, $modelNamespace);
+        }
+
+        return sprintf(
+            'new %s(field: %s, map: %s, onParent: false)',
+            $namespace->simplifyName(Discriminator::class),
+            var_export($resolution->field, true),
+            new Dumper()->dump($map),
+        );
+    }
+
+    private function selectorExpr(PhpNamespace $namespace, UnionResolution $resolution, string $modelNamespace): string
+    {
+        $selectors = $resolution->selectors;
+        assert($selectors instanceof BranchSelectors);
+        $namespace->addUse(BranchSelector::class);
+
+        $fields = [];
+
+        foreach ($selectors->fields as $model => $field) {
+            $fields[$field] = $this->classLiteral($namespace, (string) $model, $modelNamespace);
+        }
+
+        $emptyArg = $selectors->empty === null ? '' : sprintf(', empty: %s', $this->classLiteral($namespace, $selectors->empty, $modelNamespace));
+
+        return sprintf(
+            'new %s(fields: %s%s)',
+            $namespace->simplifyName(BranchSelector::class),
+            new Dumper()->dump($fields),
+            $emptyArg,
+        );
+    }
+
+    private function classLiteral(PhpNamespace $namespace, string $model, string $modelNamespace): Literal
+    {
+        $fqcn = '\\' . trim($modelNamespace, '\\') . '\\' . $model;
+        $namespace->addUse(ltrim($fqcn, '\\'));
+
+        return new Literal($namespace->simplifyName($fqcn) . '::class');
     }
 }

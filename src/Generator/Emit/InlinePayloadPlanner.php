@@ -12,6 +12,7 @@ use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
 
 use function is_array;
 
@@ -58,6 +59,8 @@ final readonly class InlinePayloadPlanner
      * @param array<string,string> $preScannedSkips raw operationId → reason, from the document-wide scan that
      *                                               ran before this planner — an operation named here is refused
      *                                               regardless of `Profile::$skip`, so it claims no payload model
+     * @param array<string,array{branch:string,reason:string}> $unionPins Profile::$unionPins — read only for a
+     *                                               response-position key, `a-union-response-selects-its-branch`
      */
     public static function build(
         OpenApi $openApi,
@@ -67,12 +70,15 @@ final readonly class InlinePayloadPlanner
         ModelNameLedger $ledger,
         array $xmlElements = [],
         array $preScannedSkips = [],
+        array $unionPins = [],
     ): InlinePayloadCatalog {
         $bodies = [];
         $returns = [];
         $roots = [];
         $requestRefusals = [];
         $responseRefusals = [];
+        $unionByPointer = [];
+        $unionByKey = [];
 
         foreach (OperationOrder::inEmissionOrder($openApi) as [, , $operation]) {
             $rawId = (string) ($operation->operationId ?? '');
@@ -93,37 +99,48 @@ final readonly class InlinePayloadPlanner
                 $bodies[$rawId] = $body;
             }
 
-            $return = self::planResponse($operation, $rawId, $base, $pins, $ledger, $roots, $openApi, $responseRefusals);
+            $unionResolution = null;
+            $return = self::planResponse($operation, $rawId, $base, $pins, $unionPins, $registry, $ledger, $roots, $openApi, $responseRefusals, $unionResolution);
 
             if ($return instanceof ReturnSpec) {
                 $returns[$rawId] = $return;
             }
+
+            if ($unionResolution instanceof UnionResolution) {
+                $unionByPointer[$unionResolution->position] = $unionResolution;
+                $unionByKey[$rawId . '.' . self::ROLE_RESPONSE] = $unionResolution;
+            }
         }
 
-        return new InlinePayloadCatalog($bodies, $returns, $roots, $requestRefusals, $responseRefusals);
+        return new InlinePayloadCatalog($bodies, $returns, $roots, $requestRefusals, $responseRefusals, new UnionCatalog($unionByPointer, $unionByKey));
     }
 
     /**
-     * @param array<string,string>   $pins
-     * @param list<SynthesisedModel> $roots
-     * @param array<string,string>   $refusals keyed by raw operationId, mirrors {@see RequestBodyPlanner::plan()}'s
+     * @param array<string,string>                             $pins
+     * @param array<string,array{branch:string,reason:string}> $unionPins
+     * @param list<SynthesisedModel>                            $roots
+     * @param array<string,string>                              $refusals keyed by raw operationId, mirrors {@see RequestBodyPlanner::plan()}'s
      */
     private static function planResponse(
         Operation $operation,
         string $rawId,
         string $base,
         array $pins,
+        array $unionPins,
+        NameRegistry $registry,
         ModelNameLedger $ledger,
         array &$roots,
         OpenApi $openApi,
         array &$refusals,
+        ?UnionResolution &$unionResolution,
     ): ?ReturnSpec {
-        $schema = self::successResponseSchema($operation);
+        $picked = self::successResponse($operation);
 
-        if (!$schema instanceof Schema) {
+        if ($picked === null) {
             return null;
         }
 
+        [$status, $schema] = $picked;
         $pin = $pins[$rawId . '.' . self::ROLE_RESPONSE] ?? null;
 
         if (is_array($schema->allOf) && $schema->allOf !== []) {
@@ -135,6 +152,21 @@ final readonly class InlinePayloadPlanner
             }
 
             return $return;
+        }
+
+        // Checked ahead of the `isSynthesisableObject()` fallback below —
+        // a `oneOf`/`anyOf` schema never satisfies it (it has no properties
+        // of its own), but the ordering mirrors {@see RequestBodyPlanner}'s
+        // for the same reason: one construct, checked once, in one place.
+        $unionRefusal = null;
+        $union = ResponseUnionPlanner::planResponse($schema, $status, $base, $rawId, $openApi, $registry, $ledger, $roots, $unionPins, $unionResolution, $unionRefusal);
+
+        if ($union instanceof ReturnSpec || $unionRefusal !== null) {
+            if ($unionRefusal !== null) {
+                $refusals[$rawId] = $unionRefusal;
+            }
+
+            return $union;
         }
 
         if (self::isSynthesisableObject($schema)) {
@@ -214,7 +246,17 @@ final readonly class InlinePayloadPlanner
         return $schema instanceof Schema ? $schema : null;
     }
 
-    private static function successResponseSchema(Operation $operation): ?Schema
+    /**
+     * Public so {@see UnionGuidanceValidator}
+     * can re-locate the same response {@see ResponseUnionPlanner} would
+     * plan against, to index it for `Profile::$unionTags`/`$unionPins`
+     * without duplicating the 2xx-picking rule a third time.
+     *
+     * @return array{0:string,1:Schema}|null the picked status and its `application/json` schema — the
+     *                                       status travels along so a refusal can name it, the same
+     *                                       way {@see ResponseRefusal} already does
+     */
+    public static function successResponse(Operation $operation): ?array
     {
         $responses = $operation->responses;
 
@@ -230,7 +272,9 @@ final readonly class InlinePayloadPlanner
                 continue;
             }
 
-            return self::jsonSchemaOf($response->content);
+            $schema = self::jsonSchemaOf($response->content);
+
+            return $schema instanceof Schema ? [(string) $status, $schema] : null;
         }
 
         return null;

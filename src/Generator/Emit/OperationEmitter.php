@@ -26,13 +26,11 @@ use function is_string;
  * Emits one method on the ApiClient class for one OpenAPI operation.
  *
  * Scope:
- *   - parameters may be `path` (required), scalar/array `query`, or
- *     optional scalar `header`;
+ *   - parameters may be `path` (required), scalar/array `query`, or optional scalar `header`;
  *   - request body may be absent, `application/json` (`$ref`-to-Model or
  *     `list<$ref>`), or `application/x-www-form-urlencoded` with declared
  *     properties;
- *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`,
- *     a scalar, or an `additionalProperties` map.
+ *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`, a scalar, a map, or a `oneOf`/`anyOf` union.
  *
  * Anything else — including `multipart/form-data` and
  * `application/octet-stream` bodies, which used to be emitted as a
@@ -214,35 +212,36 @@ final readonly class OperationEmitter
             $segments,
             $this->responseTypes->expr($namespace, $return, $this->modelNamespace),
             $return->kind === ReturnSpec::KIND_VOID,
+            $this->responseTypes->varType($namespace, $return, $this->modelNamespace),
         ));
 
         return EmitOutcome::emitted();
     }
 
     /**
-     * The whole emitted body: one call describing the request and naming the
-     * response shape.
+     * The whole emitted body: one call describing the request and naming the response shape.
      *
-     * The chain stays on one line while it reads as one — past that, one
-     * segment per line, so an operation with many parameters is still read
-     * top to bottom rather than scrolled sideways. A `void` operation drops
-     * the `return` and nothing else.
+     * The chain stays on one line while it reads as one — past that, one segment per line, so an
+     * operation with many parameters is still read top to bottom rather than scrolled sideways. A
+     * `void` operation drops the `return`; a non-null `$varType` routes through an intermediate
+     * `@var`-annotated variable instead — see {@see ResponseTypeEmitter::varType()} for why.
      *
      * @param list<string> $segments
      */
-    private function callBody(array $segments, string $responseType, bool $isVoid): string
+    private function callBody(array $segments, string $responseType, bool $isVoid, ?string $varType): string
     {
         $oneLine = implode('', $segments);
         $chain = strlen($oneLine) <= self::CHAIN_WIDTH
             ? $oneLine
             : implode("\n        ", $segments);
 
-        return ($isVoid ? '' : 'return ')
-            . "\$this->transport->send(\n    "
-            . $chain
-            . ",\n    "
-            . $responseType
-            . ",\n);";
+        $call = "\$this->transport->send(\n    " . $chain . ",\n    " . $responseType . ",\n)";
+
+        if ($varType !== null) {
+            return "/** @var {$varType} \$result */\n\$result = {$call};\n\nreturn \$result;";
+        }
+
+        return ($isVoid ? '' : 'return ') . $call . ';';
     }
 
     private function describeUnsupportedBody(RequestBody|Reference $body): string
@@ -274,6 +273,11 @@ final readonly class OperationEmitter
                     $namespace,
                     $this->responseTypes->docType($return, $this->modelNamespace),
                 ));
+
+                return;
+
+            case ReturnSpec::KIND_UNION:
+                UnionReturnTypeApplier::apply($method, $namespace, $return, $this->modelNamespace);
 
                 return;
         }

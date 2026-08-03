@@ -44,6 +44,11 @@ final readonly class RequestBodyRefusal
                 . self::SUPPORTED;
         }
 
+        // Reached only once the media type's own `schema` is present — a
+        // JSON media type with none is not a refusal at all
+        // ({@see RequestBodyAnalyzer}'s null-schema branch, a-media-type-
+        // with-no-schema-takes-a-raw-body), so "inline (non-$ref) schema" is
+        // never printed for a document that declared nothing here.
         if (isset($body->content[BodyMediaType::JSON])) {
             return 'application/json request body with an inline (non-$ref) schema' . $location
                 . ' — paogen only emits a typed body for a $ref to a component schema, or list<$ref>; '

@@ -6,6 +6,8 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
+use Mlavrinenko\Paogen\Generator\Generator;
+use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
 
 use const SORT_STRING;
 
@@ -42,6 +44,29 @@ final readonly class UnionCatalog
         private array $byKey = [],
         private array $failures = [],
     ) {}
+
+    /**
+     * One catalog from two — {@see UnionGuidanceValidator}
+     * and {@see Generator} read a single
+     * `UnionCatalog`, but property-position unions
+     * ({@see DiscriminatorEnforcer}) and
+     * response-position ones
+     * ({@see ResponseUnionPlanner}) are
+     * resolved by two different passes over the document — the second needs
+     * a `ModelNameLedger` per operation that only exists inside
+     * {@see InlinePayloadPlanner}'s own
+     * walk. Combining the two here, rather than teaching one pass about the
+     * other's bookkeeping, is what keeps "one mechanism, one set of rules"
+     * true without merging the passes themselves.
+     */
+    public static function merge(self $a, self $b): self
+    {
+        return new self(
+            [...$a->byPointer, ...$b->byPointer],
+            [...$a->byKey, ...$b->byKey],
+            [...$a->failures, ...$b->failures],
+        );
+    }
 
     public function for(Schema $propertySchema): ?UnionResolution
     {

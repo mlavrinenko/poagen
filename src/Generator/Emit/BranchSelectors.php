@@ -80,6 +80,24 @@ final readonly class BranchSelectors
             $shapes[$name] = $target instanceof Schema ? EffectiveShape::of($target, $openApi) : null;
         }
 
+        return self::computeFromShapes($shapes);
+    }
+
+    /**
+     * The core the property position's {@see compute()} builds its
+     * `$shapes` map for and calls straight through to. Pulled out so a
+     * caller who already has its branches resolved to shapes — a
+     * response-position union, whose branches are not always a `$ref`
+     * {@see ResponseUnionPlanner} — can
+     * feed this the same map keyed by whatever identity it uses (a raw
+     * component name here, a synthesised model name there) without
+     * round-tripping through a `Reference` that does not exist for an
+     * inline branch.
+     *
+     * @param array<array-key,EffectiveShape|null> $shapes
+     */
+    public static function computeFromShapes(array $shapes): self
+    {
         $closed = self::soleClosedBranch($shapes);
         $fields = [];
         $undecidable = [];

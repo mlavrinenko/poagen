@@ -13,6 +13,8 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserDirection;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserSort;
+use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserDirection;
+use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserSort;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequest;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadResponse;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequest;
@@ -25,9 +27,12 @@ use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\Repository;
 use Acme\GitHub\Generated\Model\RepositorySubscription;
 use Acme\GitHub\Generated\Model\SimpleUser;
+use Acme\GitHub\Generated\Model\Stargazer;
+use Acme\GitHub\Generated\Model\StarredRepository;
 use Acme\GitHub\Generated\Model\Thread;
 use Acme\GitHub\Generated\Model\ThreadSubscription;
 use DateTimeInterface;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -238,6 +243,28 @@ final readonly class ActivityClient implements ActivityClientInterface
     }
 
     /**
+     * @return list<SimpleUser|Stargazer>
+     */
+    public function activityListStargazersForRepo(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): array {
+        /** @var list<SimpleUser|Stargazer> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/stargazers')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('per_page', $perPage)
+                ->query('page', $page),
+            ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['avatar_url' => SimpleUser::class, 'user' => Stargazer::class]), '/paths/~1repos~1{owner}~1{repo}~1stargazers/get/responses/200/content/application~1json/schema')),
+        );
+
+        return $result;
+    }
+
+    /**
      * @return list<SimpleUser>
      */
     public function activityListWatchersForRepo(
@@ -434,6 +461,30 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('page', $page),
             ResponseType::listOf(Event::class),
         );
+    }
+
+    /**
+     * @return list<StarredRepository|Repository>
+     */
+    public function activityListReposStarredByUser(
+        string $username,
+        ?ActivityListReposStarredByUserSort $sort = null,
+        ?ActivityListReposStarredByUserDirection $direction = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): array {
+        /** @var list<StarredRepository|Repository> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users/{username}/starred')
+                ->path('username', $username)
+                ->query('sort', $sort)
+                ->query('direction', $direction)
+                ->query('per_page', $perPage)
+                ->query('page', $page),
+            ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['repo' => StarredRepository::class, 'archive_url' => Repository::class]), '/paths/~1users~1{username}~1starred/get/responses/200/content/application~1json/schema')),
+        );
+
+        return $result;
     }
 
     /**

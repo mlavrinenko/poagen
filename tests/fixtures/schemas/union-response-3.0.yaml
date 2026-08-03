@@ -1,0 +1,133 @@
+openapi: 3.0.3
+info:
+  title: Response Union Fixture
+  version: "1.0.0"
+  description: >
+    a-union-response-selects-its-branch. One document carrying every shape a
+    response-position `oneOf`/`anyOf` takes on the real corpus, so a single
+    generated tree pins all of them against each other.
+
+    `getTaggedCreature`'s 200 is layer one: the document's own `discriminator`
+    carries an explicit `mapping` whose wire values (`canine`/`feline`) do not
+    equal either branch's class name — the exact shape `users/get-authenticated`
+    and `repos/get-content` need, and the one no property-position union in
+    either vendored corpus has ever exercised.
+
+    `getCreature`'s 200 has no discriminator at all, so it falls to layer
+    three: `Dog` and `Cat` declare disjoint required fields.
+
+    `getRestrictions`'s 200 anyOf's a `$ref` against an inline closed empty
+    object — `interactions/get-restrictions-for-org`'s exact shape — decided
+    by the absence of fields.
+
+    `listCreatures`'s 200 anyOf's two *array* shapes, each of a different
+    `$ref` item — `activity/list-stargazers-for-repo`'s shape — resolved as
+    `list<Dog|Cat>` rather than `list<Dog>|list<Cat>`.
+
+    `getUndecidableCreature`'s 200 is `Celsius`/`Fahrenheit` again: identical
+    fields, neither required, so no rule resolves it and the profile pins it.
+paths:
+  /creatures:
+    get:
+      operationId: getCreature
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Dog'
+                  - $ref: '#/components/schemas/Cat'
+  /creatures/tagged:
+    get:
+      operationId: getTaggedCreature
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Dog'
+                  - $ref: '#/components/schemas/Cat'
+                discriminator:
+                  propertyName: kind
+                  mapping:
+                    canine: '#/components/schemas/Dog'
+                    feline: '#/components/schemas/Cat'
+  /creatures/restrictions:
+    get:
+      operationId: getRestrictions
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Dog'
+                  - type: object
+                    properties: {}
+                    additionalProperties: false
+  /creatures/list:
+    get:
+      operationId: listCreatures
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Dog'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Cat'
+  /creatures/undecidable:
+    get:
+      operationId: getUndecidableCreature
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Celsius'
+                  - $ref: '#/components/schemas/Fahrenheit'
+components:
+  schemas:
+    Dog:
+      type: object
+      required:
+        - bark
+      properties:
+        bark:
+          type: string
+
+    Cat:
+      type: object
+      required:
+        - meow
+      properties:
+        meow:
+          type: string
+
+    # Two branches declaring the same single optional field. Neither
+    # requires anything, so no payload names one — the refusal layer three
+    # exists for, mirrored from union-selection-3.0.yaml's own Reading/
+    # Celsius/Fahrenheit.
+    Celsius:
+      type: object
+      properties:
+        degrees:
+          type: number
+
+    Fahrenheit:
+      type: object
+      properties:
+        degrees:
+          type: number

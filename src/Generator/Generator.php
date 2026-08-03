@@ -22,6 +22,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\QuerySerializationAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\SchemalessBodyAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
 use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
@@ -29,6 +30,7 @@ use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner;
 use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
 use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
@@ -112,11 +114,9 @@ final readonly class Generator
         $unions = new DiscriminatorEnforcer($profile->discriminators, $profile)->enforce($openApi);
         $bindings = $bindings->withUnions($unions);
 
-        // Same discipline, one walk further out: a `type` list naming several
-        // types PHP cannot express as one (nullable-type-arrays), and a JSON
-        // Schema 2020-12 keyword no emitter implements
-        // (swap-openapi-parser-for-31-support). One walk, two probes, so an
-        // operation reports one reason rather than a pile of them.
+        // Same discipline, one walk further out: a `type` list naming several types PHP cannot
+        // express as one (nullable-type-arrays), and a JSON Schema 2020-12 keyword no emitter
+        // implements (swap-openapi-parser-for-31-support). One walk, two probes, one reason each.
         $schemaSkips = SchemaScan::run($openApi, [
             TypeListScanner::probe(...),
             UnsupportedKeywordScanner::probe(...),
@@ -161,12 +161,13 @@ final readonly class Generator
             $preScannedSkips[$skip->operationId] = $skip->reason;
         }
 
-        // Payload classes are named before anything is emitted, because both
-        // halves of the run need the same answer: the model planner emits them,
-        // and the operation emitter points its parameters and return types at
-        // them (inline-body-and-response-schemas).
+        // Payload classes are named before anything is emitted: the model planner emits them, and
+        // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
         $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, $profile->inlineModels, $ledger, $profile->xmlElements, $preScannedSkips);
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, $profile->inlineModels, $ledger, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
+
+        // See UnionCatalog::merge() for why the response-position half waits for this walk.
+        $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());
 
         $this->modelPlanner->plan(
             $openApi,
@@ -195,6 +196,7 @@ final readonly class Generator
             // the run says so — `declared-shapes-become-types` tolerates that
             // one `mixed` only while it is visible.
             ...UnconstrainedFieldAdvisor::notices($openApi),
+            ...SchemalessBodyAdvisor::notices($openApi),
             // One line per union naming what it will discriminate on, so the
             // rule is visible before anything runs rather than discovered in
             // production — and so a pin's narrowing is reprinted on every run,
@@ -217,7 +219,7 @@ final readonly class Generator
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
-            ...$this->unionGuidance->validate($openApi, $profile, $unions),
+            ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];
 
         if ($failures !== []) {

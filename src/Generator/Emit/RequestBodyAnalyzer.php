@@ -135,6 +135,17 @@ final readonly class RequestBodyAnalyzer
 
         $schema = $json->schema;
 
+        // The media type node exists but carries no `schema` key at all —
+        // the document says nothing about the body's shape, which is not
+        // the same claim as a schema paogen cannot type. The same
+        // KIND_JSON_MAP surface a genuinely shapeless *object* schema
+        // already reaches, arrived at by this different route: an inline
+        // `type: object` schema with no properties (SchemalessBodyAdvisor
+        // reports the run's every site so the widening stays visible).
+        if ($schema === null) {
+            return BodySpec::jsonMap(new Schema(['type' => 'object']));
+        }
+
         if ($schema instanceof Reference) {
             $ref = $schema->getReference();
             $raw = ComponentName::rawFromRef($ref);

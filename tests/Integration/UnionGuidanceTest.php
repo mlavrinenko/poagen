@@ -50,7 +50,7 @@ final class UnionGuidanceTest extends TestCase
         $this->assertRefused(
             ['Aviary.resident' => ['field' => 'species', 'map' => ['dog' => 'Dog']]],
             self::WORKING_PIN,
-            "Profile::\$unionTags['Aviary.resident'] names no property-level",
+            "Profile::\$unionTags['Aviary.resident'] names no union in the document",
         );
     }
 

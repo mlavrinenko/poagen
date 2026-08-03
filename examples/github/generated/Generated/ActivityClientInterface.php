@@ -13,6 +13,8 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserDirection;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserSort;
+use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserDirection;
+use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserSort;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequest;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadResponse;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequest;
@@ -25,6 +27,8 @@ use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\Repository;
 use Acme\GitHub\Generated\Model\RepositorySubscription;
 use Acme\GitHub\Generated\Model\SimpleUser;
+use Acme\GitHub\Generated\Model\Stargazer;
+use Acme\GitHub\Generated\Model\StarredRepository;
 use Acme\GitHub\Generated\Model\Thread;
 use Acme\GitHub\Generated\Model\ThreadSubscription;
 
@@ -121,6 +125,16 @@ interface ActivityClientInterface
     ): ActivityMarkRepoNotificationsAsReadResponse;
 
     /**
+     * @return list<SimpleUser|Stargazer>
+     */
+    public function activityListStargazersForRepo(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): array;
+
+    /**
      * @return list<SimpleUser>
      */
     public function activityListWatchersForRepo(
@@ -199,6 +213,17 @@ interface ActivityClientInterface
      */
     public function activityListReceivedPublicEventsForUser(
         string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): array;
+
+    /**
+     * @return list<StarredRepository|Repository>
+     */
+    public function activityListReposStarredByUser(
+        string $username,
+        ?ActivityListReposStarredByUserSort $sort = null,
+        ?ActivityListReposStarredByUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
     ): array;

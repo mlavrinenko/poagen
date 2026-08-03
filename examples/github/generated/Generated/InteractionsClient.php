@@ -13,6 +13,10 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\InteractionLimit;
 use Acme\GitHub\Generated\Model\InteractionLimitResponse;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForOrgResponseBranch2;
+use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForRepoResponseBranch2;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -22,6 +26,18 @@ final readonly class InteractionsClient implements InteractionsClientInterface
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    public function interactionsGetRestrictionsForOrg(
+        string $org,
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2 {
+        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2 $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/interaction-limits')->path('org', $org),
+            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForOrgResponseBranch2::class), '/paths/~1orgs~1{org}~1interaction-limits/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): InteractionLimitResponse
@@ -38,6 +54,21 @@ final readonly class InteractionsClient implements InteractionsClientInterface
             Endpoint::delete('/orgs/{org}/interaction-limits')->path('org', $org),
             ResponseType::nothing(),
         );
+    }
+
+    public function interactionsGetRestrictionsForRepo(
+        string $owner,
+        string $repo,
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2 {
+        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2 $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/interaction-limits')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForRepoResponseBranch2::class), '/paths/~1repos~1{owner}~1{repo}~1interaction-limits/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function interactionsSetRestrictionsForRepo(
@@ -62,6 +93,17 @@ final readonly class InteractionsClient implements InteractionsClientInterface
                 ->path('repo', $repo),
             ResponseType::nothing(),
         );
+    }
+
+    public function interactionsGetRestrictionsForAuthenticatedUser(
+    ): InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2 {
+        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2 $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/interaction-limits'),
+            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2::class), '/paths/~1user~1interaction-limits/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): InteractionLimitResponse

@@ -18,6 +18,7 @@ use Acme\GitHub\Generated\Model\Hovercard;
 use Acme\GitHub\Generated\Model\Key;
 use Acme\GitHub\Generated\Model\KeySimple;
 use Acme\GitHub\Generated\Model\PrivateUser;
+use Acme\GitHub\Generated\Model\PublicUser;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Acme\GitHub\Generated\Model\SocialAccount;
 use Acme\GitHub\Generated\Model\SshSigningKey;
@@ -33,6 +34,7 @@ use Acme\GitHub\Generated\Model\UsersListAttestationsBulkResponse;
 use Acme\GitHub\Generated\Model\UsersListAttestationsResponse;
 use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest;
 use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequest;
+use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -42,6 +44,17 @@ final readonly class UsersClient implements UsersClientInterface
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    public function usersGetAuthenticated(): PrivateUser|PublicUser
+    {
+        /** @var PrivateUser|PublicUser $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user'),
+            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequest $body): PrivateUser
@@ -314,6 +327,17 @@ final readonly class UsersClient implements UsersClientInterface
         );
     }
 
+    public function usersGetById(int $accountId): PrivateUser|PublicUser
+    {
+        /** @var PrivateUser|PublicUser $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/{account_id}')->path('account_id', $accountId),
+            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user~1{account_id}/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
+    }
+
     /**
      * @return list<SimpleUser>
      */
@@ -323,6 +347,17 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::get('/users')->query('since', $since)->query('per_page', $perPage),
             ResponseType::listOf(SimpleUser::class),
         );
+    }
+
+    public function usersGetByUsername(string $username): PrivateUser|PublicUser
+    {
+        /** @var PrivateUser|PublicUser $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users/{username}')->path('username', $username),
+            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1users~1{username}/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function usersListAttestationsBulk(
