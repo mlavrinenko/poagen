@@ -5,6 +5,7 @@
   tags: ("release",),
   priority: 4,
   difficulty: 3,
+  links: (depends-on("rename-the-vendor-packages-and-namespaces-before-publishing.task-260803.typ"),),
   status: accepted(2026, 8, 2),
 )
 
@@ -27,10 +28,24 @@ naming `mlavrinenko/paogen-runtime`, its own tests, and a standalone
 verification recipe that proves it installs and runs without the generator
 present.
 
+=== Owner ruling, 2026-08-03: not under its existing name
+
+The runtime publishes as `poagen/client-runtime`, not
+`mlavrinenko/paogen-runtime`, and its PHP namespace is renamed to match. The
+generator publishes too, as `poagen/client-generator` — reversing the earlier
+deferral, though still after the capability is proven.
+
+`rename-the-vendor-packages-and-namespaces-before-publishing` owns that work
+and is a hard dependency: a package published under the old name and renamed
+afterwards leaves an abandoned name and a broken require in every consumer's
+lockfile. It also carries the one open question — the owner wrote the vendor
+as `poagen` and the project everywhere else is `paogen`, which differ by a
+transposition. That is settled there, before anything is tagged.
+
 == Acceptance criteria
 
-- The runtime is published to Packagist under its existing name, at a version
-  the changelog explains.
+- The runtime is published to Packagist as `poagen/client-runtime`, at a
+  version the changelog explains, after the rename task has landed.
 - A clean project, with no clone of this repository, installs it from Packagist
   and runs a generated client against a fake transport.
 - The version is tagged in git and the tag is what Packagist resolves.
@@ -44,8 +59,11 @@ present.
 
 == Non-goals
 
-- Publishing paogen itself. The owner deferred it until the generator's
-  capability is proven against the example corpus.
+- Publishing the generator itself. It ships too, as
+  `poagen/client-generator`, but as its own step after the same rename — one
+  package published by hand at a time, so a mistake in the first is caught
+  before the second repeats it.
+- The rename. That is its own task and this one waits on it.
 - Any change to what the runtime does. This task packages what exists.
 - Automating releases. One published version by hand is the goal; a release
   pipeline is its own task if the cadence ever justifies one.

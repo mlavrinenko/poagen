@@ -42,9 +42,11 @@ position is legible rather than implied.
 - A new public repository holds the generated client, its profile, the vendored
   schema, the hand-written wrappers and the recorded-response tests, with the
   history that produced them or a clean initial commit that says where they
-  came from.
-- It installs from a clean checkout with the runtime resolved from Packagist,
-  and its tests pass with no reference to this repository.
+  came from. It is published as `maximaster/kilbil-client` — the owner's
+  ruling of 2026-08-03, and the name that satisfies the last criterion below,
+  since it names the packager and not the vendor.
+- It installs from a clean checkout with `poagen/client-runtime` resolved from
+  Packagist, and its tests pass with no reference to this repository.
 - Regenerating it from this repository's copy of the document produces the same
   tree, so the extraction did not fork the output.
 - paogen keeps a kilbil example that its own gates regenerate and check. What
