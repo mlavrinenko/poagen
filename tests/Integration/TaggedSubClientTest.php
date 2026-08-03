@@ -44,7 +44,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testEachTagBecomesAClassAndAnInterfaceDeclaringExactlyItsOwnMethods(): void
     {
-        $plan = $this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']);
+        $plan = $this->plan(self::PETSTORE);
         $names = $this->emittedNames($plan);
 
         foreach (['PetClient', 'StoreClient', 'UserClient'] as $client) {
@@ -62,7 +62,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testTheRootExposesOneAccessorPerTagAndNoFlatOperationMethods(): void
     {
-        $root = $this->sourceOf($this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']), 'ApiClient');
+        $root = $this->sourceOf($this->plan(self::PETSTORE), 'ApiClient');
 
         self::assertStringContainsString('public function pet(): PetClientInterface', $root);
         self::assertStringContainsString('public function store(): StoreClientInterface', $root);
@@ -76,7 +76,7 @@ final class TaggedSubClientTest extends TestCase
 
     public function testASubClientIsConstructibleWithoutTheRoot(): void
     {
-        $sub = $this->sourceOf($this->plan(self::PETSTORE, skip: ['uploadFile' => 'octet-stream body']), 'StoreClient');
+        $sub = $this->sourceOf($this->plan(self::PETSTORE), 'StoreClient');
 
         // Its own transport — nothing that requires the root object to exist,
         // and an interface rather than an implementation, so a consumer can

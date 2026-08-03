@@ -29,12 +29,17 @@ use cebe\openapi\spec\Schema;
  *                       declared `application/xml`, sent with the root and
  *                       repeated-item elements both named in
  *                       `Profile::$xmlElements`
+ *   - KIND_TEXT         a `type: string` schema under a text content type,
+ *                       sent as one `string` argument under the content type
+ *                       the document declared first
+ *   - KIND_BINARY       `application/octet-stream`, or any `format: binary`
+ *                       schema, sent as the PSR-7 stream the caller opened
  *
- * Anything else — `multipart/form-data`, `application/octet-stream`, a content
- * type outside the set, a form body outside the shape above, or an XML body
- * whose schema is a `$ref`/scalar/property-less object, or whose element name
- * is missing from `Profile::$xmlElements` — never produces a {@see BodySpec}
- * at all: {@see RequestBodyAnalyzer::resolve()} returns null, {@see
+ * Anything else — `multipart/form-data`, a content type outside the set, a
+ * form body outside the shape above, or an XML body whose schema is a
+ * `$ref`/scalar/property-less object, or whose element name is missing from
+ * `Profile::$xmlElements` — never produces a {@see BodySpec} at all:
+ * {@see RequestBodyAnalyzer::resolve()} returns null, {@see
  * InlinePayloadPlanner} declines it too, and the caller reports the operation
  * as unrepresentable instead of emitting a method whose body only throws, or
  * silently degrades, at call time (abort-on-unrepresentable-constructs,
@@ -48,6 +53,8 @@ final readonly class BodySpec
     public const string KIND_XML = 'xml';
     public const string KIND_XML_LIST = 'xml_list';
     public const string KIND_FORM = 'form_urlencoded';
+    public const string KIND_TEXT = 'text';
+    public const string KIND_BINARY = 'binary';
 
     /**
      * @param list<FormField> $formFields   non-empty when kind is KIND_FORM
@@ -56,6 +63,9 @@ final readonly class BodySpec
      * @param string          $rootElement  the XML root element, set for the XML kinds — the
      *                                      specification supplies no default for it
      * @param string          $itemElement  the repeated XML element, set for KIND_XML_LIST
+     * @param string          $contentType  the content type to send, set for KIND_TEXT and
+     *                                      KIND_BINARY — the document declares it and, where it
+     *                                      declared several, this is the one paogen picked
      */
     public function __construct(
         public string $kind,
@@ -64,6 +74,7 @@ final readonly class BodySpec
         public ?Schema $schema = null,
         public string $rootElement = '',
         public string $itemElement = '',
+        public string $contentType = '',
     ) {}
 
     public static function xml(string $model, string $rootElement): self
@@ -97,6 +108,16 @@ final readonly class BodySpec
     public static function form(array $fields): self
     {
         return new self(self::KIND_FORM, formFields: $fields);
+    }
+
+    public static function text(string $contentType): self
+    {
+        return new self(self::KIND_TEXT, contentType: $contentType);
+    }
+
+    public static function binary(string $contentType): self
+    {
+        return new self(self::KIND_BINARY, contentType: $contentType);
     }
 
     public function isList(): bool

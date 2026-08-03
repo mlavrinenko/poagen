@@ -30,10 +30,17 @@ return new Profile(
      * finding and why the marker stays.
      *
      * What follows is real, verified progress on a separate, larger
-     * surface: forty-nine operations this document could already not
+     * surface: forty-three operations this document could already not
      * represent before T-030 ever ran (inline request bodies, unsupported
-     * query-parameter shapes, non-JSON response content types, response
-     * schemas of unrepresentable shape). `abort-on-unrepresentable-
+     * query-parameter shapes, response schemas of unrepresentable shape).
+     * It was forty-nine until
+     * `represent-non-json-request-and-response-bodies` landed: five of the
+     * six it removed were refused for their media type alone — `text/html`,
+     * `text/plain` and `application/octocat-stream` responses,
+     * a `text/plain, text/x-markdown` request body and an
+     * `application/octet-stream` upload — and the sixth,
+     * `orgs/enable-or-disable-security-product-on-all-org-repos`, had gone
+     * stale on its own and generated cleanly already. `abort-on-unrepresentable-
      * constructs` and `default-deny-on-degradation` (both 2026-08-01)
      * unified every one of these into the same generator-time abort this
      * profile already refuses to weaken, so they need the same skip-list
@@ -65,12 +72,7 @@ return new Profile(
         'issues/set-labels' => 'application/json request body with an inline (non-$ref) schema',
         'issues/add-labels' => 'application/json request body with an inline (non-$ref) schema',
         'licenses/get-for-repo' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'markdown/render' => '200 response content type(s) \'text/html\'',
-        'markdown/render-raw' => 'request body content type(s) \'text/plain, text/x-markdown\'',
-        'meta/get-octocat' => '200 response content type(s) \'application/octocat-stream\'',
         'meta/get-all-versions' => '200 response is a JSON array whose items are an inline (non-$ref) schema',
-        'meta/get-zen' => '200 response content type(s) \'text/plain\'',
-        'orgs/enable-or-disable-security-product-on-all-org-repos' => 'application/json request body with an inline (non-$ref) schema',
         'projects/add-field-for-org' => 'application/json request body with an inline (non-$ref) schema',
         'projects/list-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/get-org-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
@@ -87,8 +89,7 @@ return new Profile(
         'repos/add-team-access-restrictions' => 'application/json request body with an inline (non-$ref) schema',
         'repos/remove-team-access-restrictions' => 'application/json request body with an inline (non-$ref) schema',
         'repos/get-content' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/upload-release-asset' => 'application/octet-stream request body',
-        'security-advisories/list-global-advisories' => 'parameter \'ecosystem\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
+        'security-advisories/list-global-advisories' =>'parameter \'ecosystem\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'users/get-authenticated' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'users/add-email-for-authenticated-user' => 'application/json request body with an inline (non-$ref) schema',
         'users/delete-email-for-authenticated-user' => 'application/json request body with an inline (non-$ref) schema',

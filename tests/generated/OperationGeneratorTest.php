@@ -144,14 +144,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: A response declaring an unsupported content type aborts the run
      * @source truth/specs/operation-generator.feature-260418.typ:87
      *
-     * Given Schema declares Operation GET /labels/{id} with operationId: getLabel whose 200 response content type is text/plain
+     * Given Schema declares Operation GET /labels/{id} with operationId: getLabel whose 200 response content type is application/octet-stream
      * When Generator runs against unaccepted Profile
      * Then Generator's run fails and emits no Generated File
      *   And Generator's report names the operationId, the unsupported content type, and the remedy
      */
     public function testAResponseDeclaringAnUnsupportedContentTypeAbortsTheRun(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsTextPlain('GET /labels/{id}', 'operationId: getLabel');
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationOctetStream('GET /labels/{id}', 'operationId: getLabel');
         $this->steps->whenGeneratorRunsAgainstUnacceptedProfile();
         $this->steps->thenGeneratorsRunFailsAndEmitsNoGeneratedFile();
         $this->steps->thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
@@ -296,14 +296,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
      * @source truth/specs/operation-generator.feature-260418.typ:177
      *
-     * Given Schema declares Operation operationId: uploadFile whose request body content type is application/octet-stream, which paogen does not emit
+     * Given Schema declares Operation operationId: createWidget whose request body content type is multipart/form-data, which paogen does not emit
      * When Generator runs against Profile
      * Then the resulting GenerationPlan carries a skippedOperations entry naming Operation's HTTP method, path, operationId and the reason for the skip
      *   And paogen CLI's generate command prints the same list to stderr so the user knows which ops did not make it into the client
      */
     public function testAnOperationWhoseBodyShapeIsUnsupportedIsReportedAsASkipRatherThanDroppedSilently(): void
     {
-        $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit('operationId: uploadFile');
+        $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPaogenDoesNotEmit('operationId: createWidget');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenResultingGenerationPlanCarriesASkippedOperationsEntryNamingOperationsHTTPMethodPathOperationIdAndTheReasonForTheSkip();
         $this->steps->thenPaogenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();
@@ -458,14 +458,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An unsupported body content type aborts the run
      * @source truth/specs/operation-generator.feature-260418.typ:268
      *
-     * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
+     * Given Schema declares Operation POST /widgets with operationId: createWidget whose request body content type is multipart/form-data
      * When Generator runs against Profile declaring no skip entry for that Operation
      * Then Generator's run fails and emits no Generated File
      *   And Generator's report names the operationId, the unsupported content type, and the remedy
      */
     public function testAnUnsupportedBodyContentTypeAbortsTheRun(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsMultipartFormData('POST /widgets', 'operationId: createWidget');
         $this->steps->whenGeneratorRunsAgainstProfileDeclaringNoSkipEntryForThatOperation();
         $this->steps->thenGeneratorsRunFailsAndEmitsNoGeneratedFile();
         $this->steps->thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();
@@ -476,18 +476,18 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An explicitly skipped operation is omitted rather than stubbed
      * @source truth/specs/operation-generator.feature-260418.typ:280
      *
-     * Given Schema declares Operation POST /pet/{petId}/uploadImage with operationId: uploadFile whose request body content type is application/octet-stream
+     * Given Schema declares Operation POST /widgets with operationId: createWidget whose request body content type is multipart/form-data
      *   And Profile declares a skip entry for that Operation carrying a reason
      * When Generator runs against Profile
-     * Then the emitted Client has no uploadFile method at all
+     * Then the emitted Client has no createWidget method at all
      *   And no Generated File contains a method that throws on an unsupported content type
      */
     public function testAnExplicitlySkippedOperationIsOmittedRatherThanStubbed(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream('POST /pet/{petId}/uploadImage', 'operationId: uploadFile');
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsMultipartFormData('POST /widgets', 'operationId: createWidget');
         $this->steps->givenProfileDeclaresASkipEntryForThatOperationCarryingAReason();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenEmittedClientHasNoUploadFileMethodAtAll();
+        $this->steps->thenEmittedClientHasNoCreateWidgetMethodAtAll();
         $this->steps->thenNoGeneratedFileContainsAMethodThatThrowsOnAnUnsupportedContentType();
     }
 

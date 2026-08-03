@@ -12,10 +12,12 @@ declare(strict_types=1);
 namespace Acme\Petstore\Generated;
 
 use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
+use Acme\Petstore\Generated\Model\ApiResponse;
 use Acme\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+use Psr\Http\Message\StreamInterface;
 
 final readonly class PetClient implements PetClientInterface
 {
@@ -87,6 +89,17 @@ final readonly class PetClient implements PetClientInterface
         $this->transport->send(
             Endpoint::delete('/pet/{petId}')->path('petId', $petId)->header('api_key', $apiKey),
             ResponseType::nothing(),
+        );
+    }
+
+    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): ApiResponse
+    {
+        return $this->transport->send(
+            Endpoint::post('/pet/{petId}/uploadImage')
+                ->path('petId', $petId)
+                ->query('additionalMetadata', $additionalMetadata)
+                ->binary($body, 'application/octet-stream'),
+            ResponseType::object(ApiResponse::class),
         );
     }
 }

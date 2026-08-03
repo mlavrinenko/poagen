@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\Petstore\Generated;
 
 use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
+use Acme\Petstore\Generated\Model\ApiResponse;
 use Acme\Petstore\Generated\Model\Pet;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * The contract for the `pet` endpoints.
@@ -43,4 +45,6 @@ interface PetClientInterface
     public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet;
 
     public function deletePet(int $petId, ?string $apiKey = null): void;
+
+    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): ApiResponse;
 }

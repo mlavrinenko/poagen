@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
@@ -12,9 +11,6 @@ use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
-use function array_keys;
-use function implode;
-use function sprintf;
 use function str_starts_with;
 
 /**
@@ -29,9 +25,15 @@ use function str_starts_with;
  * `Responses` object at all, no 2xx status entry, or a 2xx entry whose
  * `content` is empty.
  *
+ * Two shapes reach a return type: an `application/json` body, resolved by
+ * its schema, and a body the document declared as text over a `type: string`
+ * schema, which is the `string` it says it is. A binary body is neither and
+ * stays refused.
+ *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (`quality-gates-at-maximum-strictness`), mirroring
- * {@see RequestBodyAnalyzer}.
+ * {@see RequestBodyAnalyzer}; the diagnostics half moved on to
+ * {@see ResponseRefusal} for the same reason.
  *
  * @internal
  */
@@ -67,69 +69,8 @@ final readonly class ResponseAnalyzer
         }
 
         [$status, $response] = $picked;
-        $content = $response->content ?? [];
-        $pointer = $response->getDocumentPosition();
-        $location = $pointer instanceof JsonPointer ? ' (' . $pointer->getPointer() . ')' : '';
-        $prefix = sprintf('%s response%s', $status, $location);
 
-        $json = $content['application/json'] ?? null;
-
-        if (!$json instanceof MediaType) {
-            $typeList = $content === [] ? '(none declared)' : implode(', ', array_keys($content));
-
-            return sprintf(
-                "%s content type(s) '%s' — paogen only decodes application/json responses (\$ref/list<\$ref>, "
-                    . 'a scalar, or an additionalProperties map); add an application/json entry, or accept this '
-                    . 'operation by name in Profile::$skip',
-                $prefix,
-                $typeList,
-            );
-        }
-
-        $schema = $json->schema;
-
-        if ($schema instanceof Reference) {
-            return sprintf(
-                "%s \$ref '%s' does not resolve to a component schema — fix or remove the \$ref",
-                $prefix,
-                $schema->getReference(),
-            );
-        }
-
-        if (!$schema instanceof Schema) {
-            return sprintf('%s declares application/json with no schema — paogen needs one to know what to decode', $prefix);
-        }
-
-        $type = SchemaType::of($schema);
-
-        if ($type->is('array')) {
-            return self::describeArray($prefix, $schema);
-        }
-
-        return sprintf(
-            "%s has an application/json schema of type '%s', which paogen cannot represent as a method return type",
-            $prefix,
-            $type->describe(),
-        );
-    }
-
-    private static function describeArray(string $prefix, Schema $schema): string
-    {
-        $items = $schema->items;
-
-        if ($items instanceof Reference) {
-            return sprintf(
-                "%s array \$ref '%s' does not resolve to a component schema — fix or remove the \$ref",
-                $prefix,
-                $items->getReference(),
-            );
-        }
-
-        return sprintf(
-            '%s is a JSON array whose items are an inline (non-$ref) schema — paogen only emits a typed list '
-                . 'for items that are a $ref to a component schema; move the item schema into components.schemas',
-            $prefix,
-        );
+        return ResponseRefusal::describe($status, $response, $response->content ?? []);
     }
 
     private static function fromResponse(Response $response, NameRegistry $registry): ?ReturnSpec
@@ -143,7 +84,7 @@ final readonly class ResponseAnalyzer
         $json = $content['application/json'] ?? null;
 
         if (!$json instanceof MediaType) {
-            return null;
+            return self::textResponse($content);
         }
 
         $schema = $json->schema;
@@ -172,6 +113,28 @@ final readonly class ResponseAnalyzer
         $scalar = $type->scalarPhpType();
 
         return $scalar === null ? null : ReturnSpec::scalar($scalar);
+    }
+
+    /**
+     * A 2xx response the document declared as characters rather than as JSON.
+     *
+     * It reaches the caller as the `string` the schema said it was, read
+     * straight off the body — {@see ReturnSpec::scalar()} already means
+     * "no JSON decode", which is exactly right for `text/html` and for
+     * GitHub's `application/octocat-stream`. No Model, no ambiguity, and
+     * nothing about it needs a return kind of its own.
+     *
+     * A binary response is deliberately not accepted here: a
+     * `format: binary` body is a stream, not a string, and casting one to
+     * the other is the silent widening `declared-shapes-become-types`
+     * refuses. It stays a refusal until the return contract can name a
+     * stream.
+     *
+     * @param array<array-key, MediaType> $content
+     */
+    private static function textResponse(array $content): ?ReturnSpec
+    {
+        return BodyMediaType::firstText($content) === null ? null : ReturnSpec::scalar('string');
     }
 
     private static function fromArray(Schema $schema, NameRegistry $registry): ?ReturnSpec

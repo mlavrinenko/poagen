@@ -38,10 +38,9 @@ final class GeneratedSymbolShorteningTest extends TestCase
             schema: self::SCHEMA,
             output: $output,
             namespace: self::NAMESPACE,
-            // Mirrors tests/fixtures/profiles/petstore.php: uploadFile's
-            // application/octet-stream body is unrepresentable — see
-            // abort-on-unrepresentable-constructs. Irrelevant to this test.
-            skip: ['uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies'],
+            // No skip list: petstore's `uploadFile` stopped being
+            // unrepresentable in represent-non-json-request-and-response-bodies,
+            // and nothing else in this document ever was.
         ));
     }
 

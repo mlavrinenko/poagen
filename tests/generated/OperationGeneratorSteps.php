@@ -200,12 +200,14 @@ final class OperationGeneratorSteps
     private const KILBIL_SCHEMA = 'examples/kilbil/schemas/loyalty_v1.yaml';
 
     /**
-     * Petstore's octet-stream upload is unrepresentable and stops the run
-     * unless accepted. None of the tag scenarios is about that.
+     * Empty since represent-non-json-request-and-response-bodies: petstore's
+     * octet-stream upload is a `Psr\Http\Message\StreamInterface` parameter
+     * now, so nothing in this document needs accepting and an entry for it
+     * would fail the run as stale.
      *
      * @var array<string,string>
      */
-    private const PETSTORE_SKIP = ['uploadFile' => 'application/octet-stream request body — not what the tag scenarios are about'];
+    private const PETSTORE_SKIP = [];
 
     /** @var array<string,string> */
     private const KILBIL_SKIP = [
@@ -387,9 +389,10 @@ final class OperationGeneratorSteps
                     '200':
                       description: ok
                       content:
-                        text/plain:
+                        application/octet-stream:
                           schema:
                             type: string
+                            format: binary
             YAML);
 
         return $path;
@@ -627,29 +630,29 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsApplicationOctetStream(
+    public function givenSchemaDeclaresOperationOpWithIdWhoseRequestBodyContentTypeIsMultipartFormData(
         string $op,
         string $id,
     ): void {
-        TestCase::assertSame('POST /pet/{petId}/uploadImage', $op);
-        TestCase::assertSame('operationId: uploadFile', $id);
+        TestCase::assertSame('POST /widgets', $op);
+        TestCase::assertSame('operationId: createWidget', $id);
 
-        $this->profile = $this->loadProfile('petstore');
-        $this->expectedSkipOperationId = 'uploadFile';
-        $this->expectedSkipContentType = 'application/octet-stream';
+        $this->profile = $this->loadProfile('unrepresentable');
+        $this->expectedSkipOperationId = 'createWidget';
+        $this->expectedSkipContentType = 'multipart/form-data';
     }
 
 
     public function whenGeneratorRunsAgainstProfileDeclaringNoSkipEntryForThatOperation(): void
     {
-        $base = $this->loadProfile('petstore');
+        $base = $this->loadProfile('unrepresentable');
 
         // A pristine output directory, so "wrote nothing" is observable. The
         // shared fixture tree is populated by sibling scenarios and would make
         // the assertion vacuous.
         $this->abortOutputDir = sys_get_temp_dir() . '/paogen-abort-' . bin2hex(random_bytes(6));
 
-        // Same fixture profile with the skip entry removed, so the octet-stream
+        // Same fixture profile with the skip entries removed, so the multipart
         // body is left unaccepted and has to stop the run.
         $unaccepted = new Profile(
             schema: $base->schema,
@@ -688,11 +691,11 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsApplicationOctetStreamWhichPaogenDoesNotEmit(
+    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPaogenDoesNotEmit(
         string $id,
     ): void {
-        TestCase::assertSame('operationId: uploadFile', $id);
-        $this->profile = $this->loadProfile('petstore');
+        TestCase::assertSame('operationId: createWidget', $id);
+        $this->profile = $this->loadProfile('unrepresentable');
     }
 
 
@@ -1009,18 +1012,18 @@ final class OperationGeneratorSteps
         $matches = array_values(array_filter(
             $plan->skippedOperations,
             static fn(SkippedOperation $s): bool
-                => $s->operationId === 'uploadFile',
+                => $s->operationId === 'createWidget',
         ));
 
-        TestCase::assertCount(1, $matches, 'expected exactly one skip for uploadFile');
+        TestCase::assertCount(1, $matches, 'expected exactly one skip for createWidget');
         TestCase::assertSame('post', $matches[0]->httpMethod);
-        TestCase::assertSame('/pet/{petId}/uploadImage', $matches[0]->pathUri);
+        TestCase::assertSame('/widgets', $matches[0]->pathUri);
 
         // The reason is now the diagnostic a user would act on rather than a
         // category label: it names the construct, points at the schema
         // location, and says what would make it acceptable.
-        TestCase::assertStringContainsString('application/octet-stream request body', $matches[0]->reason);
-        TestCase::assertStringContainsString('/paths/~1pet~1{petId}~1uploadImage/post/requestBody', $matches[0]->reason);
+        TestCase::assertStringContainsString('multipart/form-data request body', $matches[0]->reason);
+        TestCase::assertStringContainsString('/paths/~1widgets/post/requestBody', $matches[0]->reason);
         TestCase::assertStringContainsString('application/x-www-form-urlencoded', $matches[0]->reason);
     }
 
@@ -1029,7 +1032,7 @@ final class OperationGeneratorSteps
     ): void {
         // Drive the real CLI binary so the round-trip exercises
         // GenerateCommand::reportSkipped() exactly as the user sees it.
-        $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/petstore.php';
+        $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/unrepresentable.php';
 
         $stdout = tmpfile();
         $stderr = tmpfile();
@@ -1047,8 +1050,8 @@ final class OperationGeneratorSteps
 
         rewind($stderr);
         $stderrContents = (string) stream_get_contents($stderr);
-        TestCase::assertStringContainsString('uploadFile', $stderrContents);
-        TestCase::assertStringContainsString('/pet/{petId}/uploadImage', $stderrContents);
+        TestCase::assertStringContainsString('createWidget', $stderrContents);
+        TestCase::assertStringContainsString('/widgets', $stderrContents);
         TestCase::assertStringContainsString('skipped', $stderrContents);
     }
 
@@ -1233,16 +1236,16 @@ final class OperationGeneratorSteps
 
     public function givenProfileDeclaresASkipEntryForThatOperationCarryingAReason(): void
     {
-        $this->profile = $this->loadProfile('petstore');
+        $this->profile = $this->loadProfile('unrepresentable');
 
-        TestCase::assertArrayHasKey('uploadFile', $this->profile->skip);
-        TestCase::assertNotSame('', trim($this->profile->skip['uploadFile']));
+        TestCase::assertArrayHasKey('createWidget', $this->profile->skip);
+        TestCase::assertNotSame('', trim($this->profile->skip['createWidget']));
     }
 
 
-    public function thenEmittedClientHasNoUploadFileMethodAtAll(): void
+    public function thenEmittedClientHasNoCreateWidgetMethodAtAll(): void
     {
-        TestCase::assertStringNotContainsString('function uploadFile(', $this->source);
+        TestCase::assertStringNotContainsString('function createWidget(', $this->source);
     }
 
 
@@ -1842,7 +1845,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsTextPlain(
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationOctetStream(
         string $op,
         string $id,
     ): void {
@@ -1856,7 +1859,7 @@ final class OperationGeneratorSteps
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseContentType',
         );
         $this->expectedSkipOperationId = 'getLabel';
-        $this->expectedSkipContentType = 'text/plain';
+        $this->expectedSkipContentType = 'application/octet-stream';
     }
 
 
@@ -1905,10 +1908,9 @@ final class OperationGeneratorSteps
         $message = (string) $this->abortMessage;
 
         // Refusal, not a silent void and not a raw-body passthrough — the
-        // diagnostic says exactly what paogen decodes, so a reader cannot
+        // diagnostic names the decision that governs, so a reader cannot
         // mistake this for "XML worked but came back untyped".
-        TestCase::assertStringContainsString('paogen only decodes application/json', $message);
+        TestCase::assertStringContainsString('refuses an XML response at generation time', $message);
         TestCase::assertDirectoryDoesNotExist($this->abortOutputDir . '/Generated');
     }
-
 }

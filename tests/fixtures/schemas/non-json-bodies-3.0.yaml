@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Non-JSON Body Fixture
+  version: "1.0.0"
+  description: >
+    represent-non-json-request-and-response-bodies: a body the document
+    declares as text is a string, and a body it declares as a binary stream
+    is a stream. Neither needs a model and neither is ambiguous, so neither
+    is a reason to refuse the operation.
+
+    Every shape here was read off a vendored document rather than invented.
+    `renderRaw` is GitHub's POST /markdown/raw, which declares text/plain and
+    text/x-markdown over the same `type: string` schema — the case that must
+    produce one method rather than two. `getOctocat` is GitHub's GET /octocat,
+    whose `application/octocat-stream` content type names a stream and whose
+    schema plainly says `type: string`; classifying on the subtype would get
+    it wrong, classifying on the schema gets it right. `uploadAsset` is both
+    GitHub's release-asset upload and petstore's `uploadFile`. `renderPdf`
+    carries DigitalOcean's `application/pdf` + `format: binary` pairing, to
+    pin down that binary is a property of the schema and not only of the
+    octet-stream content type.
+
+    `uploadForm` stays refused: multipart/form-data carries a content type
+    and encoding per part and is explicitly out of this task's scope.
+paths:
+  /markdown/raw:
+    post:
+      operationId: renderRaw
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+          text/x-markdown:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: rendered
+          content:
+            text/html:
+              schema:
+                type: string
+  /octocat:
+    get:
+      operationId: getOctocat
+      responses:
+        '200':
+          description: ok
+          content:
+            application/octocat-stream:
+              schema:
+                type: string
+  /assets:
+    post:
+      operationId: uploadAsset
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: uploaded
+  /pdf:
+    post:
+      operationId: renderPdf
+      requestBody:
+        required: true
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: rendered
+  /form:
+    post:
+      operationId: uploadForm
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '204':
+          description: uploaded

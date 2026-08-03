@@ -14,8 +14,17 @@ info:
     petstore declares an application/xml response, so nothing in the
     committed corpora exercises this path without it. See
     xml-responses-refused-at-generation-time — an application/xml response
-    refuses the same way any other non-application/json response does,
-    rather than being decoded or special-cased.
+    refuses without being decoded or special-cased, and it is now the only
+    non-application/json content type that does so on grounds of its type
+    alone.
+
+    `getPlainText` was one of the unrepresentable four until
+    represent-non-json-request-and-response-bodies: a `text/*` response over
+    a `type: string` schema is the string the document declared, so it is
+    kept here on the representable side, as the guard against that refusal
+    coming back. `getBinaryBlob` took its place in the count — a
+    `format: binary` body is a stream, and the return contract cannot name
+    one yet.
 paths:
   /plain-text:
     get:
@@ -27,6 +36,17 @@ paths:
             text/plain:
               schema:
                 type: string
+  /binary-blob:
+    get:
+      operationId: getBinaryBlob
+      responses:
+        '200':
+          description: ok
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
   /xml-label:
     get:
       operationId: getXmlLabel

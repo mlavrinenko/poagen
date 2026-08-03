@@ -19,10 +19,9 @@ return new Profile(
     discoverIn: [
         'Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject',
     ],
-    skip: [
-        // multipart/octet-stream request bodies are unrepresentable —
-        // paogen emits JSON and form-urlencoded bodies only. See
-        // abort-on-unrepresentable-constructs.
-        'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
-    ],
+    // `uploadFile` was skipped here for its `application/octet-stream` body
+    // until represent-non-json-request-and-response-bodies gave that body a
+    // `Psr\Http\Message\StreamInterface` parameter. Nothing in this document
+    // is unrepresentable now, so there is no skip list — and leaving the
+    // entry would fail the run as stale rather than pass quietly.
 );

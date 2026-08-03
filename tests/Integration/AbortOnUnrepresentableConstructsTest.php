@@ -63,7 +63,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
             self::assertStringContainsString('createWidget', $message);
             self::assertStringContainsString('/paths/~1widgets/post/requestBody', $message);
             // Remedy.
-            self::assertStringContainsString('paogen emits JSON', $message);
+            self::assertStringContainsString('paogen emits application/json', $message);
         }
     }
 

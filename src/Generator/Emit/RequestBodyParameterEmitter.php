@@ -10,6 +10,7 @@ use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Psr\Http\Message\StreamInterface;
 
 use function assert;
 
@@ -52,7 +53,32 @@ final readonly class RequestBodyParameterEmitter
                 $this->addFormFieldParams($method, $namespace, $body, $bindings);
 
                 return;
+
+            case BodySpec::KIND_TEXT:
+                $method->addParameter('body')->setType('string');
+
+                return;
+
+            case BodySpec::KIND_BINARY:
+                $this->addStreamBodyParam($method, $namespace);
+
+                return;
         }
+    }
+
+    /**
+     * A binary body is typed `Psr\Http\Message\StreamInterface` rather than
+     * `resource`, because PHP has no `resource` type declaration: a resource
+     * body would be `mixed` plus a docblock, and `declared-shapes-become-types`
+     * forbids a declared shape becoming `mixed`. The runtime already requires
+     * `psr/http-message`, so this names an interface the consumer's PSR-17
+     * factory hands them rather than adding a dependency or a wrapper of our
+     * own.
+     */
+    private function addStreamBodyParam(Method $method, PhpNamespace $namespace): void
+    {
+        $namespace->addUse(StreamInterface::class);
+        $method->addParameter('body')->setType(StreamInterface::class);
     }
 
     private function addJsonBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body): void

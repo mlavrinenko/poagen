@@ -16,7 +16,10 @@ use PHPUnit\Framework\TestCase;
  *
  * Uses tests/fixtures/schemas/response-degradation-3.0.yaml with all four
  * unrepresentable responses accepted via Profile::$skip, so the run
- * completes (exit 0) with a non-empty skippedOperations list.
+ * completes (exit 0) with a non-empty skippedOperations list. `getPlainText`
+ * left that set in represent-non-json-request-and-response-bodies — a
+ * `text/*` response over a `type: string` schema is representable — and
+ * `getBinaryBlob` took its place.
  */
 final class SuccessLineSuppressedOnSkipTest extends TestCase
 {
@@ -66,7 +69,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
                 output: {$output},
                 namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\SuccessLineSuppressed',
                 skip: [
-                    'getPlainText' => 'text/plain not decoded',
+                    'getBinaryBlob' => 'binary body, no stream return yet',
                     'getXmlLabel' => 'application/xml not decoded',
                     'getBrokenRef' => 'broken \$ref, fix the schema',
                     'listInlineItems' => 'inline array items unsupported',
