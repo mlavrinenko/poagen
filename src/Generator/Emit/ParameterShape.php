@@ -28,11 +28,15 @@ use function sprintf;
  * The subsets, and why each is what it is:
  *
  *   - `path` — a scalar, several scalars in either spelling, or a `$ref` (or
- *     a union of them) naming a component. A path parameter is interpolated
- *     into the URI, and `Endpoint::path()` takes
- *     `string|int|float|bool|BackedEnum|Stringable`; nothing wider fits, and
- *     the scalar union `scalar-union-path-parameters-resolve-not-refuse`
- *     landed does fit, so it stays resolved rather than refused.
+ *     a union of them) that resolves to a scalar component. `Endpoint::path()`
+ *     takes `string|int|float|bool|BackedEnum|Stringable`; nothing wider
+ *     fits. A `$ref` to an object component does not fit either —
+ *     `TypeResolver` resolves any reference to its FQCN regardless of shape,
+ *     so an unresolved one would otherwise emit a Model class where a value
+ *     belongs (`ref-path-parameter-to-a-non-scalar-component-is-ungated`) —
+ *     so a bare `$ref` and a union of them both resolve through
+ *     {@see resolvedSchema()} and are accepted only when every branch names
+ *     a scalar.
  *   - `query` — a scalar, a `$ref` to one, an array whose items are scalars
  *     (directly, or through a `$ref` — DigitalOcean's `job_names`), or a
  *     `oneOf`/`anyOf` of a bare scalar and an array of one (GitHub's
@@ -99,15 +103,16 @@ final readonly class ParameterShape
     {
         $schema = $param->schema;
 
-        // A `$ref` names a component, and the component is gated where it is
-        // declared — `ComponentCatalog` and `DiscriminatorEnforcer` both run
-        // over it — so the reference resolves to a named type rather than to
-        // the `mixed` this gate exists to stop. What it resolves to is not
-        // read here: `OperationAnalyzer` does not follow schema references,
-        // and a `$ref` to a component that is not scalar is a narrower,
-        // separate finding.
+        // A bare `$ref` resolves through {@see resolvedSchema()}, the same
+        // place `query` and `header` resolve theirs. Only a scalar target is
+        // representable here: `TypeResolver` resolves any reference to its
+        // FQCN regardless of shape, so an unresolved `$ref` to an object
+        // component would otherwise reach it and emit a Model class where a
+        // value belongs.
         if ($schema instanceof Reference) {
-            return true;
+            $target = self::resolvedSchema($schema);
+
+            return $target instanceof Schema && SchemaType::of($target)->isScalar();
         }
 
         if (!$schema instanceof Schema) {
@@ -212,12 +217,15 @@ final readonly class ParameterShape
     }
 
     /**
-     * True when every composition branch is a `$ref`, the shape
+     * True when every composition branch is a `$ref` that resolves to a
+     * scalar component — the shape
      * {@see CompositionResolver::resolveUnion()} turns into a PHP union of
      * the named types — DigitalOcean's `ssh_key_identifier`, an
      * `anyOf: [ssh_key_id, ssh_key_fingerprint]` over two scalar components,
      * which emits as a union of the two scalar value objects T-031 gives
-     * them. Like a bare `$ref`, what each branch names is not read here.
+     * them. Each branch resolves through {@see resolvedSchema()}, same as a
+     * bare `$ref`: a branch naming an object component is refused rather
+     * than reaching `TypeResolver` and emitting a Model class in the union.
      *
      * `allOf` is refused rather than followed: `TypeResolver` does not
      * flatten one in a parameter position — only `ModelPlanner` does, for a
@@ -233,7 +241,15 @@ final readonly class ParameterShape
         $branches = SchemaWalk::compositionBranches($schema);
 
         return $branches !== []
-            && array_all($branches, static fn(Schema|Reference $branch): bool => $branch instanceof Reference);
+            && array_all($branches, static function (Schema|Reference $branch): bool {
+                if (!$branch instanceof Reference) {
+                    return false;
+                }
+
+                $target = self::resolvedSchema($branch);
+
+                return $target instanceof Schema && SchemaType::of($target)->isScalar();
+            });
     }
 
     /**
@@ -259,7 +275,8 @@ final readonly class ParameterShape
     {
         return match ($in) {
             'path' => 'a path parameter is interpolated into the URI, so its schema must name a scalar '
-                . '(string, integer, number or boolean), a union of scalars, or one or more $refs to component schemas',
+                . '(string, integer, number or boolean), a union of scalars, or one or more $refs to scalar '
+                . 'component schemas',
             'query' => 'a query parameter\'s schema must name a scalar, a $ref to a scalar component, an array '
                 . 'whose items are scalars (directly or through a $ref), or a oneOf/anyOf of a scalar and a list '
                 . 'of one',

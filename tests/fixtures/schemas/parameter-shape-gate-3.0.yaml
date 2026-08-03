@@ -37,6 +37,12 @@ info:
                         scalar components — DigitalOcean's
                         `ssh_key_identifier`, an id-or-fingerprint.
                         Representable, and emitted.
+      - getWidgetByRef  ref-path-parameter-to-a-non-scalar-component-is-
+                        ungated: path parameter whose schema is a bare
+                        `$ref` to an object component. Used to pass the
+                        gate unresolved and reach TypeResolver's blind
+                        `$ref`-to-FQCN resolution, emitting a Model class
+                        on Endpoint::path(). Refused by name instead.
       - getWidgetsCommaSeparated
                         array query parameter with `explode: false`
                         declared — `Endpoint::query()` only implements
@@ -161,6 +167,18 @@ paths:
       responses:
         '204':
           description: ok
+  /widgets/by-ref/{widget_ref}:
+    get:
+      operationId: getWidgetByRef
+      parameters:
+        - name: widget_ref
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/WidgetObject'
+      responses:
+        '204':
+          description: ok
   /widgets/comma:
     get:
       operationId: getWidgetsCommaSeparated
@@ -183,3 +201,10 @@ components:
       minimum: 1
     WidgetSlug:
       type: string
+    WidgetObject:
+      type: object
+      properties:
+        kind:
+          type: string
+        value:
+          type: string

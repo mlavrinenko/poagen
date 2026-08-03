@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
+use Mlavrinenko\Paogen\Generator\Emit\ParameterShape;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
@@ -46,6 +47,7 @@ final class ParameterShapeGateTest extends TestCase
         'mergeWidget' => 'allOf path parameter',
         'searchWidgets' => 'inline object query parameter',
         'trackWidget' => 'cookie parameter',
+        'getWidgetByRef' => 'path parameter that is a $ref to a non-scalar component',
         'getWidgetsCommaSeparated' => 'array query parameter with a non-default explode',
     ];
 
@@ -58,13 +60,13 @@ final class ParameterShapeGateTest extends TestCase
     {
         $message = $this->abortMessage();
 
-        self::assertStringContainsString('6 problems found', $message);
+        self::assertStringContainsString('7 problems found', $message);
         self::assertStringContainsString(
             "parameter 'selector' (in: path, type: object) "
                 . 'at /paths/~1widgets~1{selector}/get/parameters/0 '
                 . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
                 . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
-                . 'or one or more $refs to component schemas',
+                . 'or one or more $refs to scalar component schemas',
             $message,
         );
         // The operation it belongs to, so the reader knows what to fix.
@@ -166,6 +168,31 @@ final class ParameterShapeGateTest extends TestCase
 
         self::assertStringContainsString('public function describeWidget(string $xTraceId): void', $sources);
         self::assertStringNotContainsString("'X-Trace-Id' (in: header", $sources);
+    }
+
+    /**
+     * `ref-path-parameter-to-a-non-scalar-component-is-ungated`: a path
+     * parameter whose schema is a bare `$ref` to an object component used
+     * to pass this gate unresolved — `supportsPath()` accepted any
+     * `Reference` without asking what it named — and reach `TypeResolver`'s
+     * blind `$ref`-to-FQCN resolution, emitting a Model class on
+     * `Endpoint::path()`. It now resolves through the same
+     * {@see ParameterShape::resolvedSchema()}
+     * `query` and `header` use, and refuses by name.
+     */
+    public function testARefPathParameterToANonScalarComponentStopsTheRun(): void
+    {
+        $message = $this->abortMessage();
+
+        self::assertStringContainsString(
+            "parameter 'widget_ref' (in: path, type: unspecified) "
+                . 'at /paths/~1widgets~1by-ref~1{widget_ref}/get/parameters/0 '
+                . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
+                . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
+                . 'or one or more $refs to scalar component schemas',
+            $message,
+        );
+        self::assertStringContainsString('GET /widgets/by-ref/{widget_ref} (getWidgetByRef)', $message);
     }
 
     /**
