@@ -5,7 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 6,
   difficulty: 5,
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed on branch non-json-bodies, merged and re-gated on the integrated HEAD after clearing the skip entries it made stale.],
 )
 
 == Summary

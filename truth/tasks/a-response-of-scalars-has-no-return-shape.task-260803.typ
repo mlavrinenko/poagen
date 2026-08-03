@@ -11,7 +11,11 @@
       "synthesise-a-model-for-inline-array-item-responses.task-260802.typ",
     ),
   ),
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed on branch non-json-bodies, merged and re-gated on the integrated HEAD after clearing the skip entries it made stale.],
 )
 
 == Summary
