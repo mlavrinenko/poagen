@@ -14,8 +14,6 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
-use function is_string;
-
 /**
  * Names a model class for every operation payload the document declared inline.
  *
@@ -37,6 +35,15 @@ use function is_string;
  * renames an operation: point the pin at the new identifier and the class name
  * they publish stays put.
  *
+ * An operation the document-wide schema scan already refused (skip-is-the-only-opt-out)
+ * claims nothing here — {@see build()}'s `$preScannedSkips` — so a skip entry
+ * naming that operation drops its payload model along with its method rather
+ * than leaving the model behind as a dangling write. A second operation that
+ * reaches the same schema node (a shared `components.requestBodies` /
+ * `components.responses` entry, most plainly) still claims it on its own,
+ * independently of whichever other operations named it — reachability, not
+ * the skip entry, decides whether the class survives.
+ *
  * @internal
  */
 final readonly class InlinePayloadPlanner
@@ -45,8 +52,11 @@ final readonly class InlinePayloadPlanner
     public const string ROLE_RESPONSE = 'response';
 
     /**
-     * @param array<string,string> $pins        `'<operationId>.request'|'<operationId>.response'` → PHP class name
-     * @param array<string,string> $xmlElements Profile::$xmlElements
+     * @param array<string,string> $pins            `'<operationId>.request'|'<operationId>.response'` → PHP class name
+     * @param array<string,string> $xmlElements     Profile::$xmlElements
+     * @param array<string,string> $preScannedSkips raw operationId → reason, from the document-wide scan that
+     *                                               ran before this planner — an operation named here is refused
+     *                                               regardless of `Profile::$skip`, so it claims no payload model
      */
     public static function build(
         OpenApi $openApi,
@@ -54,6 +64,7 @@ final readonly class InlinePayloadPlanner
         array $pins,
         ModelNameLedger $ledger,
         array $xmlElements = [],
+        array $preScannedSkips = [],
     ): InlinePayloadCatalog {
         $bodies = [];
         $returns = [];
@@ -63,6 +74,10 @@ final readonly class InlinePayloadPlanner
             $rawId = (string) ($operation->operationId ?? '');
 
             if ($rawId === '') {
+                continue;
+            }
+
+            if (isset($preScannedSkips[$rawId])) {
                 continue;
             }
 
@@ -111,7 +126,7 @@ final readonly class InlinePayloadPlanner
             // JSON is preferred where an operation offers both, so an XML body is
             // only reached when it is the only one on offer — which is why
             // pairing the two warns about nothing.
-            return self::planXmlRequest($resolved, $rawId, $base, $pin, $ledger, $roots, $xmlElements);
+            return InlineXmlRequestPlanner::plan($resolved, $rawId, $base, $pin, $ledger, $roots, $xmlElements);
         }
 
         if (self::isSynthesisableObject($schema)) {
@@ -134,54 +149,6 @@ final readonly class InlinePayloadPlanner
         // the client over a body the vendor deliberately left open.
         if (ObjectShape::is($schema)) {
             return BodySpec::jsonMap($schema);
-        }
-
-        return null;
-    }
-
-    /**
-     * An `application/xml` request body, whose payload model is synthesised
-     * exactly as a JSON one is — the schema is declared, so nothing about the
-     * shape is different. Only the element names are, and they come from the
-     * profile because OpenAPI supplies no default for the document root.
-     *
-     * Returns null when the profile named nothing, which the caller reports as an
-     * unrepresentable body rather than emitting XML with an invented root.
-     *
-     * @param array<string,string>   $xmlElements
-     * @param list<SynthesisedModel> $roots
-     */
-    private static function planXmlRequest(
-        RequestBody $body,
-        string $rawId,
-        string $base,
-        ?string $pin,
-        ModelNameLedger $ledger,
-        array &$roots,
-        array $xmlElements,
-    ): ?BodySpec {
-        $xml = $body->content['application/xml'] ?? null;
-        $schema = $xml instanceof MediaType && $xml->schema instanceof Schema ? $xml->schema : null;
-
-        if (!$schema instanceof Schema) {
-            return null;
-        }
-
-        $root = $xmlElements[$rawId] ?? null;
-
-        if (!is_string($root) || $root === '') {
-            return null;
-        }
-
-        if (self::isSynthesisableObject($schema)) {
-            return BodySpec::xml(self::claim($pin ?? $base . 'Request', $schema, $ledger, $roots), $root);
-        }
-
-        $items = self::inlineObjectItemsOf($schema);
-        $item = $xmlElements[$rawId . '.item'] ?? null;
-
-        if ($items instanceof Schema && is_string($item) && $item !== '') {
-            return BodySpec::xmlList(self::claim($pin ?? $base . 'RequestItem', $items, $ledger, $roots), $root, $item);
         }
 
         return null;
@@ -225,9 +192,12 @@ final readonly class InlinePayloadPlanner
     }
 
     /**
+     * Shared with {@see InlineXmlRequestPlanner}, which claims a name off the
+     * same ledger for the one content type this class does not plan itself.
+     *
      * @param list<SynthesisedModel> $roots
      */
-    private static function claim(string $name, Schema $schema, ModelNameLedger $ledger, array &$roots): string
+    public static function claim(string $name, Schema $schema, ModelNameLedger $ledger, array &$roots): string
     {
         $ledger->claim($name, SynthesisedModel::originOf($schema));
         $roots[] = SynthesisedModel::forNode($name, $schema);
@@ -235,16 +205,17 @@ final readonly class InlinePayloadPlanner
         return $name;
     }
 
-    private static function isSynthesisableObject(Schema $schema): bool
+    /** Shared with {@see InlineXmlRequestPlanner}. */
+    public static function isSynthesisableObject(Schema $schema): bool
     {
         return ObjectShape::is($schema) && InlineObjectResolver::isSynthesisable($schema);
     }
 
     /**
      * The item schema of an inline array whose items are themselves an inline
-     * object worth a class, or null.
+     * object worth a class, or null. Shared with {@see InlineXmlRequestPlanner}.
      */
-    private static function inlineObjectItemsOf(Schema $schema): ?Schema
+    public static function inlineObjectItemsOf(Schema $schema): ?Schema
     {
         if (!SchemaType::of($schema)->is('array')) {
             return null;
