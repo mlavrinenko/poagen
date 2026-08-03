@@ -8,6 +8,12 @@
 # the duplication floor a correct emitter can reach is a property of the
 # DOCUMENT, not of the generator.
 #
+# Why this file measures per tree instead of one number across all of them:
+# `truth/decisions/generated-duplication-ceiling-is-per-tree.decision-260803.typ`.
+# The measurements and per-tree commentary below are this file's own; that
+# decision cites them rather than restating them, so a number changing here
+# does not leave a stale copy behind.
+#
 # WHY PER TREE, AND NOT ONE NUMBER FOR ALL FOUR
 #
 # Measured 2026-08-03, the day both large example trees were first committed:

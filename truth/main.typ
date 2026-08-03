@@ -145,6 +145,8 @@
 #include "decisions/a-binary-body-is-a-psr-7-stream.decision-260803.typ"
 #pagebreak()
 #include "decisions/union-pin-is-a-second-opt-out.decision-260803.typ"
+#pagebreak()
+#include "decisions/generated-duplication-ceiling-is-per-tree.decision-260803.typ"
 
 // --- Supplementary artefacts ---
 //
