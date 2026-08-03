@@ -5,11 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 8,
   difficulty: 5,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Split out of resolve-composition-schemas-in-bodies-and-responses. This is the outgoing direction, which needs no branch selection at all and is therefore independent of the union machinery the response direction uses.],
+  )[Landed as 0994ae9, merged and re-gated on the integrated HEAD with check-examples clean on all four trees. Skip list 60 to 43: seventeen entries removed, and ten GitHub refusals rewritten in place to name the real cause — a branch set mixing an object with an array or scalar — instead of the stale "inline (non-`$ref`) schema" text they had carried. Both silent widenings are typed. Every figure in the task reproduced exactly. The allOf task's KIND_JSON_UNION, its parameter emitter and the runtime marshaller were reused unchanged; one new planner exists because a whole-body union folds no accumulated properties into its branches and a branch may be a scalar, neither of which the allOf branch builder expects.],
 )
 
 == Summary
