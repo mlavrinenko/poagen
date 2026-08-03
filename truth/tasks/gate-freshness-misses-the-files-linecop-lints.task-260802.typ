@@ -5,7 +5,11 @@
   tags: ("tooling", "gates"),
   priority: 3,
   difficulty: 2,
-  status: proposed(2026, 8, 2),
+  status: accepted(
+    2026,
+    8,
+    3,
+  )[Scheduled by the owner into this session's second wave. It is also the defect that taxes every session's close-out, since writing a note invalidates a pass the note cannot affect.],
 )
 
 == Summary
