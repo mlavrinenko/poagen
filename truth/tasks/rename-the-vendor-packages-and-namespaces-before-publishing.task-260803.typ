@@ -5,7 +5,11 @@
   tags: ("release", "naming"),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 8, 3),
+  status: accepted(
+    2026,
+    8,
+    3,
+  )[The one open string is confirmed. The owner ruled the vendor is `poagen`, and gave the reason: it is the initialism of PHP OpenAPI Generator. Nothing else blocked this task.],
 )
 
 == Summary
@@ -31,17 +35,29 @@ Target, as the owner gave it:
 - kilbil client: `maximaster/kilbil-client`, in its own repository
   (`extract-the-kilbil-client-to-its-own-repository`)
 
-=== One string to confirm before any rename runs
+=== The one open string, confirmed 2026-08-03
 
-The owner wrote the vendor as `poagen`. This repository, its binary, its
-documentation and its every artifact spell the project `paogen`. Those differ
-by a transposition, and the difference is not recoverable after a Packagist
-name is claimed and a namespace ships in someone's `composer.lock`.
+Asked as a straight choice — `poagen` or `paogen` — and answered `poagen`, with
+the reason: it is the initialism of PHP OpenAPI Generator, taking `p`, `oa` and
+`gen` in that order. So the vendor is `poagen` and it is not a transposition of
+the repository's spelling. It is the intended name.
 
-So the first thing this task does is get a one-word confirmation: `poagen` or
-`paogen`. Do not start the rename without it. Both readings are plausible —
-`poagen` may be a deliberately distinct vendor org — and guessing is the one
-move that cannot be undone cheaply.
+That answer carries further than the string it settles, and the last acceptance
+criterion is where it lands. If `poagen` is what the initialism spells, then
+`paogen` — the repository, the binary, the namespace segment, every artifact in
+`truth/` — is the transposed one. Shipping `poagen/client-generator` whose
+binary is `paogen` and whose namespace is `Paogen\` leaves two spellings of one
+name differing by a swap, in a project whose whole argument is that a declared
+shape is not silently altered.
+
+The owner has not ruled on the tool's own name and this task must not guess it.
+Put the question to them before the rename runs, as a second one-word answer:
+does the binary, the repository and the prose follow the vendor to `poagen`, or
+does the tool stay `paogen` deliberately? Either is defensible — a vendor org
+distinct from the tool it publishes is a normal shape — but it has to be chosen,
+not fall out of a diff. The rename is cheapest to run once, over both strings at
+the same time, which is the practical reason to ask before starting rather than
+after.
 
 === The rename is Rector's job, not a find-and-replace
 
@@ -68,7 +84,8 @@ DI cache belongs to whichever worktree wrote it last.
 == Acceptance criteria
 
 - The vendor spelling is confirmed by the owner in writing, and the
-  confirmation is recorded in this task before any file changes.
+  confirmation is recorded in this task before any file changes. Done:
+  `poagen`, 2026-08-03, recorded above with the owner's reasoning.
 - Both `composer.json` files name the new package, and both autoload maps the
   new namespace. `composer dump-autoload` runs clean and `just check` passes.
 - No occurrence of the old namespace survives outside history and a changelog
@@ -81,7 +98,11 @@ DI cache belongs to whichever worktree wrote it last.
 - `CHANGELOG.md` records the rename as a breaking change with the old and new
   names, so a reader who finds the old one knows where it went.
 - The `paogen` binary's own name is decided explicitly — kept, or renamed with
-  the package — rather than left to fall out of the diff.
+  the package — rather than left to fall out of the diff. This now needs a
+  second one-word answer from the owner, because their reason for `poagen`
+  makes `paogen` the transposition rather than the other way round. Get it
+  before the rename runs; running Rector twice over the same symbols is the
+  avoidable cost.
 
 == Non-goals
 

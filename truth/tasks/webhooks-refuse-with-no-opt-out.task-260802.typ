@@ -5,7 +5,11 @@
   tags: ("generator", "openapi-31", "strictness"),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 8, 2),
+  status: accepted(
+    2026,
+    8,
+    3,
+  )[Ruled by the owner on 2026-08-03: a webhook is skippable. The recommended ruling below is the one they took, so the shape it describes is now the work.],
 )
 
 == Summary
@@ -16,10 +20,27 @@ The gap is the opt-out, not the refusal. Profile skip names an operation under p
 
 No vendored document in examples declares webhooks, so nothing is blocked today. It is filed because the first real 3.1 document that carries them turns a whole-document refusal into a support question with no answer.
 
-=== Recommended ruling, awaiting the owner — make a webhook skippable
+=== Owner ruling, 2026-08-03 — a webhook is skippable
 
-Written so the owner rules yes or no rather than starting from a blank page.
-This task stays `proposed` until they do; nothing below is settled.
+Ruled yes, in the owner's words: skippable, because generating webhooks for a
+client makes no sense. Everything below stands as the argument they accepted.
+
+One line of that ruling needs pinning down, because the reason given reaches
+further than the answer and the wrong reading of it is a reading this project
+has rejected twice in one day. "Generating webhooks makes no sense" is not in
+dispute and never was — emitting an inbound surface is already a non-goal
+below. The question asked was narrower: whether a consumer can opt out of the
+whole-document refusal. Yes is the answer, and it leaves the default alone.
+
+So, precisely: a document declaring webhooks still refuses by default. It
+refuses because paogen will not shrink a document silently, not because a
+webhook is exotic. What changes is that `$skip` gains a key spelling for one,
+so a consumer can write the omission down and get a client from `paths`. An
+opt-out the consumer writes is an omission they asked for; the same omission
+taken by paogen unasked is the ignore-with-a-notice the owner rejected on the
+`anyOf` member and on the scalar-or-list parameter. Skippable is not
+ignored-by-default, and a later session reading only the reason could conflate
+them.
 
 The argument for skippable, in three parts:
 
@@ -38,21 +59,23 @@ The argument for skippable, in three parts:
   write a decision explaining why one construct is exempt from the rule the
   decision states absolutely.
 
-Shape, if the ruling is yes: `$skip` gains a key spelling for a webhook — keyed
-by its key in the `webhooks:` map, distinguishable from an operation id, one
-map not two, because a second opt-out map is exactly what
-`skip-is-the-only-opt-out` forbids and `record-the-union-pin-as-a-second-opt-out`
-is already amending it once for. Skipping every declared webhook generates the
-client from `paths` alone; skipping none, or some, still refuses and names the
-ones left.
+The shape, now settled: `$skip` gains a key spelling for a webhook — keyed by
+its key in the `webhooks:` map, distinguishable from an operation id, one map
+not two, because a second opt-out map is exactly what `skip-is-the-only-opt-out`
+forbids and `record-the-union-pin-as-a-second-opt-out` is already amending it
+once for. Skipping every declared webhook generates the client from `paths`
+alone; skipping none, or some, still refuses and names the ones left.
 
-Shape, if the ruling is no: a decision records that a document carrying
-webhooks is out of scope, says why the inbound surface makes the whole document
-unrepresentable rather than partially so, and names what would reopen it.
+Note the ordering this creates: `record-the-union-pin-as-a-second-opt-out`
+amends `skip-is-the-only-opt-out` to name `$unionPins` as the second and final
+opt-out surface. Widening `$skip`'s key space is not a third one — it is the
+same surface accepting a key it should always have accepted, which is the
+argument for widening rather than adding. Land this after that amendment and
+say so in it, or the amendment reads as closing a door this walks through.
 
 == Acceptance criteria
 
-- Either a webhook can be named in an opt-out the consumer writes, or the refusal is recorded as deliberate in a decision that says why a document carrying webhooks cannot be generated. Argue it; do not leave it undecided.
+- A webhook can be named in an opt-out the consumer writes. The default stays a refusal; only an explicit skip turns it off, and a document whose webhooks are not all skipped still refuses and names the ones left.
 - If webhooks become skippable, the skip entry names the webhook by its key, the run reports what it dropped, and a stale entry is called stale exactly as an operation skip is.
 - A fixture drives a document that declares both paths and webhooks and proves the chosen behaviour end to end.
 
