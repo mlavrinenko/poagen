@@ -5,11 +5,11 @@
   tags: ("truth", "decision", "gates"),
   priority: 5,
   difficulty: 2,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Owed since the duplication tier moved from one corpus-wide threshold to a ceiling per emitted tree on 2026-08-03. The reasoning is written in full; it is the artifact that is missing.],
+  )[Landed as b372888, merged and re-gated on the integrated HEAD. generated-duplication-ceiling-is-per-tree weighs all three options, cites scripts/jscpd-generated-baselines for every figure rather than copying one, and states what a fifth tree does. Marked process-only, which is what licenses naming the baselines file and the recipes directly.],
 )
 
 == Summary

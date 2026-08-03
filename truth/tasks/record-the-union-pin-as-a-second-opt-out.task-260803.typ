@@ -5,11 +5,11 @@
   tags: ("truth", "decision"),
   priority: 6,
   difficulty: 3,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Owed since declare-an-undiscriminated-union-as-raw-data landed on 2026-08-03 and shipped a second opt-out surface without amending the decision that says there is only one. Filed as a task because work with no task behind it is what the trailer rule exists to prevent.],
+  )[Landed as cf9b528, merged and re-gated on the integrated HEAD. union-pin-is-a-second-opt-out amends skip-is-the-only-opt-out through relates-to rather than superseding it, since $skip's own shape never changed and only the word "only" was false. The amended decision keeps its slug and corrects its title. It also sharpens the danger: a pin does not compile clean and fail when called, it answers wrong without failing at all, which is a worse shape than the one that decision was written against.],
 )
 
 == Summary
