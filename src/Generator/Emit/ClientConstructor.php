@@ -34,9 +34,32 @@ use Nette\PhpGenerator\PhpNamespace;
 final readonly class ClientConstructor
 {
     /**
+     * Add the constructor and put it back at the head of the class.
+     *
+     * Which credentials a client takes is only known once its operations have
+     * been emitted — a scheme required solely by an operation that turned out
+     * to be unrepresentable is not one this client needs — so the constructor
+     * is built last and moved first, rather than guessed at before the class
+     * has any methods. The emitted member order is unchanged: constructor,
+     * then operations, then whatever the root adds after them.
+     *
      * @param list<SecurityScheme> $schemes
      */
-    public static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
+    public static function addFirst(ClassType $class, PhpNamespace $namespace, array $schemes): void
+    {
+        self::addTo($class, $namespace, $schemes);
+
+        $methods = $class->getMethods();
+        $constructor = $methods['__construct'];
+        unset($methods['__construct']);
+
+        $class->setMethods([$constructor, ...array_values($methods)]);
+    }
+
+    /**
+     * @param list<SecurityScheme> $schemes
+     */
+    private static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
     {
         $namespace->addUse(TransportInterface::class);
 

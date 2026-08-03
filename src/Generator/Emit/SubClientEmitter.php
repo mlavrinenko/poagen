@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\Operation;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
@@ -43,7 +44,7 @@ final readonly class SubClientEmitter
     /**
      * A tag's sub-client, or null when nothing in the group could be emitted.
      *
-     * @return array{source:string, interface:string, skipped:list<SkippedOperation>}
+     * @return array{source:string, interface:string, skipped:list<SkippedOperation>, operations:list<Operation>}
      */
     public function emit(
         string $clientNamespace,
@@ -51,14 +52,17 @@ final readonly class SubClientEmitter
         Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
-        [$file, $namespace, $class] = $this->openSubClass($clientNamespace, $group->phpName, $group->interfaceName(), $securityCatalog);
+        [$file, $namespace, $class] = $this->openSubClass($clientNamespace, $group->phpName, $group->interfaceName());
         $outcome = $this->addOperations($class, $namespace, $group, $bindings, $securityCatalog);
 
         if ($outcome['emitted'] === 0) {
-            return ['source' => '', 'interface' => '', 'skipped' => $outcome['skipped']];
+            return ['source' => '', 'interface' => '', 'skipped' => $outcome['skipped'], 'operations' => []];
         }
 
+        ClientConstructor::addFirst($class, $namespace, $securityCatalog->constructorSchemesFor($outcome['operations']));
+
         return [
+            'operations' => $outcome['operations'],
             'source' => $this->printer->printFile($file),
             'interface' => $this->printInterface(
                 $clientNamespace,
@@ -99,7 +103,7 @@ final readonly class SubClientEmitter
         string $interfaceName,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
-        $opened = $this->openSubClass($clientNamespace, $className, $interfaceName, $securityCatalog);
+        $opened = $this->openSubClass($clientNamespace, $className, $interfaceName);
         $comment = SecurityDocs::clientComment($securityCatalog);
 
         if ($comment !== '') {
@@ -112,17 +116,14 @@ final readonly class SubClientEmitter
     }
 
     /**
-     * Start a client file: the class, its interface declaration, the shared
-     * constructor and the same-namespace `ApiException` import.
+     * Start a client file: the class and its interface declaration. The
+     * constructor comes later, from {@see ClientConstructor::addFirst}, once
+     * the emitted operations say which credentials this client actually needs.
      *
      * @return array{0:PhpFile, 1:PhpNamespace, 2:ClassType}
      */
-    private function openSubClass(
-        string $clientNamespace,
-        string $className,
-        string $interfaceName,
-        SecuritySchemeCatalog $securityCatalog,
-    ): array {
+    private function openSubClass(string $clientNamespace, string $className, string $interfaceName): array
+    {
         $clientNamespace = trim($clientNamespace, '\\');
 
         $file = new PhpFile();
@@ -131,13 +132,12 @@ final readonly class SubClientEmitter
 
         $class = $namespace->addClass($className)->setFinal()->setReadOnly();
         $class->addImplement($clientNamespace . '\\' . $interfaceName);
-        ClientConstructor::addTo($class, $namespace, $securityCatalog->constructorSchemes());
 
         return [$file, $namespace, $class];
     }
 
     /**
-     * @return array{emitted:int, skipped:list<SkippedOperation>}
+     * @return array{emitted:int, skipped:list<SkippedOperation>, operations:list<Operation>}
      */
     public function addOperations(
         ClassType $class,
@@ -148,6 +148,7 @@ final readonly class SubClientEmitter
     ): array {
         $skipped = [];
         $emitted = 0;
+        $operations = [];
 
         foreach ($group->operations as [$httpMethod, $pathUri, $operation, $pathItem]) {
             $outcome = $this->operationEmitter->emit(
@@ -163,6 +164,11 @@ final readonly class SubClientEmitter
 
             if ($outcome->wasEmitted) {
                 ++$emitted;
+                // Only an operation that reached the class counts towards the
+                // credentials the class asks for. One that turned out to be
+                // unrepresentable sends nothing, so its scheme is not this
+                // client's to demand.
+                $operations[] = $operation;
                 continue;
             }
 
@@ -171,7 +177,7 @@ final readonly class SubClientEmitter
             }
         }
 
-        return ['emitted' => $emitted, 'skipped' => $skipped];
+        return ['emitted' => $emitted, 'skipped' => $skipped, 'operations' => $operations];
     }
 
     /**

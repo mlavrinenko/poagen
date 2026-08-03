@@ -1435,8 +1435,11 @@ final class OperationGeneratorSteps
 
     public function whenConsumerConstructsClientDirectly(): void
     {
-        // Directly: a transport plus the credentials the document declares,
-        // and no root object anywhere in reach.
+        // Directly: a transport plus the credentials this client's OWN
+        // operations send, and no root object anywhere in reach. `getInventory`
+        // requires `api_key` and nothing else, so that is the whole of it —
+        // the `petstore_auth` token the pet endpoints need never reaches here
+        // (sub-client-constructors-take-every-scheme-in-the-document).
         $factory = new Psr17Factory();
 
         $this->subClient = new StoreClient(new HttpTransport(
@@ -1445,7 +1448,7 @@ final class OperationGeneratorSteps
             new RecordingClient(new Response(200, ['Content-Type' => 'application/json'], '{}')),
             $factory,
             $factory,
-        ), 'test-api-key', 'test-access-token');
+        ), 'test-api-key');
     }
 
 
@@ -1461,11 +1464,12 @@ final class OperationGeneratorSteps
             $constructor->getParameters(),
         );
 
-        // The transport plus one string per credential the document declares
-        // — `api_key` and the `petstore_auth` access token. The transport's
-        // type is the interface, never an implementation: injecting a final
-        // class is not substitution.
-        TestCase::assertSame([TransportInterface::class, 'string', 'string'], $types);
+        // The transport plus one string per credential THIS client's own
+        // operations send — `getInventory` requires `api_key` alone, so the
+        // signature names one credential rather than every scheme in the
+        // document. The transport's type is the interface, never an
+        // implementation: injecting a final class is not substitution.
+        TestCase::assertSame([TransportInterface::class, 'string'], $types);
 
         // And never the root: a sub-client that needed `ApiClient` to exist
         // would not be separately injectable, which is the point of the grain.

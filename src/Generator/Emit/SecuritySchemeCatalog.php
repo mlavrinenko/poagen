@@ -52,15 +52,47 @@ final readonly class SecuritySchemeCatalog
     }
 
     /**
-     * The wired schemes present in the schema, in constructor-arg emission
-     * order (by scheme name, ascending). Drives the client constructor's
+     * The wired schemes one client's OWN operations require, in constructor-arg
+     * emission order (by scheme name, ascending). Drives that client's
      * promoted-parameter list.
      *
+     * Scoped rather than document-wide: a sub-client that takes a credential
+     * none of its operations sends asks a consumer for a secret for an audience
+     * it never talks to, and emits a promoted property nothing reads — which is
+     * what `caller-surface-is-injectable` exists to prevent, since an injection
+     * point should describe what the thing actually needs. Ordering comes from
+     * the document-wide list, so scoping never reorders a signature: a scheme
+     * two clients share sits in the same relative place on both.
+     *
+     * The set is built from {@see activeSchemesFor}, so operation-level
+     * `security` resolves against the document-level default exactly as
+     * {@see SecurityRequirements::forOperation} defines it — an override
+     * REPLACES the global rather than adding to it, and `security: []` clears
+     * it. Taking the union of both would put a credential on a client whose
+     * operations each opted out of it.
+     *
+     * @param  list<Operation> $operations the operations actually emitted onto the client
      * @return list<SecurityScheme>
      */
-    public function constructorSchemes(): array
+    public function constructorSchemesFor(array $operations): array
     {
-        return $this->wiredInEmissionOrder;
+        $needed = [];
+
+        foreach ($operations as $operation) {
+            foreach ($this->activeSchemesFor($operation) as $scheme) {
+                $needed[$scheme->name] = true;
+            }
+        }
+
+        $out = [];
+
+        foreach ($this->wiredInEmissionOrder as $scheme) {
+            if (isset($needed[$scheme->name])) {
+                $out[] = $scheme;
+            }
+        }
+
+        return $out;
     }
 
     /**

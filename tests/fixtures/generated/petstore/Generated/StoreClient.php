@@ -21,7 +21,6 @@ final readonly class StoreClient implements StoreClientInterface
     public function __construct(
         private TransportInterface $transport,
         private string $apiKey,
-        private string $petstoreAuth,
     ) {
     }
 

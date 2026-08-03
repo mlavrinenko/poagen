@@ -57,7 +57,7 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function store(): StoreClientInterface
     {
-        return new StoreClient($this->transport, $this->apiKey, $this->petstoreAuth);
+        return new StoreClient($this->transport, $this->apiKey);
     }
 
     /**
@@ -65,6 +65,6 @@ final readonly class ApiClient implements ApiClientInterface
      */
     public function user(): UserClientInterface
     {
-        return new UserClient($this->transport, $this->apiKey, $this->petstoreAuth);
+        return new UserClient($this->transport);
     }
 }
