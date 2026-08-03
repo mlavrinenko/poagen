@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 use function array_values;
 use function implode;
+use function str_starts_with;
 use function substr_count;
 
 /**
@@ -111,6 +112,65 @@ final class NonJsonBodyTest extends TestCase
     public function testOnlyMultipartIsRefused(): void
     {
         self::assertCount(1, $this->plan()->skippedOperations);
+    }
+
+    /**
+     * binary-format-advisory-fires-on-a-format-that-now-drives-behaviour:
+     * `uploadAsset` and `renderPdf` are exactly the schemas {@see
+     * BodyMediaType} reads `format: binary` off to choose a
+     * `StreamInterface` parameter over a JSON model — so the
+     * unrecognised-format advisory, which says "the property keeps its base
+     * type", would be flatly false for either. Both drop out of the count.
+     *
+     * The fixture carries a third `format: binary` — the `file` property
+     * inside `uploadForm`'s refused multipart schema — which nothing reads,
+     * so it stays in the count. Asserting `1 use(s)` here, rather than
+     * asserting the notice is absent, is what proves the two consumed uses
+     * actually dropped out rather than the check never running at all;
+     * {@see testAnUnconsumedBinaryFormatIsStillAdvised()} is the same run,
+     * pointed at that third use.
+     */
+    public function testConsumedBinaryUsesDropOutOfTheAdvisory(): void
+    {
+        $notice = $this->binaryNotice($this->plan()->notices);
+
+        self::assertNotNull($notice, 'the one genuinely unconsumed format: binary use should still be reported');
+        self::assertStringContainsString('1 use(s)', $notice);
+    }
+
+    /**
+     * Same run as {@see testConsumedBinaryUsesDropOutOfTheAdvisory()}:
+     * `uploadForm` is refused wholesale for its multipart shape, so its
+     * `file` property's `format: binary` never reaches {@see BodyMediaType}
+     * at all — nothing acts on it, and the advisory is exactly right to
+     * still name it. Proving both in the one document is the point: the fix
+     * tells occurrences of the same format apart by whether the generator
+     * consumes each one, not by silencing the string `'binary'` everywhere
+     * it appears.
+     */
+    public function testAnUnconsumedBinaryFormatIsStillAdvised(): void
+    {
+        $notice = $this->binaryNotice($this->plan()->notices);
+
+        self::assertNotNull($notice);
+        self::assertStringContainsString(
+            '/paths/~1form/post/requestBody/content/multipart~1form-data/schema/properties/file',
+            $notice,
+        );
+    }
+
+    /**
+     * @param list<string> $notices
+     */
+    private function binaryNotice(array $notices): ?string
+    {
+        foreach ($notices as $notice) {
+            if (str_starts_with($notice, "format 'binary' ")) {
+                return $notice;
+            }
+        }
+
+        return null;
     }
 
     private function sources(): string
