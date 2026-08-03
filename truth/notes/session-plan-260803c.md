@@ -106,34 +106,79 @@ Not the same and deliberately not filed:
 
 29 non-terminal tasks.
 
-## Two rulings written in, reversible in one edit each
+## Two rulings, proposed then reversed by the owner the same day
 
-Both decide shipping behaviour and both are in the task that needs them.
+Both were drafted here as ignore-with-a-notice or normalise-it-away, and the
+owner rejected both on one principle: paogen fails when it cannot generate
+something, and the consumer decides whether to skip. Recorded because the
+reasoning that lost is the reasoning a future session will re-derive.
 
-- **A validation constraint is not a shape.** An `allOf` member that is an
-  `anyOf` of required-only schemas ("at least one of `inbound_rules` /
-  `outbound_rules`", four DigitalOcean operations) contributes nothing and is
-  reported on the notice channel. paogen already ignores `minLength`,
-  `pattern` and every other assertion keyword; refusing here would drop
-  `firewalls_create` and `firewalls_update` to enforce a rule the codebase
-  enforces nowhere else.
-- **A scalar-or-list query parameter is emitted as the list.**
-  `string | list<string>` under `style: form, explode: true` serialises a
-  one-element list to the same bytes as the scalar, so the union buys a second
-  spelling of one wire form and costs a narrowing at every call site. Nine
+- **An `anyOf` member of an `allOf` becomes a union of branch models.** The
+  draft dropped the constraint with a notice, arguing that paogen ignores
+  `minLength` and `pattern` too. It is not a choice between ignoring and
+  refusing: `anyOf` is a union and a union is expressible. `firewalls_create`
+  emits `FirewallsCreateInboundRules|FirewallsCreateOutboundRules`, both
+  branches carrying the full merged shape and one extra required field, names
+  taken from the `title` each branch declares. The constraint moves into the
+  type and nothing is lost. Where a branch set cannot be a union, the operation
+  refuses and the consumer skips it.
+- **A scalar-or-list query parameter keeps both arms.** The draft normalised
+  `string | list<string>` to a plain list, since a one-element list is the same
+  bytes under `style: form`. The rule instead is: emit the widest native type
+  the branches share and let the PHPStan annotation carry what native PHP
+  loses. So `string|array|null` with `@param string|list<string>|null`. Nine
   GitHub operations.
+
+Also recorded, so it is not re-derived: **`allOf` is not an intersection
+type.** An `allOf` payload is one flat JSON object carrying the union of its
+members' properties, not a value that is two things at once. `X&Y` would need
+paogen to emit a property-declaring interface per component, since an
+intersection of two classes is uninhabitable — the only model interfaces it
+emits today are the empty union markers `UnionInterfaceEmitter` writes, which
+constrain no shape. Non-goal, with the reasoning, in the allOf task.
+
+## Release track, settled 2026-08-03 and moved to the end
+
+The owner ruled the packages publish under a new vendor with the PHP
+namespaces renamed to match:
+
+| today | published as |
+|---|---|
+| `mlavrinenko/paogen` / `Mlavrinenko\Paogen\` | `poagen/client-generator` |
+| `mlavrinenko/paogen-runtime` / `Mlavrinenko\Paogen\Runtime\` | `poagen/client-runtime` |
+| `examples/kilbil` | `maximaster/kilbil-client` |
+
+The generator ships too, reversing the earlier deferral. Rector does the
+rename — `RenameClassRector`, never a textual replace, because docblocks and
+`@param` annotations carry the same symbols. The whole track is now the LAST
+session's work, not this one's, and `publish-the-runtime-package-to-packagist`
+depends on `rename-the-vendor-packages-and-namespaces-before-publishing`.
+
+**One string is unconfirmed and the rename task blocks on it.** The owner wrote
+the vendor as `poagen`; this repository spells the project `paogen` everywhere.
+They differ by a transposition, and a claimed Packagist name plus a namespace
+in someone's lockfile is not recoverable. Get the one-word answer first.
+
+## A rule that came out of this, worth keeping
+
+A task that fixes or enhances another project is filed in that project's
+tracker, not in the one that suffers from it. `speconaut-mindtape-skew-guard`
+named no paogen file at all; it is now speconaut's
+`keep-the-embedded-mindtape-in-step-with-the-installed-mt` and retired here.
+`speconaut-mindtape-config-skew` records where it went. This belongs in
+`AGENT.md` once `agent-guide-is-nine-lines-from-its-own-cap` makes room.
 
 ## What the owner still owes a decision on
 
 - **Webhooks** — skippable, or a decision that a document carrying them cannot
-  be generated. Recommendation and its argument are in the task.
-- **The release track.** `publish-the-runtime-package-to-packagist` and
-  `extract-the-kilbil-client-to-its-own-repository` need a Packagist account
-  and a new public GitHub repository. No agent can do either; they are owner
-  actions with an agent-shaped preparation step at most.
-- **`speconaut-mindtape-skew-guard`** — every file it names is in the speconaut
-  repository. It is tracked here because paogen is what breaks, but it cannot
-  be worked here. Either move it or accept it as a permanent tracking stub.
+  be generated. The refusal's own argument is in
+  `UnsupportedKeywordScanner::webhookFailures()`: generating the `paths` half
+  and saying nothing is an omission nobody asked for, and `$skip` names
+  operations under `paths` and components under `components`, so there is
+  nothing for a consumer to name. That argument is exactly right about the
+  default and says nothing about whether the name should exist. Nothing about
+  a webhook makes the `paths` unrepresentable. Recommendation and its full
+  argument are in the task; it stays `proposed` until ruled.
 
 ## Next session
 
@@ -169,6 +214,14 @@ per operation universal — and both rewrite every generated method. They should
 land together, after the skip list is at zero, so the trees regenerate once
 over the final surface rather than three times. The envelope is difficulty 8
 and is not Sonnet work.
+
+**The release track is the last session, by the owner's instruction.** Rename,
+then the runtime to Packagist, then the generator, then the kilbil extraction,
+then the v0.1 criteria. In that order, because each one's mistake is cheaper to
+find before the next repeats it. The rename is largely mechanical once its one
+open string is confirmed — Rector plus two `composer.json` autoload maps plus a
+full regeneration — so it suits a cheap model; the publishing steps are the
+owner's, since they need a Packagist account and a new public repository.
 
 ## Standing hazards
 
