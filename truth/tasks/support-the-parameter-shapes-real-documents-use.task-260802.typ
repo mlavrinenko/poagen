@@ -51,24 +51,37 @@ on the client, and these twenty-three do not. None of them is an edge case: a
 scalar-or-list query parameter is how a vendor lets you filter by one thing or
 several.
 
-=== Ruling: a scalar-or-list query parameter is emitted as a list
+=== Ruling: a scalar-or-list query parameter keeps both, native union plus a
+PHPStan annotation
 
-Written here rather than left open, because it decides nine operations and a
-consumer-visible signature.
+Owner ruling, 2026-08-03, reversing what this task said when it was filed. An
+earlier draft normalised the union away to a plain list, on the argument that a
+one-element list serialises to the same bytes as the scalar. The owner rejected
+that: paogen supports what PHPStan supports, and the annotation carries the
+detail the native type cannot.
 
-`string | list<string>` under `style: form, explode: true` — which is what all
-nine declare, and the OpenAPI default anyway — serialises a one-element list to
-exactly the bytes the scalar branch produces: `?fields=x`. The union therefore
-buys the consumer a second spelling of one wire form, and costs them a
-`is_string($fields) ? [$fields] : $fields` at every call site.
+So both branches survive. The native type is the union the engine can express;
+the docblock says what it actually is:
 
-So the emitted parameter is the list: `?array $fields = null` with
-`@param list<string>|null`. Nothing is lost on the wire and the surface has one
-type instead of two.
+```php
+/**
+ * @param string|list<string>|null $fields
+ */
+public function projectsListItemsForOrg(
+    string $org,
+    string|array|null $fields = null,
+): ProjectsListItemsForOrgResponse
+```
 
-This applies only where the non-array branch's type matches the array's item
-type. A `oneOf` of `string` and `list<int>` is not a widening of one shape and
-still refuses.
+`string|array` is as far as native PHP goes — `array` cannot be parameterised —
+and `string|list<string>` is what the document declared. Both are emitted. This
+is the same division of labour the generator already uses for a list body,
+where the parameter is `array` and the `@param list<User>` carries the element
+type; the difference is only that the native side is a union here.
+
+The rule generalises past these nine: emit the widest native type the branches
+share, and let the annotation carry every detail native PHP loses. A branch set
+whose native union cannot be spelled at all still refuses.
 
 == Acceptance criteria
 
@@ -82,9 +95,13 @@ still refuses.
 - DigitalOcean's `job_names` emits as a typed list of strings, serialised per
   its declared `style: form` / `explode: true`. Where a document declares
   neither, the OpenAPI defaults apply and the run says which it used.
-- A `oneOf`/`anyOf` of a scalar and a list of that same scalar emits as the
-  list, per the ruling above. A `oneOf` mixing item types still refuses by
-  name.
+- A `oneOf`/`anyOf` of a scalar and a list emits the native union plus the
+  precise PHPStan annotation, per the ruling above. Serialisation handles both
+  arms: a scalar sends one key, a list sends the repeated key its `style` and
+  `explode` call for. A fixture asserts the wire form of each arm, since they
+  differ for every value except a one-element list.
+- The generated tier's PHPStan config accepts the annotation without
+  suppression, and a call site passing either arm narrows cleanly.
 - A required header parameter is emitted as a required method argument, ahead
   of the optional ones, in the order the emitter already uses for required
   query parameters.

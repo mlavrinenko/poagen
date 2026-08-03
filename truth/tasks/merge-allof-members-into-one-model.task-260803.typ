@@ -103,42 +103,100 @@ are wrong with it for this purpose, each measured against the corpus:
   body parameter is left whose schema declares an `allOf`.
 - The eighteen DigitalOcean skip entries and GitHub's
   `apps/create-from-manifest` are removed from the profiles, not left stale.
-- A member that is a `oneOf`/`anyOf` of required-only schemas contributes
-  nothing to the shape and is reported once per site on the notice channel —
-  the stderr one `report-unrecognised-formats` established, never moving the
-  exit status. Four DigitalOcean operations carry it (`firewalls_create`,
-  `firewalls_update`, `firewalls_add_rules`, `firewalls_delete_rules`, all
-  spelling "at least one of `inbound_rules`/`outbound_rules`"), and PHP has no
-  type for that constraint. See the ruling below.
-- A `required` name that no member declares as a property is reported on the
-  same channel and otherwise ignored. `uptime_create_check` requires `method`
-  and no member declares it; that is the vendor's defect, and refusing an
-  operation over it would punish the consumer for it.
+- A member that is a `oneOf`/`anyOf` of required-only schemas emits one
+  synthesised model per branch — each the full merged shape, each carrying
+  that branch's extra requirements — and the body parameter is the PHP union
+  across them. Nothing is ignored and nothing is refused. See the ruling
+  below, which walks `firewalls_create` in full.
+- A branch set that cannot be expressed that way refuses the operation by
+  name, naming the member and the schema pointer. It is never ignored with a
+  notice: a constraint the emitter drops silently is the widening this task
+  exists to remove, and `Profile::$skip` is where a consumer says they do not
+  need the operation.
+- A `required` name that no member declares as a property refuses the run,
+  naming the operation, the name and the members searched.
+  `uptime_create_check` requires `method` and no member declares it. That is
+  the vendor's defect and the honest response is to stop and say so — the
+  consumer can skip the operation, and a skip they wrote is an omission they
+  asked for. Silently emitting a model missing a required field is not.
 - Every committed golden and example tree regenerates, and the diff on the
   nine widened operations is reviewed rather than accepted wholesale — it is
   the only place where output that already existed changes shape.
 
-=== Ruling: a validation constraint is not a shape
+=== Ruling: an `anyOf` member becomes a union of branches, not a dropped
+constraint
 
-Written here rather than left open, because it decides four shipping
-endpoints. paogen types what a document declares; it is not a validator. It
-already ignores `minLength`, `maximum`, `pattern` and every other assertion
-keyword, and an `anyOf` of required-only schemas is the same kind of thing —
-"at least one of these two" is a constraint on a value, not a statement about
-its shape. So it is ignored, loudly, on the notice channel.
+Owner ruling, 2026-08-03, reversing what this task said when it was filed.
+An earlier draft had the member ignored with a notice, on the argument that
+paogen ignores `minLength` and `pattern` too. The owner rejected that: paogen
+fails when it cannot generate something, and the consumer decides whether to
+skip. An ignored constraint is a silent widening, which is the very defect the
+rest of this task removes.
 
-Refusing instead would remove `firewalls_create` and `firewalls_update` from
-the client to enforce a rule paogen was never going to enforce anywhere else,
-which trades a whole endpoint for a consistency the codebase does not have.
+It also turns out not to be a choice between ignoring and refusing.
+`firewalls_create` is the whole argument, in the document's own words:
 
-Reversing this is one criterion's worth of work if the owner disagrees.
+```yaml
+allOf:
+  - $ref: '#/components/schemas/firewall'   # itself an allOf of two
+  - required: [name]
+  - anyOf:
+      - title: Inbound Rules
+        required: [inbound_rules]
+      - title: Outbound Rules
+        required: [outbound_rules]
+```
+
+`anyOf` is a union, and a union is expressible. Both branches declare only a
+`required` list, and both properties are already declared by `firewall`, so
+each branch is the same merged shape with one more field mandatory. Two
+synthesised models, and a native PHP union across them:
+
+```php
+public function firewallsCreate(
+    FirewallsCreateInboundRules|FirewallsCreateOutboundRules $body,
+): FirewallResponse
+```
+
+The constraint is now in the type. A caller who wants both sets of rules picks
+either branch and fills the other property, because neither branch forbids it —
+which is exactly what `anyOf` means, as against `oneOf`. Nothing is dropped,
+nothing is refused, and no PHPStan annotation is needed because native PHP
+carries it.
+
+The branch names come from the `title` each branch declares, through the same
+`<Component><TitleOrIndex>` derivation `UnionInterfaceEmitter` and the inline
+planner already use for an inline union branch. All four DigitalOcean sites
+declare titles.
+
+Where a branch set cannot be expressed as a union — branches that are not all
+object shapes, or a member whose branches conflict — the operation refuses by
+name and the consumer skips it if they do not need it.
+
+=== Non-ruling, recorded so it is not re-derived: `allOf` is not `X&Y`
+
+An intersection type is the other reading of `allOf` and it is the wrong one
+here. An `allOf` payload is one flat JSON object carrying the union of its
+members' properties. There is no value that "is both a `VpcUpdatable` and a
+`VpcDefault`" — there is one object with both sets of fields, which is what the
+merge emits.
+
+`X&Y` would additionally require paogen to emit a property-declaring interface
+per component and a class implementing all of them, since an intersection of
+two classes is uninhabitable. The only interfaces paogen emits for models today
+are the empty union markers `UnionInterfaceEmitter` writes, which declare no
+properties and so constrain no shape. Emitting shape-bearing interfaces is a
+design change that collides with `no-inheritance-no-protected-regions` and
+roughly doubles the emitted class count; it is not part of this task and
+nothing in the corpus asks for it.
 
 == Non-goals
 
-- `oneOf`/`anyOf` in the body or response position. Those are the three
-  sibling tasks this one was split from, and they land after it.
+- `oneOf`/`anyOf` as the whole body or response schema. Those are the three
+  sibling tasks this one was split from, and they land after it. This task
+  covers only a `oneOf`/`anyOf` appearing as a member of an `allOf`.
 - `not`, which no vendored document uses and which has no PHP type.
-- Validating an `anyOf` of required-only members at run time. See the ruling.
+- Intersection types. See the non-ruling above.
 - Reusing a referenced component as the emitted type instead of synthesising a
   new class. `allOf: [$ref Foo] + required: [x]` is not `Foo` — its required
   set differs — so a new class is the honest answer, and that is what the
