@@ -5,11 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 8,
   difficulty: 5,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Split out of resolve-composition-schemas-in-bodies-and-responses, which bundled four independent mechanisms behind one count. This is the first of the four and the only one that also fixes a defect shipping today.],
+  )[Landed as 2f0b124, merged and re-gated on the integrated HEAD with check-examples clean on all four trees. Skip list 78 to 60. All eighteen DigitalOcean entries and GitHub's apps/create-from-manifest are gone; one new entry replaces them, uptime_create_check, which requires a property no member declares — the vendor's defect, refused by name rather than emitted short a required field. The four firewalls sites emit a native PHP union across synthesised branch models, so the anyOf constraint moved into the type. Six named components got a bonus correctness fix: a required property beside allOf that the old one-level flatten had silently demoted to optional.],
 )
 
 == Summary
