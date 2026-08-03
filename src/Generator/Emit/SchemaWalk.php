@@ -13,6 +13,7 @@ use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 
 use function is_array;
+use function is_string;
 
 /**
  * Where a document's schema nodes are, and what hangs below each one.
@@ -74,11 +75,41 @@ final readonly class SchemaWalk
     public static function operationRoots(Operation $operation): array
     {
         $out = [];
+
+        foreach (self::bodyContentSchemas($operation) as [, $schema]) {
+            $out[] = $schema;
+        }
+
+        foreach ($operation->parameters ?? [] as $parameter) {
+            if (!$parameter instanceof Reference && $parameter->schema instanceof Schema) {
+                $out[] = $parameter->schema;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Every schema a request body or a response carries directly under a
+     * content-type key, paired with that key — the exact (media type,
+     * schema) pair {@see BodyMediaType} classifies. Parameters are not
+     * included: nothing there is ever read as a body payload.
+     *
+     * References are not followed here either, same as everywhere else in
+     * this class — a `$ref` request/response body never reaches {@see
+     * BodyMediaType} as a Schema (its callers all guard `instanceof
+     * Schema`), so it is right that this does not manufacture one.
+     *
+     * @return list<array{string, Schema}>
+     */
+    public static function bodyContentSchemas(Operation $operation): array
+    {
+        $out = [];
         $body = RequestBodyAnalyzer::resolveBody($operation->requestBody);
 
-        foreach ($body instanceof RequestBody ? $body->content : [] as $media) {
-            if ($media->schema instanceof Schema) {
-                $out[] = $media->schema;
+        foreach ($body instanceof RequestBody ? $body->content : [] as $mediaType => $media) {
+            if (is_string($mediaType) && $media->schema instanceof Schema) {
+                $out[] = [$mediaType, $media->schema];
             }
         }
 
@@ -89,16 +120,35 @@ final readonly class SchemaWalk
                 continue;
             }
 
-            foreach ($response->content as $media) {
-                if ($media->schema instanceof Schema) {
-                    $out[] = $media->schema;
+            foreach ($response->content as $mediaType => $media) {
+                if (is_string($mediaType) && $media->schema instanceof Schema) {
+                    $out[] = [$mediaType, $media->schema];
                 }
             }
         }
 
-        foreach ($operation->parameters ?? [] as $parameter) {
-            if (!$parameter instanceof Reference && $parameter->schema instanceof Schema) {
-                $out[] = $parameter->schema;
+        return $out;
+    }
+
+    /**
+     * Every body/response content schema in the whole document, paired with
+     * its media type — {@see bodyContentSchemas()} run over every operation,
+     * for {@see FormatAdvisor} to check against {@see BodyMediaType} without
+     * re-deriving which schemas request/response bodies carry.
+     *
+     * @return list<array{string, Schema}>
+     */
+    public static function bodySchemas(OpenApi $openApi): array
+    {
+        $out = [];
+
+        foreach ($openApi->paths ?? [] as $pathItem) {
+            if (!$pathItem instanceof PathItem) {
+                continue;
+            }
+
+            foreach ($pathItem->getOperations() as $operation) {
+                $out = [...$out, ...self::bodyContentSchemas($operation)];
             }
         }
 
