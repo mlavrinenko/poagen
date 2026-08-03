@@ -65,6 +65,8 @@ use Acme\GitHub\Generated\Model\OrgsCreateInvitationRequest;
 use Acme\GitHub\Generated\Model\OrgsCreateWebhookRequest;
 use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequest;
 use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequest;
+use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch1;
+use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch2;
 use Acme\GitHub\Generated\Model\OrgsEnableOrDisableSecurityProductOnAllOrgReposRequest;
 use Acme\GitHub\Generated\Model\OrgsGetImmutableReleasesSettingsRepositoriesResponse;
 use Acme\GitHub\Generated\Model\OrgsListAppInstallationsResponse;
@@ -151,10 +153,10 @@ interface OrgsClientInterface
         ?string $after = null,
     ): OrgsListAttestationsBulkResponse;
 
-    /**
-     * @param array<string, mixed> $body
-     */
-    public function orgsDeleteAttestationsBulk(string $org, array $body): void;
+    public function orgsDeleteAttestationsBulk(
+        string $org,
+        OrgsDeleteAttestationsBulkBranch1|OrgsDeleteAttestationsBulkBranch2 $body,
+    ): void;
 
     public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): void;
 

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\CertificateRequestCustom;
+use Acme\DigitalOcean\Generated\Model\CertificateRequestLetsEncrypt;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -34,6 +36,19 @@ final readonly class CertificatesClient implements CertificatesClientInterface
                 ->query('page', $page)
                 ->query('name', $name)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `certificate:create`.
+     */
+    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/certificates')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DropletsListType;
+use Acme\DigitalOcean\Generated\Model\DropletMultiCreate;
+use Acme\DigitalOcean\Generated\Model\DropletSingleCreate;
 use Acme\DigitalOcean\Generated\Model\SelectiveDestroyAssociatedResource;
 
 /**
@@ -33,6 +35,11 @@ interface DropletsClientInterface
         ?string $name = null,
         ?DropletsListType $type = null,
     ): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:create`.
+     */
+    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.

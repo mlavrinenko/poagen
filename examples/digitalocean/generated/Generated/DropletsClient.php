@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DropletsListType;
+use Acme\DigitalOcean\Generated\Model\DropletMultiCreate;
+use Acme\DigitalOcean\Generated\Model\DropletSingleCreate;
 use Acme\DigitalOcean\Generated\Model\SelectiveDestroyAssociatedResource;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -43,6 +45,19 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('name', $name)
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:create`.
+     */
+    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/droplets')
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

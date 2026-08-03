@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\CertificateRequestCustom;
+use Acme\DigitalOcean\Generated\Model\CertificateRequestLetsEncrypt;
+
 /**
  * The contract for the `Certificates` endpoints.
  *
@@ -24,6 +27,11 @@ interface CertificatesClientInterface
      * Requires `bearer_auth` scopes: `certificate:read`.
      */
     public function certificatesList(?int $perPage = null, ?int $page = null, ?string $name = null): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `certificate:create`.
+     */
+    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `certificate:read`.

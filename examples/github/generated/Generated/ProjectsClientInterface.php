@@ -11,6 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch1;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch2;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch3;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch4;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch1;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch2;
+use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch3;
 use Acme\GitHub\Generated\Model\ProjectsAddItemForOrgRequest;
 use Acme\GitHub\Generated\Model\ProjectsAddItemForUserRequest;
 use Acme\GitHub\Generated\Model\ProjectsCreateDraftItemForAuthenticatedUserRequest;
@@ -63,6 +70,12 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
     ): array;
+
+    public function projectsAddFieldForOrg(
+        int $projectNumber,
+        string $org,
+        ProjectsAddFieldForOrgBranch1|ProjectsAddFieldForOrgBranch2|ProjectsAddFieldForOrgBranch3|ProjectsAddFieldForOrgBranch4 $body,
+    ): ProjectsV2Field;
 
     public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): ProjectsV2Field;
 
@@ -122,6 +135,12 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
     ): array;
+
+    public function projectsAddFieldForUser(
+        string $username,
+        int $projectNumber,
+        ProjectsAddFieldForUserBranch1|ProjectsAddFieldForUserBranch2|ProjectsAddFieldForUserBranch3 $body,
+    ): ProjectsV2Field;
 
     public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): ProjectsV2Field;
 

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ImageActionBase;
+use Acme\DigitalOcean\Generated\Model\ImageActionTransfer;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -32,6 +34,20 @@ final readonly class ImageActionsClient implements ImageActionsClientInterface
             Endpoint::get('/v2/images/{image_id}/actions')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `image:update`.
+     */
+    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/images/{image_id}/actions')
+                ->path('image_id', $imageId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

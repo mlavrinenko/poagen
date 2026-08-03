@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VolumesExt4;
+use Acme\DigitalOcean\Generated\Model\VolumesXfs;
 
 /**
  * The contract for the `Block Storage` endpoints.
@@ -22,6 +24,11 @@ use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
  */
 interface BlockStorageClientInterface
 {
+    /**
+     * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
+     */
+    public function volumesCreate(VolumesExt4|VolumesXfs $body): void;
+
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.
      */

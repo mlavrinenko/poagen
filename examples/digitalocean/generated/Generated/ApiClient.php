@@ -274,6 +274,14 @@ final readonly class ApiClient implements ApiClientInterface
     }
 
     /**
+     * The `NFS Actions` endpoints.
+     */
+    public function nfsActions(): NfsActionsClientInterface
+    {
+        return new NfsActionsClient($this->transport, $this->bearerAuth);
+    }
+
+    /**
      * The `Partner Network Connect` endpoints.
      */
     public function partnerNetworkConnect(): PartnerNetworkConnectClientInterface
@@ -319,6 +327,14 @@ final readonly class ApiClient implements ApiClientInterface
     public function reservedIps(): ReservedIpsClientInterface
     {
         return new ReservedIpsClient($this->transport, $this->bearerAuth);
+    }
+
+    /**
+     * The `Reserved IPv6 Actions` endpoints.
+     */
+    public function reservedIpv6Actions(): ReservedIpv6ActionsClientInterface
+    {
+        return new ReservedIpv6ActionsClient($this->transport, $this->bearerAuth);
     }
 
     /**

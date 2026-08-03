@@ -15,6 +15,8 @@ use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
 use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequest;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequest;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest;
@@ -198,6 +200,10 @@ interface CodespacesClientInterface
         ?int $page = null,
         ?int $repositoryId = null,
     ): CodespacesListForAuthenticatedUserResponse;
+
+    public function codespacesCreateForAuthenticatedUser(
+        CodespacesCreateForAuthenticatedUserBranch1|CodespacesCreateForAuthenticatedUserBranch2 $body,
+    ): Codespace;
 
     public function codespacesListSecretsForAuthenticatedUser(
         ?int $perPage = null,

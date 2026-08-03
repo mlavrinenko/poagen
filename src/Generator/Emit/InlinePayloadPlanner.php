@@ -7,7 +7,6 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
-use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
@@ -63,6 +62,7 @@ final readonly class InlinePayloadPlanner
     public static function build(
         OpenApi $openApi,
         NameRegistry $operationIdRegistry,
+        NameRegistry $registry,
         array $pins,
         ModelNameLedger $ledger,
         array $xmlElements = [],
@@ -87,7 +87,7 @@ final readonly class InlinePayloadPlanner
 
             $base = ucfirst($operationIdRegistry->resolve($rawId, new NormalisationContext(SymbolKind::OperationId)));
 
-            $body = self::planRequest($operation, $rawId, $base, $pins, $ledger, $roots, $openApi, $requestRefusals, $xmlElements);
+            $body = RequestBodyPlanner::plan($operation, $rawId, $base, $pins, $registry, $ledger, $roots, $openApi, $requestRefusals, $xmlElements);
 
             if ($body instanceof BodySpec) {
                 $bodies[$rawId] = $body;
@@ -106,77 +106,7 @@ final readonly class InlinePayloadPlanner
     /**
      * @param array<string,string>   $pins
      * @param list<SynthesisedModel> $roots
-     * @param array<string,string>   $refusals    keyed by raw operationId — an `allOf`/`anyOf` merge's
-     *                                             specific reason, out-parameter for {@see build()}
-     * @param array<string,string>   $xmlElements
-     */
-    private static function planRequest(
-        Operation $operation,
-        string $rawId,
-        string $base,
-        array $pins,
-        ModelNameLedger $ledger,
-        array &$roots,
-        OpenApi $openApi,
-        array &$refusals,
-        array $xmlElements = [],
-    ): ?BodySpec {
-        $resolved = RequestBodyAnalyzer::resolveBody($operation->requestBody);
-
-        if (!$resolved instanceof RequestBody) {
-            return null;
-        }
-
-        $pin = $pins[$rawId . '.' . self::ROLE_REQUEST] ?? null;
-        $schema = self::jsonSchemaOf($resolved->content);
-
-        if (!$schema instanceof Schema) {
-            // JSON is preferred where an operation offers both, so an XML body is
-            // only reached when it is the only one on offer — which is why
-            // pairing the two warns about nothing.
-            return InlineXmlRequestPlanner::plan($resolved, $rawId, $base, $pin, $ledger, $roots, $xmlElements);
-        }
-
-        if (is_array($schema->allOf) && $schema->allOf !== []) {
-            $refusal = null;
-            $body = InlineAllOfPlanner::planRequest($schema, $base, $pin, $openApi, $ledger, $roots, $refusal);
-
-            if ($refusal !== null) {
-                $refusals[$rawId] = $refusal;
-            }
-
-            return $body;
-        }
-
-        if (self::isSynthesisableObject($schema)) {
-            $name = self::claim($pin ?? $base . 'Request', $schema, $ledger, $roots);
-
-            return BodySpec::json($name);
-        }
-
-        $items = self::inlineObjectItemsOf($schema);
-
-        if ($items instanceof Schema) {
-            $name = self::claim($pin ?? $base . 'RequestItem', $items, $ledger, $roots);
-
-            return BodySpec::jsonList($name);
-        }
-
-        // An inline object with no declared properties to synthesise a class
-        // from. The map is what the schema says, so it is what the caller
-        // passes; dropping the operation for want of a class name would shrink
-        // the client over a body the vendor deliberately left open.
-        if (ObjectShape::is($schema)) {
-            return BodySpec::jsonMap($schema);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array<string,string>   $pins
-     * @param list<SynthesisedModel> $roots
-     * @param array<string,string>   $refusals keyed by raw operationId, mirrors {@see planRequest()}'s
+     * @param array<string,string>   $refusals keyed by raw operationId, mirrors {@see RequestBodyPlanner::plan()}'s
      */
     private static function planResponse(
         Operation $operation,
@@ -267,9 +197,11 @@ final readonly class InlinePayloadPlanner
     }
 
     /**
+     * Shared with {@see RequestBodyPlanner}.
+     *
      * @param array<MediaType> $content cebe types the map's keys as `int|string`
      */
-    private static function jsonSchemaOf(array $content): ?Schema
+    public static function jsonSchemaOf(array $content): ?Schema
     {
         $json = $content['application/json'] ?? null;
 

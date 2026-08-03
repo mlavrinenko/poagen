@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\FloatingIpActionAssign;
+use Acme\DigitalOcean\Generated\Model\FloatingIpActionUnassign;
+
 /**
  * The contract for the `Floating IP Actions` endpoints.
  *
@@ -24,6 +27,14 @@ interface FloatingIpActionsClientInterface
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
      */
     public function floatingIpsActionList(string $floatingIp): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     */
+    public function floatingIpsActionPost(
+        string $floatingIp,
+        FloatingIpActionUnassign|FloatingIpActionAssign $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.

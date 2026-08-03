@@ -120,6 +120,8 @@ use Acme\GitHub\Generated\Model\OidcCustomSubRepo;
 use Acme\GitHub\Generated\Model\OrganizationActionsSecret;
 use Acme\GitHub\Generated\Model\OrganizationActionsVariable;
 use Acme\GitHub\Generated\Model\PendingDeployment;
+use Acme\GitHub\Generated\Model\ReviewCustomGatesCommentRequired;
+use Acme\GitHub\Generated\Model\ReviewCustomGatesStateRequired;
 use Acme\GitHub\Generated\Model\Runner;
 use Acme\GitHub\Generated\Model\RunnerApplication;
 use Acme\GitHub\Generated\Model\RunnerGroupsOrg;
@@ -1954,6 +1956,22 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
             ResponseType::object(EmptyObject::class),
+        );
+    }
+
+    public function actionsReviewCustomGatesForRun(
+        string $owner,
+        string $repo,
+        int $runId,
+        ReviewCustomGatesCommentRequired|ReviewCustomGatesStateRequired $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/deployment_protection_rule')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->path('run_id', $runId)
+                ->json($body),
+            ResponseType::nothing(),
         );
     }
 

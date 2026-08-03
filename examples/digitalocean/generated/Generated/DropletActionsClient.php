@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\DropletAction;
+use Acme\DigitalOcean\Generated\Model\DropletActionChangeBackupPolicy;
+use Acme\DigitalOcean\Generated\Model\DropletActionChangeKernel;
+use Acme\DigitalOcean\Generated\Model\DropletActionEnableBackups;
+use Acme\DigitalOcean\Generated\Model\DropletActionRebuild;
+use Acme\DigitalOcean\Generated\Model\DropletActionRename;
+use Acme\DigitalOcean\Generated\Model\DropletActionResize;
+use Acme\DigitalOcean\Generated\Model\DropletActionRestore;
+use Acme\DigitalOcean\Generated\Model\DropletActionSnapshot;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -24,6 +33,20 @@ final readonly class DropletActionsClient implements DropletActionsClientInterfa
     }
 
     /**
+     * Requires `bearer_auth` scopes: `droplet:update`.
+     */
+    public function dropletActionsPostByTag(DropletAction|DropletActionSnapshot $body, ?string $tagName = null): void
+    {
+        $this->transport->send(
+            Endpoint::post('/v2/droplets/actions')
+                ->query('tag_name', $tagName)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `droplet:read`.
      */
     public function dropletActionsList(int $dropletId, ?int $perPage = null, ?int $page = null): void
@@ -34,6 +57,22 @@ final readonly class DropletActionsClient implements DropletActionsClientInterfa
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:update`.
+     */
+    public function dropletActionsPost(
+        int $dropletId,
+        DropletAction|DropletActionEnableBackups|DropletActionChangeBackupPolicy|DropletActionRestore|DropletActionResize|DropletActionRebuild|DropletActionRename|DropletActionChangeKernel|DropletActionSnapshot $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/droplets/{droplet_id}/actions')
+                ->path('droplet_id', $dropletId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostAttach;
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostDetach;
+use Acme\DigitalOcean\Generated\Model\VolumeActionPostResize;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -24,6 +27,24 @@ final readonly class BlockStorageActionsClient implements BlockStorageActionsCli
     }
 
     /**
+     * Requires `bearer_auth` scopes: `block_storage_action:create`, `api:write`.
+     */
+    public function volumeActionsPost(
+        VolumeActionPostAttach|VolumeActionPostDetach $body,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/volumes/actions')
+                ->query('per_page', $perPage)
+                ->query('page', $page)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
      */
     public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): void
@@ -34,6 +55,26 @@ final readonly class BlockStorageActionsClient implements BlockStorageActionsCli
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `block_storage_action:create`.
+     */
+    public function volumeActionsPostById(
+        string $volumeId,
+        VolumeActionPostAttach|VolumeActionPostDetach|VolumeActionPostResize $body,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/volumes/{volume_id}/actions')
+                ->path('volume_id', $volumeId)
+                ->query('per_page', $perPage)
+                ->query('page', $page)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

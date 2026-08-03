@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ImageActionBase;
+use Acme\DigitalOcean\Generated\Model\ImageActionTransfer;
+
 /**
  * The contract for the `Image Actions` endpoints.
  *
@@ -24,6 +27,11 @@ interface ImageActionsClientInterface
      * Requires `bearer_auth` scopes: `image:read`.
      */
     public function imageActionsList(int $imageId): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `image:update`.
+     */
+    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.

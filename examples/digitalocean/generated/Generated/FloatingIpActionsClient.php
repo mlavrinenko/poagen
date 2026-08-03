@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\FloatingIpActionAssign;
+use Acme\DigitalOcean\Generated\Model\FloatingIpActionUnassign;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -32,6 +34,22 @@ final readonly class FloatingIpActionsClient implements FloatingIpActionsClientI
             Endpoint::get('/v2/floating_ips/{floating_ip}/actions')
                 ->path('floating_ip', $floatingIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     */
+    public function floatingIpsActionPost(
+        string $floatingIp,
+        FloatingIpActionUnassign|FloatingIpActionAssign $body,
+    ): void {
+        $this->transport->send(
+            Endpoint::post('/v2/floating_ips/{floating_ip}/actions')
+                ->path('floating_ip', $floatingIp)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth)
+                ->json($body),
             ResponseType::nothing(),
         );
     }

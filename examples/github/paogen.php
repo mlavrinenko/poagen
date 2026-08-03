@@ -133,9 +133,27 @@ return new Profile(
      * inline]` — two members, no collision, no `oneOf`/`anyOf` — and the merge
      * this task added resolves it to a synthesised `AppsCreateFromManifestResponse`
      * instead of refusing it as a response "of type 'unspecified'".
+     *
+     * `a-union-request-body-takes-a-union-parameter` took four more —
+     * `actions/review-custom-gates-for-run` (an `anyOf` of two `$ref`s),
+     * `codespaces/create-for-authenticated-user`, `projects/add-field-for-org`
+     * and `projects/add-field-for-user` (each a `oneOf` of inline objects,
+     * every branch synthesised into its own class) — and rewrote ten more in
+     * place: the six `repos/*-status-check-contexts` /
+     * `*-team-access-restrictions` operations, `issues/set-labels`,
+     * `issues/add-labels`, and the two `users/*-email-for-authenticated-user`
+     * ones all mix an object branch with a bare `array` or scalar branch
+     * paogen cannot name a PHP class for, so they stay skipped — but for that
+     * reason now, not the generic "inline schema" one every unresolved body
+     * used to carry. Two operations this list never named —
+     * `orgs/delete-attestations-bulk` and `users/delete-attestations-bulk` —
+     * used to *silently widen* to `array $body`: `type: object` alongside a
+     * two-branch `oneOf` read as an object with no declared properties, so
+     * `RequestBodyAnalyzer` emitted a bare map and discarded the "either
+     * subject_digests or attestation_ids" the document's prose already
+     * promised. Both now emit the union instead.
      */
     skip: [
-        'actions/review-custom-gates-for-run' => 'application/json request body with an inline (non-$ref) schema',
         'activity/list-stargazers-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'activity/list-repos-starred-by-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'campaigns/list-org-campaigns' => 'parameter \'state\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
@@ -143,35 +161,68 @@ return new Profile(
         'code-scanning/list-alerts-for-repo' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'code-scanning/list-alert-instances' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'code-scanning/list-recent-analyses' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'codespaces/create-for-authenticated-user' => 'application/json request body with an inline (non-$ref) schema',
         'dependabot/list-alerts-for-enterprise' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'dependabot/list-alerts-for-org' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'dependabot/list-alerts-for-repo' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'interactions/get-restrictions-for-org' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-authenticated-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'issues/set-labels' => 'application/json request body with an inline (non-$ref) schema',
-        'issues/add-labels' => 'application/json request body with an inline (non-$ref) schema',
+        // issues/set-labels and issues/add-labels: request body is a `oneOf`
+        // whose branches mix an object with a bare `array` — `body` is
+        // `array<string>` (a list of label names), which paogen cannot union
+        // with a synthesised class. Branch 2 is named because it is the
+        // first unnameable one found; issues/set-labels' 4th and 5th
+        // branches (another array, then a scalar `string`) share the defect.
+        'issues/set-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — paogen '
+            . 'can only union branches it can express as a PHP class (a $ref to a component, or an inline object '
+            . 'with declared properties); reduce this branch to one of those, or skip the operation',
+        'issues/add-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — paogen '
+            . 'can only union branches it can express as a PHP class (a $ref to a component, or an inline object '
+            . 'with declared properties); reduce this branch to one of those, or skip the operation',
         'licenses/get-for-repo' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/add-field-for-org' => 'application/json request body with an inline (non-$ref) schema',
         'projects/list-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/get-org-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/list-view-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/add-field-for-user' => 'application/json request body with an inline (non-$ref) schema',
         'projects/list-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/get-user-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'projects/list-view-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'repos/set-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/add-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/remove-status-check-contexts' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/set-team-access-restrictions' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/add-team-access-restrictions' => 'application/json request body with an inline (non-$ref) schema',
-        'repos/remove-team-access-restrictions' => 'application/json request body with an inline (non-$ref) schema',
+        // The six repos/*-status-check-contexts and *-team-access-restrictions
+        // operations: request body is `oneOf: [inline object, {type: array,
+        // items: string}]` (add/replace a list of contexts or team slugs by
+        // name) — the same object-beside-a-bare-array defect as issues/*
+        // above.
+        'repos/set-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
+            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'repos/add-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
+            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'repos/remove-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
+            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'repos/set-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
+            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'repos/add-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
+            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'repos/remove-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
+            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/get-content' => 'application/json request body with an inline (non-$ref) schema',
         'security-advisories/list-global-advisories' =>'parameter \'ecosystem\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'users/get-authenticated' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'users/add-email-for-authenticated-user' => 'application/json request body with an inline (non-$ref) schema',
-        'users/delete-email-for-authenticated-user' => 'application/json request body with an inline (non-$ref) schema',
+        // users/add-email-for-authenticated-user and
+        // users/delete-email-for-authenticated-user: request body is
+        // `oneOf: [inline object, {type: array, items: string}, {type:
+        // string}]` — three branches, and the first unnameable one is again
+        // the bare array (the third, a bare `string`, has the same defect).
+        'users/add-email-for-authenticated-user' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
+            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
+        'users/delete-email-for-authenticated-user' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
+            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'users/get-by-id' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'users/get-by-username' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
     ],
