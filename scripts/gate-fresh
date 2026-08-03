@@ -33,9 +33,17 @@ state="$root/build/cache/gate-fresh.state"
 # "path  sha256" listing — so the result changes if a file's content
 # changes, moves, is added, or is removed, and is otherwise stable across
 # runs and machines.
+#
+# A `?`-prefixed include (see gate-fresh.inputs' header) is tracked by NAME
+# only: its resolved files are still walked and still contribute a line to
+# the final hash — so adding, removing or renaming one changes the result —
+# but that line never carries the file's content, only its path. Editing a
+# name-only file in place is therefore invisible to this hash on purpose
+# (truth/notes, truth/reviews — see gate-fresh.inputs for why).
 hash_inputs() {
     local -a includes=()
     local -a excludes=()
+    local -a nameonly=()
     local line trimmed
 
     while IFS= read -r line; do
@@ -45,6 +53,10 @@ hash_inputs() {
         [[ -z "$trimmed" ]] && continue
         if [[ "$trimmed" == !* ]]; then
             excludes+=("${trimmed#!}")
+        elif [[ "$trimmed" == '?'* ]]; then
+            trimmed="${trimmed#?}"
+            includes+=("$trimmed")
+            nameonly+=("$trimmed")
         else
             includes+=("$trimmed")
         fi
@@ -76,9 +88,37 @@ hash_inputs() {
         [[ "$skip" -eq 0 ]] && kept+=("$rel")
     done
 
-    printf '%s\n' "${kept[@]}" | LC_ALL=C sort -u |
-        (cd "$root" && xargs -d '\n' -- sha256sum) |
-        sha256sum | awk '{print $1}'
+    # Partition kept files into content-tracked (the default) and
+    # name-only (under a `?` include), then hash each partition
+    # differently before combining — see the function comment above.
+    local -a content_files=()
+    local -a nameonly_files=()
+    local no
+    for rel in "${kept[@]}"; do
+        skip=0
+        for no in "${nameonly[@]}"; do
+            if [[ "$rel" == "$no" || "$rel" == "$no"/* ]]; then
+                skip=1
+                break
+            fi
+        done
+        if [[ "$skip" -eq 1 ]]; then
+            nameonly_files+=("$rel")
+        else
+            content_files+=("$rel")
+        fi
+    done
+
+    {
+        if [[ ${#content_files[@]} -gt 0 ]]; then
+            printf '%s\n' "${content_files[@]}" | LC_ALL=C sort -u |
+                (cd "$root" && xargs -d '\n' -- sha256sum)
+        fi
+        if [[ ${#nameonly_files[@]} -gt 0 ]]; then
+            printf '%s\n' "${nameonly_files[@]}" | LC_ALL=C sort -u |
+                sed 's/^/name-only  /'
+        fi
+    } | LC_ALL=C sort | sha256sum | awk '{print $1}'
 }
 
 recorded_hash() {

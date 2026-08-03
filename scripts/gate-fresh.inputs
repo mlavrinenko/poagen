@@ -7,8 +7,12 @@
 #
 # One path per line, relative to the repo root. A directory is walked
 # recursively. A line starting with `!` excludes a path (matched as an exact
-# path or a directory prefix) from an include already listed above it. Blank
-# lines and `#` comments are ignored.
+# path or a directory prefix) from an include already listed above it. A line
+# starting with `?` includes a path (directory, walked recursively) by NAME
+# ONLY: each file under it contributes its path to the hash but never its
+# content, so adding, removing or renaming a file there changes the result
+# and editing one in place does not. Blank lines and `#` comments are
+# ignored.
 #
 # CRITICAL: truth/tasks is excluded and MUST STAY excluded. `mt flip` writes
 # the task file it is gating (the status field, the note), so if task
@@ -18,6 +22,7 @@
 # real change to the gate's own behaviour touches.
 
 bin
+devbox.d
 scripts
 src
 runtime
@@ -25,6 +30,25 @@ tests
 examples
 truth
 !truth/tasks
+
+# `truth/notes` and `truth/reviews` are Markdown, never `#include`-d into
+# `truth/main.typ` — main.typ's own "Supplementary artefacts" section
+# `#link`s each one instead, and `#link` is a hyperlink annotation, not a
+# compile-time read. `speconaut check truth/` (run by `check-specs`) proves
+# both halves of that, verified by probing on 2026-08-03: appending a line to
+# an already-linked note's or review's content in place leaves `check truth/`
+# green (content is never parsed); adding a file under either directory with
+# no matching `#link` fails it with "file not included in entry point", and
+# deleting a file main.typ still links to fails it with "broken link target"
+# (both proven the same day against a scratch copy of the tree, not assumed).
+# So the set of file NAMES present is read for reachability even though no
+# file's content is — hashing content here would invalidate a recorded pass
+# on every session note written (the bug this file exists to fix); hashing
+# nothing here would let a real orphan or broken-link failure record as
+# fresh (the same bug from the other side). `?` tracks exactly what is read:
+# presence, not content.
+?truth/notes
+?truth/reviews
 
 composer.json
 composer.lock
@@ -40,6 +64,24 @@ rector.php
 .linecop.yaml
 phpunit.xml.dist
 .speconaut/config.toml
+
+# `.linecop.yaml` caps Markdown at 300 lines and PHP at 250, repo-wide,
+# excluding only vendor, build, .devbox, .git, tests/generated,
+# tests/fixtures and examples (see its own comments) — and, verified by
+# probing on 2026-08-03, every directory whose name starts with `.`: a
+# 400-line scratch file under `.github/ISSUE_TEMPLATE/` was not flagged,
+# while the identical file at the repo root was. That is why `.github`'s
+# Markdown templates need no entry here despite not being in
+# `exclude_dirs`. These seven are the root-level Markdown files linecop
+# actually reads that no directory include above already covers.
+AGENT.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+README.md
+ROADMAP.md
+SECURITY.md
+
 # `just check` runs `speconaut lock --check`, which reads this file, so a lock
 # that changes without the specs changing alters what the gate would say. Only
 # a deliberate `speconaut lock` writes it — `mt flip` never does — so hashing
