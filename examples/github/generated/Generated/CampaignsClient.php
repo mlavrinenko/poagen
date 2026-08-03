@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\CampaignState;
+use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
+use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
 use Acme\GitHub\Generated\Model\CampaignSummary;
 use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequest;
 use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequest;
@@ -23,6 +26,29 @@ final readonly class CampaignsClient implements CampaignsClientInterface
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    /**
+     * @return list<CampaignSummary>
+     */
+    public function campaignsListOrgCampaigns(
+        string $org,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?CampaignsListOrgCampaignsDirection $direction = null,
+        ?CampaignState $state = null,
+        ?CampaignsListOrgCampaignsSort $sort = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/campaigns')
+                ->path('org', $org)
+                ->query('page', $page)
+                ->query('per_page', $perPage)
+                ->query('direction', $direction)
+                ->query('state', $state)
+                ->query('sort', $sort),
+            ResponseType::listOf(CampaignSummary::class),
+        );
     }
 
     public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequest $body): CampaignSummary

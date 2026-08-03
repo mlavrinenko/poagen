@@ -13,9 +13,12 @@ namespace Acme\GitHub\Generated\Model;
 
 final readonly class CustomPropertyValue
 {
+    /**
+     * @param string|list<string>|null $value
+     */
     public function __construct(
         public string $property_name,
-        public mixed $value,
+        public string|array|null $value,
     ) {
     }
 }

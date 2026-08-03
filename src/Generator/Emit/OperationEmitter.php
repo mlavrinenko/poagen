@@ -154,6 +154,8 @@ final readonly class OperationEmitter
         $headerParams = ResolvedParameter::resolveAll(OperationAnalyzer::headerParameters($operation, $pathItem), $paramRegistry);
         $requiredQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => $p->param->required));
         $optionalQuery = array_values(array_filter($queryParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
+        $requiredHeader = array_values(array_filter($headerParams, static fn(ResolvedParameter $p): bool => $p->param->required));
+        $optionalHeader = array_values(array_filter($headerParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
         $return = $this->inlinePayloads->returnFor($rawOperationId)
             ?? OperationAnalyzer::returnType($operation->responses, $this->registry, $bindings);
@@ -177,15 +179,19 @@ final readonly class OperationEmitter
         // the preceding `@param` description rather than as its own sentence.
         SecurityDocs::addOperationComment($method, $securityCatalog, $operation);
 
+        // Required first — path, query, header — so a required header lands
+        // ahead of the optional query/header blocks below it, the same
+        // requiredness ordering the query split already keeps.
         $this->paramAdder->addPath($method, $namespace, $pathParams, $bindings, $rawOperationId);
         $this->paramAdder->addQuery($method, $namespace, $requiredQuery, $bindings, required: true, operationId: $rawOperationId);
+        $this->paramAdder->addHeader($method, $namespace, $requiredHeader, $bindings, $rawOperationId, required: true);
 
         if ($body instanceof BodySpec) {
             $this->bodyParamEmitter->addBodyParams($method, $namespace, $body, $bindings);
         }
 
         $this->paramAdder->addQuery($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $rawOperationId);
-        $this->paramAdder->addHeader($method, $namespace, $headerParams, $bindings, $rawOperationId);
+        $this->paramAdder->addHeader($method, $namespace, $optionalHeader, $bindings, $rawOperationId);
 
         $this->applyReturnType($method, $namespace, $return);
 

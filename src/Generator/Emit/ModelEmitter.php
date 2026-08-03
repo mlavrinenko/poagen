@@ -197,7 +197,17 @@ final readonly class ModelEmitter
         }
         if ($resolved->phpDoc !== null) {
             $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc);
-            $constructor->addComment(sprintf('@param %s%s $%s', $isNullable ? '?' : '', $docType, $phpName));
+            // Same reason as $spellsOwnNull above: `?string|list<string>` is
+            // not a type PHPStan reads as "the whole union, nullable" — a
+            // union doc type needs `|null` appended, not `?` prefixed.
+            $docUnion = DocTypeSimplifier::isTopLevelUnion($docType);
+            $fullDocType = match (true) {
+                !$isNullable => $docType,
+                $docUnion && !str_ends_with($docType, '|null') => $docType . '|null',
+                $docUnion => $docType,
+                default => '?' . $docType,
+            };
+            $constructor->addComment(sprintf('@param %s $%s', $fullDocType, $phpName));
         }
 
         // Hint use-statements for FQNs so the printed file uses short forms.

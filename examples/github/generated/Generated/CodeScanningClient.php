@@ -11,10 +11,23 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\CodeScanningAlertSeverity;
+use Acme\GitHub\Generated\Enum\CodeScanningAlertStateQuery;
+use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForOrgDirection;
+use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForOrgSort;
+use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForRepoDirection;
+use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForRepoSort;
+use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesDirection;
+use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\CodeScanningAlert;
+use Acme\GitHub\Generated\Model\CodeScanningAlertInstanceList;
+use Acme\GitHub\Generated\Model\CodeScanningAlertItems;
 use Acme\GitHub\Generated\Model\CodeScanningAnalysis;
 use Acme\GitHub\Generated\Model\CodeScanningAnalysisDeletion;
+use Acme\GitHub\Generated\Model\CodeScanningAnalysisSarifId;
+use Acme\GitHub\Generated\Model\CodeScanningAnalysisToolGuid;
+use Acme\GitHub\Generated\Model\CodeScanningAnalysisToolName;
 use Acme\GitHub\Generated\Model\CodeScanningAutofix;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommits;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommitsResponse;
@@ -22,6 +35,8 @@ use Acme\GitHub\Generated\Model\CodeScanningCodeqlDatabase;
 use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysisRequest;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetup;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdate;
+use Acme\GitHub\Generated\Model\CodeScanningOrganizationAlertItems;
+use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsReceipt;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsStatus;
 use Acme\GitHub\Generated\Model\CodeScanningUpdateAlertRequest;
@@ -38,6 +53,82 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    /**
+     * @return list<CodeScanningOrganizationAlertItems>
+     */
+    public function codeScanningListAlertsForOrg(
+        string $org,
+        ?CodeScanningAnalysisToolName $toolName = null,
+        ?CodeScanningAnalysisToolGuid $toolGuid = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?CodeScanningListAlertsForOrgDirection $direction = null,
+        ?CodeScanningAlertStateQuery $state = null,
+        ?CodeScanningListAlertsForOrgSort $sort = null,
+        ?CodeScanningAlertSeverity $severity = null,
+        ?string $assignees = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/code-scanning/alerts')
+                ->path('org', $org)
+                ->query('tool_name', $toolName?->toScalar())
+                ->query('tool_guid', $toolGuid?->toScalar())
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('page', $page)
+                ->query('per_page', $perPage)
+                ->query('direction', $direction)
+                ->query('state', $state)
+                ->query('sort', $sort)
+                ->query('severity', $severity)
+                ->query('assignees', $assignees),
+            ResponseType::listOf(CodeScanningOrganizationAlertItems::class),
+        );
+    }
+
+    /**
+     * @return list<CodeScanningAlertItems>
+     */
+    public function codeScanningListAlertsForRepo(
+        string $owner,
+        string $repo,
+        ?CodeScanningAnalysisToolName $toolName = null,
+        ?CodeScanningAnalysisToolGuid $toolGuid = null,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?CodeScanningRef $ref = null,
+        ?int $pr = null,
+        ?CodeScanningListAlertsForRepoDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?CodeScanningListAlertsForRepoSort $sort = null,
+        ?CodeScanningAlertStateQuery $state = null,
+        ?CodeScanningAlertSeverity $severity = null,
+        ?string $assignees = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('tool_name', $toolName?->toScalar())
+                ->query('tool_guid', $toolGuid?->toScalar())
+                ->query('page', $page)
+                ->query('per_page', $perPage)
+                ->query('ref', $ref?->toScalar())
+                ->query('pr', $pr)
+                ->query('direction', $direction)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('sort', $sort)
+                ->query('state', $state)
+                ->query('severity', $severity)
+                ->query('assignees', $assignees),
+            ResponseType::listOf(CodeScanningAlertItems::class),
+        );
     }
 
     public function codeScanningGetAlert(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAlert
@@ -105,6 +196,64 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
             ResponseType::object(CodeScanningAutofixCommitsResponse::class),
+        );
+    }
+
+    /**
+     * @return list<CodeScanningAlertInstanceList>
+     */
+    public function codeScanningListAlertInstances(
+        string $owner,
+        string $repo,
+        AlertNumber $alertNumber,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?CodeScanningRef $ref = null,
+        ?int $pr = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->path('alert_number', $alertNumber->toScalar())
+                ->query('page', $page)
+                ->query('per_page', $perPage)
+                ->query('ref', $ref?->toScalar())
+                ->query('pr', $pr),
+            ResponseType::listOf(CodeScanningAlertInstanceList::class),
+        );
+    }
+
+    /**
+     * @return list<CodeScanningAnalysis>
+     */
+    public function codeScanningListRecentAnalyses(
+        string $owner,
+        string $repo,
+        ?CodeScanningAnalysisToolName $toolName = null,
+        ?CodeScanningAnalysisToolGuid $toolGuid = null,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?int $pr = null,
+        ?CodeScanningRef $ref = null,
+        ?CodeScanningAnalysisSarifId $sarifId = null,
+        ?CodeScanningListRecentAnalysesDirection $direction = null,
+        ?CodeScanningListRecentAnalysesSort $sort = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/code-scanning/analyses')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('tool_name', $toolName?->toScalar())
+                ->query('tool_guid', $toolGuid?->toScalar())
+                ->query('page', $page)
+                ->query('per_page', $perPage)
+                ->query('pr', $pr)
+                ->query('ref', $ref?->toScalar())
+                ->query('sarif_id', $sarifId?->toScalar())
+                ->query('direction', $direction)
+                ->query('sort', $sort),
+            ResponseType::listOf(CodeScanningAnalysis::class),
         );
     }
 

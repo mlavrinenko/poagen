@@ -11,8 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseSort;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgSort;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\DependabotAlert;
+use Acme\GitHub\Generated\Model\DependabotAlertWithRepository;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequest;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateRepoSecretRequest;
 use Acme\GitHub\Generated\Model\DependabotListOrgSecretsResponse;
@@ -37,6 +47,53 @@ use Acme\GitHub\Generated\Model\OrganizationDependabotSecret;
  */
 interface DependabotClientInterface
 {
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlertWithRepository>
+     */
+    public function dependabotListAlertsForEnterprise(
+        string $enterprise,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $epssPercentage = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?DependabotListAlertsForEnterpriseScope $scope = null,
+        ?DependabotListAlertsForEnterpriseSort $sort = null,
+        ?DependabotListAlertsForEnterpriseDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
+
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlertWithRepository>
+     */
+    public function dependabotListAlertsForOrg(
+        string $org,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $epssPercentage = null,
+        ?string $artifactRegistryUrl = null,
+        ?string $artifactRegistry = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?string $runtimeRisk = null,
+        ?DependabotListAlertsForOrgScope $scope = null,
+        ?DependabotListAlertsForOrgSort $sort = null,
+        ?DependabotListAlertsForOrgDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
+
     public function dependabotRepositoryAccessForOrg(
         string $org,
         ?int $page = null,
@@ -91,6 +148,30 @@ interface DependabotClientInterface
         string $secretName,
         int $repositoryId,
     ): void;
+
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlert>
+     */
+    public function dependabotListAlertsForRepo(
+        string $owner,
+        string $repo,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $manifest = null,
+        ?string $epssPercentage = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?DependabotListAlertsForRepoScope $scope = null,
+        ?DependabotListAlertsForRepoSort $sort = null,
+        ?DependabotListAlertsForRepoDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
 
     public function dependabotGetAlert(string $owner, string $repo, AlertNumber $alertNumber): DependabotAlert;
 

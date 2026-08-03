@@ -80,10 +80,20 @@ final readonly class ParameterAdder
     }
 
     /**
+     * A required header is a required method argument, same as a required
+     * query parameter — the caller passes `required: true` for that block
+     * and `false` for the optional one, mirroring {@see addQuery}.
+     *
      * @param list<ResolvedParameter> $params
      */
-    public function addHeader(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
-    {
+    public function addHeader(
+        Method $method,
+        PhpNamespace $namespace,
+        array $params,
+        Bindings $bindings,
+        string $operationId,
+        bool $required = false,
+    ): void {
         foreach ($params as $resolvedParam) {
             $resolved = $this->resolveParamType($resolvedParam->param, $bindings, $operationId);
             $this->importParamType($namespace, $resolved);
@@ -93,7 +103,9 @@ final readonly class ParameterAdder
                 $phpParam->setType($resolved->phpType);
             }
 
-            $phpParam->setNullable()->setDefaultValue(null);
+            if (!$required) {
+                $phpParam->setNullable()->setDefaultValue(null);
+            }
         }
     }
 

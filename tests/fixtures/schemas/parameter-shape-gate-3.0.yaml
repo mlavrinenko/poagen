@@ -24,9 +24,10 @@ info:
       - searchWidgets   inline-object query parameter. Refused before this
                         task and after it, and its message is pinned so a
                         shared predicate cannot make it vaguer.
-      - describeWidget  required header parameter, scalar schema. Refused
-                        on requiredness, not on shape — pinned for the
-                        same reason.
+      - describeWidget  required header parameter, scalar schema.
+                        support-the-parameter-shapes-real-documents-use:
+                        emitted as a required method argument, no longer
+                        refused on requiredness.
       - trackWidget     `in: cookie`, a position paogen emits nothing for.
                         Refused, and says which position it is.
       - listWidgets     scalar path parameter, scalar query parameter,
@@ -36,6 +37,18 @@ info:
                         scalar components — DigitalOcean's
                         `ssh_key_identifier`, an id-or-fingerprint.
                         Representable, and emitted.
+      - getWidgetByRef  ref-path-parameter-to-a-non-scalar-component-is-
+                        ungated: path parameter whose schema is a bare
+                        `$ref` to an object component. Used to pass the
+                        gate unresolved and reach TypeResolver's blind
+                        `$ref`-to-FQCN resolution, emitting a Model class
+                        on Endpoint::path(). Refused by name instead.
+      - getWidgetsCommaSeparated
+                        array query parameter with `explode: false`
+                        declared — `Endpoint::query()` only implements
+                        the repeated-key form (`style: form`, `explode:
+                        true`), so a document asking for anything else is
+                        refused rather than silently mis-serialised.
 paths:
   /widgets/{selector}:
     get:
@@ -154,6 +167,33 @@ paths:
       responses:
         '204':
           description: ok
+  /widgets/by-ref/{widget_ref}:
+    get:
+      operationId: getWidgetByRef
+      parameters:
+        - name: widget_ref
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/WidgetObject'
+      responses:
+        '204':
+          description: ok
+  /widgets/comma:
+    get:
+      operationId: getWidgetsCommaSeparated
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '204':
+          description: ok
 components:
   schemas:
     WidgetId:
@@ -161,3 +201,10 @@ components:
       minimum: 1
     WidgetSlug:
       type: string
+    WidgetObject:
+      type: object
+      properties:
+        kind:
+          type: string
+        value:
+          type: string

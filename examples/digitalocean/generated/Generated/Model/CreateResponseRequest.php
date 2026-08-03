@@ -15,6 +15,7 @@ final readonly class CreateResponseRequest
 {
     /**
      * @param ?array<string, string> $metadata
+     * @param string|list<string>|null $stop
      * @param ?list<CreateResponseRequestToolsItem> $tools
      */
     public function __construct(
@@ -23,7 +24,7 @@ final readonly class CreateResponseRequest
         public ?string $instructions = null,
         public ?int $max_output_tokens = null,
         public ?array $metadata = null,
-        public mixed $stop = null,
+        public string|array|null $stop = null,
         public ?bool $stream = null,
         public ?CreateResponseRequestStreamOptions $stream_options = null,
         public ?float $temperature = null,

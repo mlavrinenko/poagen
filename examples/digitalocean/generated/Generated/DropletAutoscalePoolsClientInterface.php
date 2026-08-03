@@ -48,6 +48,11 @@ interface DropletAutoscalePoolsClientInterface
     public function autoscalepoolsDelete(string $autoscalePoolId): void;
 
     /**
+     * Requires `bearer_auth` scopes: `droplet:delete`.
+     */
+    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): void;
+
+    /**
      * Requires `bearer_auth` scopes: `droplet:read`.
      */
     public function autoscalepoolsListHistory(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void;

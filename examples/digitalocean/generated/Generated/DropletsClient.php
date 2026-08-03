@@ -171,6 +171,20 @@ final readonly class DropletsClient implements DropletsClientInterface
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
      */
+    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): void
+    {
+        $this->transport->send(
+            Endpoint::delete('/v2/droplets/{droplet_id}/destroy_with_associated_resources/dangerous')
+                ->path('droplet_id', $dropletId)
+                ->header('X-Dangerous', $xDangerous)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     */
     public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): void
     {
         $this->transport->send(

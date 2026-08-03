@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Enum\RegionSlug;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -23,6 +24,21 @@ final readonly class VpcPeeringsClient implements VpcPeeringsClientInterface
         private TransportInterface $transport,
         private string $bearerAuth,
     ) {
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     */
+    public function vpcPeeringsList(?int $perPage = null, ?int $page = null, ?RegionSlug $region = null): void
+    {
+        $this->transport->send(
+            Endpoint::get('/v2/vpc_peerings')
+                ->query('per_page', $perPage)
+                ->query('page', $page)
+                ->query('region', $region)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
     }
 
     /**

@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\License;
+use Acme\GitHub\Generated\Model\LicenseContent;
 use Acme\GitHub\Generated\Model\LicenseSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -43,6 +45,17 @@ final readonly class LicensesClient implements LicensesClientInterface
         return $this->transport->send(
             Endpoint::get('/licenses/{license}')->path('license', $license),
             ResponseType::object(License::class),
+        );
+    }
+
+    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): LicenseContent
+    {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/license')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('ref', $ref?->toScalar()),
+            ResponseType::object(LicenseContent::class),
         );
     }
 }

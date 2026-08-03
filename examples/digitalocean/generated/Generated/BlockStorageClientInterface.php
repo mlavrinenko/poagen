@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Enum\RegionSlug;
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\VolumesExt4;
 use Acme\DigitalOcean\Generated\Model\VolumesXfs;
@@ -25,9 +26,24 @@ use Acme\DigitalOcean\Generated\Model\VolumesXfs;
 interface BlockStorageClientInterface
 {
     /**
+     * Requires `bearer_auth` scopes: `api:read`, `api:write`, `block_storage:read`.
+     */
+    public function volumesList(
+        ?string $name = null,
+        ?RegionSlug $region = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void;
+
+    /**
      * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
      */
     public function volumesCreate(VolumesExt4|VolumesXfs $body): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `block_storage:delete`, `api:write`.
+     */
+    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): void;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.

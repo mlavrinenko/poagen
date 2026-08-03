@@ -24,6 +24,7 @@ use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsInterfa
 use Acme\DigitalOcean\Generated\Model\AlertPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DestinationRequest;
 use Acme\DigitalOcean\Generated\Model\MonitoringCreateSinkRequest;
+use Acme\DigitalOcean\Generated\Model\Urn;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -1052,6 +1053,19 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `monitoring:read`.
+     */
+    public function monitoringListSinks(?Urn $resourceId = null): void
+    {
+        $this->transport->send(
+            Endpoint::get('/v2/monitoring/sinks')
+                ->query('resource_id', $resourceId?->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
             ResponseType::nothing(),
         );

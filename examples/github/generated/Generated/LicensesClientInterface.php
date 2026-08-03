@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\License;
+use Acme\GitHub\Generated\Model\LicenseContent;
 use Acme\GitHub\Generated\Model\LicenseSimple;
 
 /**
@@ -29,4 +31,6 @@ interface LicensesClientInterface
     public function licensesGetAllCommonlyUsed(?bool $featured = null, ?int $perPage = null, ?int $page = null): array;
 
     public function licensesGet(string $license): License;
+
+    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): LicenseContent;
 }

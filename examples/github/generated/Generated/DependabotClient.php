@@ -11,8 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForEnterpriseSort;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForOrgSort;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoDirection;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoScope;
+use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\DependabotAlert;
+use Acme\GitHub\Generated\Model\DependabotAlertWithRepository;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequest;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateRepoSecretRequest;
 use Acme\GitHub\Generated\Model\DependabotListOrgSecretsResponse;
@@ -36,6 +46,96 @@ final readonly class DependabotClient implements DependabotClientInterface
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlertWithRepository>
+     */
+    public function dependabotListAlertsForEnterprise(
+        string $enterprise,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $epssPercentage = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?DependabotListAlertsForEnterpriseScope $scope = null,
+        ?DependabotListAlertsForEnterpriseSort $sort = null,
+        ?DependabotListAlertsForEnterpriseDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/enterprises/{enterprise}/dependabot/alerts')
+                ->path('enterprise', $enterprise)
+                ->query('classification', $classification)
+                ->query('state', $state)
+                ->query('severity', $severity)
+                ->query('ecosystem', $ecosystem)
+                ->query('package', $package)
+                ->query('epss_percentage', $epssPercentage)
+                ->query('has', $has)
+                ->query('assignee', $assignee)
+                ->query('scope', $scope)
+                ->query('sort', $sort)
+                ->query('direction', $direction)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(DependabotAlertWithRepository::class),
+        );
+    }
+
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlertWithRepository>
+     */
+    public function dependabotListAlertsForOrg(
+        string $org,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $epssPercentage = null,
+        ?string $artifactRegistryUrl = null,
+        ?string $artifactRegistry = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?string $runtimeRisk = null,
+        ?DependabotListAlertsForOrgScope $scope = null,
+        ?DependabotListAlertsForOrgSort $sort = null,
+        ?DependabotListAlertsForOrgDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/dependabot/alerts')
+                ->path('org', $org)
+                ->query('classification', $classification)
+                ->query('state', $state)
+                ->query('severity', $severity)
+                ->query('ecosystem', $ecosystem)
+                ->query('package', $package)
+                ->query('epss_percentage', $epssPercentage)
+                ->query('artifact_registry_url', $artifactRegistryUrl)
+                ->query('artifact_registry', $artifactRegistry)
+                ->query('has', $has)
+                ->query('assignee', $assignee)
+                ->query('runtime_risk', $runtimeRisk)
+                ->query('scope', $scope)
+                ->query('sort', $sort)
+                ->query('direction', $direction)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(DependabotAlertWithRepository::class),
+        );
     }
 
     public function dependabotRepositoryAccessForOrg(
@@ -184,6 +284,52 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
             ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * @param string|list<string> $has
+     * @return list<DependabotAlert>
+     */
+    public function dependabotListAlertsForRepo(
+        string $owner,
+        string $repo,
+        ?string $classification = null,
+        ?string $state = null,
+        ?string $severity = null,
+        ?string $ecosystem = null,
+        ?string $package = null,
+        ?string $manifest = null,
+        ?string $epssPercentage = null,
+        string|array|null $has = null,
+        ?string $assignee = null,
+        ?DependabotListAlertsForRepoScope $scope = null,
+        ?DependabotListAlertsForRepoSort $sort = null,
+        ?DependabotListAlertsForRepoDirection $direction = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/dependabot/alerts')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('classification', $classification)
+                ->query('state', $state)
+                ->query('severity', $severity)
+                ->query('ecosystem', $ecosystem)
+                ->query('package', $package)
+                ->query('manifest', $manifest)
+                ->query('epss_percentage', $epssPercentage)
+                ->query('has', $has)
+                ->query('assignee', $assignee)
+                ->query('scope', $scope)
+                ->query('sort', $sort)
+                ->query('direction', $direction)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(DependabotAlert::class),
         );
     }
 

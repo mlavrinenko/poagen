@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
+use Mlavrinenko\Paogen\Generator\Emit\ParameterShape;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
@@ -45,8 +46,9 @@ final class ParameterShapeGateTest extends TestCase
         'getWidgetTags' => 'path parameter with no declared type',
         'mergeWidget' => 'allOf path parameter',
         'searchWidgets' => 'inline object query parameter',
-        'describeWidget' => 'required header parameter',
         'trackWidget' => 'cookie parameter',
+        'getWidgetByRef' => 'path parameter that is a $ref to a non-scalar component',
+        'getWidgetsCommaSeparated' => 'array query parameter with a non-default explode',
     ];
 
     public static function tearDownAfterClass(): void
@@ -58,13 +60,13 @@ final class ParameterShapeGateTest extends TestCase
     {
         $message = $this->abortMessage();
 
-        self::assertStringContainsString('6 problems found', $message);
+        self::assertStringContainsString('7 problems found', $message);
         self::assertStringContainsString(
             "parameter 'selector' (in: path, type: object) "
                 . 'at /paths/~1widgets~1{selector}/get/parameters/0 '
                 . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
                 . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
-                . 'or one or more $refs to component schemas',
+                . 'or one or more $refs to scalar component schemas',
             $message,
         );
         // The operation it belongs to, so the reader knows what to fix.
@@ -98,11 +100,13 @@ final class ParameterShapeGateTest extends TestCase
     }
 
     /**
-     * Criterion the shared predicate has to keep: the two positions that
-     * already refused still say which position it was and what would make
-     * that position acceptable.
+     * Criterion the shared predicate has to keep: the query and cookie
+     * refusals still say which position it was and what would make that
+     * position acceptable. Header has no refusal left to pin in this
+     * fixture — a required header now emits, see
+     * {@see testARequiredHeaderParameterEmitsAheadOfOptionalOnes()}.
      */
-    public function testTheQueryAndHeaderRefusalsStillNameThemselves(): void
+    public function testTheQueryAndCookieRefusalsStillNameThemselves(): void
     {
         $message = $this->abortMessage();
 
@@ -110,14 +114,8 @@ final class ParameterShapeGateTest extends TestCase
             "parameter 'filter' (in: query, type: object) "
                 . 'at /paths/~1widgets~1search/get/parameters/0 '
                 . "is outside paogen's supported parameter shapes — a query parameter's schema must name a scalar, "
-                . 'or an array whose items are scalars',
-            $message,
-        );
-        self::assertStringContainsString(
-            "parameter 'X-Trace-Id' (in: header, type: string) "
-                . 'at /paths/~1widgets~1describe/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes — a header parameter must be optional "
-                . '(paogen gives every header a nullable default) and its schema must name a scalar',
+                . 'a $ref to a scalar component, an array whose items are scalars (directly or through a $ref), '
+                . 'or a oneOf/anyOf of a scalar and a list of one',
             $message,
         );
         self::assertStringContainsString(
@@ -157,6 +155,64 @@ final class ParameterShapeGateTest extends TestCase
 
         self::assertStringContainsString('public function getKey(WidgetId|WidgetSlug $keyIdentifier): void', $sources);
         self::assertStringNotContainsString('mixed $keyIdentifier', $sources);
+    }
+
+    /**
+     * `support-the-parameter-shapes-real-documents-use`: a required header
+     * parameter used to be refused whatever its schema; it is now a
+     * required method argument, same as a required query parameter.
+     */
+    public function testARequiredHeaderParameterEmitsAheadOfOptionalOnes(): void
+    {
+        $sources = implode("\n", array_values($this->plan(self::REFUSED)->writes));
+
+        self::assertStringContainsString('public function describeWidget(string $xTraceId): void', $sources);
+        self::assertStringNotContainsString("'X-Trace-Id' (in: header", $sources);
+    }
+
+    /**
+     * `ref-path-parameter-to-a-non-scalar-component-is-ungated`: a path
+     * parameter whose schema is a bare `$ref` to an object component used
+     * to pass this gate unresolved — `supportsPath()` accepted any
+     * `Reference` without asking what it named — and reach `TypeResolver`'s
+     * blind `$ref`-to-FQCN resolution, emitting a Model class on
+     * `Endpoint::path()`. It now resolves through the same
+     * {@see ParameterShape::resolvedSchema()}
+     * `query` and `header` use, and refuses by name.
+     */
+    public function testARefPathParameterToANonScalarComponentStopsTheRun(): void
+    {
+        $message = $this->abortMessage();
+
+        self::assertStringContainsString(
+            "parameter 'widget_ref' (in: path, type: unspecified) "
+                . 'at /paths/~1widgets~1by-ref~1{widget_ref}/get/parameters/0 '
+                . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
+                . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
+                . 'or one or more $refs to scalar component schemas',
+            $message,
+        );
+        self::assertStringContainsString('GET /widgets/by-ref/{widget_ref} (getWidgetByRef)', $message);
+    }
+
+    /**
+     * `support-the-parameter-shapes-real-documents-use`: `Endpoint::query()`
+     * implements exactly one list serialisation — a repeated key per item,
+     * `style: form` / `explode: true`. A document declaring `explode: false`
+     * (a single comma-joined value) is not that, so it refuses rather than
+     * being silently sent as repeated keys anyway.
+     */
+    public function testAnArrayQueryParameterWithANonDefaultExplodeStopsTheRun(): void
+    {
+        $message = $this->abortMessage();
+
+        self::assertStringContainsString(
+            "parameter 'tags' (in: query, type: array) "
+                . 'at /paths/~1widgets~1comma/get/parameters/0 '
+                . "is outside paogen's supported parameter shapes",
+            $message,
+        );
+        self::assertStringContainsString('GET /widgets/comma (getWidgetsCommaSeparated)', $message);
     }
 
     private function abortMessage(): string

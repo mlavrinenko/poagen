@@ -21,6 +21,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\QuerySerializationAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
 use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
@@ -200,6 +201,11 @@ final readonly class Generator
             // not only the one that added it.
             ...$unions->notices(),
             ...$security->notices,
+            // A list-valued query parameter's repeated-key wire form is
+            // correct whether the document spelled out `style`/`explode` or
+            // left the OpenAPI default to apply — but silently is not the
+            // same as visibly, `support-the-parameter-shapes-real-documents-use`.
+            ...QuerySerializationAdvisor::notices($openApi),
         ];
         $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components']];
 

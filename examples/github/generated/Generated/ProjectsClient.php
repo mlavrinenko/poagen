@@ -133,6 +133,32 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         );
     }
 
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListItemsForOrg(
+        int $projectNumber,
+        string $org,
+        ?string $q = null,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/projectsV2/{project_number}/items')
+                ->path('project_number', $projectNumber)
+                ->path('org', $org)
+                ->query('q', $q)
+                ->query('fields', $fields)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+        );
+    }
+
     public function projectsAddItemForOrg(
         string $org,
         int $projectNumber,
@@ -144,6 +170,25 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->json($body),
             ResponseType::object(ProjectsV2ItemSimple::class),
+        );
+    }
+
+    /**
+     * @param string|list<string> $fields
+     */
+    public function projectsGetOrgItem(
+        int $projectNumber,
+        string $org,
+        int $itemId,
+        string|array|null $fields = null,
+    ): ProjectsV2ItemWithContent {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/projectsV2/{project_number}/items/{item_id}')
+                ->path('project_number', $projectNumber)
+                ->path('org', $org)
+                ->path('item_id', $itemId)
+                ->query('fields', $fields),
+            ResponseType::object(ProjectsV2ItemWithContent::class),
         );
     }
 
@@ -185,6 +230,32 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->json($body),
             ResponseType::object(ProjectsV2View::class),
+        );
+    }
+
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListViewItemsForOrg(
+        int $projectNumber,
+        string $org,
+        int $viewNumber,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/orgs/{org}/projectsV2/{project_number}/views/{view_number}/items')
+                ->path('project_number', $projectNumber)
+                ->path('org', $org)
+                ->path('view_number', $viewNumber)
+                ->query('fields', $fields)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(ProjectsV2ItemWithContent::class),
         );
     }
 
@@ -293,6 +364,32 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         );
     }
 
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListItemsForUser(
+        int $projectNumber,
+        string $username,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+        ?string $q = null,
+        string|array|null $fields = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/users/{username}/projectsV2/{project_number}/items')
+                ->path('project_number', $projectNumber)
+                ->path('username', $username)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage)
+                ->query('q', $q)
+                ->query('fields', $fields),
+            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+        );
+    }
+
     public function projectsAddItemForUser(
         string $username,
         int $projectNumber,
@@ -304,6 +401,25 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->json($body),
             ResponseType::object(ProjectsV2ItemSimple::class),
+        );
+    }
+
+    /**
+     * @param string|list<string> $fields
+     */
+    public function projectsGetUserItem(
+        int $projectNumber,
+        string $username,
+        int $itemId,
+        string|array|null $fields = null,
+    ): ProjectsV2ItemWithContent {
+        return $this->transport->send(
+            Endpoint::get('/users/{username}/projectsV2/{project_number}/items/{item_id}')
+                ->path('project_number', $projectNumber)
+                ->path('username', $username)
+                ->path('item_id', $itemId)
+                ->query('fields', $fields),
+            ResponseType::object(ProjectsV2ItemWithContent::class),
         );
     }
 
@@ -331,6 +447,32 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('item_id', $itemId)
                 ->json($body),
             ResponseType::object(ProjectsV2ItemWithContent::class),
+        );
+    }
+
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListViewItemsForUser(
+        int $projectNumber,
+        string $username,
+        int $viewNumber,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/users/{username}/projectsV2/{project_number}/views/{view_number}/items')
+                ->path('project_number', $projectNumber)
+                ->path('username', $username)
+                ->path('view_number', $viewNumber)
+                ->query('fields', $fields)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('per_page', $perPage),
+            ResponseType::listOf(ProjectsV2ItemWithContent::class),
         );
     }
 }

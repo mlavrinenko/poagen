@@ -95,15 +95,16 @@ return new Profile(
      * parameter typed as the native PHP union across the branches — no
      * branch selection needed outgoing, since the caller already holds a
      * concrete instance of one of them.
+     *
+     * `support-the-parameter-shapes-real-documents-use` removed the last
+     * seven: `region` (three operations) and `resource_id` resolve through
+     * a `$ref` the parameter-shape gate used to refuse outright; `job_names`
+     * is a query array whose items are a `$ref` to a scalar component,
+     * emitted as `list<Schema>`; and the two `X-Dangerous` operations are
+     * a required header, now a required method argument instead of a
+     * refusal.
      */
     skip: [
-        'apps_list_job_invocations' => 'parameter \'job_names\' (in: query, type: array) is outside paogen\'s supported parameter shapes',
-        'volumes_list' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'volumes_delete_byName' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'autoscalepools_delete_dangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
-        'droplets_destroy_withAssociatedResourcesDangerous' => 'parameter \'X-Dangerous\' (in: header, type: boolean) is outside paogen\'s supported parameter shapes',
-        'monitoring_list_sinks' => 'parameter \'resource_id\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'vpcPeerings_list' => 'parameter \'region\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         // The vendor's own defect, not paogen's: `check_updatable` (this
         // operation's sole allOf member) declares `name`, `type`, `target`,
         // `regions`, `enabled` — never `method` — yet the request body's own

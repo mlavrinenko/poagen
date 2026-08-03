@@ -27,10 +27,13 @@ use Acme\DigitalOcean\Generated\Model\AppsCreateDeploymentRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRestartRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRollbackAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsUpdateAppRequest;
+use Acme\DigitalOcean\Generated\Model\Schema;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+
+use function array_map;
 
 final readonly class AppsClient implements AppsClientInterface
 {
@@ -428,6 +431,29 @@ final readonly class AppsClient implements AppsClientInterface
         $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/instances')
                 ->path('app_id', $appId)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `app:read`.
+     * @param list<Schema> $jobNames
+     */
+    public function appsListJobInvocations(
+        string $appId,
+        ?array $jobNames = null,
+        ?string $deploymentId = null,
+        ?int $page = null,
+        ?int $perPage = null,
+    ): void {
+        $this->transport->send(
+            Endpoint::get('/v2/apps/{app_id}/job-invocations')
+                ->path('app_id', $appId)
+                ->query('job_names', $jobNames === null ? null : array_map(static fn(Schema $__v): string => $__v->toScalar(), $jobNames))
+                ->query('deployment_id', $deploymentId)
+                ->query('page', $page)
+                ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
             ResponseType::nothing(),
         );

@@ -1,0 +1,108 @@
+openapi: 3.0.3
+info:
+  title: Parameter Shape Reference Resolution Fixture
+  version: "1.0.0"
+  description: >
+    support-the-parameter-shapes-real-documents-use fixture. Proves the
+    three mechanisms without depending on a vendor document:
+
+      - refQuery / refHeader          a $ref to a scalar component in query
+                                       and header position. Emitted, typed
+                                       as the component.
+      - refQueryItems                 a query array whose items are a $ref
+                                       to a scalar component (DigitalOcean's
+                                       job_names shape). Emitted.
+      - scalarOrList                  a query oneOf of a bare scalar and an
+                                       array of one (GitHub's fields/has
+                                       shape). Emitted as a native union
+                                       with a PHPStan annotation.
+      - dangerousOp                   a required header parameter ahead of
+                                       an optional query and an optional
+                                       header. Emitted, required argument
+                                       first.
+paths:
+  /widgets:
+    get:
+      operationId: refQuery
+      parameters:
+        - name: tag
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/TagId'
+      responses:
+        '204':
+          description: ok
+  /widgets/echo:
+    get:
+      operationId: refHeader
+      parameters:
+        - name: X-Tag-Id
+          in: header
+          required: false
+          schema:
+            $ref: '#/components/schemas/TagId'
+      responses:
+        '204':
+          description: ok
+  /widgets/by-tags:
+    get:
+      operationId: refQueryItems
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TagId'
+      responses:
+        '204':
+          description: ok
+  /widgets/filter:
+    get:
+      operationId: scalarOrList
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          schema:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+      responses:
+        '204':
+          description: ok
+  /widgets/{widget_id}/danger:
+    delete:
+      operationId: dangerousOp
+      parameters:
+        - name: widget_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: X-Confirm
+          in: header
+          required: true
+          schema:
+            type: boolean
+        - name: verbose
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: X-Debug
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+components:
+  schemas:
+    TagId:
+      type: string

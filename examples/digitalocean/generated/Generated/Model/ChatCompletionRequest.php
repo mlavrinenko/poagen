@@ -19,6 +19,7 @@ final readonly class ChatCompletionRequest
      * @param list<ChatMessage> $messages
      * @param ?array<string, int> $logit_bias
      * @param ?array<string, string> $metadata
+     * @param string|list<string>|null $stop
      * @param ?list<ChatCompletionTool> $tools
      */
     public function __construct(
@@ -34,7 +35,7 @@ final readonly class ChatCompletionRequest
         public ?float $presence_penalty = null,
         public ?ChatCompletionRequestReasoningEffort $reasoning_effort = null,
         public ?int $seed = null,
-        public mixed $stop = null,
+        public string|array|null $stop = null,
         public ?bool $stream = null,
         public ?ChatCompletionRequestStreamOptions $stream_options = null,
         public ?float $temperature = null,
