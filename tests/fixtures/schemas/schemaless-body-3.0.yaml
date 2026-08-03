@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Schemaless Body Fixture
+  version: "1.0.0"
+  description: >
+    a-media-type-with-no-schema-takes-a-raw-body. `postRaw`'s media type
+    carries `examples` and no `schema` key at all — `repos/get-content`'s
+    exact shape — and generates a raw `array<string, mixed>` parameter
+    rather than refusing the operation.
+
+    `postUnrepresentable`'s media type declares a `schema`, just one paogen
+    cannot type: a bare `type: string` body, which is neither a `$ref`, an
+    inline object, nor an array of either. The distinction the task turns
+    on is "the document said nothing" versus "the document said something
+    paogen cannot type", and only the first passes — this operation proves
+    the second still refuses, unchanged.
+paths:
+  /raw:
+    post:
+      operationId: postRaw
+      requestBody:
+        content:
+          application/json:
+            examples:
+              sample:
+                summary: an example with no schema to infer from
+      responses:
+        '204':
+          description: ok
+  /unrepresentable:
+    post:
+      operationId: postUnrepresentable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '204':
+          description: ok

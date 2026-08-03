@@ -161,10 +161,10 @@ return new Profile(
      * an array of one, now the native union `string|array` plus a
      * `string|list<string>` annotation.
      *
-     * `a-union-response-selects-its-branch` took the remaining eight, every
-     * one of them a response whose 200 is a `oneOf`/`anyOf` the analyser
-     * used to see only as a schema "of type 'unspecified'". All eight
-     * resolve with no profile guidance at all: `users/get-authenticated`,
+     * `a-union-response-selects-its-branch` took eight more, every one of
+     * them a response whose 200 is a `oneOf`/`anyOf` the analyser used to
+     * see only as a schema "of type 'unspecified'". All eight resolve with
+     * no profile guidance at all: `users/get-authenticated`,
      * `users/get-by-id` and `users/get-by-username` carry the document's
      * own `discriminator` — with an explicit `mapping` whose wire values
      * (`public`/`private`) are not either branch's class name, the one
@@ -177,6 +177,13 @@ return new Profile(
      * different `$ref` items — resolved as `list<SimpleUser|Stargazer>`
      * and `list<StarredRepository|Repository>` rather than as a union of
      * two list types, which cannot be written as a native PHP type at all.
+     *
+     * `a-media-type-with-no-schema-takes-a-raw-body` took the last one:
+     * `repos/get-content`'s request body carries `examples` and no
+     * `schema` key at all, which is not a schema paogen failed to
+     * understand — the document declares nothing about the body's shape,
+     * so it passes through untyped as `array<string, mixed>` rather than
+     * refusing the operation.
      */
     skip: [
         // issues/set-labels and issues/add-labels: request body is a `oneOf`
@@ -214,7 +221,6 @@ return new Profile(
         'repos/remove-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
             . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
-        'repos/get-content' => 'application/json request body with an inline (non-$ref) schema',
         // users/add-email-for-authenticated-user and
         // users/delete-email-for-authenticated-user: request body is
         // `oneOf: [inline object, {type: array, items: string}, {type:

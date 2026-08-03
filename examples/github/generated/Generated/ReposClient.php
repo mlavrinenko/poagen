@@ -52,7 +52,10 @@ use Acme\GitHub\Generated\Model\CommitActivity;
 use Acme\GitHub\Generated\Model\CommitComment;
 use Acme\GitHub\Generated\Model\CommitComparison;
 use Acme\GitHub\Generated\Model\CommunityProfile;
+use Acme\GitHub\Generated\Model\ContentDirectory;
 use Acme\GitHub\Generated\Model\ContentFile;
+use Acme\GitHub\Generated\Model\ContentSubmodule;
+use Acme\GitHub\Generated\Model\ContentSymlink;
 use Acme\GitHub\Generated\Model\ContentTraffic;
 use Acme\GitHub\Generated\Model\Contributor;
 use Acme\GitHub\Generated\Model\ContributorActivity;
@@ -164,6 +167,7 @@ use Acme\GitHub\Generated\Model\Topic;
 use Acme\GitHub\Generated\Model\ViewTraffic;
 use Acme\GitHub\Generated\Model\WebhookConfig;
 use DateTimeInterface;
+use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -1238,6 +1242,35 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('per_page', $perPage),
             ResponseType::object(CommitComparison::class),
         );
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public function reposGetContent(
+        string $owner,
+        string $repo,
+        string $path,
+        array $body,
+        ?string $ref = null,
+    ): ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule {
+        /** @var ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/contents/{path}')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->path('path', $path)
+                ->query('ref', $ref)
+                ->jsonRaw($body),
+            ResponseType::union(new Discriminator(field: 'type', map: [
+            'array' => ContentDirectory::class,
+            'file' => ContentFile::class,
+            'symlink' => ContentSymlink::class,
+            'submodule' => ContentSubmodule::class,
+        ], onParent: false), null, '/paths/~1repos~1{owner}~1{repo}~1contents~1{path}/get/responses/200/content/application~1json/schema'),
+        );
+
+        return $result;
     }
 
     public function reposCreateOrUpdateFileContents(

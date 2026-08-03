@@ -52,7 +52,10 @@ use Acme\GitHub\Generated\Model\CommitActivity;
 use Acme\GitHub\Generated\Model\CommitComment;
 use Acme\GitHub\Generated\Model\CommitComparison;
 use Acme\GitHub\Generated\Model\CommunityProfile;
+use Acme\GitHub\Generated\Model\ContentDirectory;
 use Acme\GitHub\Generated\Model\ContentFile;
+use Acme\GitHub\Generated\Model\ContentSubmodule;
+use Acme\GitHub\Generated\Model\ContentSymlink;
 use Acme\GitHub\Generated\Model\ContentTraffic;
 use Acme\GitHub\Generated\Model\Contributor;
 use Acme\GitHub\Generated\Model\ContributorActivity;
@@ -585,6 +588,17 @@ interface ReposClientInterface
         ?int $page = null,
         ?int $perPage = null,
     ): CommitComparison;
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public function reposGetContent(
+        string $owner,
+        string $repo,
+        string $path,
+        array $body,
+        ?string $ref = null,
+    ): ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule;
 
     public function reposCreateOrUpdateFileContents(
         string $owner,

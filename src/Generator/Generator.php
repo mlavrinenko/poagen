@@ -22,6 +22,7 @@ use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\QuerySerializationAdvisor;
+use Mlavrinenko\Paogen\Generator\Emit\SchemalessBodyAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
 use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
@@ -113,11 +114,9 @@ final readonly class Generator
         $unions = new DiscriminatorEnforcer($profile->discriminators, $profile)->enforce($openApi);
         $bindings = $bindings->withUnions($unions);
 
-        // Same discipline, one walk further out: a `type` list naming several
-        // types PHP cannot express as one (nullable-type-arrays), and a JSON
-        // Schema 2020-12 keyword no emitter implements
-        // (swap-openapi-parser-for-31-support). One walk, two probes, so an
-        // operation reports one reason rather than a pile of them.
+        // Same discipline, one walk further out: a `type` list naming several types PHP cannot
+        // express as one (nullable-type-arrays), and a JSON Schema 2020-12 keyword no emitter
+        // implements (swap-openapi-parser-for-31-support). One walk, two probes, one reason each.
         $schemaSkips = SchemaScan::run($openApi, [
             TypeListScanner::probe(...),
             UnsupportedKeywordScanner::probe(...),
@@ -197,6 +196,7 @@ final readonly class Generator
             // the run says so — `declared-shapes-become-types` tolerates that
             // one `mixed` only while it is visible.
             ...UnconstrainedFieldAdvisor::notices($openApi),
+            ...SchemalessBodyAdvisor::notices($openApi),
             // One line per union naming what it will discriminate on, so the
             // rule is visible before anything runs rather than discovered in
             // production — and so a pin's narrowing is reprinted on every run,
