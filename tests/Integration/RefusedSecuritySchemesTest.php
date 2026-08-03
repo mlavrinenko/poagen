@@ -33,11 +33,6 @@ final class RefusedSecuritySchemesTest extends TestCase
     private const string PETSTORE = __DIR__ . '/../fixtures/schemas/petstore-3.0.yaml';
     private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\RefusedSecurity';
 
-    /** @var array<string,string> */
-    private const array PETSTORE_SKIP = [
-        'uploadFile' => 'application/octet-stream request body — not what these scenarios are about',
-    ];
-
     public static function tearDownAfterClass(): void
     {
         self::removeSandboxDirs();
@@ -94,7 +89,7 @@ final class RefusedSecuritySchemesTest extends TestCase
     {
         // The vendored petstore document does exactly this: it requires
         // `api_key` on two operations and declares only `petstore_auth`.
-        $message = $this->refusal($this->profile(self::PETSTORE, self::PETSTORE_SKIP));
+        $message = $this->refusal($this->profile(self::PETSTORE, []));
 
         self::assertStringContainsString(
             "security requirement 'api_key' names a scheme components.securitySchemes does not declare",
@@ -110,7 +105,7 @@ final class RefusedSecuritySchemesTest extends TestCase
 
     public function testTheProfileDeclarationWiresTheRequirementRatherThanSkippingItsOperations(): void
     {
-        $plan = $this->plan($this->profile(self::PETSTORE, self::PETSTORE_SKIP, PetstoreFixture::SECURITY_SCHEMES));
+        $plan = $this->plan($this->profile(self::PETSTORE, [], PetstoreFixture::SECURITY_SCHEMES));
         $store = self::plannedSource($plan->writes, 'StoreClient');
 
         // Both operations that required it are emitted, and each sends it.
@@ -119,8 +114,13 @@ final class RefusedSecuritySchemesTest extends TestCase
             $store,
         );
         self::assertStringContainsString("->header('api_key', \$this->apiKey)", self::plannedSource($plan->writes, 'PetClient'));
+        // Nothing is skipped at all. `uploadFile` was the one entry here
+        // until `represent-non-json-request-and-response-bodies` gave its
+        // octet-stream body a stream parameter, so this now asserts the
+        // stronger thing the scenario was always about: supplying the missing
+        // declaration costs no operation.
         self::assertSame(
-            ['uploadFile'],
+            [],
             array_map(static fn(object $skip): string => (string) $skip->operationId, $plan->skippedOperations),
         );
     }
@@ -155,7 +155,7 @@ final class RefusedSecuritySchemesTest extends TestCase
     #[DataProvider('staleGuidance')]
     public function testGuidanceThatMatchesNothingFailsTheRun(array $securitySchemes, string $expected): void
     {
-        self::assertStringContainsString($expected, $this->refusal($this->profile(self::PETSTORE, self::PETSTORE_SKIP, $securitySchemes)));
+        self::assertStringContainsString($expected, $this->refusal($this->profile(self::PETSTORE, [], $securitySchemes)));
     }
 
     /**

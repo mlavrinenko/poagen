@@ -131,15 +131,18 @@ final class TaggedSubClientTest extends TestCase
     }
 
     /**
-     * Petstore's octet-stream upload is unrepresentable and its `api_key`
-     * requirement names a scheme the document never declares; both stop the
-     * run unless accepted, and neither is what the tag scenarios are about.
+     * Petstore's `api_key` requirement names a scheme the document never
+     * declares, which stops the run unless the declaration is supplied, and
+     * that is not what the tag scenarios are about.
+     *
+     * The octet-stream upload used to need accepting here too. It stopped
+     * being unrepresentable in `represent-non-json-request-and-response-bodies`,
+     * and a skip entry for it now fails the run as stale.
      */
     private function petstorePlan(): GenerationPlan
     {
         return $this->plan(
             self::PETSTORE,
-            skip: ['uploadFile' => 'octet-stream body'],
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         );
     }

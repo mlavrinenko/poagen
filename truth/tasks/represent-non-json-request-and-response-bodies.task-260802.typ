@@ -27,6 +27,18 @@ a small amount of plumbing.
 `real-world-schemas` is the goal this fails. A vendor that returns Markdown
 from one endpoint has not published an unusual document.
 
+=== Correction, 2026-08-03: one of the three is not a stream
+
+The Summary calls one GitHub response "a vendor stream type". It is not.
+`examples/github/schemas/api.github.com.yaml:5723-5725` declares
+`application/octocat-stream` with `schema: {type: string}` — the subtype says
+stream, the schema says string, and the schema is what counts.
+
+It matters beyond pedantry, because it is the reason `BodyMediaType`
+classifies on the schema rather than on the media type: `format: binary` makes
+a body binary under whatever name the vendor gave it, which is also why
+DigitalOcean's `application/pdf` works without being enumerated anywhere.
+
 == Acceptance criteria
 
 - A request body declared `text/*` takes a `string` argument and is sent with
