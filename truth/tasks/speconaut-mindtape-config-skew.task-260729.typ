@@ -86,7 +86,13 @@ One criterion is deliberately left unmet: the note recording how speconaut's
 embedded mindtape and the separately-installed \`mt\` stay in step. That is a
 design call belonging to speconaut, the mechanism is not paogen's to choose, and
 speconaut's tree currently carries uncommitted changes that are not this
-session's. Filed as \`speconaut-mindtape-skew-guard\` rather than written badly
-from the outside. The defect this task names is fixed; the guard against its
-recurrence is not, and saying so is more useful than a note that invents a
-mechanism nobody agreed to.
+session's. Filed rather than written badly from the outside. The defect this
+task names is fixed; the guard against its recurrence is not, and saying so is
+more useful than a note that invents a mechanism nobody agreed to.
+
+That guard lived here as \`speconaut-mindtape-skew-guard\` until 2026-08-03,
+naming no paogen file at all. The owner ruled that a task fixing another
+project belongs in that project's tracker, so it moved to speconaut's own
+backlog as \`keep-the-embedded-mindtape-in-step-with-the-installed-mt\` and
+was retired here. paogen is still what breaks when the two drift; it is simply
+not where the fix can be written.
