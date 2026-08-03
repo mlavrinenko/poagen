@@ -8,6 +8,44 @@ Written at a hard pause, mid-wave. Read this before
 are task-status changes under `truth/tasks`, which the freshness hash excludes
 by design.
 
+## Update: relaunched, and two questions answered
+
+The three interrupted agents could not be resumed — they were stopped rather
+than paused, so their transcripts are readable but not continuable. Fresh
+agents were launched into the same three worktrees instead, each told to read
+the inherited uncommitted diff and judge it on its merits rather than trust or
+discard it wholesale. The table below still describes what each worktree held
+at the moment of the pause.
+
+The owner was asked three things on resume and answered two of them by
+delegation: the security buckets and the octet-stream body type are mine to
+decide, and PSR-7 is acceptable either way provided the reason is written down
+and applied consistently. The third — whether a new golden fixture tree can be
+added later — is yes, and
+`generated-tier-duplication-ratchet-blocks-new-golden-trees` already requires
+committing the tree that was dropped.
+
+### Ruling: a binary body is a PSR-7 `StreamInterface`, both directions
+
+Decided 2026-08-03 under that delegation. The decision artifact follows once
+the implementation lands and its consequences can be stated as fact rather than
+prediction; the reasoning is recorded here first so an interruption cannot lose
+it.
+
+- PHP has no `resource` type declaration. A resource-typed body cannot be
+  written into a property or a return type at all — it would be `mixed` plus a
+  docblock. `declared-shapes-become-types` forbids a declared shape becoming
+  `mixed`, so `resource` does not lose on taste; it loses to a goal.
+- `runtime/composer.json` already requires `psr/http-message: ^2.0`,
+  `psr/http-client` and `psr/http-factory`. Nothing is added.
+- A runtime-owned stream wrapper would duplicate a standard interface and buy
+  no guarantee the interface does not already give.
+- The owner's ruling that the envelope carries no PSR-7 object means the
+  envelope does not expose the PSR-7 *response* as transport plumbing. A body
+  typed `StreamInterface` because the document declared a binary stream is the
+  declared shape of that body. Those are different claims and only the first is
+  ruled out.
+
 ## Three agents were interrupted. Their work is on disk, uncommitted.
 
 Do not run `git worktree prune`, do not remove these three worktrees, and do
