@@ -19,12 +19,13 @@ final readonly class CustomProperty
 {
     /**
      * @param ?list<string> $allowed_values
+     * @param string|list<string>|null $default_value
      */
     public function __construct(
         public string $property_name,
         public CustomPropertyValueType $value_type,
         public ?array $allowed_values = null,
-        public mixed $default_value = null,
+        public string|array|null $default_value = null,
         public ?string $description = null,
         public ?bool $require_explicit_values = null,
         public ?bool $required = null,

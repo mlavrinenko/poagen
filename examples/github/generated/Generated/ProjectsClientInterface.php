@@ -79,11 +79,35 @@ interface ProjectsClientInterface
 
     public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): ProjectsV2Field;
 
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListItemsForOrg(
+        int $projectNumber,
+        string $org,
+        ?string $q = null,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
+
     public function projectsAddItemForOrg(
         string $org,
         int $projectNumber,
         ProjectsAddItemForOrgRequest $body,
     ): ProjectsV2ItemSimple;
+
+    /**
+     * @param string|list<string> $fields
+     */
+    public function projectsGetOrgItem(
+        int $projectNumber,
+        string $org,
+        int $itemId,
+        string|array|null $fields = null,
+    ): ProjectsV2ItemWithContent;
 
     public function projectsDeleteItemForOrg(int $projectNumber, string $org, int $itemId): void;
 
@@ -99,6 +123,20 @@ interface ProjectsClientInterface
         int $projectNumber,
         ProjectsCreateViewForOrgRequest $body,
     ): ProjectsV2View;
+
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListViewItemsForOrg(
+        int $projectNumber,
+        string $org,
+        int $viewNumber,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
 
     public function projectsCreateDraftItemForAuthenticatedUser(
         string $userId,
@@ -144,11 +182,35 @@ interface ProjectsClientInterface
 
     public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): ProjectsV2Field;
 
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListItemsForUser(
+        int $projectNumber,
+        string $username,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+        ?string $q = null,
+        string|array|null $fields = null,
+    ): array;
+
     public function projectsAddItemForUser(
         string $username,
         int $projectNumber,
         ProjectsAddItemForUserRequest $body,
     ): ProjectsV2ItemSimple;
+
+    /**
+     * @param string|list<string> $fields
+     */
+    public function projectsGetUserItem(
+        int $projectNumber,
+        string $username,
+        int $itemId,
+        string|array|null $fields = null,
+    ): ProjectsV2ItemWithContent;
 
     public function projectsDeleteItemForUser(int $projectNumber, string $username, int $itemId): void;
 
@@ -158,4 +220,18 @@ interface ProjectsClientInterface
         int $itemId,
         ProjectsUpdateItemForUserRequest $body,
     ): ProjectsV2ItemWithContent;
+
+    /**
+     * @param string|list<string> $fields
+     * @return list<ProjectsV2ItemWithContent>
+     */
+    public function projectsListViewItemsForUser(
+        int $projectNumber,
+        string $username,
+        int $viewNumber,
+        string|array|null $fields = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?int $perPage = null,
+    ): array;
 }

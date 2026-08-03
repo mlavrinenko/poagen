@@ -27,6 +27,7 @@ use Acme\DigitalOcean\Generated\Model\AppsCreateDeploymentRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRestartRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRollbackAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsUpdateAppRequest;
+use Acme\DigitalOcean\Generated\Model\Schema;
 
 /**
  * The contract for the `Apps` endpoints.
@@ -210,6 +211,18 @@ interface AppsClientInterface
      * Requires `bearer_auth` scopes: `app:read`.
      */
     public function appsGetInstances(string $appId): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `app:read`.
+     * @param list<Schema> $jobNames
+     */
+    public function appsListJobInvocations(
+        string $appId,
+        ?array $jobNames = null,
+        ?string $deploymentId = null,
+        ?int $page = null,
+        ?int $perPage = null,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.

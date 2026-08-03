@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Enum\RegionSlug;
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\VolumesExt4;
 use Acme\DigitalOcean\Generated\Model\VolumesXfs;
@@ -27,6 +28,26 @@ final readonly class BlockStorageClient implements BlockStorageClientInterface
     }
 
     /**
+     * Requires `bearer_auth` scopes: `api:read`, `api:write`, `block_storage:read`.
+     */
+    public function volumesList(
+        ?string $name = null,
+        ?RegionSlug $region = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): void {
+        $this->transport->send(
+            Endpoint::get('/v2/volumes')
+                ->query('name', $name)
+                ->query('region', $region)
+                ->query('per_page', $perPage)
+                ->query('page', $page)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
      */
     public function volumesCreate(VolumesExt4|VolumesXfs $body): void
@@ -35,6 +56,20 @@ final readonly class BlockStorageClient implements BlockStorageClientInterface
             Endpoint::post('/v2/volumes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `block_storage:delete`, `api:write`.
+     */
+    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): void
+    {
+        $this->transport->send(
+            Endpoint::delete('/v2/volumes')
+                ->query('name', $name)
+                ->query('region', $region)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
             ResponseType::nothing(),
         );
     }

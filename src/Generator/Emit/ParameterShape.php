@@ -16,23 +16,14 @@ use function sprintf;
  * Whether one parameter's schema is a shape paogen emits, and — when it is
  * not — the refusal that says so.
  *
- * Two of the three positions had a gate and the third did not. `query` and
- * `header` each read their own supported subset off `SchemaType`, and a
- * parameter outside it stopped the run; `path` accepted whatever the document
- * declared and handed it to {@see TypeResolver}, so an inline object, an
- * array, or a node with no `type` at all fell through to that resolver's
- * `mixed` default and only surfaced two layers later as a PHPStan error
- * against `Endpoint::path()` — inside generated code, which a consumer reads
- * as their own bug. `fail-loud-never-silent` makes that a default-deny
- * question rather than a matter of taste, and the same discipline has to
- * apply uniformly: two constructs the generator cannot represent must fail
- * the same way.
- *
  * So all three positions ask their question here. Each keeps its own subset —
- * they are genuinely different, and widening one to match another is a
- * separate decision, not a refactoring — but the reading, the refusal
- * sentence and the schema pointer are shared, so a third near-identical gate
- * did not have to be written to add the third position.
+ * genuinely different, widening one to match another is a separate decision
+ * — but the reading, the refusal sentence and the schema pointer are shared.
+ *
+ * `query` and `header` used to refuse any `$ref` schema outright, without
+ * asking what it named — the reference resolves to a named type, and what
+ * it resolves to is exactly the question a shape gate should ask.
+ * {@see resolvedSchema()} is the one place that resolution happens.
  *
  * The subsets, and why each is what it is:
  *
@@ -42,16 +33,17 @@ use function sprintf;
  *     `string|int|float|bool|BackedEnum|Stringable`; nothing wider fits, and
  *     the scalar union `scalar-union-path-parameters-resolve-not-refuse`
  *     landed does fit, so it stays resolved rather than refused.
- *   - `query` — a scalar, or an array whose items are scalars, because
- *     `Endpoint::query()` also serialises a repeated key.
- *   - `header` — an optional scalar. A required header parameter is refused
- *     whatever its schema: the emitted signature gives every header a
- *     nullable default.
+ *   - `query` — a scalar, a `$ref` to one, an array whose items are scalars
+ *     (directly, or through a `$ref` — DigitalOcean's `job_names`), or a
+ *     `oneOf`/`anyOf` of a bare scalar and an array of one (GitHub's
+ *     `fields`/`has`) — `Endpoint::query()` already accepts a
+ *     scalar-or-array value at runtime.
+ *   - `header` — a scalar, or a `$ref` to one. A required header is now a
+ *     required method argument, not a refusal; only the schema gates it.
  *
- * Nothing here reads a `type` keyword itself — {@see SchemaType} is the one
- * reader of that in `src/`, and {@see CompositionResolver::resolveScalarUnion()}
- * the one reader of the `anyOf`/`oneOf` spelling of a scalar union. This class
- * asks those two the question and combines the answers.
+ * Nothing here reads a `type` keyword itself: {@see SchemaType} does, and
+ * {@see CompositionResolver} reads the `anyOf`/`oneOf` spellings of a
+ * scalar union and of a scalar-or-list. This class asks those the question.
  *
  * @internal
  */
@@ -131,6 +123,12 @@ final readonly class ParameterShape
     {
         $schema = $param->schema;
 
+        if ($schema instanceof Reference) {
+            $target = self::resolvedSchema($schema);
+
+            return $target instanceof Schema && SchemaType::of($target)->isScalar();
+        }
+
         if (!$schema instanceof Schema) {
             return false;
         }
@@ -141,24 +139,58 @@ final readonly class ParameterShape
             return true;
         }
 
+        // Everything below sends a repeated key — `Endpoint::query()`'s only
+        // serialisation. A document asking for anything else via
+        // `style`/`explode` is refused rather than silently mis-serialised.
+        if (!QuerySerializationStyle::isFormExploded($param)) {
+            return false;
+        }
+
+        if (CompositionResolver::resolveScalarOrList($schema) instanceof TypeResolver) {
+            return true;
+        }
+
         if (!$type->is('array')) {
             return false;
         }
 
+        // Items may themselves be a `$ref` — DigitalOcean's `job_names`,
+        // `items: {$ref: '#/components/schemas/schema'}}`, target `{type:
+        // string}`.
         $items = $schema->items;
+        $items = $items instanceof Reference ? self::resolvedSchema($items) : $items;
 
         return $items instanceof Schema && SchemaType::of($items)->isScalar();
     }
 
     private static function supportsHeader(Parameter $param): bool
     {
-        if ($param->required) {
-            return false;
-        }
-
         $schema = $param->schema;
 
+        if ($schema instanceof Reference) {
+            $target = self::resolvedSchema($schema);
+
+            return $target instanceof Schema && SchemaType::of($target)->isScalar();
+        }
+
         return $schema instanceof Schema && SchemaType::of($schema)->isScalar();
+    }
+
+    /**
+     * The schema a `$ref` names, or the schema itself when it already is
+     * one. Null when the reference does not resolve to a schema — a
+     * dangling pointer, or one naming something else. cebe's own
+     * `resolve()` already walks a chain of references, so this need not.
+     */
+    private static function resolvedSchema(Schema|Reference $node): ?Schema
+    {
+        if ($node instanceof Schema) {
+            return $node;
+        }
+
+        $target = $node->resolve();
+
+        return $target instanceof Schema ? $target : null;
     }
 
     /**
@@ -228,9 +260,10 @@ final readonly class ParameterShape
         return match ($in) {
             'path' => 'a path parameter is interpolated into the URI, so its schema must name a scalar '
                 . '(string, integer, number or boolean), a union of scalars, or one or more $refs to component schemas',
-            'query' => "a query parameter's schema must name a scalar, or an array whose items are scalars",
-            'header' => 'a header parameter must be optional (paogen gives every header a nullable default) '
-                . 'and its schema must name a scalar',
+            'query' => 'a query parameter\'s schema must name a scalar, a $ref to a scalar component, an array '
+                . 'whose items are scalars (directly or through a $ref), or a oneOf/anyOf of a scalar and a list '
+                . 'of one',
+            'header' => 'a header parameter\'s schema must name a scalar, or a $ref to a scalar component',
             default => 'paogen emits path, query and header parameters — no other `in` value',
         };
     }

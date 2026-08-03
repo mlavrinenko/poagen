@@ -152,18 +152,18 @@ return new Profile(
      * `RequestBodyAnalyzer` emitted a bare map and discarded the "either
      * subject_digests or attestation_ids" the document's prose already
      * promised. Both now emit the union instead.
+     *
+     * `support-the-parameter-shapes-real-documents-use` took the last
+     * sixteen, all a query-parameter shape whose schema is a `$ref` or a
+     * `oneOf`/`anyOf`: `state`, `tool_name` (three operations), `ref` (two),
+     * `has` (three) and `ecosystem` resolve through a `$ref` the gate used
+     * to refuse outright; `fields` (six) is a `oneOf` of a bare scalar and
+     * an array of one, now the native union `string|array` plus a
+     * `string|list<string>` annotation.
      */
     skip: [
         'activity/list-stargazers-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'activity/list-repos-starred-by-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
-        'campaigns/list-org-campaigns' => 'parameter \'state\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'code-scanning/list-alerts-for-org' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'code-scanning/list-alerts-for-repo' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'code-scanning/list-alert-instances' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'code-scanning/list-recent-analyses' => 'parameter \'tool_name\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'dependabot/list-alerts-for-enterprise' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'dependabot/list-alerts-for-org' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'dependabot/list-alerts-for-repo' => 'parameter \'has\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'interactions/get-restrictions-for-org' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-repo' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         'interactions/get-restrictions-for-authenticated-user' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
@@ -179,13 +179,6 @@ return new Profile(
         'issues/add-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — paogen '
             . 'can only union branches it can express as a PHP class (a $ref to a component, or an inline object '
             . 'with declared properties); reduce this branch to one of those, or skip the operation',
-        'licenses/get-for-repo' => 'parameter \'ref\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/list-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/get-org-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/list-view-items-for-org' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/list-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/get-user-item' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
-        'projects/list-view-items-for-user' => 'parameter \'fields\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         // The six repos/*-status-check-contexts and *-team-access-restrictions
         // operations: request body is `oneOf: [inline object, {type: array,
         // items: string}]` (add/replace a list of contexts or team slugs by
@@ -210,7 +203,6 @@ return new Profile(
             . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/get-content' => 'application/json request body with an inline (non-$ref) schema',
-        'security-advisories/list-global-advisories' =>'parameter \'ecosystem\' (in: query, type: unspecified) is outside paogen\'s supported parameter shapes',
         'users/get-authenticated' => '200 response has an application/json schema of type \'unspecified\', which paogen cannot represent as a method return type',
         // users/add-email-for-authenticated-user and
         // users/delete-email-for-authenticated-user: request body is

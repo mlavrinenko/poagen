@@ -93,6 +93,20 @@ final readonly class DropletAutoscalePoolsClient implements DropletAutoscalePool
     }
 
     /**
+     * Requires `bearer_auth` scopes: `droplet:delete`.
+     */
+    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): void
+    {
+        $this->transport->send(
+            Endpoint::delete('/v2/droplets/autoscale/{autoscale_pool_id}/dangerous')
+                ->path('autoscale_pool_id', $autoscalePoolId)
+                ->header('X-Dangerous', $xDangerous)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::nothing(),
+        );
+    }
+
+    /**
      * Requires `bearer_auth` scopes: `droplet:read`.
      */
     public function autoscalepoolsListHistory(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void

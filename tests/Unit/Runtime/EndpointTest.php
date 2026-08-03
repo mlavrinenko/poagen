@@ -66,6 +66,25 @@ final class EndpointTest extends TestCase
         self::assertSame('/pet/findByTags', Endpoint::get('/pet/findByTags')->query('tags', [])->uri());
     }
 
+    /**
+     * `support-the-parameter-shapes-real-documents-use`: a `oneOf`/`anyOf`
+     * of a scalar and a list of one (GitHub's `fields`/`has`) keeps both
+     * arms as the native union `string|array|null` rather than normalising
+     * to one, per the owner's ruling — so the same `$name` sends a single
+     * key for the scalar arm and the repeated-key form for the list arm,
+     * and the two differ on the wire for every value except a one-element
+     * list. `Endpoint::query()`'s signature already accepts either arm at
+     * runtime; this is the proof.
+     */
+    public function testAScalarOrListParameterSerialisesEachArmDifferently(): void
+    {
+        $scalarArm = Endpoint::get('/projects/items')->query('fields', 'name')->uri();
+        $listArm = Endpoint::get('/projects/items')->query('fields', ['name', 'status'])->uri();
+
+        self::assertSame('/projects/items?fields=name', $scalarArm);
+        self::assertSame('/projects/items?fields=name&fields=status', $listArm);
+    }
+
     public function testEveryQueryValueIsUrlencodedSoACredentialCannotSmuggleASecondPair(): void
     {
         self::assertSame(

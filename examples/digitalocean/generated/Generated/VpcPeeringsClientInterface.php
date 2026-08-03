@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Enum\RegionSlug;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequest;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
 
@@ -23,6 +24,11 @@ use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
  */
 interface VpcPeeringsClientInterface
 {
+    /**
+     * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     */
+    public function vpcPeeringsList(?int $perPage = null, ?int $page = null, ?RegionSlug $region = null): void;
+
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
      */

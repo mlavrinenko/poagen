@@ -11,12 +11,17 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListGlobalAdvisoriesDirection;
+use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListGlobalAdvisoriesSeverity;
+use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListGlobalAdvisoriesSort;
+use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListGlobalAdvisoriesType;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListOrgRepositoryAdvisoriesDirection;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListOrgRepositoryAdvisoriesSort;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListOrgRepositoryAdvisoriesState;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesDirection;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesSort;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesState;
+use Acme\GitHub\Generated\Enum\SecurityAdvisoryEcosystems;
 use Acme\GitHub\Generated\Model\FullRepository;
 use Acme\GitHub\Generated\Model\GlobalAdvisory;
 use Acme\GitHub\Generated\Model\PrivateVulnerabilityReportCreate;
@@ -32,6 +37,55 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
     public function __construct(
         private TransportInterface $transport,
     ) {
+    }
+
+    /**
+     * @param string|list<string> $cwes
+     * @param string|list<string> $affects
+     * @return list<GlobalAdvisory>
+     */
+    public function securityAdvisoriesListGlobalAdvisories(
+        ?string $ghsaId = null,
+        ?SecurityAdvisoriesListGlobalAdvisoriesType $type = null,
+        ?string $cveId = null,
+        ?SecurityAdvisoryEcosystems $ecosystem = null,
+        ?SecurityAdvisoriesListGlobalAdvisoriesSeverity $severity = null,
+        string|array|null $cwes = null,
+        ?bool $isWithdrawn = null,
+        string|array|null $affects = null,
+        ?string $published = null,
+        ?string $updated = null,
+        ?string $modified = null,
+        ?string $epssPercentage = null,
+        ?string $epssPercentile = null,
+        ?string $before = null,
+        ?string $after = null,
+        ?SecurityAdvisoriesListGlobalAdvisoriesDirection $direction = null,
+        ?int $perPage = null,
+        ?SecurityAdvisoriesListGlobalAdvisoriesSort $sort = null,
+    ): array {
+        return $this->transport->send(
+            Endpoint::get('/advisories')
+                ->query('ghsa_id', $ghsaId)
+                ->query('type', $type)
+                ->query('cve_id', $cveId)
+                ->query('ecosystem', $ecosystem)
+                ->query('severity', $severity)
+                ->query('cwes', $cwes)
+                ->query('is_withdrawn', $isWithdrawn)
+                ->query('affects', $affects)
+                ->query('published', $published)
+                ->query('updated', $updated)
+                ->query('modified', $modified)
+                ->query('epss_percentage', $epssPercentage)
+                ->query('epss_percentile', $epssPercentile)
+                ->query('before', $before)
+                ->query('after', $after)
+                ->query('direction', $direction)
+                ->query('per_page', $perPage)
+                ->query('sort', $sort),
+            ResponseType::listOf(GlobalAdvisory::class),
+        );
     }
 
     public function securityAdvisoriesGetGlobalAdvisory(string $ghsaId): GlobalAdvisory

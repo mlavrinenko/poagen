@@ -24,9 +24,10 @@ info:
       - searchWidgets   inline-object query parameter. Refused before this
                         task and after it, and its message is pinned so a
                         shared predicate cannot make it vaguer.
-      - describeWidget  required header parameter, scalar schema. Refused
-                        on requiredness, not on shape — pinned for the
-                        same reason.
+      - describeWidget  required header parameter, scalar schema.
+                        support-the-parameter-shapes-real-documents-use:
+                        emitted as a required method argument, no longer
+                        refused on requiredness.
       - trackWidget     `in: cookie`, a position paogen emits nothing for.
                         Refused, and says which position it is.
       - listWidgets     scalar path parameter, scalar query parameter,
@@ -36,6 +37,12 @@ info:
                         scalar components — DigitalOcean's
                         `ssh_key_identifier`, an id-or-fingerprint.
                         Representable, and emitted.
+      - getWidgetsCommaSeparated
+                        array query parameter with `explode: false`
+                        declared — `Endpoint::query()` only implements
+                        the repeated-key form (`style: form`, `explode:
+                        true`), so a document asking for anything else is
+                        refused rather than silently mis-serialised.
 paths:
   /widgets/{selector}:
     get:
@@ -151,6 +158,21 @@ paths:
             anyOf:
               - $ref: '#/components/schemas/WidgetId'
               - $ref: '#/components/schemas/WidgetSlug'
+      responses:
+        '204':
+          description: ok
+  /widgets/comma:
+    get:
+      operationId: getWidgetsCommaSeparated
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         '204':
           description: ok

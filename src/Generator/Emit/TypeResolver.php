@@ -90,6 +90,15 @@ final readonly class TypeResolver
             return $scalarUnion;
         }
 
+        // A oneOf/anyOf of a bare scalar and an array of one — GitHub's
+        // `fields`/`has` — is a different shape again: resolveScalarUnion
+        // above refuses the moment one branch is an array.
+        $scalarOrList = CompositionResolver::resolveScalarOrList($node);
+
+        if ($scalarOrList instanceof self) {
+            return $scalarOrList;
+        }
+
         return match ($type->name) {
             'string' => new self('string', null, null, $nullable),
             'integer' => new self('int', null, null, $nullable),

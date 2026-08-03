@@ -24,6 +24,7 @@ use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsInterfa
 use Acme\DigitalOcean\Generated\Model\AlertPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DestinationRequest;
 use Acme\DigitalOcean\Generated\Model\MonitoringCreateSinkRequest;
+use Acme\DigitalOcean\Generated\Model\Urn;
 
 /**
  * The contract for the `Monitoring` endpoints.
@@ -435,6 +436,11 @@ interface MonitoringClientInterface
      * Requires `bearer_auth` scopes: `monitoring:read`.
      */
     public function monitoringGetLbFrontendTlsConnectionsLimit(string $lbId, string $start, string $end): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `monitoring:read`.
+     */
+    public function monitoringListSinks(?Urn $resourceId = null): void;
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:create`.

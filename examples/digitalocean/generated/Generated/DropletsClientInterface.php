@@ -84,6 +84,11 @@ interface DropletsClientInterface
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
      */
+    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): void;
+
+    /**
+     * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     */
     public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): void;
 
     /**

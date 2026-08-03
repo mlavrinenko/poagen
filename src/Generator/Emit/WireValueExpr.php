@@ -77,13 +77,25 @@ final readonly class WireValueExpr
      * The conversion call for one list item, inside a closure that declares
      * a `string` return — so the enum branch is spelled out rather than left
      * to `Endpoint`.
+     *
+     * A scalar value object's `toScalar()` cast to `string` only when its
+     * declared return type might not already be one — every branch of a
+     * scalar-component ref carries its own JSON type (DigitalOcean's
+     * `job_names`, `items: {$ref: '.../schema'}}`, target `{type: string}`),
+     * and `TagId::toScalar(): string` makes `(string) $v->toScalar()`
+     * PHPStan's `cast.useless` under strict rules — a real regression, not
+     * a style nit, since `quality-gates-at-maximum-strictness` runs the
+     * generated tier at max with no suppression.
      */
     public function itemExpr(string $varName, Schema|Reference|null $node, Bindings $bindings, PhpNamespace $namespace): string
     {
         $var = '$' . $varName;
+        $types = $this->scalarBranchTypes($node);
 
-        if ($this->refsScalarVo($node)) {
-            return '(string) ' . $var . '->toScalar()';
+        if ($types !== null) {
+            $cast = array_all($types, static fn(string $t): bool => $t === 'string') ? '' : '(string) ';
+
+            return $cast . $var . '->toScalar()';
         }
 
         $schema = $node instanceof Schema ? $node : null;
@@ -128,43 +140,70 @@ final readonly class WireValueExpr
 
     private function refsScalarVo(Schema|Reference|null $node): bool
     {
+        return $this->scalarBranchTypes($node) !== null;
+    }
+
+    /**
+     * Every branch's declared JSON scalar type, in branch order, when
+     * `$node` is a bare `$ref` (or a union of them) to a scalar component.
+     * Null when it is not that shape at all — the caller's "not a scalar
+     * VO" follows from null the same way it did from `refsScalarVo` false.
+     *
+     * @return list<'string'|'integer'|'number'|'boolean'>|null
+     */
+    private function scalarBranchTypes(Schema|Reference|null $node): ?array
+    {
         if (!$this->components instanceof ComponentCatalog || $node === null) {
-            return false;
+            return null;
         }
 
         if ($node instanceof Reference) {
-            return $this->isScalarComponentRef($node);
+            $type = $this->scalarComponentType($node);
+
+            return $type === null ? null : [$type];
         }
 
         $branches = (is_array($node->oneOf) && $node->oneOf !== []) ? $node->oneOf
             : ((is_array($node->anyOf) && $node->anyOf !== []) ? $node->anyOf : []);
 
         if ($branches === []) {
-            return false;
+            return null;
         }
 
-        return array_all(
-            $branches,
-            fn(Schema|Reference $branch): bool => $branch instanceof Reference && $this->isScalarComponentRef($branch),
-        );
+        $types = [];
+
+        foreach ($branches as $branch) {
+            $type = $branch instanceof Reference ? $this->scalarComponentType($branch) : null;
+
+            if ($type === null) {
+                return null;
+            }
+
+            $types[] = $type;
+        }
+
+        return $types;
     }
 
-    private function isScalarComponentRef(Reference $ref): bool
+    /**
+     * @return 'string'|'integer'|'number'|'boolean'|null
+     */
+    private function scalarComponentType(Reference $ref): ?string
     {
         $catalog = $this->components;
 
         if (!$catalog instanceof ComponentCatalog) {
-            return false;
+            return null;
         }
 
         $rawName = ComponentName::rawFromRef($ref->getReference());
 
         if ($rawName === '') {
-            return false;
+            return null;
         }
 
         $shape = $catalog->shapeOf($rawName);
 
-        return $shape instanceof ComponentShape && $shape->kind === ComponentShape::KIND_SCALAR;
+        return $shape instanceof ComponentShape && $shape->kind === ComponentShape::KIND_SCALAR ? $shape->scalarType : null;
     }
 }

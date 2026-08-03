@@ -116,6 +116,17 @@ final class CompositionResolver
         return new TypeResolver($type->unionPhpType(), null, null, false);
     }
 
+    /** A bare scalar plus an array of one — {@see ScalarOrListResolver} has the shape and the ruling. */
+    public static function resolveScalarOrList(Schema $node): ?TypeResolver
+    {
+        $branches = self::rawBranches($node);
+        if (count($branches) !== 2 || !$branches[0] instanceof Schema || !$branches[1] instanceof Schema) {
+            return null;
+        }
+
+        return ScalarOrListResolver::resolve($branches[0], $branches[1], SchemaType::nullableOf($node));
+    }
+
     /**
      * Build the PROPERTY_MAP shape tuple for a `oneOf`/`anyOf` union.
      * Returns null when the schema is not a ref-only union.

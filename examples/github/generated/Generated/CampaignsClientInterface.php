@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Enum\CampaignState;
+use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
+use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
 use Acme\GitHub\Generated\Model\CampaignSummary;
 use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequest;
 use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequest;
@@ -24,6 +27,18 @@ use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequest;
  */
 interface CampaignsClientInterface
 {
+    /**
+     * @return list<CampaignSummary>
+     */
+    public function campaignsListOrgCampaigns(
+        string $org,
+        ?int $page = null,
+        ?int $perPage = null,
+        ?CampaignsListOrgCampaignsDirection $direction = null,
+        ?CampaignState $state = null,
+        ?CampaignsListOrgCampaignsSort $sort = null,
+    ): array;
+
     public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequest $body): CampaignSummary;
 
     public function campaignsGetCampaignSummary(string $org, int $campaignNumber): CampaignSummary;

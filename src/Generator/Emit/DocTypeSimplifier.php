@@ -34,4 +34,31 @@ final class DocTypeSimplifier
 
         return $namespace->simplifyType($docType);
     }
+
+    /**
+     * True when `$docType` is itself a `|`-joined union — `string|array`,
+     * not `list<string|int>`, where the `|` sits inside a generic's `<>`
+     * and names the item type instead. `?T` only nullifies a single type;
+     * a caller prefixing that onto a real union (`?string|array`) writes
+     * something PHPStan does not read as "the whole union, nullable" —
+     * only a bracket-depth-aware reading tells the two apart.
+     */
+    public static function isTopLevelUnion(string $docType): bool
+    {
+        $depth = 0;
+
+        foreach (str_split($docType) as $char) {
+            $depth += match ($char) {
+                '<' => 1,
+                '>' => -1,
+                default => 0,
+            };
+
+            if ($char === '|' && $depth === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
