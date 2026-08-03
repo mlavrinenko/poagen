@@ -71,10 +71,10 @@ it passed.** The pipeline reports the last command's status, so a red gate reads
 as exit 0 — verified on `linecop`, which exits 1 directly and 0 through `| head`.
 Redirect to a file and echo `$?`.
 
-### The parser's accessors lie in three measured ways
+### The parser's accessors lie in four measured ways
 
 `devizzent/cebe-php-openapi` reaches most of the document through magic
-getters, and three of them do not mean what their declaration says. Each was
+getters, and four of them do not mean what their declaration says. Each was
 found the expensive way; check the accessor before you trust it.
 
 **`$openApi->servers` invents a server nobody declared.** The spec defaults an
@@ -94,6 +94,15 @@ holds the guard; go through it. Same shape as the widening in
 **`$openApi->security` is a plain list, not a container.** The fork deleted the
 `SecurityRequirements` class cebe had; the scheme names are the requirement's
 own keys, read through `getSerializableData()`.
+
+**`$schema->additionalProperties` grants a permission nobody asked for.** JSON
+Schema defaults the keyword to `true` and the parser substitutes that default
+(`spec/Schema.php`'s `attributeDefaults()`), so a document that wrote nothing
+reads back identically to one that wrote `true`. Believing the accessor puts an
+extras bag on every object paogen emits — 107 models in kilbil alone.
+`getSerializableData()` again reflects only what the document set;
+`ObjectShape::declaresOpenExtras()` holds that reading. `false` is a third
+state, and still the signal that closes a shape.
 
 ### speconaut and mt
 
