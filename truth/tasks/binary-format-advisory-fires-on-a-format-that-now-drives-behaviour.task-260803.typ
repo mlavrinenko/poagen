@@ -5,11 +5,11 @@
   tags: ("generator", "dx"),
   priority: 2,
   difficulty: 2,
-  status: accepted(
+  status: done(
     2026,
     8,
     4,
-  )[Last of this session's skip-list work. Run alone rather than paired: its Files list names src/Generator/Emit/FormatAdvisor.php and src/Generator/Bindings.php, so it cannot share a wave with another generator agent.],
+  )[Landed as 1cd0590, merged and re-gated on the integrated HEAD. The premise was re-established against the current base rather than taken from the task: isBinary now drives a StreamInterface parameter, and the advisory was still calling the format unrecognised on petstore's uploadImage and GitHub's upload-release-asset. Recognition is derived by calling BodyMediaType itself, not by re-checking the literal string, so there is no second list to drift. Bindings.php was in the Files list and correctly left untouched — binary drives a whole body's shape, not a scalar binding, and that list predates five generator tasks.],
 )
 
 == Summary
