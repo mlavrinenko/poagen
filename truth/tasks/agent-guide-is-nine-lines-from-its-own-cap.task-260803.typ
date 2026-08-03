@@ -5,11 +5,11 @@
   tags: ("docs", "process"),
   priority: 3,
   difficulty: 2,
-  status: accepted(
+  status: done(
     2026,
     8,
     3,
-  )[Scheduled by the owner into this session. Sequenced after gate-freshness-misses-the-files-linecop-lints so whatever file the split creates lands in a freshness input set that already covers the root Markdown docs linecop lints.],
+  )[Landed as 4fc3d88, merged and re-gated on the integrated HEAD. Split by audience rather than by size: process guidance read once at the start of a task stays in AGENT.md, and trap material consulted when a gate goes red moved to AGENT_HAZARDS.md, with the four parser accessors kept together as one list. Nothing deleted — every prior line survives verbatim in one of the two files. 219 lines with 81 to spare, and 86 with 214. The agent checked rather than assumed whether the new file was covered by the freshness manifest, found it was not, and reported it instead of editing out of boundary; that gap is the-freshness-manifest-enumerates-root-docs-and-drifts.],
 )
 
 == Summary

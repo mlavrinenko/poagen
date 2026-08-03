@@ -72,15 +72,16 @@ phpunit.xml.dist
 # 400-line scratch file under `.github/ISSUE_TEMPLATE/` was not flagged,
 # while the identical file at the repo root was. That is why `.github`'s
 # Markdown templates need no entry here despite not being in
-# `exclude_dirs`. These seven are the root-level Markdown files linecop
-# actually reads that no directory include above already covers.
-AGENT.md
-CHANGELOG.md
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
-README.md
-ROADMAP.md
-SECURITY.md
+# `exclude_dirs`.
+#
+# `./<pattern>` matches root-level files by name and recurses into nothing,
+# which is the one thing a directory include cannot express at the repo root.
+# It replaces an enumeration of seven Markdown files written on 2026-08-03
+# that was already wrong by that afternoon: splitting `AGENT.md` created
+# `AGENT_HAZARDS.md`, linecop capped it like every other root document, and
+# the list did not know. A set that grows cannot be maintained by hand beside
+# the thing that grows it.
+./*.md
 
 # `just check` runs `speconaut lock --check`, which reads this file, so a lock
 # that changes without the specs changing alters what the gate would say. Only

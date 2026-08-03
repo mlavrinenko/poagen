@@ -65,6 +65,17 @@ hash_inputs() {
     local -a files=()
     local inc p f
     for inc in "${includes[@]}"; do
+        # `./<pattern>` matches root-level files by name. It exists because a
+        # directory include cannot reach the repo root without swallowing the
+        # whole tree, and enumerating root files by name is a list that goes
+        # stale the moment somebody adds one — which is exactly what happened
+        # to the seven root Markdown docs this replaced.
+        if [[ "$inc" == ./* ]]; then
+            while IFS= read -r -d '' f; do
+                files+=("${f#"$root"/}")
+            done < <(find "$root" -maxdepth 1 -type f -name "${inc#./}" -print0)
+            continue
+        fi
         p="$root/$inc"
         if [[ -d "$p" ]]; then
             while IFS= read -r -d '' f; do
