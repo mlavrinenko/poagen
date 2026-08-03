@@ -33,6 +33,12 @@ final readonly class EndpointBodyEmitter
                 var_export($body->itemElement, true),
             ),
             BodySpec::KIND_FORM => $this->form($body),
+            // Both carry the content type the document declared rather than
+            // one implied by the kind: a `format: binary` schema is binary
+            // under whatever type the vendor named it (`application/pdf` in
+            // DigitalOcean's corpus), not only under octet-stream.
+            BodySpec::KIND_TEXT => sprintf('->text($body, %s)', var_export($body->contentType, true)),
+            BodySpec::KIND_BINARY => sprintf('->binary($body, %s)', var_export($body->contentType, true)),
             default => '->json($body)',
         };
     }

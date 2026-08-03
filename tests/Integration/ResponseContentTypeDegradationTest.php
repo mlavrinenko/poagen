@@ -19,12 +19,18 @@ use const DIRECTORY_SEPARATOR;
  * the vendor's body away.
  *
  * Fixture: tests/fixtures/schemas/response-degradation-3.0.yaml carries four
- * independently unrepresentable responses (two non-JSON content types —
- * text/plain and application/xml, see xml-responses-refused-at-generation-time
- * — a broken `$ref`, and an array of non-`$ref` items) plus one fully
- * representable operation (`okOperation`), so a single run proves the
- * generator collects every one of them and that `Profile::$skip` only
- * affects what it names.
+ * independently unrepresentable responses (application/xml, see
+ * xml-responses-refused-at-generation-time; a `format: binary` body; a broken
+ * `$ref`; and an array of non-`$ref` items) plus two fully representable
+ * operations (`okOperation`, and the `text/plain` `getPlainText`), so a
+ * single run proves the generator collects every one of them and that
+ * `Profile::$skip` only affects what it names.
+ *
+ * `getPlainText` moved from the first group to the second in
+ * represent-non-json-request-and-response-bodies. The refusal it used to
+ * prove was never about decoding — a `text/*` response over a `type: string`
+ * schema needs no decoding at all — so the test that asserted it is now the
+ * test that it returns a string.
  */
 final class ResponseContentTypeDegradationTest extends TestCase
 {
@@ -38,17 +44,29 @@ final class ResponseContentTypeDegradationTest extends TestCase
         self::removeSandboxDirs();
     }
 
-    public function testAResponseWithNoApplicationJsonAbortsTheRun(): void
+    public function testAPlainTextResponseIsReturnedAsAStringRatherThanRefused(): void
+    {
+        $sources = implode("\n", array_values($this->plan($this->acceptAllExcept(''))->writes));
+
+        // `string`, not a Model and not a decoded array: the schema said
+        // `type: string` and nothing about the response needs a JSON decode.
+        self::assertStringContainsString('function getPlainText(): string', $sources);
+        self::assertStringContainsString('ResponseType::string()', $sources);
+    }
+
+    public function testABinaryResponseStillAbortsBecauseTheReturnContractCannotNameAStream(): void
     {
         try {
-            $this->plan($this->acceptAllExcept('getPlainText'));
+            $this->plan($this->acceptAllExcept('getBinaryBlob'));
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
             $message = $e->getMessage();
 
-            self::assertStringContainsString('getPlainText', $message);
-            self::assertStringContainsString('text/plain', $message);
-            self::assertStringContainsString('application/json', $message);
+            self::assertStringContainsString('getBinaryBlob', $message);
+            self::assertStringContainsString('binary', $message);
+            // The remedy is real and named, which is what separates a
+            // refusal from a dead end (abort-on-unrepresentable-constructs).
+            self::assertStringContainsString('Profile::$skip', $message);
         }
     }
 
@@ -79,7 +97,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
         }
     }
 
-    public function testAResponseWithAnInlineNonRefArrayItemAbortsTheRun(): void
+    public function testAResponseWithAnArrayItemThatDeclaresNothingAbortsTheRun(): void
     {
         try {
             $this->plan($this->acceptAllExcept('listInlineItems'));
@@ -89,6 +107,9 @@ final class ResponseContentTypeDegradationTest extends TestCase
 
             self::assertStringContainsString('listInlineItems', $message);
             self::assertStringContainsString('array', $message);
+            // An inline item is fine now if it declares a scalar type; what
+            // is left unrepresentable is an item that declares nothing.
+            self::assertStringContainsString('scalar `type`', $message);
         }
     }
 
@@ -106,36 +127,34 @@ final class ResponseContentTypeDegradationTest extends TestCase
     {
         try {
             $this->plan([
-                'getPlainText' => 'text/plain not decoded',
                 'getXmlLabel' => 'application/xml not decoded',
+                'getBinaryBlob' => 'binary body, no stream return yet',
                 'getBrokenRef' => 'broken $ref, fix the schema',
                 'listInlineItems' => 'inline array items unsupported',
-                // okOperation was never unrepresentable — this entry has
-                // outlived whatever it was meant to guard against.
-                'okOperation' => 'no longer needed',
+                // `getPlainText` was genuinely unrepresentable when this
+                // entry would have been written, and is not any more. That
+                // is precisely the entry a consumer would carry forward
+                // forever without the staleness check.
+                'getPlainText' => 'text/plain not decoded',
             ]);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
-            self::assertStringContainsString("Profile::\$skip['okOperation']", $e->getMessage());
+            self::assertStringContainsString("Profile::\$skip['getPlainText']", $e->getMessage());
             self::assertStringContainsString('stale', $e->getMessage());
         }
     }
 
     public function testSkipHonouredOmitsFromOutputAndRunSucceedsWithoutAnnouncingSuccess(): void
     {
-        $plan = $this->plan([
-            'getPlainText' => 'text/plain not decoded',
-            'getXmlLabel' => 'application/xml not decoded',
-            'getBrokenRef' => 'broken $ref, fix the schema',
-            'listInlineItems' => 'inline array items unsupported',
-        ]);
+        $plan = $this->plan($this->acceptAllExcept(''));
 
         self::assertCount(4, $plan->skippedOperations);
 
         $sources = implode("\n", array_values($plan->writes));
         self::assertStringContainsString('function okOperation(', $sources);
-        self::assertStringNotContainsString('function getPlainText(', $sources);
+        self::assertStringContainsString('function getPlainText(', $sources);
         self::assertStringNotContainsString('function getXmlLabel(', $sources);
+        self::assertStringNotContainsString('function getBinaryBlob(', $sources);
         self::assertStringNotContainsString('function getBrokenRef(', $sources);
         self::assertStringNotContainsString('function listInlineItems(', $sources);
     }
@@ -162,8 +181,8 @@ final class ResponseContentTypeDegradationTest extends TestCase
     private function acceptAllExcept(string $exclude): array
     {
         $all = [
-            'getPlainText' => 'text/plain not decoded',
             'getXmlLabel' => 'application/xml not decoded',
+            'getBinaryBlob' => 'binary body, no stream return yet',
             'getBrokenRef' => 'broken $ref, fix the schema',
             'listInlineItems' => 'inline array items unsupported',
         ];

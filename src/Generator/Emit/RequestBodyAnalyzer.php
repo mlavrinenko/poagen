@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
@@ -15,7 +14,6 @@ use function count;
 use function in_array;
 use function is_array;
 use function is_string;
-use function sprintf;
 
 /**
  * Resolves the `requestBody` of an OpenAPI Operation into a {@see BodySpec}.
@@ -37,13 +35,21 @@ use function sprintf;
  *      T-011). A `$ref`-to-Model form body is intentionally skipped to
  *      avoid flattening a whole Model into dozens of parameters; petstore's
  *      JSON+form pairings are already covered by the JSON branch.
- *   3. `null` otherwise — the caller refuses the operation; {@see
+ *   3. A text content type over a `type: string` schema — one `string`
+ *      parameter, sent under the first such content type the document
+ *      declared (TEXT kind). {@see BodyMediaType::firstText()} carries the
+ *      reasoning for why several text types on one body stay one method.
+ *   4. `application/octet-stream`, or any `format: binary` schema — one
+ *      `Psr\Http\Message\StreamInterface` parameter, handed to the transport
+ *      unread (BINARY kind).
+ *   5. `null` otherwise — the caller refuses the operation; {@see
  *      describeUnsupported()} explains why, for the operation to be
  *      reported instead of silently dropped (abort-on-unrepresentable-constructs,
  *      default-deny-on-degradation).
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
- * linecop limit (`quality-gates-at-maximum-strictness`).
+ * linecop limit (`quality-gates-at-maximum-strictness`); the diagnostics half
+ * moved on to {@see RequestBodyRefusal} for the same reason.
  *
  * @internal
  */
@@ -63,7 +69,34 @@ final readonly class RequestBodyAnalyzer
             return $jsonSpec;
         }
 
-        return self::formBody($resolved);
+        $formSpec = self::formBody($resolved);
+
+        if ($formSpec instanceof BodySpec) {
+            return $formSpec;
+        }
+
+        return self::opaqueBody($resolved);
+    }
+
+    /**
+     * A body the document declared as characters or as bytes.
+     *
+     * Neither needs a Model: the schema says `type: string` and that is the
+     * whole shape. Text wins over binary when a document declares both,
+     * because a `type: string` schema without `format: binary` is the more
+     * specific claim.
+     */
+    private static function opaqueBody(RequestBody $body): ?BodySpec
+    {
+        $text = BodyMediaType::firstText($body->content);
+
+        if ($text !== null) {
+            return BodySpec::text($text);
+        }
+
+        $binary = BodyMediaType::firstBinary($body->content);
+
+        return $binary === null ? null : BodySpec::binary($binary);
     }
 
     /**
@@ -89,74 +122,7 @@ final readonly class RequestBodyAnalyzer
      */
     public static function describeUnsupported(RequestBody $body): string
     {
-        $types = array_keys($body->content);
-        $pointer = $body->getDocumentPosition();
-        $location = $pointer instanceof JsonPointer ? ' (' . $pointer->getPointer() . ')' : '';
-
-        if (isset($body->content['multipart/form-data'])) {
-            return 'multipart/form-data request body' . $location
-                . ' — paogen emits JSON ($ref or list<$ref>), application/x-www-form-urlencoded, and '
-                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) bodies only';
-        }
-
-        if (isset($body->content['application/octet-stream'])) {
-            return 'application/octet-stream request body' . $location
-                . ' — paogen emits JSON ($ref or list<$ref>), application/x-www-form-urlencoded, and '
-                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) bodies only';
-        }
-
-        if (isset($body->content['application/json'])) {
-            return 'application/json request body with an inline (non-$ref) schema' . $location
-                . ' — paogen only emits a typed body for a $ref to a component schema, or list<$ref>; '
-                . 'move the schema into components.schemas and reference it';
-        }
-
-        $form = $body->content['application/x-www-form-urlencoded'] ?? null;
-
-        if ($form instanceof MediaType) {
-            return self::describeUnsupportedForm($form, $types, $location);
-        }
-
-        if (isset($body->content['application/xml'])) {
-            return 'application/xml request body' . $location
-                . ' — paogen serialises an inline object (or an array of inline objects) schema declared '
-                . 'application/xml, naming the document root (and, for a list, the repeated item element) in '
-                . 'Profile::$xmlElements; add the missing entry, or — if the schema is a $ref, a scalar, or an '
-                . 'inline object with no declared properties — it cannot be named there and stays unrepresentable';
-        }
-
-        $typeList = $types === [] ? '(none declared)' : implode(', ', $types);
-
-        return sprintf(
-            "request body content type(s) '%s'%s — paogen supports application/json (\$ref/list<\$ref>), "
-                . 'application/x-www-form-urlencoded as the sole content type with an inline object schema, and '
-                . 'application/xml (inline object/array, elements named in Profile::$xmlElements) only',
-            $typeList,
-            $location,
-        );
-    }
-
-    /**
-     * @param list<string> $types
-     */
-    private static function describeUnsupportedForm(MediaType $form, array $types, string $location): string
-    {
-        if (count($types) > 1) {
-            $others = implode(', ', array_values(array_diff($types, ['application/x-www-form-urlencoded'])));
-
-            return "application/x-www-form-urlencoded request body paired with other content type(s) ({$others}){$location}"
-                . ' — paogen only honours it when it is the sole content type';
-        }
-
-        $schema = $form->schema;
-
-        if (!$schema instanceof Schema || !SchemaType::of($schema)->is('object')) {
-            return "application/x-www-form-urlencoded request body{$location} whose schema is not an inline `type: object`"
-                . ' — paogen flattens declared properties into method parameters and needs an inline object schema';
-        }
-
-        return "application/x-www-form-urlencoded request body{$location} declares no properties"
-            . ' — paogen needs at least one property to generate method parameters from';
+        return RequestBodyRefusal::describe($body);
     }
 
     private static function jsonBody(RequestBody $body, NameRegistry $registry): ?BodySpec

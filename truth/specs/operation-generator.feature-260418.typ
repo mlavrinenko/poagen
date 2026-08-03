@@ -90,7 +90,7 @@
       case: "unsupported-content-type-aborts-run",
       standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "GET /labels/{id}")) with #p((id: "operationId: getLabel")) whose 200 response content type is `text/plain`]
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /labels/{id}")) with #p((id: "operationId: getLabel")) whose 200 response content type is `application/octet-stream`]
       #when[#the(Generator) runs against #the([unaccepted], Profile)]
       #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
       #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]
@@ -178,7 +178,7 @@
       "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`, which paogen does not emit]
+      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: createWidget")) whose request body content type is `multipart/form-data`, which paogen does not emit]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the resulting `GenerationPlan` carries a `skippedOperations` entry naming #the(Operation)'s HTTP method, path, operationId and the reason for the skip]
       #and_[#the(PaogenCli)'s `generate` command prints the same list to stderr so the user knows which ops did not make it into the client]
@@ -271,7 +271,7 @@
       case: "unsupported-content-type-aborts-run",
       standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /widgets")) with #p((id: "operationId: createWidget")) whose request body content type is `multipart/form-data`]
       #when[#the(Generator) runs against #a(Profile) declaring no skip entry for that #a(Operation)]
       #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
       #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]
@@ -283,10 +283,10 @@
       case: "explicit-skip-omits-without-stub",
       standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet/{petId}/uploadImage")) with #p((id: "operationId: uploadFile")) whose request body content type is `application/octet-stream`]
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /widgets")) with #p((id: "operationId: createWidget")) whose request body content type is `multipart/form-data`]
       #and_[#the(Profile) declares a skip entry for that #a(Operation) carrying a reason]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has no `uploadFile` method at all]
+      #then[the emitted #the(Client) has no `createWidget` method at all]
       #and_[no #a(GeneratedFile) contains a method that throws on an unsupported content type]
     ]
   ]

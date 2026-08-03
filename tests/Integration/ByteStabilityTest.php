@@ -48,14 +48,15 @@ final class ByteStabilityTest extends TestCase
     private const string PETSTORE_PROFILE = 'tests/fixtures/profiles/petstore.php';
 
     /**
+     * Mirrors tests/fixtures/profiles/petstore.php, which carries no skip
+     * list any more: `uploadFile`'s `application/octet-stream` body became a
+     * `Psr\Http\Message\StreamInterface` parameter in
+     * represent-non-json-request-and-response-bodies, and an entry for it
+     * would now fail the run as stale rather than pass quietly.
+     *
      * @var array<string,string>
      */
-    private const array PETSTORE_SKIP = [
-        // Mirrors tests/fixtures/profiles/petstore.php: uploadFile's
-        // application/octet-stream body is unrepresentable — see
-        // abort-on-unrepresentable-constructs.
-        'uploadFile' => 'application/octet-stream request body — paogen does not support binary bodies',
-    ];
+    private const array PETSTORE_SKIP = [];
 
     public function testPetstoreGeneratorRunsAreByteIdenticalToEachOtherAndToTheGoldenTree(): void
     {

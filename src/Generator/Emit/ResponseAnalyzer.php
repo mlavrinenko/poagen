@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
-use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Mlavrinenko\Paogen\Generator\ScalarFormat;
 
-use function array_keys;
-use function implode;
-use function sprintf;
+use function is_string;
 use function str_starts_with;
 
 /**
@@ -29,9 +28,15 @@ use function str_starts_with;
  * `Responses` object at all, no 2xx status entry, or a 2xx entry whose
  * `content` is empty.
  *
+ * Two shapes reach a return type: an `application/json` body, resolved by
+ * its schema, and a body the document declared as text over a `type: string`
+ * schema, which is the `string` it says it is. A binary body is neither and
+ * stays refused.
+ *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (`quality-gates-at-maximum-strictness`), mirroring
- * {@see RequestBodyAnalyzer}.
+ * {@see RequestBodyAnalyzer}; the diagnostics half moved on to
+ * {@see ResponseRefusal} for the same reason.
  *
  * @internal
  */
@@ -40,7 +45,7 @@ final readonly class ResponseAnalyzer
     /**
      * @param Responses<Response|Reference>|null $responses
      */
-    public static function resolve(?Responses $responses, NameRegistry $registry): ?ReturnSpec
+    public static function resolve(?Responses $responses, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
     {
         $picked = self::pick2xx($responses);
 
@@ -48,7 +53,7 @@ final readonly class ResponseAnalyzer
             return ReturnSpec::void();
         }
 
-        return self::fromResponse($picked[1], $registry);
+        return self::fromResponse($picked[1], $registry, $bindings ?? new Bindings([]));
     }
 
     /**
@@ -67,72 +72,11 @@ final readonly class ResponseAnalyzer
         }
 
         [$status, $response] = $picked;
-        $content = $response->content ?? [];
-        $pointer = $response->getDocumentPosition();
-        $location = $pointer instanceof JsonPointer ? ' (' . $pointer->getPointer() . ')' : '';
-        $prefix = sprintf('%s response%s', $status, $location);
 
-        $json = $content['application/json'] ?? null;
-
-        if (!$json instanceof MediaType) {
-            $typeList = $content === [] ? '(none declared)' : implode(', ', array_keys($content));
-
-            return sprintf(
-                "%s content type(s) '%s' — paogen only decodes application/json responses (\$ref/list<\$ref>, "
-                    . 'a scalar, or an additionalProperties map); add an application/json entry, or accept this '
-                    . 'operation by name in Profile::$skip',
-                $prefix,
-                $typeList,
-            );
-        }
-
-        $schema = $json->schema;
-
-        if ($schema instanceof Reference) {
-            return sprintf(
-                "%s \$ref '%s' does not resolve to a component schema — fix or remove the \$ref",
-                $prefix,
-                $schema->getReference(),
-            );
-        }
-
-        if (!$schema instanceof Schema) {
-            return sprintf('%s declares application/json with no schema — paogen needs one to know what to decode', $prefix);
-        }
-
-        $type = SchemaType::of($schema);
-
-        if ($type->is('array')) {
-            return self::describeArray($prefix, $schema);
-        }
-
-        return sprintf(
-            "%s has an application/json schema of type '%s', which paogen cannot represent as a method return type",
-            $prefix,
-            $type->describe(),
-        );
+        return ResponseRefusal::describe($status, $response, $response->content ?? []);
     }
 
-    private static function describeArray(string $prefix, Schema $schema): string
-    {
-        $items = $schema->items;
-
-        if ($items instanceof Reference) {
-            return sprintf(
-                "%s array \$ref '%s' does not resolve to a component schema — fix or remove the \$ref",
-                $prefix,
-                $items->getReference(),
-            );
-        }
-
-        return sprintf(
-            '%s is a JSON array whose items are an inline (non-$ref) schema — paogen only emits a typed list '
-                . 'for items that are a $ref to a component schema; move the item schema into components.schemas',
-            $prefix,
-        );
-    }
-
-    private static function fromResponse(Response $response, NameRegistry $registry): ?ReturnSpec
+    private static function fromResponse(Response $response, NameRegistry $registry, Bindings $bindings): ?ReturnSpec
     {
         $content = $response->content ?? [];
 
@@ -143,7 +87,7 @@ final readonly class ResponseAnalyzer
         $json = $content['application/json'] ?? null;
 
         if (!$json instanceof MediaType) {
-            return null;
+            return self::textResponse($content);
         }
 
         $schema = $json->schema;
@@ -162,7 +106,7 @@ final readonly class ResponseAnalyzer
         $type = SchemaType::of($schema);
 
         if ($type->is('array')) {
-            return self::fromArray($schema, $registry);
+            return self::fromArray($schema, $registry, $bindings);
         }
 
         if (ObjectShape::is($schema)) {
@@ -174,18 +118,90 @@ final readonly class ResponseAnalyzer
         return $scalar === null ? null : ReturnSpec::scalar($scalar);
     }
 
-    private static function fromArray(Schema $schema, NameRegistry $registry): ?ReturnSpec
+    /**
+     * A 2xx response the document declared as characters rather than as JSON.
+     *
+     * It reaches the caller as the `string` the schema said it was, read
+     * straight off the body — {@see ReturnSpec::scalar()} already means
+     * "no JSON decode", which is exactly right for `text/html` and for
+     * GitHub's `application/octocat-stream`. No Model, no ambiguity, and
+     * nothing about it needs a return kind of its own.
+     *
+     * A binary response is deliberately not accepted here: a
+     * `format: binary` body is a stream, not a string, and casting one to
+     * the other is the silent widening `declared-shapes-become-types`
+     * refuses. It stays a refusal until the return contract can name a
+     * stream.
+     *
+     * @param array<array-key, MediaType> $content
+     */
+    private static function textResponse(array $content): ?ReturnSpec
+    {
+        return BodyMediaType::firstText($content) === null ? null : ReturnSpec::scalar('string');
+    }
+
+    /**
+     * A JSON array response, as a list of whatever its items declare.
+     *
+     * A `$ref` item is a Model and the list is hydrated, byte-identically to
+     * before. An inline item that declares a scalar type is a scalar, and the
+     * list carries it without any model class at all — GitHub returns three
+     * such arrays (`items: {type: string}` twice, and once with
+     * `format: date`), and until this branch existed every one of them was
+     * refused for want of a class to hydrate into.
+     *
+     * An item that declares nothing still refuses: `mixed` in a list is the
+     * widening `declared-shapes-become-types` exists to resist, and
+     * {@see ResponseRefusal} names the gap so the document's silence is
+     * visible rather than tolerated.
+     */
+    private static function fromArray(Schema $schema, NameRegistry $registry, Bindings $bindings): ?ReturnSpec
     {
         $items = $schema->items;
 
-        if (!$items instanceof Reference) {
+        if ($items instanceof Reference) {
+            $ref = $items->getReference();
+            $raw = ComponentName::rawFromRef($ref);
+
+            return $raw === '' ? null : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
+        }
+
+        if (!$items instanceof Schema) {
             return null;
         }
 
-        $ref = $items->getReference();
-        $raw = ComponentName::rawFromRef($ref);
+        $item = self::scalarItem($items, $bindings);
 
-        return $raw === '' ? null : ReturnSpec::listOf(ComponentName::phpFromRef($ref, $registry));
+        return $item instanceof ReturnSpec ? ReturnSpec::scalarListOf($item) : null;
+    }
+
+    /**
+     * One inline array item, when the document declared a scalar for it.
+     *
+     * The `format` is read through the same {@see Bindings} a model property
+     * consults, so `{type: string, format: date}` arrives as whatever a
+     * date-formatted string binds to elsewhere — `\DateTimeImmutable` by
+     * default, or the consumer's own value object where they registered one.
+     * A format nobody bound leaves the item as its base scalar, which is what
+     * the same annotation does on a property.
+     */
+    private static function scalarItem(Schema $items, Bindings $bindings): ?ReturnSpec
+    {
+        $scalar = SchemaType::of($items)->scalarPhpType();
+
+        if ($scalar === null) {
+            return null;
+        }
+
+        $format = $items->format;
+
+        if (!is_string($format) || $format === '') {
+            return ReturnSpec::scalar($scalar);
+        }
+
+        $bound = $bindings->scalarFormat($format);
+
+        return $bound instanceof ScalarFormat ? ReturnSpec::boundScalar($bound) : ReturnSpec::scalar($scalar);
     }
 
     /**

@@ -11,6 +11,7 @@ use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Responses;
+use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
@@ -147,9 +148,9 @@ final readonly class OperationAnalyzer
      *                                              than fall back to `void`; see
      *                                              {@see describeUnsupportedResponse()}
      */
-    public static function returnType(?Responses $responses, NameRegistry $registry): ?ReturnSpec
+    public static function returnType(?Responses $responses, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
     {
-        return ResponseAnalyzer::resolve($responses, $registry);
+        return ResponseAnalyzer::resolve($responses, $registry, $bindings);
     }
 
     /**

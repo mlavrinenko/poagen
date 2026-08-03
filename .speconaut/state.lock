@@ -215,7 +215,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:a0bd53b7c87f5aeca18da8f336bbdc3a6e3ce36b20b8b56237d9ccef7d13ace2"
+spec-hash = "sha256:4a87355b215e73e65821282d029b49b4b20be1feeb53b3fc8573defe4cee14d0"
 
 [features."Operation Generator".scenarios."A 2xx JSON response body is deserialized into the typed Model"]
 as-is-hash = "sha256:638f61669b2a360cf09da772147c51ab1c3298017ee9f5ad4c55c5a2e1d7eab6"
@@ -278,8 +278,8 @@ as-is = "KLUv/QBYpQsAdhlIIzCP0wEDKISkXW1l/ynbUI6QUyVDZvGhmXWFZnhzdwsHrSwwPABBAD4
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A response declaring an unsupported content type aborts the run"]
-as-is-hash = "sha256:c44df7b4a26015f399bc95d11962af4c193c0fb1d6783cb308f11dddb95a8e39"
-as-is = "KLUv/QBYNQgA1hE0IUCL0wb7GmU7AVrJW8yipE7IJpOQqYPusxwxdQfOKE50QSgALAAsAM/ym7XuSsV81bBe/GIuRt+VSj2Kj9HM4C1Ly5GvmEq/7DAjbxl+gQSIIN3sTfyAzkGh6YolhSMCD2Pe2roysN6cNwvE+IV72IgnxVbxMeOMLcRGYHjGmBWf5ZVr6/iH8Q2CjVBooHOioTLBeJaUYhm+1lssAnzNZuJ0xQr2jBkBDejOE4k7ht6V6ggdA0ZPtO45N0KzpjOJ8VlWgMhJch0YfdWXxfDxahIAhSvQxnWHC2JsxZ3MBKk1cKsBcJLBdZCuQAyqJwBsFwTj08JAQmLHWpndOJS8mmXBDA=="
+as-is-hash = "sha256:9b52fbb7ef6d12dc7e87088c5fbe5b8a0d948ed02e0efd8e386a4640540f8778"
+as-is = "KLUv/QBYbQgAZlI1IUCL0wY7B5vcQCs4p7afiBKyySRk6qD7LEcMVRLYDA/GgCgALgAtAIh70mfWuomK+athvfc9RE7fxLUevcdnXk6lNejJ18OlTzvMQJV2R5BfzEgFaGbVxA9JOSi0uWKNwpGBhw/VWn4dWG/OGQTxnUE9bMQbxVbvMeOLLcQOi1nvSSeu5e8P35kEG7HQSMqJxkIFO/ZcDdgvQgVSzVpmVYuFgK/ITNxcMYMNDenOE4k7dt7E9XQOAqfjWVc5dzqzNsokvietABElwURw+q4jZPd49ZQFEwCTK9DGdZULIm7FncwEsDVwqwFwksF1kK5ADKonwG0XdOPT3sDgxSUSO8vKbMGhhKhZFqI="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A scalar 2xx JSON response is returned as the scalar PHP type without hydration"]
@@ -313,8 +313,8 @@ as-is = "KLUv/QBYzQsAxhhKL4CnSQczMAMzBBPGVfoWibTFlvI8m0hLuxEI8RXX46MfMRp+BRPFNXb
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An explicitly skipped operation is omitted rather than stubbed"]
-as-is-hash = "sha256:fdf26c995656845414383c0c6773523d7aeabcc7d2038270b78b597f04a88644"
-as-is = "KLUv/QBYzQkAZtc/IEBt2gZzJBqT7rQU5xK+ZhPydjai/y2d0BhOLGYMN9i5NgA6ADcABnby5LBduHjxh23DTs4djmWX0dBaj9bU57unpNcZ89b0Kn2u1DksR9KeuaQibhzwIk8NbxoBkfXiF9M4ctLhXV8erv5KBPHTFXhxGGgP4j9MYRzLpBbFxGHslYRirxROaBwgHHhdLZkfm3JkGsZDXLmmxxsYjxTsBHPZ1eYHXkTVzGaDI7p429M1pCL44ICdMAicM4CAygUrdt0VsF+TCnNJKfM6XwXnq6nUsnAxmjG9IKlozQvPFtP4PDEl85pPor2S6GXIi79EcB+t8SjBTnbh2cO8cFFrEwBw7Y3LXEuV0M/eUQbBWJZ9Gcu/wc3/ZJACNxMie3ez7dIaXPuoHz+uNdAIHXRkDWw/bRXBDA=="
+as-is-hash = "sha256:d9d694c10e3945f25c5db5f4bd2e240159bd1e8fc52f6806f46e412eacf733c5"
+as-is = "KLUv/QBYXQkAlhY9HmBN0gZb7dVGkrJzJfYn0vDmnmqfe/ME9pgiCZ4arDQANgA2AMgRo1ZvseKN2oWNmDMYy6qvzjp/ttLmu6ag1XxoW/mENk/JINQPtJYYShP3EViBlnVPFgGK1fz0WO99DxM/DDK8+iXi6Ssehxm+9UysMAhnzWHdN4w5BLywSFBIsD4LJTcu5SdZ+C5hB3ZLOnErfz/w/TDYyKHW0+XG2SOzksUHP3LvriN7wFSwOQIbcRgwZoCBhA2uLROgJD4IbFayRUvmm5jSorf4yodWB+bZsp7VkRnYHA+h8pYNnr2CZ63jvRsquH/W97NgI6tn1SjrBRIALO0NzFxLlcrGXnMGwVyWfQgrP7F1/2S88rQoAlbOYu+Vs62qsTxew+2hd5pjW9oqQhQ="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization"]
@@ -338,8 +338,8 @@ as-is = "KLUv/QBYtQoAtpdCIlBt0wGLIiFywtrKHk+2/ZylCYXA48TgNvzWKgy+GaoGq4Y2ADsAOgA
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation whose body shape is unsupported is reported as a skip rather than dropped silently"]
-as-is-hash = "sha256:29248598b6aac7b9f8d32913811ce0ec47698145518fa0cfe3703a9eb118030e"
-as-is = "KLUv/QBYHQsAJttHIECN0gag6tVmkrK/LEgnGvpjxs2UZfWYVHLh7oziRBcEPABAAD8AjReH1DrsxGTZ+2Lq85Qwj6/QOo+20ski6rLW02o+38SUGr3Gan4qpJ4cdPAVkcSHtpVP6CPwAi3rrjgCzL141uPxHYKVjBRDEiuYeq4G7FdBAcWWlGqy3vseKqtvIJ5fzOAULqnx4jAUrM9alB8Xc6Q4fI+wAzvxxaFWL1YcRHvGjccDwQoAOWPqPMm9W8/TLbMUXy2NQ4Oc7dLo00frO3rYA2bDq2cFKes16cSt/P3Ad7RgJxoGjjF4LXu3Rdkzr/mRYo4da0KV4EWc1wbVmT+rxvWqLT5TumeZfK4YBhUfYgVgJBScI7ATySKa+OBDrXPlw1CgrRQXAFHHG+01SitRn425ilfFhqkbQjKX45jLWdpMA21V/zLoLKJcpVCsXcR3VB01AWM2usqGIbKsFCsgKUwx/KzsAQ=="
+as-is-hash = "sha256:1230a416d664e0a001e2951e39b413f48be0a5b0ed86108889501aca59d98f8b"
+as-is = "KLUv/QBYDQsARhtIIFBt0gaM6NVGkrKb2DSdaC64rdnhOAaGM+A1nVA1WD0EPABAAD8AjRdXah12IrLsfTH1eUqYx1donUdb6WQQdVnraTWfb2JKjV5jNT8VUkcONviKKMKHtpVP6CPwAi3rnjgCXjzr8fiuYCWjxFCEFbV1AphEB4HNSrZLw0TWe9/DZPXNw3OvHFP41jPx4jASrM9akh8Xc5Q4fIcwAzvxpaFWLwfRnnHj8TiwAihnTJ0juXfrebplVuKrpXFoytkujT59tL6jhzlgNrx6VkpZr0knbuXvBr4jBTvBMHBswWvMA3u3Jdkzr/mQYo4da0KNwIM4rw2qM39WjetVW3ymdM8y+VwxDCa+YgVgIBScI7ATySCa6OBDrXPlw1CgrWRFFgBRxyPtNUwrUZ+NuYpXxYa5G0Iyl+OYS1naDANtRf8y5CyiXKXQq12E6Fh7ZqOzbBgky0uxApLCFMPPyh4="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation-level `$ref` to a component parameter is resolved to a typed method argument"]
@@ -363,8 +363,8 @@ as-is = "KLUv/QBYhQsAhhlLL4A3SQczMAMzBBMGEdNYS+TuuKWk6MjdWtpERhyNr1uB7FdH84jVWb9
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An unsupported body content type aborts the run"]
-as-is-hash = "sha256:a5bd977996d280afca8a00c3533de57628d2d8b402ce80054d0c6af1b27388bf"
-as-is = "KLUv/QBY9QgA9pM4IHDH6aHx45Yr9RbpEZbN5hInUC9Mvt3H8E4/aAP071cDLQAyAC8ASmEnfx63DJsNb24XO8GmvrNmq/k4f0XrxS8m4yjlw+mruVZj2IwIG1Lp4ZklZ+lE/EclbEiLtLMq4jcHLdLls5qSkBb7haDsl2LHwmgYU+3pF8Pseg/z5IPuMIvxBwHqj4KkNrwM1TVnhk2tuafHK4x3BOyE4JCUC4eVA4buuixgv0wqjHrWOjO17M3g6lE69ELh0KFXcz0hQiWcnmi2CroTntmjDmJsagbgsJM9Z60JcaSL91IFzIluMBQA0SvQxnXTywX2Mrxuu6TF4LkwbjUADo0yurobiUHhySrQHpd/RvqoHz+ubUOQQibZoEaWQEJJAQ=="
+as-is-hash = "sha256:cb12e6ac7c2e1e2c332b86a3268e94dbc27c29abdd6c69c0b6d22c6e513baf9e"
+as-is = "KLUv/QBYlQgAJlM2IFCJ0wZAbsLNJGJmpW1Ldk8evNDbXBdLhJCXzzETu1ADLAAuAC0ARu44bBdCPpyxTWwEIfWb9VpNh/kqWi9+MRVHKR1OX02loIWQMeFDnhpeSQLrEMLVX9k8TPC1q+JDGkg3ew+vPZPuYXAjWTCMeWt6tfC6mqM82Z43SmJ8wikcaAbvzi2pDO/CM8a8EFJrrunxCuMbAhsxQKRzAaGywLaWAh7NxbBq6taBHq/bUfrzQuGPoVdTPWHiBJye6LX33AnNyzlbjJB6ATRsZK1Zay6OdPFWd7CcARMAsCvQxnWyy8XtMjhuu6XF0LcwbjUADg0iurobiUHhyaZ/j0ctI2os7zUOfGJSDXW9ABBKCg=="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An untagged operation stays on the root and no DefaultApi type is invented"]

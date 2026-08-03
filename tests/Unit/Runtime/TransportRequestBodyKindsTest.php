@@ -10,6 +10,7 @@ use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -96,6 +97,30 @@ final class TransportRequestBodyKindsTest extends TestCase
         // `+` for the space is RFC1738, which is what an OAuth2 token
         // endpoint expects.
         self::assertSame('grantType=password&clientId=my+app', (string) $request->getBody());
+    }
+
+    public function testATextBodyIsSentVerbatimUnderTheDeclaredContentType(): void
+    {
+        $request = $this->send(Endpoint::post('/markdown/raw')->text('Hello **world**', 'text/plain'));
+
+        // No encoding step at all: the document said the body is a string,
+        // so the string the caller passed is the body.
+        self::assertSame('text/plain', $request->getHeaderLine('Content-Type'));
+        self::assertSame('Hello **world**', (string) $request->getBody());
+    }
+
+    public function testABinaryBodyReachesTheRequestAsTheSameStreamNeverReadWhole(): void
+    {
+        $stream = new NoWholeReadStream(new Psr17Factory()->createStream('bytes'));
+        $request = $this->send(Endpoint::post('/assets')->binary($stream, 'application/octet-stream'));
+
+        self::assertSame('application/octet-stream', $request->getHeaderLine('Content-Type'));
+        // Identity, not equality: a `createStream((string) $stream)` would
+        // have produced a different object, and would have thrown getting
+        // there. An upload therefore costs the process no more memory than
+        // the client's own chunk size, whatever the file's size is.
+        self::assertSame($stream, $request->getBody());
+        self::assertSame(0, $request->getBody()->tell());
     }
 
     private function send(Endpoint $endpoint): RequestInterface

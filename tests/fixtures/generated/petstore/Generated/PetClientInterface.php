@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated;
 
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\ApiResponse;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * The contract for the `pet` endpoints.
@@ -60,4 +62,9 @@ interface PetClientInterface
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      */
     public function deletePet(int $petId, ?string $apiKey = null): void;
+
+    /**
+     * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     */
+    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): ApiResponse;
 }

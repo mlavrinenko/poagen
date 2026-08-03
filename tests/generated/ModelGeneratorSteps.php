@@ -306,10 +306,9 @@ final class ModelGeneratorSteps
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $tempBase,
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Prune\\Petstore',
-            // Petstore's octet-stream upload is unrepresentable and now stops
-            // the run unless accepted. This scenario is about pruning, so
-            // accept it here rather than exercise the refusal.
-            skip: ['uploadFile' => 'application/octet-stream request body — out of scope for the prune scenario'],
+            // No skip list: petstore's octet-stream upload became
+            // representable in represent-non-json-request-and-response-bodies,
+            // and an entry accepting it would now fail the run as stale.
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         );
 
@@ -1415,7 +1414,6 @@ final class ModelGeneratorSteps
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $base,
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ComponentEnum',
-            skip: ['uploadFile' => 'application/octet-stream request body — not what this scenario is about'],
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         ));
 
