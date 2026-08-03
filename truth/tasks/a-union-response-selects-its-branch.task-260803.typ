@@ -5,12 +5,14 @@
   tags: ("generator", "strictness"),
   priority: 7,
   difficulty: 5,
-  status: accepted(
+  status: done(
     2026,
     8,
-    3,
-  )[Split out of resolve-composition-schemas-in-bodies-and-responses. This is the incoming direction — the only one of the four that needs the undiscriminated-union machinery, and the only one that can end in a refusal no rule resolves.],
-  links: (depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),),
+    4,
+  )[Landed as c873f4a, merged and re-gated on the integrated HEAD. Skip list 20 to 12 on this task alone. One selection mechanism, not a second: the same BranchSelectors core and the same runtime picker the property-position union uses, with computeFromShapes exposed so a non-ref caller can feed it. The task's own non-goal was wrong — three of the eight branches do declare a discriminator mapping whose wire values are not the branch class names, and reading it was the difference between correct hydration and silently building the wrong class. A structural-layer key was raw component identity rather than PHP class name, which only the real GitHub corpus exposed.],
+  links: (
+    depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),
+  ),
 )
 
 == Summary

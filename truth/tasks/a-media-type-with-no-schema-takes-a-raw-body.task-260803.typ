@@ -5,11 +5,11 @@
   tags: ("generator", "strictness"),
   priority: 6,
   difficulty: 2,
-  status: accepted(
+  status: done(
     2026,
     8,
-    3,
-  )[Split out of resolve-composition-schemas-in-bodies-and-responses, where it was the one case that is not a schema problem at all. One operation, and it is the whole task.],
+    4,
+  )[Landed as 8575fe8, merged and re-gated on the integrated HEAD. A media type with no schema key declares nothing, so it passes through untyped with a notice on the report channel and never moves the exit status; a media type declaring a shape paogen cannot type still refuses, which is the distinction the task exists to draw. repos/get-content leaves the skip list, and its response resolves through the union work in the same merge.],
 )
 
 == Summary
