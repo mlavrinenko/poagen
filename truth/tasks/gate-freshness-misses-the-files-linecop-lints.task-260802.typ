@@ -25,8 +25,8 @@ tasks whose work was merged and green.
 That refusal is correct on its own terms — `gate-fresh.inputs` lists `truth`
 and excludes only `truth/tasks`, so a note is a hashed input — and it is
 pointless, because nothing `just check` runs reads a note. `speconaut check`
-validates artifacts under `truth/`; a Markdown note is included in
-`truth/main.typ` for reachability and never parsed for content.
+validates artifacts under `truth/`; a Markdown note is listed in the entry
+point for reachability and never parsed for content.
 
 So the input set is wrong in both directions at once, and they are one defect
 rather than two: it hashes `truth/notes`, which the gate does not check, and it
