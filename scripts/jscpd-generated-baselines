@@ -1,0 +1,100 @@
+# Per-tree duplication baselines for the generated tier.
+#
+# Read by the Justfile's `lint-jscpd-generated` recipe, which runs jscpd once
+# per emitted tree. Trees under `tests/fixtures/generated/` are deliberately
+# NOT listed here — they are ours, small and hand-made, and stay under the one
+# uniform threshold spelled in that recipe. This file covers
+# `examples/*/generated` only: trees emitted from real vendor documents, where
+# the duplication floor a correct emitter can reach is a property of the
+# DOCUMENT, not of the generator.
+#
+# WHY PER TREE, AND NOT ONE NUMBER FOR ALL FOUR
+#
+# Measured 2026-08-03, the day both large example trees were first committed:
+# petstore 0.00%, kilbil 1.67%, DigitalOcean 6.27%, GitHub 20.65%. Those are
+# not four readings of one quantity. They are four documents.
+#
+# What the two large trees actually contain, measured from jscpd's own JSON
+# report rather than assumed:
+#
+#   DigitalOcean — 122 clones, 1732 clone-lines. 75 clones / 969 lines (55.9%)
+#   are client-to-client, 36 / 552 (31.9%) model-to-model, 11 / 211 (12.2%)
+#   enum-to-enum. The client clones are the transport delegation itself:
+#   `$this->transport->send(Endpoint::get('/v2/...')->path(...)->query(...)
+#   ->header('Authorization', ...), ResponseType::nothing())`. Two operations
+#   that take the same parameter shape emit byte-identical bodies apart from
+#   the URL literal. That block is what a correct emitter produces — it is the
+#   generator USING runtime/ instead of inlining — and a document with 300+
+#   operations gets 300+ copies of it by construction.
+#
+#   GitHub — 1035 clones, 21297 clone-lines, 894 clones / 19109 lines (89.7%)
+#   model-to-model. The tree holds 3222 models, 1837 of them `Webhook*`; of
+#   the 885 distinct files taking part in a clone, 687 are `Webhook*`. The
+#   largest clones are `FullRepository` against `RepositoryWebhooks`,
+#   `NullableRepositoryWebhooks`, `Repository` and `TeamRepository` (94, 88, 88
+#   and 63 lines) — one repository shape the document declares under five
+#   names. `Model/DiscussionAnswerChosenBy` alone takes part in 389 clones: a
+#   user object GitHub re-declares inline under a fresh component name in
+#   nearly every webhook payload. Each is a named component a consumer
+#   references by name, so the emitter cannot merge them; merging them would
+#   be the bug.
+#
+# Neither figure is duplicated LOGIC. Both are the vendor's document restated
+# in PHP. So one number across all four trees measures how big a vendor's
+# document is, and the tree that sets it decides the ceiling for every other:
+# a single threshold high enough for GitHub (20.65%) would let kilbil grow
+# twelvefold undetected, and one tight enough for kilbil fails GitHub on the
+# day it lands. Per document is the only line that gates all four at once.
+#
+# This does not blunt the gate. The regression this tier exists to catch — the
+# emitter abandoning `runtime/` and inlining request assembly per operation —
+# still shows up as a RISE, on whichever tree it lands on, because inlined
+# assembly is far bulkier per operation than the delegation it replaces.
+# Verified by planting exactly that on scratch copies of two trees on
+# 2026-08-03: DigitalOcean went 6.27% to 8.30% and the petstore fixture 0.00%
+# to 8.60%, both red, both naming the file and the line range.
+#
+# FORMAT
+#
+# One row per tree: <tree path> <ceiling, jscpd "Total duplicated lines" %>.
+# Blank lines and `#` comments are ignored. An `examples/*/generated` tree
+# with no row here is a hard failure rather than a pass, for the same reason
+# the recipe refuses an empty tree list; a row naming a tree that does not
+# exist is a hard failure too, so a baseline can never outlive what it gates.
+#
+# Each ceiling is the measured figure rounded UP to the next hundredth. That
+# is a hair over a tenth of a line on kilbil and about one line on
+# DigitalOcean — less slack than jscpd's smallest possible clone anywhere, so
+# a single new clone turns the tree red. jscpd fails on `measured > threshold`
+# strictly (probed 2026-08-03: kilbil at 1.6750% passes 1.68 and fails 1.67;
+# petstore with zero clones passes 0.00), and the reading is deterministic —
+# three runs of the same tree returned 1.6749660480% to ten places.
+#
+# RATCHET: every number here only ever moves DOWN, as emitted duplication is
+# collapsed for real. A tree getting more duplicated is the failure this file
+# exists to report, never a reason to edit the number. Regenerating a tree
+# against a NEWER vendor document can legitimately move its floor — record the
+# new measurement and say which document revision moved it, in this file, in
+# the same commit. Do not round up "for headroom".
+
+# 0 clones. The petstore document declares 7 models and one client; there is
+# nothing in it to repeat. Any clone at all is a regression here.
+examples/petstore/generated       0.00
+
+# 2 clones, 37 lines over 2209. Both are genuine same-shape model pairs the
+# emitter really does write out twice — Model/GoodsRequestItem against
+# Model/GoodsXmlRequestItem (10 lines), and
+# Model/ProcessSaleRequestGoodsDataItem against
+# Model/SearchClientRequestGoodsDataItem (29 lines). This tree set the old
+# uniform 2.0 threshold when it was the worst one measured.
+examples/kilbil/generated         1.68
+
+# 122 clones, 1610 duplicated lines over 25696. Majority (55.9% of
+# clone-lines) is operation-method transport delegation across a document with
+# 300+ operations; the rest is same-shape models and enums.
+examples/digitalocean/generated   6.27
+
+# 1035 clones, 20262 duplicated lines over 98129. 89.7% of clone-lines are
+# model-to-model, driven by ~918 declared components including 1837 webhook
+# payload types that re-declare the same nested objects under fresh names.
+examples/github/generated        20.65
