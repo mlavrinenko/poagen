@@ -5,7 +5,11 @@
   tags: ("generator", "guidance", "strictness"),
   priority: 9,
   difficulty: 8,
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Landed as cc3d68f9, merged and re-gated on the integrated HEAD. All fifteen unions resolve: 8 by discriminating field, 3 by a parent tag, 2 by the closed-shape predicate, 2 pinned. Zero or two matches raise.],
 )
 
 == Summary

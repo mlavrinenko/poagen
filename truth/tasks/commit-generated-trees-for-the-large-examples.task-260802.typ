@@ -5,7 +5,11 @@
   tags: ("examples", "gate"),
   priority: 6,
   difficulty: 3,
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Both trees committed, 7242 files. The duplication tier was re-measured against the larger corpus and moved deliberately to a per-tree ceiling, with the reasoning recorded, as this task required.],
   links: (depends-on("clear-example-expected-failures.task-260728.typ"),),
 )
 

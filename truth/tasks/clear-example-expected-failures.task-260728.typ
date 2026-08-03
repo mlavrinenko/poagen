@@ -5,7 +5,11 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: wip(2026, 8, 3),
+  status: done(
+    2026,
+    8,
+    3,
+  )[Both markers gone, both examples generate cleanly. The mechanism was not the per-property discriminator this task assumed and its first attempt proved impossible.],
   links: (
     depends-on("declare-an-undiscriminated-union-as-raw-data.task-260802.typ"),
     depends-on("skipped-component-leaves-dangling-references.task-260802.typ"),
