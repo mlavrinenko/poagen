@@ -5,7 +5,7 @@
   tags: ("tooling",),
   priority: 4,
   difficulty: 3,
-  status: proposed(2026, 8, 4),
+  status: wip(2026, 8, 4)[wave 3 agent dispatched],
 )
 
 == Summary

@@ -5,11 +5,7 @@
   tags: ("generator", "errors", "decision"),
   priority: 5,
   difficulty: 2,
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Owner ruled 2026-08-02: a payload-level result envelope stays entirely the consumer's business. What remains is the decision artifact and the README line.],
+  status: wip(2026, 8, 4)[wave 3 agent dispatched],
 )
 
 == Summary
