@@ -17,6 +17,12 @@ info:
     left it as raw arrays rather than path items, and paogen never looked. The
     document parsed clean and produced a client for `/pings` alone, with
     nothing anywhere saying half the document had gone missing.
+
+    Two webhooks, not one, since webhooks-refuse-with-no-opt-out needs a
+    document where naming one in Profile::$skip and not the other is a
+    meaningfully different case from naming all of them — a single-webhook
+    fixture can prove "refused" and "skippable" but not "still refuses,
+    naming the one left" when only part of the map is accepted.
 paths:
   /pings:
     post:
@@ -28,6 +34,23 @@ webhooks:
   memberCreated:
     post:
       operationId: onMemberCreated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        '200':
+          description: ok
+  orderClosed:
+    post:
+      operationId: onOrderClosed
       requestBody:
         required: true
         content:

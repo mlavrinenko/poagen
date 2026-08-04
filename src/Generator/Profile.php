@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator;
 
+use Mlavrinenko\Paogen\Generator\Emit\WebhookSkipKey;
 use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
 
 /**
@@ -174,13 +175,15 @@ final readonly class Profile
      *                                              place. There is deliberately no preference-order form: picking
      *                                              the first of several matches is the silent guess the whole
      *                                              design exists to refuse.
-     * @param array<string,string>  $skip           Operation id or raw component name → human reason. A
-     *                                              skip-listed item is omitted from the output instead of
-     *                                              failing the run. An entry that no longer matches a problem
-     *                                              (the item now generates cleanly), or that names an
-     *                                              operation id / component absent from the schema, fails the
-     *                                              run instead of being ignored. See
-     *                                              abort-on-unrepresentable-constructs.
+     * @param array<string,string>  $skip           Operation id, raw component name, or webhook key → human reason.
+     *                                              A skip-listed item is omitted; a stale entry, or one naming an
+     *                                              id / component / webhook absent from the schema, fails the run
+     *                                              instead (abort-on-unrepresentable-constructs). A webhook is
+     *                                              named `'<webhookName>.webhook'` ({@see WebhookSkipKey}),
+     *                                              suffixed so it cannot collide with a bare id or component. The
+     *                                              default stays a refusal; a partly-skipped set still refuses
+     *                                              naming the rest (webhooks-refuse-with-no-opt-out), and an entry
+     *                                              only goes stale by the webhook leaving the document.
      * @param string                $source         How this profile is named in the header of every file it
      *                                              produces, and in the regenerate command that header prints.
      *                                              {@see ProfileLoader} fills it with the path the run was given,

@@ -115,7 +115,7 @@ final class GenerateCommand
             // printing the plain success line ahead of (or instead of
             // disclosing) it is exactly the "opens by announcing success"
             // shape default-deny-on-degradation forbids.
-            if ($plan->skippedOperations === [] && $plan->skippedComponents === []) {
+            if ($plan->skippedOperations === [] && $plan->skippedComponents === [] && $plan->skippedWebhooks === []) {
                 fwrite($stdout, "paogen: generated into {$profile->output}\n");
             }
 
@@ -150,6 +150,17 @@ final class GenerateCommand
 
             foreach ($skippedComponents as $entry) {
                 fwrite($stderr, "  - {$entry->rawName} [{$entry->reason}]\n");
+            }
+        }
+
+        $skippedWebhooks = $plan->skippedWebhooks;
+
+        if ($skippedWebhooks !== []) {
+            $count = count($skippedWebhooks);
+            fwrite($stderr, "paogen: {$count} webhook(s) skipped — paogen does not generate webhook handlers:\n");
+
+            foreach ($skippedWebhooks as $entry) {
+                fwrite($stderr, "  - {$entry->name} [{$entry->reason}]\n");
             }
         }
 

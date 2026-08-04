@@ -107,6 +107,17 @@ problem, and a notice printed on every run rather than only the one that
 added it. A key that does not need all three is not an opt-out by this
 decision's own test, and does not need this decision's process to add.
 
+=== This does not close the door on widening `$skip` itself
+
+"No third opt-out surface... without a decision that supersedes or amends
+this one by name" is a rule about a *new* surface, not about `$skip`'s own
+key space. `webhooks-refuse-with-no-opt-out`, landed 2026-08-04, widened
+`$skip` to also accept a webhook's key — see `skip-is-the-only-opt-out`'s
+own "key space widens" section — and that is not a third surface by this
+decision's test: it is the same `$skip` map, the same omit-never-degrade
+shape, accepting a key it should always have accepted. `$skip` and
+`$unionPins` are still the only two.
+
 == Consequences
 
 - `skip-is-the-only-opt-out` is corrected in the same commit: its title no

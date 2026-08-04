@@ -6,6 +6,7 @@ namespace Mlavrinenko\Paogen\Generator;
 
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
+use Mlavrinenko\Paogen\Generator\Emit\SkippedWebhook;
 
 /**
  * The outcome of planning a generation run without touching disk.
@@ -28,6 +29,13 @@ final readonly class GenerationPlan
      * @param list<SkippedComponent> $skippedComponents   Components (or components with an undiscriminated
      *                                                    union property) the generator did not emit. Same
      *                                                    skip-list guarantee as $skippedOperations.
+     * @param list<SkippedWebhook>   $skippedWebhooks     Top-level `webhooks:` entries the generator did not emit
+     *                                                    because `Profile::$skip` named them
+     *                                                    (webhooks-refuse-with-no-opt-out). Unlike the two lists
+     *                                                    above, reaching a successful plan says nothing about
+     *                                                    whether every webhook was accounted for — a webhook the
+     *                                                    document declares and `$skip` does not name still throws,
+     *                                                    it never lands here empty-handed.
      * @param list<string>           $notices             Facts about the document worth a reader's attention that
      *                                                    are not omissions: nothing here was left out of the
      *                                                    emitted tree. They name an opportunity the consumer's
@@ -44,6 +52,7 @@ final readonly class GenerationPlan
         public array $prunes,
         public array $skippedOperations = [],
         public array $skippedComponents = [],
+        public array $skippedWebhooks = [],
         public array $notices = [],
     ) {}
 }
