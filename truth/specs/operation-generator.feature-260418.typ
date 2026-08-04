@@ -97,7 +97,7 @@
     ]
 
     #scenario(
-      "An application/xml response aborts the run the same way any other non-JSON response does",
+      "An application/xml response aborts the run because XML is refused at generation time, not because it is non-JSON",
       stage: "unstable",
       standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[

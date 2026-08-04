@@ -159,7 +159,7 @@ final class OperationGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: An application/xml response aborts the run the same way any other non-JSON response does
+     * Scenario: An application/xml response aborts the run because XML is refused at generation time, not because it is non-JSON
      * @source truth/specs/operation-generator.feature-260418.typ:99
      *
      * Given Schema declares Operation GET /xml-label with operationId: getXmlLabel whose 200 response content type is application/xml
@@ -168,7 +168,8 @@ final class OperationGeneratorTest extends TestCase
      *   And Generator's report names the operationId, the unsupported content type, and the remedy
      *   And Generator does not decode the XML body or pass it through raw — see ../decisions/xml-responses-refused-at-generation-time.decision-260801.typ
      */
-    public function testAnApplicationXmlResponseAbortsTheRunTheSameWayAnyOtherNonJSONResponseDoes(): void
+    public function testAnApplicationXmlResponseAbortsTheRunBecauseXMLIsRefusedAtGenerationTimeNotBecauseItIsNonJSON(
+    ): void
     {
         $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationXml('GET /xml-label', 'operationId: getXmlLabel');
         $this->steps->whenGeneratorRunsAgainstUnacceptedProfile();
