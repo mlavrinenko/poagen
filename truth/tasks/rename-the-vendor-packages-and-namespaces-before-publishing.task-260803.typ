@@ -5,11 +5,11 @@
   tags: ("release", "naming"),
   priority: 4,
   difficulty: 4,
-  status: accepted(
+  status: wip(
     2026,
     8,
-    3,
-  )[The one open string is confirmed. The owner ruled the vendor is `poagen`, and gave the reason: it is the initialism of PHP OpenAPI Generator. Nothing else blocked this task.],
+    4,
+  )[Dispatched to a worktree agent off 9ecdea04. Namespaces settled as Poagen\\Generator and Poagen\\Runtime - siblings, since they are two separately published packages. Reversible by another rector pass until the runtime publishes.],
 )
 
 == Summary
