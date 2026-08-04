@@ -12,9 +12,17 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\RegionSlug;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreate201Content;
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsGetById200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsList200Content;
+use Acme\DigitalOcean\Generated\Model\VolumesCreate201Content;
 use Acme\DigitalOcean\Generated\Model\VolumesExt4;
+use Acme\DigitalOcean\Generated\Model\VolumesGet200Content;
+use Acme\DigitalOcean\Generated\Model\VolumesList200Content;
 use Acme\DigitalOcean\Generated\Model\VolumesXfs;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Block Storage` endpoints.
@@ -27,51 +35,60 @@ interface BlockStorageClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `api:read`, `api:write`, `block_storage:read`.
+     * @return Envelope<VolumesList200Content|Error>
      */
     public function volumesList(
         ?string $name = null,
         ?RegionSlug $region = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
+     * @return Envelope<VolumesCreate201Content|Error>
      */
-    public function volumesCreate(VolumesExt4|VolumesXfs $body): void;
+    public function volumesCreate(VolumesExt4|VolumesXfs $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:delete`, `api:write`.
+     * @return Envelope<null|Error>
      */
-    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): void;
+    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.
+     * @return Envelope<VolumeSnapshotsGetById200Content|Error>
      */
-    public function volumeSnapshotsGetById(string $snapshotId): void;
+    public function volumeSnapshotsGetById(string $snapshotId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:delete`.
+     * @return Envelope<null|Error>
      */
-    public function volumeSnapshotsDeleteById(string $snapshotId): void;
+    public function volumeSnapshotsDeleteById(string $snapshotId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:read`.
+     * @return Envelope<VolumesGet200Content|Error>
      */
-    public function volumesGet(string $volumeId): void;
+    public function volumesGet(string $volumeId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:delete`.
+     * @return Envelope<null|Error>
      */
-    public function volumesDelete(string $volumeId): void;
+    public function volumesDelete(string $volumeId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.
+     * @return Envelope<VolumeSnapshotsList200Content|Error>
      */
-    public function volumeSnapshotsList(string $volumeId, ?int $perPage = null, ?int $page = null): void;
+    public function volumeSnapshotsList(string $volumeId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:create`.
+     * @return Envelope<VolumeSnapshotsCreate201Content|Error>
      */
-    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequestContent $body): void;
+    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequestContent $body): Envelope;
 }

@@ -16,12 +16,15 @@ use Acme\GitHub\Generated\Enum\ReactionsListForIssueCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForIssueContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForPullRequestReviewCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForReleaseContent;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Reaction;
 use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `reactions` endpoints.
@@ -33,7 +36,7 @@ use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequestContent;
 interface ReactionsClientInterface
 {
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForCommitComment(
         string $owner,
@@ -42,24 +45,30 @@ interface ReactionsClientInterface
         ?ReactionsListForCommitCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForCommitCommentRequestContent $body,
-    ): Reaction;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function reactionsDeleteForCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         int $reactionId,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForIssueComment(
         string $owner,
@@ -68,19 +77,30 @@ interface ReactionsClientInterface
         ?ReactionsListForIssueCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForIssueComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForIssueCommentRequestContent $body,
-    ): Reaction;
-
-    public function reactionsDeleteForIssueComment(string $owner, string $repo, int $commentId, int $reactionId): void;
+    ): Envelope;
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForIssueComment(
+        string $owner,
+        string $repo,
+        int $commentId,
+        int $reactionId,
+    ): Envelope;
+
+    /**
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForIssue(
         string $owner,
@@ -89,19 +109,25 @@ interface ReactionsClientInterface
         ?ReactionsListForIssueContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         ReactionsCreateForIssueRequestContent $body,
-    ): Reaction;
-
-    public function reactionsDeleteForIssue(string $owner, string $repo, int $issueNumber, int $reactionId): void;
+    ): Envelope;
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForIssue(string $owner, string $repo, int $issueNumber, int $reactionId): Envelope;
+
+    /**
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForPullRequestReviewComment(
         string $owner,
@@ -110,24 +136,30 @@ interface ReactionsClientInterface
         ?ReactionsListForPullRequestReviewCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForPullRequestReviewComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForPullRequestReviewCommentRequestContent $body,
-    ): Reaction;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function reactionsDeleteForPullRequestComment(
         string $owner,
         string $repo,
         int $commentId,
         int $reactionId,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForRelease(
         string $owner,
@@ -136,14 +168,20 @@ interface ReactionsClientInterface
         ?ReactionsListForReleaseContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForRelease(
         string $owner,
         string $repo,
         int $releaseId,
         ReactionsCreateForReleaseRequestContent $body,
-    ): Reaction;
+    ): Envelope;
 
-    public function reactionsDeleteForRelease(string $owner, string $repo, int $releaseId, int $reactionId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForRelease(string $owner, string $repo, int $releaseId, int $reactionId): Envelope;
 }

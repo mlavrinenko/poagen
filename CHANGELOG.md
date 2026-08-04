@@ -28,6 +28,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking.** Every generated operation's return type changes: a method
+  now returns [`Envelope`](runtime/src/Contract/Envelope.php) instead of a
+  bare model. `->status` carries the HTTP status the wire sent, `->body` is
+  hydrated into the shape the document declared for that status, `->response`
+  is the PSR-7 response that carried both. A status the document
+  describes — 2xx or not — is a return value now, never a throw, so a
+  consumer who read a model straight off a call reads `->body` instead, and
+  one who caught `Generated\ApiException` for a declared error status reads
+  `->status` and narrows `->body` in its place. `Generated\ApiException`
+  survives, narrower: it is raised only for a status the document declared no
+  exact, range or `default` response for, or a declared body that failed to
+  hydrate. See
+  [`envelope-supersedes-error-response-policy`](truth/decisions/envelope-supersedes-error-response-policy.decision-260804.typ),
+  which supersedes `error-response-policy`.
 - `allOf` merges recursively — reading the node's own `properties`/`required`
   alongside every member's, and recursing into a member whose own `$ref`
   target is itself `allOf` — instead of the one-level, later-wins flatten T-008

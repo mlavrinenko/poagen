@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpCreate;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ReservedIpsClient implements ReservedIpsClientInterface
@@ -26,54 +32,70 @@ final readonly class ReservedIpsClient implements ReservedIpsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsList200Content|Error>
      */
-    public function reservedIpsList(?int $perPage = null, ?int $page = null): void
+    public function reservedIpsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ips')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<ReservedIpsCreate202Content|Error>
      */
-    public function reservedIpsCreate(ReservedIpCreate $body): void
+    public function reservedIpsCreate(ReservedIpCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpsCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/reserved_ips')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ReservedIpsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsGet200Content|Error>
      */
-    public function reservedIpsGet(string $reservedIp): void
+    public function reservedIpsGet(string $reservedIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ips/{reserved_ip}')
                 ->path('reserved_ip', $reservedIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function reservedIpsDelete(string $reservedIp): void
+    public function reservedIpsDelete(string $reservedIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/reserved_ips/{reserved_ip}')
                 ->path('reserved_ip', $reservedIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

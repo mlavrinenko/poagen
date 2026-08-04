@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SizesList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `Sizes` endpoints.
  *
@@ -22,6 +26,7 @@ interface SizesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `sizes:read`, `regions:read`.
+     * @return Envelope<SizesList200Content|Error>
      */
-    public function sizesList(?int $perPage = null, ?int $page = null): void;
+    public function sizesList(?int $perPage = null, ?int $page = null): Envelope;
 }

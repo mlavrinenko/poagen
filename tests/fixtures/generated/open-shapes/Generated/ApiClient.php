@@ -12,10 +12,12 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated;
 
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenRequest;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenResponse;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpen200Content;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenRequestContent;
 
 final readonly class ApiClient implements ApiClientInterface
 {
@@ -24,11 +26,17 @@ final readonly class ApiClient implements ApiClientInterface
     ) {
     }
 
-    public function saveOpen(SaveOpenRequest $body): SaveOpenResponse
+    /**
+     * @return Envelope<SaveOpen200Content>
+     */
+    public function saveOpen(SaveOpenRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SaveOpen200Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/open')->json($body),
-            ResponseType::object(SaveOpenResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveOpen200Content::class)]])),
         );
+
+        return $result;
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeams201Content;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequestContent;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsers201Content;
@@ -34,6 +35,9 @@ use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequestCont
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics1DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics28DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetricsDay;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `copilot` endpoints.
@@ -44,101 +48,151 @@ use Acme\GitHub\Generated\Model\CopilotUsageMetricsDay;
  */
 interface CopilotClientInterface
 {
-    public function copilotCopilotEnterpriseOneDayUsageMetrics(
-        string $enterprise,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport;
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|BasicError>
+     */
+    public function copilotCopilotEnterpriseOneDayUsageMetrics(string $enterprise, \DateTimeImmutable $day): Envelope;
 
-    public function copilotCopilotEnterpriseUsageMetrics(string $enterprise): CopilotUsageMetrics28DayReport;
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotEnterpriseUsageMetrics(string $enterprise): Envelope;
 
-    public function copilotCopilotUsersOneDayUsageMetrics(
-        string $enterprise,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport;
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|BasicError>
+     */
+    public function copilotCopilotUsersOneDayUsageMetrics(string $enterprise, \DateTimeImmutable $day): Envelope;
 
-    public function copilotCopilotUsersUsageMetrics(string $enterprise): CopilotUsageMetrics28DayReport;
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotUsersUsageMetrics(string $enterprise): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotSetEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotSetEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotAddOrganizationsToEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotRemoveOrganizationsFromEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function copilotGetCopilotOrganizationDetails(string $org): CopilotOrganizationDetails;
+    /**
+     * @return Envelope<CopilotOrganizationDetails|BasicError|null>
+     */
+    public function copilotGetCopilotOrganizationDetails(string $org): Envelope;
 
-    public function copilotListCopilotSeats(
-        string $org,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): CopilotListCopilotSeats200Content;
+    /**
+     * @return Envelope<CopilotListCopilotSeats200Content|BasicError>
+     */
+    public function copilotListCopilotSeats(string $org, ?int $page = null, ?int $perPage = null): Envelope;
 
+    /**
+     * @return Envelope<CopilotAddCopilotSeatsForTeams201Content|BasicError|null>
+     */
     public function copilotAddCopilotSeatsForTeams(
         string $org,
         CopilotAddCopilotSeatsForTeamsRequestContent $body,
-    ): CopilotAddCopilotSeatsForTeams201Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CopilotCancelCopilotSeatAssignmentForTeams200Content|BasicError|null>
+     */
     public function copilotCancelCopilotSeatAssignmentForTeams(
         string $org,
         CopilotCancelCopilotSeatAssignmentForTeamsRequestContent $body,
-    ): CopilotCancelCopilotSeatAssignmentForTeams200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CopilotAddCopilotSeatsForUsers201Content|BasicError|null>
+     */
     public function copilotAddCopilotSeatsForUsers(
         string $org,
         CopilotAddCopilotSeatsForUsersRequestContent $body,
-    ): CopilotAddCopilotSeatsForUsers201Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CopilotCancelCopilotSeatAssignmentForUsers200Content|BasicError|null>
+     */
     public function copilotCancelCopilotSeatAssignmentForUsers(
         string $org,
         CopilotCancelCopilotSeatAssignmentForUsersRequestContent $body,
-    ): CopilotCancelCopilotSeatAssignmentForUsers200Content;
+    ): Envelope;
 
-    public function copilotGetCopilotCodingAgentPermissionsOrganization(
-        string $org,
-    ): CopilotGetCopilotCodingAgentPermissionsOrganization200Content;
+    /**
+     * @return Envelope<CopilotGetCopilotCodingAgentPermissionsOrganization200Content|BasicError>
+     */
+    public function copilotGetCopilotCodingAgentPermissionsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function copilotSetCopilotCodingAgentPermissionsOrganization(
         string $org,
         CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content|BasicError>
+     */
     public function copilotListCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function copilotSetCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
         CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function copilotEnableCopilotCodingAgentForRepositoryInOrganization(string $org, int $repositoryId): void;
-
-    public function copilotDisableCopilotCodingAgentForRepositoryInOrganization(string $org, int $repositoryId): void;
-
-    public function copilotCopilotContentExclusionForOrganization(
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function copilotEnableCopilotCodingAgentForRepositoryInOrganization(
         string $org,
-    ): CopilotOrganizationContentExclusionDetails;
+        int $repositoryId,
+    ): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function copilotDisableCopilotCodingAgentForRepositoryInOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope;
+
+    /**
+     * @return Envelope<CopilotOrganizationContentExclusionDetails|BasicError>
+     */
+    public function copilotCopilotContentExclusionForOrganization(string $org): Envelope;
 
     /**
      * @param array<string, list<mixed>> $body
+     * @return Envelope<CopilotSetCopilotContentExclusionForOrganization200Content|BasicError|ValidationErrorSimple>
      */
-    public function copilotSetCopilotContentExclusionForOrganization(
-        string $org,
-        array $body,
-    ): CopilotSetCopilotContentExclusionForOrganization200Content;
+    public function copilotSetCopilotContentExclusionForOrganization(string $org, array $body): Envelope;
 
     /**
-     * @return list<CopilotUsageMetricsDay>
+     * @return Envelope<list<CopilotUsageMetricsDay>|BasicError>
      */
     public function copilotCopilotMetricsForOrganization(
         string $org,
@@ -146,26 +200,35 @@ interface CopilotClientInterface
         ?string $until = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
-
-    public function copilotCopilotOrganizationOneDayUsageMetrics(
-        string $org,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport;
-
-    public function copilotCopilotOrganizationUsageMetrics(string $org): CopilotUsageMetrics28DayReport;
-
-    public function copilotCopilotOrganizationUsersOneDayUsageMetrics(
-        string $org,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport;
-
-    public function copilotCopilotOrganizationUsersUsageMetrics(string $org): CopilotUsageMetrics28DayReport;
-
-    public function copilotGetCopilotSeatDetailsForUser(string $org, string $username): CopilotSeatDetails;
+    ): Envelope;
 
     /**
-     * @return list<CopilotUsageMetricsDay>
+     * @return Envelope<CopilotUsageMetrics1DayReport|null|BasicError>
+     */
+    public function copilotCopilotOrganizationOneDayUsageMetrics(string $org, \DateTimeImmutable $day): Envelope;
+
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotOrganizationUsageMetrics(string $org): Envelope;
+
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|null|BasicError>
+     */
+    public function copilotCopilotOrganizationUsersOneDayUsageMetrics(string $org, \DateTimeImmutable $day): Envelope;
+
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotOrganizationUsersUsageMetrics(string $org): Envelope;
+
+    /**
+     * @return Envelope<CopilotSeatDetails|BasicError|null>
+     */
+    public function copilotGetCopilotSeatDetailsForUser(string $org, string $username): Envelope;
+
+    /**
+     * @return Envelope<list<CopilotUsageMetricsDay>|BasicError>
      */
     public function copilotCopilotMetricsForTeam(
         string $org,
@@ -174,5 +237,5 @@ interface CopilotClientInterface
         ?string $until = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 }

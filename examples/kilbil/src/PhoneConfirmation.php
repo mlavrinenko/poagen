@@ -6,10 +6,13 @@ namespace Acme\Kilbil;
 
 use Acme\Kilbil\Generated\ConfirmationCodesClientInterface;
 use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone403Content;
 use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode403Content;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The wrapper architecture on the acceptance target.
@@ -59,19 +62,34 @@ final class PhoneConfirmation implements ConfirmationCodesClientInterface
             code: $code,
         ));
 
+        // The vendor's 403 carries no `result_code` worth trusting as a
+        // success flag — narrowing to the 200 body first is what
+        // `typed-error-responses` bought over the old thrown `ApiException`:
+        // a declared 403 is a value to check, not a branch that unwound
+        // the call before this method got to look at anything.
+        if (!$response->body instanceof CheckConfirmPhoneCode200Content) {
+            return false;
+        }
+
         // The vendor signals success in a `result_code` — declared `type: string`,
         // so `'0'` and not `0` — rather than in the HTTP status. That is exactly
         // the kind of local knowledge that belongs here and not in generated code:
         // paogen emitted the field faithfully and has no idea what its values mean.
-        return $response->result_code === '0';
+        return $response->body->result_code === '0';
     }
 
-    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content
+    /**
+     * @return Envelope<AskConfirmPhone200Content|AskConfirmPhone403Content>
+     */
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): Envelope
     {
         return $this->inner->askConfirmPhone($body);
     }
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content
+    /**
+     * @return Envelope<CheckConfirmPhoneCode200Content|CheckConfirmPhoneCode403Content>
+     */
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): Envelope
     {
         return $this->inner->checkConfirmPhoneCode($body);
     }

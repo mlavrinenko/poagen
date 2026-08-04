@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\RateLimitOverview;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `rate-limit` endpoints.
@@ -22,5 +24,8 @@ use Acme\GitHub\Generated\Model\RateLimitOverview;
  */
 interface RateLimitClientInterface
 {
-    public function rateLimitGet(): RateLimitOverview;
+    /**
+     * @return Envelope<RateLimitOverview|null|BasicError>
+     */
+    public function rateLimitGet(): Envelope;
 }

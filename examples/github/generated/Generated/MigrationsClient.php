@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Import;
 use Acme\GitHub\Generated\Model\Migration;
 use Acme\GitHub\Generated\Model\MigrationsMapCommitAuthorRequestContent;
@@ -22,8 +23,11 @@ use Acme\GitHub\Generated\Model\MigrationsUpdateImportRequestContent;
 use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\PorterAuthor;
 use Acme\GitHub\Generated\Model\PorterLargeFile;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class MigrationsClient implements MigrationsClientInterface
@@ -35,276 +39,386 @@ final readonly class MigrationsClient implements MigrationsClientInterface
 
     /**
      * @param list<string> $exclude
-     * @return list<Migration>
+     * @return Envelope<list<Migration>>
      */
     public function migrationsListForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?array $exclude = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Migration>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/migrations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('exclude', $exclude),
-            ResponseType::listOf(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequestContent $body): Migration
+    /**
+     * @return Envelope<Migration|BasicError|ValidationError>
+     */
+    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Migration|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/migrations')->path('org', $org)->json($body),
-            ResponseType::object(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $exclude
+     * @return Envelope<Migration|BasicError>
      */
-    public function migrationsGetStatusForOrg(string $org, int $migrationId, ?array $exclude = null): Migration
+    public function migrationsGetStatusForOrg(string $org, int $migrationId, ?array $exclude = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Migration|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/migrations/{migration_id}')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId)
                 ->query('exclude', $exclude),
-            ResponseType::object(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsDownloadArchiveForOrg(string $org, int $migrationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDownloadArchiveForOrg(string $org, int $migrationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/migrations/{migration_id}/archive')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsDeleteArchiveForOrg(string $org, int $migrationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDeleteArchiveForOrg(string $org, int $migrationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/migrations/{migration_id}/archive')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsUnlockRepoForOrg(string $org, int $migrationId, string $repoName): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsUnlockRepoForOrg(string $org, int $migrationId, string $repoName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/migrations/{migration_id}/repos/{repo_name}/lock')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId)
                 ->path('repo_name', $repoName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function migrationsListReposForOrg(
         string $org,
         int $migrationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/migrations/{migration_id}/repositories')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsGetImportStatus(string $owner, string $repo): Import
+    /**
+     * @return Envelope<Import|BasicError>
+     */
+    public function migrationsGetImportStatus(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Import|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(Import::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Import|ValidationError|BasicError>
+     */
     public function migrationsStartImport(
         string $owner,
         string $repo,
         MigrationsStartImportRequestContent $body,
-    ): Import {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Import|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Import::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function migrationsCancelImport(string $owner, string $repo): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsCancelImport(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Import|BasicError>
+     */
     public function migrationsUpdateImport(
         string $owner,
         string $repo,
         MigrationsUpdateImportRequestContent $body,
-    ): Import {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Import|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Import::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PorterAuthor>
+     * @return Envelope<list<PorterAuthor>|BasicError>
      */
-    public function migrationsGetCommitAuthors(string $owner, string $repo, ?int $since = null): array
+    public function migrationsGetCommitAuthors(string $owner, string $repo, ?int $since = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<PorterAuthor>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/import/authors')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('since', $since),
-            ResponseType::listOf(PorterAuthor::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterAuthor::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PorterAuthor|ValidationError|BasicError>
+     */
     public function migrationsMapCommitAuthor(
         string $owner,
         string $repo,
         int $authorId,
         MigrationsMapCommitAuthorRequestContent $body,
-    ): PorterAuthor {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PorterAuthor|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/import/authors/{author_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('author_id', $authorId)
                 ->json($body),
-            ResponseType::object(PorterAuthor::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PorterAuthor::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PorterLargeFile>
+     * @return Envelope<list<PorterLargeFile>|BasicError>
      */
-    public function migrationsGetLargeFiles(string $owner, string $repo): array
+    public function migrationsGetLargeFiles(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<PorterLargeFile>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/import/large_files')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(PorterLargeFile::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterLargeFile::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Import|ValidationError|BasicError>
+     */
     public function migrationsSetLfsPreference(
         string $owner,
         string $repo,
         MigrationsSetLfsPreferenceRequestContent $body,
-    ): Import {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Import|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/import/lfs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Import::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Migration>
+     * @return Envelope<list<Migration>|null|BasicError>
      */
-    public function migrationsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function migrationsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Migration>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/migrations')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Migration|ValidationError|null|BasicError>
+     */
     public function migrationsStartForAuthenticatedUser(
         MigrationsStartForAuthenticatedUserRequestContent $body,
-    ): Migration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Migration|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/migrations')->json($body),
-            ResponseType::object(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $exclude
+     * @return Envelope<Migration|BasicError|null>
      */
-    public function migrationsGetStatusForAuthenticatedUser(int $migrationId, ?array $exclude = null): Migration
+    public function migrationsGetStatusForAuthenticatedUser(int $migrationId, ?array $exclude = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Migration|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/migrations/{migration_id}')
                 ->path('migration_id', $migrationId)
                 ->query('exclude', $exclude),
-            ResponseType::object(Migration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function migrationsGetArchiveForAuthenticatedUser(int $migrationId): void
-    {
-        $this->transport->send(
-            Endpoint::get('/user/migrations/{migration_id}/archive')
-                ->path('migration_id', $migrationId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function migrationsDeleteArchiveForAuthenticatedUser(int $migrationId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/migrations/{migration_id}/archive')
-                ->path('migration_id', $migrationId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function migrationsUnlockRepoForAuthenticatedUser(int $migrationId, string $repoName): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/migrations/{migration_id}/repos/{repo_name}/lock')
-                ->path('migration_id', $migrationId)
-                ->path('repo_name', $repoName),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsGetArchiveForAuthenticatedUser(int $migrationId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/migrations/{migration_id}/archive')
+                ->path('migration_id', $migrationId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDeleteArchiveForAuthenticatedUser(int $migrationId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/migrations/{migration_id}/archive')
+                ->path('migration_id', $migrationId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsUnlockRepoForAuthenticatedUser(int $migrationId, string $repoName): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/migrations/{migration_id}/repos/{repo_name}/lock')
+                ->path('migration_id', $migrationId)
+                ->path('repo_name', $repoName),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function migrationsListReposForAuthenticatedUser(
         int $migrationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/migrations/{migration_id}/repositories')
                 ->path('migration_id', $migrationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

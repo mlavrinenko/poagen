@@ -72,7 +72,7 @@ final class NullableIdiomEquivalenceTest extends TestCase
     {
         foreach ([self::SCHEMA_30, self::SCHEMA_31] as $schema) {
             self::assertStringContainsString(
-                'public function getMember(string $memberId, ?string $since = null): Member',
+                'public function getMember(string $memberId, ?string $since = null): Envelope',
                 $this->sourcesOf($schema)['ApiClient.php'],
             );
         }

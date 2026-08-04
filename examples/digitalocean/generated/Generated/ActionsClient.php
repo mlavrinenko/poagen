@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ActionsClient implements ActionsClientInterface
@@ -25,28 +30,36 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `actions:read`.
+     * @return Envelope<ActionsList200Content|Error>
      */
-    public function actionsList(?int $perPage = null, ?int $page = null): void
+    public function actionsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ActionsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/actions')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `actions:read`.
+     * @return Envelope<ActionsGet200Content|Error>
      */
-    public function actionsGet(int $actionId): void
+    public function actionsGet(int $actionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ActionsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/actions/{action_id}')
                 ->path('action_id', $actionId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

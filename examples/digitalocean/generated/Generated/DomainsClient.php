@@ -12,8 +12,14 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\Domain;
+use Acme\DigitalOcean\Generated\Model\DomainsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\DomainsGet200Content;
+use Acme\DigitalOcean\Generated\Model\DomainsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DomainsClient implements DomainsClientInterface
@@ -26,54 +32,70 @@ final readonly class DomainsClient implements DomainsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsList200Content|Error>
      */
-    public function domainsList(?int $perPage = null, ?int $page = null): void
+    public function domainsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/domains')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:create`.
+     * @return Envelope<DomainsCreate201Content|Error>
      */
-    public function domainsCreate(Domain $body): void
+    public function domainsCreate(Domain $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/domains')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DomainsCreate201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsGet200Content|Error>
      */
-    public function domainsGet(string $domainName): void
+    public function domainsGet(string $domainName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/domains/{domain_name}')
                 ->path('domain_name', $domainName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:delete`.
+     * @return Envelope<null|Error>
      */
-    public function domainsDelete(string $domainName): void
+    public function domainsDelete(string $domainName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/domains/{domain_name}')
                 ->path('domain_name', $domainName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

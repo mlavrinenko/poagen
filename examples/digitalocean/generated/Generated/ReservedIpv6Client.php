@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6Create;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6Create201Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6Get200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6List200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ReservedIpv6Client implements ReservedIpv6ClientInterface
@@ -26,54 +32,70 @@ final readonly class ReservedIpv6Client implements ReservedIpv6ClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpv6List200Content|Error>
      */
-    public function reservedIpv6List(?int $perPage = null, ?int $page = null): void
+    public function reservedIpv6List(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpv6List200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ipv6')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpv6List200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<ReservedIpv6Create201Content|Error>
      */
-    public function reservedIpv6Create(ReservedIpv6Create $body): void
+    public function reservedIpv6Create(ReservedIpv6Create $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpv6Create201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/reserved_ipv6')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReservedIpv6Create201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpv6Get200Content|Error>
      */
-    public function reservedIpv6Get(string $reservedIpv6): void
+    public function reservedIpv6Get(string $reservedIpv6): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpv6Get200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ipv6/{reserved_ipv6}')
                 ->path('reserved_ipv6', $reservedIpv6)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpv6Get200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function reservedIpv6Delete(string $reservedIpv6): void
+    public function reservedIpv6Delete(string $reservedIpv6): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/reserved_ipv6/{reserved_ipv6}')
                 ->path('reserved_ipv6', $reservedIpv6)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

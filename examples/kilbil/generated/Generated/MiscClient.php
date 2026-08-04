@@ -12,14 +12,20 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\CloseSession200Content;
+use Acme\Kilbil\Generated\Model\CloseSession403Content;
 use Acme\Kilbil\Generated\Model\CloseSessionRequestContent;
 use Acme\Kilbil\Generated\Model\ExchangePosSettings200Content;
+use Acme\Kilbil\Generated\Model\ExchangePosSettings403Content;
 use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequestContent;
 use Acme\Kilbil\Generated\Model\GenerateCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateCard403Content;
 use Acme\Kilbil\Generated\Model\GenerateCardRequestContent;
 use Acme\Kilbil\Generated\Model\LegalInfo200Content;
+use Acme\Kilbil\Generated\Model\LegalInfo403Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class MiscClient implements MiscClientInterface
@@ -30,35 +36,59 @@ final readonly class MiscClient implements MiscClientInterface
     ) {
     }
 
-    public function closeSession(CloseSessionRequestContent $body): CloseSession200Content
+    /**
+     * @return Envelope<CloseSession200Content|CloseSession403Content>
+     */
+    public function closeSession(CloseSessionRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CloseSession200Content|CloseSession403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/closesession')->query('h', $this->h)->json($body),
-            ResponseType::object(CloseSession200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloseSession200Content::class)], ['403', ResponseType::object(CloseSession403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): ExchangePosSettings200Content
+    /**
+     * @return Envelope<ExchangePosSettings200Content|ExchangePosSettings403Content>
+     */
+    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ExchangePosSettings200Content|ExchangePosSettings403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/exchangepossettings')->query('h', $this->h)->json($body),
-            ResponseType::object(ExchangePosSettings200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ExchangePosSettings200Content::class)], ['403', ResponseType::object(ExchangePosSettings403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function generateCard(GenerateCardRequestContent $body): GenerateCard200Content
+    /**
+     * @return Envelope<GenerateCard200Content|GenerateCard403Content>
+     */
+    public function generateCard(GenerateCardRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GenerateCard200Content|GenerateCard403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/generatecard')->query('h', $this->h)->json($body),
-            ResponseType::object(GenerateCard200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateCard200Content::class)], ['403', ResponseType::object(GenerateCard403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function legalInfo(): LegalInfo200Content
+    /**
+     * @return Envelope<LegalInfo200Content|LegalInfo403Content>
+     */
+    public function legalInfo(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<LegalInfo200Content|LegalInfo403Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/load/legal_info')->query('h', $this->h),
-            ResponseType::object(LegalInfo200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LegalInfo200Content::class)], ['403', ResponseType::object(LegalInfo403Content::class)]])),
         );
+
+        return $result;
     }
 }

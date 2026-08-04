@@ -13,7 +13,7 @@
     2026,
     8,
     4,
-  )[Envelope is built and green on branch envelope-finish at dc6a9035 — 528 tests, PHPStan max clean on both tiers, both coverage floors held, all four examples byte-stable. One gate red: lint-jscpd-generated. Emitted duplication rose because every operation now carries the responses object the emitter never represented before. Collapsed what could be collapsed (petstore 8.2 to 4.4, GitHub 24.1 to 22.3) without touching a ratchet file. Residual needs an owner ruling on whether the per-tree floors re-measure, because the baselines file says they only ever move down.],
+  )[Built and gated. Resolution pending a final gate on the merged HEAD.],
 )
 
 == Summary

@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpActionAssign;
 use Acme\DigitalOcean\Generated\Model\ReservedIpActionUnassign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsPost201Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Reserved IP Actions` endpoints.
@@ -25,19 +30,22 @@ interface ReservedIpActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsActionsList200Content|Error>
      */
-    public function reservedIpsActionsList(string $reservedIp): void;
+    public function reservedIpsActionsList(string $reservedIp): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<ReservedIpsActionsPost201Content|Error>
      */
     public function reservedIpsActionsPost(
         string $reservedIp,
         ReservedIpActionUnassign|ReservedIpActionAssign $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsActionsGet200Content|Error>
      */
-    public function reservedIpsActionsGet(string $reservedIp, int $actionId): void;
+    public function reservedIpsActionsGet(string $reservedIp, int $actionId): Envelope;
 }

@@ -11,9 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AddonsCreate200Content;
 use Acme\DigitalOcean\Generated\Model\AddonsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsGet200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsGetApp200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsGetAppMetadata200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsList200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsPatch200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchPlan200Content;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequestContent;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Add-Ons` endpoints.
@@ -24,37 +33,49 @@ use Acme\DigitalOcean\Generated\Model\AddonsPatchRequestContent;
  */
 interface AddOnsClientInterface
 {
-    public function addonsGetApp(): void;
+    /**
+     * @return Envelope<AddonsGetApp200Content|Error>
+     */
+    public function addonsGetApp(): Envelope;
 
-    public function addonsGetAppMetadata(string $appSlug): void;
+    /**
+     * @return Envelope<AddonsGetAppMetadata200Content|Error>
+     */
+    public function addonsGetAppMetadata(string $appSlug): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.
+     * @return Envelope<AddonsList200Content|Error>
      */
-    public function addonsList(): void;
+    public function addonsList(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:create`.
+     * @return Envelope<AddonsCreate200Content|Error>
      */
-    public function addonsCreate(AddonsCreateRequestContent $body): void;
+    public function addonsCreate(AddonsCreateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.
+     * @return Envelope<AddonsGet200Content|Error>
      */
-    public function addonsGet(string $resourceUuid): void;
+    public function addonsGet(string $resourceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:delete`.
+     * @return Envelope<null|Error>
      */
-    public function addonsDelete(string $resourceUuid): void;
+    public function addonsDelete(string $resourceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
+     * @return Envelope<AddonsPatch200Content|Error>
      */
-    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): void;
+    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
+     * @return Envelope<AddonsPatchPlan200Content|Error>
      */
-    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): void;
+    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): Envelope;
 }

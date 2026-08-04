@@ -11,10 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\FloatingIpActionAssign;
 use Acme\DigitalOcean\Generated\Model\FloatingIpActionUnassign;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionGet200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionList200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionPost201Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class FloatingIpActionsClient implements FloatingIpActionsClientInterface
@@ -27,44 +33,56 @@ final readonly class FloatingIpActionsClient implements FloatingIpActionsClientI
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsActionList200Content|Error>
      */
-    public function floatingIpsActionList(string $floatingIp): void
+    public function floatingIpsActionList(string $floatingIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FloatingIpsActionList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/floating_ips/{floating_ip}/actions')
                 ->path('floating_ip', $floatingIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FloatingIpsActionList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<FloatingIpsActionPost201Content|Error>
      */
     public function floatingIpsActionPost(
         string $floatingIp,
         FloatingIpActionUnassign|FloatingIpActionAssign $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<FloatingIpsActionPost201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/floating_ips/{floating_ip}/actions')
                 ->path('floating_ip', $floatingIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FloatingIpsActionPost201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsActionGet200Content|Error>
      */
-    public function floatingIpsActionGet(string $floatingIp, int $actionId): void
+    public function floatingIpsActionGet(string $floatingIp, int $actionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FloatingIpsActionGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/floating_ips/{floating_ip}/actions/{action_id}')
                 ->path('floating_ip', $floatingIp)
                 ->path('action_id', $actionId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FloatingIpsActionGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

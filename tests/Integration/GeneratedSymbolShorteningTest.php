@@ -65,19 +65,34 @@ final class GeneratedSymbolShorteningTest extends TestCase
 
     public function testAnImportedGlobalFunctionIsWrittenUnqualifiedInAnEmittedBody(): void
     {
-        // The emitter used to spell a global function `\json_decode(...)`
-        // inline; it imports the symbol once with `use function json_decode;`
+        // The emitter used to spell a global function `\array_map(...)`
+        // inline; it imports the symbol once with `use function array_map;`
         // and calls it unqualified, mirroring what
         // `import-global-functions-in-source` already does for paogen's own
-        // sources. Since request assembly moved to the runtime, the emitted
-        // file that still calls one is the per-profile `ApiException`.
-        $exception = $this->sourceEndingWith('Generated/ApiException.php');
+        // sources. `ApiException` no longer calls one at all — a declared
+        // body is hydrated by the runtime now, never decoded by hand
+        // (typed-error-responses) — so the emitted file this pins is a
+        // query parameter that is a list of scalar-binding value objects:
+        // each item needs its own `toScalar()`, called through `array_map`.
+        $plan = self::generator()->generate(new Profile(
+            schema: __DIR__ . '/../fixtures/schemas/parameter-shape-references-3.0.yaml',
+            output: self::makeSandboxDir('paogen-symbol-shortening-array-map-'),
+            namespace: self::NAMESPACE . 'ArrayMap',
+        ));
+        $client = '';
 
-        self::assertStringContainsString('use function json_decode;', $exception);
-        self::assertStringContainsString('use const JSON_ERROR_NONE;', $exception);
-        self::assertStringContainsString('$decoded = json_decode($body, true);', $exception);
-        self::assertStringNotContainsString('\\json_decode(', $exception);
-        self::assertStringNotContainsString('\\JSON_ERROR_NONE', $exception);
+        foreach ($plan->writes as $path => $source) {
+            if (str_ends_with($path, 'Generated/ApiClient.php')) {
+                $client = $source;
+            }
+        }
+
+        self::assertStringContainsString('use function array_map;', $client);
+        self::assertStringContainsString(
+            'array_map(static fn(TagId $__v): string => $__v->toScalar(), $tags)',
+            $client,
+        );
+        self::assertStringNotContainsString('\\array_map(', $client);
     }
 
     public function testAnEmittedClientCarriesNoImportItDoesNotUse(): void

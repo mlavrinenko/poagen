@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GeneratePromocode200Content;
+use Acme\Kilbil\Generated\Model\GeneratePromocode403Content;
 use Acme\Kilbil\Generated\Model\GeneratePromocodeRequestContent;
 use Acme\Kilbil\Generated\Model\ReservedPromocode200Content;
+use Acme\Kilbil\Generated\Model\ReservedPromocode403Content;
 use Acme\Kilbil\Generated\Model\ReservedPromocodeRequestContent;
 use Acme\Kilbil\Generated\Model\SearchPromocode200Content;
+use Acme\Kilbil\Generated\Model\SearchPromocode403Content;
 use Acme\Kilbil\Generated\Model\SearchPromocodeRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class PromocodesClient implements PromocodesClientInterface
@@ -29,27 +34,45 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     ) {
     }
 
-    public function generatePromocode(GeneratePromocodeRequestContent $body): GeneratePromocode200Content
+    /**
+     * @return Envelope<GeneratePromocode200Content|GeneratePromocode403Content>
+     */
+    public function generatePromocode(GeneratePromocodeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GeneratePromocode200Content|GeneratePromocode403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/generate_promocode')->query('h', $this->h)->json($body),
-            ResponseType::object(GeneratePromocode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GeneratePromocode200Content::class)], ['403', ResponseType::object(GeneratePromocode403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function reservedPromocode(ReservedPromocodeRequestContent $body): ReservedPromocode200Content
+    /**
+     * @return Envelope<ReservedPromocode200Content|ReservedPromocode403Content>
+     */
+    public function reservedPromocode(ReservedPromocodeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ReservedPromocode200Content|ReservedPromocode403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/reservedpromocode')->query('h', $this->h)->json($body),
-            ResponseType::object(ReservedPromocode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedPromocode200Content::class)], ['403', ResponseType::object(ReservedPromocode403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function searchPromocode(SearchPromocodeRequestContent $body): SearchPromocode200Content
+    /**
+     * @return Envelope<SearchPromocode200Content|SearchPromocode403Content>
+     */
+    public function searchPromocode(SearchPromocodeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SearchPromocode200Content|SearchPromocode403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/searchpromocode')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchPromocode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchPromocode200Content::class)], ['403', ResponseType::object(SearchPromocode403Content::class)]])),
         );
+
+        return $result;
     }
 }

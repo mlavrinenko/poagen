@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Blob;
 use Acme\GitHub\Generated\Model\GitCommit;
-use Acme\GitHub\Generated\Model\GitCreateBlobRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateCommitRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateRefRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateTagRequestContent;
@@ -22,7 +22,8 @@ use Acme\GitHub\Generated\Model\GitRef;
 use Acme\GitHub\Generated\Model\GitTag;
 use Acme\GitHub\Generated\Model\GitTree;
 use Acme\GitHub\Generated\Model\GitUpdateRefRequestContent;
-use Acme\GitHub\Generated\Model\ShortBlob;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `git` endpoints.
@@ -33,32 +34,63 @@ use Acme\GitHub\Generated\Model\ShortBlob;
  */
 interface GitClientInterface
 {
-    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequestContent $body): ShortBlob;
-
-    public function gitGetBlob(string $owner, string $repo, string $fileSha): Blob;
-
-    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): GitCommit;
-
-    public function gitGetCommit(string $owner, string $repo, string $commitSha): GitCommit;
+    /**
+     * @return Envelope<Blob|BasicError|ValidationError>
+     */
+    public function gitGetBlob(string $owner, string $repo, string $fileSha): Envelope;
 
     /**
-     * @return list<GitRef>
+     * @return Envelope<GitCommit|ValidationError|BasicError>
      */
-    public function gitListMatchingRefs(string $owner, string $repo, string $ref): array;
+    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): Envelope;
 
-    public function gitGetRef(string $owner, string $repo, string $ref): GitRef;
+    /**
+     * @return Envelope<GitCommit|BasicError>
+     */
+    public function gitGetCommit(string $owner, string $repo, string $commitSha): Envelope;
 
-    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): GitRef;
+    /**
+     * @return Envelope<list<GitRef>|BasicError>
+     */
+    public function gitListMatchingRefs(string $owner, string $repo, string $ref): Envelope;
 
-    public function gitDeleteRef(string $owner, string $repo, string $ref): void;
+    /**
+     * @return Envelope<GitRef|BasicError>
+     */
+    public function gitGetRef(string $owner, string $repo, string $ref): Envelope;
 
-    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): GitRef;
+    /**
+     * @return Envelope<GitRef|ValidationError|BasicError>
+     */
+    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): Envelope;
 
-    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): GitTag;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gitDeleteRef(string $owner, string $repo, string $ref): Envelope;
 
-    public function gitGetTag(string $owner, string $repo, string $tagSha): GitTag;
+    /**
+     * @return Envelope<GitRef|ValidationError|BasicError>
+     */
+    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): Envelope;
 
-    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): GitTree;
+    /**
+     * @return Envelope<GitTag|ValidationError|BasicError>
+     */
+    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): Envelope;
 
-    public function gitGetTree(string $owner, string $repo, string $treeSha, ?string $recursive = null): GitTree;
+    /**
+     * @return Envelope<GitTag|BasicError>
+     */
+    public function gitGetTag(string $owner, string $repo, string $tagSha): Envelope;
+
+    /**
+     * @return Envelope<GitTree|ValidationError|BasicError>
+     */
+    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<GitTree|ValidationError|BasicError>
+     */
+    public function gitGetTree(string $owner, string $repo, string $treeSha, ?string $recursive = null): Envelope;
 }

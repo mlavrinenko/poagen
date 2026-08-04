@@ -11,11 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostAttach;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostDetach;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostResize;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsPost202Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsPostById202Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class BlockStorageActionsClient implements BlockStorageActionsClientInterface
@@ -28,70 +35,90 @@ final readonly class BlockStorageActionsClient implements BlockStorageActionsCli
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:create`, `api:write`.
+     * @return Envelope<VolumeActionsPost202Content|Error>
      */
     public function volumeActionsPost(
         VolumeActionPostAttach|VolumeActionPostDetach $body,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VolumeActionsPost202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/volumes/actions')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(VolumeActionsPost202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
+     * @return Envelope<VolumeActionsList200Content|Error>
      */
-    public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): void
+    public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumeActionsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes/{volume_id}/actions')
                 ->path('volume_id', $volumeId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumeActionsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:create`.
+     * @return Envelope<VolumeActionsPostById202Content|Error>
      */
     public function volumeActionsPostById(
         string $volumeId,
         VolumeActionPostAttach|VolumeActionPostDetach|VolumeActionPostResize $body,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VolumeActionsPostById202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/volumes/{volume_id}/actions')
                 ->path('volume_id', $volumeId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(VolumeActionsPostById202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
+     * @return Envelope<VolumeActionsGet200Content|Error>
      */
-    public function volumeActionsGet(string $volumeId, int $actionId, ?int $perPage = null, ?int $page = null): void
-    {
-        $this->transport->send(
+    public function volumeActionsGet(
+        string $volumeId,
+        int $actionId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<VolumeActionsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes/{volume_id}/actions/{action_id}')
                 ->path('volume_id', $volumeId)
                 ->path('action_id', $actionId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumeActionsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

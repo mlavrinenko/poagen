@@ -12,15 +12,21 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AddClientTags200Content;
+use Acme\Kilbil\Generated\Model\AddClientTags403Content;
 use Acme\Kilbil\Generated\Model\AddClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\DeleteClientTags200Content;
+use Acme\Kilbil\Generated\Model\DeleteClientTags403Content;
 use Acme\Kilbil\Generated\Model\DeleteClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientTags200Content;
+use Acme\Kilbil\Generated\Model\GetClientTags403Content;
 use Acme\Kilbil\Generated\Model\GetClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\GetListTags200Content;
+use Acme\Kilbil\Generated\Model\GetListTags403Content;
 use Acme\Kilbil\Generated\Model\GetListTagsRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class TagsClient implements TagsClientInterface
@@ -31,35 +37,59 @@ final readonly class TagsClient implements TagsClientInterface
     ) {
     }
 
-    public function addClientTags(AddClientTagsRequestContent $body): AddClientTags200Content
+    /**
+     * @return Envelope<AddClientTags200Content|AddClientTags403Content>
+     */
+    public function addClientTags(AddClientTagsRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AddClientTags200Content|AddClientTags403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/addclienttags')->query('h', $this->h)->json($body),
-            ResponseType::object(AddClientTags200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClientTags200Content::class)], ['403', ResponseType::object(AddClientTags403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function deleteClientTags(DeleteClientTagsRequestContent $body): DeleteClientTags200Content
+    /**
+     * @return Envelope<DeleteClientTags200Content|DeleteClientTags403Content>
+     */
+    public function deleteClientTags(DeleteClientTagsRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DeleteClientTags200Content|DeleteClientTags403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/deleteclienttags')->query('h', $this->h)->json($body),
-            ResponseType::object(DeleteClientTags200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteClientTags200Content::class)], ['403', ResponseType::object(DeleteClientTags403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function getClientTags(GetClientTagsRequestContent $body): GetClientTags200Content
+    /**
+     * @return Envelope<GetClientTags200Content|GetClientTags403Content>
+     */
+    public function getClientTags(GetClientTagsRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetClientTags200Content|GetClientTags403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getclienttags')->query('h', $this->h)->json($body),
-            ResponseType::object(GetClientTags200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientTags200Content::class)], ['403', ResponseType::object(GetClientTags403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function getListTags(GetListTagsRequestContent $body): GetListTags200Content
+    /**
+     * @return Envelope<GetListTags200Content|GetListTags403Content>
+     */
+    public function getListTags(GetListTagsRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetListTags200Content|GetListTags403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getlisttags')->query('h', $this->h)->json($body),
-            ResponseType::object(GetListTags200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetListTags200Content::class)], ['403', ResponseType::object(GetListTags403Content::class)]])),
         );
+
+        return $result;
     }
 }

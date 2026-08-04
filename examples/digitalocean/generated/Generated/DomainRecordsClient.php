@@ -22,8 +22,16 @@ use Acme\DigitalOcean\Generated\Model\DomainRecordNs;
 use Acme\DigitalOcean\Generated\Model\DomainRecordSoa;
 use Acme\DigitalOcean\Generated\Model\DomainRecordSrv;
 use Acme\DigitalOcean\Generated\Model\DomainRecordTxt;
+use Acme\DigitalOcean\Generated\Model\DomainsCreateRecord201Content;
+use Acme\DigitalOcean\Generated\Model\DomainsGetRecord200Content;
+use Acme\DigitalOcean\Generated\Model\DomainsListRecords200Content;
+use Acme\DigitalOcean\Generated\Model\DomainsPatchRecord200Content;
+use Acme\DigitalOcean\Generated\Model\DomainsUpdateRecord200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DomainRecordsClient implements DomainRecordsClientInterface
@@ -36,6 +44,7 @@ final readonly class DomainRecordsClient implements DomainRecordsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsListRecords200Content|Error>
      */
     public function domainsListRecords(
         string $domainName,
@@ -43,8 +52,9 @@ final readonly class DomainRecordsClient implements DomainRecordsClientInterface
         ?DomainsListRecordsType $type = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DomainsListRecords200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/domains/{domain_name}/records')
                 ->path('domain_name', $domainName)
                 ->query('name', $name)
@@ -52,81 +62,103 @@ final readonly class DomainRecordsClient implements DomainRecordsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsListRecords200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:create`, `domain:update`.
+     * @return Envelope<DomainsCreateRecord201Content|Error>
      */
     public function domainsCreateRecord(
         string $domainName,
         DomainRecordA|DomainRecordAaaa|DomainRecordCaa|DomainRecordCname|DomainRecordMx|DomainRecordNs|DomainRecordSoa|DomainRecordSrv|DomainRecordTxt $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DomainsCreateRecord201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/domains/{domain_name}/records')
                 ->path('domain_name', $domainName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DomainsCreateRecord201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsGetRecord200Content|Error>
      */
-    public function domainsGetRecord(string $domainName, int $domainRecordId): void
+    public function domainsGetRecord(string $domainName, int $domainRecordId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsGetRecord200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/domains/{domain_name}/records/{domain_record_id}')
                 ->path('domain_name', $domainName)
                 ->path('domain_record_id', $domainRecordId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsGetRecord200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:update`.
+     * @return Envelope<DomainsUpdateRecord200Content|Error>
      */
-    public function domainsUpdateRecord(string $domainName, int $domainRecordId, DomainRecord $body): void
+    public function domainsUpdateRecord(string $domainName, int $domainRecordId, DomainRecord $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsUpdateRecord200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/domains/{domain_name}/records/{domain_record_id}')
                 ->path('domain_name', $domainName)
                 ->path('domain_record_id', $domainRecordId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsUpdateRecord200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:delete`, `domain:update`.
+     * @return Envelope<null|Error>
      */
-    public function domainsDeleteRecord(string $domainName, int $domainRecordId): void
+    public function domainsDeleteRecord(string $domainName, int $domainRecordId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/domains/{domain_name}/records/{domain_record_id}')
                 ->path('domain_name', $domainName)
                 ->path('domain_record_id', $domainRecordId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `domain:update`.
+     * @return Envelope<DomainsPatchRecord200Content|Error>
      */
-    public function domainsPatchRecord(string $domainName, int $domainRecordId, DomainRecord $body): void
+    public function domainsPatchRecord(string $domainName, int $domainRecordId, DomainRecord $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DomainsPatchRecord200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/domains/{domain_name}/records/{domain_record_id}')
                 ->path('domain_name', $domainName)
                 ->path('domain_record_id', $domainRecordId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DomainsPatchRecord200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

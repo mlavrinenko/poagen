@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated;
 
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenRequest;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenResponse;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpen200Content;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveOpenRequestContent;
 
 /**
  * The composition root's contract: one accessor per tag, plus whatever the document left untagged.
@@ -21,5 +22,8 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\OpenShapes\Generated\Model\SaveO
  */
 interface ApiClientInterface
 {
-    public function saveOpen(SaveOpenRequest $body): SaveOpenResponse;
+    /**
+     * @return Envelope<SaveOpen200Content>
+     */
+    public function saveOpen(SaveOpenRequestContent $body): Envelope;
 }

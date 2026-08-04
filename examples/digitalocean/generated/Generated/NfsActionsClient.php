@@ -11,14 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\NfsActionAttach;
 use Acme\DigitalOcean\Generated\Model\NfsActionDetach;
 use Acme\DigitalOcean\Generated\Model\NfsActionReassign;
 use Acme\DigitalOcean\Generated\Model\NfsActionResize;
 use Acme\DigitalOcean\Generated\Model\NfsActionSnapshot;
 use Acme\DigitalOcean\Generated\Model\NfsActionSwitchPerformanceTier;
+use Acme\DigitalOcean\Generated\Model\NfsActionsResponse;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class NfsActionsClient implements NfsActionsClientInterface
@@ -31,17 +35,21 @@ final readonly class NfsActionsClient implements NfsActionsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `nfs:create`.
+     * @return Envelope<NfsActionsResponse|Error>
      */
     public function nfsCreateAction(
         string $nfsId,
         NfsActionResize|NfsActionSnapshot|NfsActionAttach|NfsActionDetach|NfsActionReassign|NfsActionSwitchPerformanceTier $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<NfsActionsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/nfs/{nfs_id}/actions')
                 ->path('nfs_id', $nfsId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(NfsActionsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

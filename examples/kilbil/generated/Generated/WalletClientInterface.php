@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetWalletLink200Content;
+use Acme\Kilbil\Generated\Model\GetWalletLink403Content;
 use Acme\Kilbil\Generated\Model\GetWalletLinkRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Wallet` endpoints.
@@ -23,5 +25,8 @@ use Acme\Kilbil\Generated\Model\GetWalletLinkRequestContent;
  */
 interface WalletClientInterface
 {
-    public function getWalletLink(GetWalletLinkRequestContent $body): GetWalletLink200Content;
+    /**
+     * @return Envelope<GetWalletLink200Content|GetWalletLink403Content>
+     */
+    public function getWalletLink(GetWalletLinkRequestContent $body): Envelope;
 }

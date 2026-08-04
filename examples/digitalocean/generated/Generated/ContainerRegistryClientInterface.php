@@ -11,11 +11,27 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\DockerCredentials;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\RegistryCreate;
+use Acme\DigitalOcean\Generated\Model\RegistryCreate201Content;
+use Acme\DigitalOcean\Generated\Model\RegistryGet200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryGetGarbageCollection200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryGetOptions200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryGetSubscription200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryListGarbageCollections200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryListRepositories200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryListRepositoriesV2200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryListRepositoryManifests200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryListRepositoryTags200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryRunGarbageCollection201Content;
 use Acme\DigitalOcean\Generated\Model\RegistryRunGc;
+use Acme\DigitalOcean\Generated\Model\RegistryUpdateGarbageCollection200Content;
+use Acme\DigitalOcean\Generated\Model\RegistryUpdateSubscription200Content;
 use Acme\DigitalOcean\Generated\Model\RegistryUpdateSubscriptionRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateRegistry;
 use Acme\DigitalOcean\Generated\Model\ValidateRegistry;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Container Registry` endpoints.
@@ -28,122 +44,140 @@ interface ContainerRegistryClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryGet200Content|Error>
      */
-    public function registryGet(): void;
+    public function registryGet(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.
+     * @return Envelope<RegistryCreate201Content|Error>
      */
-    public function registryCreate(RegistryCreate $body): void;
+    public function registryCreate(RegistryCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
-    public function registryDelete(): void;
+    public function registryDelete(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`, `registry:update`.
+     * @return Envelope<DockerCredentials|Error>
      */
-    public function registryGetDockerCredentials(?int $expirySeconds = null, ?bool $readWrite = null): void;
+    public function registryGetDockerCredentials(?int $expirySeconds = null, ?bool $readWrite = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryGetOptions200Content|Error>
      */
-    public function registryGetOptions(): void;
+    public function registryGetOptions(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryGetSubscription200Content|Error>
      */
-    public function registryGetSubscription(): void;
+    public function registryGetSubscription(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistryUpdateSubscription200Content|Error>
      */
-    public function registryUpdateSubscription(RegistryUpdateSubscriptionRequestContent $body): void;
+    public function registryUpdateSubscription(RegistryUpdateSubscriptionRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.
+     * @return Envelope<null|Error>
      */
-    public function registryValidateName(ValidateRegistry $body): void;
+    public function registryValidateName(ValidateRegistry $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryGetGarbageCollection200Content|Error>
      */
-    public function registryGetGarbageCollection(string $registryName): void;
+    public function registryGetGarbageCollection(string $registryName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistryRunGarbageCollection201Content|Error>
      */
-    public function registryRunGarbageCollection(string $registryName, RegistryRunGc $body): void;
+    public function registryRunGarbageCollection(string $registryName, RegistryRunGc $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistryUpdateGarbageCollection200Content|Error>
      */
     public function registryUpdateGarbageCollection(
         string $registryName,
         string $garbageCollectionUuid,
         UpdateRegistry $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryListGarbageCollections200Content|Error>
      */
     public function registryListGarbageCollections(
         string $registryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryListRepositories200Content|Error>
      */
-    public function registryListRepositories(string $registryName, ?int $perPage = null, ?int $page = null): void;
+    public function registryListRepositories(string $registryName, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryListRepositoryManifests200Content|Error>
      */
     public function registryListRepositoryManifests(
         string $registryName,
         string $repositoryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
     public function registryDeleteRepositoryManifest(
         string $registryName,
         string $repositoryName,
         string $manifestDigest,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryListRepositoryTags200Content|Error>
      */
     public function registryListRepositoryTags(
         string $registryName,
         string $repositoryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
     public function registryDeleteRepositoryTag(
         string $registryName,
         string $repositoryName,
         string $repositoryTag,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistryListRepositoriesV2200Content|Error>
      */
     public function registryListRepositoriesV2(
         string $registryName,
         ?int $perPage = null,
         ?int $page = null,
         ?string $pageToken = null,
-    ): void;
+    ): Envelope;
 }

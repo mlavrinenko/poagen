@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AccountGet200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `Account` endpoints.
  *
@@ -22,6 +26,7 @@ interface AccountClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `account:read`.
+     * @return Envelope<AccountGet200Content|Error>
      */
-    public function accountGet(): void;
+    public function accountGet(): Envelope;
 }

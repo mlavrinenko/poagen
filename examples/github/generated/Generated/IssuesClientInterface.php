@@ -31,6 +31,7 @@ use Acme\GitHub\Generated\Enum\IssuesListMilestonesSort;
 use Acme\GitHub\Generated\Enum\IssuesListMilestonesState;
 use Acme\GitHub\Generated\Enum\IssuesListSort;
 use Acme\GitHub\Generated\Enum\IssuesListState;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Issue;
 use Acme\GitHub\Generated\Model\IssueComment;
 use Acme\GitHub\Generated\Model\IssueEvent;
@@ -38,17 +39,24 @@ use Acme\GitHub\Generated\Model\IssueEventForIssue;
 use Acme\GitHub\Generated\Model\IssueFieldValue;
 use Acme\GitHub\Generated\Model\IssuesAddAssigneesRequestContent;
 use Acme\GitHub\Generated\Model\IssuesAddBlockedByDependencyRequestContent;
+use Acme\GitHub\Generated\Model\IssuesAddIssueFieldValues503Content;
 use Acme\GitHub\Generated\Model\IssuesAddIssueFieldValuesRequestContent;
 use Acme\GitHub\Generated\Model\IssuesAddSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesCreate503Content;
 use Acme\GitHub\Generated\Model\IssuesCreateCommentRequestContent;
 use Acme\GitHub\Generated\Model\IssuesCreateLabelRequestContent;
 use Acme\GitHub\Generated\Model\IssuesCreateMilestoneRequestContent;
 use Acme\GitHub\Generated\Model\IssuesCreateRequestContent;
+use Acme\GitHub\Generated\Model\IssuesDeleteIssueFieldValue503Content;
 use Acme\GitHub\Generated\Model\IssuesLockRequestContent;
 use Acme\GitHub\Generated\Model\IssuesRemoveAssigneesRequestContent;
 use Acme\GitHub\Generated\Model\IssuesRemoveSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesReprioritizeSubIssue503Content;
 use Acme\GitHub\Generated\Model\IssuesReprioritizeSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesSetIssueFieldValues503Content;
 use Acme\GitHub\Generated\Model\IssuesSetIssueFieldValuesRequestContent;
+use Acme\GitHub\Generated\Model\IssuesUnpinComment503Content;
+use Acme\GitHub\Generated\Model\IssuesUpdate503Content;
 use Acme\GitHub\Generated\Model\IssuesUpdateCommentRequestContent;
 use Acme\GitHub\Generated\Model\IssuesUpdateLabelRequestContent;
 use Acme\GitHub\Generated\Model\IssuesUpdateMilestoneRequestContent;
@@ -57,6 +65,9 @@ use Acme\GitHub\Generated\Model\Label;
 use Acme\GitHub\Generated\Model\Milestone;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Acme\GitHub\Generated\Model\TimelineIssueEvents;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `issues` endpoints.
@@ -68,7 +79,7 @@ use Acme\GitHub\Generated\Model\TimelineIssueEvents;
 interface IssuesClientInterface
 {
     /**
-     * @return list<Issue>
+     * @return Envelope<list<Issue>|ValidationError|null|BasicError>
      */
     public function issuesList(
         ?IssuesListFilter $filter = null,
@@ -83,10 +94,10 @@ interface IssuesClientInterface
         ?bool $pulls = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<list<Issue>|BasicError>
      */
     public function issuesListForOrg(
         string $org,
@@ -99,17 +110,25 @@ interface IssuesClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|BasicError>
      */
-    public function issuesListAssignees(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
-
-    public function issuesCheckUserCanBeAssigned(string $owner, string $repo, string $assignee): void;
+    public function issuesListAssignees(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<null|BasicError>
+     */
+    public function issuesCheckUserCanBeAssigned(string $owner, string $repo, string $assignee): Envelope;
+
+    /**
+     * @return Envelope<list<Issue>|BasicError|ValidationError>
      */
     public function issuesListForRepo(
         string $owner,
@@ -126,12 +145,15 @@ interface IssuesClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function issuesCreate(string $owner, string $repo, IssuesCreateRequestContent $body): Issue;
+    ): Envelope;
 
     /**
-     * @return list<IssueComment>
+     * @return Envelope<Issue|BasicError|ValidationError|IssuesCreate503Content>
+     */
+    public function issuesCreate(string $owner, string $repo, IssuesCreateRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<IssueComment>|ValidationError|BasicError>
      */
     public function issuesListCommentsForRepo(
         string $owner,
@@ -141,67 +163,100 @@ interface IssuesClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function issuesGetComment(string $owner, string $repo, int $commentId): IssueComment;
+    /**
+     * @return Envelope<IssueComment|BasicError>
+     */
+    public function issuesGetComment(string $owner, string $repo, int $commentId): Envelope;
 
-    public function issuesDeleteComment(string $owner, string $repo, int $commentId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function issuesDeleteComment(string $owner, string $repo, int $commentId): Envelope;
 
+    /**
+     * @return Envelope<IssueComment|ValidationError>
+     */
     public function issuesUpdateComment(
         string $owner,
         string $repo,
         int $commentId,
         IssuesUpdateCommentRequestContent $body,
-    ): IssueComment;
-
-    public function issuesPinComment(string $owner, string $repo, int $commentId): IssueComment;
-
-    public function issuesUnpinComment(string $owner, string $repo, int $commentId): void;
+    ): Envelope;
 
     /**
-     * @return list<IssueEvent>
+     * @return Envelope<IssueComment|BasicError|ValidationError>
+     */
+    public function issuesPinComment(string $owner, string $repo, int $commentId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|IssuesUnpinComment503Content>
+     */
+    public function issuesUnpinComment(string $owner, string $repo, int $commentId): Envelope;
+
+    /**
+     * @return Envelope<list<IssueEvent>|ValidationError>
      */
     public function issuesListEventsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function issuesGetEvent(string $owner, string $repo, int $eventId): IssueEvent;
+    /**
+     * @return Envelope<IssueEvent|BasicError>
+     */
+    public function issuesGetEvent(string $owner, string $repo, int $eventId): Envelope;
 
-    public function issuesGet(string $owner, string $repo, int $issueNumber): Issue;
+    /**
+     * @return Envelope<Issue|BasicError|null>
+     */
+    public function issuesGet(string $owner, string $repo, int $issueNumber): Envelope;
 
+    /**
+     * @return Envelope<Issue|ValidationError|IssuesUpdate503Content|BasicError>
+     */
     public function issuesUpdate(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesUpdateRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue>
+     */
     public function issuesAddAssignees(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesAddAssigneesRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue>
+     */
     public function issuesRemoveAssignees(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesRemoveAssigneesRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function issuesCheckUserCanBeAssignedToIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         string $assignee,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<IssueComment>
+     * @return Envelope<list<IssueComment>|BasicError>
      */
     public function issuesListComments(
         string $owner,
@@ -210,17 +265,20 @@ interface IssuesClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<IssueComment|BasicError|ValidationError>
+     */
     public function issuesCreateComment(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesCreateCommentRequestContent $body,
-    ): IssueComment;
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<list<Issue>|BasicError>
      */
     public function issuesListDependenciesBlockedBy(
         string $owner,
@@ -228,24 +286,30 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue|BasicError|ValidationError>
+     */
     public function issuesAddBlockedByDependency(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesAddBlockedByDependencyRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue|BasicError>
+     */
     public function issuesRemoveDependencyBlockedBy(
         string $owner,
         string $repo,
         int $issueNumber,
         int $issueId,
-    ): Issue;
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<list<Issue>|BasicError>
      */
     public function issuesListDependenciesBlocking(
         string $owner,
@@ -253,10 +317,10 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<IssueEventForIssue>
+     * @return Envelope<list<IssueEventForIssue>|BasicError>
      */
     public function issuesListEvents(
         string $owner,
@@ -264,10 +328,10 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<IssueFieldValue>
+     * @return Envelope<list<IssueFieldValue>|BasicError>
      */
     public function issuesListIssueFieldValuesForIssue(
         string $owner,
@@ -275,10 +339,10 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Label>
+     * @return Envelope<list<Label>|BasicError>
      */
     public function issuesListLabelsOnIssue(
         string $owner,
@@ -286,30 +350,50 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function issuesRemoveAllLabels(string $owner, string $repo, int $issueNumber): void;
+    ): Envelope;
 
     /**
-     * @return list<Label>
+     * @return Envelope<null|BasicError>
      */
-    public function issuesRemoveLabel(string $owner, string $repo, int $issueNumber, string $name): array;
+    public function issuesRemoveAllLabels(string $owner, string $repo, int $issueNumber): Envelope;
 
-    public function issuesLock(string $owner, string $repo, int $issueNumber, IssuesLockRequestContent $body): void;
+    /**
+     * @return Envelope<list<Label>|BasicError>
+     */
+    public function issuesRemoveLabel(string $owner, string $repo, int $issueNumber, string $name): Envelope;
 
-    public function issuesUnlock(string $owner, string $repo, int $issueNumber): void;
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function issuesLock(
+        string $owner,
+        string $repo,
+        int $issueNumber,
+        IssuesLockRequestContent $body,
+    ): Envelope;
 
-    public function issuesGetParent(string $owner, string $repo, int $issueNumber): Issue;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function issuesUnlock(string $owner, string $repo, int $issueNumber): Envelope;
 
+    /**
+     * @return Envelope<Issue|BasicError>
+     */
+    public function issuesGetParent(string $owner, string $repo, int $issueNumber): Envelope;
+
+    /**
+     * @return Envelope<Issue|BasicError>
+     */
     public function issuesRemoveSubIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesRemoveSubIssueRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<list<Issue>|BasicError>
      */
     public function issuesListSubIssues(
         string $owner,
@@ -317,24 +401,30 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue|BasicError|ValidationError>
+     */
     public function issuesAddSubIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesAddSubIssueRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Issue|BasicError|ValidationErrorSimple|IssuesReprioritizeSubIssue503Content>
+     */
     public function issuesReprioritizeSubIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         IssuesReprioritizeSubIssueRequestContent $body,
-    ): Issue;
+    ): Envelope;
 
     /**
-     * @return list<TimelineIssueEvents>
+     * @return Envelope<list<TimelineIssueEvents>|BasicError>
      */
     public function issuesListEventsForTimeline(
         string $owner,
@@ -342,33 +432,45 @@ interface IssuesClientInterface
         int $issueNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Label>
+     * @return Envelope<list<Label>|BasicError>
      */
     public function issuesListLabelsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function issuesCreateLabel(string $owner, string $repo, IssuesCreateLabelRequestContent $body): Label;
+    /**
+     * @return Envelope<Label|ValidationError|BasicError>
+     */
+    public function issuesCreateLabel(string $owner, string $repo, IssuesCreateLabelRequestContent $body): Envelope;
 
-    public function issuesGetLabel(string $owner, string $repo, string $name): Label;
+    /**
+     * @return Envelope<Label|BasicError>
+     */
+    public function issuesGetLabel(string $owner, string $repo, string $name): Envelope;
 
-    public function issuesDeleteLabel(string $owner, string $repo, string $name): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function issuesDeleteLabel(string $owner, string $repo, string $name): Envelope;
 
+    /**
+     * @return Envelope<Label>
+     */
     public function issuesUpdateLabel(
         string $owner,
         string $repo,
         string $name,
         IssuesUpdateLabelRequestContent $body,
-    ): Label;
+    ): Envelope;
 
     /**
-     * @return list<Milestone>
+     * @return Envelope<list<Milestone>|BasicError>
      */
     public function issuesListMilestones(
         string $owner,
@@ -378,27 +480,39 @@ interface IssuesClientInterface
         ?IssuesListMilestonesDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Milestone|BasicError|ValidationError>
+     */
     public function issuesCreateMilestone(
         string $owner,
         string $repo,
         IssuesCreateMilestoneRequestContent $body,
-    ): Milestone;
+    ): Envelope;
 
-    public function issuesGetMilestone(string $owner, string $repo, int $milestoneNumber): Milestone;
+    /**
+     * @return Envelope<Milestone|BasicError>
+     */
+    public function issuesGetMilestone(string $owner, string $repo, int $milestoneNumber): Envelope;
 
-    public function issuesDeleteMilestone(string $owner, string $repo, int $milestoneNumber): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function issuesDeleteMilestone(string $owner, string $repo, int $milestoneNumber): Envelope;
 
+    /**
+     * @return Envelope<Milestone>
+     */
     public function issuesUpdateMilestone(
         string $owner,
         string $repo,
         int $milestoneNumber,
         IssuesUpdateMilestoneRequestContent $body,
-    ): Milestone;
+    ): Envelope;
 
     /**
-     * @return list<Label>
+     * @return Envelope<list<Label>>
      */
     public function issuesListLabelsForMilestone(
         string $owner,
@@ -406,30 +520,33 @@ interface IssuesClientInterface
         int $milestoneNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<IssueFieldValue>
+     * @return Envelope<list<IssueFieldValue>|BasicError|ValidationError|IssuesSetIssueFieldValues503Content>
      */
     public function issuesSetIssueFieldValues(
         int $repositoryId,
         int $issueNumber,
         IssuesSetIssueFieldValuesRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<IssueFieldValue>
+     * @return Envelope<list<IssueFieldValue>|BasicError|ValidationError|IssuesAddIssueFieldValues503Content>
      */
     public function issuesAddIssueFieldValues(
         int $repositoryId,
         int $issueNumber,
         IssuesAddIssueFieldValuesRequestContent $body,
-    ): array;
-
-    public function issuesDeleteIssueFieldValue(int $repositoryId, int $issueNumber, int $issueFieldId): void;
+    ): Envelope;
 
     /**
-     * @return list<Issue>
+     * @return Envelope<null|BasicError|ValidationError|IssuesDeleteIssueFieldValue503Content>
+     */
+    public function issuesDeleteIssueFieldValue(int $repositoryId, int $issueNumber, int $issueFieldId): Envelope;
+
+    /**
+     * @return Envelope<list<Issue>|BasicError|null>
      */
     public function issuesListForAuthenticatedUser(
         ?IssuesListForAuthenticatedUserFilter $filter = null,
@@ -440,5 +557,5 @@ interface IssuesClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 }

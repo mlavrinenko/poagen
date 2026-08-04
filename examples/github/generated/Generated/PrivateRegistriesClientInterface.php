@@ -11,12 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfiguration;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfigurationWithSelectedRepositories;
 use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequestContent;
 use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKey200Content;
 use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistries200Content;
 use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `private-registries` endpoints.
@@ -27,29 +30,44 @@ use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequest
  */
 interface PrivateRegistriesClientInterface
 {
+    /**
+     * @return Envelope<PrivateRegistriesListOrgPrivateRegistries200Content|BasicError>
+     */
     public function privateRegistriesListOrgPrivateRegistries(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): PrivateRegistriesListOrgPrivateRegistries200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<OrgPrivateRegistryConfigurationWithSelectedRepositories|BasicError|ValidationError>
+     */
     public function privateRegistriesCreateOrgPrivateRegistry(
         string $org,
         PrivateRegistriesCreateOrgPrivateRegistryRequestContent $body,
-    ): OrgPrivateRegistryConfigurationWithSelectedRepositories;
+    ): Envelope;
 
-    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKey200Content;
+    /**
+     * @return Envelope<PrivateRegistriesGetOrgPublicKey200Content|BasicError>
+     */
+    public function privateRegistriesGetOrgPublicKey(string $org): Envelope;
 
-    public function privateRegistriesGetOrgPrivateRegistry(
-        string $org,
-        string $secretName,
-    ): OrgPrivateRegistryConfiguration;
+    /**
+     * @return Envelope<OrgPrivateRegistryConfiguration|BasicError>
+     */
+    public function privateRegistriesGetOrgPrivateRegistry(string $org, string $secretName): Envelope;
 
-    public function privateRegistriesDeleteOrgPrivateRegistry(string $org, string $secretName): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function privateRegistriesDeleteOrgPrivateRegistry(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function privateRegistriesUpdateOrgPrivateRegistry(
         string $org,
         string $secretName,
         PrivateRegistriesUpdateOrgPrivateRegistryRequestContent $body,
-    ): void;
+    ): Envelope;
 }

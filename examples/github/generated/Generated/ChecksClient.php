@@ -15,6 +15,7 @@ use Acme\GitHub\Generated\Enum\ChecksListForRefFilter;
 use Acme\GitHub\Generated\Enum\ChecksListForRefStatus;
 use Acme\GitHub\Generated\Enum\ChecksListForSuiteFilter;
 use Acme\GitHub\Generated\Enum\ChecksListForSuiteStatus;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CheckAnnotation;
 use Acme\GitHub\Generated\Model\CheckRun;
 use Acme\GitHub\Generated\Model\CheckSuite;
@@ -28,7 +29,9 @@ use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequestContent;
 use Acme\GitHub\Generated\Model\ChecksUpdateRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ChecksClient implements ChecksClientInterface
@@ -38,46 +41,64 @@ final readonly class ChecksClient implements ChecksClientInterface
     ) {
     }
 
-    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): CheckRun
+    /**
+     * @return Envelope<CheckRun>
+     */
+    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckRun> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-runs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(CheckRun::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CheckRun::class)]])),
         );
+
+        return $result;
     }
 
-    public function checksGet(string $owner, string $repo, int $checkRunId): CheckRun
+    /**
+     * @return Envelope<CheckRun>
+     */
+    public function checksGet(string $owner, string $repo, int $checkRunId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckRun> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/check-runs/{check_run_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId),
-            ResponseType::object(CheckRun::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CheckRun>
+     */
     public function checksUpdate(
         string $owner,
         string $repo,
         int $checkRunId,
         ChecksUpdateRequestContent $body,
-    ): CheckRun {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CheckRun> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/check-runs/{check_run_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId)
                 ->json($body),
-            ResponseType::object(CheckRun::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CheckAnnotation>
+     * @return Envelope<list<CheckAnnotation>>
      */
     public function checksListAnnotations(
         string $owner,
@@ -85,65 +106,95 @@ final readonly class ChecksClient implements ChecksClientInterface
         int $checkRunId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CheckAnnotation>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/check-runs/{check_run_id}/annotations')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(CheckAnnotation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CheckAnnotation::class)]])),
         );
+
+        return $result;
     }
 
-    public function checksRerequestRun(string $owner, string $repo, int $checkRunId): EmptyObject
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function checksRerequestRun(string $owner, string $repo, int $checkRunId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-runs/{check_run_id}/rerequest')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): CheckSuite
+    /**
+     * @return Envelope<CheckSuite>
+     */
+    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckSuite> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-suites')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(CheckSuite::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)], ['201', ResponseType::object(CheckSuite::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CheckSuitePreference>
+     */
     public function checksSetSuitesPreferences(
         string $owner,
         string $repo,
         ChecksSetSuitesPreferencesRequestContent $body,
-    ): CheckSuitePreference {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CheckSuitePreference> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/check-suites/preferences')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(CheckSuitePreference::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuitePreference::class)]])),
         );
+
+        return $result;
     }
 
-    public function checksGetSuite(string $owner, string $repo, int $checkSuiteId): CheckSuite
+    /**
+     * @return Envelope<CheckSuite>
+     */
+    public function checksGetSuite(string $owner, string $repo, int $checkSuiteId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckSuite> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/check-suites/{check_suite_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_suite_id', $checkSuiteId),
-            ResponseType::object(CheckSuite::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ChecksListForSuite200Content>
+     */
     public function checksListForSuite(
         string $owner,
         string $repo,
@@ -153,8 +204,9 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?ChecksListForSuiteFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListForSuite200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ChecksListForSuite200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -164,21 +216,32 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ChecksListForSuite200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForSuite200Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function checksRerequestSuite(string $owner, string $repo, int $checkSuiteId): EmptyObject
+    /**
+     * @return Envelope<EmptyObject>
+     */
+    public function checksRerequestSuite(string $owner, string $repo, int $checkSuiteId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-suites/{check_suite_id}/rerequest')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_suite_id', $checkSuiteId),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ChecksListForRef200Content>
+     */
     public function checksListForRef(
         string $owner,
         string $repo,
@@ -189,8 +252,9 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?int $appId = null,
-    ): ChecksListForRef200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ChecksListForRef200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/check-runs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -201,10 +265,15 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('app_id', $appId),
-            ResponseType::object(ChecksListForRef200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForRef200Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ChecksListSuitesForRef200Content>
+     */
     public function checksListSuitesForRef(
         string $owner,
         string $repo,
@@ -213,8 +282,9 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?string $checkName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListSuitesForRef200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ChecksListSuitesForRef200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/check-suites')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -223,7 +293,9 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('check_name', $checkName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ChecksListSuitesForRef200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListSuitesForRef200Content::class)]])),
         );
+
+        return $result;
     }
 }

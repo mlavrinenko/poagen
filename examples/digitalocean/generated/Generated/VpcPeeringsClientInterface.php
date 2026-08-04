@@ -12,8 +12,15 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\RegionSlug;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreate202Content;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsDelete202Content;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsGet200Content;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsList200Content;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatch200Content;
 use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `VPC Peerings` endpoints.
@@ -26,26 +33,31 @@ interface VpcPeeringsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     * @return Envelope<VpcPeeringsList200Content|Error>
      */
-    public function vpcPeeringsList(?int $perPage = null, ?int $page = null, ?RegionSlug $region = null): void;
+    public function vpcPeeringsList(?int $perPage = null, ?int $page = null, ?RegionSlug $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
+     * @return Envelope<VpcPeeringsCreate202Content|Error>
      */
-    public function vpcPeeringsCreate(VpcPeeringsCreateRequestContent $body): void;
+    public function vpcPeeringsCreate(VpcPeeringsCreateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     * @return Envelope<VpcPeeringsGet200Content|Error>
      */
-    public function vpcPeeringsGet(string $vpcPeeringId): void;
+    public function vpcPeeringsGet(string $vpcPeeringId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:delete`.
+     * @return Envelope<VpcPeeringsDelete202Content|Error>
      */
-    public function vpcPeeringsDelete(string $vpcPeeringId): void;
+    public function vpcPeeringsDelete(string $vpcPeeringId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
+     * @return Envelope<VpcPeeringsPatch200Content|Error>
      */
-    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequestContent $body): void;
+    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequestContent $body): Envelope;
 }

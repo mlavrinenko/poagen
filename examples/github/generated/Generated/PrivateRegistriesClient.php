@@ -11,14 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfiguration;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfigurationWithSelectedRepositories;
 use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequestContent;
 use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKey200Content;
 use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistries200Content;
 use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class PrivateRegistriesClient implements PrivateRegistriesClientInterface
@@ -28,71 +32,105 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
     ) {
     }
 
+    /**
+     * @return Envelope<PrivateRegistriesListOrgPrivateRegistries200Content|BasicError>
+     */
     public function privateRegistriesListOrgPrivateRegistries(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): PrivateRegistriesListOrgPrivateRegistries200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PrivateRegistriesListOrgPrivateRegistries200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(PrivateRegistriesListOrgPrivateRegistries200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesListOrgPrivateRegistries200Content::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgPrivateRegistryConfigurationWithSelectedRepositories|BasicError|ValidationError>
+     */
     public function privateRegistriesCreateOrgPrivateRegistry(
         string $org,
         PrivateRegistriesCreateOrgPrivateRegistryRequestContent $body,
-    ): OrgPrivateRegistryConfigurationWithSelectedRepositories {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgPrivateRegistryConfigurationWithSelectedRepositories|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/private-registries')->path('org', $org)->json($body),
-            ResponseType::object(OrgPrivateRegistryConfigurationWithSelectedRepositories::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgPrivateRegistryConfigurationWithSelectedRepositories::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKey200Content
+    /**
+     * @return Envelope<PrivateRegistriesGetOrgPublicKey200Content|BasicError>
+     */
+    public function privateRegistriesGetOrgPublicKey(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PrivateRegistriesGetOrgPublicKey200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries/public-key')->path('org', $org),
-            ResponseType::object(PrivateRegistriesGetOrgPublicKey200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesGetOrgPublicKey200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function privateRegistriesGetOrgPrivateRegistry(
-        string $org,
-        string $secretName,
-    ): OrgPrivateRegistryConfiguration {
-        return $this->transport->send(
+    /**
+     * @return Envelope<OrgPrivateRegistryConfiguration|BasicError>
+     */
+    public function privateRegistriesGetOrgPrivateRegistry(string $org, string $secretName): Envelope
+    {
+        /** @var Envelope<OrgPrivateRegistryConfiguration|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::object(OrgPrivateRegistryConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgPrivateRegistryConfiguration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function privateRegistriesDeleteOrgPrivateRegistry(string $org, string $secretName): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function privateRegistriesDeleteOrgPrivateRegistry(string $org, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/private-registries/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function privateRegistriesUpdateOrgPrivateRegistry(
         string $org,
         string $secretName,
         PrivateRegistriesUpdateOrgPrivateRegistryRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/private-registries/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 }

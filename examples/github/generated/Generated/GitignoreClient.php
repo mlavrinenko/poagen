@@ -13,7 +13,9 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\GitignoreTemplate;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GitignoreClient implements GitignoreClientInterface
@@ -24,21 +26,30 @@ final readonly class GitignoreClient implements GitignoreClientInterface
     }
 
     /**
-     * @return list<string>
+     * @return Envelope<list<string>|null>
      */
-    public function gitignoreGetAllTemplates(): array
+    public function gitignoreGetAllTemplates(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<string>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gitignore/templates'),
-            ResponseType::scalarListOf(ResponseType::string()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['304', null]])),
         );
+
+        return $result;
     }
 
-    public function gitignoreGetTemplate(string $name): GitignoreTemplate
+    /**
+     * @return Envelope<GitignoreTemplate|null>
+     */
+    public function gitignoreGetTemplate(string $name): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitignoreTemplate|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gitignore/templates/{name}')->path('name', $name),
-            ResponseType::object(GitignoreTemplate::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitignoreTemplate::class)], ['304', null]])),
         );
+
+        return $result;
     }
 }

@@ -12,16 +12,22 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\BaseGist;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\GistComment;
 use Acme\GitHub\Generated\Model\GistCommit;
 use Acme\GitHub\Generated\Model\GistSimple;
 use Acme\GitHub\Generated\Model\GistsCreateCommentRequestContent;
 use Acme\GitHub\Generated\Model\GistsCreateRequestContent;
+use Acme\GitHub\Generated\Model\GistsGet403Content;
+use Acme\GitHub\Generated\Model\GistsGetComment403Content;
 use Acme\GitHub\Generated\Model\GistsUpdateCommentRequestContent;
 use Acme\GitHub\Generated\Model\GistsUpdateRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GistsClient implements GistsClientInterface
@@ -32,222 +38,324 @@ final readonly class GistsClient implements GistsClientInterface
     }
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<list<BaseGist>|null|BasicError>
      */
-    public function gistsList(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): array
+    public function gistsList(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<BaseGist>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists')
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(BaseGist::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function gistsCreate(GistsCreateRequestContent $body): GistSimple
-    {
-        return $this->transport->send(
-            Endpoint::post('/gists')->json($body),
-            ResponseType::object(GistSimple::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<GistSimple|ValidationError|null|BasicError>
      */
-    public function gistsListPublic(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): array
+    public function gistsCreate(GistsCreateRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GistSimple|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/gists')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<BaseGist>|ValidationError|null|BasicError>
+     */
+    public function gistsListPublic(
+        ?\DateTimeImmutable $since = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<BaseGist>|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/public')
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(BaseGist::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<list<BaseGist>|BasicError|null>
      */
     public function gistsListStarred(
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<BaseGist>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/starred')
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(BaseGist::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function gistsGet(string $gistId): GistSimple
-    {
-        return $this->transport->send(
-            Endpoint::get('/gists/{gist_id}')->path('gist_id', $gistId),
-            ResponseType::object(GistSimple::class),
-        );
-    }
-
-    public function gistsDelete(string $gistId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/gists/{gist_id}')->path('gist_id', $gistId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): GistSimple
-    {
-        return $this->transport->send(
-            Endpoint::patch('/gists/{gist_id}')->path('gist_id', $gistId)->json($body),
-            ResponseType::object(GistSimple::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<GistComment>
+     * @return Envelope<GistSimple|GistsGet403Content|BasicError|null>
      */
-    public function gistsListComments(string $gistId, ?int $perPage = null, ?int $page = null): array
+    public function gistsGet(string $gistId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GistSimple|GistsGet403Content|BasicError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/gists/{gist_id}')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['403', ResponseType::object(GistsGet403Content::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsDelete(string $gistId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/gists/{gist_id}')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<GistSimple|ValidationError|BasicError>
+     */
+    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): Envelope
+    {
+        /** @var Envelope<GistSimple|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/gists/{gist_id}')->path('gist_id', $gistId)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<GistComment>|null|BasicError>
+     */
+    public function gistsListComments(string $gistId, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<GistComment>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/comments')
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(GistComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): GistComment
+    /**
+     * @return Envelope<GistComment|null|BasicError>
+     */
+    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GistComment|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/gists/{gist_id}/comments')->path('gist_id', $gistId)->json($body),
-            ResponseType::object(GistComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function gistsGetComment(string $gistId, int $commentId): GistComment
+    /**
+     * @return Envelope<GistComment|null|BasicError|GistsGetComment403Content>
+     */
+    public function gistsGetComment(string $gistId, int $commentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GistComment|null|BasicError|GistsGetComment403Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId),
-            ResponseType::object(GistComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(GistsGetComment403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function gistsDeleteComment(string $gistId, int $commentId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsDeleteComment(string $gistId, int $commentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<GistComment|BasicError>
+     */
     public function gistsUpdateComment(
         string $gistId,
         int $commentId,
         GistsUpdateCommentRequestContent $body,
-    ): GistComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<GistComment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(GistComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<GistCommit>
+     * @return Envelope<list<GistCommit>|BasicError|null>
      */
-    public function gistsListCommits(string $gistId, ?int $perPage = null, ?int $page = null): array
+    public function gistsListCommits(string $gistId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<GistCommit>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/commits')
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(GistCommit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistCommit::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<GistSimple>
+     * @return Envelope<list<GistSimple>|BasicError|null>
      */
-    public function gistsListForks(string $gistId, ?int $perPage = null, ?int $page = null): array
+    public function gistsListForks(string $gistId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<GistSimple>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/forks')
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(GistSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistSimple::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function gistsFork(string $gistId): BaseGist
-    {
-        return $this->transport->send(
-            Endpoint::post('/gists/{gist_id}/forks')->path('gist_id', $gistId),
-            ResponseType::object(BaseGist::class),
-        );
-    }
-
-    public function gistsCheckIsStarred(string $gistId): void
-    {
-        $this->transport->send(
-            Endpoint::get('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function gistsStar(string $gistId): void
-    {
-        $this->transport->send(
-            Endpoint::put('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function gistsUnstar(string $gistId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function gistsGetRevision(string $gistId, string $sha): GistSimple
-    {
-        return $this->transport->send(
-            Endpoint::get('/gists/{gist_id}/{sha}')->path('gist_id', $gistId)->path('sha', $sha),
-            ResponseType::object(GistSimple::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<BaseGist|BasicError|ValidationError|null>
+     */
+    public function gistsFork(string $gistId): Envelope
+    {
+        /** @var Envelope<BaseGist|BasicError|ValidationError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/gists/{gist_id}/forks')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BaseGist::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|array<string, mixed>|BasicError>
+     */
+    public function gistsCheckIsStarred(string $gistId): Envelope
+    {
+        /** @var Envelope<null|array<string, mixed>|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/gists/{gist_id}/star')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsStar(string $gistId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/gists/{gist_id}/star')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsUnstar(string $gistId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/gists/{gist_id}/star')->path('gist_id', $gistId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<GistSimple|ValidationError|BasicError>
+     */
+    public function gistsGetRevision(string $gistId, string $sha): Envelope
+    {
+        /** @var Envelope<GistSimple|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/gists/{gist_id}/{sha}')->path('gist_id', $gistId)->path('sha', $sha),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<BaseGist>|ValidationError>
      */
     public function gistsListForUser(
         string $username,
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<BaseGist>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/gists')
                 ->path('username', $username)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(BaseGist::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 }

@@ -11,11 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EnterpriseTeam;
 use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequestContent;
 use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInterface
@@ -26,62 +29,87 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
     }
 
     /**
-     * @return list<EnterpriseTeam>
+     * @return Envelope<list<EnterpriseTeam>|BasicError>
      */
-    public function enterpriseTeamsList(string $enterprise, ?int $perPage = null, ?int $page = null): array
+    public function enterpriseTeamsList(string $enterprise, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<EnterpriseTeam>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams')
                 ->path('enterprise', $enterprise)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(EnterpriseTeam::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function enterpriseTeamsCreate(
-        string $enterprise,
-        EnterpriseTeamsCreateRequestContent $body,
-    ): EnterpriseTeam {
-        return $this->transport->send(
+    /**
+     * @return Envelope<EnterpriseTeam>
+     */
+    public function enterpriseTeamsCreate(string $enterprise, EnterpriseTeamsCreateRequestContent $body): Envelope
+    {
+        /** @var Envelope<EnterpriseTeam> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::object(EnterpriseTeam::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EnterpriseTeam::class)]])),
         );
+
+        return $result;
     }
 
-    public function enterpriseTeamsGet(string $enterprise, string $teamSlug): EnterpriseTeam
+    /**
+     * @return Envelope<EnterpriseTeam|BasicError>
+     */
+    public function enterpriseTeamsGet(string $enterprise, string $teamSlug): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EnterpriseTeam|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams/{team_slug}')
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug),
-            ResponseType::object(EnterpriseTeam::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function enterpriseTeamsDelete(string $enterprise, string $teamSlug): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function enterpriseTeamsDelete(string $enterprise, string $teamSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/teams/{team_slug}')
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EnterpriseTeam|BasicError>
+     */
     public function enterpriseTeamsUpdate(
         string $enterprise,
         string $teamSlug,
         EnterpriseTeamsUpdateRequestContent $body,
-    ): EnterpriseTeam {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EnterpriseTeam|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/enterprises/{enterprise}/teams/{team_slug}')
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug)
                 ->json($body),
-            ResponseType::object(EnterpriseTeam::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

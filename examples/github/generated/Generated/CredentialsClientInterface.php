@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CredentialsRevokeRequestContent;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `credentials` endpoints.
@@ -22,5 +25,8 @@ use Acme\GitHub\Generated\Model\CredentialsRevokeRequestContent;
  */
 interface CredentialsClientInterface
 {
-    public function credentialsRevoke(CredentialsRevokeRequestContent $body): void;
+    /**
+     * @return Envelope<array<string, mixed>|ValidationErrorSimple|BasicError>
+     */
+    public function credentialsRevoke(CredentialsRevokeRequestContent $body): Envelope;
 }

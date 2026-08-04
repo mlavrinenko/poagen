@@ -19,18 +19,43 @@ use Acme\DigitalOcean\Generated\Enum\AppsGetLogsActiveDeploymentAggregateType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsActiveDeploymentType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsAggregateType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsType;
+use Acme\DigitalOcean\Generated\Model\AppEvents;
+use Acme\DigitalOcean\Generated\Model\AppHealthResponse;
+use Acme\DigitalOcean\Generated\Model\AppInstances;
+use Acme\DigitalOcean\Generated\Model\AppJobInvocation;
+use Acme\DigitalOcean\Generated\Model\AppJobInvocations;
+use Acme\DigitalOcean\Generated\Model\AppMetricsBandwidthUsage;
 use Acme\DigitalOcean\Generated\Model\AppMetricsBandwidthUsageRequest;
 use Acme\DigitalOcean\Generated\Model\AppPropose;
+use Acme\DigitalOcean\Generated\Model\AppProposeResponse;
+use Acme\DigitalOcean\Generated\Model\AppResponse;
+use Acme\DigitalOcean\Generated\Model\AppsAlertResponse;
 use Acme\DigitalOcean\Generated\Model\AppsAssignAppAlertDestinationsRequest;
+use Acme\DigitalOcean\Generated\Model\AppsCancelEvent200Content;
 use Acme\DigitalOcean\Generated\Model\AppsCreateAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsCreateDeploymentRequest;
+use Acme\DigitalOcean\Generated\Model\AppsDeleteAppResponse;
+use Acme\DigitalOcean\Generated\Model\AppsDeploymentResponse;
+use Acme\DigitalOcean\Generated\Model\AppsDeploymentsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetEvent200Content;
+use Acme\DigitalOcean\Generated\Model\AppsGetExecResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetInstanceSizeResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetLogsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListAlertsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListInstanceSizesResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListRegionsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsResponse;
 use Acme\DigitalOcean\Generated\Model\AppsRestartRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRollbackAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsUpdateAppRequest;
+use Acme\DigitalOcean\Generated\Model\AppsValidateRollback200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\Schema;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 use function array_map;
@@ -45,151 +70,192 @@ final readonly class AppsClient implements AppsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsResponse|Error>
      */
-    public function appsList(?int $page = null, ?int $perPage = null, ?bool $withProjects = null): void
+    public function appsList(?int $page = null, ?int $perPage = null, ?bool $withProjects = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('with_projects', $withProjects)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:create`.
+     * @return Envelope<AppResponse|Error>
      */
     public function appsCreate(
         AppsCreateAppRequest $body,
         ?AppsCreateAccept $accept = null,
         ?AppsCreateContentType $contentType = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps')
                 ->header('Accept', $accept)
                 ->header('Content-Type', $contentType)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppMetricsBandwidthUsage|Error>
      */
-    public function appsListMetricsBandwidthDaily(AppMetricsBandwidthUsageRequest $body): void
+    public function appsListMetricsBandwidthDaily(AppMetricsBandwidthUsageRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppMetricsBandwidthUsage|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/metrics/bandwidth_daily')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppMetricsBandwidthUsage::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppProposeResponse|Error>
      */
-    public function appsValidateAppSpec(AppPropose $body): void
+    public function appsValidateAppSpec(AppPropose $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppProposeResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/propose')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppProposeResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListRegionsResponse|Error>
      */
-    public function appsListRegions(): void
+    public function appsListRegions(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsListRegionsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/regions')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListRegionsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListInstanceSizesResponse|Error>
      */
-    public function appsListInstanceSizes(): void
+    public function appsListInstanceSizes(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsListInstanceSizesResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/tiers/instance_sizes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstanceSizesResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetInstanceSizeResponse|Error>
      */
-    public function appsGetInstanceSize(string $slug): void
+    public function appsGetInstanceSize(string $slug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsGetInstanceSizeResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/tiers/instance_sizes/{slug}')
                 ->path('slug', $slug)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetInstanceSizeResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListAlertsResponse|Error>
      */
-    public function appsListAlerts(string $appId): void
+    public function appsListAlerts(string $appId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsListAlertsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/alerts')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListAlertsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsAlertResponse|Error>
      */
     public function appsAssignAlertDestinations(
         string $appId,
         string $alertId,
         AppsAssignAppAlertDestinationsRequest $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsAlertResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/alerts/{alert_id}/destinations')
                 ->path('app_id', $appId)
                 ->path('alert_id', $alertId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsAlertResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:access_console`.
+     * @return Envelope<AppsGetExecResponse|Error>
      */
     public function appsGetExecActiveDeployment(
         string $appId,
         string $componentName,
         ?string $instanceName = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetExecResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/components/{component_name}/exec')
                 ->path('app_id', $appId)
                 ->path('component_name', $componentName)
                 ->query('instance_name', $instanceName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetExecResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsActiveDeployment(
         string $appId,
@@ -197,8 +263,9 @@ final readonly class AppsClient implements AppsClientInterface
         AppsGetLogsActiveDeploymentType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/components/{component_name}/logs')
                 ->path('app_id', $appId)
                 ->path('component_name', $componentName)
@@ -206,95 +273,118 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('type', $type)
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<string> $deploymentTypes
+     * @return Envelope<AppsDeploymentsResponse|Error>
      */
     public function appsListDeployments(
         string $appId,
         ?int $page = null,
         ?int $perPage = null,
         ?array $deploymentTypes = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsDeploymentsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/deployments')
                 ->path('app_id', $appId)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('deployment_types', $deploymentTypes)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCreateDeployment(string $appId, AppsCreateDeploymentRequest $body): void
+    public function appsCreateDeployment(string $appId, AppsCreateDeploymentRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/deployments')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsGetDeployment(string $appId, string $deploymentId): void
+    public function appsGetDeployment(string $appId, string $deploymentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/deployments/{deployment_id}')
                 ->path('app_id', $appId)
                 ->path('deployment_id', $deploymentId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCancelDeployment(string $appId, string $deploymentId): void
+    public function appsCancelDeployment(string $appId, string $deploymentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/deployments/{deployment_id}/cancel')
                 ->path('app_id', $appId)
                 ->path('deployment_id', $deploymentId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:access_console`.
+     * @return Envelope<AppsGetExecResponse|Error>
      */
     public function appsGetExec(
         string $appId,
         string $deploymentId,
         string $componentName,
         ?string $instanceName = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetExecResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/deployments/{deployment_id}/components/{component_name}/exec')
                 ->path('app_id', $appId)
                 ->path('deployment_id', $deploymentId)
                 ->path('component_name', $componentName)
                 ->query('instance_name', $instanceName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetExecResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogs(
         string $appId,
@@ -303,8 +393,9 @@ final readonly class AppsClient implements AppsClientInterface
         AppsGetLogsType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/deployments/{deployment_id}/components/{component_name}/logs')
                 ->path('app_id', $appId)
                 ->path('deployment_id', $deploymentId)
@@ -313,12 +404,15 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('type', $type)
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsAggregate(
         string $appId,
@@ -326,8 +420,9 @@ final readonly class AppsClient implements AppsClientInterface
         AppsGetLogsAggregateType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/deployments/{deployment_id}/logs')
                 ->path('app_id', $appId)
                 ->path('deployment_id', $deploymentId)
@@ -335,61 +430,76 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('type', $type)
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<string> $eventTypes
+     * @return Envelope<AppEvents|Error>
      */
     public function appsListEvents(
         string $appId,
         ?int $page = null,
         ?int $perPage = null,
         ?array $eventTypes = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppEvents|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/events')
                 ->path('app_id', $appId)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('event_types', $eventTypes)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppEvents::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetEvent200Content|Error>
      */
-    public function appsGetEvent(string $appId, string $eventId): void
+    public function appsGetEvent(string $appId, string $eventId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsGetEvent200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/events/{event_id}')
                 ->path('app_id', $appId)
                 ->path('event_id', $eventId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetEvent200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsCancelEvent200Content|Error>
      */
-    public function appsCancelEvent(string $appId, string $eventId): void
+    public function appsCancelEvent(string $appId, string $eventId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsCancelEvent200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/events/{event_id}/cancel')
                 ->path('app_id', $appId)
                 ->path('event_id', $eventId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsCancelEvent200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetEventLogs(
         string $appId,
@@ -397,8 +507,9 @@ final readonly class AppsClient implements AppsClientInterface
         AppsGetEventLogsType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/events/{event_id}/logs')
                 ->path('app_id', $appId)
                 ->path('event_id', $eventId)
@@ -406,39 +517,50 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('type', $type)
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppHealthResponse|Error>
      */
-    public function appsGetHealth(string $appId): void
+    public function appsGetHealth(string $appId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppHealthResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/health')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppHealthResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppInstances|Error>
      */
-    public function appsGetInstances(string $appId): void
+    public function appsGetInstances(string $appId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppInstances|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/instances')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppInstances::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<Schema> $jobNames
+     * @return Envelope<AppJobInvocations|Error>
      */
     public function appsListJobInvocations(
         string $appId,
@@ -446,8 +568,9 @@ final readonly class AppsClient implements AppsClientInterface
         ?string $deploymentId = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppJobInvocations|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/job-invocations')
                 ->path('app_id', $appId)
                 ->query('job_names', $jobNames === null ? null : array_map(static fn(Schema $__v): string => $__v->toScalar(), $jobNames))
@@ -455,42 +578,53 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppJobInvocations::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppJobInvocation|Error>
      */
-    public function appsGetJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): void
+    public function appsGetJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppJobInvocation|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/job-invocations/{job_invocation_id}')
                 ->path('app_id', $appId)
                 ->path('job_invocation_id', $jobInvocationId)
                 ->query('job_name', $jobName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppJobInvocation::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppJobInvocation|Error>
      */
-    public function appsCancelJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): void
+    public function appsCancelJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppJobInvocation|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/job-invocations/{job_invocation_id}/cancel')
                 ->path('app_id', $appId)
                 ->path('job_invocation_id', $jobInvocationId)
                 ->query('job_name', $jobName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppJobInvocation::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetJobInvocationLogs(
         string $appId,
@@ -501,8 +635,9 @@ final readonly class AppsClient implements AppsClientInterface
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
         ?string $tailLines = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/jobs/{job_name}/invocations/{job_invocation_id}/logs')
                 ->path('app_id', $appId)
                 ->path('job_name', $jobName)
@@ -513,150 +648,192 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->query('tail_lines', $tailLines)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsActiveDeploymentAggregate(
         string $appId,
         AppsGetLogsActiveDeploymentAggregateType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsGetLogsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/logs')
                 ->path('app_id', $appId)
                 ->query('follow', $follow)
                 ->query('type', $type)
                 ->query('pod_connection_timeout', $podConnectionTimeout)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsGetLogsResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppMetricsBandwidthUsage|Error>
      */
-    public function appsGetMetricsBandwidthDaily(string $appId, ?\DateTimeImmutable $date = null): void
+    public function appsGetMetricsBandwidthDaily(string $appId, ?\DateTimeImmutable $date = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppMetricsBandwidthUsage|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{app_id}/metrics/bandwidth_daily')
                 ->path('app_id', $appId)
                 ->query('date', $date?->format(DateTimeInterface::RFC3339))
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppMetricsBandwidthUsage::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsRestart(string $appId, AppsRestartRequest $body): void
+    public function appsRestart(string $appId, AppsRestartRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/restart')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCreateRollback(string $appId, AppsRollbackAppRequest $body): void
+    public function appsCreateRollback(string $appId, AppsRollbackAppRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/rollback')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<null|Error>
      */
-    public function appsCommitRollback(string $appId): void
+    public function appsCommitRollback(string $appId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/rollback/commit')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsRevertRollback(string $appId): void
+    public function appsRevertRollback(string $appId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeploymentResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/rollback/revert')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeploymentResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsValidateRollback200Content|Error>
      */
-    public function appsValidateRollback(string $appId, AppsRollbackAppRequest $body): void
+    public function appsValidateRollback(string $appId, AppsRollbackAppRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsValidateRollback200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/apps/{app_id}/rollback/validate')
                 ->path('app_id', $appId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsValidateRollback200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppResponse|Error>
      */
-    public function appsGet(string $id, ?string $name = null): void
+    public function appsGet(string $id, ?string $name = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/apps/{id}')
                 ->path('id', $id)
                 ->query('name', $name)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppResponse|Error>
      */
-    public function appsUpdate(string $id, AppsUpdateAppRequest $body): void
+    public function appsUpdate(string $id, AppsUpdateAppRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/apps/{id}')
                 ->path('id', $id)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `app:delete`.
+     * @return Envelope<AppsDeleteAppResponse|Error>
      */
-    public function appsDelete(string $id): void
+    public function appsDelete(string $id): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AppsDeleteAppResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/apps/{id}')
                 ->path('id', $id)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsDeleteAppResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

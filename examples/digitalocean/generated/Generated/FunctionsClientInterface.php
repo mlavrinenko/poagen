@@ -14,8 +14,20 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\AccessKeyCreateRequest;
 use Acme\DigitalOcean\Generated\Model\CreateNamespace;
 use Acme\DigitalOcean\Generated\Model\CreateTrigger;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyCreate201Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyList200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequestContent;
+use Acme\DigitalOcean\Generated\Model\FunctionsCreateNamespace200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsCreateTrigger200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsGetNamespace200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsGetTrigger200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsListNamespaces200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsListTriggers200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsUpdateTrigger200Content;
 use Acme\DigitalOcean\Generated\Model\UpdateTrigger;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Functions` endpoints.
@@ -28,71 +40,83 @@ interface FunctionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsListNamespaces200Content|Error>
      */
-    public function functionsListNamespaces(): void;
+    public function functionsListNamespaces(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:create`, `function:admin`.
+     * @return Envelope<FunctionsCreateNamespace200Content|Error>
      */
-    public function functionsCreateNamespace(CreateNamespace $body): void;
+    public function functionsCreateNamespace(CreateNamespace $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsGetNamespace200Content|Error>
      */
-    public function functionsGetNamespace(string $namespaceId): void;
+    public function functionsGetNamespace(string $namespaceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:delete`, `function:admin`.
+     * @return Envelope<null|Error>
      */
-    public function functionsDeleteNamespace(string $namespaceId): void;
+    public function functionsDeleteNamespace(string $namespaceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyList200Content|Error>
      */
-    public function functionsAccessKeyList(string $namespaceId): void;
+    public function functionsAccessKeyList(string $namespaceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyCreate201Content|Error>
      */
-    public function functionsAccessKeyCreate(string $namespaceId, AccessKeyCreateRequest $body): void;
+    public function functionsAccessKeyCreate(string $namespaceId, AccessKeyCreateRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyUpdate200Content|Error>
      */
     public function functionsAccessKeyUpdate(
         string $namespaceId,
         string $keyId,
         FunctionsAccessKeyUpdateRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>|Error>
      */
-    public function functionsAccessKeyDelete(string $namespaceId, string $keyId): array;
+    public function functionsAccessKeyDelete(string $namespaceId, string $keyId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsListTriggers200Content|Error>
      */
-    public function functionsListTriggers(string $namespaceId): void;
+    public function functionsListTriggers(string $namespaceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:create`, `function:admin`.
+     * @return Envelope<FunctionsCreateTrigger200Content|Error>
      */
-    public function functionsCreateTrigger(string $namespaceId, CreateTrigger $body): void;
+    public function functionsCreateTrigger(string $namespaceId, CreateTrigger $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsGetTrigger200Content|Error>
      */
-    public function functionsGetTrigger(string $namespaceId, string $triggerName): void;
+    public function functionsGetTrigger(string $namespaceId, string $triggerName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:update`, `function:admin`.
+     * @return Envelope<FunctionsUpdateTrigger200Content|Error>
      */
-    public function functionsUpdateTrigger(string $namespaceId, string $triggerName, UpdateTrigger $body): void;
+    public function functionsUpdateTrigger(string $namespaceId, string $triggerName, UpdateTrigger $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `function:delete`, `function:admin`.
+     * @return Envelope<null|Error>
      */
-    public function functionsDeleteTrigger(string $namespaceId, string $triggerName): void;
+    public function functionsDeleteTrigger(string $namespaceId, string $triggerName): Envelope;
 }

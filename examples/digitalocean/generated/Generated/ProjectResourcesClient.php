@@ -11,9 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ProjectAssignment;
+use Acme\DigitalOcean\Generated\Model\ProjectsAssignResources200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsAssignResourcesDefault200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsListResources200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsListResourcesDefault200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ProjectResourcesClient implements ProjectResourcesClientInterface
@@ -26,55 +33,71 @@ final readonly class ProjectResourcesClient implements ProjectResourcesClientInt
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsListResourcesDefault200Content|Error>
      */
-    public function projectsListResourcesDefault(): void
+    public function projectsListResourcesDefault(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ProjectsListResourcesDefault200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/projects/default/resources')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsListResourcesDefault200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsAssignResourcesDefault200Content|Error>
      */
-    public function projectsAssignResourcesDefault(ProjectAssignment $body): void
+    public function projectsAssignResourcesDefault(ProjectAssignment $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ProjectsAssignResourcesDefault200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/projects/default/resources')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsAssignResourcesDefault200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsListResources200Content|Error>
      */
-    public function projectsListResources(string $projectId, ?int $perPage = null, ?int $page = null): void
+    public function projectsListResources(string $projectId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ProjectsListResources200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/projects/{project_id}/resources')
                 ->path('project_id', $projectId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsListResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsAssignResources200Content|Error>
      */
-    public function projectsAssignResources(string $projectId, ProjectAssignment $body): void
+    public function projectsAssignResources(string $projectId, ProjectAssignment $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ProjectsAssignResources200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/projects/{project_id}/resources')
                 ->path('project_id', $projectId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsAssignResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

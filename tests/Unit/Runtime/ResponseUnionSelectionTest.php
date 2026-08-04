@@ -36,7 +36,7 @@ final class ResponseUnionSelectionTest extends TestCase
 {
     public function testAPayloadCarryingOnlyOneBranchsFieldSelectsThatBranch(): void
     {
-        $dog = $this->client('{"bark":"woof"}')->getCreature();
+        $dog = $this->client('{"bark":"woof"}')->getCreature()->body;
 
         self::assertInstanceOf(Dog::class, $dog);
         self::assertSame('woof', $dog->bark);
@@ -44,26 +44,33 @@ final class ResponseUnionSelectionTest extends TestCase
 
     public function testTheOtherBranchIsSelectedByItsOwnField(): void
     {
-        $cat = $this->client('{"meow":"mrrp"}')->getCreature();
+        $cat = $this->client('{"meow":"mrrp"}')->getCreature()->body;
 
         self::assertInstanceOf(Cat::class, $cat);
         self::assertSame('mrrp', $cat->meow);
     }
 
+    /**
+     * A payload matching no branch is a {@see UnionBranchException} the
+     * hydrator raises — and, per `typed-error-responses`, a declared body
+     * that fails to hydrate is one more case the envelope cannot honestly
+     * represent, so the transport catches it and raises the profile's
+     * `ApiException` instead, carrying the original message as its reason.
+     */
     public function testAPayloadMatchingNeitherBranchRaises(): void
     {
-        $this->expectException(UnionBranchException::class);
-        $this->expectExceptionMessage('matched none of the union branches');
-
-        $this->client('{"scales":"green"}')->getCreature();
+        $this->assertReasonContains(
+            'matched none of the union branches',
+            fn(): mixed => $this->client('{"scales":"green"}')->getCreature(),
+        );
     }
 
     public function testAPayloadMatchingBothBranchesRaises(): void
     {
-        $this->expectException(UnionBranchException::class);
-        $this->expectExceptionMessage('matched 2 union branches at once');
-
-        $this->client('{"bark":"woof","meow":"mrrp"}')->getCreature();
+        $this->assertReasonContains(
+            'matched 2 union branches at once',
+            fn(): mixed => $this->client('{"bark":"woof","meow":"mrrp"}')->getCreature(),
+        );
     }
 
     /**
@@ -74,24 +81,24 @@ final class ResponseUnionSelectionTest extends TestCase
      */
     public function testADocumentDiscriminatorWithAnExplicitMappingSelectsByItsWireValue(): void
     {
-        $dog = $this->client('{"kind":"canine","bark":"woof"}')->getTaggedCreature();
+        $dog = $this->client('{"kind":"canine","bark":"woof"}')->getTaggedCreature()->body;
 
         self::assertInstanceOf(Dog::class, $dog);
     }
 
     public function testTheMappingsOtherValueSelectsTheOtherBranch(): void
     {
-        $cat = $this->client('{"kind":"feline","meow":"mrrp"}')->getTaggedCreature();
+        $cat = $this->client('{"kind":"feline","meow":"mrrp"}')->getTaggedCreature()->body;
 
         self::assertInstanceOf(Cat::class, $cat);
     }
 
     public function testATagValueTheMappingDoesNotNameRaises(): void
     {
-        $this->expectException(UnionBranchException::class);
-        $this->expectExceptionMessage("carries 'reptile', which no branch is mapped to");
-
-        $this->client('{"kind":"reptile","scales":"green"}')->getTaggedCreature();
+        $this->assertReasonContains(
+            "carries 'reptile', which no branch is mapped to",
+            fn(): mixed => $this->client('{"kind":"reptile","scales":"green"}')->getTaggedCreature(),
+        );
     }
 
     /**
@@ -102,14 +109,14 @@ final class ResponseUnionSelectionTest extends TestCase
      */
     public function testAnEmptyPayloadSelectsTheClosedBranch(): void
     {
-        $result = $this->client('{}')->getRestrictions();
+        $result = $this->client('{}')->getRestrictions()->body;
 
         self::assertInstanceOf(GetRestrictionsResponseBranch2::class, $result);
     }
 
     public function testANonEmptyPayloadSelectsTheOtherBranchInstead(): void
     {
-        $result = $this->client('{"bark":"woof"}')->getRestrictions();
+        $result = $this->client('{"bark":"woof"}')->getRestrictions()->body;
 
         self::assertInstanceOf(Dog::class, $result);
     }
@@ -124,7 +131,7 @@ final class ResponseUnionSelectionTest extends TestCase
      */
     public function testEveryItemInTheListIsIndependentlyBranchSelected(): void
     {
-        $items = $this->client('[{"bark":"woof"},{"meow":"mrrp"}]')->listCreatures();
+        $items = $this->client('[{"bark":"woof"},{"meow":"mrrp"}]')->listCreatures()->body;
 
         self::assertCount(2, $items);
         self::assertInstanceOf(Dog::class, $items[0]);
@@ -133,14 +140,15 @@ final class ResponseUnionSelectionTest extends TestCase
 
     public function testAnEmptyListRaisesNothingBecauseNoItemNeedsAPick(): void
     {
-        self::assertSame([], $this->client('[]')->listCreatures());
+        self::assertSame([], $this->client('[]')->listCreatures()->body);
     }
 
     public function testAListItemMatchingNoBranchRaises(): void
     {
-        $this->expectException(UnionBranchException::class);
-
-        $this->client('[{"scales":"green"}]')->listCreatures();
+        $this->assertReasonContains(
+            'matched none of the union branches',
+            fn(): mixed => $this->client('[{"scales":"green"}]')->listCreatures(),
+        );
     }
 
     /**
@@ -151,10 +159,20 @@ final class ResponseUnionSelectionTest extends TestCase
      */
     public function testAPinnedResponseHydratesAsTheSingleClassItWasTypedAs(): void
     {
-        $reading = $this->client('{"degrees":42.0}')->getUndecidableCreature();
+        $reading = $this->client('{"degrees":42.0}')->getUndecidableCreature()->body;
 
         self::assertInstanceOf(Celsius::class, $reading);
         self::assertSame(42.0, $reading->degrees);
+    }
+
+    private function assertReasonContains(string $needle, callable $call): void
+    {
+        try {
+            $call();
+            self::fail('expected ApiException');
+        } catch (ApiException $e) {
+            self::assertStringContainsString($needle, $e->getReason());
+        }
     }
 
     private function client(string $body): ApiClient

@@ -13,11 +13,22 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SecurityGetLatestScanSeverity;
 use Acme\DigitalOcean\Generated\Enum\SecurityGetScanSeverity;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateScan201Content;
 use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequestContent;
 use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityGetLatestScan200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityGetScan200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityListScanFindingAffectedResources200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityListScans200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlan200Content;
 use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequestContent;
+use Acme\DigitalOcean\Generated\Model\Settings;
+use Acme\DigitalOcean\Generated\Model\SuppressedResourceRoot;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SecurityClient implements SecurityClientInterface
@@ -30,65 +41,82 @@ final readonly class SecurityClient implements SecurityClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityListScans200Content|Error>
      */
-    public function securityListScans(?int $perPage = null, ?int $page = null): void
+    public function securityListScans(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SecurityListScans200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/security/scans')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecurityListScans200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<SecurityCreateScan201Content|Error>
      */
-    public function securityCreateScan(): void
+    public function securityCreateScan(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SecurityCreateScan201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/security/scans')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SecurityCreateScan201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityGetLatestScan200Content|Error>
      */
     public function securityGetLatestScan(
         ?int $perPage = null,
         ?int $page = null,
         ?SecurityGetLatestScanSeverity $severity = null,
         ?string $type = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecurityGetLatestScan200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/security/scans/latest')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('severity', $severity)
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecurityGetLatestScan200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<null|Error>
      */
-    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): void
+    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/security/scans/rules')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', null], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityGetScan200Content|Error>
      */
     public function securityGetScan(
         string $scanId,
@@ -96,8 +124,9 @@ final readonly class SecurityClient implements SecurityClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?string $type = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecurityGetScan200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/security/scans/{scan_id}')
                 ->path('scan_id', $scanId)
                 ->query('severity', $severity)
@@ -105,80 +134,102 @@ final readonly class SecurityClient implements SecurityClientInterface
                 ->query('page', $page)
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecurityGetScan200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityListScanFindingAffectedResources200Content|Error>
      */
     public function securityListScanFindingAffectedResources(
         string $scanId,
         string $findingUuid,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecurityListScanFindingAffectedResources200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/security/scans/{scan_id}/findings/{finding_uuid}/affected_resources')
                 ->path('scan_id', $scanId)
                 ->path('finding_uuid', $findingUuid)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecurityListScanFindingAffectedResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<Settings|Error>
      */
-    public function securityListSettings(?int $perPage = null, ?int $page = null): void
+    public function securityListSettings(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Settings|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/security/settings')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Settings::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:update`.
+     * @return Envelope<SecurityUpdateSettingsPlan200Content|Error>
      */
-    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): void
+    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SecurityUpdateSettingsPlan200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/security/settings/plan')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecurityUpdateSettingsPlan200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<SuppressedResourceRoot|Error>
      */
-    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): void
+    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SuppressedResourceRoot|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/security/settings/suppressions')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SuppressedResourceRoot::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `security:delete`.
+     * @return Envelope<null|Error>
      */
-    public function securityDeleteSuppression(string $suppressionUuid): void
+    public function securityDeleteSuppression(string $suppressionUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/security/settings/suppressions/{suppression_uuid}')
                 ->path('suppression_uuid', $suppressionUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

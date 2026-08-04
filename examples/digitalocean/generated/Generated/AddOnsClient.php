@@ -11,11 +11,21 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AddonsCreate200Content;
 use Acme\DigitalOcean\Generated\Model\AddonsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsGet200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsGetApp200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsGetAppMetadata200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsList200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsPatch200Content;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchPlan200Content;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequestContent;
 use Acme\DigitalOcean\Generated\Model\AddonsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class AddOnsClient implements AddOnsClientInterface
@@ -26,101 +36,137 @@ final readonly class AddOnsClient implements AddOnsClientInterface
     ) {
     }
 
-    public function addonsGetApp(): void
+    /**
+     * @return Envelope<AddonsGetApp200Content|Error>
+     */
+    public function addonsGetApp(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsGetApp200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/add-ons/apps')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsGetApp200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
-    public function addonsGetAppMetadata(string $appSlug): void
+    /**
+     * @return Envelope<AddonsGetAppMetadata200Content|Error>
+     */
+    public function addonsGetAppMetadata(string $appSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsGetAppMetadata200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/add-ons/apps/{app_slug}/metadata')
                 ->path('app_slug', $appSlug)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsGetAppMetadata200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.
+     * @return Envelope<AddonsList200Content|Error>
      */
-    public function addonsList(): void
+    public function addonsList(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/add-ons/saas')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:create`.
+     * @return Envelope<AddonsCreate200Content|Error>
      */
-    public function addonsCreate(AddonsCreateRequestContent $body): void
+    public function addonsCreate(AddonsCreateRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsCreate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/add-ons/saas')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsCreate200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.
+     * @return Envelope<AddonsGet200Content|Error>
      */
-    public function addonsGet(string $resourceUuid): void
+    public function addonsGet(string $resourceUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/add-ons/saas/{resource_uuid}')
                 ->path('resource_uuid', $resourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:delete`.
+     * @return Envelope<null|Error>
      */
-    public function addonsDelete(string $resourceUuid): void
+    public function addonsDelete(string $resourceUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/add-ons/saas/{resource_uuid}')
                 ->path('resource_uuid', $resourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
+     * @return Envelope<AddonsPatch200Content|Error>
      */
-    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): void
+    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsPatch200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/add-ons/saas/{resource_uuid}')
                 ->path('resource_uuid', $resourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsPatch200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
+     * @return Envelope<AddonsPatchPlan200Content|Error>
      */
-    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): void
+    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AddonsPatchPlan200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/add-ons/saas/{resource_uuid}/plan')
                 ->path('resource_uuid', $resourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddonsPatchPlan200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

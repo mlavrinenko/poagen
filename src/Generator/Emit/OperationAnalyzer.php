@@ -10,9 +10,6 @@ use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
-use cebe\openapi\spec\Response;
-use cebe\openapi\spec\Responses;
-use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
@@ -200,31 +197,5 @@ final readonly class OperationAnalyzer
     public static function requestBody(RequestBody|Reference|null $body, NameRegistry $registry): ?BodySpec
     {
         return RequestBodyAnalyzer::resolve($body, $registry);
-    }
-
-    /**
-     * @param  Responses<Response|Reference>|null $responses
-     * @return ReturnSpec|null                     null when the picked 2xx response sits outside
-     *                                              paogen's supported shapes — the caller must refuse
-     *                                              the operation (default-deny-on-degradation) rather
-     *                                              than fall back to `void`; see
-     *                                              {@see describeUnsupportedResponse()}
-     */
-    public static function returnType(?Responses $responses, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
-    {
-        return ResponseAnalyzer::resolve($responses, $registry, $bindings);
-    }
-
-    /**
-     * Explains why {@see returnType()} returned null — names the response
-     * status, the content type(s) found, and what would make the response
-     * acceptable. Only meaningful to call after {@see returnType()} has
-     * returned null.
-     *
-     * @param Responses<Response|Reference>|null $responses
-     */
-    public static function describeUnsupportedResponse(?Responses $responses): string
-    {
-        return ResponseAnalyzer::describeUnsupported($responses);
     }
 }

@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\FloatingIpCreate;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsGet200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class FloatingIpsClient implements FloatingIpsClientInterface
@@ -26,54 +32,70 @@ final readonly class FloatingIpsClient implements FloatingIpsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsList200Content|Error>
      */
-    public function floatingIpsList(?int $perPage = null, ?int $page = null): void
+    public function floatingIpsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FloatingIpsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/floating_ips')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FloatingIpsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<FloatingIpsCreate202Content|Error>
      */
-    public function floatingIpsCreate(FloatingIpCreate $body): void
+    public function floatingIpsCreate(FloatingIpCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FloatingIpsCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/floating_ips')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FloatingIpsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsGet200Content|Error>
      */
-    public function floatingIpsGet(string $floatingIp): void
+    public function floatingIpsGet(string $floatingIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FloatingIpsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/floating_ips/{floating_ip}')
                 ->path('floating_ip', $floatingIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FloatingIpsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function floatingIpsDelete(string $floatingIp): void
+    public function floatingIpsDelete(string $floatingIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/floating_ips/{floating_ip}')
                 ->path('floating_ip', $floatingIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

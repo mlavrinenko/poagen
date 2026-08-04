@@ -11,8 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\ErrorWithRootCauses;
 use Acme\DigitalOcean\Generated\Model\Tags;
+use Acme\DigitalOcean\Generated\Model\TagsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\TagsGet200Content;
+use Acme\DigitalOcean\Generated\Model\TagsList200Content;
 use Acme\DigitalOcean\Generated\Model\TagsResource;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Tags` endpoints.
@@ -25,31 +31,37 @@ interface TagsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `tag:read`.
+     * @return Envelope<TagsList200Content|Error>
      */
-    public function tagsList(?int $perPage = null, ?int $page = null): void;
+    public function tagsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `tag:create`.
+     * @return Envelope<TagsCreate201Content|ErrorWithRootCauses|Error>
      */
-    public function tagsCreate(Tags $body): void;
+    public function tagsCreate(Tags $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `tag:read`.
+     * @return Envelope<TagsGet200Content|Error>
      */
-    public function tagsGet(string $tagId): void;
+    public function tagsGet(string $tagId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `tag:delete`.
+     * @return Envelope<null|Error>
      */
-    public function tagsDelete(string $tagId): void;
+    public function tagsDelete(string $tagId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `tag:create`.
+     * @return Envelope<null|Error>
      */
-    public function tagsAssignResources(string $tagId, TagsResource $body): void;
+    public function tagsAssignResources(string $tagId, TagsResource $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `tag:delete`.
+     * @return Envelope<null|Error>
      */
-    public function tagsUnassignResources(string $tagId, TagsResource $body): void;
+    public function tagsUnassignResources(string $tagId, TagsResource $body): Envelope;
 }

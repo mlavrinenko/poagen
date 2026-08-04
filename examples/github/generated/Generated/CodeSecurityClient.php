@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\CodeSecurityGetConfigurationsForOrgTargetType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeSecurityAttachConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityAttachEnterpriseConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityConfiguration;
@@ -28,7 +29,9 @@ use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultRequestCont
 use Acme\GitHub\Generated\Model\CodeSecurityUpdateConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityUpdateEnterpriseConfigurationRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CodeSecurityClient implements CodeSecurityClientInterface
@@ -39,112 +42,156 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     }
 
     /**
-     * @return list<CodeSecurityConfiguration>
+     * @return Envelope<list<CodeSecurityConfiguration>|BasicError>
      */
     public function codeSecurityGetConfigurationsForEnterprise(
         string $enterprise,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeSecurityConfiguration>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations')
                 ->path('enterprise', $enterprise)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::listOf(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|BasicError>
+     */
     public function codeSecurityCreateConfigurationForEnterprise(
         string $enterprise,
         CodeSecurityCreateConfigurationForEnterpriseRequestContent $body,
-    ): CodeSecurityConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecurityConfiguration|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/code-security/configurations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityGetDefaultConfigurationsForEnterprise(
-        string $enterprise,
-    ): CodeSecurityDefaultConfigurations {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodeSecurityDefaultConfigurations>
+     */
+    public function codeSecurityGetDefaultConfigurationsForEnterprise(string $enterprise): Envelope
+    {
+        /** @var Envelope<CodeSecurityDefaultConfigurations> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations/defaults')
                 ->path('enterprise', $enterprise),
-            ResponseType::object(CodeSecurityDefaultConfigurations::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
     public function codeSecurityGetSingleConfigurationForEnterprise(
         string $enterprise,
         int $configurationId,
-    ): CodeSecurityConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecurityConfiguration|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityDeleteConfigurationForEnterprise(string $enterprise, int $configurationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codeSecurityDeleteConfigurationForEnterprise(string $enterprise, int $configurationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
     public function codeSecurityUpdateEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
         CodeSecurityUpdateEnterpriseConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecurityConfiguration|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<array<string, mixed>|BasicError>
+     */
     public function codeSecurityAttachEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
         CodeSecurityAttachEnterpriseConfigurationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<array<string, mixed>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/code-security/configurations/{configuration_id}/attach')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecuritySetConfigurationAsDefaultForEnterprise200Content|BasicError>
+     */
     public function codeSecuritySetConfigurationAsDefaultForEnterprise(
         string $enterprise,
         int $configurationId,
         CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestContent $body,
-    ): CodeSecuritySetConfigurationAsDefaultForEnterprise200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecuritySetConfigurationAsDefaultForEnterprise200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/code-security/configurations/{configuration_id}/defaults')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterprise200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterprise200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeSecurityConfigurationRepositories>
+     * @return Envelope<list<CodeSecurityConfigurationRepositories>|BasicError>
      */
     public function codeSecurityGetRepositoriesForEnterpriseConfiguration(
         string $enterprise,
@@ -153,8 +200,9 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $status = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeSecurityConfigurationRepositories>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations/{configuration_id}/repositories')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
@@ -162,12 +210,14 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('status', $status),
-            ResponseType::listOf(CodeSecurityConfigurationRepositories::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeSecurityConfiguration>
+     * @return Envelope<list<CodeSecurityConfiguration>|BasicError>
      */
     public function codeSecurityGetConfigurationsForOrg(
         string $org,
@@ -175,115 +225,166 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeSecurityConfiguration>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-security/configurations')
                 ->path('org', $org)
                 ->query('target_type', $targetType)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::listOf(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration>
+     */
     public function codeSecurityCreateConfiguration(
         string $org,
         CodeSecurityCreateConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecurityConfiguration> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/code-security/configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityGetDefaultConfigurations(string $org): CodeSecurityDefaultConfigurations
+    /**
+     * @return Envelope<CodeSecurityDefaultConfigurations|null|BasicError>
+     */
+    public function codeSecurityGetDefaultConfigurations(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeSecurityDefaultConfigurations|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-security/configurations/defaults')
                 ->path('org', $org),
-            ResponseType::object(CodeSecurityDefaultConfigurations::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codeSecurityDetachConfiguration(
         string $org,
         CodeSecurityDetachConfigurationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/code-security/configurations/detach')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityGetConfiguration(string $org, int $configurationId): CodeSecurityConfiguration
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
+    public function codeSecurityGetConfiguration(string $org, int $configurationId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeSecurityConfiguration|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-security/configurations/{configuration_id}')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityDeleteConfiguration(string $org, int $configurationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codeSecurityDeleteConfiguration(string $org, int $configurationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/code-security/configurations/{configuration_id}')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null>
+     */
     public function codeSecurityUpdateConfiguration(
         string $org,
         int $configurationId,
         CodeSecurityUpdateConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecurityConfiguration|null> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/code-security/configurations/{configuration_id}')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecurityConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<array<string, mixed>>
+     */
     public function codeSecurityAttachConfiguration(
         string $org,
         int $configurationId,
         CodeSecurityAttachConfigurationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<array<string, mixed>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/code-security/configurations/{configuration_id}/attach')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeSecuritySetConfigurationAsDefault200Content|BasicError>
+     */
     public function codeSecuritySetConfigurationAsDefault(
         string $org,
         int $configurationId,
         CodeSecuritySetConfigurationAsDefaultRequestContent $body,
-    ): CodeSecuritySetConfigurationAsDefault200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeSecuritySetConfigurationAsDefault200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/code-security/configurations/{configuration_id}/defaults')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecuritySetConfigurationAsDefault200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefault200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeSecurityConfigurationRepositories>
+     * @return Envelope<list<CodeSecurityConfigurationRepositories>|BasicError>
      */
     public function codeSecurityGetRepositoriesForConfiguration(
         string $org,
@@ -292,8 +393,9 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $status = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeSecurityConfigurationRepositories>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-security/configurations/{configuration_id}/repositories')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
@@ -301,19 +403,25 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('status', $status),
-            ResponseType::listOf(CodeSecurityConfigurationRepositories::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codeSecurityGetConfigurationForRepository(
-        string $owner,
-        string $repo,
-    ): CodeSecurityConfigurationForRepository {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodeSecurityConfigurationForRepository|null|BasicError>
+     */
+    public function codeSecurityGetConfigurationForRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<CodeSecurityConfigurationForRepository|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-security-configuration')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(CodeSecurityConfigurationForRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfigurationForRepository::class)], ['204', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

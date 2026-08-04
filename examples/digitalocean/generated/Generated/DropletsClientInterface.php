@@ -12,9 +12,26 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DropletsListType;
+use Acme\DigitalOcean\Generated\Model\AssociatedResourceStatus;
 use Acme\DigitalOcean\Generated\Model\DropletMultiCreate;
 use Acme\DigitalOcean\Generated\Model\DropletSingleCreate;
+use Acme\DigitalOcean\Generated\Model\DropletsCreateResponseMultipleDropletResponse;
+use Acme\DigitalOcean\Generated\Model\DropletsCreateResponseSingleDropletResponse;
+use Acme\DigitalOcean\Generated\Model\DropletsGet200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsGetBackupPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsList200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListAssociatedResources200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListBackupPolicies200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListBackups200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListFirewalls200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListKernels200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListNeighbors200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListSnapshots200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListSupportedBackupPolicies200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\NeighborIds;
 use Acme\DigitalOcean\Generated\Model\SelectiveDestroyAssociatedResource;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Droplets` endpoints.
@@ -27,6 +44,7 @@ interface DropletsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsList200Content|Error>
      */
     public function dropletsList(
         ?int $perPage = null,
@@ -34,98 +52,116 @@ interface DropletsClientInterface
         ?string $tagName = null,
         ?string $name = null,
         ?DropletsListType $type = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<DropletsCreateResponseSingleDropletResponse|DropletsCreateResponseMultipleDropletResponse|Error>
      */
-    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): void;
+    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyByTag(string $tagName): void;
+    public function dropletsDestroyByTag(string $tagName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListBackupPolicies200Content|Error>
      */
-    public function dropletsListBackupPolicies(?int $perPage = null, ?int $page = null): void;
+    public function dropletsListBackupPolicies(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListSupportedBackupPolicies200Content|Error>
      */
-    public function dropletsListSupportedBackupPolicies(): void;
+    public function dropletsListSupportedBackupPolicies(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsGet200Content|Error>
      */
-    public function dropletsGet(int $dropletId): void;
+    public function dropletsGet(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroy(int $dropletId): void;
+    public function dropletsDestroy(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListBackups200Content|Error>
      */
-    public function dropletsListBackups(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+    public function dropletsListBackups(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsGetBackupPolicy200Content|Error>
      */
-    public function dropletsGetBackupPolicy(int $dropletId): void;
+    public function dropletsGetBackupPolicy(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListAssociatedResources200Content|Error>
      */
-    public function dropletsListAssociatedResources(int $dropletId): void;
+    public function dropletsListAssociatedResources(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): void;
+    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): void;
+    public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
     public function dropletsDestroyWithAssociatedResourcesSelective(
         int $dropletId,
         SelectiveDestroyAssociatedResource $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<AssociatedResourceStatus|Error>
      */
-    public function dropletsGetDestroyAssociatedResourcesStatus(int $dropletId): void;
+    public function dropletsGetDestroyAssociatedResourcesStatus(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:read`.
+     * @return Envelope<DropletsListFirewalls200Content|Error>
      */
-    public function dropletsListFirewalls(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+    public function dropletsListFirewalls(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListKernels200Content|Error>
      */
-    public function dropletsListKernels(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+    public function dropletsListKernels(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListNeighbors200Content|Error>
      */
-    public function dropletsListNeighbors(int $dropletId): void;
+    public function dropletsListNeighbors(int $dropletId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListSnapshots200Content|Error>
      */
-    public function dropletsListSnapshots(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+    public function dropletsListSnapshots(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<NeighborIds|Error>
      */
-    public function dropletsListNeighborsIds(): void;
+    public function dropletsListNeighborsIds(): Envelope;
 }

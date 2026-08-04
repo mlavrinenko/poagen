@@ -15,6 +15,7 @@ use Acme\GitHub\Generated\Enum\ChecksListForRefFilter;
 use Acme\GitHub\Generated\Enum\ChecksListForRefStatus;
 use Acme\GitHub\Generated\Enum\ChecksListForSuiteFilter;
 use Acme\GitHub\Generated\Enum\ChecksListForSuiteStatus;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CheckAnnotation;
 use Acme\GitHub\Generated\Model\CheckRun;
 use Acme\GitHub\Generated\Model\CheckSuite;
@@ -27,6 +28,7 @@ use Acme\GitHub\Generated\Model\ChecksListSuitesForRef200Content;
 use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequestContent;
 use Acme\GitHub\Generated\Model\ChecksUpdateRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `checks` endpoints.
@@ -37,19 +39,28 @@ use Acme\GitHub\Generated\Model\EmptyObject;
  */
 interface ChecksClientInterface
 {
-    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): CheckRun;
+    /**
+     * @return Envelope<CheckRun>
+     */
+    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): Envelope;
 
-    public function checksGet(string $owner, string $repo, int $checkRunId): CheckRun;
+    /**
+     * @return Envelope<CheckRun>
+     */
+    public function checksGet(string $owner, string $repo, int $checkRunId): Envelope;
 
+    /**
+     * @return Envelope<CheckRun>
+     */
     public function checksUpdate(
         string $owner,
         string $repo,
         int $checkRunId,
         ChecksUpdateRequestContent $body,
-    ): CheckRun;
+    ): Envelope;
 
     /**
-     * @return list<CheckAnnotation>
+     * @return Envelope<list<CheckAnnotation>>
      */
     public function checksListAnnotations(
         string $owner,
@@ -57,20 +68,35 @@ interface ChecksClientInterface
         int $checkRunId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function checksRerequestRun(string $owner, string $repo, int $checkRunId): EmptyObject;
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function checksRerequestRun(string $owner, string $repo, int $checkRunId): Envelope;
 
-    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): CheckSuite;
+    /**
+     * @return Envelope<CheckSuite>
+     */
+    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): Envelope;
 
+    /**
+     * @return Envelope<CheckSuitePreference>
+     */
     public function checksSetSuitesPreferences(
         string $owner,
         string $repo,
         ChecksSetSuitesPreferencesRequestContent $body,
-    ): CheckSuitePreference;
+    ): Envelope;
 
-    public function checksGetSuite(string $owner, string $repo, int $checkSuiteId): CheckSuite;
+    /**
+     * @return Envelope<CheckSuite>
+     */
+    public function checksGetSuite(string $owner, string $repo, int $checkSuiteId): Envelope;
 
+    /**
+     * @return Envelope<ChecksListForSuite200Content>
+     */
     public function checksListForSuite(
         string $owner,
         string $repo,
@@ -80,10 +106,16 @@ interface ChecksClientInterface
         ?ChecksListForSuiteFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListForSuite200Content;
+    ): Envelope;
 
-    public function checksRerequestSuite(string $owner, string $repo, int $checkSuiteId): EmptyObject;
+    /**
+     * @return Envelope<EmptyObject>
+     */
+    public function checksRerequestSuite(string $owner, string $repo, int $checkSuiteId): Envelope;
 
+    /**
+     * @return Envelope<ChecksListForRef200Content>
+     */
     public function checksListForRef(
         string $owner,
         string $repo,
@@ -94,8 +126,11 @@ interface ChecksClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?int $appId = null,
-    ): ChecksListForRef200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ChecksListSuitesForRef200Content>
+     */
     public function checksListSuitesForRef(
         string $owner,
         string $repo,
@@ -104,5 +139,5 @@ interface ChecksClientInterface
         ?string $checkName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListSuitesForRef200Content;
+    ): Envelope;
 }

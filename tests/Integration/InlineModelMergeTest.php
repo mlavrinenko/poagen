@@ -11,6 +11,8 @@ use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
 
+use function substr_count;
+
 /**
  * name-inline-schemas-by-operation-and-status: `Profile::$inlineModels` reads
  * as one class name to many sites, and nothing merges without an entry there.
@@ -61,9 +63,11 @@ final class InlineModelMergeTest extends TestCase
         self::assertNotContains('GetC200Content', $models);
 
         $client = self::plannedSource($plan->writes, 'ApiClient');
-        self::assertStringContainsString('public function getA(): SharedError', $client);
-        self::assertStringContainsString('public function getB(): SharedError', $client);
-        self::assertStringContainsString('public function getC(): SharedError', $client);
+        self::assertStringContainsString('@return Envelope<SharedError>', $client);
+        self::assertSame(3, substr_count($client, '@return Envelope<SharedError>'));
+        self::assertStringContainsString('public function getA(): Envelope', $client);
+        self::assertStringContainsString('public function getB(): Envelope', $client);
+        self::assertStringContainsString('public function getC(): Envelope', $client);
     }
 
     public function testARequestSiteMergeWorksTheSameWay(): void

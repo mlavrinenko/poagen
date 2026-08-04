@@ -12,10 +12,14 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetActionsList200Content;
+use Acme\Kilbil\Generated\Model\GetActionsList403Content;
 use Acme\Kilbil\Generated\Model\GetActionsListRequestContent;
 use Acme\Kilbil\Generated\Model\GetPrograms200Content;
+use Acme\Kilbil\Generated\Model\GetPrograms403Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInterface
@@ -26,22 +30,32 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
     ) {
     }
 
-    public function getActionsList(GetActionsListRequestContent $body): GetActionsList200Content
+    /**
+     * @return Envelope<GetActionsList200Content|GetActionsList403Content>
+     */
+    public function getActionsList(GetActionsListRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetActionsList200Content|GetActionsList403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getactionslist')->query('h', $this->h)->json($body),
-            ResponseType::object(GetActionsList200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetActionsList200Content::class)], ['403', ResponseType::object(GetActionsList403Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param array<string, mixed> $body
+     * @return Envelope<GetPrograms200Content|GetPrograms403Content>
      */
-    public function getPrograms(array $body): GetPrograms200Content
+    public function getPrograms(array $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetPrograms200Content|GetPrograms403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getprograms')->query('h', $this->h)->jsonRaw($body),
-            ResponseType::object(GetPrograms200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetPrograms200Content::class)], ['403', ResponseType::object(GetPrograms403Content::class)]])),
         );
+
+        return $result;
     }
 }

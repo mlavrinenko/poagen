@@ -12,21 +12,30 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AddClient200Content;
+use Acme\Kilbil\Generated\Model\AddClient403Content;
 use Acme\Kilbil\Generated\Model\AddClientRequestContent;
 use Acme\Kilbil\Generated\Model\BlockCard200Content;
+use Acme\Kilbil\Generated\Model\BlockCard403Content;
 use Acme\Kilbil\Generated\Model\BlockCardRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientCards200Content;
+use Acme\Kilbil\Generated\Model\GetClientCards403Content;
 use Acme\Kilbil\Generated\Model\GetClientCardsRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientFullBalance200ContentItem;
+use Acme\Kilbil\Generated\Model\GetClientFullBalance403Content;
 use Acme\Kilbil\Generated\Model\GetClientFullBalanceRequestContent;
 use Acme\Kilbil\Generated\Model\GetConfirmationCode200Content;
+use Acme\Kilbil\Generated\Model\GetConfirmationCode403Content;
 use Acme\Kilbil\Generated\Model\GetConfirmationCodeRequestContent;
 use Acme\Kilbil\Generated\Model\ReplaceCard200Content;
+use Acme\Kilbil\Generated\Model\ReplaceCard403Content;
 use Acme\Kilbil\Generated\Model\ReplaceCardRequestContent;
 use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClient403Content;
 use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CustomersClient implements CustomersClientInterface
@@ -37,62 +46,101 @@ final readonly class CustomersClient implements CustomersClientInterface
     ) {
     }
 
-    public function addClient(AddClientRequestContent $body): AddClient200Content
+    /**
+     * @return Envelope<AddClient200Content|AddClient403Content>
+     */
+    public function addClient(AddClientRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AddClient200Content|AddClient403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/addclient')->query('h', $this->h)->json($body),
-            ResponseType::object(AddClient200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClient200Content::class)], ['403', ResponseType::object(AddClient403Content::class)]])),
         );
-    }
 
-    public function blockCard(BlockCardRequestContent $body): BlockCard200Content
-    {
-        return $this->transport->send(
-            Endpoint::post('/load/blockcard')->query('h', $this->h)->json($body),
-            ResponseType::object(BlockCard200Content::class),
-        );
-    }
-
-    public function getClientCards(GetClientCardsRequestContent $body): GetClientCards200Content
-    {
-        return $this->transport->send(
-            Endpoint::post('/load/getclientcards')->query('h', $this->h)->json($body),
-            ResponseType::object(GetClientCards200Content::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<GetClientFullBalance200ContentItem>
+     * @return Envelope<BlockCard200Content|BlockCard403Content>
      */
-    public function getClientFullBalance(GetClientFullBalanceRequestContent $body): array
+    public function blockCard(BlockCardRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<BlockCard200Content|BlockCard403Content> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/load/blockcard')->query('h', $this->h)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BlockCard200Content::class)], ['403', ResponseType::object(BlockCard403Content::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<GetClientCards200Content|GetClientCards403Content>
+     */
+    public function getClientCards(GetClientCardsRequestContent $body): Envelope
+    {
+        /** @var Envelope<GetClientCards200Content|GetClientCards403Content> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/load/getclientcards')->query('h', $this->h)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientCards200Content::class)], ['403', ResponseType::object(GetClientCards403Content::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<GetClientFullBalance200ContentItem>|GetClientFullBalance403Content>
+     */
+    public function getClientFullBalance(GetClientFullBalanceRequestContent $body): Envelope
+    {
+        /** @var Envelope<list<GetClientFullBalance200ContentItem>|GetClientFullBalance403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getclientfullbalance')->query('h', $this->h)->json($body),
-            ResponseType::listOf(GetClientFullBalance200ContentItem::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GetClientFullBalance200ContentItem::class)], ['403', ResponseType::object(GetClientFullBalance403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function getConfirmationCode(GetConfirmationCodeRequestContent $body): GetConfirmationCode200Content
+    /**
+     * @return Envelope<GetConfirmationCode200Content|GetConfirmationCode403Content>
+     */
+    public function getConfirmationCode(GetConfirmationCodeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetConfirmationCode200Content|GetConfirmationCode403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getconfirmationcode')->query('h', $this->h)->json($body),
-            ResponseType::object(GetConfirmationCode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetConfirmationCode200Content::class)], ['403', ResponseType::object(GetConfirmationCode403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function replaceCard(ReplaceCardRequestContent $body): ReplaceCard200Content
+    /**
+     * @return Envelope<ReplaceCard200Content|ReplaceCard403Content>
+     */
+    public function replaceCard(ReplaceCardRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ReplaceCard200Content|ReplaceCard403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/replacecard')->query('h', $this->h)->json($body),
-            ResponseType::object(ReplaceCard200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReplaceCard200Content::class)], ['403', ResponseType::object(ReplaceCard403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function searchClient(SearchClientRequestContent $body): SearchClient200Content
+    /**
+     * @return Envelope<SearchClient200Content|SearchClient403Content>
+     */
+    public function searchClient(SearchClientRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SearchClient200Content|SearchClient403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/searchclient')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchClient200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchClient200Content::class)], ['403', ResponseType::object(SearchClient403Content::class)]])),
         );
+
+        return $result;
     }
 }

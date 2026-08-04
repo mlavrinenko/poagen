@@ -120,8 +120,9 @@ final class SecurityMetadataEmissionTest extends TestCase
             $this->docblockOf(self::$rootSource, 'oauthScheme'),
         );
         // An operation whose requirement names no scopes says nothing at all
-        // rather than an empty list.
-        self::assertSame('', $this->docblockOf(self::$rootSource, 'oidcScheme'));
+        // about them — the docblock still carries the `@return` every
+        // method now does, but no "Requires" line and no empty list.
+        self::assertStringNotContainsString('Requires', $this->docblockOf(self::$rootSource, 'oidcScheme'));
     }
 
     /**

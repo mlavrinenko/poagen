@@ -24,13 +24,14 @@ use function sprintf;
  */
 final class StubErrorFactory implements ErrorFactoryInterface
 {
-    public function errorFor(int $status, RequestInterface $request, ResponseInterface $response): Throwable
+    public function errorFor(int $status, RequestInterface $request, ResponseInterface $response, string $reason): Throwable
     {
         return new RuntimeException(sprintf(
-            'HTTP %d for %s (%d bytes)',
+            'HTTP %d for %s (%d bytes): %s',
             $status,
             (string) $request->getUri(),
             $response->getBody()->getSize() ?? 0,
+            $reason,
         ));
     }
 }

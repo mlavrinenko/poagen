@@ -73,9 +73,13 @@ final class KilbilNullableTypeArrayDefectTest extends TestCase
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, $body));
         $client = KilbilHttpHarness::client($http);
 
-        return $client->customers()->searchClient(new SearchClientRequestContent(
+        $result = $client->customers()->searchClient(new SearchClientRequestContent(
             search_mode: SearchClientRequestContentSearchMode::_1,
             search_value: '79129999999',
         ));
+
+        self::assertInstanceOf(SearchClient200Content::class, $result->body);
+
+        return $result->body;
     }
 }

@@ -16,9 +16,12 @@ use Acme\GitHub\Generated\Model\InteractionLimitResponse;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForOrgResponseBranch2;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForRepoResponseBranch2;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class InteractionsClient implements InteractionsClientInterface
@@ -28,97 +31,136 @@ final readonly class InteractionsClient implements InteractionsClientInterface
     ) {
     }
 
-    public function interactionsGetRestrictionsForOrg(
-        string $org,
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2 {
-        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2 $result */
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2>
+     */
+    public function interactionsGetRestrictionsForOrg(string $org): Envelope
+    {
+        /** @var Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/interaction-limits')->path('org', $org),
-            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForOrgResponseBranch2::class), '/paths/~1orgs~1{org}~1interaction-limits/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForOrgResponseBranch2::class), '/paths/~1orgs~1{org}~1interaction-limits/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
     }
 
-    public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): InteractionLimitResponse
+    /**
+     * @return Envelope<InteractionLimitResponse|ValidationError>
+     */
+    public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<InteractionLimitResponse|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/interaction-limits')->path('org', $org)->json($body),
-            ResponseType::object(InteractionLimitResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function interactionsRemoveRestrictionsForOrg(string $org): void
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForOrg(string $org): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/interaction-limits')->path('org', $org),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function interactionsGetRestrictionsForRepo(
-        string $owner,
-        string $repo,
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2 {
-        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2 $result */
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2>
+     */
+    public function interactionsGetRestrictionsForRepo(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2> $result */
         $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/interaction-limits')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForRepoResponseBranch2::class), '/paths/~1repos~1{owner}~1{repo}~1interaction-limits/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForRepoResponseBranch2::class), '/paths/~1repos~1{owner}~1{repo}~1interaction-limits/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
     }
 
-    public function interactionsSetRestrictionsForRepo(
-        string $owner,
-        string $repo,
-        InteractionLimit $body,
-    ): InteractionLimitResponse {
-        return $this->transport->send(
+    /**
+     * @return Envelope<InteractionLimitResponse|null>
+     */
+    public function interactionsSetRestrictionsForRepo(string $owner, string $repo, InteractionLimit $body): Envelope
+    {
+        /** @var Envelope<InteractionLimitResponse|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/interaction-limits')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(InteractionLimitResponse::class),
-        );
-    }
-
-    public function interactionsRemoveRestrictionsForRepo(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/interaction-limits')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function interactionsGetRestrictionsForAuthenticatedUser(
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2 {
-        /** @var InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2 $result */
-        $result = $this->transport->send(
-            Endpoint::get('/user/interaction-limits'),
-            ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2::class), '/paths/~1user~1interaction-limits/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['409', null]])),
         );
 
         return $result;
     }
 
-    public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): InteractionLimitResponse
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForRepo(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
-            Endpoint::put('/user/interaction-limits')->json($body),
-            ResponseType::object(InteractionLimitResponse::class),
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/interaction-limits')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
+
+        return $result;
     }
 
-    public function interactionsRemoveRestrictionsForAuthenticatedUser(): void
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2|null>
+     */
+    public function interactionsGetRestrictionsForAuthenticatedUser(): Envelope
     {
-        $this->transport->send(
-            Endpoint::delete('/user/interaction-limits'),
-            ResponseType::nothing(),
+        /** @var Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/interaction-limits'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2::class), '/paths/~1user~1interaction-limits/get/responses/200/content/application~1json/schema')], ['204', null]])),
         );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<InteractionLimitResponse|ValidationError>
+     */
+    public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): Envelope
+    {
+        /** @var Envelope<InteractionLimitResponse|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/user/interaction-limits')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForAuthenticatedUser(): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/interaction-limits'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
+        );
+
+        return $result;
     }
 }

@@ -184,8 +184,28 @@ return new Profile(
      * understand — the document declares nothing about the body's shape,
      * so it passes through untyped as `array<string, mixed>` rather than
      * refusing the operation.
+     *
+     * `typed-error-responses` adds three more, none of them at the 2xx that
+     * used to be the only status examined: `git/create-blob`'s 422,
+     * `orgs/update`'s 422 and `repos/create-or-update-file-contents`'s 409
+     * are each a two-branch `oneOf`/`anyOf` (`RepositoryRuleViolationError`
+     * vs `ValidationError`, `ValidationError` vs `ValidationErrorSimple`,
+     * `BasicError` vs `RepositoryRuleViolationError`) whose branches share
+     * every discriminating field, at a status nothing wired into the return
+     * type until now. A `Profile::$unionPins` entry could pin one branch
+     * instead of skipping the operation; skip is the conservative default
+     * until a consumer of this example says which branch they want.
      */
     skip: [
+        // typed-error-responses: an error-status response union with no
+        // decidable branch, first found examining every declared status
+        // rather than only the picked 2xx.
+        'git/create-blob' => '422 response branches RepositoryRuleViolationError and ValidationError share every '
+            . 'discriminating field — add a discriminator, or pin one with Profile::$unionPins',
+        'orgs/update' => '422 response branches ValidationError and ValidationErrorSimple share every '
+            . 'discriminating field — add a discriminator, or pin one with Profile::$unionPins',
+        'repos/create-or-update-file-contents' => '409 response branches BasicError and RepositoryRuleViolationError '
+            . 'share every discriminating field — add a discriminator, or pin one with Profile::$unionPins',
         // issues/set-labels and issues/add-labels: request body is a `oneOf`
         // whose branches mix an object with a bare `array` — `body` is
         // `array<string>` (a list of label names), which paogen cannot union

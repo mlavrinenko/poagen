@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AddClientTags200Content;
+use Acme\Kilbil\Generated\Model\AddClientTags403Content;
 use Acme\Kilbil\Generated\Model\AddClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\DeleteClientTags200Content;
+use Acme\Kilbil\Generated\Model\DeleteClientTags403Content;
 use Acme\Kilbil\Generated\Model\DeleteClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientTags200Content;
+use Acme\Kilbil\Generated\Model\GetClientTags403Content;
 use Acme\Kilbil\Generated\Model\GetClientTagsRequestContent;
 use Acme\Kilbil\Generated\Model\GetListTags200Content;
+use Acme\Kilbil\Generated\Model\GetListTags403Content;
 use Acme\Kilbil\Generated\Model\GetListTagsRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Теги` endpoints.
@@ -29,11 +34,23 @@ use Acme\Kilbil\Generated\Model\GetListTagsRequestContent;
  */
 interface TagsClientInterface
 {
-    public function addClientTags(AddClientTagsRequestContent $body): AddClientTags200Content;
+    /**
+     * @return Envelope<AddClientTags200Content|AddClientTags403Content>
+     */
+    public function addClientTags(AddClientTagsRequestContent $body): Envelope;
 
-    public function deleteClientTags(DeleteClientTagsRequestContent $body): DeleteClientTags200Content;
+    /**
+     * @return Envelope<DeleteClientTags200Content|DeleteClientTags403Content>
+     */
+    public function deleteClientTags(DeleteClientTagsRequestContent $body): Envelope;
 
-    public function getClientTags(GetClientTagsRequestContent $body): GetClientTags200Content;
+    /**
+     * @return Envelope<GetClientTags200Content|GetClientTags403Content>
+     */
+    public function getClientTags(GetClientTagsRequestContent $body): Envelope;
 
-    public function getListTags(GetListTagsRequestContent $body): GetListTags200Content;
+    /**
+     * @return Envelope<GetListTags200Content|GetListTags403Content>
+     */
+    public function getListTags(GetListTagsRequestContent $body): Envelope;
 }

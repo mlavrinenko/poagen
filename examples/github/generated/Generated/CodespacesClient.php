@@ -11,16 +11,21 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
+use Acme\GitHub\Generated\Model\CodespacesCheckPermissionsForDevcontainer503Content;
 use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrg200Content;
@@ -48,8 +53,11 @@ use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequestConte
 use Acme\GitHub\Generated\Model\CodespacesUserPublicKey;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\RepoCodespacesSecret;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CodespacesClient implements CodespacesClientInterface
@@ -59,584 +67,862 @@ final readonly class CodespacesClient implements CodespacesClientInterface
     ) {
     }
 
-    public function codespacesListInOrganization(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListInOrganization200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespacesListInOrganization200Content|null|BasicError>
+     */
+    public function codespacesListInOrganization(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<CodespacesListInOrganization200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListInOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInOrganization200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesSetCodespacesAccess(
         string $org,
         CodespacesSetCodespacesAccessRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/access')->path('org', $org)->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesSetCodespacesAccessUsers(
         string $org,
         CodespacesSetCodespacesAccessUsersRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/codespaces/access/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesDeleteCodespacesAccessUsers(
         string $org,
         CodespacesDeleteCodespacesAccessUsersRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/codespaces/access/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesListOrgSecrets(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListOrgSecrets200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespacesListOrgSecrets200Content>
+     */
+    public function codespacesListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<CodespacesListOrgSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListOrgSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListOrgSecrets200Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetOrgPublicKey(string $org): CodespacesPublicKey
+    /**
+     * @return Envelope<CodespacesPublicKey>
+     */
+    public function codespacesGetOrgPublicKey(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespacesPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets/public-key')->path('org', $org),
-            ResponseType::object(CodespacesPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetOrgSecret(string $org, string $secretName): CodespacesOrgSecret
+    /**
+     * @return Envelope<CodespacesOrgSecret>
+     */
+    public function codespacesGetOrgSecret(string $org, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespacesOrgSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::object(CodespacesOrgSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesOrgSecret::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null|BasicError|ValidationError>
+     */
     public function codespacesCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         CodespacesCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesDeleteOrgSecret(string $org, string $secretName): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codespacesDeleteOrgSecret(string $org, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/codespaces/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesListSelectedReposForOrgSecret200Content|BasicError>
+     */
     public function codespacesListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): CodespacesListSelectedReposForOrgSecret200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesListSelectedReposForOrgSecret200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(CodespacesListSelectedReposForOrgSecret200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSelectedReposForOrgSecret200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         CodespacesSetSelectedReposForOrgSecretRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null]])),
         );
+
+        return $result;
     }
 
-    public function codespacesAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function codespacesAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesRemoveSelectedRepoFromOrgSecret(
         string $org,
         string $secretName,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesGetCodespacesForUserInOrg200Content|null|BasicError>
+     */
     public function codespacesGetCodespacesForUserInOrg(
         string $org,
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesGetCodespacesForUserInOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesGetCodespacesForUserInOrg200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/members/{username}/codespaces')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesGetCodespacesForUserInOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesGetCodespacesForUserInOrg200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesDeleteFromOrganization(string $org, string $username, string $codespaceName): void
+    /**
+     * @return Envelope<array<string, mixed>|null|BasicError>
+     */
+    public function codespacesDeleteFromOrganization(string $org, string $username, string $codespaceName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/members/{username}/codespaces/{codespace_name}')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('codespace_name', $codespaceName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesStopInOrganization(string $org, string $username, string $codespaceName): Codespace
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesStopInOrganization(string $org, string $username, string $codespaceName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Codespace|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/members/{username}/codespaces/{codespace_name}/stop')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesListInRepositoryForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesListInRepositoryForAuthenticatedUser(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInRepositoryForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesListInRepositoryForAuthenticatedUser200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListInRepositoryForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateWithRepoForAuthenticatedUser503Content>
+     */
     public function codespacesCreateWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
         CodespacesCreateWithRepoForAuthenticatedUserRequestContent $body,
-    ): Codespace {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Codespace|BasicError|CodespacesCreateWithRepoForAuthenticatedUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/codespaces')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithRepoForAuthenticatedUser503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesListDevcontainersInRepositoryForAuthenticatedUser(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/devcontainers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesRepoMachinesForAuthenticatedUser200Content|null|BasicError>
+     */
     public function codespacesRepoMachinesForAuthenticatedUser(
         string $owner,
         string $repo,
         ?string $location = null,
         ?string $clientIp = null,
         ?string $ref = null,
-    ): CodespacesRepoMachinesForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesRepoMachinesForAuthenticatedUser200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/machines')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('location', $location)
                 ->query('client_ip', $clientIp)
                 ->query('ref', $ref),
-            ResponseType::object(CodespacesRepoMachinesForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesRepoMachinesForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesPreFlightWithRepoForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesPreFlightWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
         ?string $ref = null,
         ?string $clientIp = null,
-    ): CodespacesPreFlightWithRepoForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesPreFlightWithRepoForAuthenticatedUser200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/new')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref)
                 ->query('client_ip', $clientIp),
-            ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesPermissionsCheckForDevcontainer|BasicError|ValidationError|CodespacesCheckPermissionsForDevcontainer503Content>
+     */
     public function codespacesCheckPermissionsForDevcontainer(
         string $owner,
         string $repo,
         string $ref,
         string $devcontainerPath,
-    ): CodespacesPermissionsCheckForDevcontainer {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesPermissionsCheckForDevcontainer|BasicError|ValidationError|CodespacesCheckPermissionsForDevcontainer503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/permissions_check')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref)
                 ->query('devcontainer_path', $devcontainerPath),
-            ResponseType::object(CodespacesPermissionsCheckForDevcontainer::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPermissionsCheckForDevcontainer::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(CodespacesCheckPermissionsForDevcontainer503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesListRepoSecrets200Content>
+     */
     public function codespacesListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListRepoSecrets200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesListRepoSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListRepoSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepoSecrets200Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetRepoPublicKey(string $owner, string $repo): CodespacesPublicKey
+    /**
+     * @return Envelope<CodespacesPublicKey>
+     */
+    public function codespacesGetRepoPublicKey(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespacesPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(CodespacesPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetRepoSecret(string $owner, string $repo, string $secretName): RepoCodespacesSecret
+    /**
+     * @return Envelope<RepoCodespacesSecret>
+     */
+    public function codespacesGetRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RepoCodespacesSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::object(RepoCodespacesSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepoCodespacesSecret::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function codespacesCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         CodespacesCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/codespaces/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
+
+        return $result;
     }
 
-    public function codespacesDeleteRepoSecret(string $owner, string $repo, string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function codespacesDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/codespaces/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateWithPrForAuthenticatedUser503Content>
+     */
     public function codespacesCreateWithPrForAuthenticatedUser(
         string $owner,
         string $repo,
         int $pullNumber,
         CodespacesCreateWithPrForAuthenticatedUserRequestContent $body,
-    ): Codespace {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Codespace|BasicError|CodespacesCreateWithPrForAuthenticatedUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/codespaces')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithPrForAuthenticatedUser503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespacesListForAuthenticatedUser200Content|null|BasicError>
+     */
     public function codespacesListForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
         ?int $repositoryId = null,
-    ): CodespacesListForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespacesListForAuthenticatedUser200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('repository_id', $repositoryId),
-            ResponseType::object(CodespacesListForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateForAuthenticatedUser503Content>
+     */
     public function codespacesCreateForAuthenticatedUser(
         CodespacesCreateForAuthenticatedUserBranch1|CodespacesCreateForAuthenticatedUserBranch2 $body,
-    ): Codespace {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Codespace|BasicError|CodespacesCreateForAuthenticatedUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/codespaces')->json($body),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateForAuthenticatedUser503Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesListSecretsForAuthenticatedUser(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListSecretsForAuthenticatedUser200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespacesListSecretsForAuthenticatedUser200Content>
+     */
+    public function codespacesListSecretsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<CodespacesListSecretsForAuthenticatedUser200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListSecretsForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSecretsForAuthenticatedUser200Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetPublicKeyForAuthenticatedUser(): CodespacesUserPublicKey
+    /**
+     * @return Envelope<CodespacesUserPublicKey>
+     */
+    public function codespacesGetPublicKeyForAuthenticatedUser(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespacesUserPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/public-key'),
-            ResponseType::object(CodespacesUserPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesUserPublicKey::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetSecretForAuthenticatedUser(string $secretName): CodespacesSecret
+    /**
+     * @return Envelope<CodespacesSecret>
+     */
+    public function codespacesGetSecretForAuthenticatedUser(string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespacesSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName),
-            ResponseType::object(CodespacesSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesSecret::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null|ValidationError|BasicError>
+     */
     public function codespacesCreateOrUpdateSecretForAuthenticatedUser(
         string $secretName,
         CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesDeleteSecretForAuthenticatedUser(string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function codespacesDeleteSecretForAuthenticatedUser(string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function codespacesListRepositoriesForSecretForAuthenticatedUser(
-        string $secretName,
-    ): CodespacesListRepositoriesForSecretForAuthenticatedUser200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespacesListRepositoriesForSecretForAuthenticatedUser200Content|BasicError>
+     */
+    public function codespacesListRepositoriesForSecretForAuthenticatedUser(string $secretName): Envelope
+    {
+        /** @var Envelope<CodespacesListRepositoriesForSecretForAuthenticatedUser200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/{secret_name}/repositories')
                 ->path('secret_name', $secretName),
-            ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesSetRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
         CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/codespaces/secrets/{secret_name}/repositories')
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesAddRepositoryForSecretForAuthenticatedUser(string $secretName, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codespacesAddRepositoryForSecretForAuthenticatedUser(
+        string $secretName,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesRemoveRepositoryForSecretForAuthenticatedUser(
         string $secretName,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetForAuthenticatedUser(string $codespaceName): Codespace
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesGetForAuthenticatedUser(string $codespaceName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Codespace|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesDeleteForAuthenticatedUser(string $codespaceName): void
+    /**
+     * @return Envelope<array<string, mixed>|null|BasicError>
+     */
+    public function codespacesDeleteForAuthenticatedUser(string $codespaceName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Codespace|BasicError>
+     */
     public function codespacesUpdateForAuthenticatedUser(
         string $codespaceName,
         CodespacesUpdateForAuthenticatedUserRequestContent $body,
-    ): Codespace {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Codespace|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName)
                 ->json($body),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesExportForAuthenticatedUser(string $codespaceName): CodespaceExportDetails
+    /**
+     * @return Envelope<CodespaceExportDetails|BasicError|ValidationError>
+     */
+    public function codespacesExportForAuthenticatedUser(string $codespaceName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodespaceExportDetails|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/exports')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(CodespaceExportDetails::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodespaceExportDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesGetExportDetailsForAuthenticatedUser(
-        string $codespaceName,
-        string $exportId,
-    ): CodespaceExportDetails {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespaceExportDetails|BasicError>
+     */
+    public function codespacesGetExportDetailsForAuthenticatedUser(string $codespaceName, string $exportId): Envelope
+    {
+        /** @var Envelope<CodespaceExportDetails|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}/exports/{export_id}')
                 ->path('codespace_name', $codespaceName)
                 ->path('export_id', $exportId),
-            ResponseType::object(CodespaceExportDetails::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespaceExportDetails::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesCodespaceMachinesForAuthenticatedUser(
-        string $codespaceName,
-    ): CodespacesCodespaceMachinesForAuthenticatedUser200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodespacesCodespaceMachinesForAuthenticatedUser200Content|null|BasicError>
+     */
+    public function codespacesCodespaceMachinesForAuthenticatedUser(string $codespaceName): Envelope
+    {
+        /** @var Envelope<CodespacesCodespaceMachinesForAuthenticatedUser200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}/machines')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodespaceWithFullRepository|BasicError|ValidationError>
+     */
     public function codespacesPublishForAuthenticatedUser(
         string $codespaceName,
         CodespacesPublishForAuthenticatedUserRequestContent $body,
-    ): CodespaceWithFullRepository {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodespaceWithFullRepository|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/publish')
                 ->path('codespace_name', $codespaceName)
                 ->json($body),
-            ResponseType::object(CodespaceWithFullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodespaceWithFullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesStartForAuthenticatedUser(string $codespaceName): Codespace
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesStartForAuthenticatedUser(string $codespaceName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Codespace|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/start')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['402', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function codespacesStopForAuthenticatedUser(string $codespaceName): Codespace
+    /**
+     * @return Envelope<Codespace|BasicError>
+     */
+    public function codespacesStopForAuthenticatedUser(string $codespaceName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Codespace|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/stop')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(Codespace::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

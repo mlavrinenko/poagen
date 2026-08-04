@@ -11,11 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\CdnCreateEndpoint201Content;
 use Acme\DigitalOcean\Generated\Model\CdnEndpoint;
+use Acme\DigitalOcean\Generated\Model\CdnGetEndpoint200Content;
+use Acme\DigitalOcean\Generated\Model\CdnListEndpoints200Content;
+use Acme\DigitalOcean\Generated\Model\CdnUpdateEndpoints200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\PurgeCache;
 use Acme\DigitalOcean\Generated\Model\UpdateEndpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CdnEndpointsClient implements CdnEndpointsClientInterface
@@ -28,82 +35,106 @@ final readonly class CdnEndpointsClient implements CdnEndpointsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `cdn:read`.
+     * @return Envelope<CdnListEndpoints200Content|Error>
      */
-    public function cdnListEndpoints(?int $perPage = null, ?int $page = null): void
+    public function cdnListEndpoints(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CdnListEndpoints200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/cdn/endpoints')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CdnListEndpoints200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `cdn:create`.
+     * @return Envelope<CdnCreateEndpoint201Content|Error>
      */
-    public function cdnCreateEndpoint(CdnEndpoint $body): void
+    public function cdnCreateEndpoint(CdnEndpoint $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CdnCreateEndpoint201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/cdn/endpoints')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CdnCreateEndpoint201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `cdn:read`.
+     * @return Envelope<CdnGetEndpoint200Content|Error>
      */
-    public function cdnGetEndpoint(string $cdnId): void
+    public function cdnGetEndpoint(string $cdnId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CdnGetEndpoint200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/cdn/endpoints/{cdn_id}')
                 ->path('cdn_id', $cdnId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CdnGetEndpoint200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `cdn:update`.
+     * @return Envelope<CdnUpdateEndpoints200Content|Error>
      */
-    public function cdnUpdateEndpoints(string $cdnId, UpdateEndpoint $body): void
+    public function cdnUpdateEndpoints(string $cdnId, UpdateEndpoint $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CdnUpdateEndpoints200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/cdn/endpoints/{cdn_id}')
                 ->path('cdn_id', $cdnId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CdnUpdateEndpoints200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `cdn:delete`.
+     * @return Envelope<null|Error>
      */
-    public function cdnDeleteEndpoint(string $cdnId): void
+    public function cdnDeleteEndpoint(string $cdnId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/cdn/endpoints/{cdn_id}')
                 ->path('cdn_id', $cdnId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `cdn:delete`.
+     * @return Envelope<null|Error>
      */
-    public function cdnPurgeCache(string $cdnId, PurgeCache $body): void
+    public function cdnPurgeCache(string $cdnId, PurgeCache $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/cdn/endpoints/{cdn_id}/cache')
                 ->path('cdn_id', $cdnId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

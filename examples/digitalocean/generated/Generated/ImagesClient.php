@@ -12,14 +12,22 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\ImagesListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImageNewCustom;
 use Acme\DigitalOcean\Generated\Model\ImageUpdate;
+use Acme\DigitalOcean\Generated\Model\ImagesCreateCustom202Content;
+use Acme\DigitalOcean\Generated\Model\ImagesGet200Content;
+use Acme\DigitalOcean\Generated\Model\ImagesList200Content;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferAccept;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCancel;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCreate;
+use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCreate201Content;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferDecline;
+use Acme\DigitalOcean\Generated\Model\ImagesUpdate200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ImagesClient implements ImagesClientInterface
@@ -32,6 +40,7 @@ final readonly class ImagesClient implements ImagesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImagesList200Content|Error>
      */
     public function imagesList(
         ?ImagesListType $type = null,
@@ -39,8 +48,9 @@ final readonly class ImagesClient implements ImagesClientInterface
         ?string $tagName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ImagesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/images')
                 ->query('type', $type)
                 ->query('private', $private)
@@ -48,116 +58,150 @@ final readonly class ImagesClient implements ImagesClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<ImagesCreateCustom202Content|Error>
      */
-    public function imagesCreateCustom(ImageNewCustom $body): void
+    public function imagesCreateCustom(ImageNewCustom $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ImagesCreateCustom202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ImagesCreateCustom202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImagesGet200Content|Error>
      */
-    public function imagesGet(int|string $imageId): void
+    public function imagesGet(int|string $imageId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ImagesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/images/{image_id}')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<ImagesUpdate200Content|Error>
      */
-    public function imagesUpdate(int $imageId, ImageUpdate $body): void
+    public function imagesUpdate(int $imageId, ImageUpdate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ImagesUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/images/{image_id}')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:delete`.
+     * @return Envelope<null|Error>
      */
-    public function imagesDelete(int $imageId): void
+    public function imagesDelete(int $imageId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/images/{image_id}')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:update`, `image:delete`.
+     * @return Envelope<ImagesPostAccountTransferCreate201Content|Error>
      */
-    public function imagesPostAccountTransferCreate(int $imageId, ImagesPostAccountTransferCreate $body): void
+    public function imagesPostAccountTransferCreate(int $imageId, ImagesPostAccountTransferCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ImagesPostAccountTransferCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images/{image_id}/account_transfer')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ImagesPostAccountTransferCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferAccept(int $imageId, ImagesPostAccountTransferAccept $body): void
+    public function imagesPostAccountTransferAccept(int $imageId, ImagesPostAccountTransferAccept $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images/{image_id}/account_transfer/accept')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', null], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferCancel(int $imageId, ImagesPostAccountTransferCancel $body): void
+    public function imagesPostAccountTransferCancel(int $imageId, ImagesPostAccountTransferCancel $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images/{image_id}/account_transfer/cancel')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferDecline(int $imageId, ImagesPostAccountTransferDecline $body): void
+    public function imagesPostAccountTransferDecline(int $imageId, ImagesPostAccountTransferDecline $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images/{image_id}/account_transfer/decline')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

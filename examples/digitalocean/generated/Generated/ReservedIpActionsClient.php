@@ -11,10 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpActionAssign;
 use Acme\DigitalOcean\Generated\Model\ReservedIpActionUnassign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsActionsPost201Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ReservedIpActionsClient implements ReservedIpActionsClientInterface
@@ -27,44 +33,56 @@ final readonly class ReservedIpActionsClient implements ReservedIpActionsClientI
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsActionsList200Content|Error>
      */
-    public function reservedIpsActionsList(string $reservedIp): void
+    public function reservedIpsActionsList(string $reservedIp): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpsActionsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ips/{reserved_ip}/actions')
                 ->path('reserved_ip', $reservedIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpsActionsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<ReservedIpsActionsPost201Content|Error>
      */
     public function reservedIpsActionsPost(
         string $reservedIp,
         ReservedIpActionUnassign|ReservedIpActionAssign $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReservedIpsActionsPost201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/reserved_ips/{reserved_ip}/actions')
                 ->path('reserved_ip', $reservedIp)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReservedIpsActionsPost201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsActionsGet200Content|Error>
      */
-    public function reservedIpsActionsGet(string $reservedIp, int $actionId): void
+    public function reservedIpsActionsGet(string $reservedIp, int $actionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ReservedIpsActionsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reserved_ips/{reserved_ip}/actions/{action_id}')
                 ->path('reserved_ip', $reservedIp)
                 ->path('action_id', $actionId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedIpsActionsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

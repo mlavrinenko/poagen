@@ -14,10 +14,23 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\AccessKeyCreateRequest;
 use Acme\DigitalOcean\Generated\Model\CreateNamespace;
 use Acme\DigitalOcean\Generated\Model\CreateTrigger;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyCreate201Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyList200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequestContent;
+use Acme\DigitalOcean\Generated\Model\FunctionsCreateNamespace200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsCreateTrigger200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsGetNamespace200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsGetTrigger200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsListNamespaces200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsListTriggers200Content;
+use Acme\DigitalOcean\Generated\Model\FunctionsUpdateTrigger200Content;
 use Acme\DigitalOcean\Generated\Model\UpdateTrigger;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class FunctionsClient implements FunctionsClientInterface
@@ -30,182 +43,233 @@ final readonly class FunctionsClient implements FunctionsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsListNamespaces200Content|Error>
      */
-    public function functionsListNamespaces(): void
+    public function functionsListNamespaces(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsListNamespaces200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListNamespaces200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:create`, `function:admin`.
+     * @return Envelope<FunctionsCreateNamespace200Content|Error>
      */
-    public function functionsCreateNamespace(CreateNamespace $body): void
+    public function functionsCreateNamespace(CreateNamespace $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsCreateNamespace200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/functions/namespaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsGetNamespace200Content|Error>
      */
-    public function functionsGetNamespace(string $namespaceId): void
+    public function functionsGetNamespace(string $namespaceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsGetNamespace200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces/{namespace_id}')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['403', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:delete`, `function:admin`.
+     * @return Envelope<null|Error>
      */
-    public function functionsDeleteNamespace(string $namespaceId): void
+    public function functionsDeleteNamespace(string $namespaceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/functions/namespaces/{namespace_id}')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyList200Content|Error>
      */
-    public function functionsAccessKeyList(string $namespaceId): void
+    public function functionsAccessKeyList(string $namespaceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsAccessKeyList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces/{namespace_id}/keys')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyCreate201Content|Error>
      */
-    public function functionsAccessKeyCreate(string $namespaceId, AccessKeyCreateRequest $body): void
+    public function functionsAccessKeyCreate(string $namespaceId, AccessKeyCreateRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsAccessKeyCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/functions/namespaces/{namespace_id}/keys')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FunctionsAccessKeyCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
+     * @return Envelope<FunctionsAccessKeyUpdate200Content|Error>
      */
     public function functionsAccessKeyUpdate(
         string $namespaceId,
         string $keyId,
         FunctionsAccessKeyUpdateRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<FunctionsAccessKeyUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/functions/namespaces/{namespace_id}/keys/{key_id}')
                 ->path('namespace_id', $namespaceId)
                 ->path('key_id', $keyId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyUpdate200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:admin`.
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>|Error>
      */
-    public function functionsAccessKeyDelete(string $namespaceId, string $keyId): array
+    public function functionsAccessKeyDelete(string $namespaceId, string $keyId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, mixed>|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/functions/namespaces/{namespace_id}/keys/{key_id}')
                 ->path('namespace_id', $namespaceId)
                 ->path('key_id', $keyId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::mapOf(ResponseType::mixed()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsListTriggers200Content|Error>
      */
-    public function functionsListTriggers(string $namespaceId): void
+    public function functionsListTriggers(string $namespaceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsListTriggers200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces/{namespace_id}/triggers')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListTriggers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:create`, `function:admin`.
+     * @return Envelope<FunctionsCreateTrigger200Content|Error>
      */
-    public function functionsCreateTrigger(string $namespaceId, CreateTrigger $body): void
+    public function functionsCreateTrigger(string $namespaceId, CreateTrigger $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsCreateTrigger200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/functions/namespaces/{namespace_id}/triggers')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:read`, `function:admin`.
+     * @return Envelope<FunctionsGetTrigger200Content|Error>
      */
-    public function functionsGetTrigger(string $namespaceId, string $triggerName): void
+    public function functionsGetTrigger(string $namespaceId, string $triggerName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsGetTrigger200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}')
                 ->path('namespace_id', $namespaceId)
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetTrigger200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:update`, `function:admin`.
+     * @return Envelope<FunctionsUpdateTrigger200Content|Error>
      */
-    public function functionsUpdateTrigger(string $namespaceId, string $triggerName, UpdateTrigger $body): void
+    public function functionsUpdateTrigger(string $namespaceId, string $triggerName, UpdateTrigger $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<FunctionsUpdateTrigger200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}')
                 ->path('namespace_id', $namespaceId)
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsUpdateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `function:delete`, `function:admin`.
+     * @return Envelope<null|Error>
      */
-    public function functionsDeleteTrigger(string $namespaceId, string $triggerName): void
+    public function functionsDeleteTrigger(string $namespaceId, string $triggerName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}')
                 ->path('namespace_id', $namespaceId)
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

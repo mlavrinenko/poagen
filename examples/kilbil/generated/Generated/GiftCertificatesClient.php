@@ -12,12 +12,17 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GenerateGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateGiftCard403Content;
 use Acme\Kilbil\Generated\Model\GenerateGiftCardRequestContent;
 use Acme\Kilbil\Generated\Model\GetProgramGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GetProgramGiftCard403Content;
 use Acme\Kilbil\Generated\Model\SearchGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCard403Content;
 use Acme\Kilbil\Generated\Model\SearchGiftCardRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GiftCertificatesClient implements GiftCertificatesClientInterface
@@ -28,27 +33,45 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
     ) {
     }
 
-    public function generateGiftCard(GenerateGiftCardRequestContent $body): GenerateGiftCard200Content
+    /**
+     * @return Envelope<GenerateGiftCard200Content|GenerateGiftCard403Content>
+     */
+    public function generateGiftCard(GenerateGiftCardRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GenerateGiftCard200Content|GenerateGiftCard403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/generategiftcard')->query('h', $this->h)->json($body),
-            ResponseType::object(GenerateGiftCard200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateGiftCard200Content::class)], ['403', ResponseType::object(GenerateGiftCard403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function getProgramGiftCard(): GetProgramGiftCard200Content
+    /**
+     * @return Envelope<GetProgramGiftCard200Content|GetProgramGiftCard403Content>
+     */
+    public function getProgramGiftCard(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetProgramGiftCard200Content|GetProgramGiftCard403Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/load/getprogramgiftcard')->query('h', $this->h),
-            ResponseType::object(GetProgramGiftCard200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetProgramGiftCard200Content::class)], ['403', ResponseType::object(GetProgramGiftCard403Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function searchGiftCard(SearchGiftCardRequestContent $body): SearchGiftCard200Content
+    /**
+     * @return Envelope<SearchGiftCard200Content|SearchGiftCard403Content>
+     */
+    public function searchGiftCard(SearchGiftCardRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SearchGiftCard200Content|SearchGiftCard403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/searchgiftcard')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchGiftCard200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchGiftCard200Content::class)], ['403', ResponseType::object(SearchGiftCard403Content::class)]])),
         );
+
+        return $result;
     }
 }

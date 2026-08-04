@@ -11,12 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Classroom;
 use Acme\GitHub\Generated\Model\ClassroomAcceptedAssignment;
 use Acme\GitHub\Generated\Model\ClassroomAssignment;
 use Acme\GitHub\Generated\Model\ClassroomAssignmentGrade;
 use Acme\GitHub\Generated\Model\SimpleClassroom;
 use Acme\GitHub\Generated\Model\SimpleClassroomAssignment;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `classroom` endpoints.
@@ -27,35 +29,41 @@ use Acme\GitHub\Generated\Model\SimpleClassroomAssignment;
  */
 interface ClassroomClientInterface
 {
-    public function classroomGetAnAssignment(int $assignmentId): ClassroomAssignment;
+    /**
+     * @return Envelope<ClassroomAssignment|BasicError>
+     */
+    public function classroomGetAnAssignment(int $assignmentId): Envelope;
 
     /**
-     * @return list<ClassroomAcceptedAssignment>
+     * @return Envelope<list<ClassroomAcceptedAssignment>>
      */
     public function classroomListAcceptedAssignmentsForAnAssignment(
         int $assignmentId,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<ClassroomAssignmentGrade>
+     * @return Envelope<list<ClassroomAssignmentGrade>|BasicError>
      */
-    public function classroomGetAssignmentGrades(int $assignmentId): array;
+    public function classroomGetAssignmentGrades(int $assignmentId): Envelope;
 
     /**
-     * @return list<SimpleClassroom>
+     * @return Envelope<list<SimpleClassroom>>
      */
-    public function classroomListClassrooms(?int $page = null, ?int $perPage = null): array;
-
-    public function classroomGetAClassroom(int $classroomId): Classroom;
+    public function classroomListClassrooms(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
-     * @return list<SimpleClassroomAssignment>
+     * @return Envelope<Classroom|BasicError>
+     */
+    public function classroomGetAClassroom(int $classroomId): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleClassroomAssignment>>
      */
     public function classroomListAssignmentsForAClassroom(
         int $classroomId,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 }

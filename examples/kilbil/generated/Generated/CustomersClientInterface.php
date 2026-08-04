@@ -12,19 +12,27 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AddClient200Content;
+use Acme\Kilbil\Generated\Model\AddClient403Content;
 use Acme\Kilbil\Generated\Model\AddClientRequestContent;
 use Acme\Kilbil\Generated\Model\BlockCard200Content;
+use Acme\Kilbil\Generated\Model\BlockCard403Content;
 use Acme\Kilbil\Generated\Model\BlockCardRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientCards200Content;
+use Acme\Kilbil\Generated\Model\GetClientCards403Content;
 use Acme\Kilbil\Generated\Model\GetClientCardsRequestContent;
 use Acme\Kilbil\Generated\Model\GetClientFullBalance200ContentItem;
+use Acme\Kilbil\Generated\Model\GetClientFullBalance403Content;
 use Acme\Kilbil\Generated\Model\GetClientFullBalanceRequestContent;
 use Acme\Kilbil\Generated\Model\GetConfirmationCode200Content;
+use Acme\Kilbil\Generated\Model\GetConfirmationCode403Content;
 use Acme\Kilbil\Generated\Model\GetConfirmationCodeRequestContent;
 use Acme\Kilbil\Generated\Model\ReplaceCard200Content;
+use Acme\Kilbil\Generated\Model\ReplaceCard403Content;
 use Acme\Kilbil\Generated\Model\ReplaceCardRequestContent;
 use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClient403Content;
 use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Клиенты` endpoints.
@@ -35,20 +43,38 @@ use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
  */
 interface CustomersClientInterface
 {
-    public function addClient(AddClientRequestContent $body): AddClient200Content;
-
-    public function blockCard(BlockCardRequestContent $body): BlockCard200Content;
-
-    public function getClientCards(GetClientCardsRequestContent $body): GetClientCards200Content;
+    /**
+     * @return Envelope<AddClient200Content|AddClient403Content>
+     */
+    public function addClient(AddClientRequestContent $body): Envelope;
 
     /**
-     * @return list<GetClientFullBalance200ContentItem>
+     * @return Envelope<BlockCard200Content|BlockCard403Content>
      */
-    public function getClientFullBalance(GetClientFullBalanceRequestContent $body): array;
+    public function blockCard(BlockCardRequestContent $body): Envelope;
 
-    public function getConfirmationCode(GetConfirmationCodeRequestContent $body): GetConfirmationCode200Content;
+    /**
+     * @return Envelope<GetClientCards200Content|GetClientCards403Content>
+     */
+    public function getClientCards(GetClientCardsRequestContent $body): Envelope;
 
-    public function replaceCard(ReplaceCardRequestContent $body): ReplaceCard200Content;
+    /**
+     * @return Envelope<list<GetClientFullBalance200ContentItem>|GetClientFullBalance403Content>
+     */
+    public function getClientFullBalance(GetClientFullBalanceRequestContent $body): Envelope;
 
-    public function searchClient(SearchClientRequestContent $body): SearchClient200Content;
+    /**
+     * @return Envelope<GetConfirmationCode200Content|GetConfirmationCode403Content>
+     */
+    public function getConfirmationCode(GetConfirmationCodeRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<ReplaceCard200Content|ReplaceCard403Content>
+     */
+    public function replaceCard(ReplaceCardRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<SearchClient200Content|SearchClient403Content>
+     */
+    public function searchClient(SearchClientRequestContent $body): Envelope;
 }

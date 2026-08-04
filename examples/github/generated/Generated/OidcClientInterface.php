@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusion;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusionInput;
 use Acme\GitHub\Generated\Model\OidcCustomSub;
 use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `oidc` endpoints.
@@ -27,36 +29,54 @@ use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequestCont
 interface OidcClientInterface
 {
     /**
-     * @return list<OidcCustomPropertyInclusion>
+     * @return Envelope<list<OidcCustomPropertyInclusion>|BasicError>
      */
-    public function oidcListOidcCustomPropertyInclusionsForEnterprise(string $enterprise): array;
+    public function oidcListOidcCustomPropertyInclusionsForEnterprise(string $enterprise): Envelope;
 
+    /**
+     * @return Envelope<OidcCustomPropertyInclusion|null|BasicError>
+     */
     public function oidcCreateOidcCustomPropertyInclusionForEnterprise(
         string $enterprise,
         OidcCustomPropertyInclusionInput $body,
-    ): OidcCustomPropertyInclusion;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function oidcDeleteOidcCustomPropertyInclusionForEnterprise(
         string $enterprise,
         string $customPropertyName,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<OidcCustomPropertyInclusion>
+     * @return Envelope<list<OidcCustomPropertyInclusion>|BasicError>
      */
-    public function oidcListOidcCustomPropertyInclusionsForOrg(string $org): array;
+    public function oidcListOidcCustomPropertyInclusionsForOrg(string $org): Envelope;
 
+    /**
+     * @return Envelope<OidcCustomPropertyInclusion|null|BasicError>
+     */
     public function oidcCreateOidcCustomPropertyInclusionForOrg(
         string $org,
         OidcCustomPropertyInclusionInput $body,
-    ): OidcCustomPropertyInclusion;
+    ): Envelope;
 
-    public function oidcDeleteOidcCustomPropertyInclusionForOrg(string $org, string $customPropertyName): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function oidcDeleteOidcCustomPropertyInclusionForOrg(string $org, string $customPropertyName): Envelope;
 
-    public function oidcGetOidcCustomSubTemplateForOrg(string $org): OidcCustomSub;
+    /**
+     * @return Envelope<OidcCustomSub>
+     */
+    public function oidcGetOidcCustomSubTemplateForOrg(string $org): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
     public function oidcUpdateOidcCustomSubTemplateForOrg(
         string $org,
         OidcUpdateOidcCustomSubTemplateForOrgRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 }

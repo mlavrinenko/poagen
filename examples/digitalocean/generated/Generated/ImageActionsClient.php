@@ -11,10 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Action;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImageActionBase;
 use Acme\DigitalOcean\Generated\Model\ImageActionTransfer;
+use Acme\DigitalOcean\Generated\Model\ImageActionsList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ImageActionsClient implements ImageActionsClientInterface
@@ -27,42 +32,54 @@ final readonly class ImageActionsClient implements ImageActionsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImageActionsList200Content|Error>
      */
-    public function imageActionsList(int $imageId): void
+    public function imageActionsList(int $imageId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ImageActionsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/images/{image_id}/actions')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImageActionsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<Action|Error>
      */
-    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): void
+    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Action|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/images/{image_id}/actions')
                 ->path('image_id', $imageId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Action::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<Action|Error>
      */
-    public function imageActionsGet(int $imageId, int $actionId): void
+    public function imageActionsGet(int $imageId, int $actionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Action|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/images/{image_id}/actions/{action_id}')
                 ->path('image_id', $imageId)
                 ->path('action_id', $actionId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Action::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

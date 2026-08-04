@@ -11,9 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EnterpriseTeam;
 use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequestContent;
 use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `enterprise-teams` endpoints.
@@ -25,22 +27,31 @@ use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequestContent;
 interface EnterpriseTeamsClientInterface
 {
     /**
-     * @return list<EnterpriseTeam>
+     * @return Envelope<list<EnterpriseTeam>|BasicError>
      */
-    public function enterpriseTeamsList(string $enterprise, ?int $perPage = null, ?int $page = null): array;
+    public function enterpriseTeamsList(string $enterprise, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function enterpriseTeamsCreate(
-        string $enterprise,
-        EnterpriseTeamsCreateRequestContent $body,
-    ): EnterpriseTeam;
+    /**
+     * @return Envelope<EnterpriseTeam>
+     */
+    public function enterpriseTeamsCreate(string $enterprise, EnterpriseTeamsCreateRequestContent $body): Envelope;
 
-    public function enterpriseTeamsGet(string $enterprise, string $teamSlug): EnterpriseTeam;
+    /**
+     * @return Envelope<EnterpriseTeam|BasicError>
+     */
+    public function enterpriseTeamsGet(string $enterprise, string $teamSlug): Envelope;
 
-    public function enterpriseTeamsDelete(string $enterprise, string $teamSlug): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function enterpriseTeamsDelete(string $enterprise, string $teamSlug): Envelope;
 
+    /**
+     * @return Envelope<EnterpriseTeam|BasicError>
+     */
     public function enterpriseTeamsUpdate(
         string $enterprise,
         string $teamSlug,
         EnterpriseTeamsUpdateRequestContent $body,
-    ): EnterpriseTeam;
+    ): Envelope;
 }

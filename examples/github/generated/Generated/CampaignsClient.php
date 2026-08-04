@@ -14,11 +14,19 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Enum\CampaignState;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CampaignSummary;
+use Acme\GitHub\Generated\Model\CampaignsCreateCampaign503Content;
 use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequestContent;
+use Acme\GitHub\Generated\Model\CampaignsDeleteCampaign503Content;
+use Acme\GitHub\Generated\Model\CampaignsGetCampaignSummary503Content;
+use Acme\GitHub\Generated\Model\CampaignsListOrgCampaigns503Content;
+use Acme\GitHub\Generated\Model\CampaignsUpdateCampaign503Content;
 use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CampaignsClient implements CampaignsClientInterface
@@ -29,7 +37,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
     }
 
     /**
-     * @return list<CampaignSummary>
+     * @return Envelope<list<CampaignSummary>|BasicError|CampaignsListOrgCampaigns503Content>
      */
     public function campaignsListOrgCampaigns(
         string $org,
@@ -38,8 +46,9 @@ final readonly class CampaignsClient implements CampaignsClientInterface
         ?CampaignsListOrgCampaignsDirection $direction = null,
         ?CampaignState $state = null,
         ?CampaignsListOrgCampaignsSort $sort = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CampaignSummary>|BasicError|CampaignsListOrgCampaigns503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/campaigns')
                 ->path('org', $org)
                 ->query('page', $page)
@@ -47,49 +56,75 @@ final readonly class CampaignsClient implements CampaignsClientInterface
                 ->query('direction', $direction)
                 ->query('state', $state)
                 ->query('sort', $sort),
-            ResponseType::listOf(CampaignSummary::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsListOrgCampaigns503Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): CampaignSummary
+    /**
+     * @return Envelope<CampaignSummary|BasicError|null|CampaignsCreateCampaign503Content>
+     */
+    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CampaignSummary|BasicError|null|CampaignsCreateCampaign503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/campaigns')->path('org', $org)->json($body),
-            ResponseType::object(CampaignSummary::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['429', null], ['503', ResponseType::object(CampaignsCreateCampaign503Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function campaignsGetCampaignSummary(string $org, int $campaignNumber): CampaignSummary
+    /**
+     * @return Envelope<CampaignSummary|BasicError|CampaignsGetCampaignSummary503Content>
+     */
+    public function campaignsGetCampaignSummary(string $org, int $campaignNumber): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CampaignSummary|BasicError|CampaignsGetCampaignSummary503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/campaigns/{campaign_number}')
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber),
-            ResponseType::object(CampaignSummary::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsGetCampaignSummary503Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function campaignsDeleteCampaign(string $org, int $campaignNumber): void
+    /**
+     * @return Envelope<null|BasicError|CampaignsDeleteCampaign503Content>
+     */
+    public function campaignsDeleteCampaign(string $org, int $campaignNumber): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError|CampaignsDeleteCampaign503Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/campaigns/{campaign_number}')
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsDeleteCampaign503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CampaignSummary|BasicError|CampaignsUpdateCampaign503Content>
+     */
     public function campaignsUpdateCampaign(
         string $org,
         int $campaignNumber,
         CampaignsUpdateCampaignRequestContent $body,
-    ): CampaignSummary {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CampaignSummary|BasicError|CampaignsUpdateCampaign503Content> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/campaigns/{campaign_number}')
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber)
                 ->json($body),
-            ResponseType::object(CampaignSummary::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsUpdateCampaign503Content::class)]])),
         );
+
+        return $result;
     }
 }

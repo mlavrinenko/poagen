@@ -11,10 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\SshKeyFingerprint;
 use Acme\DigitalOcean\Generated\Model\SshKeyId;
 use Acme\DigitalOcean\Generated\Model\SshKeys;
+use Acme\DigitalOcean\Generated\Model\SshKeysCreate201Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysGet200Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysList200Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `SSH Keys` endpoints.
@@ -27,29 +33,34 @@ interface SshKeysClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `ssh_key:read`.
+     * @return Envelope<SshKeysList200Content|Error>
      */
-    public function sshKeysList(?int $perPage = null, ?int $page = null): void;
+    public function sshKeysList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:create`.
+     * @return Envelope<SshKeysCreate201Content|Error>
      */
-    public function sshKeysCreate(SshKeys $body): void;
+    public function sshKeysCreate(SshKeys $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:read`.
+     * @return Envelope<SshKeysGet200Content|Error>
      */
-    public function sshKeysGet(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): void;
+    public function sshKeysGet(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:update`.
+     * @return Envelope<SshKeysUpdate200Content|Error>
      */
     public function sshKeysUpdate(
         SshKeyId|SshKeyFingerprint $sshKeyIdentifier,
         SshKeysUpdateRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:delete`.
+     * @return Envelope<null|Error>
      */
-    public function sshKeysDelete(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): void;
+    public function sshKeysDelete(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): Envelope;
 }

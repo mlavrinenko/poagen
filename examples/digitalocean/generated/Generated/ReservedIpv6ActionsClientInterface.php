@@ -11,8 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionAssign;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionUnassign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionsPost201Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Reserved IPv6 Actions` endpoints.
@@ -25,9 +28,10 @@ interface ReservedIpv6ActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<ReservedIpv6ActionsPost201Content|Error>
      */
     public function reservedIpv6ActionsPost(
         string $reservedIpv6,
         ReservedIpv6ActionUnassign|ReservedIpv6ActionAssign $body,
-    ): void;
+    ): Envelope;
 }

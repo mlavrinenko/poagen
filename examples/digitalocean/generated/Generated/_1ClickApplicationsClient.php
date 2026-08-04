@@ -12,9 +12,14 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\OneClicksListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\OneClicksCreate;
+use Acme\DigitalOcean\Generated\Model\OneClicksInstallKubernetes200Content;
+use Acme\DigitalOcean\Generated\Model\OneClicksList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class _1ClickApplicationsClient implements _1ClickApplicationsClientInterface
@@ -25,26 +30,36 @@ final readonly class _1ClickApplicationsClient implements _1ClickApplicationsCli
     ) {
     }
 
-    public function oneClicksList(?OneClicksListType $type = null): void
+    /**
+     * @return Envelope<OneClicksList200Content|Error>
+     */
+    public function oneClicksList(?OneClicksListType $type = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<OneClicksList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/1-clicks')
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OneClicksList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`, `addon:create`.
+     * @return Envelope<OneClicksInstallKubernetes200Content|Error>
      */
-    public function oneClicksInstallKubernetes(OneClicksCreate $body): void
+    public function oneClicksInstallKubernetes(OneClicksCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<OneClicksInstallKubernetes200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/1-clicks/kubernetes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OneClicksInstallKubernetes200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

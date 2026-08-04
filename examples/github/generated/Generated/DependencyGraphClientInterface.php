@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshot201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphDiff;
 use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReport201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphSpdxSbom;
 use Acme\GitHub\Generated\Model\Snapshot;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `dependency-graph` endpoints.
@@ -26,25 +28,33 @@ use Acme\GitHub\Generated\Model\Snapshot;
  */
 interface DependencyGraphClientInterface
 {
+    /**
+     * @return Envelope<DependencyGraphDiff|BasicError>
+     */
     public function dependencyGraphDiffRange(
         string $owner,
         string $repo,
         string $basehead,
         ?string $name = null,
-    ): DependencyGraphDiff;
+    ): Envelope;
 
-    public function dependencyGraphExportSbom(string $owner, string $repo): DependencyGraphSpdxSbom;
+    /**
+     * @return Envelope<DependencyGraphSpdxSbom|BasicError>
+     */
+    public function dependencyGraphExportSbom(string $owner, string $repo): Envelope;
 
-    public function dependencyGraphFetchSbomReport(string $owner, string $repo, string $sbomUuid): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function dependencyGraphFetchSbomReport(string $owner, string $repo, string $sbomUuid): Envelope;
 
-    public function dependencyGraphGenerateSbomReport(
-        string $owner,
-        string $repo,
-    ): DependencyGraphGenerateSbomReport201Content;
+    /**
+     * @return Envelope<DependencyGraphGenerateSbomReport201Content|BasicError>
+     */
+    public function dependencyGraphGenerateSbomReport(string $owner, string $repo): Envelope;
 
-    public function dependencyGraphCreateRepositorySnapshot(
-        string $owner,
-        string $repo,
-        Snapshot $body,
-    ): DependencyGraphCreateRepositorySnapshot201Content;
+    /**
+     * @return Envelope<DependencyGraphCreateRepositorySnapshot201Content>
+     */
+    public function dependencyGraphCreateRepositorySnapshot(string $owner, string $repo, Snapshot $body): Envelope;
 }

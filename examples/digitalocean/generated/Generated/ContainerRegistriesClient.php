@@ -11,12 +11,29 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\DockerCredentials;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\MultiregistryCreate;
+use Acme\DigitalOcean\Generated\Model\RegistriesCreate201Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesGet200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesGetGarbageCollection200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesGetOptions200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesGetSubscription200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesList200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesListGarbageCollections200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesListRepositoriesV2200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesListRepositoryManifests200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesListRepositoryTags200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesRunGarbageCollection201Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesUpdateGarbageCollection200Content;
+use Acme\DigitalOcean\Generated\Model\RegistriesUpdateSubscription200Content;
 use Acme\DigitalOcean\Generated\Model\RegistriesUpdateSubscriptionRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateRegistry;
 use Acme\DigitalOcean\Generated\Model\ValidateRegistry;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ContainerRegistriesClient implements ContainerRegistriesClientInterface
@@ -29,287 +46,363 @@ final readonly class ContainerRegistriesClient implements ContainerRegistriesCli
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesList200Content|Error>
      */
-    public function registriesList(): void
+    public function registriesList(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.
+     * @return Envelope<RegistriesCreate201Content|Error>
      */
-    public function registriesCreate(MultiregistryCreate $body): void
+    public function registriesCreate(MultiregistryCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/registries')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RegistriesCreate201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesGetOptions200Content|Error>
      */
-    public function registriesGetOptions(): void
+    public function registriesGetOptions(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesGetOptions200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/options')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesGetOptions200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesGetSubscription200Content|Error>
      */
-    public function registriesGetSubscription(): void
+    public function registriesGetSubscription(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesGetSubscription200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/subscription')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesGetSubscription200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistriesUpdateSubscription200Content|Error>
      */
-    public function registriesUpdateSubscription(RegistriesUpdateSubscriptionRequestContent $body): void
+    public function registriesUpdateSubscription(RegistriesUpdateSubscriptionRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesUpdateSubscription200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/registries/subscription')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesUpdateSubscription200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.
+     * @return Envelope<null|Error>
      */
-    public function registriesValidateName(ValidateRegistry $body): void
+    public function registriesValidateName(ValidateRegistry $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/registries/validate-name')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesGet200Content|Error>
      */
-    public function registriesGet(string $registryName): void
+    public function registriesGet(string $registryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}')
                 ->path('registry_name', $registryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
-    public function registriesDelete(string $registryName): void
+    public function registriesDelete(string $registryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/registries/{registry_name}')
                 ->path('registry_name', $registryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`, `registry:update`.
+     * @return Envelope<DockerCredentials|Error>
      */
-    public function registriesGetDockerCredentials(string $registryName): void
+    public function registriesGetDockerCredentials(string $registryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DockerCredentials|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/docker-credentials')
                 ->path('registry_name', $registryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DockerCredentials::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesGetGarbageCollection200Content|Error>
      */
-    public function registriesGetGarbageCollection(string $registryName): void
+    public function registriesGetGarbageCollection(string $registryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesGetGarbageCollection200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/garbage-collection')
                 ->path('registry_name', $registryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesGetGarbageCollection200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistriesRunGarbageCollection201Content|Error>
      */
-    public function registriesRunGarbageCollection(string $registryName): void
+    public function registriesRunGarbageCollection(string $registryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<RegistriesRunGarbageCollection201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/registries/{registry_name}/garbage-collection')
                 ->path('registry_name', $registryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RegistriesRunGarbageCollection201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
+     * @return Envelope<RegistriesUpdateGarbageCollection200Content|Error>
      */
     public function registriesUpdateGarbageCollection(
         string $registryName,
         string $garbageCollectionUuid,
         UpdateRegistry $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RegistriesUpdateGarbageCollection200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/registries/{registry_name}/garbage-collection/{garbage_collection_uuid}')
                 ->path('registry_name', $registryName)
                 ->path('garbage_collection_uuid', $garbageCollectionUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesUpdateGarbageCollection200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesListGarbageCollections200Content|Error>
      */
     public function registriesListGarbageCollections(
         string $registryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RegistriesListGarbageCollections200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/garbage-collections')
                 ->path('registry_name', $registryName)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesListGarbageCollections200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
-    public function registriesDeleteRepository(string $registryName, string $repositoryName): void
+    public function registriesDeleteRepository(string $registryName, string $repositoryName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/registries/{registry_name}/repositories/{repository_name}')
                 ->path('registry_name', $registryName)
                 ->path('repository_name', $repositoryName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesListRepositoryManifests200Content|Error>
      */
     public function registriesListRepositoryManifests(
         string $registryName,
         string $repositoryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RegistriesListRepositoryManifests200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/repositories/{repository_name}/digests')
                 ->path('registry_name', $registryName)
                 ->path('repository_name', $repositoryName)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesListRepositoryManifests200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
     public function registriesDeleteRepositoryManifest(
         string $registryName,
         string $repositoryName,
         string $manifestDigest,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/registries/{registry_name}/repositories/{repository_name}/digests/{manifest_digest}')
                 ->path('registry_name', $registryName)
                 ->path('repository_name', $repositoryName)
                 ->path('manifest_digest', $manifestDigest)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesListRepositoryTags200Content|Error>
      */
     public function registriesListRepositoryTags(
         string $registryName,
         string $repositoryName,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RegistriesListRepositoryTags200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/repositories/{repository_name}/tags')
                 ->path('registry_name', $registryName)
                 ->path('repository_name', $repositoryName)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesListRepositoryTags200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:delete`.
+     * @return Envelope<null|Error>
      */
     public function registriesDeleteRepositoryTag(
         string $registryName,
         string $repositoryName,
         string $repositoryTag,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/registries/{registry_name}/repositories/{repository_name}/tags/{repository_tag}')
                 ->path('registry_name', $registryName)
                 ->path('repository_name', $repositoryName)
                 ->path('repository_tag', $repositoryTag)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `registry:read`.
+     * @return Envelope<RegistriesListRepositoriesV2200Content|Error>
      */
     public function registriesListRepositoriesV2(
         string $registryName,
         ?int $perPage = null,
         ?int $page = null,
         ?string $pageToken = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RegistriesListRepositoriesV2200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/registries/{registry_name}/repositoriesV2')
                 ->path('registry_name', $registryName)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('page_token', $pageToken)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RegistriesListRepositoriesV2200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

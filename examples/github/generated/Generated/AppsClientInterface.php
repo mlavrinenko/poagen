@@ -28,6 +28,7 @@ use Acme\GitHub\Generated\Model\AppsResetTokenRequestContent;
 use Acme\GitHub\Generated\Model\AppsScopeTokenRequestContent;
 use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequestContent;
 use Acme\GitHub\Generated\Model\Authorization;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\HookDelivery;
 use Acme\GitHub\Generated\Model\HookDeliveryItem;
 use Acme\GitHub\Generated\Model\Installation;
@@ -37,7 +38,10 @@ use Acme\GitHub\Generated\Model\IntegrationInstallationRequest;
 use Acme\GitHub\Generated\Model\MarketplaceListingPlan;
 use Acme\GitHub\Generated\Model\MarketplacePurchase;
 use Acme\GitHub\Generated\Model\UserMarketplacePurchase;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\WebhookConfig;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `apps` endpoints.
@@ -48,83 +52,140 @@ use Acme\GitHub\Generated\Model\WebhookConfig;
  */
 interface AppsClientInterface
 {
-    public function appsGetAuthenticated(): Integration;
-
-    public function appsCreateFromManifest(string $code): AppsCreateFromManifest201Content;
-
-    public function appsGetWebhookConfigForApp(): WebhookConfig;
-
-    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): WebhookConfig;
+    /**
+     * @return Envelope<Integration>
+     */
+    public function appsGetAuthenticated(): Envelope;
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<AppsCreateFromManifest201Content|BasicError|ValidationErrorSimple>
+     */
+    public function appsCreateFromManifest(string $code): Envelope;
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function appsGetWebhookConfigForApp(): Envelope;
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function appsListWebhookDeliveries(
         ?int $perPage = null,
         ?string $cursor = null,
         ?AppsListWebhookDeliveriesStatus $status = null,
-    ): array;
-
-    public function appsGetWebhookDelivery(int $deliveryId): HookDelivery;
-
-    public function appsRedeliverWebhookDelivery(int $deliveryId): void;
+    ): Envelope;
 
     /**
-     * @return list<IntegrationInstallationRequest>
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
      */
-    public function appsListInstallationRequestsForAuthenticatedApp(?int $perPage = null, ?int $page = null): array;
+    public function appsGetWebhookDelivery(int $deliveryId): Envelope;
 
     /**
-     * @return list<Installation>
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function appsRedeliverWebhookDelivery(int $deliveryId): Envelope;
+
+    /**
+     * @return Envelope<list<IntegrationInstallationRequest>|null|BasicError>
+     */
+    public function appsListInstallationRequestsForAuthenticatedApp(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<Installation>>
      */
     public function appsListInstallations(
         ?int $perPage = null,
         ?int $page = null,
         ?\DateTimeImmutable $since = null,
         ?string $outdated = null,
-    ): array;
+    ): Envelope;
 
-    public function appsGetInstallation(int $installationId): Installation;
+    /**
+     * @return Envelope<Installation|BasicError>
+     */
+    public function appsGetInstallation(int $installationId): Envelope;
 
-    public function appsDeleteInstallation(int $installationId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsDeleteInstallation(int $installationId): Envelope;
 
+    /**
+     * @return Envelope<InstallationToken|BasicError|ValidationError>
+     */
     public function appsCreateInstallationAccessToken(
         int $installationId,
         AppsCreateInstallationAccessTokenRequestContent $body,
-    ): InstallationToken;
-
-    public function appsSuspendInstallation(int $installationId): void;
-
-    public function appsUnsuspendInstallation(int $installationId): void;
-
-    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): void;
-
-    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Authorization;
-
-    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): void;
-
-    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Authorization;
-
-    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Authorization;
-
-    public function appsGetBySlug(string $appSlug): Integration;
-
-    public function appsListReposAccessibleToInstallation(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): AppsListReposAccessibleToInstallation200Content;
-
-    public function appsRevokeInstallationAccessToken(): void;
-
-    public function appsGetSubscriptionPlanForAccount(int $accountId): MarketplacePurchase;
+    ): Envelope;
 
     /**
-     * @return list<MarketplaceListingPlan>
+     * @return Envelope<null|BasicError>
      */
-    public function appsListPlans(?int $perPage = null, ?int $page = null): array;
+    public function appsSuspendInstallation(int $installationId): Envelope;
 
     /**
-     * @return list<MarketplacePurchase>
+     * @return Envelope<null|BasicError>
+     */
+    public function appsUnsuspendInstallation(int $installationId): Envelope;
+
+    /**
+     * @return Envelope<null|ValidationError>
+     */
+    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<Authorization|ValidationError|BasicError>
+     */
+    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<null|ValidationError>
+     */
+    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<Authorization|ValidationError>
+     */
+    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<Authorization|BasicError|ValidationError>
+     */
+    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<Integration|BasicError>
+     */
+    public function appsGetBySlug(string $appSlug): Envelope;
+
+    /**
+     * @return Envelope<AppsListReposAccessibleToInstallation200Content|BasicError|null>
+     */
+    public function appsListReposAccessibleToInstallation(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function appsRevokeInstallationAccessToken(): Envelope;
+
+    /**
+     * @return Envelope<MarketplacePurchase|BasicError>
+     */
+    public function appsGetSubscriptionPlanForAccount(int $accountId): Envelope;
+
+    /**
+     * @return Envelope<list<MarketplaceListingPlan>|BasicError>
+     */
+    public function appsListPlans(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<MarketplacePurchase>|BasicError|ValidationError>
      */
     public function appsListAccountsForPlan(
         int $planId,
@@ -132,17 +193,20 @@ interface AppsClientInterface
         ?AppsListAccountsForPlanDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function appsGetSubscriptionPlanForAccountStubbed(int $accountId): MarketplacePurchase;
+    ): Envelope;
 
     /**
-     * @return list<MarketplaceListingPlan>
+     * @return Envelope<MarketplacePurchase|null|BasicError>
      */
-    public function appsListPlansStubbed(?int $perPage = null, ?int $page = null): array;
+    public function appsGetSubscriptionPlanForAccountStubbed(int $accountId): Envelope;
 
     /**
-     * @return list<MarketplacePurchase>
+     * @return Envelope<list<MarketplaceListingPlan>|BasicError>
+     */
+    public function appsListPlansStubbed(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<MarketplacePurchase>|BasicError>
      */
     public function appsListAccountsForPlanStubbed(
         int $planId,
@@ -150,36 +214,60 @@ interface AppsClientInterface
         ?AppsListAccountsForPlanStubbedDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function appsGetOrgInstallation(string $org): Installation;
+    /**
+     * @return Envelope<Installation>
+     */
+    public function appsGetOrgInstallation(string $org): Envelope;
 
-    public function appsGetRepoInstallation(string $owner, string $repo): Installation;
+    /**
+     * @return Envelope<Installation|BasicError>
+     */
+    public function appsGetRepoInstallation(string $owner, string $repo): Envelope;
 
-    public function appsListInstallationsForAuthenticatedUser(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): AppsListInstallationsForAuthenticatedUser200Content;
+    /**
+     * @return Envelope<AppsListInstallationsForAuthenticatedUser200Content|null|BasicError>
+     */
+    public function appsListInstallationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<AppsListInstallationReposForAuthenticatedUser200Content|BasicError|null>
+     */
     public function appsListInstallationReposForAuthenticatedUser(
         int $installationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationReposForAuthenticatedUser200Content;
-
-    public function appsAddRepoToInstallationForAuthenticatedUser(int $installationId, int $repositoryId): void;
-
-    public function appsRemoveRepoFromInstallationForAuthenticatedUser(int $installationId, int $repositoryId): void;
+    ): Envelope;
 
     /**
-     * @return list<UserMarketplacePurchase>
+     * @return Envelope<null|BasicError>
      */
-    public function appsListSubscriptionsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function appsAddRepoToInstallationForAuthenticatedUser(int $installationId, int $repositoryId): Envelope;
 
     /**
-     * @return list<UserMarketplacePurchase>
+     * @return Envelope<null|BasicError>
      */
-    public function appsListSubscriptionsForAuthenticatedUserStubbed(?int $perPage = null, ?int $page = null): array;
+    public function appsRemoveRepoFromInstallationForAuthenticatedUser(
+        int $installationId,
+        int $repositoryId,
+    ): Envelope;
 
-    public function appsGetUserInstallation(string $username): Installation;
+    /**
+     * @return Envelope<list<UserMarketplacePurchase>|null|BasicError>
+     */
+    public function appsListSubscriptionsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<UserMarketplacePurchase>|null|BasicError>
+     */
+    public function appsListSubscriptionsForAuthenticatedUserStubbed(
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
+
+    /**
+     * @return Envelope<Installation>
+     */
+    public function appsGetUserInstallation(string $username): Envelope;
 }

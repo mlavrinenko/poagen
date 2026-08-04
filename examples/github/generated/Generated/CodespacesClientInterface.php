@@ -11,16 +11,21 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
+use Acme\GitHub\Generated\Model\CodespacesCheckPermissionsForDevcontainer503Content;
 use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUser503Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrg200Content;
@@ -48,6 +53,8 @@ use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequestConte
 use Acme\GitHub\Generated\Model\CodespacesUserPublicKey;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\RepoCodespacesSecret;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `codespaces` endpoints.
@@ -58,214 +65,343 @@ use Acme\GitHub\Generated\Model\RepoCodespacesSecret;
  */
 interface CodespacesClientInterface
 {
-    public function codespacesListInOrganization(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListInOrganization200Content;
+    /**
+     * @return Envelope<CodespacesListInOrganization200Content|null|BasicError>
+     */
+    public function codespacesListInOrganization(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesSetCodespacesAccess(
         string $org,
         CodespacesSetCodespacesAccessRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesSetCodespacesAccessUsers(
         string $org,
         CodespacesSetCodespacesAccessUsersRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesDeleteCodespacesAccessUsers(
         string $org,
         CodespacesDeleteCodespacesAccessUsersRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function codespacesListOrgSecrets(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListOrgSecrets200Content;
+    /**
+     * @return Envelope<CodespacesListOrgSecrets200Content>
+     */
+    public function codespacesListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function codespacesGetOrgPublicKey(string $org): CodespacesPublicKey;
+    /**
+     * @return Envelope<CodespacesPublicKey>
+     */
+    public function codespacesGetOrgPublicKey(string $org): Envelope;
 
-    public function codespacesGetOrgSecret(string $org, string $secretName): CodespacesOrgSecret;
+    /**
+     * @return Envelope<CodespacesOrgSecret>
+     */
+    public function codespacesGetOrgSecret(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null|BasicError|ValidationError>
+     */
     public function codespacesCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         CodespacesCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function codespacesDeleteOrgSecret(string $org, string $secretName): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codespacesDeleteOrgSecret(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<CodespacesListSelectedReposForOrgSecret200Content|BasicError>
+     */
     public function codespacesListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): CodespacesListSelectedReposForOrgSecret200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         CodespacesSetSelectedReposForOrgSecretRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function codespacesAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void;
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function codespacesAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function codespacesRemoveSelectedRepoFromOrgSecret(
         string $org,
         string $secretName,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesGetCodespacesForUserInOrg200Content|null|BasicError>
+     */
     public function codespacesGetCodespacesForUserInOrg(
         string $org,
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesGetCodespacesForUserInOrg200Content;
+    ): Envelope;
 
-    public function codespacesDeleteFromOrganization(string $org, string $username, string $codespaceName): void;
+    /**
+     * @return Envelope<array<string, mixed>|null|BasicError>
+     */
+    public function codespacesDeleteFromOrganization(string $org, string $username, string $codespaceName): Envelope;
 
-    public function codespacesStopInOrganization(string $org, string $username, string $codespaceName): Codespace;
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesStopInOrganization(string $org, string $username, string $codespaceName): Envelope;
 
+    /**
+     * @return Envelope<CodespacesListInRepositoryForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesListInRepositoryForAuthenticatedUser(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInRepositoryForAuthenticatedUser200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateWithRepoForAuthenticatedUser503Content>
+     */
     public function codespacesCreateWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
         CodespacesCreateWithRepoForAuthenticatedUserRequestContent $body,
-    ): Codespace;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesListDevcontainersInRepositoryForAuthenticatedUser(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesRepoMachinesForAuthenticatedUser200Content|null|BasicError>
+     */
     public function codespacesRepoMachinesForAuthenticatedUser(
         string $owner,
         string $repo,
         ?string $location = null,
         ?string $clientIp = null,
         ?string $ref = null,
-    ): CodespacesRepoMachinesForAuthenticatedUser200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesPreFlightWithRepoForAuthenticatedUser200Content|BasicError>
+     */
     public function codespacesPreFlightWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
         ?string $ref = null,
         ?string $clientIp = null,
-    ): CodespacesPreFlightWithRepoForAuthenticatedUser200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesPermissionsCheckForDevcontainer|BasicError|ValidationError|CodespacesCheckPermissionsForDevcontainer503Content>
+     */
     public function codespacesCheckPermissionsForDevcontainer(
         string $owner,
         string $repo,
         string $ref,
         string $devcontainerPath,
-    ): CodespacesPermissionsCheckForDevcontainer;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesListRepoSecrets200Content>
+     */
     public function codespacesListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListRepoSecrets200Content;
+    ): Envelope;
 
-    public function codespacesGetRepoPublicKey(string $owner, string $repo): CodespacesPublicKey;
+    /**
+     * @return Envelope<CodespacesPublicKey>
+     */
+    public function codespacesGetRepoPublicKey(string $owner, string $repo): Envelope;
 
-    public function codespacesGetRepoSecret(string $owner, string $repo, string $secretName): RepoCodespacesSecret;
+    /**
+     * @return Envelope<RepoCodespacesSecret>
+     */
+    public function codespacesGetRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function codespacesCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         CodespacesCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function codespacesDeleteRepoSecret(string $owner, string $repo, string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function codespacesDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateWithPrForAuthenticatedUser503Content>
+     */
     public function codespacesCreateWithPrForAuthenticatedUser(
         string $owner,
         string $repo,
         int $pullNumber,
         CodespacesCreateWithPrForAuthenticatedUserRequestContent $body,
-    ): Codespace;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodespacesListForAuthenticatedUser200Content|null|BasicError>
+     */
     public function codespacesListForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
         ?int $repositoryId = null,
-    ): CodespacesListForAuthenticatedUser200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Codespace|BasicError|CodespacesCreateForAuthenticatedUser503Content>
+     */
     public function codespacesCreateForAuthenticatedUser(
         CodespacesCreateForAuthenticatedUserBranch1|CodespacesCreateForAuthenticatedUserBranch2 $body,
-    ): Codespace;
+    ): Envelope;
 
-    public function codespacesListSecretsForAuthenticatedUser(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): CodespacesListSecretsForAuthenticatedUser200Content;
+    /**
+     * @return Envelope<CodespacesListSecretsForAuthenticatedUser200Content>
+     */
+    public function codespacesListSecretsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
-    public function codespacesGetPublicKeyForAuthenticatedUser(): CodespacesUserPublicKey;
+    /**
+     * @return Envelope<CodespacesUserPublicKey>
+     */
+    public function codespacesGetPublicKeyForAuthenticatedUser(): Envelope;
 
-    public function codespacesGetSecretForAuthenticatedUser(string $secretName): CodespacesSecret;
+    /**
+     * @return Envelope<CodespacesSecret>
+     */
+    public function codespacesGetSecretForAuthenticatedUser(string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null|ValidationError|BasicError>
+     */
     public function codespacesCreateOrUpdateSecretForAuthenticatedUser(
         string $secretName,
         CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function codespacesDeleteSecretForAuthenticatedUser(string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function codespacesDeleteSecretForAuthenticatedUser(string $secretName): Envelope;
 
-    public function codespacesListRepositoriesForSecretForAuthenticatedUser(
-        string $secretName,
-    ): CodespacesListRepositoriesForSecretForAuthenticatedUser200Content;
+    /**
+     * @return Envelope<CodespacesListRepositoriesForSecretForAuthenticatedUser200Content|BasicError>
+     */
+    public function codespacesListRepositoriesForSecretForAuthenticatedUser(string $secretName): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesSetRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
         CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function codespacesAddRepositoryForSecretForAuthenticatedUser(string $secretName, int $repositoryId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codespacesAddRepositoryForSecretForAuthenticatedUser(
+        string $secretName,
+        int $repositoryId,
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codespacesRemoveRepositoryForSecretForAuthenticatedUser(
         string $secretName,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
-    public function codespacesGetForAuthenticatedUser(string $codespaceName): Codespace;
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesGetForAuthenticatedUser(string $codespaceName): Envelope;
 
-    public function codespacesDeleteForAuthenticatedUser(string $codespaceName): void;
+    /**
+     * @return Envelope<array<string, mixed>|null|BasicError>
+     */
+    public function codespacesDeleteForAuthenticatedUser(string $codespaceName): Envelope;
 
+    /**
+     * @return Envelope<Codespace|BasicError>
+     */
     public function codespacesUpdateForAuthenticatedUser(
         string $codespaceName,
         CodespacesUpdateForAuthenticatedUserRequestContent $body,
-    ): Codespace;
+    ): Envelope;
 
-    public function codespacesExportForAuthenticatedUser(string $codespaceName): CodespaceExportDetails;
+    /**
+     * @return Envelope<CodespaceExportDetails|BasicError|ValidationError>
+     */
+    public function codespacesExportForAuthenticatedUser(string $codespaceName): Envelope;
 
-    public function codespacesGetExportDetailsForAuthenticatedUser(
-        string $codespaceName,
-        string $exportId,
-    ): CodespaceExportDetails;
+    /**
+     * @return Envelope<CodespaceExportDetails|BasicError>
+     */
+    public function codespacesGetExportDetailsForAuthenticatedUser(string $codespaceName, string $exportId): Envelope;
 
-    public function codespacesCodespaceMachinesForAuthenticatedUser(
-        string $codespaceName,
-    ): CodespacesCodespaceMachinesForAuthenticatedUser200Content;
+    /**
+     * @return Envelope<CodespacesCodespaceMachinesForAuthenticatedUser200Content|null|BasicError>
+     */
+    public function codespacesCodespaceMachinesForAuthenticatedUser(string $codespaceName): Envelope;
 
+    /**
+     * @return Envelope<CodespaceWithFullRepository|BasicError|ValidationError>
+     */
     public function codespacesPublishForAuthenticatedUser(
         string $codespaceName,
         CodespacesPublishForAuthenticatedUserRequestContent $body,
-    ): CodespaceWithFullRepository;
+    ): Envelope;
 
-    public function codespacesStartForAuthenticatedUser(string $codespaceName): Codespace;
+    /**
+     * @return Envelope<Codespace|null|BasicError>
+     */
+    public function codespacesStartForAuthenticatedUser(string $codespaceName): Envelope;
 
-    public function codespacesStopForAuthenticatedUser(string $codespaceName): Codespace;
+    /**
+     * @return Envelope<Codespace|BasicError>
+     */
+    public function codespacesStopForAuthenticatedUser(string $codespaceName): Envelope;
 }

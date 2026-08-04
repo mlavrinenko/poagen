@@ -11,9 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CredentialsRevokeRequestContent;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CredentialsClient implements CredentialsClientInterface
@@ -23,11 +27,17 @@ final readonly class CredentialsClient implements CredentialsClientInterface
     ) {
     }
 
-    public function credentialsRevoke(CredentialsRevokeRequestContent $body): void
+    /**
+     * @return Envelope<array<string, mixed>|ValidationErrorSimple|BasicError>
+     */
+    public function credentialsRevoke(CredentialsRevokeRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|ValidationErrorSimple|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/credentials/revoke')->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['422', ResponseType::object(ValidationErrorSimple::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class EmojisClient implements EmojisClientInterface
@@ -23,13 +25,16 @@ final readonly class EmojisClient implements EmojisClientInterface
     }
 
     /**
-     * @return array<string, string>
+     * @return Envelope<array<string, string>|null>
      */
-    public function emojisGet(): array
+    public function emojisGet(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, string>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/emojis'),
-            ResponseType::mapOf(ResponseType::string()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::string())], ['304', null]])),
         );
+
+        return $result;
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeams201Content;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequestContent;
 use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsers201Content;
@@ -34,8 +35,12 @@ use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequestCont
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics1DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics28DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetricsDay;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CopilotClient implements CopilotClientInterface
@@ -45,247 +50,364 @@ final readonly class CopilotClient implements CopilotClientInterface
     ) {
     }
 
-    public function copilotCopilotEnterpriseOneDayUsageMetrics(
-        string $enterprise,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|BasicError>
+     */
+    public function copilotCopilotEnterpriseOneDayUsageMetrics(string $enterprise, \DateTimeImmutable $day): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics1DayReport|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/enterprise-1-day')
                 ->path('enterprise', $enterprise)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::object(CopilotUsageMetrics1DayReport::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotCopilotEnterpriseUsageMetrics(string $enterprise): CopilotUsageMetrics28DayReport
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotEnterpriseUsageMetrics(string $enterprise): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CopilotUsageMetrics28DayReport|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/enterprise-28-day/latest')
                 ->path('enterprise', $enterprise),
-            ResponseType::object(CopilotUsageMetrics28DayReport::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotCopilotUsersOneDayUsageMetrics(
-        string $enterprise,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|BasicError>
+     */
+    public function copilotCopilotUsersOneDayUsageMetrics(string $enterprise, \DateTimeImmutable $day): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics1DayReport|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/users-1-day')
                 ->path('enterprise', $enterprise)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::object(CopilotUsageMetrics1DayReport::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotCopilotUsersUsageMetrics(string $enterprise): CopilotUsageMetrics28DayReport
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotUsersUsageMetrics(string $enterprise): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CopilotUsageMetrics28DayReport|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/users-28-day/latest')
                 ->path('enterprise', $enterprise),
-            ResponseType::object(CopilotUsageMetrics28DayReport::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotSetEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotSetEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/copilot/policies/coding_agent')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotAddOrganizationsToEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function copilotRemoveOrganizationsFromEnterpriseCodingAgentPolicy(
         string $enterprise,
         CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotGetCopilotOrganizationDetails(string $org): CopilotOrganizationDetails
+    /**
+     * @return Envelope<CopilotOrganizationDetails|BasicError|null>
+     */
+    public function copilotGetCopilotOrganizationDetails(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CopilotOrganizationDetails|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/billing')->path('org', $org),
-            ResponseType::object(CopilotOrganizationDetails::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
-    public function copilotListCopilotSeats(
-        string $org,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): CopilotListCopilotSeats200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CopilotListCopilotSeats200Content|BasicError>
+     */
+    public function copilotListCopilotSeats(string $org, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<CopilotListCopilotSeats200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/billing/seats')
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(CopilotListCopilotSeats200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotSeats200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CopilotAddCopilotSeatsForTeams201Content|BasicError|null>
+     */
     public function copilotAddCopilotSeatsForTeams(
         string $org,
         CopilotAddCopilotSeatsForTeamsRequestContent $body,
-    ): CopilotAddCopilotSeatsForTeams201Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CopilotAddCopilotSeatsForTeams201Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotAddCopilotSeatsForTeams201Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForTeams201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CopilotCancelCopilotSeatAssignmentForTeams200Content|BasicError|null>
+     */
     public function copilotCancelCopilotSeatAssignmentForTeams(
         string $org,
         CopilotCancelCopilotSeatAssignmentForTeamsRequestContent $body,
-    ): CopilotCancelCopilotSeatAssignmentForTeams200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CopilotCancelCopilotSeatAssignmentForTeams200Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeams200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeams200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CopilotAddCopilotSeatsForUsers201Content|BasicError|null>
+     */
     public function copilotAddCopilotSeatsForUsers(
         string $org,
         CopilotAddCopilotSeatsForUsersRequestContent $body,
-    ): CopilotAddCopilotSeatsForUsers201Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CopilotAddCopilotSeatsForUsers201Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotAddCopilotSeatsForUsers201Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForUsers201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CopilotCancelCopilotSeatAssignmentForUsers200Content|BasicError|null>
+     */
     public function copilotCancelCopilotSeatAssignmentForUsers(
         string $org,
         CopilotCancelCopilotSeatAssignmentForUsersRequestContent $body,
-    ): CopilotCancelCopilotSeatAssignmentForUsers200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CopilotCancelCopilotSeatAssignmentForUsers200Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsers200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsers200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
-    public function copilotGetCopilotCodingAgentPermissionsOrganization(
-        string $org,
-    ): CopilotGetCopilotCodingAgentPermissionsOrganization200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CopilotGetCopilotCodingAgentPermissionsOrganization200Content|BasicError>
+     */
+    public function copilotGetCopilotCodingAgentPermissionsOrganization(string $org): Envelope
+    {
+        /** @var Envelope<CopilotGetCopilotCodingAgentPermissionsOrganization200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/coding-agent/permissions')->path('org', $org),
-            ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function copilotSetCopilotCodingAgentPermissionsOrganization(
         string $org,
         CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content|BasicError>
+     */
     public function copilotListCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/coding-agent/permissions/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function copilotSetCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
         CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotEnableCopilotCodingAgentForRepositoryInOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function copilotEnableCopilotCodingAgentForRepositoryInOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotDisableCopilotCodingAgentForRepositoryInOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function copilotDisableCopilotCodingAgentForRepositoryInOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/copilot/coding-agent/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function copilotCopilotContentExclusionForOrganization(
-        string $org,
-    ): CopilotOrganizationContentExclusionDetails {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CopilotOrganizationContentExclusionDetails|BasicError>
+     */
+    public function copilotCopilotContentExclusionForOrganization(string $org): Envelope
+    {
+        /** @var Envelope<CopilotOrganizationContentExclusionDetails|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/content_exclusion')->path('org', $org),
-            ResponseType::object(CopilotOrganizationContentExclusionDetails::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationContentExclusionDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param array<string, list<mixed>> $body
+     * @return Envelope<CopilotSetCopilotContentExclusionForOrganization200Content|BasicError|ValidationErrorSimple>
      */
-    public function copilotSetCopilotContentExclusionForOrganization(
-        string $org,
-        array $body,
-    ): CopilotSetCopilotContentExclusionForOrganization200Content {
-        return $this->transport->send(
+    public function copilotSetCopilotContentExclusionForOrganization(string $org, array $body): Envelope
+    {
+        /** @var Envelope<CopilotSetCopilotContentExclusionForOrganization200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/content_exclusion')
                 ->path('org', $org)
                 ->jsonRaw($body),
-            ResponseType::object(CopilotSetCopilotContentExclusionForOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSetCopilotContentExclusionForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CopilotUsageMetricsDay>
+     * @return Envelope<list<CopilotUsageMetricsDay>|BasicError>
      */
     public function copilotCopilotMetricsForOrganization(
         string $org,
@@ -293,72 +415,101 @@ final readonly class CopilotClient implements CopilotClientInterface
         ?string $until = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CopilotUsageMetricsDay>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/metrics')
                 ->path('org', $org)
                 ->query('since', $since)
                 ->query('until', $until)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(CopilotUsageMetricsDay::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function copilotCopilotOrganizationOneDayUsageMetrics(
-        string $org,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-1-day')
-                ->path('org', $org)
-                ->query('day', $day->format('Y-m-d')),
-            ResponseType::object(CopilotUsageMetrics1DayReport::class),
-        );
-    }
-
-    public function copilotCopilotOrganizationUsageMetrics(string $org): CopilotUsageMetrics28DayReport
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-28-day/latest')
-                ->path('org', $org),
-            ResponseType::object(CopilotUsageMetrics28DayReport::class),
-        );
-    }
-
-    public function copilotCopilotOrganizationUsersOneDayUsageMetrics(
-        string $org,
-        \DateTimeImmutable $day,
-    ): CopilotUsageMetrics1DayReport {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-1-day')
-                ->path('org', $org)
-                ->query('day', $day->format('Y-m-d')),
-            ResponseType::object(CopilotUsageMetrics1DayReport::class),
-        );
-    }
-
-    public function copilotCopilotOrganizationUsersUsageMetrics(string $org): CopilotUsageMetrics28DayReport
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-28-day/latest')
-                ->path('org', $org),
-            ResponseType::object(CopilotUsageMetrics28DayReport::class),
-        );
-    }
-
-    public function copilotGetCopilotSeatDetailsForUser(string $org, string $username): CopilotSeatDetails
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/members/{username}/copilot')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::object(CopilotSeatDetails::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<CopilotUsageMetricsDay>
+     * @return Envelope<CopilotUsageMetrics1DayReport|null|BasicError>
+     */
+    public function copilotCopilotOrganizationOneDayUsageMetrics(string $org, \DateTimeImmutable $day): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics1DayReport|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-1-day')
+                ->path('org', $org)
+                ->query('day', $day->format('Y-m-d')),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', null], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotOrganizationUsageMetrics(string $org): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics28DayReport|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-28-day/latest')
+                ->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<CopilotUsageMetrics1DayReport|null|BasicError>
+     */
+    public function copilotCopilotOrganizationUsersOneDayUsageMetrics(string $org, \DateTimeImmutable $day): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics1DayReport|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-1-day')
+                ->path('org', $org)
+                ->query('day', $day->format('Y-m-d')),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', null], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<CopilotUsageMetrics28DayReport|BasicError>
+     */
+    public function copilotCopilotOrganizationUsersUsageMetrics(string $org): Envelope
+    {
+        /** @var Envelope<CopilotUsageMetrics28DayReport|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-28-day/latest')
+                ->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<CopilotSeatDetails|BasicError|null>
+     */
+    public function copilotGetCopilotSeatDetailsForUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<CopilotSeatDetails|BasicError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/members/{username}/copilot')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSeatDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<CopilotUsageMetricsDay>|BasicError>
      */
     public function copilotCopilotMetricsForTeam(
         string $org,
@@ -367,8 +518,9 @@ final readonly class CopilotClient implements CopilotClientInterface
         ?string $until = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CopilotUsageMetricsDay>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/team/{team_slug}/copilot/metrics')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
@@ -376,7 +528,9 @@ final readonly class CopilotClient implements CopilotClientInterface
                 ->query('until', $until)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(CopilotUsageMetricsDay::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

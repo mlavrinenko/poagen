@@ -13,8 +13,16 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ByoipPrefixCreate;
 use Acme\DigitalOcean\Generated\Model\ByoipPrefixUpdate;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesCreate202Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesGet200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesList200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesListResources200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesPatch202Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ByoipPrefixesClient implements ByoipPrefixesClientInterface
@@ -27,83 +35,110 @@ final readonly class ByoipPrefixesClient implements ByoipPrefixesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesList200Content|Error>
      */
-    public function byoipPrefixesList(?int $perPage = null, ?int $page = null): void
+    public function byoipPrefixesList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ByoipPrefixesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/byoip_prefixes')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ByoipPrefixesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:create`.
+     * @return Envelope<ByoipPrefixesCreate202Content|Error>
      */
-    public function byoipPrefixesCreate(ByoipPrefixCreate $body): void
+    public function byoipPrefixesCreate(ByoipPrefixCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ByoipPrefixesCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/byoip_prefixes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ByoipPrefixesCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesGet200Content|Error>
      */
-    public function byoipPrefixesGet(string $byoipPrefixUuid): void
+    public function byoipPrefixesGet(string $byoipPrefixUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ByoipPrefixesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/byoip_prefixes/{byoip_prefix_uuid}')
                 ->path('byoip_prefix_uuid', $byoipPrefixUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ByoipPrefixesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:delete`.
+     * @return Envelope<null|Error>
      */
-    public function byoipPrefixesDelete(string $byoipPrefixUuid): void
+    public function byoipPrefixesDelete(string $byoipPrefixUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/byoip_prefixes/{byoip_prefix_uuid}')
                 ->path('byoip_prefix_uuid', $byoipPrefixUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:write`.
+     * @return Envelope<ByoipPrefixesPatch202Content|Error>
      */
-    public function byoipPrefixesPatch(string $byoipPrefixUuid, ByoipPrefixUpdate $body): void
+    public function byoipPrefixesPatch(string $byoipPrefixUuid, ByoipPrefixUpdate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ByoipPrefixesPatch202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/byoip_prefixes/{byoip_prefix_uuid}')
                 ->path('byoip_prefix_uuid', $byoipPrefixUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ByoipPrefixesPatch202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesListResources200Content|Error>
      */
-    public function byoipPrefixesListResources(string $byoipPrefixUuid, ?int $perPage = null, ?int $page = null): void
-    {
-        $this->transport->send(
+    public function byoipPrefixesListResources(
+        string $byoipPrefixUuid,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<ByoipPrefixesListResources200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/byoip_prefixes/{byoip_prefix_uuid}/ips')
                 ->path('byoip_prefix_uuid', $byoipPrefixUuid)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ByoipPrefixesListResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

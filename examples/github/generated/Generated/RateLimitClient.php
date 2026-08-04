@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\RateLimitOverview;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class RateLimitClient implements RateLimitClientInterface
@@ -23,11 +26,17 @@ final readonly class RateLimitClient implements RateLimitClientInterface
     ) {
     }
 
-    public function rateLimitGet(): RateLimitOverview
+    /**
+     * @return Envelope<RateLimitOverview|null|BasicError>
+     */
+    public function rateLimitGet(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RateLimitOverview|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/rate_limit'),
-            ResponseType::object(RateLimitOverview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RateLimitOverview::class)], ['304', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

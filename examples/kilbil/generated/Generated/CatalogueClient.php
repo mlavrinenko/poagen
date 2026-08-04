@@ -12,15 +12,21 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\Goods200Content;
+use Acme\Kilbil\Generated\Model\Goods403Content;
 use Acme\Kilbil\Generated\Model\GoodsList200Content;
+use Acme\Kilbil\Generated\Model\GoodsList403Content;
 use Acme\Kilbil\Generated\Model\GoodsListRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsListXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsListXml403Content;
 use Acme\Kilbil\Generated\Model\GoodsListXmlRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsXml403Content;
 use Acme\Kilbil\Generated\Model\GoodsXmlRequestContentItem;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CatalogueClient implements CatalogueClientInterface
@@ -33,59 +39,75 @@ final readonly class CatalogueClient implements CatalogueClientInterface
 
     /**
      * @param list<GoodsRequestContentItem> $body
+     * @return Envelope<Goods200Content|Goods403Content>
      */
-    public function goods(array $body, ?int $partial = null, ?int $id = null): Goods200Content
+    public function goods(array $body, ?int $partial = null, ?int $id = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Goods200Content|Goods403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/goods')
                 ->query('partial', $partial)
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::object(Goods200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Goods200Content::class)], ['403', ResponseType::object(Goods403Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param list<GoodsListRequestContentItem> $body
+     * @return Envelope<GoodsList200Content|GoodsList403Content>
      */
-    public function goodsList(array $body, ?int $id = null): GoodsList200Content
+    public function goodsList(array $body, ?int $id = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GoodsList200Content|GoodsList403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/goodslist')
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::object(GoodsList200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsList200Content::class)], ['403', ResponseType::object(GoodsList403Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param list<GoodsListXmlRequestContentItem> $body
+     * @return Envelope<GoodsListXml200Content|GoodsListXml403Content>
      */
-    public function goodsListXml(array $body, ?int $id = null): GoodsListXml200Content
+    public function goodsListXml(array $body, ?int $id = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GoodsListXml200Content|GoodsListXml403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/goodslistxml')
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goodslist', 'goodlist'),
-            ResponseType::object(GoodsListXml200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsListXml200Content::class)], ['403', ResponseType::object(GoodsListXml403Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param list<GoodsXmlRequestContentItem> $body
+     * @return Envelope<GoodsXml200Content|GoodsXml403Content>
      */
-    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXml200Content
+    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GoodsXml200Content|GoodsXml403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/goodsxml')
                 ->query('partial', $partial)
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goods', 'good'),
-            ResponseType::object(GoodsXml200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsXml200Content::class)], ['403', ResponseType::object(GoodsXml403Content::class)]])),
         );
+
+        return $result;
     }
 }

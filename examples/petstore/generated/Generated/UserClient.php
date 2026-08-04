@@ -13,7 +13,9 @@ namespace Acme\Petstore\Generated;
 
 use Acme\Petstore\Generated\Model\User;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class UserClient implements UserClientInterface
@@ -23,64 +25,104 @@ final readonly class UserClient implements UserClientInterface
     ) {
     }
 
-    public function createUser(User $body): User
+    /**
+     * @return Envelope<User|null>
+     */
+    public function createUser(User $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<User|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user')->json($body),
-            ResponseType::object(User::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * @param list<User> $body
+     * @return Envelope<User|null>
      */
-    public function createUsersWithListInput(array $body): User
+    public function createUsersWithListInput(array $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<User|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/createWithList')->jsonList($body),
-            ResponseType::object(User::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function loginUser(?string $username = null, ?string $password = null): string
+    /**
+     * @return Envelope<string|null>
+     */
+    public function loginUser(?string $username = null, ?string $password = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<string|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/login')
                 ->query('username', $username)
                 ->query('password', $password),
-            ResponseType::string(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['400', null]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function logoutUser(): void
+    /**
+     * @return Envelope<null>
+     */
+    public function logoutUser(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/logout'),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function getUserByName(string $username): User
+    /**
+     * @return Envelope<User|null>
+     */
+    public function getUserByName(string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<User|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/{username}')->path('username', $username),
-            ResponseType::object(User::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function updateUser(string $username, User $body): void
+    /**
+     * @return Envelope<null>
+     */
+    public function updateUser(string $username, User $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/{username}')->path('username', $username)->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function deleteUser(string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteUser(string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/{username}')->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 }

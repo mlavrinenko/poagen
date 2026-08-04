@@ -11,10 +11,21 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\PartnerAttachmentUpdatable;
 use Acme\DigitalOcean\Generated\Model\PartnerAttachmentWritable;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsDelete202Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGet200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGetBgpAuthKey200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGetServiceKey200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsList200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsListRemoteRoutes200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsPatch202Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnectClientInterface
@@ -27,122 +38,161 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsList200Content|Error>
      */
-    public function partnerAttachmentsList(?int $perPage = null, ?int $page = null): void
+    public function partnerAttachmentsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/partner_network_connect/attachments')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:create`.
+     * @return Envelope<PartnerAttachmentsCreate202Content|Error>
      */
-    public function partnerAttachmentsCreate(PartnerAttachmentWritable $body): void
+    public function partnerAttachmentsCreate(PartnerAttachmentWritable $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/partner_network_connect/attachments')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGet200Content|Error>
      */
-    public function partnerAttachmentsGet(string $paId): void
+    public function partnerAttachmentsGet(string $paId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsDelete202Content|Error>
      */
-    public function partnerAttachmentsDelete(string $paId): void
+    public function partnerAttachmentsDelete(string $paId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsDelete202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/partner_network_connect/attachments/{pa_id}')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsDelete202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsPatch202Content|Error>
      */
-    public function partnerAttachmentsPatch(string $paId, PartnerAttachmentUpdatable $body): void
+    public function partnerAttachmentsPatch(string $paId, PartnerAttachmentUpdatable $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsPatch202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/partner_network_connect/attachments/{pa_id}')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsPatch202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGetBgpAuthKey200Content|Error>
      */
-    public function partnerAttachmentsGetBgpAuthKey(string $paId): void
+    public function partnerAttachmentsGetBgpAuthKey(string $paId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsGetBgpAuthKey200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}/bgp_auth_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetBgpAuthKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsListRemoteRoutes200Content|Error>
      */
-    public function partnerAttachmentsListRemoteRoutes(string $paId, ?int $perPage = null, ?int $page = null): void
-    {
-        $this->transport->send(
+    public function partnerAttachmentsListRemoteRoutes(
+        string $paId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<PartnerAttachmentsListRemoteRoutes200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}/remote_routes')
                 ->path('pa_id', $paId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsListRemoteRoutes200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGetServiceKey200Content|Error>
      */
-    public function partnerAttachmentsGetServiceKey(string $paId): void
+    public function partnerAttachmentsGetServiceKey(string $paId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<PartnerAttachmentsGetServiceKey200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}/service_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetServiceKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:write`.
+     * @return Envelope<array<string, mixed>|Error>
      */
-    public function partnerAttachmentsCreateServiceKey(string $paId): void
+    public function partnerAttachmentsCreateServiceKey(string $paId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/partner_network_connect/attachments/{pa_id}/service_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

@@ -13,7 +13,9 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\MarkdownRenderRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class MarkdownClient implements MarkdownClientInterface
@@ -23,19 +25,31 @@ final readonly class MarkdownClient implements MarkdownClientInterface
     ) {
     }
 
-    public function markdownRender(MarkdownRenderRequestContent $body): string
+    /**
+     * @return Envelope<string|null>
+     */
+    public function markdownRender(MarkdownRenderRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<string|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/markdown')->json($body),
-            ResponseType::string(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', null]])),
         );
+
+        return $result;
     }
 
-    public function markdownRenderRaw(string $body): string
+    /**
+     * @return Envelope<string|null>
+     */
+    public function markdownRenderRaw(string $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<string|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/markdown/raw')->text($body, 'text/plain'),
-            ResponseType::string(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', null]])),
         );
+
+        return $result;
     }
 }

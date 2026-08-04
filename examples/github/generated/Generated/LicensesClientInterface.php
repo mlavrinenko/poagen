@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\License;
 use Acme\GitHub\Generated\Model\LicenseContent;
 use Acme\GitHub\Generated\Model\LicenseSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `licenses` endpoints.
@@ -26,11 +28,21 @@ use Acme\GitHub\Generated\Model\LicenseSimple;
 interface LicensesClientInterface
 {
     /**
-     * @return list<LicenseSimple>
+     * @return Envelope<list<LicenseSimple>|null>
      */
-    public function licensesGetAllCommonlyUsed(?bool $featured = null, ?int $perPage = null, ?int $page = null): array;
+    public function licensesGetAllCommonlyUsed(
+        ?bool $featured = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
-    public function licensesGet(string $license): License;
+    /**
+     * @return Envelope<License|BasicError|null>
+     */
+    public function licensesGet(string $license): Envelope;
 
-    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): LicenseContent;
+    /**
+     * @return Envelope<LicenseContent|BasicError>
+     */
+    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): Envelope;
 }

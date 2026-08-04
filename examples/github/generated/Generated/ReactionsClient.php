@@ -16,14 +16,18 @@ use Acme\GitHub\Generated\Enum\ReactionsListForIssueCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForIssueContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForPullRequestReviewCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForReleaseContent;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Reaction;
 use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ReactionsClient implements ReactionsClientInterface
@@ -34,7 +38,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
     }
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForCommitComment(
         string $owner,
@@ -43,8 +47,9 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         ?ReactionsListForCommitCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Reaction>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -52,44 +57,58 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForCommitCommentRequestContent $body,
-    ): Reaction {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Reaction|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function reactionsDeleteForCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         int $reactionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/comments/{comment_id}/reactions/{reaction_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForIssueComment(
         string $owner,
@@ -98,8 +117,9 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         ?ReactionsListForIssueCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Reaction>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/issues/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -107,40 +127,58 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForIssueComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForIssueCommentRequestContent $body,
-    ): Reaction {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Reaction|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/issues/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reactionsDeleteForIssueComment(string $owner, string $repo, int $commentId, int $reactionId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForIssueComment(
+        string $owner,
+        string $repo,
+        int $commentId,
+        int $reactionId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/issues/comments/{comment_id}/reactions/{reaction_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForIssue(
         string $owner,
@@ -149,8 +187,9 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         ?ReactionsListForIssueContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Reaction>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/issues/{issue_number}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -158,40 +197,54 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForIssue(
         string $owner,
         string $repo,
         int $issueNumber,
         ReactionsCreateForIssueRequestContent $body,
-    ): Reaction {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Reaction|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/issues/{issue_number}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::object(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reactionsDeleteForIssue(string $owner, string $repo, int $issueNumber, int $reactionId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForIssue(string $owner, string $repo, int $issueNumber, int $reactionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/issues/{issue_number}/reactions/{reaction_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->path('reaction_id', $reactionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForPullRequestReviewComment(
         string $owner,
@@ -200,8 +253,9 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         ?ReactionsListForPullRequestReviewCommentContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Reaction>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -209,44 +263,58 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForPullRequestReviewComment(
         string $owner,
         string $repo,
         int $commentId,
         ReactionsCreateForPullRequestReviewCommentRequestContent $body,
-    ): Reaction {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Reaction|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function reactionsDeleteForPullRequestComment(
         string $owner,
         string $repo,
         int $commentId,
         int $reactionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Reaction>
+     * @return Envelope<list<Reaction>|BasicError>
      */
     public function reactionsListForRelease(
         string $owner,
@@ -255,8 +323,9 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         ?ReactionsListForReleaseContent $content = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Reaction>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/{release_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -264,35 +333,49 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Reaction|ValidationError>
+     */
     public function reactionsCreateForRelease(
         string $owner,
         string $repo,
         int $releaseId,
         ReactionsCreateForReleaseRequestContent $body,
-    ): Reaction {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Reaction|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases/{release_id}/reactions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->json($body),
-            ResponseType::object(Reaction::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reactionsDeleteForRelease(string $owner, string $repo, int $releaseId, int $reactionId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reactionsDeleteForRelease(string $owner, string $repo, int $releaseId, int $reactionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/releases/{release_id}/reactions/{reaction_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 }

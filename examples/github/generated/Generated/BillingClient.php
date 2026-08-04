@@ -12,10 +12,31 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\BillingGetAllBudgetsOrgScope;
+use Acme\GitHub\Generated\Model\BasicError;
+use Acme\GitHub\Generated\Model\BillingDeleteBudgetOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetBudgetOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingPremiumRequestUsageReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingPremiumRequestUsageReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageSummaryReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageSummaryReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingPremiumRequestUsageReportOrg;
+use Acme\GitHub\Generated\Model\BillingPremiumRequestUsageReportUser;
 use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrg200Content;
 use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequestContent;
+use Acme\GitHub\Generated\Model\BillingUsageReport;
+use Acme\GitHub\Generated\Model\BillingUsageReportUser;
+use Acme\GitHub\Generated\Model\BillingUsageSummaryReportOrg;
+use Acme\GitHub\Generated\Model\BillingUsageSummaryReportUser;
+use Acme\GitHub\Generated\Model\DeleteBudget;
+use Acme\GitHub\Generated\Model\GetAllBudgets;
+use Acme\GitHub\Generated\Model\GetBudget;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class BillingClient implements BillingClientInterface
@@ -25,56 +46,83 @@ final readonly class BillingClient implements BillingClientInterface
     ) {
     }
 
+    /**
+     * @return Envelope<GetAllBudgets|BasicError>
+     */
     public function billingGetAllBudgetsOrg(
         string $org,
         ?int $page = null,
         ?int $perPage = null,
         ?BillingGetAllBudgetsOrgScope $scope = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<GetAllBudgets|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/settings/billing/budgets')
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('scope', $scope),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetAllBudgets::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function billingGetBudgetOrg(string $org, string $budgetId): void
+    /**
+     * @return Envelope<GetBudget|BasicError|BillingGetBudgetOrg503Content>
+     */
+    public function billingGetBudgetOrg(string $org, string $budgetId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<GetBudget|BasicError|BillingGetBudgetOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetBudgetOrg503Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function billingDeleteBudgetOrg(string $org, string $budgetId): void
+    /**
+     * @return Envelope<DeleteBudget|BasicError|BillingDeleteBudgetOrg503Content>
+     */
+    public function billingDeleteBudgetOrg(string $org, string $budgetId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DeleteBudget|BasicError|BillingDeleteBudgetOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingDeleteBudgetOrg503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingUpdateBudgetOrg200Content|BasicError|ValidationError>
+     */
     public function billingUpdateBudgetOrg(
         string $org,
         string $budgetId,
         BillingUpdateBudgetOrgRequestContent $body,
-    ): BillingUpdateBudgetOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingUpdateBudgetOrg200Content|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId)
                 ->json($body),
-            ResponseType::object(BillingUpdateBudgetOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUpdateBudgetOrg200Content::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingPremiumRequestUsageReportOrg|BasicError|BillingGetGithubBillingPremiumRequestUsageReportOrg503Content>
+     */
     public function billingGetGithubBillingPremiumRequestUsageReportOrg(
         string $org,
         ?int $year = null,
@@ -83,8 +131,9 @@ final readonly class BillingClient implements BillingClientInterface
         ?string $user = null,
         ?string $model = null,
         ?string $product = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingPremiumRequestUsageReportOrg|BasicError|BillingGetGithubBillingPremiumRequestUsageReportOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/settings/billing/premium_request/usage')
                 ->path('org', $org)
                 ->query('year', $year)
@@ -93,26 +142,37 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('user', $user)
                 ->query('model', $model)
                 ->query('product', $product),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportOrg503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingUsageReport|BasicError|BillingGetGithubBillingUsageReportOrg503Content>
+     */
     public function billingGetGithubBillingUsageReportOrg(
         string $org,
         ?int $year = null,
         ?int $month = null,
         ?int $day = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingUsageReport|BasicError|BillingGetGithubBillingUsageReportOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/settings/billing/usage')
                 ->path('org', $org)
                 ->query('year', $year)
                 ->query('month', $month)
                 ->query('day', $day),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReport::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportOrg503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingUsageSummaryReportOrg|BasicError|BillingGetGithubBillingUsageSummaryReportOrg503Content>
+     */
     public function billingGetGithubBillingUsageSummaryReportOrg(
         string $org,
         ?int $year = null,
@@ -121,8 +181,9 @@ final readonly class BillingClient implements BillingClientInterface
         ?string $repository = null,
         ?string $product = null,
         ?string $sku = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingUsageSummaryReportOrg|BasicError|BillingGetGithubBillingUsageSummaryReportOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/settings/billing/usage/summary')
                 ->path('org', $org)
                 ->query('year', $year)
@@ -131,10 +192,15 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('repository', $repository)
                 ->query('product', $product)
                 ->query('sku', $sku),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportOrg503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingPremiumRequestUsageReportUser|BasicError|BillingGetGithubBillingPremiumRequestUsageReportUser503Content>
+     */
     public function billingGetGithubBillingPremiumRequestUsageReportUser(
         string $username,
         ?int $year = null,
@@ -142,8 +208,9 @@ final readonly class BillingClient implements BillingClientInterface
         ?int $day = null,
         ?string $model = null,
         ?string $product = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingPremiumRequestUsageReportUser|BasicError|BillingGetGithubBillingPremiumRequestUsageReportUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/settings/billing/premium_request/usage')
                 ->path('username', $username)
                 ->query('year', $year)
@@ -151,26 +218,37 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('day', $day)
                 ->query('model', $model)
                 ->query('product', $product),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportUser503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingUsageReportUser|BasicError|BillingGetGithubBillingUsageReportUser503Content>
+     */
     public function billingGetGithubBillingUsageReportUser(
         string $username,
         ?int $year = null,
         ?int $month = null,
         ?int $day = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingUsageReportUser|BasicError|BillingGetGithubBillingUsageReportUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/settings/billing/usage')
                 ->path('username', $username)
                 ->query('year', $year)
                 ->query('month', $month)
                 ->query('day', $day),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportUser503Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BillingUsageSummaryReportUser|BasicError|BillingGetGithubBillingUsageSummaryReportUser503Content>
+     */
     public function billingGetGithubBillingUsageSummaryReportUser(
         string $username,
         ?int $year = null,
@@ -179,8 +257,9 @@ final readonly class BillingClient implements BillingClientInterface
         ?string $repository = null,
         ?string $product = null,
         ?string $sku = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingUsageSummaryReportUser|BasicError|BillingGetGithubBillingUsageSummaryReportUser503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/settings/billing/usage/summary')
                 ->path('username', $username)
                 ->query('year', $year)
@@ -189,7 +268,9 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('repository', $repository)
                 ->query('product', $product)
                 ->query('sku', $sku),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportUser503Content::class)]])),
         );
+
+        return $result;
     }
 }

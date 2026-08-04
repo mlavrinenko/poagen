@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated;
 
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequest;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequestContent;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
 
 final readonly class ApiClient implements ApiClientInterface
@@ -30,93 +32,141 @@ final readonly class ApiClient implements ApiClientInterface
     ) {
     }
 
-    public function postInlineBody(PostInlineBodyRequest $body): void
+    /**
+     * @return Envelope<null>
+     */
+    public function postInlineBody(PostInlineBodyRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/inline-body')->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
-    }
 
-    public function getSshKeyById(SshKeyId $sshKeyId): void
-    {
-        $this->transport->send(
-            Endpoint::get('/keys/{ssh_key_id}')->path('ssh_key_id', $sshKeyId->toScalar()),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Order>
+     * @return Envelope<null>
      */
-    public function listOrders(?int $limit = null, ?string $apiKey = null): array
+    public function getSshKeyById(SshKeyId $sshKeyId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/keys/{ssh_key_id}')->path('ssh_key_id', $sshKeyId->toScalar()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Order>>
+     */
+    public function listOrders(?int $limit = null, ?string $apiKey = null): Envelope
+    {
+        /** @var Envelope<list<Order>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/order')
                 ->query('limit', $limit)
                 ->header('api_key', $apiKey)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::listOf(Order::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)]])),
         );
-    }
 
-    public function placeOrder(Order $body): Order
-    {
-        return $this->transport->send(
-            Endpoint::post('/order')
-                ->header('Authorization', 'Bearer ' . $this->bearerToken)
-                ->json($body),
-            ResponseType::object(Order::class),
-        );
-    }
-
-    public function getPetById(int $petId): Pet
-    {
-        return $this->transport->send(
-            Endpoint::get('/pet/{petId}')->path('petId', $petId),
-            ResponseType::object(Pet::class),
-        );
-    }
-
-    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void
-    {
-        $this->transport->send(
-            Endpoint::post('/proxy')
-                ->header('Content-Type', $contentType)
-                ->header('X-Trace-ID', $xTraceId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Order>
+     * @return Envelope<Order>
      */
-    public function listStoreItems(int $storeId): array
+    public function placeOrder(Order $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Order> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/order')
+                ->header('Authorization', 'Bearer ' . $this->bearerToken)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<Pet>
+     */
+    public function getPetById(int $petId): Envelope
+    {
+        /** @var Envelope<Pet> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/pet/{petId}')->path('petId', $petId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/proxy')
+                ->header('Content-Type', $contentType)
+                ->header('X-Trace-ID', $xTraceId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Order>|null>
+     */
+    public function listStoreItems(int $storeId): Envelope
+    {
+        /** @var Envelope<list<Order>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/store/{storeId}/items')
                 ->path('storeId', $storeId)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::listOf(Order::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)], ['404', null]])),
         );
+
+        return $result;
     }
 
-    public function clearStore(int $storeId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function clearStore(int $storeId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/store/{storeId}/items')
                 ->path('storeId', $storeId)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function issueToken(string $grantType, string $clientId, ?string $scope = null): void
+    /**
+     * @return Envelope<null>
+     */
+    public function issueToken(string $grantType, string $clientId, ?string $scope = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/token')
                 ->form(['grantType' => $grantType, 'clientId' => $clientId, 'scope' => $scope]),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 }

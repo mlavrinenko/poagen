@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\UsersGetContextForUserSubjectType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Email;
+use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\GpgKey;
 use Acme\GitHub\Generated\Model\Hovercard;
 use Acme\GitHub\Generated\Model\Key;
@@ -34,9 +36,12 @@ use Acme\GitHub\Generated\Model\UsersListAttestationsBulk200Content;
 use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequestContent;
 use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class UsersClient implements UsersClientInterface
@@ -46,371 +51,545 @@ final readonly class UsersClient implements UsersClientInterface
     ) {
     }
 
-    public function usersGetAuthenticated(): PrivateUser|PublicUser
+    /**
+     * @return Envelope<PrivateUser|PublicUser|null|BasicError>
+     */
+    public function usersGetAuthenticated(): Envelope
     {
-        /** @var PrivateUser|PublicUser $result */
+        /** @var Envelope<PrivateUser|PublicUser|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user'),
-            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user/get/responses/200/content/application~1json/schema')], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
     }
 
-    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): PrivateUser
-    {
-        return $this->transport->send(
-            Endpoint::patch('/user')->json($body),
-            ResponseType::object(PrivateUser::class),
-        );
-    }
-
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<PrivateUser|null|BasicError|ValidationError>
      */
-    public function usersListBlockedByAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): Envelope
     {
-        return $this->transport->send(
-            Endpoint::get('/user/blocks')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+        /** @var Envelope<PrivateUser|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/user')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateUser::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
-    }
 
-    public function usersCheckBlocked(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::get('/user/blocks/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function usersBlock(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::put('/user/blocks/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function usersUnblock(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/blocks/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Email>
+     * @return Envelope<list<SimpleUser>|null|BasicError>
+     */
+    public function usersListBlockedByAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/blocks')->query('per_page', $perPage)->query('page', $page),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersCheckBlocked(string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/blocks/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersBlock(string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/user/blocks/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersUnblock(string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/blocks/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Email>|null|BasicError|ValidationError>
      */
     public function usersSetPrimaryEmailVisibilityForAuthenticatedUser(
         UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Email>|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/user/email/visibility')->json($body),
-            ResponseType::listOf(Email::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Email>
+     * @return Envelope<list<Email>|null|BasicError>
      */
-    public function usersListEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersListEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Email>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/emails')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(Email::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|null|BasicError>
      */
-    public function usersListFollowersForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersListFollowersForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/followers')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|null|BasicError>
      */
-    public function usersListFollowedByAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersListFollowedByAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/following')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function usersCheckPersonIsFollowedByAuthenticated(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::get('/user/following/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function usersFollow(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::put('/user/following/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function usersUnfollow(string $username): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/following/{username}')->path('username', $username),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<GpgKey>
+     * @return Envelope<null|BasicError>
      */
-    public function usersListGpgKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersCheckPersonIsFollowedByAuthenticated(string $username): Envelope
     {
-        return $this->transport->send(
-            Endpoint::get('/user/gpg_keys')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(GpgKey::class),
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/following/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersFollow(string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/user/following/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersUnfollow(string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/following/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<GpgKey>|null|BasicError>
+     */
+    public function usersListGpgKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<GpgKey>|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/gpg_keys')->query('per_page', $perPage)->query('page', $page),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<GpgKey|ValidationError|null|BasicError>
+     */
     public function usersCreateGpgKeyForAuthenticatedUser(
         UsersCreateGpgKeyForAuthenticatedUserRequestContent $body,
-    ): GpgKey {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<GpgKey|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/gpg_keys')->json($body),
-            ResponseType::object(GpgKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GpgKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function usersGetGpgKeyForAuthenticatedUser(int $gpgKeyId): GpgKey
-    {
-        return $this->transport->send(
-            Endpoint::get('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
-            ResponseType::object(GpgKey::class),
-        );
-    }
-
-    public function usersDeleteGpgKeyForAuthenticatedUser(int $gpgKeyId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Key>
+     * @return Envelope<GpgKey|BasicError|null>
      */
-    public function usersListPublicSshKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersGetGpgKeyForAuthenticatedUser(int $gpgKeyId): Envelope
     {
-        return $this->transport->send(
-            Endpoint::get('/user/keys')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(Key::class),
+        /** @var Envelope<GpgKey|BasicError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GpgKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersDeleteGpgKeyForAuthenticatedUser(int $gpgKeyId): Envelope
+    {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Key>|null|BasicError>
+     */
+    public function usersListPublicSshKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<Key>|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/keys')->query('per_page', $perPage)->query('page', $page),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Key::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<Key|ValidationError|null|BasicError>
+     */
     public function usersCreatePublicSshKeyForAuthenticatedUser(
         UsersCreatePublicSshKeyForAuthenticatedUserRequestContent $body,
-    ): Key {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Key|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/keys')->json($body),
-            ResponseType::object(Key::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Key::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function usersGetPublicSshKeyForAuthenticatedUser(int $keyId): Key
-    {
-        return $this->transport->send(
-            Endpoint::get('/user/keys/{key_id}')->path('key_id', $keyId),
-            ResponseType::object(Key::class),
-        );
-    }
-
-    public function usersDeletePublicSshKeyForAuthenticatedUser(int $keyId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/keys/{key_id}')->path('key_id', $keyId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Email>
+     * @return Envelope<Key|BasicError|null>
      */
-    public function usersListPublicEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersGetPublicSshKeyForAuthenticatedUser(int $keyId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Key|BasicError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/keys/{key_id}')->path('key_id', $keyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Key::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeletePublicSshKeyForAuthenticatedUser(int $keyId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/keys/{key_id}')->path('key_id', $keyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Email>|null|BasicError>
+     */
+    public function usersListPublicEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<Email>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/public_emails')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Email::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<list<SocialAccount>|null|BasicError>
      */
-    public function usersListSocialAccountsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersListSocialAccountsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SocialAccount>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/social_accounts')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SocialAccount::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<list<SocialAccount>|ValidationError|null|BasicError>
      */
     public function usersAddSocialAccountForAuthenticatedUser(
         UsersAddSocialAccountForAuthenticatedUserRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SocialAccount>|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/social_accounts')->json($body),
-            ResponseType::listOf(SocialAccount::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::listOf(SocialAccount::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function usersDeleteSocialAccountForAuthenticatedUser(
-        UsersDeleteSocialAccountForAuthenticatedUserRequestContent $body,
-    ): void {
-        $this->transport->send(
-            Endpoint::delete('/user/social_accounts')->json($body),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<SshSigningKey>
+     * @return Envelope<null|ValidationError|BasicError>
      */
-    public function usersListSshSigningKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function usersDeleteSocialAccountForAuthenticatedUser(
+        UsersDeleteSocialAccountForAuthenticatedUserRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/social_accounts')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SshSigningKey>|null|BasicError>
+     */
+    public function usersListSshSigningKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SshSigningKey>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/ssh_signing_keys')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SshSigningKey::class),
-        );
-    }
-
-    public function usersCreateSshSigningKeyForAuthenticatedUser(
-        UsersCreateSshSigningKeyForAuthenticatedUserRequestContent $body,
-    ): SshSigningKey {
-        return $this->transport->send(
-            Endpoint::post('/user/ssh_signing_keys')->json($body),
-            ResponseType::object(SshSigningKey::class),
-        );
-    }
-
-    public function usersGetSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): SshSigningKey
-    {
-        return $this->transport->send(
-            Endpoint::get('/user/ssh_signing_keys/{ssh_signing_key_id}')
-                ->path('ssh_signing_key_id', $sshSigningKeyId),
-            ResponseType::object(SshSigningKey::class),
-        );
-    }
-
-    public function usersDeleteSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/ssh_signing_keys/{ssh_signing_key_id}')
-                ->path('ssh_signing_key_id', $sshSigningKeyId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function usersGetById(int $accountId): PrivateUser|PublicUser
-    {
-        /** @var PrivateUser|PublicUser $result */
-        $result = $this->transport->send(
-            Endpoint::get('/user/{account_id}')->path('account_id', $accountId),
-            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user~1{account_id}/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<SshSigningKey|ValidationError|null|BasicError>
      */
-    public function usersList(?int $since = null, ?int $perPage = null): array
-    {
-        return $this->transport->send(
-            Endpoint::get('/users')->query('since', $since)->query('per_page', $perPage),
-            ResponseType::listOf(SimpleUser::class),
-        );
-    }
-
-    public function usersGetByUsername(string $username): PrivateUser|PublicUser
-    {
-        /** @var PrivateUser|PublicUser $result */
+    public function usersCreateSshSigningKeyForAuthenticatedUser(
+        UsersCreateSshSigningKeyForAuthenticatedUserRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<SshSigningKey|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
-            Endpoint::get('/users/{username}')->path('username', $username),
-            ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1users~1{username}/get/responses/200/content/application~1json/schema'),
+            Endpoint::post('/user/ssh_signing_keys')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SshSigningKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
     }
 
+    /**
+     * @return Envelope<SshSigningKey|BasicError|null>
+     */
+    public function usersGetSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): Envelope
+    {
+        /** @var Envelope<SshSigningKey|BasicError|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/ssh_signing_keys/{ssh_signing_key_id}')
+                ->path('ssh_signing_key_id', $sshSigningKeyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshSigningKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/ssh_signing_keys/{ssh_signing_key_id}')
+                ->path('ssh_signing_key_id', $sshSigningKeyId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<PrivateUser|PublicUser|BasicError>
+     */
+    public function usersGetById(int $accountId): Envelope
+    {
+        /** @var Envelope<PrivateUser|PublicUser|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/user/{account_id}')->path('account_id', $accountId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user~1{account_id}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleUser>|null>
+     */
+    public function usersList(?int $since = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<list<SimpleUser>|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users')->query('since', $since)->query('per_page', $perPage),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<PrivateUser|PublicUser|BasicError>
+     */
+    public function usersGetByUsername(string $username): Envelope
+    {
+        /** @var Envelope<PrivateUser|PublicUser|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users/{username}')->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1users~1{username}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<UsersListAttestationsBulk200Content>
+     */
     public function usersListAttestationsBulk(
         string $username,
         UsersListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): UsersListAttestationsBulk200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<UsersListAttestationsBulk200Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/attestations/bulk-list')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after)
                 ->json($body),
-            ResponseType::object(UsersListAttestationsBulk200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestationsBulk200Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function usersDeleteAttestationsBulk(
         string $username,
         UsersDeleteAttestationsBulkBranch1|UsersDeleteAttestationsBulkBranch2 $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/attestations/delete-request')
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function usersDeleteAttestationsBySubjectDigest(string $username, string $subjectDigest): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteAttestationsBySubjectDigest(string $username, string $subjectDigest): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/users/{username}/attestations/digest/{subject_digest}')
                 ->path('username', $username)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function usersDeleteAttestationsById(string $username, int $attestationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteAttestationsById(string $username, int $attestationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/users/{username}/attestations/{attestation_id}')
                 ->path('username', $username)
                 ->path('attestation_id', $attestationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<UsersListAttestations200Content|EmptyObject|null|BasicError>
+     */
     public function usersListAttestations(
         string $username,
         string $subjectDigest,
@@ -418,8 +597,9 @@ final readonly class UsersClient implements UsersClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): UsersListAttestations200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<UsersListAttestations200Content|EmptyObject|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/attestations/{subject_digest}')
                 ->path('username', $username)
                 ->path('subject_digest', $subjectDigest)
@@ -427,115 +607,153 @@ final readonly class UsersClient implements UsersClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::object(UsersListAttestations200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestations200Content::class)], ['201', ResponseType::object(EmptyObject::class)], ['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function usersListFollowersForUser(string $username, ?int $perPage = null, ?int $page = null): array
+    public function usersListFollowersForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/followers')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function usersListFollowingForUser(string $username, ?int $perPage = null, ?int $page = null): array
+    public function usersListFollowingForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/following')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
-    }
 
-    public function usersCheckFollowingForUser(string $username, string $targetUser): void
-    {
-        $this->transport->send(
-            Endpoint::get('/users/{username}/following/{target_user}')
-                ->path('username', $username)
-                ->path('target_user', $targetUser),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<GpgKey>
+     * @return Envelope<null>
      */
-    public function usersListGpgKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array
+    public function usersCheckFollowingForUser(string $username, string $targetUser): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users/{username}/following/{target_user}')
+                ->path('username', $username)
+                ->path('target_user', $targetUser),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<GpgKey>>
+     */
+    public function usersListGpgKeysForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<GpgKey>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/gpg_keys')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(GpgKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Hovercard|BasicError|ValidationError>
+     */
     public function usersGetContextForUser(
         string $username,
         ?UsersGetContextForUserSubjectType $subjectType = null,
         ?string $subjectId = null,
-    ): Hovercard {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Hovercard|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/hovercard')
                 ->path('username', $username)
                 ->query('subject_type', $subjectType)
                 ->query('subject_id', $subjectId),
-            ResponseType::object(Hovercard::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hovercard::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<KeySimple>
+     * @return Envelope<list<KeySimple>>
      */
-    public function usersListPublicKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array
+    public function usersListPublicKeysForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<KeySimple>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/keys')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(KeySimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(KeySimple::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<list<SocialAccount>>
      */
-    public function usersListSocialAccountsForUser(string $username, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function usersListSocialAccountsForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<SocialAccount>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/social_accounts')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SocialAccount::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SshSigningKey>
+     * @return Envelope<list<SshSigningKey>>
      */
-    public function usersListSshSigningKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function usersListSshSigningKeysForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<SshSigningKey>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/ssh_signing_keys')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SshSigningKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)]])),
         );
+
+        return $result;
     }
 }

@@ -11,11 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkAddRequestContent;
 use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMembershipsClientInterface
@@ -26,97 +29,124 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsList(
         string $enterprise,
         string $enterpriseTeam,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams/{enterprise-team}/memberships')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamMembershipsBulkAddRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/memberships/add')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamMembershipsBulkRemoveRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/memberships/remove')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SimpleUser>
+     */
     public function enterpriseTeamMembershipsGet(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): SimpleUser {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SimpleUser> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams/{enterprise-team}/memberships/{username}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::object(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SimpleUser>
+     */
     public function enterpriseTeamMembershipsAdd(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): SimpleUser {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SimpleUser> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/teams/{enterprise-team}/memberships/{username}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::object(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SimpleUser::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function enterpriseTeamMembershipsRemove(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/teams/{enterprise-team}/memberships/{username}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 }

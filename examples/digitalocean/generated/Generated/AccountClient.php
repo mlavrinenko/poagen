@@ -11,8 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AccountGet200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class AccountClient implements AccountClientInterface
@@ -25,12 +29,16 @@ final readonly class AccountClient implements AccountClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `account:read`.
+     * @return Envelope<AccountGet200Content|Error>
      */
-    public function accountGet(): void
+    public function accountGet(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AccountGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/account')->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AccountGet200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

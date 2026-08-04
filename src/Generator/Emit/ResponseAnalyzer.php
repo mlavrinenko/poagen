@@ -7,26 +7,24 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
-use cebe\openapi\spec\Responses;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\ScalarFormat;
 
 use function is_string;
-use function str_starts_with;
 
 /**
- * Resolves the picked 2xx response of an OpenAPI Operation into a
- * {@see ReturnSpec}.
+ * Resolves one declared status's response into a {@see ReturnSpec} — the
+ * shape a status's body has, independent of which status it is.
  *
  * `null` means this response sits outside paogen's supported shapes and the
- * caller must refuse the operation rather than fall back to `void` — a
- * response that declares a body and gets one dropped is exactly the silent
- * shrink `silence-means-success` forbids (default-deny-on-degradation).
- * `void` is returned only when the document itself declares no body: no
- * `Responses` object at all, no 2xx status entry, or a 2xx entry whose
- * `content` is empty.
+ * caller must refuse the whole operation rather than fall back to `void` —
+ * a response that declares a body and gets one dropped is exactly the
+ * silent shrink `silence-means-success` forbids
+ * (default-deny-on-degradation). `void` is returned only when the document
+ * itself declares no body for the status: an entry whose `content` is
+ * empty.
  *
  * Two shapes reach a return type: an `application/json` body, resolved by
  * its schema, and a body the document declared as text over a `type: string`
@@ -36,43 +34,27 @@ use function str_starts_with;
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (`quality-gates-at-maximum-strictness`), mirroring
  * {@see RequestBodyAnalyzer}; the diagnostics half moved on to
- * {@see ResponseRefusal} for the same reason.
+ * {@see ResponseRefusal} for the same reason. {@see InlinePayloadPlanner::build()}
+ * is the only caller: it tries an inline-synthesis reading of a status
+ * first (allOf, a response union, an inline object) and falls back to this
+ * class for everything else — a `$ref`, a scalar, a map, a scalar list.
  *
  * @internal
  */
 final readonly class ResponseAnalyzer
 {
-    /**
-     * @param Responses<Response|Reference>|null $responses
-     */
-    public static function resolve(?Responses $responses, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
+    public static function resolveOne(Response $response, NameRegistry $registry, ?Bindings $bindings = null): ?ReturnSpec
     {
-        $picked = self::pick2xx($responses);
-
-        if ($picked === null) {
-            return ReturnSpec::void();
-        }
-
-        return self::fromResponse($picked[1], $registry, $bindings ?? new Bindings([]));
+        return self::fromResponse($response, $registry, $bindings ?? new Bindings([]));
     }
 
     /**
-     * Explains why {@see resolve()} returned null for an operation whose 2xx
-     * response was picked — names the status, the content type(s) found,
-     * and what would make the response acceptable.
-     *
-     * @param Responses<Response|Reference>|null $responses
+     * Explains why {@see resolveOne()} returned null for this status — names
+     * it, the content type(s) found, and what would make the response
+     * acceptable.
      */
-    public static function describeUnsupported(?Responses $responses): string
+    public static function describeOne(string $status, Response $response): string
     {
-        $picked = self::pick2xx($responses);
-
-        if ($picked === null) {
-            return "this operation's 2xx response could not be re-located to describe — this should not happen";
-        }
-
-        [$status, $response] = $picked;
-
         return ResponseRefusal::describe($status, $response, $response->content ?? []);
     }
 
@@ -119,7 +101,7 @@ final readonly class ResponseAnalyzer
     }
 
     /**
-     * A 2xx response the document declared as characters rather than as JSON.
+     * A response the document declared as characters rather than as JSON.
      *
      * It reaches the caller as the `string` the schema said it was, read
      * straight off the body — {@see ReturnSpec::scalar()} already means
@@ -262,29 +244,5 @@ final readonly class ResponseAnalyzer
         return ObjectShape::is($additional)
             ? ReturnSpec::map(self::mapValue($additional->additionalProperties, $registry))
             : ReturnSpec::mixed();
-    }
-
-    /**
-     * @param  Responses<Response|Reference>|null $responses
-     * @return array{0:string,1:Response}|null
-     */
-    private static function pick2xx(?Responses $responses): ?array
-    {
-        if (!$responses instanceof Responses) {
-            return null;
-        }
-
-        foreach ($responses->getResponses() as $status => $response) {
-            if (!str_starts_with((string) $status, '2')) {
-                continue;
-            }
-            if (!$response instanceof Response) {
-                continue;
-            }
-
-            return [(string) $status, $response];
-        }
-
-        return null;
     }
 }

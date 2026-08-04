@@ -11,12 +11,19 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\SshKeyFingerprint;
 use Acme\DigitalOcean\Generated\Model\SshKeyId;
 use Acme\DigitalOcean\Generated\Model\SshKeys;
+use Acme\DigitalOcean\Generated\Model\SshKeysCreate201Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysGet200Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysList200Content;
+use Acme\DigitalOcean\Generated\Model\SshKeysUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SshKeysClient implements SshKeysClientInterface
@@ -29,70 +36,90 @@ final readonly class SshKeysClient implements SshKeysClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:read`.
+     * @return Envelope<SshKeysList200Content|Error>
      */
-    public function sshKeysList(?int $perPage = null, ?int $page = null): void
+    public function sshKeysList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SshKeysList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/account/keys')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshKeysList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:create`.
+     * @return Envelope<SshKeysCreate201Content|Error>
      */
-    public function sshKeysCreate(SshKeys $body): void
+    public function sshKeysCreate(SshKeys $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SshKeysCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/account/keys')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SshKeysCreate201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:read`.
+     * @return Envelope<SshKeysGet200Content|Error>
      */
-    public function sshKeysGet(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): void
+    public function sshKeysGet(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SshKeysGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/account/keys/{ssh_key_identifier}')
                 ->path('ssh_key_identifier', $sshKeyIdentifier->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshKeysGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:update`.
+     * @return Envelope<SshKeysUpdate200Content|Error>
      */
     public function sshKeysUpdate(
         SshKeyId|SshKeyFingerprint $sshKeyIdentifier,
         SshKeysUpdateRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SshKeysUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/account/keys/{ssh_key_identifier}')
                 ->path('ssh_key_identifier', $sshKeyIdentifier->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshKeysUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:delete`.
+     * @return Envelope<null|Error>
      */
-    public function sshKeysDelete(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): void
+    public function sshKeysDelete(SshKeyId|SshKeyFingerprint $sshKeyIdentifier): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/account/keys/{ssh_key_identifier}')
                 ->path('ssh_key_identifier', $sshKeyIdentifier->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

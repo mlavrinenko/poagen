@@ -36,6 +36,7 @@ use Acme\GitHub\Generated\Enum\ReposListForksSort;
 use Acme\GitHub\Generated\Enum\ReposListWebhookDeliveriesStatus;
 use Acme\GitHub\Generated\Model\Activity;
 use Acme\GitHub\Generated\Model\Autolink;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\BranchProtection;
 use Acme\GitHub\Generated\Model\BranchRestrictionPolicy;
 use Acme\GitHub\Generated\Model\BranchShort;
@@ -67,6 +68,7 @@ use Acme\GitHub\Generated\Model\DeploymentBranchPolicyNamePattern;
 use Acme\GitHub\Generated\Model\DeploymentBranchPolicyNamePatternWithType;
 use Acme\GitHub\Generated\Model\DeploymentProtectionRule;
 use Acme\GitHub\Generated\Model\DeploymentStatus;
+use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\Environment;
 use Acme\GitHub\Generated\Model\FileCommit;
 use Acme\GitHub\Generated\Model\FullRepository;
@@ -96,12 +98,14 @@ use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequestContent;
 use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequestContent;
 use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequestContent;
 use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReporting200Content;
+use Acme\GitHub\Generated\Model\ReposCompareCommits503Content;
 use Acme\GitHub\Generated\Model\ReposCreateAttestation201Content;
 use Acme\GitHub\Generated\Model\ReposCreateAttestationRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeployment202Content;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequestContent;
@@ -110,7 +114,6 @@ use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateForkRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateInOrgRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequestContent;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequestContent;
@@ -119,10 +122,13 @@ use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent;
+use Acme\GitHub\Generated\Model\ReposDelete403Content;
+use Acme\GitHub\Generated\Model\ReposDeleteFile503Content;
 use Acme\GitHub\Generated\Model\ReposDeleteFileRequestContent;
 use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequestContent;
 use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRules200Content;
 use Acme\GitHub\Generated\Model\ReposGetAllEnvironments200Content;
+use Acme\GitHub\Generated\Model\ReposGetCommit503Content;
 use Acme\GitHub\Generated\Model\ReposListAttestations200Content;
 use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrations200Content;
 use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPolicies200Content;
@@ -164,12 +170,16 @@ use Acme\GitHub\Generated\Model\StatusCheckPolicy;
 use Acme\GitHub\Generated\Model\Tag;
 use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\Topic;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\ViewTraffic;
 use Acme\GitHub\Generated\Model\WebhookConfig;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -181,7 +191,7 @@ final readonly class ReposClient implements ReposClientInterface
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>>
      */
     public function reposListForOrg(
         string $org,
@@ -190,8 +200,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposListForOrgDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/repos')
                 ->path('org', $org)
                 ->query('type', $type)
@@ -199,45 +210,65 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
-    }
 
-    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): FullRepository
-    {
-        return $this->transport->send(
-            Endpoint::post('/orgs/{org}/repos')->path('org', $org)->json($body),
-            ResponseType::object(FullRepository::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<RepositoryRuleset>
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): Envelope
+    {
+        /** @var Envelope<FullRepository|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/orgs/{org}/repos')->path('org', $org)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<RepositoryRuleset>|BasicError>
      */
     public function reposGetOrgRulesets(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $targets = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RepositoryRuleset>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('targets', $targets),
-            ResponseType::listOf(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): RepositoryRuleset
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
+    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RepositoryRuleset|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/rulesets')->path('org', $org)->json($body),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RuleSuites|BasicError>
+     */
     public function reposGetOrgRuleSuites(
         string $org,
         ?string $ref = null,
@@ -247,8 +278,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposGetOrgRuleSuitesRuleSuiteResult $ruleSuiteResult = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): RuleSuites {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RuleSuites|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets/rule-suites')
                 ->path('org', $org)
                 ->query('ref', $ref)
@@ -258,85 +290,129 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('rule_suite_result', $ruleSuiteResult)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(RuleSuites::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetOrgRuleSuite(string $org, int $ruleSuiteId): RuleSuite
+    /**
+     * @return Envelope<RuleSuite|BasicError>
+     */
+    public function reposGetOrgRuleSuite(string $org, int $ruleSuiteId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RuleSuite|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets/rule-suites/{rule_suite_id}')
                 ->path('org', $org)
                 ->path('rule_suite_id', $ruleSuiteId),
-            ResponseType::object(RuleSuite::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetOrgRuleset(string $org, int $rulesetId): RepositoryRuleset
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError>
+     */
+    public function reposGetOrgRuleset(string $org, int $rulesetId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RepositoryRuleset|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets/{ruleset_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposUpdateOrgRuleset(
         string $org,
         int $rulesetId,
         ReposUpdateOrgRulesetRequestContent $body,
-    ): RepositoryRuleset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryRuleset|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/rulesets/{ruleset_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId)
                 ->json($body),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteOrgRuleset(string $org, int $rulesetId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteOrgRuleset(string $org, int $rulesetId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/rulesets/{ruleset_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGet(string $owner, string $repo): FullRepository
+    /**
+     * @return Envelope<FullRepository|BasicError>
+     */
+    public function reposGet(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<FullRepository|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}')->path('owner', $owner)->path('repo', $repo),
-            ResponseType::object(FullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['301', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDelete(string $owner, string $repo): void
+    /**
+     * @return Envelope<null|ReposDelete403Content|BasicError>
+     */
+    public function reposDelete(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ReposDelete403Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(ReposDelete403Content::class)], ['307', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): FullRepository
+    /**
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<FullRepository|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(FullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['307', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Activity>
+     * @return Envelope<list<Activity>|ValidationErrorSimple>
      */
     public function reposListActivities(
         string $owner,
@@ -349,8 +425,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?string $actor = null,
         ?ReposListActivitiesTimePeriod $timePeriod = null,
         ?ReposListActivitiesActivityType $activityType = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Activity>|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/activity')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -362,24 +439,35 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('actor', $actor)
                 ->query('time_period', $timePeriod)
                 ->query('activity_type', $activityType),
-            ResponseType::listOf(Activity::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Activity::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposCreateAttestation201Content|BasicError|ValidationError>
+     */
     public function reposCreateAttestation(
         string $owner,
         string $repo,
         ReposCreateAttestationRequestContent $body,
-    ): ReposCreateAttestation201Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposCreateAttestation201Content|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/attestations')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(ReposCreateAttestation201Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReposCreateAttestation201Content::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposListAttestations200Content>
+     */
     public function reposListAttestations(
         string $owner,
         string $repo,
@@ -388,8 +476,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): ReposListAttestations200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposListAttestations200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/attestations/{subject_digest}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -398,91 +487,132 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::object(ReposListAttestations200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListAttestations200Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Autolink>
+     * @return Envelope<list<Autolink>>
      */
-    public function reposListAutolinks(string $owner, string $repo): array
+    public function reposListAutolinks(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Autolink>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/autolinks')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(Autolink::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Autolink::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Autolink|ValidationError>
+     */
     public function reposCreateAutolink(
         string $owner,
         string $repo,
         ReposCreateAutolinkRequestContent $body,
-    ): Autolink {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Autolink|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/autolinks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Autolink::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Autolink::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetAutolink(string $owner, string $repo, int $autolinkId): Autolink
+    /**
+     * @return Envelope<Autolink|BasicError>
+     */
+    public function reposGetAutolink(string $owner, string $repo, int $autolinkId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Autolink|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/autolinks/{autolink_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('autolink_id', $autolinkId),
-            ResponseType::object(Autolink::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Autolink::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteAutolink(string $owner, string $repo, int $autolinkId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteAutolink(string $owner, string $repo, int $autolinkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/autolinks/{autolink_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('autolink_id', $autolinkId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposCheckAutomatedSecurityFixes(string $owner, string $repo): CheckAutomatedSecurityFixes
-    {
-        return $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/automated-security-fixes')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::object(CheckAutomatedSecurityFixes::class),
-        );
-    }
-
-    public function reposEnableAutomatedSecurityFixes(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::put('/repos/{owner}/{repo}/automated-security-fixes')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function reposDisableAutomatedSecurityFixes(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/automated-security-fixes')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<ShortBranch>
+     * @return Envelope<CheckAutomatedSecurityFixes|null>
+     */
+    public function reposCheckAutomatedSecurityFixes(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<CheckAutomatedSecurityFixes|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/automated-security-fixes')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckAutomatedSecurityFixes::class)], ['404', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function reposEnableAutomatedSecurityFixes(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/repos/{owner}/{repo}/automated-security-fixes')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDisableAutomatedSecurityFixes(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/automated-security-fixes')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<ShortBranch>|BasicError>
      */
     public function reposListBranches(
         string $owner,
@@ -490,445 +620,583 @@ final readonly class ReposClient implements ReposClientInterface
         ?bool $protected = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ShortBranch>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('protected', $protected)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(ShortBranch::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ShortBranch::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetBranch(string $owner, string $repo, string $branch): BranchWithProtection
+    /**
+     * @return Envelope<BranchWithProtection|BasicError>
+     */
+    public function reposGetBranch(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<BranchWithProtection|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(BranchWithProtection::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchWithProtection::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetBranchProtection(string $owner, string $repo, string $branch): BranchProtection
+    /**
+     * @return Envelope<BranchProtection|BasicError>
+     */
+    public function reposGetBranchProtection(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<BranchProtection|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(BranchProtection::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchProtection::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProtectedBranch|BasicError|ValidationErrorSimple>
+     */
     public function reposUpdateBranchProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdateBranchProtectionRequestContent $body,
-    ): ProtectedBranch {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProtectedBranch|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::object(ProtectedBranch::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranch::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteBranchProtection(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteBranchProtection(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetAdminBranchProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced>
+     */
+    public function reposGetAdminBranchProtection(string $owner, string $repo, string $branch): Envelope
+    {
+        /** @var Envelope<ProtectedBranchAdminEnforced> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(ProtectedBranchAdminEnforced::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposSetAdminBranchProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced>
+     */
+    public function reposSetAdminBranchProtection(string $owner, string $repo, string $branch): Envelope
+    {
+        /** @var Envelope<ProtectedBranchAdminEnforced> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(ProtectedBranchAdminEnforced::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteAdminBranchProtection(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteAdminBranchProtection(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetPullRequestReviewProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchPullRequestReview {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ProtectedBranchPullRequestReview>
+     */
+    public function reposGetPullRequestReviewProtection(string $owner, string $repo, string $branch): Envelope
+    {
+        /** @var Envelope<ProtectedBranchPullRequestReview> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(ProtectedBranchPullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeletePullRequestReviewProtection(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeletePullRequestReviewProtection(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProtectedBranchPullRequestReview|ValidationError>
+     */
     public function reposUpdatePullRequestReviewProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdatePullRequestReviewProtectionRequestContent $body,
-    ): ProtectedBranchPullRequestReview {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProtectedBranchPullRequestReview|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::object(ProtectedBranchPullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetCommitSignatureProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced|BasicError>
+     */
+    public function reposGetCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope
+    {
+        /** @var Envelope<ProtectedBranchAdminEnforced|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/required_signatures')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(ProtectedBranchAdminEnforced::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreateCommitSignatureProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced|BasicError>
+     */
+    public function reposCreateCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope
+    {
+        /** @var Envelope<ProtectedBranchAdminEnforced|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/required_signatures')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(ProtectedBranchAdminEnforced::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteCommitSignatureProtection(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/required_signatures')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetStatusChecksProtection(string $owner, string $repo, string $branch): StatusCheckPolicy
+    /**
+     * @return Envelope<StatusCheckPolicy|BasicError>
+     */
+    public function reposGetStatusChecksProtection(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<StatusCheckPolicy|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(StatusCheckPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposRemoveStatusCheckProtection(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposRemoveStatusCheckProtection(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<StatusCheckPolicy|BasicError|ValidationError>
+     */
     public function reposUpdateStatusCheckProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdateStatusCheckProtectionRequestContent $body,
-    ): StatusCheckPolicy {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<StatusCheckPolicy|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::object(StatusCheckPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<string>
+     * @return Envelope<list<string>|BasicError>
      */
-    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): array
+    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<string>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks/contexts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::scalarListOf(ResponseType::string()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetAccessRestrictions(string $owner, string $repo, string $branch): BranchRestrictionPolicy
+    /**
+     * @return Envelope<BranchRestrictionPolicy|BasicError>
+     */
+    public function reposGetAccessRestrictions(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<BranchRestrictionPolicy|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::object(BranchRestrictionPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchRestrictionPolicy::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteAccessRestrictions(string $owner, string $repo, string $branch): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteAccessRestrictions(string $owner, string $repo, string $branch): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|BasicError>
      */
-    public function reposGetAppsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array
+    public function reposGetAppsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Integration>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::listOf(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposSetAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposSetAppAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Integration>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposAddAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposAddAppAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Integration>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposRemoveAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposRemoveAppAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Integration>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError>
      */
-    public function reposGetTeamsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array
+    public function reposGetTeamsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Team>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|BasicError>
      */
-    public function reposGetUsersWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array
+    public function reposGetUsersWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposSetUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposSetUserAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposAddUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposAddUserAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposRemoveUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposRemoveUserAccessRestrictionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BranchWithProtection|BasicError|ValidationError>
+     */
     public function reposRenameBranch(
         string $owner,
         string $repo,
         string $branch,
         ReposRenameBranchRequestContent $body,
-    ): BranchWithProtection {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BranchWithProtection|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/rename')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::object(BranchWithProtection::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BranchWithProtection::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCodeownersErrors(string $owner, string $repo, ?string $ref = null): CodeownersErrors
+    /**
+     * @return Envelope<CodeownersErrors|null>
+     */
+    public function reposCodeownersErrors(string $owner, string $repo, ?string $ref = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeownersErrors|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codeowners/errors')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref),
-            ResponseType::object(CodeownersErrors::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeownersErrors::class)], ['404', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Collaborator>
+     * @return Envelope<list<Collaborator>|BasicError>
      */
     public function reposListCollaborators(
         string $owner,
@@ -937,8 +1205,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposListCollaboratorsPermission $permission = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Collaborator>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/collaborators')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -946,121 +1215,165 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('permission', $permission)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Collaborator::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Collaborator::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCheckCollaborator(string $owner, string $repo, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposCheckCollaborator(string $owner, string $repo, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/collaborators/{username}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryInvitation|null|ValidationError|BasicError>
+     */
     public function reposAddCollaborator(
         string $owner,
         string $repo,
         string $username,
         ReposAddCollaboratorRequestContent $body,
-    ): RepositoryInvitation {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryInvitation|null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/collaborators/{username}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::object(RepositoryInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryInvitation::class)], ['204', null], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposRemoveCollaborator(string $owner, string $repo, string $username): void
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
+    public function reposRemoveCollaborator(string $owner, string $repo, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/collaborators/{username}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetCollaboratorPermissionLevel(
-        string $owner,
-        string $repo,
-        string $username,
-    ): RepositoryCollaboratorPermission {
-        return $this->transport->send(
+    /**
+     * @return Envelope<RepositoryCollaboratorPermission|BasicError>
+     */
+    public function reposGetCollaboratorPermissionLevel(string $owner, string $repo, string $username): Envelope
+    {
+        /** @var Envelope<RepositoryCollaboratorPermission|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/collaborators/{username}/permission')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::object(RepositoryCollaboratorPermission::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryCollaboratorPermission::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CommitComment>
+     * @return Envelope<list<CommitComment>>
      */
     public function reposListCommitCommentsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CommitComment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(CommitComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetCommitComment(string $owner, string $repo, int $commentId): CommitComment
+    /**
+     * @return Envelope<CommitComment|BasicError>
+     */
+    public function reposGetCommitComment(string $owner, string $repo, int $commentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CommitComment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::object(CommitComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteCommitComment(string $owner, string $repo, int $commentId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteCommitComment(string $owner, string $repo, int $commentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CommitComment|BasicError>
+     */
     public function reposUpdateCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         ReposUpdateCommitCommentRequestContent $body,
-    ): CommitComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CommitComment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(CommitComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Commit>
+     * @return Envelope<list<Commit>|BasicError>
      */
     public function reposListCommits(
         string $owner,
@@ -1073,8 +1386,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?\DateTimeImmutable $until = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Commit>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1086,26 +1400,31 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('until', $until?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Commit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<BranchShort>
+     * @return Envelope<list<BranchShort>|ValidationError|BasicError>
      */
-    public function reposListBranchesForHeadCommit(string $owner, string $repo, string $commitSha): array
+    public function reposListBranchesForHeadCommit(string $owner, string $repo, string $commitSha): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<BranchShort>|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{commit_sha}/branches-where-head')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha),
-            ResponseType::listOf(BranchShort::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BranchShort::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CommitComment>
+     * @return Envelope<list<CommitComment>>
      */
     public function reposListCommentsForCommit(
         string $owner,
@@ -1113,36 +1432,45 @@ final readonly class ReposClient implements ReposClientInterface
         string $commitSha,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CommitComment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{commit_sha}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(CommitComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CommitComment|BasicError|ValidationError>
+     */
     public function reposCreateCommitComment(
         string $owner,
         string $repo,
         string $commitSha,
         ReposCreateCommitCommentRequestContent $body,
-    ): CommitComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CommitComment|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/commits/{commit_sha}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha)
                 ->json($body),
-            ResponseType::object(CommitComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CommitComment::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PullRequestSimple>
+     * @return Envelope<list<PullRequestSimple>|BasicError>
      */
     public function reposListPullRequestsAssociatedWithCommit(
         string $owner,
@@ -1150,56 +1478,71 @@ final readonly class ReposClient implements ReposClientInterface
         string $commitSha,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PullRequestSimple>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{commit_sha}/pulls')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PullRequestSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Commit|ValidationError|BasicError|ReposGetCommit503Content>
+     */
     public function reposGetCommit(
         string $owner,
         string $repo,
         string $ref,
         ?int $page = null,
         ?int $perPage = null,
-    ): Commit {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Commit|ValidationError|BasicError|ReposGetCommit503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(Commit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Commit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposGetCommit503Content::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CombinedCommitStatus|BasicError>
+     */
     public function reposGetCombinedStatusForRef(
         string $owner,
         string $repo,
         string $ref,
         ?int $perPage = null,
         ?int $page = null,
-    ): CombinedCommitStatus {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CombinedCommitStatus|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/status')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CombinedCommitStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CombinedCommitStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Status>
+     * @return Envelope<list<Status>|BasicError>
      */
     public function reposListCommitStatusesForRef(
         string $owner,
@@ -1207,48 +1550,64 @@ final readonly class ReposClient implements ReposClientInterface
         string $ref,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Status>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/statuses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Status::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Status::class)], ['301', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetCommunityProfileMetrics(string $owner, string $repo): CommunityProfile
+    /**
+     * @return Envelope<CommunityProfile>
+     */
+    public function reposGetCommunityProfileMetrics(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CommunityProfile> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/community/profile')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(CommunityProfile::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommunityProfile::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CommitComparison|BasicError|ReposCompareCommits503Content>
+     */
     public function reposCompareCommits(
         string $owner,
         string $repo,
         string $basehead,
         ?int $page = null,
         ?int $perPage = null,
-    ): CommitComparison {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CommitComparison|BasicError|ReposCompareCommits503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/compare/{basehead}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('basehead', $basehead)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(CommitComparison::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComparison::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposCompareCommits503Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
      * @param array<string, mixed> $body
+     * @return Envelope<ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule|BasicError|null>
      */
     public function reposGetContent(
         string $owner,
@@ -1256,8 +1615,8 @@ final readonly class ReposClient implements ReposClientInterface
         string $path,
         array $body,
         ?string $ref = null,
-    ): ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule {
-        /** @var ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule $result */
+    ): Envelope {
+        /** @var Envelope<ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/contents/{path}')
                 ->path('owner', $owner)
@@ -1265,51 +1624,41 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('path', $path)
                 ->query('ref', $ref)
                 ->jsonRaw($body),
-            ResponseType::union(new Discriminator(field: 'type', map: [
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'type', map: [
             'array' => ContentDirectory::class,
             'file' => ContentFile::class,
             'symlink' => ContentSymlink::class,
             'submodule' => ContentSubmodule::class,
-        ], onParent: false), null, '/paths/~1repos~1{owner}~1{repo}~1contents~1{path}/get/responses/200/content/application~1json/schema'),
+        ], onParent: false), null, '/paths/~1repos~1{owner}~1{repo}~1contents~1{path}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['302', null], ['304', null]])),
         );
 
         return $result;
     }
 
-    public function reposCreateOrUpdateFileContents(
-        string $owner,
-        string $repo,
-        string $path,
-        ReposCreateOrUpdateFileContentsRequestContent $body,
-    ): FileCommit {
-        return $this->transport->send(
-            Endpoint::put('/repos/{owner}/{repo}/contents/{path}')
-                ->path('owner', $owner)
-                ->path('repo', $repo)
-                ->path('path', $path)
-                ->json($body),
-            ResponseType::object(FileCommit::class),
-        );
-    }
-
+    /**
+     * @return Envelope<FileCommit|ValidationError|BasicError|ReposDeleteFile503Content>
+     */
     public function reposDeleteFile(
         string $owner,
         string $repo,
         string $path,
         ReposDeleteFileRequestContent $body,
-    ): FileCommit {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<FileCommit|ValidationError|BasicError|ReposDeleteFile503Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/contents/{path}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('path', $path)
                 ->json($body),
-            ResponseType::object(FileCommit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FileCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposDeleteFile503Content::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Contributor>
+     * @return Envelope<list<Contributor>|null|BasicError>
      */
     public function reposListContributors(
         string $owner,
@@ -1317,20 +1666,23 @@ final readonly class ReposClient implements ReposClientInterface
         ?string $anon = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Contributor>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/contributors')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('anon', $anon)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Contributor::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Contributor::class)], ['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Deployment>
+     * @return Envelope<list<Deployment>>
      */
     public function reposListDeployments(
         string $owner,
@@ -1341,8 +1693,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?string $environment = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Deployment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/deployments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1352,48 +1705,68 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('environment', $environment)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Deployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Deployment|ReposCreateDeployment202Content|null|ValidationError>
+     */
     public function reposCreateDeployment(
         string $owner,
         string $repo,
         ReposCreateDeploymentRequestContent $body,
-    ): Deployment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Deployment|ReposCreateDeployment202Content|null|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/deployments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Deployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Deployment::class)], ['202', ResponseType::object(ReposCreateDeployment202Content::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetDeployment(string $owner, string $repo, int $deploymentId): Deployment
+    /**
+     * @return Envelope<Deployment|BasicError>
+     */
+    public function reposGetDeployment(string $owner, string $repo, int $deploymentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Deployment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/deployments/{deployment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId),
-            ResponseType::object(Deployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Deployment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteDeployment(string $owner, string $repo, int $deploymentId): void
+    /**
+     * @return Envelope<null|BasicError|ValidationErrorSimple>
+     */
+    public function reposDeleteDeployment(string $owner, string $repo, int $deploymentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/deployments/{deployment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<DeploymentStatus>
+     * @return Envelope<list<DeploymentStatus>|BasicError>
      */
     public function reposListDeploymentStatuses(
         string $owner,
@@ -1401,284 +1774,385 @@ final readonly class ReposClient implements ReposClientInterface
         int $deploymentId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<DeploymentStatus>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/deployments/{deployment_id}/statuses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(DeploymentStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentStatus|ValidationError>
+     */
     public function reposCreateDeploymentStatus(
         string $owner,
         string $repo,
         int $deploymentId,
         ReposCreateDeploymentStatusRequestContent $body,
-    ): DeploymentStatus {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentStatus|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/deployments/{deployment_id}/statuses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId)
                 ->json($body),
-            ResponseType::object(DeploymentStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentStatus::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetDeploymentStatus(
-        string $owner,
-        string $repo,
-        int $deploymentId,
-        int $statusId,
-    ): DeploymentStatus {
-        return $this->transport->send(
+    /**
+     * @return Envelope<DeploymentStatus|BasicError>
+     */
+    public function reposGetDeploymentStatus(string $owner, string $repo, int $deploymentId, int $statusId): Envelope
+    {
+        /** @var Envelope<DeploymentStatus|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/deployments/{deployment_id}/statuses/{status_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId)
                 ->path('status_id', $statusId),
-            ResponseType::object(DeploymentStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function reposCreateDispatchEvent(
         string $owner,
         string $repo,
         ReposCreateDispatchEventRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/dispatches')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposGetAllEnvironments200Content>
+     */
     public function reposGetAllEnvironments(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposGetAllEnvironments200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposGetAllEnvironments200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ReposGetAllEnvironments200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllEnvironments200Content::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetEnvironment(string $owner, string $repo, string $environmentName): Environment
+    /**
+     * @return Envelope<Environment>
+     */
+    public function reposGetEnvironment(string $owner, string $repo, string $environmentName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Environment> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::object(Environment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Environment|BasicError>
+     */
     public function reposCreateOrUpdateEnvironment(
         string $owner,
         string $repo,
         string $environmentName,
         ReposCreateOrUpdateEnvironmentRequestContent $body,
-    ): Environment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Environment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/environments/{environment_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::object(Environment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteAnEnvironment(string $owner, string $repo, string $environmentName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteAnEnvironment(string $owner, string $repo, string $environmentName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/environments/{environment_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposListDeploymentBranchPolicies200Content>
+     */
     public function reposListDeploymentBranchPolicies(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposListDeploymentBranchPolicies200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposListDeploymentBranchPolicies200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ReposListDeploymentBranchPolicies200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListDeploymentBranchPolicies200Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy|null>
+     */
     public function reposCreateDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         DeploymentBranchPolicyNamePatternWithType $body,
-    ): DeploymentBranchPolicy {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentBranchPolicy|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::object(DeploymentBranchPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)], ['404', null], ['303', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy>
+     */
     public function reposGetDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
-    ): DeploymentBranchPolicy {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentBranchPolicy> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId),
-            ResponseType::object(DeploymentBranchPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy>
+     */
     public function reposUpdateDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
         DeploymentBranchPolicyNamePattern $body,
-    ): DeploymentBranchPolicy {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentBranchPolicy> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId)
                 ->json($body),
-            ResponseType::object(DeploymentBranchPolicy::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function reposDeleteDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies/{branch_policy_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposGetAllDeploymentProtectionRules200Content>
+     */
     public function reposGetAllDeploymentProtectionRules(
         string $environmentName,
         string $repo,
         string $owner,
-    ): ReposGetAllDeploymentProtectionRules200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposGetAllDeploymentProtectionRules200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules')
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner),
-            ResponseType::object(ReposGetAllDeploymentProtectionRules200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllDeploymentProtectionRules200Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentProtectionRule>
+     */
     public function reposCreateDeploymentProtectionRule(
         string $environmentName,
         string $repo,
         string $owner,
         ReposCreateDeploymentProtectionRuleRequestContent $body,
-    ): DeploymentProtectionRule {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentProtectionRule> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules')
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner)
                 ->json($body),
-            ResponseType::object(DeploymentProtectionRule::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentProtectionRule::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReposListCustomDeploymentRuleIntegrations200Content>
+     */
     public function reposListCustomDeploymentRuleIntegrations(
         string $environmentName,
         string $repo,
         string $owner,
         ?int $page = null,
         ?int $perPage = null,
-    ): ReposListCustomDeploymentRuleIntegrations200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReposListCustomDeploymentRuleIntegrations200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/apps')
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ReposListCustomDeploymentRuleIntegrations200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListCustomDeploymentRuleIntegrations200Content::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeploymentProtectionRule>
+     */
     public function reposGetCustomDeploymentProtectionRule(
         string $owner,
         string $repo,
         string $environmentName,
         int $protectionRuleId,
-    ): DeploymentProtectionRule {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeploymentProtectionRule> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/{protection_rule_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('protection_rule_id', $protectionRuleId),
-            ResponseType::object(DeploymentProtectionRule::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentProtectionRule::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function reposDisableDeploymentProtectionRule(
         string $environmentName,
         string $repo,
         string $owner,
         int $protectionRuleId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/{protection_rule_id}')
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner)
                 ->path('protection_rule_id', $protectionRuleId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function reposListForks(
         string $owner,
@@ -1686,122 +2160,170 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposListForksSort $sort = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/forks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('sort', $sort)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['400', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): FullRepository
+    /**
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<FullRepository|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/forks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(FullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Hook>
+     * @return Envelope<list<Hook>|BasicError>
      */
-    public function reposListWebhooks(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposListWebhooks(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Hook>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/hooks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Hook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Hook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Hook
+    /**
+     * @return Envelope<Hook|BasicError|ValidationError>
+     */
+    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Hook|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/hooks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Hook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetWebhook(string $owner, string $repo, int $hookId): Hook
+    /**
+     * @return Envelope<Hook|BasicError>
+     */
+    public function reposGetWebhook(string $owner, string $repo, int $hookId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Hook|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/hooks/{hook_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::object(Hook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteWebhook(string $owner, string $repo, int $hookId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteWebhook(string $owner, string $repo, int $hookId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/hooks/{hook_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Hook|ValidationError|BasicError>
+     */
     public function reposUpdateWebhook(
         string $owner,
         string $repo,
         int $hookId,
         ReposUpdateWebhookRequestContent $body,
-    ): Hook {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Hook|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/hooks/{hook_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::object(Hook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetWebhookConfigForRepo(string $owner, string $repo, int $hookId): WebhookConfig
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function reposGetWebhookConfigForRepo(string $owner, string $repo, int $hookId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/hooks/{hook_id}/config')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::object(WebhookConfig::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<WebhookConfig>
+     */
     public function reposUpdateWebhookConfigForRepo(
         string $owner,
         string $repo,
         int $hookId,
         ReposUpdateWebhookConfigForRepoRequestContent $body,
-    ): WebhookConfig {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/hooks/{hook_id}/config')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::object(WebhookConfig::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function reposListWebhookDeliveries(
         string $owner,
@@ -1810,8 +2332,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?int $perPage = null,
         ?string $cursor = null,
         ?ReposListWebhookDeliveriesStatus $status = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<HookDeliveryItem>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/hooks/{hook_id}/deliveries')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1819,579 +2342,851 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::listOf(HookDeliveryItem::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): HookDelivery
+    /**
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
+     */
+    public function reposGetWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<HookDelivery|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::object(HookDelivery::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposRedeliverWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): void
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function reposRedeliverWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/hooks/{hook_id}/deliveries/{delivery_id}/attempts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposPingWebhook(string $owner, string $repo, int $hookId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposPingWebhook(string $owner, string $repo, int $hookId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/hooks/{hook_id}/pings')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposTestPushWebhook(string $owner, string $repo, int $hookId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposTestPushWebhook(string $owner, string $repo, int $hookId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/hooks/{hook_id}/tests')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposCheckImmutableReleases(string $owner, string $repo): CheckImmutableReleases
-    {
-        return $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/immutable-releases')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::object(CheckImmutableReleases::class),
-        );
-    }
-
-    public function reposEnableImmutableReleases(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::put('/repos/{owner}/{repo}/immutable-releases')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function reposDisableImmutableReleases(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/immutable-releases')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<RepositoryInvitation>
+     * @return Envelope<CheckImmutableReleases|null>
      */
-    public function reposListInvitations(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposCheckImmutableReleases(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckImmutableReleases|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/immutable-releases')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckImmutableReleases::class)], ['404', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposEnableImmutableReleases(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/repos/{owner}/{repo}/immutable-releases')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDisableImmutableReleases(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/immutable-releases')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<RepositoryInvitation>>
+     */
+    public function reposListInvitations(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<RepositoryInvitation>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/invitations')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(RepositoryInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteInvitation(string $owner, string $repo, int $invitationId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteInvitation(string $owner, string $repo, int $invitationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/invitations/{invitation_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('invitation_id', $invitationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryInvitation>
+     */
     public function reposUpdateInvitation(
         string $owner,
         string $repo,
         int $invitationId,
         ReposUpdateInvitationRequestContent $body,
-    ): RepositoryInvitation {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryInvitation> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/invitations/{invitation_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('invitation_id', $invitationId)
                 ->json($body),
-            ResponseType::object(RepositoryInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryInvitation::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<DeployKey>
+     * @return Envelope<list<DeployKey>>
      */
-    public function reposListDeployKeys(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function reposListDeployKeys(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<DeployKey>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/keys')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(DeployKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeployKey::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DeployKey|ValidationError>
+     */
     public function reposCreateDeployKey(
         string $owner,
         string $repo,
         ReposCreateDeployKeyRequestContent $body,
-    ): DeployKey {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DeployKey|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/keys')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(DeployKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeployKey::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetDeployKey(string $owner, string $repo, int $keyId): DeployKey
+    /**
+     * @return Envelope<DeployKey|BasicError>
+     */
+    public function reposGetDeployKey(string $owner, string $repo, int $keyId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DeployKey|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/keys/{key_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('key_id', $keyId),
-            ResponseType::object(DeployKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeployKey::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteDeployKey(string $owner, string $repo, int $keyId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteDeployKey(string $owner, string $repo, int $keyId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/keys/{key_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('key_id', $keyId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function reposListLanguages(string $owner, string $repo): Language
+    /**
+     * @return Envelope<Language>
+     */
+    public function reposListLanguages(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Language> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/languages')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(Language::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Language::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposMergeUpstream(
-        string $owner,
-        string $repo,
-        ReposMergeUpstreamRequestContent $body,
-    ): MergedUpstream {
-        return $this->transport->send(
+    /**
+     * @return Envelope<MergedUpstream|null>
+     */
+    public function reposMergeUpstream(string $owner, string $repo, ReposMergeUpstreamRequestContent $body): Envelope
+    {
+        /** @var Envelope<MergedUpstream|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/merge-upstream')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(MergedUpstream::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MergedUpstream::class)], ['409', null], ['422', null]])),
         );
+
+        return $result;
     }
 
-    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Commit
+    /**
+     * @return Envelope<Commit|null|BasicError|ValidationError>
+     */
+    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Commit|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/merges')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Commit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Commit::class)], ['204', null], ['404', null], ['409', null], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetPages(string $owner, string $repo): Page
+    /**
+     * @return Envelope<Page|BasicError>
+     */
+    public function reposGetPages(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Page|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pages')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(Page::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Page::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
     public function reposUpdateInformationAboutPagesSite(
         string $owner,
         string $repo,
         ReposUpdateInformationAboutPagesSiteRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pages')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequestContent $body): Page
-    {
-        return $this->transport->send(
+    /**
+     * @return Envelope<Page|ValidationError|BasicError>
+     */
+    public function reposCreatePagesSite(
+        string $owner,
+        string $repo,
+        ReposCreatePagesSiteRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<Page|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Page::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Page::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposDeletePagesSite(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/pages')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<PageBuild>
+     * @return Envelope<null|ValidationError|BasicError>
      */
-    public function reposListPagesBuilds(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposDeletePagesSite(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/pages')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<PageBuild>>
+     */
+    public function reposListPagesBuilds(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<PageBuild>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pages/builds')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PageBuild::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PageBuild::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposRequestPagesBuild(string $owner, string $repo): PageBuildStatus
+    /**
+     * @return Envelope<PageBuildStatus>
+     */
+    public function reposRequestPagesBuild(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PageBuildStatus> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages/builds')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(PageBuildStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PageBuildStatus::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetLatestPagesBuild(string $owner, string $repo): PageBuild
+    /**
+     * @return Envelope<PageBuild>
+     */
+    public function reposGetLatestPagesBuild(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PageBuild> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pages/builds/latest')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(PageBuild::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetPagesBuild(string $owner, string $repo, int $buildId): PageBuild
+    /**
+     * @return Envelope<PageBuild>
+     */
+    public function reposGetPagesBuild(string $owner, string $repo, int $buildId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PageBuild> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pages/builds/{build_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('build_id', $buildId),
-            ResponseType::object(PageBuild::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PageDeployment|BasicError|ValidationError>
+     */
     public function reposCreatePagesDeployment(
         string $owner,
         string $repo,
         ReposCreatePagesDeploymentRequestContent $body,
-    ): PageDeployment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PageDeployment|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages/deployments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(PageDeployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageDeployment::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetPagesDeployment(
-        string $owner,
-        string $repo,
-        int|string $pagesDeploymentId,
-    ): PagesDeploymentStatus {
-        return $this->transport->send(
+    /**
+     * @return Envelope<PagesDeploymentStatus|BasicError>
+     */
+    public function reposGetPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): Envelope
+    {
+        /** @var Envelope<PagesDeploymentStatus|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pages/deployments/{pages_deployment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pages_deployment_id', $pagesDeploymentId),
-            ResponseType::object(PagesDeploymentStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesDeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCancelPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposCancelPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages/deployments/{pages_deployment_id}/cancel')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pages_deployment_id', $pagesDeploymentId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposGetPagesHealthCheck(string $owner, string $repo): PagesHealthCheck
-    {
-        return $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/pages/health')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::object(PagesHealthCheck::class),
-        );
-    }
-
-    public function reposCheckPrivateVulnerabilityReporting(
-        string $owner,
-        string $repo,
-    ): ReposCheckPrivateVulnerabilityReporting200Content {
-        return $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/private-vulnerability-reporting')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::object(ReposCheckPrivateVulnerabilityReporting200Content::class),
-        );
-    }
-
-    public function reposEnablePrivateVulnerabilityReporting(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::put('/repos/{owner}/{repo}/private-vulnerability-reporting')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function reposDisablePrivateVulnerabilityReporting(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/private-vulnerability-reporting')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<CustomPropertyValue>
+     * @return Envelope<PagesHealthCheck|EmptyObject|null|BasicError>
      */
-    public function reposCustomPropertiesForReposGetRepositoryValues(string $owner, string $repo): array
+    public function reposGetPagesHealthCheck(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PagesHealthCheck|EmptyObject|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/pages/health')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesHealthCheck::class)], ['202', ResponseType::object(EmptyObject::class)], ['400', null], ['422', null], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<ReposCheckPrivateVulnerabilityReporting200Content|BasicError>
+     */
+    public function reposCheckPrivateVulnerabilityReporting(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ReposCheckPrivateVulnerabilityReporting200Content|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/private-vulnerability-reporting')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposCheckPrivateVulnerabilityReporting200Content::class)], ['422', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposEnablePrivateVulnerabilityReporting(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/repos/{owner}/{repo}/private-vulnerability-reporting')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDisablePrivateVulnerabilityReporting(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/private-vulnerability-reporting')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<CustomPropertyValue>|BasicError>
+     */
+    public function reposCustomPropertiesForReposGetRepositoryValues(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<list<CustomPropertyValue>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/properties/values')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(CustomPropertyValue::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomPropertyValue::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function reposCustomPropertiesForReposCreateOrUpdateRepositoryValues(
         string $owner,
         string $repo,
         ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/properties/values')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetReadme(string $owner, string $repo, ?string $ref = null): ContentFile
+    /**
+     * @return Envelope<ContentFile|null|BasicError|ValidationError>
+     */
+    public function reposGetReadme(string $owner, string $repo, ?string $ref = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ContentFile|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/readme')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref),
-            ResponseType::object(ContentFile::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetReadmeInDirectory(
-        string $owner,
-        string $repo,
-        string $dir,
-        ?string $ref = null,
-    ): ContentFile {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ContentFile|BasicError|ValidationError>
+     */
+    public function reposGetReadmeInDirectory(string $owner, string $repo, string $dir, ?string $ref = null): Envelope
+    {
+        /** @var Envelope<ContentFile|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/readme/{dir}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('dir', $dir)
                 ->query('ref', $ref),
-            ResponseType::object(ContentFile::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Release>
+     * @return Envelope<list<Release>|BasicError>
      */
-    public function reposListReleases(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposListReleases(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Release>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Release
+    /**
+     * @return Envelope<Release|BasicError|ValidationError>
+     */
+    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Release|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetReleaseAsset(string $owner, string $repo, int $assetId): ReleaseAsset
+    /**
+     * @return Envelope<ReleaseAsset|BasicError|null>
+     */
+    public function reposGetReleaseAsset(string $owner, string $repo, int $assetId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ReleaseAsset|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/assets/{asset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId),
-            ResponseType::object(ReleaseAsset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)], ['404', ResponseType::object(BasicError::class)], ['302', null]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteReleaseAsset(string $owner, string $repo, int $assetId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteReleaseAsset(string $owner, string $repo, int $assetId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/releases/assets/{asset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReleaseAsset>
+     */
     public function reposUpdateReleaseAsset(
         string $owner,
         string $repo,
         int $assetId,
         ReposUpdateReleaseAssetRequestContent $body,
-    ): ReleaseAsset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReleaseAsset> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/releases/assets/{asset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId)
                 ->json($body),
-            ResponseType::object(ReleaseAsset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReleaseNotesContent|BasicError>
+     */
     public function reposGenerateReleaseNotes(
         string $owner,
         string $repo,
         ReposGenerateReleaseNotesRequestContent $body,
-    ): ReleaseNotesContent {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReleaseNotesContent|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases/generate-notes')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(ReleaseNotesContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseNotesContent::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetLatestRelease(string $owner, string $repo): Release
+    /**
+     * @return Envelope<Release|BasicError>
+     */
+    public function reposGetLatestRelease(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Release|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/latest')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetReleaseByTag(string $owner, string $repo, string $tag): Release
+    /**
+     * @return Envelope<Release|BasicError>
+     */
+    public function reposGetReleaseByTag(string $owner, string $repo, string $tag): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Release|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/tags/{tag}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('tag', $tag),
-            ResponseType::object(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetRelease(string $owner, string $repo, int $releaseId): Release
+    /**
+     * @return Envelope<Release|null>
+     */
+    public function reposGetRelease(string $owner, string $repo, int $releaseId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Release|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/{release_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId),
-            ResponseType::object(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['401', null]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteRelease(string $owner, string $repo, int $releaseId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteRelease(string $owner, string $repo, int $releaseId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/releases/{release_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Release|BasicError>
+     */
     public function reposUpdateRelease(
         string $owner,
         string $repo,
         int $releaseId,
         ReposUpdateReleaseRequestContent $body,
-    ): Release {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Release|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/releases/{release_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->json($body),
-            ResponseType::object(Release::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ReleaseAsset>
+     * @return Envelope<list<ReleaseAsset>>
      */
     public function reposListReleaseAssets(
         string $owner,
@@ -2399,18 +3194,24 @@ final readonly class ReposClient implements ReposClientInterface
         int $releaseId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ReleaseAsset>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/releases/{release_id}/assets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(ReleaseAsset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReleaseAsset::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ReleaseAsset|null>
+     */
     public function reposUploadReleaseAsset(
         string $owner,
         string $repo,
@@ -2418,8 +3219,9 @@ final readonly class ReposClient implements ReposClientInterface
         string $name,
         StreamInterface $body,
         ?string $label = null,
-    ): ReleaseAsset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReleaseAsset|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases/{release_id}/assets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -2427,12 +3229,14 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('name', $name)
                 ->query('label', $label)
                 ->binary($body, 'application/octet-stream'),
-            ResponseType::object(ReleaseAsset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReleaseAsset::class)], ['422', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RepositoryRuleDetailed>
+     * @return Envelope<list<RepositoryRuleDetailed>>
      */
     public function reposGetBranchRules(
         string $owner,
@@ -2440,20 +3244,23 @@ final readonly class ReposClient implements ReposClientInterface
         string $branch,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RepositoryRuleDetailed>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rules/branches/{branch}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(RepositoryRuleDetailed::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleDetailed::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RepositoryRuleset>
+     * @return Envelope<list<RepositoryRuleset>|BasicError>
      */
     public function reposGetRepoRulesets(
         string $owner,
@@ -2462,8 +3269,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?int $page = null,
         ?bool $includesParents = null,
         ?string $targets = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RepositoryRuleset>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -2471,24 +3279,35 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('page', $page)
                 ->query('includes_parents', $includesParents)
                 ->query('targets', $targets),
-            ResponseType::listOf(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposCreateRepoRuleset(
         string $owner,
         string $repo,
         ReposCreateRepoRulesetRequestContent $body,
-    ): RepositoryRuleset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryRuleset|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/rulesets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RuleSuites|BasicError>
+     */
     public function reposGetRepoRuleSuites(
         string $owner,
         string $repo,
@@ -2498,8 +3317,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposGetRepoRuleSuitesRuleSuiteResult $ruleSuiteResult = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): RuleSuites {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RuleSuites|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets/rule-suites')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -2509,66 +3329,92 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('rule_suite_result', $ruleSuiteResult)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(RuleSuites::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetRepoRuleSuite(string $owner, string $repo, int $ruleSuiteId): RuleSuite
+    /**
+     * @return Envelope<RuleSuite|BasicError>
+     */
+    public function reposGetRepoRuleSuite(string $owner, string $repo, int $ruleSuiteId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RuleSuite|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets/rule-suites/{rule_suite_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('rule_suite_id', $ruleSuiteId),
-            ResponseType::object(RuleSuite::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError>
+     */
     public function reposGetRepoRuleset(
         string $owner,
         string $repo,
         int $rulesetId,
         ?bool $includesParents = null,
-    ): RepositoryRuleset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryRuleset|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets/{ruleset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->query('includes_parents', $includesParents),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposUpdateRepoRuleset(
         string $owner,
         string $repo,
         int $rulesetId,
         ReposUpdateRepoRulesetRequestContent $body,
-    ): RepositoryRuleset {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryRuleset|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/rulesets/{ruleset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->json($body),
-            ResponseType::object(RepositoryRuleset::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDeleteRepoRuleset(string $owner, string $repo, int $rulesetId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteRepoRuleset(string $owner, string $repo, int $rulesetId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/rulesets/{ruleset_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RulesetVersion>
+     * @return Envelope<list<RulesetVersion>|BasicError>
      */
     public function reposGetRepoRulesetHistory(
         string $owner,
@@ -2576,306 +3422,416 @@ final readonly class ReposClient implements ReposClientInterface
         int $rulesetId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RulesetVersion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets/{ruleset_id}/history')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(RulesetVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetRepoRulesetVersion(
-        string $owner,
-        string $repo,
-        int $rulesetId,
-        int $versionId,
-    ): RulesetVersionWithState {
-        return $this->transport->send(
+    /**
+     * @return Envelope<RulesetVersionWithState|BasicError>
+     */
+    public function reposGetRepoRulesetVersion(string $owner, string $repo, int $rulesetId, int $versionId): Envelope
+    {
+        /** @var Envelope<RulesetVersionWithState|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/rulesets/{ruleset_id}/history/{version_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->path('version_id', $versionId),
-            ResponseType::object(RulesetVersionWithState::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeFrequencyStat>
+     * @return Envelope<list<CodeFrequencyStat>|array<string, mixed>|null>
      */
-    public function reposGetCodeFrequencyStats(string $owner, string $repo): array
+    public function reposGetCodeFrequencyStats(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<CodeFrequencyStat>|array<string, mixed>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/stats/code_frequency')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(CodeFrequencyStat::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null], ['422', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CommitActivity>
+     * @return Envelope<list<CommitActivity>|array<string, mixed>|null>
      */
-    public function reposGetCommitActivityStats(string $owner, string $repo): array
+    public function reposGetCommitActivityStats(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<CommitActivity>|array<string, mixed>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/stats/commit_activity')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(CommitActivity::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ContributorActivity>
+     * @return Envelope<list<ContributorActivity>|array<string, mixed>|null>
      */
-    public function reposGetContributorsStats(string $owner, string $repo): array
+    public function reposGetContributorsStats(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<ContributorActivity>|array<string, mixed>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/stats/contributors')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(ContributorActivity::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContributorActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null]])),
         );
-    }
 
-    public function reposGetParticipationStats(string $owner, string $repo): ParticipationStats
-    {
-        return $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/stats/participation')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::object(ParticipationStats::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<CodeFrequencyStat>
+     * @return Envelope<ParticipationStats|BasicError>
      */
-    public function reposGetPunchCardStats(string $owner, string $repo): array
+    public function reposGetParticipationStats(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ParticipationStats|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/stats/participation')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ParticipationStats::class)], ['404', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<CodeFrequencyStat>|null>
+     */
+    public function reposGetPunchCardStats(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<list<CodeFrequencyStat>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/stats/punch_card')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(CodeFrequencyStat::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['204', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Status>
+     */
     public function reposCreateCommitStatus(
         string $owner,
         string $repo,
         string $sha,
         ReposCreateCommitStatusRequestContent $body,
-    ): Status {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Status> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/statuses/{sha}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('sha', $sha)
                 ->json($body),
-            ResponseType::object(Status::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Status::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Tag>
+     * @return Envelope<list<Tag>>
      */
-    public function reposListTags(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposListTags(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Tag>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/tags')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Tag::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Tag::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposDownloadTarballArchive(string $owner, string $repo, string $ref): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDownloadTarballArchive(string $owner, string $repo, string $ref): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/tarball/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError>
      */
-    public function reposListTeams(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array
+    public function reposListTeams(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Team>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/teams')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetAllTopics(string $owner, string $repo, ?int $page = null, ?int $perPage = null): Topic
+    /**
+     * @return Envelope<Topic|BasicError>
+     */
+    public function reposGetAllTopics(string $owner, string $repo, ?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Topic|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/topics')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(Topic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Topic|BasicError|ValidationErrorSimple>
+     */
     public function reposReplaceAllTopics(
         string $owner,
         string $repo,
         ReposReplaceAllTopicsRequestContent $body,
-    ): Topic {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Topic|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/topics')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(Topic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetClones(string $owner, string $repo, ?ReposGetClonesPer $per = null): CloneTraffic
+    /**
+     * @return Envelope<CloneTraffic|BasicError>
+     */
+    public function reposGetClones(string $owner, string $repo, ?ReposGetClonesPer $per = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CloneTraffic|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/traffic/clones')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per', $per),
-            ResponseType::object(CloneTraffic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloneTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ContentTraffic>
+     * @return Envelope<list<ContentTraffic>|BasicError>
      */
-    public function reposGetTopPaths(string $owner, string $repo): array
+    public function reposGetTopPaths(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<ContentTraffic>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/traffic/popular/paths')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(ContentTraffic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContentTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ReferrerTraffic>
+     * @return Envelope<list<ReferrerTraffic>|BasicError>
      */
-    public function reposGetTopReferrers(string $owner, string $repo): array
+    public function reposGetTopReferrers(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<ReferrerTraffic>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/traffic/popular/referrers')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(ReferrerTraffic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReferrerTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposGetViews(string $owner, string $repo, ?ReposGetViewsPer $per = null): ViewTraffic
+    /**
+     * @return Envelope<ViewTraffic|BasicError>
+     */
+    public function reposGetViews(string $owner, string $repo, ?ReposGetViewsPer $per = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ViewTraffic|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/traffic/views')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per', $per),
-            ResponseType::object(ViewTraffic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ViewTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): MinimalRepository
+    /**
+     * @return Envelope<MinimalRepository>
+     */
+    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<MinimalRepository> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/transfer')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(MinimalRepository::class)]])),
         );
+
+        return $result;
     }
 
-    public function reposCheckVulnerabilityAlerts(string $owner, string $repo): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposCheckVulnerabilityAlerts(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
+
+        return $result;
     }
 
-    public function reposEnableVulnerabilityAlerts(string $owner, string $repo): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposEnableVulnerabilityAlerts(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function reposDisableVulnerabilityAlerts(string $owner, string $repo): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDisableVulnerabilityAlerts(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
+
+        return $result;
     }
 
-    public function reposDownloadZipballArchive(string $owner, string $repo, string $ref): void
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDownloadZipballArchive(string $owner, string $repo, string $ref): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/zipball/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<FullRepository>
+     */
     public function reposCreateUsingTemplate(
         string $templateOwner,
         string $templateRepo,
         ReposCreateUsingTemplateRequestContent $body,
-    ): FullRepository {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<FullRepository> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{template_owner}/{template_repo}/generate')
                 ->path('template_owner', $templateOwner)
                 ->path('template_repo', $templateRepo)
                 ->json($body),
-            ResponseType::object(FullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|ValidationError|null>
      */
-    public function reposListPublic(?int $since = null): array
+    public function reposListPublic(?int $since = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<MinimalRepository>|ValidationError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repositories')->query('since', $since),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null]])),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Repository>
+     * @return Envelope<list<Repository>|ValidationError|null|BasicError>
      */
     public function reposListForAuthenticatedUser(
         ?ReposListForAuthenticatedUserVisibility $visibility = null,
@@ -2887,8 +3843,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?int $page = null,
         ?\DateTimeImmutable $since = null,
         ?\DateTimeImmutable $before = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Repository>|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/repos')
                 ->query('visibility', $visibility)
                 ->query('affiliation', $affiliation)
@@ -2899,52 +3856,74 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('page', $page)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('before', $before?->format(DateTimeInterface::RFC3339)),
-            ResponseType::listOf(Repository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposCreateForAuthenticatedUser(
-        ReposCreateForAuthenticatedUserRequestContent $body,
-    ): FullRepository {
-        return $this->transport->send(
-            Endpoint::post('/user/repos')->json($body),
-            ResponseType::object(FullRepository::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<RepositoryInvitation>
+     * @return Envelope<FullRepository|BasicError|null|ValidationError>
      */
-    public function reposListInvitationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function reposCreateForAuthenticatedUser(ReposCreateForAuthenticatedUserRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<FullRepository|BasicError|null|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/user/repos')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<RepositoryInvitation>|null|BasicError>
+     */
+    public function reposListInvitationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<RepositoryInvitation>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/repository_invitations')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(RepositoryInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
-    }
 
-    public function reposDeclineInvitationForAuthenticatedUser(int $invitationId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/user/repository_invitations/{invitation_id}')
-                ->path('invitation_id', $invitationId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function reposAcceptInvitationForAuthenticatedUser(int $invitationId): void
-    {
-        $this->transport->send(
-            Endpoint::patch('/user/repository_invitations/{invitation_id}')
-                ->path('invitation_id', $invitationId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeclineInvitationForAuthenticatedUser(int $invitationId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/user/repository_invitations/{invitation_id}')
+                ->path('invitation_id', $invitationId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposAcceptInvitationForAuthenticatedUser(int $invitationId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/user/repository_invitations/{invitation_id}')
+                ->path('invitation_id', $invitationId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<MinimalRepository>>
      */
     public function reposListForUser(
         string $username,
@@ -2953,8 +3932,9 @@ final readonly class ReposClient implements ReposClientInterface
         ?ReposListForUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/repos')
                 ->path('username', $username)
                 ->query('type', $type)
@@ -2962,7 +3942,9 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
+
+        return $result;
     }
 }

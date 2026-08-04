@@ -11,11 +11,22 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\VpcsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\VpcsCreatePeerings202Content;
 use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequestContent;
 use Acme\DigitalOcean\Generated\Model\VpcsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsGet200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsList200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsListMembers200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsListPeerings200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsPatch200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchPeerings200Content;
 use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequestContent;
 use Acme\DigitalOcean\Generated\Model\VpcsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `VPCs` endpoints.
@@ -28,60 +39,70 @@ interface VPCsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsList200Content|Error>
      */
-    public function vpcsList(?int $perPage = null, ?int $page = null): void;
+    public function vpcsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:create`.
+     * @return Envelope<VpcsCreate201Content|Error>
      */
-    public function vpcsCreate(VpcsCreateRequestContent $body): void;
+    public function vpcsCreate(VpcsCreateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsGet200Content|Error>
      */
-    public function vpcsGet(string $vpcId): void;
+    public function vpcsGet(string $vpcId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
+     * @return Envelope<VpcsUpdate200Content|Error>
      */
-    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): void;
+    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:delete`.
+     * @return Envelope<null|Error>
      */
-    public function vpcsDelete(string $vpcId): void;
+    public function vpcsDelete(string $vpcId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
+     * @return Envelope<VpcsPatch200Content|Error>
      */
-    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): void;
+    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsListMembers200Content|Error>
      */
     public function vpcsListMembers(
         string $vpcId,
         ?string $resourceType = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     * @return Envelope<VpcsListPeerings200Content|Error>
      */
-    public function vpcsListPeerings(string $vpcId, ?int $perPage = null, ?int $page = null): void;
+    public function vpcsListPeerings(string $vpcId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
+     * @return Envelope<VpcsCreatePeerings202Content|Error>
      */
-    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): void;
+    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
+     * @return Envelope<VpcsPatchPeerings200Content|Error>
      */
     public function vpcsPatchPeerings(
         string $vpcId,
         string $vpcPeeringId,
         VpcsPatchPeeringsRequestContent $body,
-    ): void;
+    ): Envelope;
 }

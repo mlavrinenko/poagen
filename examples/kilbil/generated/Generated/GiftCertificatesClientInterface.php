@@ -12,10 +12,14 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GenerateGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateGiftCard403Content;
 use Acme\Kilbil\Generated\Model\GenerateGiftCardRequestContent;
 use Acme\Kilbil\Generated\Model\GetProgramGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GetProgramGiftCard403Content;
 use Acme\Kilbil\Generated\Model\SearchGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCard403Content;
 use Acme\Kilbil\Generated\Model\SearchGiftCardRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Подарочные сертификаты` endpoints.
@@ -26,9 +30,18 @@ use Acme\Kilbil\Generated\Model\SearchGiftCardRequestContent;
  */
 interface GiftCertificatesClientInterface
 {
-    public function generateGiftCard(GenerateGiftCardRequestContent $body): GenerateGiftCard200Content;
+    /**
+     * @return Envelope<GenerateGiftCard200Content|GenerateGiftCard403Content>
+     */
+    public function generateGiftCard(GenerateGiftCardRequestContent $body): Envelope;
 
-    public function getProgramGiftCard(): GetProgramGiftCard200Content;
+    /**
+     * @return Envelope<GetProgramGiftCard200Content|GetProgramGiftCard403Content>
+     */
+    public function getProgramGiftCard(): Envelope;
 
-    public function searchGiftCard(SearchGiftCardRequestContent $body): SearchGiftCard200Content;
+    /**
+     * @return Envelope<SearchGiftCard200Content|SearchGiftCard403Content>
+     */
+    public function searchGiftCard(SearchGiftCardRequestContent $body): Envelope;
 }

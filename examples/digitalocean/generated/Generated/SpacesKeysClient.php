@@ -11,9 +11,17 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\Key;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyCreate201Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyGet200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyList200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyPatch200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyUpdate200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SpacesKeysClient implements SpacesKeysClientInterface
@@ -26,6 +34,7 @@ final readonly class SpacesKeysClient implements SpacesKeysClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:read`.
+     * @return Envelope<SpacesKeyList200Content|Error>
      */
     public function spacesKeyList(
         ?int $perPage = null,
@@ -35,8 +44,9 @@ final readonly class SpacesKeysClient implements SpacesKeysClientInterface
         ?string $name = null,
         ?string $bucket = null,
         ?string $permission = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SpacesKeyList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/spaces/keys')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
@@ -46,74 +56,96 @@ final readonly class SpacesKeysClient implements SpacesKeysClientInterface
                 ->query('bucket', $bucket)
                 ->query('permission', $permission)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SpacesKeyList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:create_credentials`.
+     * @return Envelope<SpacesKeyCreate201Content|Error>
      */
-    public function spacesKeyCreate(Key $body): void
+    public function spacesKeyCreate(Key $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SpacesKeyCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/spaces/keys')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SpacesKeyCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:read`.
+     * @return Envelope<SpacesKeyGet200Content|Error>
      */
-    public function spacesKeyGet(string $accessKey): void
+    public function spacesKeyGet(string $accessKey): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SpacesKeyGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/spaces/keys/{access_key}')
                 ->path('access_key', $accessKey)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SpacesKeyGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:update`.
+     * @return Envelope<SpacesKeyUpdate200Content|Error>
      */
-    public function spacesKeyUpdate(string $accessKey, Key $body): void
+    public function spacesKeyUpdate(string $accessKey, Key $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SpacesKeyUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/spaces/keys/{access_key}')
                 ->path('access_key', $accessKey)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SpacesKeyUpdate200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:delete`.
+     * @return Envelope<null|Error>
      */
-    public function spacesKeyDelete(string $accessKey): void
+    public function spacesKeyDelete(string $accessKey): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/spaces/keys/{access_key}')
                 ->path('access_key', $accessKey)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:update`.
+     * @return Envelope<SpacesKeyPatch200Content|Error>
      */
-    public function spacesKeyPatch(string $accessKey, Key $body): void
+    public function spacesKeyPatch(string $accessKey, Key $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SpacesKeyPatch200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/spaces/keys/{access_key}')
                 ->path('access_key', $accessKey)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SpacesKeyPatch200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

@@ -12,11 +12,20 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\RegionSlug;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreate201Content;
 use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsGetById200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsList200Content;
+use Acme\DigitalOcean\Generated\Model\VolumesCreate201Content;
 use Acme\DigitalOcean\Generated\Model\VolumesExt4;
+use Acme\DigitalOcean\Generated\Model\VolumesGet200Content;
+use Acme\DigitalOcean\Generated\Model\VolumesList200Content;
 use Acme\DigitalOcean\Generated\Model\VolumesXfs;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class BlockStorageClient implements BlockStorageClientInterface
@@ -29,129 +38,165 @@ final readonly class BlockStorageClient implements BlockStorageClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `api:read`, `api:write`, `block_storage:read`.
+     * @return Envelope<VolumesList200Content|Error>
      */
     public function volumesList(
         ?string $name = null,
         ?RegionSlug $region = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VolumesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes')
                 ->query('name', $name)
                 ->query('region', $region)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `api:write`, `block_storage:create`.
+     * @return Envelope<VolumesCreate201Content|Error>
      */
-    public function volumesCreate(VolumesExt4|VolumesXfs $body): void
+    public function volumesCreate(VolumesExt4|VolumesXfs $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumesCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/volumes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(VolumesCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:delete`, `api:write`.
+     * @return Envelope<null|Error>
      */
-    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): void
+    public function volumesDeleteByName(?string $name = null, ?RegionSlug $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/volumes')
                 ->query('name', $name)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.
+     * @return Envelope<VolumeSnapshotsGetById200Content|Error>
      */
-    public function volumeSnapshotsGetById(string $snapshotId): void
+    public function volumeSnapshotsGetById(string $snapshotId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumeSnapshotsGetById200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumeSnapshotsGetById200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:delete`.
+     * @return Envelope<null|Error>
      */
-    public function volumeSnapshotsDeleteById(string $snapshotId): void
+    public function volumeSnapshotsDeleteById(string $snapshotId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/volumes/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:read`.
+     * @return Envelope<VolumesGet200Content|Error>
      */
-    public function volumesGet(string $volumeId): void
+    public function volumesGet(string $volumeId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes/{volume_id}')
                 ->path('volume_id', $volumeId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage:delete`.
+     * @return Envelope<null|Error>
      */
-    public function volumesDelete(string $volumeId): void
+    public function volumesDelete(string $volumeId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/volumes/{volume_id}')
                 ->path('volume_id', $volumeId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:read`.
+     * @return Envelope<VolumeSnapshotsList200Content|Error>
      */
-    public function volumeSnapshotsList(string $volumeId, ?int $perPage = null, ?int $page = null): void
+    public function volumeSnapshotsList(string $volumeId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumeSnapshotsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/volumes/{volume_id}/snapshots')
                 ->path('volume_id', $volumeId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VolumeSnapshotsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:create`.
+     * @return Envelope<VolumeSnapshotsCreate201Content|Error>
      */
-    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequestContent $body): void
+    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VolumeSnapshotsCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/volumes/{volume_id}/snapshots')
                 ->path('volume_id', $volumeId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(VolumeSnapshotsCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

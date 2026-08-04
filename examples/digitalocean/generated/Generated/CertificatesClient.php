@@ -13,8 +13,14 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\CertificateRequestCustom;
 use Acme\DigitalOcean\Generated\Model\CertificateRequestLetsEncrypt;
+use Acme\DigitalOcean\Generated\Model\CertificatesCreate201Content;
+use Acme\DigitalOcean\Generated\Model\CertificatesGet200Content;
+use Acme\DigitalOcean\Generated\Model\CertificatesList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CertificatesClient implements CertificatesClientInterface
@@ -27,55 +33,71 @@ final readonly class CertificatesClient implements CertificatesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `certificate:read`.
+     * @return Envelope<CertificatesList200Content|Error>
      */
-    public function certificatesList(?int $perPage = null, ?int $page = null, ?string $name = null): void
+    public function certificatesList(?int $perPage = null, ?int $page = null, ?string $name = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CertificatesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/certificates')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('name', $name)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CertificatesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `certificate:create`.
+     * @return Envelope<CertificatesCreate201Content|Error>
      */
-    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): void
+    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CertificatesCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/certificates')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CertificatesCreate201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `certificate:read`.
+     * @return Envelope<CertificatesGet200Content|Error>
      */
-    public function certificatesGet(string $certificateId): void
+    public function certificatesGet(string $certificateId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<CertificatesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/certificates/{certificate_id}')
                 ->path('certificate_id', $certificateId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CertificatesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `certificate:delete`.
+     * @return Envelope<null|Error>
      */
-    public function certificatesDelete(string $certificateId): void
+    public function certificatesDelete(string $certificateId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/certificates/{certificate_id}')
                 ->path('certificate_id', $certificateId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

@@ -38,7 +38,7 @@ final class ScalarListResponseTest extends TestCase
     {
         $sources = $this->sources();
 
-        self::assertStringContainsString('@return list<string>', $sources);
+        self::assertStringContainsString('@return Envelope<list<string>>', $sources);
         self::assertStringContainsString('ResponseType::scalarListOf(ResponseType::string())', $sources);
     }
 
@@ -57,7 +57,7 @@ final class ScalarListResponseTest extends TestCase
         // `format: date` is `\DateTimeImmutable` on a model property, so it is
         // `\DateTimeImmutable` here. Arriving as a raw string would make the
         // same annotation mean two different things in one document.
-        self::assertStringContainsString('@return list<DateTimeImmutable>', $sources);
+        self::assertStringContainsString('@return Envelope<list<DateTimeImmutable>>', $sources);
         self::assertStringContainsString('ResponseType::scalarListOf(ResponseType::dateTime())', $sources);
     }
 
@@ -67,7 +67,7 @@ final class ScalarListResponseTest extends TestCase
 
         // Email is a `#[BindsFormat('email')]` value object implementing
         // ScalarBinding. A built-in would have left this a plain string.
-        self::assertStringContainsString('@return list<Email>', $sources);
+        self::assertStringContainsString('@return Envelope<list<Email>>', $sources);
         self::assertStringContainsString('ResponseType::scalarListOf(ResponseType::binding(Email::class))', $sources);
     }
 
@@ -76,7 +76,7 @@ final class ScalarListResponseTest extends TestCase
         $sources = $this->sources();
 
         self::assertStringContainsString('ResponseType::listOf(Pet::class)', $sources);
-        self::assertStringContainsString('@return list<Pet>', $sources);
+        self::assertStringContainsString('@return Envelope<list<Pet>>', $sources);
     }
 
     public function testItemsThatDeclareNothingAreRefusedRatherThanWidenedToMixed(): void
