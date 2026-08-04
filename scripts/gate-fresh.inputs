@@ -7,12 +7,14 @@
 #
 # One path per line, relative to the repo root. A directory is walked
 # recursively. A line starting with `!` excludes a path (matched as an exact
-# path or a directory prefix) from an include already listed above it. A line
-# starting with `?` includes a path (directory, walked recursively) by NAME
-# ONLY: each file under it contributes its path to the hash but never its
-# content, so adding, removing or renaming a file there changes the result
-# and editing one in place does not. Blank lines and `#` comments are
-# ignored.
+# path, a directory prefix, or a glob pattern containing `*` — `*` matches
+# within one path segment, same as a shell glob, so `examples/*/build`
+# matches `examples/kilbil/build` but not `examples/kilbil/x/build`) from an
+# include already listed above it. A line starting with `?` includes a path
+# (directory, walked recursively) by NAME ONLY: each file under it
+# contributes its path to the hash but never its content, so adding,
+# removing or renaming a file there changes the result and editing one in
+# place does not. Blank lines and `#` comments are ignored.
 #
 # CRITICAL: truth/tasks is excluded and MUST STAY excluded. `mt flip` writes
 # the task file it is gating (the status field, the note), so if task
@@ -44,6 +46,41 @@ tests
 examples
 truth
 !truth/tasks
+
+# examples/*/build is each example's own PHPStan tmpDir —
+# examples/<name>/phpstan.neon sets `tmpDir: ./build/cache/phpstan`, and
+# `just check`'s lint-phpstan-generated step runs `just check` inside every
+# examples/*/ directory, so every `just check` writes there. Each
+# examples/<name>/.gitignore already ignores it alongside vendor/ and
+# composer.lock, same as the root build/ tree (never in this file's include
+# list at all) ignores the root tool caches.
+#
+# It is not byte-stable run over run — reproduced 2026-08-04 by running
+# `just check` twice in a row in examples/kilbil with nothing else touched,
+# then again via two full `scripts/gated-check` / `just check` passes with
+# zero tracked changes in between (`git status --porcelain` and `git diff
+# --stat` both empty): the recorded hash still went stale.
+# `build/cache/phpstan/cache/nette.configurator/container.journal` changes
+# content every run (`Container_c74faa8208:<unix-timestamp>`, minted fresh
+# by Nette's DI container journal), and
+# `build/cache/phpstan/cache/PHPStan/cache-cleared` (content `v2-new`)
+# appeared on the second run where it was absent on the first — so even the
+# SET of file names under build/ is unstable, and tracking it by name only
+# (the `?` mechanism below) would still flip freshness on an untouched tree.
+# Fully excluded, not name-only, for that reason.
+#
+# Irrelevant to whether the gate ran: build/ is PHPStan's own scratch cache,
+# never something `just check` reads as an input that decides whether it
+# would still pass, and no reviewer would call cache content "the work" —
+# what IS the work stays hashed by the `examples` include above:
+# examples/*/generated, examples/*/src, and each example's own
+# phpstan.neon and Justfile.
+#
+# A glob, not four literal paths, because a hand-enumerated list is exactly
+# the kind of set that goes stale unnoticed — see `./*.md` further down for
+# the same lesson learned once already on this file. `scripts/gate-fresh`'s
+# exclude matching understands `*` in a pattern for this reason.
+!examples/*/build
 
 # `truth/notes` and `truth/reviews` are Markdown, never `#include`-d into
 # `truth/main.typ` — main.typ's own "Supplementary artefacts" section

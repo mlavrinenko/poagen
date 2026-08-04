@@ -95,12 +95,20 @@ hash_inputs() {
         fi
     done
 
+    # $ex is deliberately unquoted on the right of `==` here: inside
+    # `[[ ]]` an unquoted RHS is a glob pattern, so a literal exclude like
+    # `truth/tasks` still matches only itself (no glob metacharacters, so
+    # the pattern degenerates to a literal), while `examples/*/build`
+    # matches every example's build dir without enumerating them by name —
+    # see gate-fresh.inputs for why that enumeration is the thing to avoid.
+    # No filesystem globbing happens here; `[[ ]]` never touches disk for a
+    # pattern match, it only compares against the already-collected $rel.
     local -a kept=()
     local rel ex skip
     for rel in "${files[@]}"; do
         skip=0
         for ex in "${excludes[@]}"; do
-            if [[ "$rel" == "$ex" || "$rel" == "$ex"/* ]]; then
+            if [[ "$rel" == $ex || "$rel" == $ex/* ]]; then
                 skip=1
                 break
             fi
