@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A 2xx response whose schema declares `format: binary` returns a PSR-7
   `StreamInterface` instead of aborting generation, mirroring the request
   side's binary body. The stream is never read to produce it.
+- Skipping a component whose type another component or operation still
+  references now refuses the run, naming every referencer and the
+  `Profile::$skip` entry that would resolve it, instead of emitting a
+  dangling reference to a class that no longer exists.
 
 ### Changed
 

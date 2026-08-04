@@ -157,6 +157,8 @@
 #include "decisions/envelope-supersedes-error-response-policy.decision-260804.typ"
 #pagebreak()
 #include "decisions/envelope-remeasures-the-generated-duplication-floors.decision-260804.typ"
+#pagebreak()
+#include "decisions/refuse-a-skip-that-leaves-dangling-references.decision-260804.typ"
 
 // --- Supplementary artefacts ---
 //

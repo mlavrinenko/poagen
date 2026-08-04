@@ -159,8 +159,11 @@ final readonly class SchemaWalk
      * context cannot resolve answers `null`, same as an unresolvable request
      * body does, rather than fabricating a `Response` the document never
      * wrote.
+     *
+     * Public so {@see OperationReferencedComponents} can resolve the same
+     * container this class already does, without a second copy of the rule.
      */
-    private static function resolveResponse(Response|Reference|null $response): ?Response
+    public static function resolveResponse(Response|Reference|null $response): ?Response
     {
         if ($response instanceof Reference) {
             $resolved = $response->resolve();

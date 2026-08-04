@@ -11,6 +11,7 @@ use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
+use Mlavrinenko\Paogen\Generator\Emit\DanglingReferenceScanner;
 use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
@@ -29,7 +30,6 @@ use Mlavrinenko\Paogen\Generator\Emit\SchemalessBodyAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
 use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
 use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
 use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
@@ -149,15 +149,14 @@ final readonly class Generator
         $writes = [];
 
         $components = ComponentCatalog::build($openApi, $registry, $enums);
-        $excludedComponents = array_fill_keys(
-            array_map(
-                static fn(SkippedComponent $c): string => $c->rawName,
-                [...$unions->failures(), ...$schemaSkips['components']],
-            ),
-            true,
-        );
         // Both refusal sources a skip entry must cover — see OperationAnalyzer::preScanSkips().
         $preScannedSkips = OperationAnalyzer::preScanSkips($openApi, $schemaSkips['operations']);
+
+        // Refuse, not cascade (a-skipped-component-leaves-dangling-references-behind-it) — see DanglingReferenceScanner.
+        $unrepresentable = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components']];
+        $dangling = DanglingReferenceScanner::scan($openApi, $unrepresentable, $preScannedSkips);
+        $excludedComponents = $dangling['excluded'];
+        $preScannedSkips += $dangling['operations']; // earlier reasons win
 
         // Payload classes are named before anything is emitted: the model planner emits them, and
         // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
@@ -208,7 +207,7 @@ final readonly class Generator
             ...QuerySerializationAdvisor::notices($openApi),
             ...InlineModelMergeAdvisor::notices($openApi, $operationIdRegistry, $preScannedSkips),
         ];
-        $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components']];
+        $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components'], ...$dangling['components']];
 
         $failures = [
             ...$profileSecurityFailures,
