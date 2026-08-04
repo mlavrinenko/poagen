@@ -3,11 +3,11 @@ info:
   title: Inline Payload Name Collision Fixture
   version: "1.0.0"
   description: >
-    inline-body-and-response-schemas fixture. `placeOrder`'s inline response
-    derives the class name `PlaceOrderResponse`, and a component is declared
-    under that same name — two different shapes, one emitted file. The run has
-    to fail and name both origins rather than let the second write overwrite
-    the first.
+    name-inline-schemas-by-operation-and-status fixture. `placeOrder`'s inline
+    `200` response derives the class name `PlaceOrder200Content`, and a
+    component is declared under that same name — two different shapes, one
+    emitted file. The run has to fail and name both origins rather than let
+    the second write overwrite the first.
 paths:
   /orders:
     post:
@@ -32,13 +32,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlaceOrderResponse'
+              $ref: '#/components/schemas/PlaceOrder200Content'
       responses:
         '204':
           description: ok
 components:
   schemas:
-    PlaceOrderResponse:
+    PlaceOrder200Content:
       type: object
       required:
         - unrelated

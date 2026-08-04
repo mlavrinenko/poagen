@@ -64,9 +64,9 @@ final class WidenedShapesTest extends TestCase
         // has no contract a reader can rely on.
         $plan = $this->plan();
 
-        self::assertContains('SaveProfileResponse', $this->modelNames($plan));
+        self::assertContains('SaveProfile200Content', $this->modelNames($plan));
         self::assertStringContainsString(
-            'public function saveProfile(SaveProfileRequest $body): SaveProfileResponse',
+            'public function saveProfile(SaveProfileRequestContent $body): SaveProfile200Content',
             $this->clientSource($plan),
         );
     }
@@ -87,7 +87,7 @@ final class WidenedShapesTest extends TestCase
     {
         // At payload granularity this shape emitted nothing at all: the
         // properties vanished with no comment anywhere in the client.
-        $request = $this->sourceOf($this->plan(), 'SaveProfileRequest.php');
+        $request = $this->sourceOf($this->plan(), 'SaveProfileRequestContent.php');
 
         self::assertStringContainsString('public ?string $handle = null,', $request);
         self::assertStringContainsString('@param array<string, Part> $additionalProperties', $request);

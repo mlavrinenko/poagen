@@ -56,7 +56,7 @@ final class XmlRequestBodyTest extends TestCase
         // encoding differs.
         // No methodRenames here, so the method keeps the vendor's spelling.
         self::assertStringContainsString('public function goodsxml(array $body', $surface);
-        self::assertStringContainsString('GoodsxmlRequestItem> $body', $surface);
+        self::assertStringContainsString('GoodsxmlRequestContentItem> $body', $surface);
         // The element names the document supplies travel with the body; how it
         // is rendered and which content type it carries are the transport's.
         self::assertStringContainsString("->xmlList(\$body, 'goods', 'good')", $surface);

@@ -54,7 +54,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     public function testAnInlineObjectBodyAndResponseAreBothTyped(): void
     {
         self::assertStringContainsString(
-            'public function placeOrder(PlaceOrderRequest $body): PlaceOrderResponse',
+            'public function placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content',
             $this->clientSource($this->plan()),
         );
     }
@@ -66,8 +66,8 @@ final class InlinePayloadSynthesisTest extends TestCase
         // Both models are imported into the client's namespace, so a correct
         // emitter shortens the doc type to the imported alias (T-260730)
         // rather than repeating the FQCN nette already resolves in the signature.
-        self::assertStringContainsString('@param list<PlaceOrdersBulkRequestItem> $body', $client);
-        self::assertStringContainsString('@return list<PlaceOrdersBulkResponseItem>', $client);
+        self::assertStringContainsString('@param list<PlaceOrdersBulkRequestContentItem> $body', $client);
+        self::assertStringContainsString('@return list<PlaceOrdersBulk200ContentItem>', $client);
         self::assertStringContainsString('public function placeOrdersBulk(array $body): array', $client);
     }
 
@@ -77,9 +77,9 @@ final class InlinePayloadSynthesisTest extends TestCase
 
         // The response root, an object nested one level under it, and the item
         // class of an array nested under it.
-        self::assertContains('PlaceOrderResponse', $models);
-        self::assertContains('PlaceOrderResponseShipping', $models);
-        self::assertContains('PlaceOrderResponseLinesItem', $models);
+        self::assertContains('PlaceOrder200Content', $models);
+        self::assertContains('PlaceOrder200ContentShipping', $models);
+        self::assertContains('PlaceOrder200ContentLinesItem', $models);
     }
 
     public function testAnInlineEnumInAPayloadBecomesABackedEnum(): void
@@ -87,8 +87,8 @@ final class InlinePayloadSynthesisTest extends TestCase
         $enums = $this->emittedNames($this->plan(), 'Enum');
 
         // On a property, and on an array's items.
-        self::assertContains('PlaceOrderRequestChannel', $enums);
-        self::assertContains('PlaceOrderResponseTagsItem', $enums);
+        self::assertContains('PlaceOrderRequestContentChannel', $enums);
+        self::assertContains('PlaceOrder200ContentTagsItem', $enums);
     }
 
     public function testAnUnconstrainedInlineObjectBodyIsPassedAsAMapRatherThanDroppingTheOperation(): void
@@ -168,8 +168,8 @@ final class InlinePayloadSynthesisTest extends TestCase
             $this->planFor(self::COLLISION_SCHEMA);
             self::fail('expected ModelNameCollisionException');
         } catch (ModelNameCollisionException $e) {
-            self::assertStringContainsString('PlaceOrderResponse', $e->getMessage());
-            self::assertStringContainsString('components.schemas/PlaceOrderResponse', $e->getMessage());
+            self::assertStringContainsString('PlaceOrder200Content', $e->getMessage());
+            self::assertStringContainsString('components.schemas/PlaceOrder200Content', $e->getMessage());
             self::assertStringContainsString('/paths/~1orders/post/responses/200', $e->getMessage());
         }
     }

@@ -1328,17 +1328,17 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenGeneratedFileGeneratedModelPlaceOrderRequestPhpAndGeneratedFileGeneratedModelPlaceOrderResponsePhpAreBothWritten(
+    public function thenGeneratedFileGeneratedModelPlaceOrderRequestContentPhpAndGeneratedFileGeneratedModelPlaceOrder200ContentPhpAreBothWritten(
     ): void {
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrderRequest.php');
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponse.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrderRequestContent.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrder200Content.php');
     }
 
 
-    public function thenEmittedClientDeclaresPlaceOrderPlaceOrderRequestBodyPlaceOrderResponse(): void
+    public function thenEmittedClientDeclaresPlaceOrderPlaceOrderRequestContentBodyPlaceOrder200Content(): void
     {
         TestCase::assertStringContainsString(
-            'public function placeOrder(PlaceOrderRequest $body): PlaceOrderResponse',
+            'public function placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content',
             $this->inlineClientSource(),
         );
     }
@@ -1362,21 +1362,21 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenGeneratedFileGeneratedModelPlaceOrdersBulkRequestItemPhpAndGeneratedFileGeneratedModelPlaceOrdersBulkResponseItemPhpAreWrittenForTheItemShapes(
+    public function thenGeneratedFileGeneratedModelPlaceOrdersBulkRequestContentItemPhpAndGeneratedFileGeneratedModelPlaceOrdersBulk200ContentItemPhpAreWrittenForTheItemShapes(
     ): void {
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrdersBulkRequestItem.php');
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrdersBulkResponseItem.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrdersBulkRequestContentItem.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrdersBulk200ContentItem.php');
     }
 
 
-    public function thenEmittedClientTypesTheParameterListPlaceOrdersBulkRequestItemAndTheReturnListPlaceOrdersBulkResponseItemInPhpdoc(
+    public function thenEmittedClientTypesTheParameterListPlaceOrdersBulkRequestContentItemAndTheReturnListPlaceOrdersBulk200ContentItemInPhpdoc(
     ): void {
         $client = $this->inlineClientSource();
 
         // The signature is `array`; the element type lives in phpdoc, which is
         // the only place PHP lets it be said.
-        TestCase::assertStringContainsString('@param list<PlaceOrdersBulkRequestItem> $body', $client);
-        TestCase::assertStringContainsString('@return list<PlaceOrdersBulkResponseItem>', $client);
+        TestCase::assertStringContainsString('@param list<PlaceOrdersBulkRequestContentItem> $body', $client);
+        TestCase::assertStringContainsString('@return list<PlaceOrdersBulk200ContentItem>', $client);
         TestCase::assertStringContainsString('public function placeOrdersBulk(array $body): array', $client);
     }
 
@@ -1390,23 +1390,23 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenGeneratedFileGeneratedModelPlaceOrderResponseShippingPhpAndGeneratedFileGeneratedModelPlaceOrderResponseLinesItemPhpAreWritten(
+    public function thenGeneratedFileGeneratedModelPlaceOrder200ContentShippingPhpAndGeneratedFileGeneratedModelPlaceOrder200ContentLinesItemPhpAreWritten(
     ): void {
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponseShipping.php');
-        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponseLinesItem.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrder200ContentShipping.php');
+        TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlaceOrder200ContentLinesItem.php');
     }
 
 
     public function thenModelTwoPropertiesAreTypedAsThoseClassesRatherThanArrayStringMixed(): void
     {
-        $model = (string) file_get_contents($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponse.php');
+        $model = (string) file_get_contents($this->inlineOutputDir . '/Generated/Model/PlaceOrder200Content.php');
 
         // The object property carries the synthesised class; the array property
         // carries a list of the synthesised item class. Either one degrading to
         // `array<string, mixed>` is the failure this pins, so the absence of
         // that type in the file is asserted too.
-        TestCase::assertStringContainsString('public ?PlaceOrderResponseShipping $shipping = null', $model);
-        TestCase::assertStringContainsString('@param ?list<PlaceOrderResponseLinesItem> $lines', $model);
+        TestCase::assertStringContainsString('public ?PlaceOrder200ContentShipping $shipping = null', $model);
+        TestCase::assertStringContainsString('@param ?list<PlaceOrder200ContentLinesItem> $lines', $model);
         TestCase::assertStringNotContainsString('array<string, mixed>', $model);
     }
 
@@ -1422,16 +1422,16 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenGeneratedFileGeneratedEnumPlaceOrderRequestChannelPhpIsABackedEnumWithThoseThreeCases(): void
+    public function thenGeneratedFileGeneratedEnumPlaceOrderRequestContentChannelPhpIsABackedEnumWithThoseThreeCases(): void
     {
-        $path = $this->inlineOutputDir . '/Generated/Enum/PlaceOrderRequestChannel.php';
+        $path = $this->inlineOutputDir . '/Generated/Enum/PlaceOrderRequestContentChannel.php';
         TestCase::assertFileExists($path);
 
         $source = (string) file_get_contents($path);
 
         // Backed, and by string — an unbacked enum could not round-trip the
         // document's values.
-        TestCase::assertStringContainsString('enum PlaceOrderRequestChannel: string', $source);
+        TestCase::assertStringContainsString('enum PlaceOrderRequestContentChannel: string', $source);
         TestCase::assertStringContainsString("case Web = 'web';", $source);
         TestCase::assertStringContainsString("case Phone = 'phone';", $source);
         TestCase::assertStringContainsString("case Store = 'store';", $source);
@@ -1503,10 +1503,10 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenGeneratedFileGeneratedModelPlacedOrderPhpIsWrittenAndNoPlaceOrderResponsePhpIs(): void
+    public function thenGeneratedFileGeneratedModelPlacedOrderPhpIsWrittenAndNoPlaceOrder200ContentPhpIs(): void
     {
         TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlacedOrder.php');
-        TestCase::assertFileDoesNotExist($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponse.php');
+        TestCase::assertFileDoesNotExist($this->inlineOutputDir . '/Generated/Model/PlaceOrder200Content.php');
 
         // The pinned name is what the client returns, not merely what a file
         // is called.
@@ -1519,7 +1519,7 @@ final class ModelGeneratorSteps
         // Children follow the root's new name, so a consumer who pins one class
         // does not have to pin the whole subtree behind it.
         TestCase::assertFileExists($this->inlineOutputDir . '/Generated/Model/PlacedOrderShipping.php');
-        TestCase::assertFileDoesNotExist($this->inlineOutputDir . '/Generated/Model/PlaceOrderResponseShipping.php');
+        TestCase::assertFileDoesNotExist($this->inlineOutputDir . '/Generated/Model/PlaceOrder200ContentShipping.php');
     }
 
 
@@ -1555,7 +1555,7 @@ final class ModelGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresAComponentNamedPlaceOrderResponseAndOperationIdWhoseInlineResponseDerivesThatSameName(
+    public function givenSchemaDeclaresAComponentNamedPlaceOrder200ContentAndOperationIdWhoseInlineResponseDerivesThatSameName(
         string $id,
     ): void {
         TestCase::assertSame('placeOrder', $id);
@@ -1573,8 +1573,8 @@ final class ModelGeneratorSteps
 
         // Both origins, because the reader cannot act on the collision without
         // knowing which two nodes claimed the name.
-        TestCase::assertStringContainsString('PlaceOrderResponse', $message);
-        TestCase::assertStringContainsString('components.schemas/PlaceOrderResponse', $message);
+        TestCase::assertStringContainsString('PlaceOrder200Content', $message);
+        TestCase::assertStringContainsString('components.schemas/PlaceOrder200Content', $message);
         TestCase::assertStringContainsString('/paths/~1orders/post/responses/200', $message);
     }
 
@@ -2173,5 +2173,6 @@ final class ModelGeneratorSteps
         TestCase::assertInstanceOf(UnionBranchException::class, $unmapped);
         TestCase::assertStringContainsString('no branch is mapped to', $unmapped->getMessage());
     }
+
 
 }

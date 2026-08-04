@@ -6,7 +6,7 @@
 
 [features."Model Generator"]
 spec = "truth/specs/model-generator.feature-260418.typ"
-spec-hash = "sha256:d01407d68d7f2b11e3b065f5976f7ea2c7ab9395021af7a2c8ebef9128443655"
+spec-hash = "sha256:2659dfe8511a852b8d5fc8a1bffde1b3261e42fd259e99c799071f3ad9d89a55"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding"]
 as-is-hash = "sha256:8be88086af99a2fa6020e333f7de5ed768fedd11639f2cb8d13ee2cb522b8bab"
@@ -64,8 +64,8 @@ as-is = "KLUv/QBYhQwAhl5UIzCtpgNAoCYn617pYcKGcuROelTt87n1t2dCDV7X3JOGEqgTSQBIAEk
 stage = "unstable"
 
 [features."Model Generator".scenarios."A document declaring no components still emits a model for every payload"]
-as-is-hash = "sha256:612c0a485baefa66659a82ada075810d202cd25ee72a32a568e5a6df91fabfe0"
-as-is = "KLUv/QBYVQoAxtdAIEBv0gYbv2wjSRkat68TNdTEiCVgi2gEfSrtI2O4cfcCNgA4ADUAehI7Hql92IxTiJpKbvIWd6KE0Q8yLusacyNkq9a9HyYGFeM5cpaFlB/vnZEoeGxgB1rWXXkE6YsLguYgxKuXVDx9qBMNxVBK5SsuE+dPLlwplHxoW/m04HNl1YFmE3NfWV/MF+Xhu4Ul2IwjSG3J4NWzipT1JOnErfw9wfflwWZEFByDsN42nzCTz7I28SqfgKAdT836Z+jMV16Uup/l62HSB8ko1GUtn29ienrxrGaHQHMQAuAAvaEDn++X9TkDm3HftZx4WYT4mZY00MDQQD+o0Dg/MgSfO5gEBhkAo7uhiwxyGEAPd5Gfd2sjJl9oul1iug4jmyG4ctC0wM8uAW3cLRSEFbGkdku3+wJsr9gYQUC4cKAaOSraGWbOYhai"
+as-is-hash = "sha256:8bfd0dad44bac7e88d3751af8ec1189a515f090d80fd0756502348a8c649396f"
+as-is = "KLUv/QBYhQoAZthCIDBx0gYPmmwPSRnFtl8TNZ/jVLuYeWk6sv65GpFRuBAGOAA6ADgAkVq9iR+X1ELsxilETSU3+Ys7ccLoBxmXdY25EbJV694PE4OK8Sw5y0LKj/fOTBQ8PvADLeuuQAJ6mPTpjIyC5mDEq59YPH2oFA7FUErlKy4Yzp9kuFIo+dC28onB58qqA80m5r6yvpgvCsT3C1OwG0cBluDzB5vAbPDqWUnKepN04lb+ruD7AmE3JAyORVhvm0+YyWdZw/Aqp4igH0/N+mfozFdelLqf5QfJKtRlLZ9vYnp68azmh0BzMALgAL0hBJ/vl/W5A7tx37XE8LIY8ZOAoCAtaWDve4jg0OBAP7jgOD8KGAC1u8GMDHvYgOh2GgOXbCNuX2gCXsL4evgQsFHVYLTmQMNsC6VjRSyp3dLtvgDbKzZGEBAuHKhGjop2hpmzmIUo"
 stage = "unstable"
 
 [features."Model Generator".scenarios."A kebab-case component name becomes a PascalCase PHP class under the default pipeline"]
@@ -164,13 +164,13 @@ as-is = "KLUv/QBYjQgAxpI2IkCrpgMDEiVRbfI1rD+mbWk5xwtiuIFBlIWFRFVuVnHDKwIrACsALwB
 stage = "unstable"
 
 [features."Model Generator".scenarios."An inline array of inline objects is typed at both ends"]
-as-is-hash = "sha256:806e286d9ebdee2fcc56cdf06a01f92a6e662a5e4b55787f3b64f0d7c0dff44b"
-as-is = "KLUv/QBYxQkABhU7IkCNmgNAoyWie0s3QhZhIi3ZCwfTTGMXEC5FDKo3KrqGQAQwADEAMwDOR2DDXq6Y25aPFZfcQuylobzTLsZ7RmeVdUO3be7ArMhy5VTPT1SJToYVC/XyDSRHTosTn/NFRWruvp7fcrF2NYUSYJTnClqMt/2BuPptpYkf1EPQ9Egdb04x58I9PXMEDMD5HiQ8EupoISTQr9DA6AoYWfrwtsSTnFs+al17+nzD+bRgLw0DCBncjqtnS5nR9VQTzUIsMSd6kfrs1U+7ENiGyvq9c3qsbR5VgdF30TlKhr20s0vNaa0r4vwu6sRXlgIbACWzgakVaSZcN2Mrjwgl9JSc9k8QXgM3SNAAClzAqgK0NS4bxsAgO1bPksZbrAnPh3VvmQFIB9ysrsRc4joAY3n+Hdph3pkH"
+as-is-hash = "sha256:18c3e8f1493f9099867542286a01d87a5486bb2fff1857d763e4da2b99869909"
+as-is = "KLUv/QBY5QkAppU8IkCNmgOj2hLRvaUboWWYSEv2wuTNqGaGw6VgAFRvVHQNgQgyADIANQBnEuclMGIvV8xty8eNO9wm2EtDeaddjPeMzirrhm7b/IFZk+XKqZ6fqBKdDzcW6uWbhOh6qjlyWqT4nC82UnP39fyWi7WrJyYYRnmuoMV425+Iq99WohhCPQNNj1Ty5hRzLtzTLDEA51uw+c0FQThQqKNloEC/QgKjK+Bk6YG3JZ7DueWj1rWnz0ecTwv20iCAkMHtuHq2lDnNQiwxJ9qR+uzVT+sI2IbK+r1zeqxtHhXE6LvoHOXDXtrZpea01jVxfheV4utiwQgaAC4jA62PPWsvoBmVRwQXekpO+zkIWwjOg8EPuhbwtlvLNggwSITVs6TxFmvC82HdW2YA0gE3qysxl7gOwFief4d2mHfmAQ=="
 stage = "unstable"
 
 [features."Model Generator".scenarios."An inline enum inside a payload becomes a backed enum, wherever the payload came from"]
-as-is-hash = "sha256:6ba669861fd7069d28bdf080db09d77c07e0e6a5d4e61aed7a955f989f2833f4"
-as-is = "KLUv/QBYhQoAFhlDH1BN0wagf5MkkoihRfialrjiCv+r9IDmjClNGFWDs546ADoAPwBWPEFsLS5enGGLwVYoqRG+YudoWd+4HjE+7hLHEJv3Sp4jPsukMWXzLy0mKwvex5RgMg54kUkNfxgCmEj5QM48eIFmBiZd68VVs4xWYpwc0dBxs/QqVdm8htxcIl77ZeL6TcRYf5rwY4kyZlqmVwnGN9KBA8kvEXw4YCt+RStZIQVAsKAQoCxYEHB/kgx8b0gRqQpei8kY5sVFrblMjz8wHjnYCgiB/drxIXDpwRDXXOvjAXe15Py8xmD68Ornleh9nhmYzq65PhpjfMXWRyuxkxb+ktG8byS5Vy88plLy+K4Y3tceHRcAjasA6QXGrxloDtKp2YbRe10JBtfjT2yzrrmha3shbVzXBttDkViRTWqsWHORqSs6x8bosbF9Ycj+VClVl4IC"
+as-is-hash = "sha256:59e27c884d5e6102517d5a3d3a5b83129fad475337e43467074a91cc4d584e66"
+as-is = "KLUv/QBYlQoAhplDH1BN0wagvy1bacXQInxNS1xxhf9VekBzxpQmjKrBWU86ADoAPwC24gliu3Dx4gxbBluhpEb4ip2jtb5xPWJ83CWOITavK3mO+CyTxpTNv7QwWVnwPqYEk3HAi0xq+MMQxzGR8oGcefACzQxMusuLq2aNNjFOjmjouFm9SlU2L0NuLhHv+jJx/UrEWH+a8GOJMmZa06sE4xvpIAg+HLAVv6JNVkgBECx+MQkWFAKUBQsC7k+Sge8NKSJVwbswGcO8cFFrrunxB8YjB1sBIbC+7PgQuPRgiGvucne15Py8jMH04dXPm+j1PDMwnV1z+WiM8RVbPtrETlr8JaN5vZHkunrxmErJ47tieN91dPLLFwCUqwDpBeKvGWgO4KnZotF7awmG2uNrbDOyuYFse3na4K4NtocisSKb1Fix5iJTV3SOjdFjY/vCkP2pUqouBQU="
 stage = "unstable"
 
 [features."Model Generator".scenarios."An inline nested object schema becomes a synthesised typed class"]
@@ -199,8 +199,8 @@ as-is = "KLUv/QBYnQwAth5ZL4CnSQczMAMzBBOG4TtaI5IUe6WNRxJpcu9ijDpsA2/wGx5HsFEPfPy
 stage = "unstable"
 
 [features."Model Generator".scenarios."Nesting below a synthesised payload is reached by the same queue as nesting below a component"]
-as-is-hash = "sha256:f6326acec07f2e484cb9d2ecd1756468ecacc6f929a197ddc82f78f3c2cc85f9"
-as-is = "KLUv/QBYjQkAZtY8IUBv0gYbv2wjIjIVJS0maqiJETsWIqCvmAgSDDAqOk3wAjIAMgAzAF4sHtVilIJW8yWXTPiMqY/WTcTnSLGn9XxMpcaWz/X0aLFRmycqPeIFb/UKbqhLwyuQXyqXV7lERKFZf5mm+Ipq6dPHS3i+KjRx/uTjiqVlVLeWXw/jKc5hL54itooSN77YQhyM86cz8HnDRahc8CqeLWZFSTrVWh7vMB452AuIgXMPT7MyXz1eaizTjOaD5gVvrUPqZjME5xXHGGDBy1UBtM6jtbRe1ZKyVvP5atZPNVn7YIG9wO9eTvxkvgd6PISFVgCEYYGRflRCFQCLlhaLvUfaFhr2kX2IZcRwi1DAqoKdNbqZO605tgXdsSKW1G6pdh/ENiKF52AgukLtz3wI8xwdjgI="
+as-is-hash = "sha256:178dd42857d6d406a7617ba9d8643b8eb0bc9308635b6c6624e9713fe6ee68a4"
+as-is = "KLUv/QBYpQkA9lY+IDBx0gYbvmwPIjLGJI0laj7H2bN6MC/jxipfCgMLixrANAAzADUAELuxeFSLUQpazZdccuEzpj5aNxGfI8We1vMxlRpbPtfTo8VGbZ6o9IgXvNU7eEBdGl6BBG42v1Qur3KLiEKz/jJN8RXV0qePl/B8VWji/MmHK5aWUd1afj0Yj3EKduMpYqso8cAX2470oxoc50+X4POIq1AJ4VU8W8yKknSqtTxewXgkYTcoCs5NPM3KfPV4qbFMM5oPmhe8tQ5pBucZxxhgwctVArTOo7W0XtWSslbz+WrWTzVZ++CB3cDvXk78ZL4LejyGhVYAZPGLCuHxEIAIFACTlhaNvWfaFiL2kQETC4nhHgEC1gI9uyRn2W+hIKyIJbVbqt0HsY1I4TkYiK5Q+zMfwjxHh6M="
 stage = "unstable"
 
 [features."Model Generator".scenarios."Property types follow OpenAPI scalars and required-ness"]
@@ -224,8 +224,8 @@ as-is = "KLUv/QBY3QYAtpAtHHC3aQMQm8SOyWJG6MdElMfr5HBvWJAbgqn++4UkACQAJwCJWsMu9FL
 stage = "unstable"
 
 [features."Model Generator".scenarios."The profile pins the class name for a synthesised payload"]
-as-is-hash = "sha256:3f733891cf1b9e7d228626c8efd4753f008bbef5269d1f45c72796824ec8a30b"
-as-is = "KLUv/QBYBQgAZlIzIGCJ0gZAfCqZRPZdIpvYWSytdmT8JHKVsLdpioY4Ll4BKQAqACwADVuMnRzLFDHl8709WhhZmzUZvsPQu5YaHy0vnvLTMVKVjxZG5KnhGyZWvphqrwb90YI3lpTi/alaY2UOb/pJguMlPH8TQRbjF05hJ08KthYfRjynEO9ZIWU4HM6fbsDnCztZi2cN8+JDrblMj1cYjw7sJCGBpxCsnDeWFsUBiQ08pQ4xXvNxfJ31Bx8+X3u0cw1wzGRemXo1njooYCcGixN90IxfKxIADGMaBAaxuHHra82CgE/rAtO8hpYFGCsjYSZg5g6siElqyBxDuE+9+Z4L35ThMw=="
+as-is-hash = "sha256:79c5f4da1be3d9729d66513efa7667101e928c1897172950502735e6ef762290"
+as-is = "KLUv/QBYLQgA9hI1IGCJ0gZAfCqZRPZdIpvYWSwtqm/MvlwlEsOfpmiI4+IVKwAsACwAikNsNWzlWKYGUz7f26OFDWuz5sOPGHrXUuOj5cVTfrpHqvKRw4o8NXzTCIsFFl6+mGqvB/3RgzeW1OL9qVpjZRFv+kmD4yU8fxNNGOMZjmErTwu2FiUOZvxapxPvWSF1QCDOn67A5w5bWYtnEPOiRK25TI9nGI8QbEVhgacSvJw3lpgQPKUONbzmE/k66w9KfL72aOca4JjJvDL1ajx1cMBWFn5hEiQSAYwTfTARAA5jGgQGscBxK2zNgoBR60KnuYOxMhJmAmbuwIqYpIbMMYT71JvvufBNGT4D"
 stage = "unstable"
 
 [features."Model Generator".scenarios."Two raw component names that normalise to the same PHP class abort the run"]
@@ -234,8 +234,8 @@ as-is = "KLUv/QBYPQgAtlI0IGBp0wZoQWvtZc1QRAglorKxQu3mOS5dvGBDLBPAqXQFKQAtACsAiYp
 stage = "unstable"
 
 [features."Model Generator".scenarios."Two shapes deriving one class name fail the run rather than overwriting a file"]
-as-is-hash = "sha256:9fbb359e7d88ba07ec1631a4ee4c3ee9d84fbffb857c4f9931cdc30c8347f4ac"
-as-is = "KLUv/QBY7QkAFhdAKJAnSQf///8/92OLYmtNkmFLSVoj9yZpEwLVruxz61r0KwIs6q5XZRczADQANwCbsA1HhrhsztaykWegr846f7bSt0j/rJEV4id1Vi10+Ic2ZwzLF+tTHTU2FGyAlnU/EgE/Q2e+4mk4+dC28gnhcuXrYdITyJdE/CiU4LL3w5Tg4bI+Cx0vruTnSPjOMARFrd7CBjcVAfyzBwUJFljPjCX6LCrQCwqwOUNWyP0oYCZ49axMWW+RTtzK3xF8PwVsw4GDYgb8pNRbZ61PB3pDKZUVeAs+h52GVb8wxvUiR148qzlf6onqw5r1DIT6RPAFqynVJwBsA4LO7xkmD0AkAhUAVkUd20iNEXY0A0bN8mg6vNkCU0G6RgJTZYXsDsU2wjdN5jT5fV3dRcuiEYBUpJJokajhCFrtjAI="
+as-is-hash = "sha256:5cd84d74692119e9110e28f3a8791f6f1fde2eb2da933dae1c90d9754111ba40"
+as-is = "KLUv/QBYDQoAptdBKZAnSQf///8/92OLYmtNkmFLSVoj9yZpEwLVrgxuXYsGl4L+HYqvLwUuNAA2ADgApjZhH44McdmcrWUjz0BfnXX+bKVvkf5ZIyvET+qsWujwD23OGJYv1qc6amwwOAEt634kAumfoTNf8TScfGhb+YRwufLe93AAAgKAfEnEj0ILLns/TAkeLuuz0PHiSn6OhO8MU1DU6i2c8GcPGCxoYD0zluizqEAvWMDmDFkh98OAueDVszJlvUU6cSt/V/D9HLAPCQIUQ+Anpd46a/31MOkDekMplRV4DT6HnYZVvzDG9SJHXjyrOV/qieqDNesZCPWp4A1WU6pPBNgHBJ3fM0w2gEgQ8AMUAFZFHdtIjRF2NANGzfJoOrzZAlNBvkYCU2WF7I7FNuI3TQY1+X1d/UVLjgY3G60XNdyj1U4z"
 stage = "unstable"
 
 [features."Operation Generator"]

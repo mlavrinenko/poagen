@@ -36,7 +36,7 @@ final class TypeListTest extends TestCase
 
     public function testASingleMemberPlusNullBecomesThatTypeNullable(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString('public ?int $requiredButNullable,', $model);
         self::assertStringContainsString('public ?string $optionalNullableString = null,', $model);
@@ -44,7 +44,7 @@ final class TypeListTest extends TestCase
 
     public function testARequiredButNullablePropertyTakesNoDefaultSoTheOrderingStaysLegal(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         // `required` and `nullable` are separate facts. Conflating them gave the
         // required-and-nullable property a default, which pushed a required
@@ -56,7 +56,7 @@ final class TypeListTest extends TestCase
 
     public function testANullableArrayKeepsTheItemPhpdocAPlainArrayWouldGet(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString('@param ?list<string> $nullableList', $model);
         self::assertStringContainsString('public ?array $nullableList = null,', $model);
@@ -64,7 +64,7 @@ final class TypeListTest extends TestCase
 
     public function testASingleElementListReadsAsThatTypeWithoutNullability(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         // Optional, so nullable — but from required-ness, not from the list.
         self::assertStringContainsString('public ?string $singleMemberList = null,', $model);
@@ -73,12 +73,12 @@ final class TypeListTest extends TestCase
     public function testAnEnumWrittenWithAListTypeIsStillBacked(): void
     {
         $plan = $this->plan(['refusedShapes' => 'out of scope for this assertion']);
-        $model = $this->sourceOf($plan, 'NullableShapesRequest');
+        $model = $this->sourceOf($plan, 'NullableShapesRequestContent');
 
-        self::assertStringContainsString('public ?NullableShapesRequestNullableEnum $nullableEnum = null,', $model);
+        self::assertStringContainsString('public ?NullableShapesRequestContentNullableEnum $nullableEnum = null,', $model);
         self::assertStringContainsString(
             "case Draft = 'draft';",
-            $this->sourceOf($plan, 'NullableShapesRequestNullableEnum'),
+            $this->sourceOf($plan, 'NullableShapesRequestContentNullableEnum'),
         );
     }
 
@@ -96,39 +96,39 @@ final class TypeListTest extends TestCase
     public function testARequiredNullableEnumSynthesisedInlineStaysNullable(): void
     {
         $plan = $this->plan(['refusedShapes' => 'out of scope for this assertion']);
-        $model = $this->sourceOf($plan, 'NullableShapesRequest');
+        $model = $this->sourceOf($plan, 'NullableShapesRequestContent');
 
         self::assertStringContainsString(
-            'public ?NullableShapesRequestRequiredNullableEnum $requiredNullableEnum,',
+            'public ?NullableShapesRequestContentRequiredNullableEnum $requiredNullableEnum,',
             $model,
         );
         self::assertStringContainsString(
             "case Draft = 'draft';",
-            $this->sourceOf($plan, 'NullableShapesRequestRequiredNullableEnum'),
+            $this->sourceOf($plan, 'NullableShapesRequestContentRequiredNullableEnum'),
         );
     }
 
     public function testARequiredNullableObjectSynthesisedInlineStaysNullable(): void
     {
         $plan = $this->plan(['refusedShapes' => 'out of scope for this assertion']);
-        $model = $this->sourceOf($plan, 'NullableShapesRequest');
+        $model = $this->sourceOf($plan, 'NullableShapesRequestContent');
 
         self::assertStringContainsString(
-            'public ?NullableShapesRequestRequiredNullableObject $requiredNullableObject,',
+            'public ?NullableShapesRequestContentRequiredNullableObject $requiredNullableObject,',
             $model,
         );
         self::assertStringContainsString(
             'public ?string $inner = null,',
-            $this->sourceOf($plan, 'NullableShapesRequestRequiredNullableObject'),
+            $this->sourceOf($plan, 'NullableShapesRequestContentRequiredNullableObject'),
         );
     }
 
     public function testARequiredNullableArrayOfSynthesisedObjectsStaysNullable(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString(
-            '@param ?list<NullableShapesRequestRequiredNullableObjectArrayItem> $requiredNullableObjectArray',
+            '@param ?list<NullableShapesRequestContentRequiredNullableObjectArrayItem> $requiredNullableObjectArray',
             $model,
         );
         self::assertStringContainsString('public ?array $requiredNullableObjectArray,', $model);
@@ -145,7 +145,7 @@ final class TypeListTest extends TestCase
      */
     public function testARequiredNullableTypedMapWithNoDeclaredPropertiesStaysNullable(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString(
             '@param ?array<string, string> $requiredNullableTypedMap',
@@ -162,7 +162,7 @@ final class TypeListTest extends TestCase
      */
     public function testARequiredNullableRefOnlyUnionStaysNullable(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString(
             'public NullableUnionBranchOne|NullableUnionBranchTwo|null $requiredNullableRefUnion,',
@@ -178,7 +178,7 @@ final class TypeListTest extends TestCase
      */
     public function testARequiredNullableComposedScalarUnionStaysNullable(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         self::assertStringContainsString(
             'public int|string|null $requiredNullableComposedScalarUnion,',
@@ -188,7 +188,7 @@ final class TypeListTest extends TestCase
 
     public function testSeveralScalarMembersBecomeAPhpUnionRatherThanMixed(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         // PHP can say this, and a union is strictly more of the schema
         // represented than `mixed` is. Optional, so `|null` joins the union
@@ -198,7 +198,7 @@ final class TypeListTest extends TestCase
 
     public function testASchemaWithNoTypeAtAllDeclaresMixedRatherThanNothing(): void
     {
-        $model = $this->modelSource('NullableShapesRequest');
+        $model = $this->modelSource('NullableShapesRequestContent');
 
         // An untyped promoted readonly property is a finding at max level, so
         // the absence of a type has to be spelled rather than left off.

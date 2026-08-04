@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
 use LogicException;
+use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
 
 /**
  * Turns an {@see AllOfMerge} into what {@see InlinePayloadPlanner} needs for
@@ -18,9 +19,9 @@ use LogicException;
  * Split from {@see InlinePayloadPlanner} to keep both under the linecop
  * limit.
  *
- * Request and response share the single-object merge (a class named
- * `<Base>Request`/`<Base>Response`, matching the non-`allOf` synthesis
- * naming already in `InlinePayloadPlanner::planRequest()`/`planResponse()`),
+ * Request and response share the single-object merge (a class named through
+ * {@see InlinePayloadName}, matching the non-`allOf` synthesis naming already
+ * in {@see RequestBodyPlanner}/`InlinePayloadPlanner::planResponse()`),
  * but only the request side accepts a `oneOf`/`anyOf` branch union: turning
  * it into N synthesised classes and a PHP union parameter is safe because
  * the caller already holds a concrete instance of one of them. A response
@@ -68,7 +69,7 @@ final readonly class InlineAllOfPlanner
         }
 
         $name = InlinePayloadPlanner::claim(
-            $pin ?? $base . 'Request',
+            $pin ?? InlinePayloadName::request($base),
             $merge->schema ?? throw new LogicException('allOf merge missing schema'),
             $ledger,
             $roots,
@@ -84,6 +85,7 @@ final readonly class InlineAllOfPlanner
     public static function planResponse(
         Schema $schema,
         string $base,
+        string $status,
         ?string $pin,
         OpenApi $openApi,
         ModelNameLedger $ledger,
@@ -111,7 +113,7 @@ final readonly class InlineAllOfPlanner
         }
 
         $name = InlinePayloadPlanner::claim(
-            $pin ?? $base . 'Response',
+            $pin ?? InlinePayloadName::response($base, $status),
             $merge->schema ?? throw new LogicException('allOf merge missing schema'),
             $ledger,
             $roots,
