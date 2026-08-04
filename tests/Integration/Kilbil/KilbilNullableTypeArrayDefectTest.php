@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
-use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
 

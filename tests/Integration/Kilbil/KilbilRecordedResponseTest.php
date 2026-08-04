@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
-use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
 use Acme\Kilbil\Generated\Enum\SearchClient200ContentActivateClientType;
 use Acme\Kilbil\Generated\Enum\SearchClient200ContentInterfacesItemInterfaceType;
 use Acme\Kilbil\Generated\Enum\SearchClient200ContentProgramType;
-use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
+use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
 use Acme\Kilbil\Generated\Model\SearchClient200Content;
 use Acme\Kilbil\Generated\Model\SearchClient200ContentCardsItem;
 use Acme\Kilbil\Generated\Model\SearchClient200ContentInterfacesItem;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
 use DateTimeImmutable;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
