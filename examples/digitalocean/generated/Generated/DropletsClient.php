@@ -12,11 +12,30 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\DropletsListType;
+use Acme\DigitalOcean\Generated\Model\AssociatedResourceStatus;
 use Acme\DigitalOcean\Generated\Model\DropletMultiCreate;
 use Acme\DigitalOcean\Generated\Model\DropletSingleCreate;
+use Acme\DigitalOcean\Generated\Model\DropletsCreateResponseMultipleDropletResponse;
+use Acme\DigitalOcean\Generated\Model\DropletsCreateResponseSingleDropletResponse;
+use Acme\DigitalOcean\Generated\Model\DropletsGet200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsGetBackupPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsList200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListAssociatedResources200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListBackupPolicies200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListBackups200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListFirewalls200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListKernels200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListNeighbors200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListSnapshots200Content;
+use Acme\DigitalOcean\Generated\Model\DropletsListSupportedBackupPolicies200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\NeighborIds;
 use Acme\DigitalOcean\Generated\Model\SelectiveDestroyAssociatedResource;
+use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DropletsClient implements DropletsClientInterface
@@ -29,6 +48,7 @@ final readonly class DropletsClient implements DropletsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsList200Content|Error>
      */
     public function dropletsList(
         ?int $perPage = null,
@@ -36,8 +56,9 @@ final readonly class DropletsClient implements DropletsClientInterface
         ?string $tagName = null,
         ?string $name = null,
         ?DropletsListType $type = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DropletsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
@@ -45,252 +66,329 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('name', $name)
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<DropletsCreateResponseSingleDropletResponse|DropletsCreateResponseMultipleDropletResponse|Error>
      */
-    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): void
+    public function dropletsCreate(DropletSingleCreate|DropletMultiCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsCreateResponseSingleDropletResponse|DropletsCreateResponseMultipleDropletResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/droplets')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::union(null, new BranchSelector(fields: [
+            'droplet' => DropletsCreateResponseSingleDropletResponse::class,
+            'droplets' => DropletsCreateResponseMultipleDropletResponse::class,
+        ]), '/components/responses/droplet_create/content/application~1json/schema')], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyByTag(string $tagName): void
+    public function dropletsDestroyByTag(string $tagName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets')
                 ->query('tag_name', $tagName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListBackupPolicies200Content|Error>
      */
-    public function dropletsListBackupPolicies(?int $perPage = null, ?int $page = null): void
+    public function dropletsListBackupPolicies(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListBackupPolicies200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/backups/policies')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListSupportedBackupPolicies200Content|Error>
      */
-    public function dropletsListSupportedBackupPolicies(): void
+    public function dropletsListSupportedBackupPolicies(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListSupportedBackupPolicies200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/backups/supported_policies')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSupportedBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsGet200Content|Error>
      */
-    public function dropletsGet(int $dropletId): void
+    public function dropletsGet(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroy(int $dropletId): void
+    public function dropletsDestroy(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets/{droplet_id}')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListBackups200Content|Error>
      */
-    public function dropletsListBackups(int $dropletId, ?int $perPage = null, ?int $page = null): void
+    public function dropletsListBackups(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListBackups200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/backups')
                 ->path('droplet_id', $dropletId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackups200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsGetBackupPolicy200Content|Error>
      */
-    public function dropletsGetBackupPolicy(int $dropletId): void
+    public function dropletsGetBackupPolicy(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsGetBackupPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/backups/policy')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGetBackupPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListAssociatedResources200Content|Error>
      */
-    public function dropletsListAssociatedResources(int $dropletId): void
+    public function dropletsListAssociatedResources(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListAssociatedResources200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/destroy_with_associated_resources')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListAssociatedResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): void
+    public function dropletsDestroyWithAssociatedResourcesDangerous(int $dropletId, bool $xDangerous): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets/{droplet_id}/destroy_with_associated_resources/dangerous')
                 ->path('droplet_id', $dropletId)
                 ->header('X-Dangerous', $xDangerous)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): void
+    public function dropletsDestroyRetryWithAssociatedResources(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/droplets/{droplet_id}/destroy_with_associated_resources/retry')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`, `block_storage:delete`, `block_storage_snapshot:delete`, `image:delete`, `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
     public function dropletsDestroyWithAssociatedResourcesSelective(
         int $dropletId,
         SelectiveDestroyAssociatedResource $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets/{droplet_id}/destroy_with_associated_resources/selective')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<AssociatedResourceStatus|Error>
      */
-    public function dropletsGetDestroyAssociatedResourcesStatus(int $dropletId): void
+    public function dropletsGetDestroyAssociatedResourcesStatus(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AssociatedResourceStatus|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/destroy_with_associated_resources/status')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AssociatedResourceStatus::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `firewall:read`.
+     * @return Envelope<DropletsListFirewalls200Content|Error>
      */
-    public function dropletsListFirewalls(int $dropletId, ?int $perPage = null, ?int $page = null): void
+    public function dropletsListFirewalls(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListFirewalls200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/firewalls')
                 ->path('droplet_id', $dropletId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListFirewalls200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListKernels200Content|Error>
      */
-    public function dropletsListKernels(int $dropletId, ?int $perPage = null, ?int $page = null): void
+    public function dropletsListKernels(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListKernels200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/kernels')
                 ->path('droplet_id', $dropletId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListKernels200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListNeighbors200Content|Error>
      */
-    public function dropletsListNeighbors(int $dropletId): void
+    public function dropletsListNeighbors(int $dropletId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListNeighbors200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/neighbors')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListNeighbors200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletsListSnapshots200Content|Error>
      */
-    public function dropletsListSnapshots(int $dropletId, ?int $perPage = null, ?int $page = null): void
+    public function dropletsListSnapshots(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DropletsListSnapshots200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/{droplet_id}/snapshots')
                 ->path('droplet_id', $dropletId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSnapshots200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<NeighborIds|Error>
      */
-    public function dropletsListNeighborsIds(): void
+    public function dropletsListNeighborsIds(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NeighborIds|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/reports/droplet_neighbors_ids')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NeighborIds::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

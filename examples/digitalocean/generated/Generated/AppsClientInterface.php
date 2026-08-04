@@ -19,15 +19,39 @@ use Acme\DigitalOcean\Generated\Enum\AppsGetLogsActiveDeploymentAggregateType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsActiveDeploymentType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsAggregateType;
 use Acme\DigitalOcean\Generated\Enum\AppsGetLogsType;
+use Acme\DigitalOcean\Generated\Model\AppEvents;
+use Acme\DigitalOcean\Generated\Model\AppHealthResponse;
+use Acme\DigitalOcean\Generated\Model\AppInstances;
+use Acme\DigitalOcean\Generated\Model\AppJobInvocation;
+use Acme\DigitalOcean\Generated\Model\AppJobInvocations;
+use Acme\DigitalOcean\Generated\Model\AppMetricsBandwidthUsage;
 use Acme\DigitalOcean\Generated\Model\AppMetricsBandwidthUsageRequest;
 use Acme\DigitalOcean\Generated\Model\AppPropose;
+use Acme\DigitalOcean\Generated\Model\AppProposeResponse;
+use Acme\DigitalOcean\Generated\Model\AppResponse;
+use Acme\DigitalOcean\Generated\Model\AppsAlertResponse;
 use Acme\DigitalOcean\Generated\Model\AppsAssignAppAlertDestinationsRequest;
+use Acme\DigitalOcean\Generated\Model\AppsCancelEvent200Content;
 use Acme\DigitalOcean\Generated\Model\AppsCreateAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsCreateDeploymentRequest;
+use Acme\DigitalOcean\Generated\Model\AppsDeleteAppResponse;
+use Acme\DigitalOcean\Generated\Model\AppsDeploymentResponse;
+use Acme\DigitalOcean\Generated\Model\AppsDeploymentsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetEvent200Content;
+use Acme\DigitalOcean\Generated\Model\AppsGetExecResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetInstanceSizeResponse;
+use Acme\DigitalOcean\Generated\Model\AppsGetLogsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListAlertsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListInstanceSizesResponse;
+use Acme\DigitalOcean\Generated\Model\AppsListRegionsResponse;
+use Acme\DigitalOcean\Generated\Model\AppsResponse;
 use Acme\DigitalOcean\Generated\Model\AppsRestartRequest;
 use Acme\DigitalOcean\Generated\Model\AppsRollbackAppRequest;
 use Acme\DigitalOcean\Generated\Model\AppsUpdateAppRequest;
+use Acme\DigitalOcean\Generated\Model\AppsValidateRollback200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\Schema;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Apps` endpoints.
@@ -40,68 +64,79 @@ interface AppsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsResponse|Error>
      */
-    public function appsList(?int $page = null, ?int $perPage = null, ?bool $withProjects = null): void;
+    public function appsList(?int $page = null, ?int $perPage = null, ?bool $withProjects = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:create`.
+     * @return Envelope<AppResponse|Error>
      */
     public function appsCreate(
         AppsCreateAppRequest $body,
         ?AppsCreateAccept $accept = null,
         ?AppsCreateContentType $contentType = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppMetricsBandwidthUsage|Error>
      */
-    public function appsListMetricsBandwidthDaily(AppMetricsBandwidthUsageRequest $body): void;
+    public function appsListMetricsBandwidthDaily(AppMetricsBandwidthUsageRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppProposeResponse|Error>
      */
-    public function appsValidateAppSpec(AppPropose $body): void;
+    public function appsValidateAppSpec(AppPropose $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListRegionsResponse|Error>
      */
-    public function appsListRegions(): void;
+    public function appsListRegions(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListInstanceSizesResponse|Error>
      */
-    public function appsListInstanceSizes(): void;
+    public function appsListInstanceSizes(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetInstanceSizeResponse|Error>
      */
-    public function appsGetInstanceSize(string $slug): void;
+    public function appsGetInstanceSize(string $slug): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsListAlertsResponse|Error>
      */
-    public function appsListAlerts(string $appId): void;
+    public function appsListAlerts(string $appId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsAlertResponse|Error>
      */
     public function appsAssignAlertDestinations(
         string $appId,
         string $alertId,
         AppsAssignAppAlertDestinationsRequest $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:access_console`.
+     * @return Envelope<AppsGetExecResponse|Error>
      */
     public function appsGetExecActiveDeployment(
         string $appId,
         string $componentName,
         ?string $instanceName = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsActiveDeployment(
         string $appId,
@@ -109,46 +144,52 @@ interface AppsClientInterface
         AppsGetLogsActiveDeploymentType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<string> $deploymentTypes
+     * @return Envelope<AppsDeploymentsResponse|Error>
      */
     public function appsListDeployments(
         string $appId,
         ?int $page = null,
         ?int $perPage = null,
         ?array $deploymentTypes = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCreateDeployment(string $appId, AppsCreateDeploymentRequest $body): void;
+    public function appsCreateDeployment(string $appId, AppsCreateDeploymentRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsGetDeployment(string $appId, string $deploymentId): void;
+    public function appsGetDeployment(string $appId, string $deploymentId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCancelDeployment(string $appId, string $deploymentId): void;
+    public function appsCancelDeployment(string $appId, string $deploymentId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:access_console`.
+     * @return Envelope<AppsGetExecResponse|Error>
      */
     public function appsGetExec(
         string $appId,
         string $deploymentId,
         string $componentName,
         ?string $instanceName = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogs(
         string $appId,
@@ -157,10 +198,11 @@ interface AppsClientInterface
         AppsGetLogsType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsAggregate(
         string $appId,
@@ -168,31 +210,35 @@ interface AppsClientInterface
         AppsGetLogsAggregateType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<string> $eventTypes
+     * @return Envelope<AppEvents|Error>
      */
     public function appsListEvents(
         string $appId,
         ?int $page = null,
         ?int $perPage = null,
         ?array $eventTypes = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetEvent200Content|Error>
      */
-    public function appsGetEvent(string $appId, string $eventId): void;
+    public function appsGetEvent(string $appId, string $eventId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsCancelEvent200Content|Error>
      */
-    public function appsCancelEvent(string $appId, string $eventId): void;
+    public function appsCancelEvent(string $appId, string $eventId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetEventLogs(
         string $appId,
@@ -200,21 +246,24 @@ interface AppsClientInterface
         AppsGetEventLogsType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppHealthResponse|Error>
      */
-    public function appsGetHealth(string $appId): void;
+    public function appsGetHealth(string $appId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppInstances|Error>
      */
-    public function appsGetInstances(string $appId): void;
+    public function appsGetInstances(string $appId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
      * @param list<Schema> $jobNames
+     * @return Envelope<AppJobInvocations|Error>
      */
     public function appsListJobInvocations(
         string $appId,
@@ -222,20 +271,23 @@ interface AppsClientInterface
         ?string $deploymentId = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppJobInvocation|Error>
      */
-    public function appsGetJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): void;
+    public function appsGetJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppJobInvocation|Error>
      */
-    public function appsCancelJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): void;
+    public function appsCancelJobInvocation(string $appId, string $jobInvocationId, ?string $jobName = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetJobInvocationLogs(
         string $appId,
@@ -246,60 +298,70 @@ interface AppsClientInterface
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
         ?string $tailLines = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppsGetLogsResponse|Error>
      */
     public function appsGetLogsActiveDeploymentAggregate(
         string $appId,
         AppsGetLogsActiveDeploymentAggregateType $type,
         ?bool $follow = null,
         ?string $podConnectionTimeout = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppMetricsBandwidthUsage|Error>
      */
-    public function appsGetMetricsBandwidthDaily(string $appId, ?\DateTimeImmutable $date = null): void;
+    public function appsGetMetricsBandwidthDaily(string $appId, ?\DateTimeImmutable $date = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsRestart(string $appId, AppsRestartRequest $body): void;
+    public function appsRestart(string $appId, AppsRestartRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsCreateRollback(string $appId, AppsRollbackAppRequest $body): void;
+    public function appsCreateRollback(string $appId, AppsRollbackAppRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<null|Error>
      */
-    public function appsCommitRollback(string $appId): void;
+    public function appsCommitRollback(string $appId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsDeploymentResponse|Error>
      */
-    public function appsRevertRollback(string $appId): void;
+    public function appsRevertRollback(string $appId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppsValidateRollback200Content|Error>
      */
-    public function appsValidateRollback(string $appId, AppsRollbackAppRequest $body): void;
+    public function appsValidateRollback(string $appId, AppsRollbackAppRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:read`.
+     * @return Envelope<AppResponse|Error>
      */
-    public function appsGet(string $id, ?string $name = null): void;
+    public function appsGet(string $id, ?string $name = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:update`.
+     * @return Envelope<AppResponse|Error>
      */
-    public function appsUpdate(string $id, AppsUpdateAppRequest $body): void;
+    public function appsUpdate(string $id, AppsUpdateAppRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `app:delete`.
+     * @return Envelope<AppsDeleteAppResponse|Error>
      */
-    public function appsDelete(string $id): void;
+    public function appsDelete(string $id): Envelope;
 }

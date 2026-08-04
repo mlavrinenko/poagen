@@ -14,6 +14,7 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequestContent;
 use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\OrganizationSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `enterprise-team-organizations` endpoints.
@@ -25,41 +26,53 @@ use Acme\GitHub\Generated\Model\OrganizationSimple;
 interface EnterpriseTeamOrganizationsClientInterface
 {
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
     public function enterpriseTeamOrganizationsGetAssignments(
         string $enterprise,
         string $enterpriseTeam,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
     public function enterpriseTeamOrganizationsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamOrganizationsBulkAddRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function enterpriseTeamOrganizationsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamOrganizationsBulkRemoveRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<OrganizationSimple|null>
+     */
     public function enterpriseTeamOrganizationsGetAssignment(
         string $enterprise,
         string $enterpriseTeam,
         string $org,
-    ): OrganizationSimple;
+    ): Envelope;
 
-    public function enterpriseTeamOrganizationsAdd(
+    /**
+     * @return Envelope<OrganizationSimple>
+     */
+    public function enterpriseTeamOrganizationsAdd(string $enterprise, string $enterpriseTeam, string $org): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function enterpriseTeamOrganizationsDelete(
         string $enterprise,
         string $enterpriseTeam,
         string $org,
-    ): OrganizationSimple;
-
-    public function enterpriseTeamOrganizationsDelete(string $enterprise, string $enterpriseTeam, string $org): void;
+    ): Envelope;
 }

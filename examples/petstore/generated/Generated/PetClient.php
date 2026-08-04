@@ -15,7 +15,9 @@ use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
 use Acme\Petstore\Generated\Model\ApiResponse;
 use Acme\Petstore\Generated\Model\Pet;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -30,114 +32,144 @@ final readonly class PetClient implements PetClientInterface
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function updatePet(Pet $body): Pet
+    public function updatePet(Pet $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Pet|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/pet')
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->json($body),
-            ResponseType::object(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function addPet(Pet $body): Pet
+    public function addPet(Pet $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Pet|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/pet')
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->json($body),
-            ResponseType::object(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
-     * @return list<Pet>
+     * @return Envelope<list<Pet>|null>
      */
-    public function findPetsByStatus(FindPetsByStatusStatus $status): array
+    public function findPetsByStatus(FindPetsByStatusStatus $status): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Pet>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/pet/findByStatus')
                 ->query('status', $status)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::listOf(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @param list<string> $tags
-     * @return list<Pet>
+     * @return Envelope<list<Pet>|null>
      */
-    public function findPetsByTags(array $tags): array
+    public function findPetsByTags(array $tags): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Pet>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/pet/findByTags')
                 ->query('tags', $tags)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::listOf(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function getPetById(int $petId): Pet
+    public function getPetById(int $petId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Pet|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/pet/{petId}')
                 ->path('petId', $petId)
                 ->header('api_key', $this->apiKey)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::object(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet
+    public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Pet|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/pet/{petId}')
                 ->path('petId', $petId)
                 ->query('name', $name)
                 ->query('status', $status)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::object(Pet::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<null>
      */
-    public function deletePet(int $petId, ?string $apiKey = null): void
+    public function deletePet(int $petId, ?string $apiKey = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/pet/{petId}')
                 ->path('petId', $petId)
                 ->header('api_key', $apiKey)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<ApiResponse|null>
      */
-    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): ApiResponse
+    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiResponse|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/pet/{petId}/uploadImage')
                 ->path('petId', $petId)
                 ->query('additionalMetadata', $additionalMetadata)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->binary($body, 'application/octet-stream'),
-            ResponseType::object(ApiResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiResponse::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 }

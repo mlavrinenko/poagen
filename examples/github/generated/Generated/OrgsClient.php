@@ -35,6 +35,7 @@ use Acme\GitHub\Generated\Model\ApiInsightsSubjectStats;
 use Acme\GitHub\Generated\Model\ApiInsightsSummaryStats;
 use Acme\GitHub\Generated\Model\ApiInsightsTimeStats;
 use Acme\GitHub\Generated\Model\ApiInsightsUserStats;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CustomProperty;
 use Acme\GitHub\Generated\Model\CustomPropertySetPayload;
 use Acme\GitHub\Generated\Model\HookDelivery;
@@ -77,6 +78,7 @@ use Acme\GitHub\Generated\Model\OrgsListAttestations200Content;
 use Acme\GitHub\Generated\Model\OrgsListAttestationsBulk200Content;
 use Acme\GitHub\Generated\Model\OrgsListAttestationsBulkRequestContent;
 use Acme\GitHub\Generated\Model\OrgsListOrgRoles200Content;
+use Acme\GitHub\Generated\Model\OrgsRemoveOutsideCollaborator422Content;
 use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestRequestContent;
 use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestsInBulkRequestContent;
 use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecords200Content;
@@ -87,7 +89,6 @@ use Acme\GitHub\Generated\Model\OrgsSetMembershipForUserRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateMembershipForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessesRequestContent;
-use Acme\GitHub\Generated\Model\OrgsUpdateRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateWebhookConfigForOrgRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\RulesetVersion;
@@ -97,10 +98,14 @@ use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\TeamRoleAssignment;
 use Acme\GitHub\Generated\Model\TeamSimple;
 use Acme\GitHub\Generated\Model\UserRoleAssignment;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\WebhookConfig;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class OrgsClient implements OrgsClientInterface
@@ -111,144 +116,195 @@ final readonly class OrgsClient implements OrgsClientInterface
     }
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>|null>
      */
-    public function orgsList(?int $since = null, ?int $perPage = null): array
+    public function orgsList(?int $since = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<OrganizationSimple>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations')->query('since', $since)->query('per_page', $perPage),
-            ResponseType::listOf(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGet(string $org): OrganizationFull
+    /**
+     * @return Envelope<OrganizationFull|BasicError>
+     */
+    public function orgsGet(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrganizationFull|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}')->path('org', $org),
-            ResponseType::object(OrganizationFull::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsDelete(string $org): void
+    /**
+     * @return Envelope<array<string, mixed>|BasicError>
+     */
+    public function orgsDelete(string $org): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}')->path('org', $org),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdate(string $org, OrgsUpdateRequestContent $body): OrganizationFull
-    {
-        return $this->transport->send(
-            Endpoint::patch('/orgs/{org}')->path('org', $org)->json($body),
-            ResponseType::object(OrganizationFull::class),
-        );
-    }
-
+    /**
+     * @return Envelope<OrgsCreateArtifactDeploymentRecord200Content|BasicError>
+     */
     public function orgsCreateArtifactDeploymentRecord(
         string $org,
         OrgsCreateArtifactDeploymentRecordRequestContent $body,
-    ): OrgsCreateArtifactDeploymentRecord200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsCreateArtifactDeploymentRecord200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/artifacts/metadata/deployment-record')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(OrgsCreateArtifactDeploymentRecord200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactDeploymentRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgsSetClusterDeploymentRecords200Content|BasicError>
+     */
     public function orgsSetClusterDeploymentRecords(
         string $org,
         string $cluster,
         OrgsSetClusterDeploymentRecordsRequestContent $body,
-    ): OrgsSetClusterDeploymentRecords200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsSetClusterDeploymentRecords200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/artifacts/metadata/deployment-record/cluster/{cluster}')
                 ->path('org', $org)
                 ->path('cluster', $cluster)
                 ->json($body),
-            ResponseType::object(OrgsSetClusterDeploymentRecords200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsSetClusterDeploymentRecords200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgsCreateArtifactStorageRecord200Content|BasicError>
+     */
     public function orgsCreateArtifactStorageRecord(
         string $org,
         OrgsCreateArtifactStorageRecordRequestContent $body,
-    ): OrgsCreateArtifactStorageRecord200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsCreateArtifactStorageRecord200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/artifacts/metadata/storage-record')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(OrgsCreateArtifactStorageRecord200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactStorageRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsListArtifactDeploymentRecords(
-        string $org,
-        string $subjectDigest,
-    ): OrgsListArtifactDeploymentRecords200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<OrgsListArtifactDeploymentRecords200Content>
+     */
+    public function orgsListArtifactDeploymentRecords(string $org, string $subjectDigest): Envelope
+    {
+        /** @var Envelope<OrgsListArtifactDeploymentRecords200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/artifacts/{subject_digest}/metadata/deployment-records')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::object(OrgsListArtifactDeploymentRecords200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactDeploymentRecords200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsListArtifactStorageRecords(
-        string $org,
-        string $subjectDigest,
-    ): OrgsListArtifactStorageRecords200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<OrgsListArtifactStorageRecords200Content>
+     */
+    public function orgsListArtifactStorageRecords(string $org, string $subjectDigest): Envelope
+    {
+        /** @var Envelope<OrgsListArtifactStorageRecords200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/artifacts/{subject_digest}/metadata/storage-records')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::object(OrgsListArtifactStorageRecords200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactStorageRecords200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgsListAttestationsBulk200Content>
+     */
     public function orgsListAttestationsBulk(
         string $org,
         OrgsListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): OrgsListAttestationsBulk200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsListAttestationsBulk200Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/attestations/bulk-list')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after)
                 ->json($body),
-            ResponseType::object(OrgsListAttestationsBulk200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestationsBulk200Content::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsDeleteAttestationsBulk(
-        string $org,
-        OrgsDeleteAttestationsBulkBranch1|OrgsDeleteAttestationsBulkBranch2 $body,
-    ): void {
-        $this->transport->send(
-            Endpoint::post('/orgs/{org}/attestations/delete-request')
-                ->path('org', $org)
-                ->json($body),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/attestations/digest/{subject_digest}')
-                ->path('org', $org)
-                ->path('subject_digest', $subjectDigest),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<OrgsListAttestationRepositories200ContentItem>
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteAttestationsBulk(
+        string $org,
+        OrgsDeleteAttestationsBulkBranch1|OrgsDeleteAttestationsBulkBranch2 $body,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/orgs/{org}/attestations/delete-request')
+                ->path('org', $org)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/attestations/digest/{subject_digest}')
+                ->path('org', $org)
+                ->path('subject_digest', $subjectDigest),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<OrgsListAttestationRepositories200ContentItem>>
      */
     public function orgsListAttestationRepositories(
         string $org,
@@ -256,28 +312,40 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrgsListAttestationRepositories200ContentItem>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/attestations/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::listOf(OrgsListAttestationRepositories200ContentItem::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgsListAttestationRepositories200ContentItem::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsDeleteAttestationsById(string $org, int $attestationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteAttestationsById(string $org, int $attestationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/attestations/{attestation_id}')
                 ->path('org', $org)
                 ->path('attestation_id', $attestationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgsListAttestations200Content>
+     */
     public function orgsListAttestations(
         string $org,
         string $subjectDigest,
@@ -285,8 +353,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): OrgsListAttestations200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsListAttestations200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/attestations/{subject_digest}')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest)
@@ -294,147 +363,212 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::object(OrgsListAttestations200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestations200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function orgsListBlockedUsers(string $org, ?int $perPage = null, ?int $page = null): array
+    public function orgsListBlockedUsers(string $org, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/blocks')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsCheckBlockedUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::get('/orgs/{org}/blocks/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function orgsBlockUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::put('/orgs/{org}/blocks/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function orgsUnblockUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/blocks/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<null|BasicError>
      */
-    public function orgsListFailedInvitations(string $org, ?int $perPage = null, ?int $page = null): array
+    public function orgsCheckBlockedUser(string $org, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/blocks/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|ValidationError>
+     */
+    public function orgsBlockUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<null|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/orgs/{org}/blocks/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsUnblockUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/blocks/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<OrganizationInvitation>|BasicError>
+     */
+    public function orgsListFailedInvitations(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<OrganizationInvitation>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/failed_invitations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrganizationInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrgHook>
+     * @return Envelope<list<OrgHook>|BasicError>
      */
-    public function orgsListWebhooks(string $org, ?int $perPage = null, ?int $page = null): array
+    public function orgsListWebhooks(string $org, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<OrgHook>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/hooks')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrgHook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequestContent $body): OrgHook
+    /**
+     * @return Envelope<OrgHook|ValidationError|BasicError>
+     */
+    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgHook|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/hooks')->path('org', $org)->json($body),
-            ResponseType::object(OrgHook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetWebhook(string $org, int $hookId): OrgHook
+    /**
+     * @return Envelope<OrgHook|BasicError>
+     */
+    public function orgsGetWebhook(string $org, int $hookId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgHook|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/hooks/{hook_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::object(OrgHook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsDeleteWebhook(string $org, int $hookId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteWebhook(string $org, int $hookId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/hooks/{hook_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequestContent $body): OrgHook
+    /**
+     * @return Envelope<OrgHook|ValidationError|BasicError>
+     */
+    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgHook|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/hooks/{hook_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::object(OrgHook::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetWebhookConfigForOrg(string $org, int $hookId): WebhookConfig
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function orgsGetWebhookConfigForOrg(string $org, int $hookId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/hooks/{hook_id}/config')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::object(WebhookConfig::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<WebhookConfig>
+     */
     public function orgsUpdateWebhookConfigForOrg(
         string $org,
         int $hookId,
         OrgsUpdateWebhookConfigForOrgRequestContent $body,
-    ): WebhookConfig {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/hooks/{hook_id}/config')
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::object(WebhookConfig::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function orgsListWebhookDeliveries(
         string $org,
@@ -442,52 +576,74 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?int $perPage = null,
         ?string $cursor = null,
         ?OrgsListWebhookDeliveriesStatus $status = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<HookDeliveryItem>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/hooks/{hook_id}/deliveries')
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::listOf(HookDeliveryItem::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetWebhookDelivery(string $org, int $hookId, int $deliveryId): HookDelivery
+    /**
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
+     */
+    public function orgsGetWebhookDelivery(string $org, int $hookId, int $deliveryId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<HookDelivery|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::object(HookDelivery::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRedeliverWebhookDelivery(string $org, int $hookId, int $deliveryId): void
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function orgsRedeliverWebhookDelivery(string $org, int $hookId, int $deliveryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<array<string, mixed>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/hooks/{hook_id}/deliveries/{delivery_id}/attempts')
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsPingWebhook(string $org, int $hookId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsPingWebhook(string $org, int $hookId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/hooks/{hook_id}/pings')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsRouteStats>
      */
     public function apiInsightsGetRouteStatsByActor(
         string $org,
@@ -500,8 +656,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?ApiInsightsGetRouteStatsByActorDirection $direction = null,
         ?array $sort = null,
         ?string $apiRouteSubstring = null,
-    ): ApiInsightsRouteStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsRouteStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/route-stats/{actor_type}/{actor_id}')
                 ->path('org', $org)
                 ->path('actor_type', $actorType)
@@ -513,12 +670,15 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('api_route_substring', $apiRouteSubstring),
-            ResponseType::object(ApiInsightsRouteStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsRouteStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsSubjectStats>
      */
     public function apiInsightsGetSubjectStats(
         string $org,
@@ -529,8 +689,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?ApiInsightsGetSubjectStatsDirection $direction = null,
         ?array $sort = null,
         ?string $subjectNameSubstring = null,
-    ): ApiInsightsSubjectStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsSubjectStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/subject-stats')
                 ->path('org', $org)
                 ->query('min_timestamp', $minTimestamp)
@@ -540,92 +701,127 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('subject_name_substring', $subjectNameSubstring),
-            ResponseType::object(ApiInsightsSubjectStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSubjectStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStats(
         string $org,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsSummaryStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/summary-stats')
                 ->path('org', $org)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::object(ApiInsightsSummaryStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStatsByUser(
         string $org,
         string $userId,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsSummaryStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/summary-stats/users/{user_id}')
                 ->path('org', $org)
                 ->path('user_id', $userId)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::object(ApiInsightsSummaryStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStatsByActor(
         string $org,
         ApiInsightsGetSummaryStatsByActorActorType $actorType,
         int $actorId,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsSummaryStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/summary-stats/{actor_type}/{actor_id}')
                 ->path('org', $org)
                 ->path('actor_type', $actorType)
                 ->path('actor_id', $actorId)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::object(ApiInsightsSummaryStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStats(
         string $org,
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsTimeStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/time-stats')
                 ->path('org', $org)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::object(ApiInsightsTimeStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStatsByUser(
         string $org,
         string $userId,
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsTimeStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/time-stats/users/{user_id}')
                 ->path('org', $org)
                 ->path('user_id', $userId)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::object(ApiInsightsTimeStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStatsByActor(
         string $org,
         ApiInsightsGetTimeStatsByActorActorType $actorType,
@@ -633,8 +829,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsTimeStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/time-stats/{actor_type}/{actor_id}')
                 ->path('org', $org)
                 ->path('actor_type', $actorType)
@@ -642,12 +839,15 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::object(ApiInsightsTimeStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsUserStats>
      */
     public function apiInsightsGetUserStats(
         string $org,
@@ -659,8 +859,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?ApiInsightsGetUserStatsDirection $direction = null,
         ?array $sort = null,
         ?string $actorNameSubstring = null,
-    ): ApiInsightsUserStats {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiInsightsUserStats> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/insights/api/user-stats/{user_id}')
                 ->path('org', $org)
                 ->path('user_id', $userId)
@@ -671,26 +872,31 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('actor_name_substring', $actorNameSubstring),
-            ResponseType::object(ApiInsightsUserStats::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsUserStats::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsListAppInstallations(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): OrgsListAppInstallations200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<OrgsListAppInstallations200Content>
+     */
+    public function orgsListAppInstallations(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<OrgsListAppInstallations200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/installations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(OrgsListAppInstallations200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAppInstallations200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<list<OrganizationInvitation>|BasicError>
      */
     public function orgsListPendingInvitations(
         string $org,
@@ -698,142 +904,197 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?int $page = null,
         ?OrgsListPendingInvitationsRole $role = null,
         ?OrgsListPendingInvitationsInvitationSource $invitationSource = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrganizationInvitation>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/invitations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('role', $role)
                 ->query('invitation_source', $invitationSource),
-            ResponseType::listOf(OrganizationInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsCreateInvitation(
-        string $org,
-        OrgsCreateInvitationRequestContent $body,
-    ): OrganizationInvitation {
-        return $this->transport->send(
-            Endpoint::post('/orgs/{org}/invitations')->path('org', $org)->json($body),
-            ResponseType::object(OrganizationInvitation::class),
-        );
-    }
-
-    public function orgsCancelInvitation(string $org, int $invitationId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/invitations/{invitation_id}')
-                ->path('org', $org)
-                ->path('invitation_id', $invitationId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<OrganizationInvitation|ValidationError|BasicError>
+     */
+    public function orgsCreateInvitation(string $org, OrgsCreateInvitationRequestContent $body): Envelope
+    {
+        /** @var Envelope<OrganizationInvitation|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/orgs/{org}/invitations')->path('org', $org)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationInvitation::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
+    public function orgsCancelInvitation(string $org, int $invitationId): Envelope
+    {
+        /** @var Envelope<null|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/invitations/{invitation_id}')
+                ->path('org', $org)
+                ->path('invitation_id', $invitationId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Team>|BasicError>
      */
     public function orgsListInvitationTeams(
         string $org,
         int $invitationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Team>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/invitations/{invitation_id}/teams')
                 ->path('org', $org)
                 ->path('invitation_id', $invitationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<IssueField>
+     * @return Envelope<list<IssueField>|BasicError>
      */
-    public function orgsListIssueFields(string $org): array
+    public function orgsListIssueFields(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<IssueField>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/issue-fields')->path('org', $org),
-            ResponseType::listOf(IssueField::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueField::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsCreateIssueField(string $org, OrganizationCreateIssueField $body): IssueField
+    /**
+     * @return Envelope<IssueField|BasicError|ValidationErrorSimple>
+     */
+    public function orgsCreateIssueField(string $org, OrganizationCreateIssueField $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<IssueField|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/issue-fields')->path('org', $org)->json($body),
-            ResponseType::object(IssueField::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsDeleteIssueField(string $org, int $issueFieldId): void
+    /**
+     * @return Envelope<null|BasicError|ValidationErrorSimple>
+     */
+    public function orgsDeleteIssueField(string $org, int $issueFieldId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/issue-fields/{issue_field_id}')
                 ->path('org', $org)
                 ->path('issue_field_id', $issueFieldId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdateIssueField(
-        string $org,
-        int $issueFieldId,
-        OrganizationUpdateIssueField $body,
-    ): IssueField {
-        return $this->transport->send(
+    /**
+     * @return Envelope<IssueField|BasicError|ValidationErrorSimple>
+     */
+    public function orgsUpdateIssueField(string $org, int $issueFieldId, OrganizationUpdateIssueField $body): Envelope
+    {
+        /** @var Envelope<IssueField|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/issue-fields/{issue_field_id}')
                 ->path('org', $org)
                 ->path('issue_field_id', $issueFieldId)
                 ->json($body),
-            ResponseType::object(IssueField::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<IssueType>
+     * @return Envelope<list<IssueType>|BasicError>
      */
-    public function orgsListIssueTypes(string $org): array
+    public function orgsListIssueTypes(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<IssueType>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/issue-types')->path('org', $org),
-            ResponseType::listOf(IssueType::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueType::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsCreateIssueType(string $org, OrganizationCreateIssueType $body): IssueType
+    /**
+     * @return Envelope<IssueType|BasicError|ValidationErrorSimple>
+     */
+    public function orgsCreateIssueType(string $org, OrganizationCreateIssueType $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<IssueType|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/issue-types')->path('org', $org)->json($body),
-            ResponseType::object(IssueType::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdateIssueType(string $org, int $issueTypeId, OrganizationUpdateIssueType $body): IssueType
+    /**
+     * @return Envelope<IssueType|BasicError|ValidationErrorSimple>
+     */
+    public function orgsUpdateIssueType(string $org, int $issueTypeId, OrganizationUpdateIssueType $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<IssueType|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/issue-types/{issue_type_id}')
                 ->path('org', $org)
                 ->path('issue_type_id', $issueTypeId)
                 ->json($body),
-            ResponseType::object(IssueType::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsDeleteIssueType(string $org, int $issueTypeId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/issue-types/{issue_type_id}')
-                ->path('org', $org)
-                ->path('issue_type_id', $issueTypeId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<null|ValidationErrorSimple|BasicError>
+     */
+    public function orgsDeleteIssueType(string $org, int $issueTypeId): Envelope
+    {
+        /** @var Envelope<null|ValidationErrorSimple|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/issue-types/{issue_type_id}')
+                ->path('org', $org)
+                ->path('issue_type_id', $issueTypeId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function orgsListMembers(
         string $org,
@@ -841,234 +1102,333 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?OrgsListMembersRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/members')
                 ->path('org', $org)
                 ->query('filter', $filter)
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsCheckMembershipForUser(string $org, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsCheckMembershipForUser(string $org, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['302', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRemoveMember(string $org, string $username): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsRemoveMember(string $org, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetMembershipForUser(string $org, string $username): OrgMembership
+    /**
+     * @return Envelope<OrgMembership|BasicError>
+     */
+    public function orgsGetMembershipForUser(string $org, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgMembership|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/memberships/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::object(OrgMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgMembership|ValidationError|BasicError>
+     */
     public function orgsSetMembershipForUser(
         string $org,
         string $username,
         OrgsSetMembershipForUserRequestContent $body,
-    ): OrgMembership {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgMembership|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/memberships/{username}')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::object(OrgMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRemoveMembershipForUser(string $org, string $username): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsRemoveMembershipForUser(string $org, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/memberships/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsListOrgRoles(string $org): OrgsListOrgRoles200Content
+    /**
+     * @return Envelope<OrgsListOrgRoles200Content|BasicError|ValidationError>
+     */
+    public function orgsListOrgRoles(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgsListOrgRoles200Content|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/organization-roles')->path('org', $org),
-            ResponseType::object(OrgsListOrgRoles200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListOrgRoles200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRevokeAllOrgRolesTeam(string $org, string $teamSlug): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeAllOrgRolesTeam(string $org, string $teamSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/organization-roles/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsAssignTeamToOrgRole(string $org, string $teamSlug, int $roleId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAssignTeamToOrgRole(string $org, string $teamSlug, int $roleId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('role_id', $roleId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRevokeOrgRoleTeam(string $org, string $teamSlug, int $roleId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeOrgRoleTeam(string $org, string $teamSlug, int $roleId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('role_id', $roleId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRevokeAllOrgRolesUser(string $org, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeAllOrgRolesUser(string $org, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/organization-roles/users/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsAssignUserToOrgRole(string $org, string $username, int $roleId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAssignUserToOrgRole(string $org, string $username, int $roleId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/organization-roles/users/{username}/{role_id}')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('role_id', $roleId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRevokeOrgRoleUser(string $org, string $username, int $roleId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeOrgRoleUser(string $org, string $username, int $roleId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/organization-roles/users/{username}/{role_id}')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('role_id', $roleId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsGetOrgRole(string $org, int $roleId): OrganizationRole
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/organization-roles/{role_id}')
-                ->path('org', $org)
-                ->path('role_id', $roleId),
-            ResponseType::object(OrganizationRole::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<TeamRoleAssignment>
+     * @return Envelope<OrganizationRole|BasicError|ValidationError>
      */
-    public function orgsListOrgRoleTeams(string $org, int $roleId, ?int $perPage = null, ?int $page = null): array
+    public function orgsGetOrgRole(string $org, int $roleId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrganizationRole|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/organization-roles/{role_id}')
+                ->path('org', $org)
+                ->path('role_id', $roleId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationRole::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<TeamRoleAssignment>|null>
+     */
+    public function orgsListOrgRoleTeams(string $org, int $roleId, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<TeamRoleAssignment>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/organization-roles/{role_id}/teams')
                 ->path('org', $org)
                 ->path('role_id', $roleId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(TeamRoleAssignment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamRoleAssignment::class)], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<UserRoleAssignment>
+     * @return Envelope<list<UserRoleAssignment>|null>
      */
-    public function orgsListOrgRoleUsers(string $org, int $roleId, ?int $perPage = null, ?int $page = null): array
+    public function orgsListOrgRoleUsers(string $org, int $roleId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<UserRoleAssignment>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/organization-roles/{role_id}/users')
                 ->path('org', $org)
                 ->path('role_id', $roleId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(UserRoleAssignment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserRoleAssignment::class)], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function orgsListOutsideCollaborators(
         string $org,
         ?OrgsListOutsideCollaboratorsFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/outside_collaborators')
                 ->path('org', $org)
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>|null|BasicError>
      */
     public function orgsConvertMemberToOutsideCollaborator(
         string $org,
         string $username,
         OrgsConvertMemberToOutsideCollaboratorRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<array<string, mixed>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/outside_collaborators/{username}')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::mapOf(ResponseType::mixed()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['204', ResponseType::nothing()], ['403', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRemoveOutsideCollaborator(string $org, string $username): void
+    /**
+     * @return Envelope<null|OrgsRemoveOutsideCollaborator422Content>
+     */
+    public function orgsRemoveOutsideCollaborator(string $org, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|OrgsRemoveOutsideCollaborator422Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/outside_collaborators/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(OrgsRemoveOutsideCollaborator422Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $owner
      * @param list<string> $tokenId
-     * @return list<OrganizationProgrammaticAccessGrantRequest>
+     * @return Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrantRequest>>
      */
     public function orgsListPatGrantRequests(
         string $org,
@@ -1082,8 +1442,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?\DateTimeImmutable $lastUsedBefore = null,
         ?\DateTimeImmutable $lastUsedAfter = null,
         ?array $tokenId = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrantRequest>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/personal-access-token-requests')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
@@ -1096,59 +1457,76 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('last_used_before', $lastUsedBefore?->format(DateTimeInterface::RFC3339))
                 ->query('last_used_after', $lastUsedAfter?->format(DateTimeInterface::RFC3339))
                 ->query('token_id', $tokenId),
-            ResponseType::listOf(OrganizationProgrammaticAccessGrantRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrantRequest::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BasicError|ValidationError|array<string, mixed>>
+     */
     public function orgsReviewPatGrantRequestsInBulk(
         string $org,
         OrgsReviewPatGrantRequestsInBulkRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|ValidationError|array<string, mixed>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/personal-access-token-requests')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<BasicError|ValidationError|null>
+     */
     public function orgsReviewPatGrantRequest(
         string $org,
         int $patRequestId,
         OrgsReviewPatGrantRequestRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|ValidationError|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/personal-access-token-requests/{pat_request_id}')
                 ->path('org', $org)
                 ->path('pat_request_id', $patRequestId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<BasicError|list<MinimalRepository>>
      */
     public function orgsListPatGrantRequestRepositories(
         string $org,
         int $patRequestId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/personal-access-token-requests/{pat_request_id}/repositories')
                 ->path('org', $org)
                 ->path('pat_request_id', $patRequestId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param list<string> $owner
      * @param list<string> $tokenId
-     * @return list<OrganizationProgrammaticAccessGrant>
+     * @return Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrant>>
      */
     public function orgsListPatGrants(
         string $org,
@@ -1162,8 +1540,9 @@ final readonly class OrgsClient implements OrgsClientInterface
         ?\DateTimeImmutable $lastUsedBefore = null,
         ?\DateTimeImmutable $lastUsedAfter = null,
         ?array $tokenId = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrant>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/personal-access-tokens')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
@@ -1176,383 +1555,545 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('last_used_before', $lastUsedBefore?->format(DateTimeInterface::RFC3339))
                 ->query('last_used_after', $lastUsedAfter?->format(DateTimeInterface::RFC3339))
                 ->query('token_id', $tokenId),
-            ResponseType::listOf(OrganizationProgrammaticAccessGrant::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrant::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequestContent $body): void
+    /**
+     * @return Envelope<BasicError|array<string, mixed>|ValidationError>
+     */
+    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<BasicError|array<string, mixed>|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/personal-access-tokens')->path('org', $org)->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequestContent $body): void
+    /**
+     * @return Envelope<BasicError|null|ValidationError>
+     */
+    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<BasicError|null|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/personal-access-tokens/{pat_id}')
                 ->path('org', $org)
                 ->path('pat_id', $patId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<BasicError|list<MinimalRepository>>
      */
     public function orgsListPatGrantRepositories(
         string $org,
         int $patId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BasicError|list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/personal-access-tokens/{pat_id}/repositories')
                 ->path('org', $org)
                 ->path('pat_id', $patId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CustomProperty>
+     * @return Envelope<list<CustomProperty>|BasicError>
      */
-    public function orgsCustomPropertiesForReposGetOrganizationDefinitions(string $org): array
+    public function orgsCustomPropertiesForReposGetOrganizationDefinitions(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<CustomProperty>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/properties/schema')->path('org', $org),
-            ResponseType::listOf(CustomProperty::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CustomProperty>
+     * @return Envelope<list<CustomProperty>|BasicError>
      */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitions(
         string $org,
         OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CustomProperty>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/properties/schema')->path('org', $org)->json($body),
-            ResponseType::listOf(CustomProperty::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CustomProperty|BasicError>
+     */
     public function orgsCustomPropertiesForReposGetOrganizationDefinition(
         string $org,
         string $customPropertyName,
-    ): CustomProperty {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CustomProperty|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/properties/schema/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::object(CustomProperty::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CustomProperty|BasicError>
+     */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinition(
         string $org,
         string $customPropertyName,
         CustomPropertySetPayload $body,
-    ): CustomProperty {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CustomProperty|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/properties/schema/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName)
                 ->json($body),
-            ResponseType::object(CustomProperty::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsCustomPropertiesForReposDeleteOrganizationDefinition(
-        string $org,
-        string $customPropertyName,
-    ): void {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/properties/schema/{custom_property_name}')
-                ->path('org', $org)
-                ->path('custom_property_name', $customPropertyName),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<OrgRepoCustomPropertyValues>
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsCustomPropertiesForReposDeleteOrganizationDefinition(
+        string $org,
+        string $customPropertyName,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/properties/schema/{custom_property_name}')
+                ->path('org', $org)
+                ->path('custom_property_name', $customPropertyName),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<OrgRepoCustomPropertyValues>|BasicError>
      */
     public function orgsCustomPropertiesForReposGetOrganizationValues(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $repositoryQuery = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrgRepoCustomPropertyValues>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/properties/values')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('repository_query', $repositoryQuery),
-            ResponseType::listOf(OrgRepoCustomPropertyValues::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgRepoCustomPropertyValues::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationValues(
-        string $org,
-        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequestContent $body,
-    ): void {
-        $this->transport->send(
-            Endpoint::patch('/orgs/{org}/properties/values')->path('org', $org)->json($body),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<null|BasicError|ValidationError>
      */
-    public function orgsListPublicMembers(string $org, ?int $perPage = null, ?int $page = null): array
+    public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationValues(
+        string $org,
+        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/orgs/{org}/properties/values')->path('org', $org)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleUser>>
+     */
+    public function orgsListPublicMembers(string $org, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/public_members')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function orgsCheckPublicMembershipForUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::get('/orgs/{org}/public_members/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function orgsSetPublicMembershipForAuthenticatedUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::put('/orgs/{org}/public_members/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function orgsRemovePublicMembershipForAuthenticatedUser(string $org, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/orgs/{org}/public_members/{username}')
-                ->path('org', $org)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<RulesetVersion>
+     * @return Envelope<null>
+     */
+    public function orgsCheckPublicMembershipForUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/public_members/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsSetPublicMembershipForAuthenticatedUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/orgs/{org}/public_members/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRemovePublicMembershipForAuthenticatedUser(string $org, string $username): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/orgs/{org}/public_members/{username}')
+                ->path('org', $org)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<RulesetVersion>|BasicError>
      */
     public function orgsGetOrgRulesetHistory(
         string $org,
         int $rulesetId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RulesetVersion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets/{ruleset_id}/history')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(RulesetVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetOrgRulesetVersion(string $org, int $rulesetId, int $versionId): RulesetVersionWithState
+    /**
+     * @return Envelope<RulesetVersionWithState|BasicError>
+     */
+    public function orgsGetOrgRulesetVersion(string $org, int $rulesetId, int $versionId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RulesetVersionWithState|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/rulesets/{ruleset_id}/history/{version_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId)
                 ->path('version_id', $versionId),
-            ResponseType::object(RulesetVersionWithState::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<TeamSimple>
+     * @return Envelope<list<TeamSimple>>
      */
-    public function orgsListSecurityManagerTeams(string $org): array
+    public function orgsListSecurityManagerTeams(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<TeamSimple>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/security-managers')->path('org', $org),
-            ResponseType::listOf(TeamSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsAddSecurityManagerTeam(string $org, string $teamSlug): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAddSecurityManagerTeam(string $org, string $teamSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/security-managers/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsRemoveSecurityManagerTeam(string $org, string $teamSlug): void
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRemoveSecurityManagerTeam(string $org, string $teamSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/security-managers/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetImmutableReleasesSettings(string $org): ImmutableReleasesOrganizationSettings
+    /**
+     * @return Envelope<ImmutableReleasesOrganizationSettings>
+     */
+    public function orgsGetImmutableReleasesSettings(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ImmutableReleasesOrganizationSettings> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/immutable-releases')->path('org', $org),
-            ResponseType::object(ImmutableReleasesOrganizationSettings::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImmutableReleasesOrganizationSettings::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function orgsSetImmutableReleasesSettings(
         string $org,
         OrgsSetImmutableReleasesSettingsRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/settings/immutable-releases')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgsGetImmutableReleasesSettingsRepositories200Content>
+     */
     public function orgsGetImmutableReleasesSettingsRepositories(
         string $org,
         ?int $page = null,
         ?int $perPage = null,
-    ): OrgsGetImmutableReleasesSettingsRepositories200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgsGetImmutableReleasesSettingsRepositories200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/immutable-releases/repositories')
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(OrgsGetImmutableReleasesSettingsRepositories200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsGetImmutableReleasesSettingsRepositories200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function orgsSetImmutableReleasesSettingsRepositories(
         string $org,
         OrgsSetImmutableReleasesSettingsRepositoriesRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/settings/immutable-releases/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsEnableSelectedRepositoryImmutableReleasesOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsEnableSelectedRepositoryImmutableReleasesOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/settings/immutable-releases/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsDisableSelectedRepositoryImmutableReleasesOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsDisableSelectedRepositoryImmutableReleasesOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/settings/immutable-releases/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function orgsEnableOrDisableSecurityProductOnAllOrgRepos(
         string $org,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct $securityProduct,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement $enablement,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/{security_product}/{enablement}')
                 ->path('org', $org)
                 ->path('security_product', $securityProduct)
                 ->path('enablement', $enablement)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrgMembership>
+     * @return Envelope<list<OrgMembership>|null|BasicError|ValidationError>
      */
     public function orgsListMembershipsForAuthenticatedUser(
         ?OrgsListMembershipsForAuthenticatedUserState $state = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrgMembership>|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/memberships/orgs')
                 ->query('state', $state)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrgMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgMembership::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function orgsGetMembershipForAuthenticatedUser(string $org): OrgMembership
+    /**
+     * @return Envelope<OrgMembership|BasicError>
+     */
+    public function orgsGetMembershipForAuthenticatedUser(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrgMembership|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/memberships/orgs/{org}')->path('org', $org),
-            ResponseType::object(OrgMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrgMembership|BasicError|ValidationError>
+     */
     public function orgsUpdateMembershipForAuthenticatedUser(
         string $org,
         OrgsUpdateMembershipForAuthenticatedUserRequestContent $body,
-    ): OrgMembership {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrgMembership|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/user/memberships/orgs/{org}')->path('org', $org)->json($body),
-            ResponseType::object(OrgMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>|null|BasicError>
      */
-    public function orgsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function orgsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<OrganizationSimple>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/orgs')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
-    public function orgsListForUser(string $username, ?int $perPage = null, ?int $page = null): array
+    public function orgsListForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<OrganizationSimple>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/orgs')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

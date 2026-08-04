@@ -103,6 +103,13 @@ return new Profile(
      * emitted as `list<Schema>`; and the two `X-Dangerous` operations are
      * a required header, now a required method argument instead of a
      * refusal.
+     *
+     * `typed-error-responses` adds two more, both a `200` declared through
+     * `components.responses` — a `$ref` the old picked-2xx-only reading
+     * skipped past silently, treating the operation as if it had no 2xx at
+     * all and emitting `void`. Resolving every `$ref`'d response properly
+     * surfaces the vendor's real content type instead: a PDF stream and a
+     * YAML document, neither of which paogen decodes.
      */
     skip: [
         // The vendor's own defect, not paogen's: `check_updatable` (this
@@ -113,5 +120,15 @@ return new Profile(
         // than emit a model that promises a field no branch supplies.
         'uptime_create_check' => 'allOf requires \'method\' but no member declares it as a property — members '
             . 'searched: #/components/schemas/check_updatable',
+        // typed-error-responses: 200 is `#/components/responses/invoice_pdf`,
+        // `application/pdf` — paogen sends a binary request body as a PSR-7
+        // stream but does not yet return one.
+        'invoices_get_pdfByUUID' => "200 response (components/responses/invoice_pdf) content type "
+            . "'application/pdf' declares a binary body paogen does not yet return",
+        // typed-error-responses: 200 is `#/components/responses/kubeconfig`,
+        // `application/yaml` — paogen decodes JSON responses and text over a
+        // `type: string` schema, not YAML.
+        'kubernetes_get_kubeconfig' => "200 response (components/responses/kubeconfig) content type "
+            . "'application/yaml' is not one paogen decodes",
     ],
 );

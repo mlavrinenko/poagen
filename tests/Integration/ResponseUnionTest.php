@@ -44,7 +44,8 @@ final class ResponseUnionTest extends TestCase
     {
         $client = $this->clientSource();
 
-        self::assertStringContainsString('public function getCreature(): Dog|Cat', $client);
+        self::assertStringContainsString('@return Envelope<Dog|Cat>', $client);
+        self::assertStringContainsString('public function getCreature(): Envelope', $client);
     }
 
     /**
@@ -56,8 +57,8 @@ final class ResponseUnionTest extends TestCase
     {
         $client = $this->clientSource();
 
-        self::assertStringContainsString('public function listCreatures(): array', $client);
-        self::assertStringContainsString('@return list<Dog|Cat>', $client);
+        self::assertStringContainsString('public function listCreatures(): Envelope', $client);
+        self::assertStringContainsString('@return Envelope<list<Dog|Cat>>', $client);
     }
 
     /**
@@ -68,10 +69,8 @@ final class ResponseUnionTest extends TestCase
     {
         $client = $this->clientSource();
 
-        self::assertStringContainsString(
-            'public function getRestrictions(): Dog|GetRestrictionsResponseBranch2',
-            $client,
-        );
+        self::assertStringContainsString('@return Envelope<Dog|GetRestrictionsResponseBranch2>', $client);
+        self::assertStringContainsString('public function getRestrictions(): Envelope', $client);
     }
 
     /**
@@ -85,7 +84,7 @@ final class ResponseUnionTest extends TestCase
         $client = $this->clientSource();
         $method = self::methodSlice($client, 'getTaggedCreature');
 
-        self::assertStringContainsString('public function getTaggedCreature(): Dog|Cat', $method);
+        self::assertStringContainsString('public function getTaggedCreature(): Envelope', $method);
         self::assertStringContainsString("new Discriminator(field: 'kind'", $method);
         self::assertStringContainsString("'canine' => Dog::class", $method);
         self::assertStringContainsString("'feline' => Cat::class", $method);
@@ -99,7 +98,8 @@ final class ResponseUnionTest extends TestCase
     {
         $client = $this->clientSource();
 
-        self::assertStringContainsString('public function getUndecidableCreature(): Celsius', $client);
+        self::assertStringContainsString('@return Envelope<Celsius>', $client);
+        self::assertStringContainsString('public function getUndecidableCreature(): Envelope', $client);
     }
 
     /**

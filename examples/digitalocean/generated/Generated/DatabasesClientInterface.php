@@ -13,30 +13,75 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ConnectionPool;
 use Acme\DigitalOcean\Generated\Model\ConnectionPoolUpdate;
+use Acme\DigitalOcean\Generated\Model\ConnectionPools;
 use Acme\DigitalOcean\Generated\Model\Database;
 use Acme\DigitalOcean\Generated\Model\DatabaseAutoscaleParams;
 use Acme\DigitalOcean\Generated\Model\DatabaseClusterResize;
 use Acme\DigitalOcean\Generated\Model\DatabaseConfig;
 use Acme\DigitalOcean\Generated\Model\DatabaseMaintenanceWindow;
+use Acme\DigitalOcean\Generated\Model\DatabasesAdd201Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddConnectionPool201Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddUser201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesAddUserRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateCluster201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateClusterRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchema201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchemaRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopic201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopicRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsink201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsinkRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplica201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplicaRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesGet200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetAutoscale200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetCa200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetCluster200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetClusterMetricsCredentials200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetConnectionPool200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetEvictionPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchema200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaSubjectConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaVersion200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaTopic200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetReplica200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetUser200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesList200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListBackups200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListClusters200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListEventsLogs200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListFirewallRules200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListKafkaSchemas200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListKafkaTopics200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListLogsink200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListOpeasearchIndexes200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListReplicas200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListUsers200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesResetAuth200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesResetAuthRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateClusterMetricsCredentialsRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateEvictionPolicyRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateFirewallRulesRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfig200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfigRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfig200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfigRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopic200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopicRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateRegionRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUser201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUserRequestContent;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\LogsinkSchema;
 use Acme\DigitalOcean\Generated\Model\LogsinkUpdate;
+use Acme\DigitalOcean\Generated\Model\OnlineMigration;
+use Acme\DigitalOcean\Generated\Model\Options;
 use Acme\DigitalOcean\Generated\Model\SourceDatabase;
 use Acme\DigitalOcean\Generated\Model\SqlMode;
 use Acme\DigitalOcean\Generated\Model\Version2;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Databases` endpoints.
@@ -49,399 +94,472 @@ interface DatabasesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListClusters200Content|Error>
      */
-    public function databasesListClusters(?string $tagName = null): void;
+    public function databasesListClusters(?string $tagName = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateCluster201Content|Error>
      */
-    public function databasesCreateCluster(DatabasesCreateClusterRequestContent $body): void;
+    public function databasesCreateCluster(DatabasesCreateClusterRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`, `database:view_credentials`.
+     * @return Envelope<DatabasesGetClusterMetricsCredentials200Content|Error>
      */
-    public function databasesGetClusterMetricsCredentials(): void;
+    public function databasesGetClusterMetricsCredentials(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateClusterMetricsCredentials(
         DatabasesUpdateClusterMetricsCredentialsRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<Options|Error>
      */
-    public function databasesListOptions(): void;
+    public function databasesListOptions(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetCluster200Content|Error>
      */
-    public function databasesGetCluster(string $databaseClusterUuid): void;
+    public function databasesGetCluster(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDestroyCluster(string $databaseClusterUuid): void;
+    public function databasesDestroyCluster(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetAutoscale200Content|Error>
      */
-    public function databasesGetAutoscale(string $databaseClusterUuid): void;
+    public function databasesGetAutoscale(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateAutoscale(string $databaseClusterUuid, DatabaseAutoscaleParams $body): void;
+    public function databasesUpdateAutoscale(string $databaseClusterUuid, DatabaseAutoscaleParams $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListBackups200Content|Error>
      */
-    public function databasesListBackups(string $databaseClusterUuid): void;
+    public function databasesListBackups(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetCa200Content|Error>
      */
-    public function databasesGetCa(string $databaseClusterUuid): void;
+    public function databasesGetCa(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetConfig200Content|Error>
      */
-    public function databasesGetConfig(string $databaseClusterUuid): void;
+    public function databasesGetConfig(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesPatchConfig(string $databaseClusterUuid, DatabaseConfig $body): void;
+    public function databasesPatchConfig(string $databaseClusterUuid, DatabaseConfig $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesList200Content|Error>
      */
-    public function databasesList(string $databaseClusterUuid): void;
+    public function databasesList(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAdd201Content|Error>
      */
-    public function databasesAdd(string $databaseClusterUuid, Database $body): void;
+    public function databasesAdd(string $databaseClusterUuid, Database $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGet200Content|Error>
      */
-    public function databasesGet(string $databaseClusterUuid, string $databaseName): void;
+    public function databasesGet(string $databaseClusterUuid, string $databaseName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDelete(string $databaseClusterUuid, string $databaseName): void;
+    public function databasesDelete(string $databaseClusterUuid, string $databaseName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListEventsLogs200Content|Error>
      */
-    public function databasesListEventsLogs(string $databaseClusterUuid): void;
+    public function databasesListEventsLogs(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetEvictionPolicy200Content|Error>
      */
-    public function databasesGetEvictionPolicy(string $databaseClusterUuid): void;
+    public function databasesGetEvictionPolicy(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateEvictionPolicy(
         string $databaseClusterUuid,
         DatabasesUpdateEvictionPolicyRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListFirewallRules200Content|Error>
      */
-    public function databasesListFirewallRules(string $databaseClusterUuid): void;
+    public function databasesListFirewallRules(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateFirewallRules(
         string $databaseClusterUuid,
         DatabasesUpdateFirewallRulesRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListOpeasearchIndexes200Content|Error>
      */
-    public function databasesListOpeasearchIndexes(string $databaseClusterUuid): void;
+    public function databasesListOpeasearchIndexes(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteOpensearchIndex(string $databaseClusterUuid, string $indexName): void;
+    public function databasesDeleteOpensearchIndex(string $databaseClusterUuid, string $indexName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesInstallUpdate(string $databaseClusterUuid): void;
+    public function databasesInstallUpdate(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListLogsink200Content|Error>
      */
-    public function databasesListLogsink(string $databaseClusterUuid): void;
+    public function databasesListLogsink(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateLogsink201Content|Error>
      */
     public function databasesCreateLogsink(
         string $databaseClusterUuid,
         DatabasesCreateLogsinkRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<LogsinkSchema|Error>
      */
-    public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): void;
+    public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateLogsink(string $databaseClusterUuid, string $logsinkId, LogsinkUpdate $body): void;
+    public function databasesUpdateLogsink(
+        string $databaseClusterUuid,
+        string $logsinkId,
+        LogsinkUpdate $body,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteLogsink(string $databaseClusterUuid, string $logsinkId): void;
+    public function databasesDeleteLogsink(string $databaseClusterUuid, string $logsinkId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateMaintenanceWindow(
         string $databaseClusterUuid,
         DatabaseMaintenanceWindow $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateRegion(
         string $databaseClusterUuid,
         DatabasesUpdateRegionRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<OnlineMigration|Error>
      */
-    public function databasesGetMigrationStatus(string $databaseClusterUuid): void;
+    public function databasesGetMigrationStatus(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<OnlineMigration|Error>
      */
-    public function databasesUpdateOnlineMigration(string $databaseClusterUuid, SourceDatabase $body): void;
+    public function databasesUpdateOnlineMigration(string $databaseClusterUuid, SourceDatabase $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteOnlineMigration(string $databaseClusterUuid, string $migrationId): void;
+    public function databasesDeleteOnlineMigration(string $databaseClusterUuid, string $migrationId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<ConnectionPools|Error>
      */
-    public function databasesListConnectionPools(string $databaseClusterUuid): void;
+    public function databasesListConnectionPools(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAddConnectionPool201Content|Error>
      */
-    public function databasesAddConnectionPool(string $databaseClusterUuid, ConnectionPool $body): void;
+    public function databasesAddConnectionPool(string $databaseClusterUuid, ConnectionPool $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetConnectionPool200Content|Error>
      */
-    public function databasesGetConnectionPool(string $databaseClusterUuid, string $poolName): void;
+    public function databasesGetConnectionPool(string $databaseClusterUuid, string $poolName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateConnectionPool(
         string $databaseClusterUuid,
         string $poolName,
         ConnectionPoolUpdate $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteConnectionPool(string $databaseClusterUuid, string $poolName): void;
+    public function databasesDeleteConnectionPool(string $databaseClusterUuid, string $poolName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListReplicas200Content|Error>
      */
-    public function databasesListReplicas(string $databaseClusterUuid): void;
+    public function databasesListReplicas(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateReplica201Content|Error>
      */
     public function databasesCreateReplica(
         string $databaseClusterUuid,
         DatabasesCreateReplicaRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetReplica200Content|Error>
      */
-    public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): void;
+    public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDestroyReplica(string $databaseClusterUuid, string $replicaName): void;
+    public function databasesDestroyReplica(string $databaseClusterUuid, string $replicaName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesPromoteReplica(string $databaseClusterUuid, string $replicaName): void;
+    public function databasesPromoteReplica(string $databaseClusterUuid, string $replicaName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateClusterSize(string $databaseClusterUuid, DatabaseClusterResize $body): void;
+    public function databasesUpdateClusterSize(string $databaseClusterUuid, DatabaseClusterResize $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListKafkaSchemas200Content|Error>
      */
-    public function databasesListKafkaSchemas(string $databaseClusterUuid): void;
+    public function databasesListKafkaSchemas(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateKafkaSchema201Content|Error>
      */
     public function databasesCreateKafkaSchema(
         string $databaseClusterUuid,
         DatabasesCreateKafkaSchemaRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaConfig200Content|Error>
      */
-    public function databasesGetKafkaSchemaConfig(string $databaseClusterUuid): void;
+    public function databasesGetKafkaSchemaConfig(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:write`.
+     * @return Envelope<DatabasesUpdateKafkaSchemaConfig200Content|Error>
      */
     public function databasesUpdateKafkaSchemaConfig(
         string $databaseClusterUuid,
         DatabasesUpdateKafkaSchemaConfigRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaSubjectConfig200Content|Error>
      */
-    public function databasesGetKafkaSchemaSubjectConfig(string $databaseClusterUuid, string $subjectName): void;
+    public function databasesGetKafkaSchemaSubjectConfig(string $databaseClusterUuid, string $subjectName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:write`.
+     * @return Envelope<DatabasesUpdateKafkaSchemaSubjectConfig200Content|Error>
      */
     public function databasesUpdateKafkaSchemaSubjectConfig(
         string $databaseClusterUuid,
         string $subjectName,
         DatabasesUpdateKafkaSchemaSubjectConfigRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchema200Content|Error>
      */
-    public function databasesGetKafkaSchema(string $databaseClusterUuid, string $subjectName): void;
+    public function databasesGetKafkaSchema(string $databaseClusterUuid, string $subjectName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteKafkaSchema(string $databaseClusterUuid, string $subjectName): void;
+    public function databasesDeleteKafkaSchema(string $databaseClusterUuid, string $subjectName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaVersion200Content|Error>
      */
     public function databasesGetKafkaSchemaVersion(
         string $databaseClusterUuid,
         string $subjectName,
         string $version,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<SqlMode|Error>
      */
-    public function databasesGetSqlMode(string $databaseClusterUuid): void;
+    public function databasesGetSqlMode(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateSqlMode(string $databaseClusterUuid, SqlMode $body): void;
+    public function databasesUpdateSqlMode(string $databaseClusterUuid, SqlMode $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListKafkaTopics200Content|Error>
      */
-    public function databasesListKafkaTopics(string $databaseClusterUuid): void;
+    public function databasesListKafkaTopics(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateKafkaTopic201Content|Error>
      */
     public function databasesCreateKafkaTopic(
         string $databaseClusterUuid,
         DatabasesCreateKafkaTopicRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaTopic200Content|Error>
      */
-    public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): void;
+    public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesUpdateKafkaTopic200Content|Error>
      */
     public function databasesUpdateKafkaTopic(
         string $databaseClusterUuid,
         string $topicName,
         DatabasesUpdateKafkaTopicRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteKafkaTopic(string $databaseClusterUuid, string $topicName): void;
+    public function databasesDeleteKafkaTopic(string $databaseClusterUuid, string $topicName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateMajorVersion(string $databaseClusterUuid, Version2 $body): void;
+    public function databasesUpdateMajorVersion(string $databaseClusterUuid, Version2 $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListUsers200Content|Error>
      */
-    public function databasesListUsers(string $databaseClusterUuid): void;
+    public function databasesListUsers(string $databaseClusterUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAddUser201Content|Error>
      */
-    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequestContent $body): void;
+    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetUser200Content|Error>
      */
-    public function databasesGetUser(string $databaseClusterUuid, string $username): void;
+    public function databasesGetUser(string $databaseClusterUuid, string $username): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesUpdateUser201Content|Error>
      */
     public function databasesUpdateUser(
         string $databaseClusterUuid,
         string $username,
         DatabasesUpdateUserRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteUser(string $databaseClusterUuid, string $username): void;
+    public function databasesDeleteUser(string $databaseClusterUuid, string $username): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesResetAuth200Content|Error>
      */
     public function databasesResetAuth(
         string $databaseClusterUuid,
         string $username,
         DatabasesResetAuthRequestContent $body,
-    ): void;
+    ): Envelope;
 }

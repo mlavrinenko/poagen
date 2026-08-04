@@ -12,12 +12,19 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\ImagesListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImageNewCustom;
 use Acme\DigitalOcean\Generated\Model\ImageUpdate;
+use Acme\DigitalOcean\Generated\Model\ImagesCreateCustom202Content;
+use Acme\DigitalOcean\Generated\Model\ImagesGet200Content;
+use Acme\DigitalOcean\Generated\Model\ImagesList200Content;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferAccept;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCancel;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCreate;
+use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferCreate201Content;
 use Acme\DigitalOcean\Generated\Model\ImagesPostAccountTransferDecline;
+use Acme\DigitalOcean\Generated\Model\ImagesUpdate200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Images` endpoints.
@@ -30,6 +37,7 @@ interface ImagesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImagesList200Content|Error>
      */
     public function imagesList(
         ?ImagesListType $type = null,
@@ -37,45 +45,53 @@ interface ImagesClientInterface
         ?string $tagName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<ImagesCreateCustom202Content|Error>
      */
-    public function imagesCreateCustom(ImageNewCustom $body): void;
+    public function imagesCreateCustom(ImageNewCustom $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImagesGet200Content|Error>
      */
-    public function imagesGet(int|string $imageId): void;
+    public function imagesGet(int|string $imageId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<ImagesUpdate200Content|Error>
      */
-    public function imagesUpdate(int $imageId, ImageUpdate $body): void;
+    public function imagesUpdate(int $imageId, ImageUpdate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:delete`.
+     * @return Envelope<null|Error>
      */
-    public function imagesDelete(int $imageId): void;
+    public function imagesDelete(int $imageId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:update`, `image:delete`.
+     * @return Envelope<ImagesPostAccountTransferCreate201Content|Error>
      */
-    public function imagesPostAccountTransferCreate(int $imageId, ImagesPostAccountTransferCreate $body): void;
+    public function imagesPostAccountTransferCreate(int $imageId, ImagesPostAccountTransferCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferAccept(int $imageId, ImagesPostAccountTransferAccept $body): void;
+    public function imagesPostAccountTransferAccept(int $imageId, ImagesPostAccountTransferAccept $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferCancel(int $imageId, ImagesPostAccountTransferCancel $body): void;
+    public function imagesPostAccountTransferCancel(int $imageId, ImagesPostAccountTransferCancel $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:create`.
+     * @return Envelope<null|Error>
      */
-    public function imagesPostAccountTransferDecline(int $imageId, ImagesPostAccountTransferDecline $body): void;
+    public function imagesPostAccountTransferDecline(int $imageId, ImagesPostAccountTransferDecline $body): Envelope;
 }

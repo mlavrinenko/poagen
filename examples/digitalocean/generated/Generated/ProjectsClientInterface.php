@@ -11,10 +11,20 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\Project;
+use Acme\DigitalOcean\Generated\Model\ProjectsCreate201Content;
 use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\ProjectsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsGetDefault200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsList200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsPatch200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsPatchDefault200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdate200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefault200Content;
 use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequestContent;
 use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Projects` endpoints.
@@ -27,46 +37,55 @@ interface ProjectsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsList200Content|Error>
      */
-    public function projectsList(?int $perPage = null, ?int $page = null): void;
+    public function projectsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:create`.
+     * @return Envelope<ProjectsCreate201Content|Error>
      */
-    public function projectsCreate(ProjectsCreateRequestContent $body): void;
+    public function projectsCreate(ProjectsCreateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsGetDefault200Content|Error>
      */
-    public function projectsGetDefault(): void;
+    public function projectsGetDefault(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsUpdateDefault200Content|Error>
      */
-    public function projectsUpdateDefault(ProjectsUpdateDefaultRequestContent $body): void;
+    public function projectsUpdateDefault(ProjectsUpdateDefaultRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsPatchDefault200Content|Error>
      */
-    public function projectsPatchDefault(Project $body): void;
+    public function projectsPatchDefault(Project $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsGet200Content|Error>
      */
-    public function projectsGet(string $projectId): void;
+    public function projectsGet(string $projectId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsUpdate200Content|Error>
      */
-    public function projectsUpdate(string $projectId, ProjectsUpdateRequestContent $body): void;
+    public function projectsUpdate(string $projectId, ProjectsUpdateRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:delete`.
+     * @return Envelope<null|Error>
      */
-    public function projectsDelete(string $projectId): void;
+    public function projectsDelete(string $projectId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsPatch200Content|Error>
      */
-    public function projectsPatch(string $projectId, Project $body): void;
+    public function projectsPatch(string $projectId, Project $body): Envelope;
 }

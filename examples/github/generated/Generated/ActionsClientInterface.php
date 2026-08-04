@@ -17,7 +17,9 @@ use Acme\GitHub\Generated\Enum\ActionsListJobsForWorkflowRunFilter;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunArtifactsDirection;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsForRepoStatus;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsStatus;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetention;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetentionResponse;
@@ -42,7 +44,9 @@ use Acme\GitHub\Generated\Model\ActionsCreateWorkflowDispatchRequestContent;
 use Acme\GitHub\Generated\Model\ActionsForkPrContributorApproval;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateRepos;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateReposRequest;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrg201Content;
 use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepo201Content;
 use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsGetActionsCacheUsageByRepoForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsGetDefaultWorkflowPermissions;
@@ -63,6 +67,8 @@ use Acme\GitHub\Generated\Model\ActionsListGithubHostedRunnersInGroupForOrg200Co
 use Acme\GitHub\Generated\Model\ActionsListHostedRunnersForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRun200Content;
 use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRunAttempt200Content;
+use Acme\GitHub\Generated\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListLabelsForSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsListOrgSecrets200Content;
 use Acme\GitHub\Generated\Model\ActionsListOrgVariables200Content;
 use Acme\GitHub\Generated\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content;
@@ -87,10 +93,16 @@ use Acme\GitHub\Generated\Model\ActionsPublicKey;
 use Acme\GitHub\Generated\Model\ActionsReRunJobForWorkflowRunRequestContent;
 use Acme\GitHub\Generated\Model\ActionsReRunWorkflowFailedJobsRequestContent;
 use Acme\GitHub\Generated\Model\ActionsReRunWorkflowRequestContent;
+use Acme\GitHub\Generated\Model\ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsRepositoryPermissions;
 use Acme\GitHub\Generated\Model\ActionsReviewPendingDeploymentsForRunRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSecret;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSetCustomOidcSubClaimForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSetDefaultWorkflowPermissions;
@@ -112,6 +124,7 @@ use Acme\GitHub\Generated\Model\ActionsVariable;
 use Acme\GitHub\Generated\Model\ActionsWorkflowAccessToRepository;
 use Acme\GitHub\Generated\Model\Artifact;
 use Acme\GitHub\Generated\Model\AuthenticationToken;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Deployment;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\EnvironmentApprovals;
@@ -127,10 +140,14 @@ use Acme\GitHub\Generated\Model\RunnerApplication;
 use Acme\GitHub\Generated\Model\RunnerGroupsOrg;
 use Acme\GitHub\Generated\Model\SelectedActions;
 use Acme\GitHub\Generated\Model\SelfHostedRunnersSettings;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\Workflow;
+use Acme\GitHub\Generated\Model\WorkflowDispatchResponse;
 use Acme\GitHub\Generated\Model\WorkflowRun;
 use Acme\GitHub\Generated\Model\WorkflowRunUsage;
 use Acme\GitHub\Generated\Model\WorkflowUsage;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `actions` endpoints.
@@ -141,417 +158,698 @@ use Acme\GitHub\Generated\Model\WorkflowUsage;
  */
 interface ActionsClientInterface
 {
-    public function actionsGetActionsCacheRetentionLimitForEnterprise(
-        string $enterprise,
-    ): ActionsCacheRetentionLimitForEnterprise;
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForEnterprise|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForEnterprise(string $enterprise): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForEnterprise(
         string $enterprise,
         ActionsCacheRetentionLimitForEnterprise $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheStorageLimitForEnterprise(
-        string $enterprise,
-    ): ActionsCacheStorageLimitForEnterprise;
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForEnterprise|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForEnterprise(string $enterprise): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForEnterprise(
         string $enterprise,
         ActionsCacheStorageLimitForEnterprise $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheRetentionLimitForOrganization(
-        string $org,
-    ): ActionsCacheRetentionLimitForOrganization;
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForOrganization|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForOrganization(
         string $org,
         ActionsCacheRetentionLimitForOrganization $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheStorageLimitForOrganization(
-        string $org,
-    ): ActionsCacheStorageLimitForOrganization;
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForOrganization|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForOrganization(
         string $org,
         ActionsCacheStorageLimitForOrganization $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheUsageForOrg(string $org): ActionsCacheUsageOrgEnterprise;
+    /**
+     * @return Envelope<ActionsCacheUsageOrgEnterprise>
+     */
+    public function actionsGetActionsCacheUsageForOrg(string $org): Envelope;
 
+    /**
+     * @return Envelope<ActionsGetActionsCacheUsageByRepoForOrg200Content>
+     */
     public function actionsGetActionsCacheUsageByRepoForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsGetActionsCacheUsageByRepoForOrg200Content;
+    ): Envelope;
 
-    public function actionsListHostedRunnersForOrg(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListHostedRunnersForOrg200Content;
+    /**
+     * @return Envelope<ActionsListHostedRunnersForOrg200Content>
+     */
+    public function actionsListHostedRunnersForOrg(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
     public function actionsCreateHostedRunnerForOrg(
         string $org,
         ActionsCreateHostedRunnerForOrgRequestContent $body,
-    ): ActionsHostedRunner;
+    ): Envelope;
 
-    public function actionsListCustomImagesForOrg(string $org): ActionsListCustomImagesForOrg200Content;
+    /**
+     * @return Envelope<ActionsListCustomImagesForOrg200Content>
+     */
+    public function actionsListCustomImagesForOrg(string $org): Envelope;
 
-    public function actionsGetCustomImageForOrg(string $org, int $imageDefinitionId): ActionsHostedRunnerCustomImage;
+    /**
+     * @return Envelope<ActionsHostedRunnerCustomImage>
+     */
+    public function actionsGetCustomImageForOrg(string $org, int $imageDefinitionId): Envelope;
 
-    public function actionsDeleteCustomImageFromOrg(string $org, int $imageDefinitionId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteCustomImageFromOrg(string $org, int $imageDefinitionId): Envelope;
 
-    public function actionsListCustomImageVersionsForOrg(
-        int $imageDefinitionId,
-        string $org,
-    ): ActionsListCustomImageVersionsForOrg200Content;
+    /**
+     * @return Envelope<ActionsListCustomImageVersionsForOrg200Content>
+     */
+    public function actionsListCustomImageVersionsForOrg(int $imageDefinitionId, string $org): Envelope;
 
-    public function actionsGetCustomImageVersionForOrg(
+    /**
+     * @return Envelope<ActionsHostedRunnerCustomImageVersion>
+     */
+    public function actionsGetCustomImageVersionForOrg(string $org, int $imageDefinitionId, string $version): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteCustomImageVersionFromOrg(
         string $org,
         int $imageDefinitionId,
         string $version,
-    ): ActionsHostedRunnerCustomImageVersion;
+    ): Envelope;
 
-    public function actionsDeleteCustomImageVersionFromOrg(string $org, int $imageDefinitionId, string $version): void;
+    /**
+     * @return Envelope<ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content>
+     */
+    public function actionsGetHostedRunnersGithubOwnedImagesForOrg(string $org): Envelope;
 
-    public function actionsGetHostedRunnersGithubOwnedImagesForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content;
+    /**
+     * @return Envelope<ActionsGetHostedRunnersPartnerImagesForOrg200Content>
+     */
+    public function actionsGetHostedRunnersPartnerImagesForOrg(string $org): Envelope;
 
-    public function actionsGetHostedRunnersPartnerImagesForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersPartnerImagesForOrg200Content;
+    /**
+     * @return Envelope<ActionsHostedRunnerLimits>
+     */
+    public function actionsGetHostedRunnersLimitsForOrg(string $org): Envelope;
 
-    public function actionsGetHostedRunnersLimitsForOrg(string $org): ActionsHostedRunnerLimits;
+    /**
+     * @return Envelope<ActionsGetHostedRunnersMachineSpecsForOrg200Content>
+     */
+    public function actionsGetHostedRunnersMachineSpecsForOrg(string $org): Envelope;
 
-    public function actionsGetHostedRunnersMachineSpecsForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersMachineSpecsForOrg200Content;
+    /**
+     * @return Envelope<ActionsGetHostedRunnersPlatformsForOrg200Content>
+     */
+    public function actionsGetHostedRunnersPlatformsForOrg(string $org): Envelope;
 
-    public function actionsGetHostedRunnersPlatformsForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersPlatformsForOrg200Content;
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
+    public function actionsGetHostedRunnerForOrg(string $org, int $hostedRunnerId): Envelope;
 
-    public function actionsGetHostedRunnerForOrg(string $org, int $hostedRunnerId): ActionsHostedRunner;
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
+    public function actionsDeleteHostedRunnerForOrg(string $org, int $hostedRunnerId): Envelope;
 
-    public function actionsDeleteHostedRunnerForOrg(string $org, int $hostedRunnerId): ActionsHostedRunner;
-
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
     public function actionsUpdateHostedRunnerForOrg(
         string $org,
         int $hostedRunnerId,
         ActionsUpdateHostedRunnerForOrgRequestContent $body,
-    ): ActionsHostedRunner;
+    ): Envelope;
 
-    public function actionsGetGithubActionsPermissionsOrganization(string $org): ActionsOrganizationPermissions;
+    /**
+     * @return Envelope<ActionsOrganizationPermissions>
+     */
+    public function actionsGetGithubActionsPermissionsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsPermissionsOrganization(
         string $org,
         ActionsSetGithubActionsPermissionsOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetArtifactAndLogRetentionSettingsOrganization(
-        string $org,
-    ): ActionsArtifactAndLogRetentionResponse;
+    /**
+     * @return Envelope<ActionsArtifactAndLogRetentionResponse|BasicError>
+     */
+    public function actionsGetArtifactAndLogRetentionSettingsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetArtifactAndLogRetentionSettingsOrganization(
         string $org,
         ActionsArtifactAndLogRetention $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetForkPrContributorApprovalPermissionsOrganization(
-        string $org,
-    ): ActionsForkPrContributorApproval;
+    /**
+     * @return Envelope<ActionsForkPrContributorApproval|BasicError>
+     */
+    public function actionsGetForkPrContributorApprovalPermissionsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetForkPrContributorApprovalPermissionsOrganization(
         string $org,
         ActionsForkPrContributorApproval $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetPrivateRepoForkPrWorkflowsSettingsOrganization(
-        string $org,
-    ): ActionsForkPrWorkflowsPrivateRepos;
+    /**
+     * @return Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError>
+     */
+    public function actionsGetPrivateRepoForkPrWorkflowsSettingsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetPrivateRepoForkPrWorkflowsSettingsOrganization(
         string $org,
         ActionsForkPrWorkflowsPrivateReposRequest $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content>
+     */
     public function actionsListSelectedRepositoriesEnabledGithubActionsOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedRepositoriesEnabledGithubActionsOrganization(
         string $org,
         ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsEnableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsEnableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): Envelope;
 
-    public function actionsDisableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDisableSelectedRepositoryGithubActionsOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope;
 
-    public function actionsGetAllowedActionsOrganization(string $org): SelectedActions;
+    /**
+     * @return Envelope<SelectedActions>
+     */
+    public function actionsGetAllowedActionsOrganization(string $org): Envelope;
 
-    public function actionsSetAllowedActionsOrganization(string $org, SelectedActions $body): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsSetAllowedActionsOrganization(string $org, SelectedActions $body): Envelope;
 
-    public function actionsGetSelfHostedRunnersPermissionsOrganization(string $org): SelfHostedRunnersSettings;
+    /**
+     * @return Envelope<SelfHostedRunnersSettings|BasicError>
+     */
+    public function actionsGetSelfHostedRunnersPermissionsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetSelfHostedRunnersPermissionsOrganization(
         string $org,
         ActionsSetSelfHostedRunnersPermissionsOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content|BasicError>
+     */
     public function actionsListSelectedRepositoriesSelfHostedRunnersOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetSelectedRepositoriesSelfHostedRunnersOrganization(
         string $org,
         ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsEnableSelectedRepositorySelfHostedRunnersOrganization(string $org, int $repositoryId): void;
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function actionsEnableSelectedRepositorySelfHostedRunnersOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsDisableSelectedRepositorySelfHostedRunnersOrganization(
         string $org,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsOrganization(
-        string $org,
-    ): ActionsGetDefaultWorkflowPermissions;
+    /**
+     * @return Envelope<ActionsGetDefaultWorkflowPermissions>
+     */
+    public function actionsGetGithubActionsDefaultWorkflowPermissionsOrganization(string $org): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsDefaultWorkflowPermissionsOrganization(
         string $org,
         ActionsSetDefaultWorkflowPermissions $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnerGroupsForOrg200Content>
+     */
     public function actionsListSelfHostedRunnerGroupsForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $visibleToRepository = null,
-    ): ActionsListSelfHostedRunnerGroupsForOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
     public function actionsCreateSelfHostedRunnerGroupForOrg(
         string $org,
         ActionsCreateSelfHostedRunnerGroupForOrgRequestContent $body,
-    ): RunnerGroupsOrg;
+    ): Envelope;
 
-    public function actionsGetSelfHostedRunnerGroupForOrg(string $org, int $runnerGroupId): RunnerGroupsOrg;
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
+    public function actionsGetSelfHostedRunnerGroupForOrg(string $org, int $runnerGroupId): Envelope;
 
-    public function actionsDeleteSelfHostedRunnerGroupFromOrg(string $org, int $runnerGroupId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteSelfHostedRunnerGroupFromOrg(string $org, int $runnerGroupId): Envelope;
 
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
     public function actionsUpdateSelfHostedRunnerGroupForOrg(
         string $org,
         int $runnerGroupId,
         ActionsUpdateSelfHostedRunnerGroupForOrgRequestContent $body,
-    ): RunnerGroupsOrg;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListGithubHostedRunnersInGroupForOrg200Content>
+     */
     public function actionsListGithubHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListGithubHostedRunnersInGroupForOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content>
+     */
     public function actionsListRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersInGroupForOrg200Content>
+     */
     public function actionsListSelfHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersInGroupForOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelfHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ActionsSetSelfHostedRunnersInGroupForOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsAddSelfHostedRunnerToGroupForOrg(string $org, int $runnerGroupId, int $runnerId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelfHostedRunnerToGroupForOrg(string $org, int $runnerGroupId, int $runnerId): Envelope;
 
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrg(string $org, int $runnerGroupId, int $runnerId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelfHostedRunnerFromGroupForOrg(
+        string $org,
+        int $runnerGroupId,
+        int $runnerId,
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersForOrg200Content>
+     */
     public function actionsListSelfHostedRunnersForOrg(
         string $org,
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForOrg200Content;
+    ): Envelope;
 
     /**
-     * @return list<RunnerApplication>
+     * @return Envelope<list<RunnerApplication>>
      */
-    public function actionsListRunnerApplicationsForOrg(string $org): array;
+    public function actionsListRunnerApplicationsForOrg(string $org): Envelope;
 
+    /**
+     * @return Envelope<ActionsGenerateRunnerJitconfigForOrg201Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsGenerateRunnerJitconfigForOrg(
         string $org,
         ActionsGenerateRunnerJitconfigForOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsCreateRegistrationTokenForOrg(string $org): AuthenticationToken;
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRegistrationTokenForOrg(string $org): Envelope;
 
-    public function actionsCreateRemoveTokenForOrg(string $org): AuthenticationToken;
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRemoveTokenForOrg(string $org): Envelope;
 
-    public function actionsGetSelfHostedRunnerForOrg(string $org, int $runnerId): Runner;
+    /**
+     * @return Envelope<Runner>
+     */
+    public function actionsGetSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope;
 
-    public function actionsDeleteSelfHostedRunnerFromOrg(string $org, int $runnerId): void;
+    /**
+     * @return Envelope<null|ValidationErrorSimple>
+     */
+    public function actionsDeleteSelfHostedRunnerFromOrg(string $org, int $runnerId): Envelope;
 
-    public function actionsListLabelsForSelfHostedRunnerForOrg(string $org, int $runnerId): void;
+    /**
+     * @return Envelope<ActionsListLabelsForSelfHostedRunnerForOrg200Content|BasicError>
+     */
+    public function actionsListLabelsForSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope;
 
+    /**
+     * @return Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomLabelsForSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
         ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsAddCustomLabelsToSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
         ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg(string $org, int $runnerId): void;
+    /**
+     * @return Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content|BasicError>
+     */
+    public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope;
 
-    public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrg(string $org, int $runnerId, string $name): void;
-
-    public function actionsListOrgSecrets(
+    /**
+     * @return Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
+    public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrg(
         string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListOrgSecrets200Content;
+        int $runnerId,
+        string $name,
+    ): Envelope;
 
-    public function actionsGetOrgPublicKey(string $org): ActionsPublicKey;
+    /**
+     * @return Envelope<ActionsListOrgSecrets200Content>
+     */
+    public function actionsListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function actionsGetOrgSecret(string $org, string $secretName): OrganizationActionsSecret;
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetOrgPublicKey(string $org): Envelope;
 
+    /**
+     * @return Envelope<OrganizationActionsSecret>
+     */
+    public function actionsGetOrgSecret(string $org, string $secretName): Envelope;
+
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         ActionsCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function actionsDeleteOrgSecret(string $org, string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteOrgSecret(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelectedReposForOrgSecret200Content>
+     */
     public function actionsListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgSecret200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ActionsSetSelectedReposForOrgSecretRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope;
 
-    public function actionsRemoveSelectedRepoFromOrgSecret(string $org, string $secretName, int $repositoryId): void;
-
-    public function actionsListOrgVariables(
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelectedRepoFromOrgSecret(
         string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListOrgVariables200Content;
+        string $secretName,
+        int $repositoryId,
+    ): Envelope;
 
-    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequestContent $body): EmptyObject;
+    /**
+     * @return Envelope<ActionsListOrgVariables200Content>
+     */
+    public function actionsListOrgVariables(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function actionsGetOrgVariable(string $org, string $name): OrganizationActionsVariable;
+    /**
+     * @return Envelope<EmptyObject>
+     */
+    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequestContent $body): Envelope;
 
-    public function actionsDeleteOrgVariable(string $org, string $name): void;
+    /**
+     * @return Envelope<OrganizationActionsVariable>
+     */
+    public function actionsGetOrgVariable(string $org, string $name): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteOrgVariable(string $org, string $name): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateOrgVariable(
         string $org,
         string $name,
         ActionsUpdateOrgVariableRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelectedReposForOrgVariable200Content|null>
+     */
     public function actionsListSelectedReposForOrgVariable(
         string $org,
         string $name,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgVariable200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedReposForOrgVariable(
         string $org,
         string $name,
         ActionsSetSelectedReposForOrgVariableRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsAddSelectedRepoToOrgVariable(string $org, string $name, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelectedRepoToOrgVariable(string $org, string $name, int $repositoryId): Envelope;
 
-    public function actionsRemoveSelectedRepoFromOrgVariable(string $org, string $name, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelectedRepoFromOrgVariable(string $org, string $name, int $repositoryId): Envelope;
 
+    /**
+     * @return Envelope<ActionsListArtifactsForRepo200Content>
+     */
     public function actionsListArtifactsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
         ?string $name = null,
-    ): ActionsListArtifactsForRepo200Content;
+    ): Envelope;
 
-    public function actionsGetArtifact(string $owner, string $repo, int $artifactId): Artifact;
+    /**
+     * @return Envelope<Artifact>
+     */
+    public function actionsGetArtifact(string $owner, string $repo, int $artifactId): Envelope;
 
-    public function actionsDeleteArtifact(string $owner, string $repo, int $artifactId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteArtifact(string $owner, string $repo, int $artifactId): Envelope;
 
-    public function actionsDownloadArtifact(string $owner, string $repo, int $artifactId, string $archiveFormat): void;
-
-    public function actionsGetActionsCacheRetentionLimitForRepository(
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function actionsDownloadArtifact(
         string $owner,
         string $repo,
-    ): ActionsCacheRetentionLimitForRepository;
+        int $artifactId,
+        string $archiveFormat,
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForRepository|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForRepository(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForRepository(
         string $owner,
         string $repo,
         ActionsCacheRetentionLimitForRepository $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheStorageLimitForRepository(
-        string $owner,
-        string $repo,
-    ): ActionsCacheStorageLimitForRepository;
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForRepository|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForRepository(
         string $owner,
         string $repo,
         ActionsCacheStorageLimitForRepository $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetActionsCacheUsage(string $owner, string $repo): ActionsCacheUsageByRepository;
+    /**
+     * @return Envelope<ActionsCacheUsageByRepository>
+     */
+    public function actionsGetActionsCacheUsage(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<ActionsCacheList>
+     */
     public function actionsGetActionsCacheList(
         string $owner,
         string $repo,
@@ -561,176 +859,263 @@ interface ActionsClientInterface
         ?string $key = null,
         ?ActionsGetActionsCacheListSort $sort = null,
         ?ActionsGetActionsCacheListDirection $direction = null,
-    ): ActionsCacheList;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsCacheList>
+     */
     public function actionsDeleteActionsCacheByKey(
         string $owner,
         string $repo,
         string $key,
         ?string $ref = null,
-    ): ActionsCacheList;
+    ): Envelope;
 
-    public function actionsDeleteActionsCacheById(string $owner, string $repo, int $cacheId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteActionsCacheById(string $owner, string $repo, int $cacheId): Envelope;
 
-    public function actionsGetJobForWorkflowRun(string $owner, string $repo, int $jobId): Job;
+    /**
+     * @return Envelope<Job>
+     */
+    public function actionsGetJobForWorkflowRun(string $owner, string $repo, int $jobId): Envelope;
 
-    public function actionsDownloadJobLogsForWorkflowRun(string $owner, string $repo, int $jobId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDownloadJobLogsForWorkflowRun(string $owner, string $repo, int $jobId): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
     public function actionsReRunJobForWorkflowRun(
         string $owner,
         string $repo,
         int $jobId,
         ActionsReRunJobForWorkflowRunRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function actionsGetCustomOidcSubClaimForRepo(string $owner, string $repo): OidcCustomSubRepo;
+    /**
+     * @return Envelope<OidcCustomSubRepo|BasicError>
+     */
+    public function actionsGetCustomOidcSubClaimForRepo(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomOidcSubClaimForRepo(
         string $owner,
         string $repo,
         ActionsSetCustomOidcSubClaimForRepoRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoOrganizationSecrets200Content>
+     */
     public function actionsListRepoOrganizationSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationSecrets200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoOrganizationVariables200Content>
+     */
     public function actionsListRepoOrganizationVariables(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationVariables200Content;
+    ): Envelope;
 
-    public function actionsGetGithubActionsPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsRepositoryPermissions;
+    /**
+     * @return Envelope<ActionsRepositoryPermissions>
+     */
+    public function actionsGetGithubActionsPermissionsRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsPermissionsRepository(
         string $owner,
         string $repo,
         ActionsSetGithubActionsPermissionsRepositoryRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetWorkflowAccessToRepository(
-        string $owner,
-        string $repo,
-    ): ActionsWorkflowAccessToRepository;
+    /**
+     * @return Envelope<ActionsWorkflowAccessToRepository>
+     */
+    public function actionsGetWorkflowAccessToRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetWorkflowAccessToRepository(
         string $owner,
         string $repo,
         ActionsWorkflowAccessToRepository $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetArtifactAndLogRetentionSettingsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsArtifactAndLogRetentionResponse;
+    /**
+     * @return Envelope<ActionsArtifactAndLogRetentionResponse|BasicError>
+     */
+    public function actionsGetArtifactAndLogRetentionSettingsRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetArtifactAndLogRetentionSettingsRepository(
         string $owner,
         string $repo,
         ActionsArtifactAndLogRetention $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetForkPrContributorApprovalPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsForkPrContributorApproval;
+    /**
+     * @return Envelope<ActionsForkPrContributorApproval|BasicError>
+     */
+    public function actionsGetForkPrContributorApprovalPermissionsRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetForkPrContributorApprovalPermissionsRepository(
         string $owner,
         string $repo,
         ActionsForkPrContributorApproval $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetPrivateRepoForkPrWorkflowsSettingsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsForkPrWorkflowsPrivateRepos;
+    /**
+     * @return Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError>
+     */
+    public function actionsGetPrivateRepoForkPrWorkflowsSettingsRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetPrivateRepoForkPrWorkflowsSettingsRepository(
         string $owner,
         string $repo,
         ActionsForkPrWorkflowsPrivateReposRequest $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsGetAllowedActionsRepository(string $owner, string $repo): SelectedActions;
+    /**
+     * @return Envelope<SelectedActions>
+     */
+    public function actionsGetAllowedActionsRepository(string $owner, string $repo): Envelope;
 
-    public function actionsSetAllowedActionsRepository(string $owner, string $repo, SelectedActions $body): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsSetAllowedActionsRepository(string $owner, string $repo, SelectedActions $body): Envelope;
 
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsGetDefaultWorkflowPermissions;
+    /**
+     * @return Envelope<ActionsGetDefaultWorkflowPermissions>
+     */
+    public function actionsGetGithubActionsDefaultWorkflowPermissionsRepository(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsDefaultWorkflowPermissionsRepository(
         string $owner,
         string $repo,
         ActionsSetDefaultWorkflowPermissions $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersForRepo200Content>
+     */
     public function actionsListSelfHostedRunnersForRepo(
         string $owner,
         string $repo,
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForRepo200Content;
+    ): Envelope;
 
     /**
-     * @return list<RunnerApplication>
+     * @return Envelope<list<RunnerApplication>>
      */
-    public function actionsListRunnerApplicationsForRepo(string $owner, string $repo): array;
+    public function actionsListRunnerApplicationsForRepo(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<ActionsGenerateRunnerJitconfigForRepo201Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsGenerateRunnerJitconfigForRepo(
         string $owner,
         string $repo,
         ActionsGenerateRunnerJitconfigForRepoRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsCreateRegistrationTokenForRepo(string $owner, string $repo): AuthenticationToken;
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRegistrationTokenForRepo(string $owner, string $repo): Envelope;
 
-    public function actionsCreateRemoveTokenForRepo(string $owner, string $repo): AuthenticationToken;
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRemoveTokenForRepo(string $owner, string $repo): Envelope;
 
-    public function actionsGetSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Runner;
+    /**
+     * @return Envelope<Runner>
+     */
+    public function actionsGetSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Envelope;
 
-    public function actionsDeleteSelfHostedRunnerFromRepo(string $owner, string $repo, int $runnerId): void;
+    /**
+     * @return Envelope<null|ValidationErrorSimple>
+     */
+    public function actionsDeleteSelfHostedRunnerFromRepo(string $owner, string $repo, int $runnerId): Envelope;
 
-    public function actionsListLabelsForSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): void;
+    /**
+     * @return Envelope<ActionsListLabelsForSelfHostedRunnerForRepo200Content|BasicError>
+     */
+    public function actionsListLabelsForSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Envelope;
 
+    /**
+     * @return Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomLabelsForSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsAddCustomLabelsToSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content|BasicError>
+     */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         string $name,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListWorkflowRunsForRepo200Content>
+     */
     public function actionsListWorkflowRunsForRepo(
         string $owner,
         string $repo,
@@ -744,24 +1129,36 @@ interface ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRunsForRepo200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<WorkflowRun>
+     */
     public function actionsGetWorkflowRun(
         string $owner,
         string $repo,
         int $runId,
         ?bool $excludePullRequests = null,
-    ): WorkflowRun;
-
-    public function actionsDeleteWorkflowRun(string $owner, string $repo, int $runId): void;
+    ): Envelope;
 
     /**
-     * @return list<EnvironmentApprovals>
+     * @return Envelope<null>
      */
-    public function actionsGetReviewsForRun(string $owner, string $repo, int $runId): array;
+    public function actionsDeleteWorkflowRun(string $owner, string $repo, int $runId): Envelope;
 
-    public function actionsApproveWorkflowRun(string $owner, string $repo, int $runId): EmptyObject;
+    /**
+     * @return Envelope<list<EnvironmentApprovals>>
+     */
+    public function actionsGetReviewsForRun(string $owner, string $repo, int $runId): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsApproveWorkflowRun(string $owner, string $repo, int $runId): Envelope;
+
+    /**
+     * @return Envelope<ActionsListWorkflowRunArtifacts200Content>
+     */
     public function actionsListWorkflowRunArtifacts(
         string $owner,
         string $repo,
@@ -770,16 +1167,22 @@ interface ActionsClientInterface
         ?int $page = null,
         ?string $name = null,
         ?ActionsListWorkflowRunArtifactsDirection $direction = null,
-    ): ActionsListWorkflowRunArtifacts200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<WorkflowRun>
+     */
     public function actionsGetWorkflowRunAttempt(
         string $owner,
         string $repo,
         int $runId,
         int $attemptNumber,
         ?bool $excludePullRequests = null,
-    ): WorkflowRun;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListJobsForWorkflowRunAttempt200Content|BasicError>
+     */
     public function actionsListJobsForWorkflowRunAttempt(
         string $owner,
         string $repo,
@@ -787,26 +1190,41 @@ interface ActionsClientInterface
         int $attemptNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRunAttempt200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDownloadWorkflowRunAttemptLogs(
         string $owner,
         string $repo,
         int $runId,
         int $attemptNumber,
-    ): void;
+    ): Envelope;
 
-    public function actionsCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject;
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsCancelWorkflowRun(string $owner, string $repo, int $runId): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsReviewCustomGatesForRun(
         string $owner,
         string $repo,
         int $runId,
         ReviewCustomGatesCommentRequired|ReviewCustomGatesStateRequired $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsForceCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject;
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsForceCancelWorkflowRun(string $owner, string $repo, int $runId): Envelope;
 
+    /**
+     * @return Envelope<ActionsListJobsForWorkflowRun200Content>
+     */
     public function actionsListJobsForWorkflowRun(
         string $owner,
         string $repo,
@@ -814,107 +1232,170 @@ interface ActionsClientInterface
         ?ActionsListJobsForWorkflowRunFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRun200Content;
-
-    public function actionsDownloadWorkflowRunLogs(string $owner, string $repo, int $runId): void;
-
-    public function actionsDeleteWorkflowRunLogs(string $owner, string $repo, int $runId): void;
+    ): Envelope;
 
     /**
-     * @return list<PendingDeployment>
+     * @return Envelope<null>
      */
-    public function actionsGetPendingDeploymentsForRun(string $owner, string $repo, int $runId): array;
+    public function actionsDownloadWorkflowRunLogs(string $owner, string $repo, int $runId): Envelope;
 
     /**
-     * @return list<Deployment>
+     * @return Envelope<null|BasicError>
+     */
+    public function actionsDeleteWorkflowRunLogs(string $owner, string $repo, int $runId): Envelope;
+
+    /**
+     * @return Envelope<list<PendingDeployment>>
+     */
+    public function actionsGetPendingDeploymentsForRun(string $owner, string $repo, int $runId): Envelope;
+
+    /**
+     * @return Envelope<list<Deployment>>
      */
     public function actionsReviewPendingDeploymentsForRun(
         string $owner,
         string $repo,
         int $runId,
         ActionsReviewPendingDeploymentsForRunRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsReRunWorkflow(
         string $owner,
         string $repo,
         int $runId,
         ActionsReRunWorkflowRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsReRunWorkflowFailedJobs(
         string $owner,
         string $repo,
         int $runId,
         ActionsReRunWorkflowFailedJobsRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function actionsGetWorkflowRunUsage(string $owner, string $repo, int $runId): WorkflowRunUsage;
+    /**
+     * @return Envelope<WorkflowRunUsage>
+     */
+    public function actionsGetWorkflowRunUsage(string $owner, string $repo, int $runId): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoSecrets200Content>
+     */
     public function actionsListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoSecrets200Content;
+    ): Envelope;
 
-    public function actionsGetRepoPublicKey(string $owner, string $repo): ActionsPublicKey;
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetRepoPublicKey(string $owner, string $repo): Envelope;
 
-    public function actionsGetRepoSecret(string $owner, string $repo, string $secretName): ActionsSecret;
+    /**
+     * @return Envelope<ActionsSecret>
+     */
+    public function actionsGetRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         ActionsCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function actionsDeleteRepoSecret(string $owner, string $repo, string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoVariables200Content>
+     */
     public function actionsListRepoVariables(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoVariables200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsCreateRepoVariable(
         string $owner,
         string $repo,
         ActionsCreateRepoVariableRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function actionsGetRepoVariable(string $owner, string $repo, string $name): ActionsVariable;
+    /**
+     * @return Envelope<ActionsVariable>
+     */
+    public function actionsGetRepoVariable(string $owner, string $repo, string $name): Envelope;
 
-    public function actionsDeleteRepoVariable(string $owner, string $repo, string $name): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteRepoVariable(string $owner, string $repo, string $name): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateRepoVariable(
         string $owner,
         string $repo,
         string $name,
         ActionsUpdateRepoVariableRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListRepoWorkflows200Content>
+     */
     public function actionsListRepoWorkflows(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoWorkflows200Content;
+    ): Envelope;
 
-    public function actionsGetWorkflow(string $owner, string $repo, int|string $workflowId): Workflow;
+    /**
+     * @return Envelope<Workflow>
+     */
+    public function actionsGetWorkflow(string $owner, string $repo, int|string $workflowId): Envelope;
 
-    public function actionsDisableWorkflow(string $owner, string $repo, int|string $workflowId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDisableWorkflow(string $owner, string $repo, int|string $workflowId): Envelope;
 
+    /**
+     * @return Envelope<null|WorkflowDispatchResponse>
+     */
     public function actionsCreateWorkflowDispatch(
         string $owner,
         string $repo,
         int|string $workflowId,
         ActionsCreateWorkflowDispatchRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function actionsEnableWorkflow(string $owner, string $repo, int|string $workflowId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsEnableWorkflow(string $owner, string $repo, int|string $workflowId): Envelope;
 
+    /**
+     * @return Envelope<ActionsListWorkflowRuns200Content>
+     */
     public function actionsListWorkflowRuns(
         string $owner,
         string $repo,
@@ -929,80 +1410,109 @@ interface ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRuns200Content;
+    ): Envelope;
 
-    public function actionsGetWorkflowUsage(string $owner, string $repo, int|string $workflowId): WorkflowUsage;
+    /**
+     * @return Envelope<WorkflowUsage>
+     */
+    public function actionsGetWorkflowUsage(string $owner, string $repo, int|string $workflowId): Envelope;
 
+    /**
+     * @return Envelope<ActionsListEnvironmentSecrets200Content>
+     */
     public function actionsListEnvironmentSecrets(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentSecrets200Content;
+    ): Envelope;
 
-    public function actionsGetEnvironmentPublicKey(
-        string $owner,
-        string $repo,
-        string $environmentName,
-    ): ActionsPublicKey;
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetEnvironmentPublicKey(string $owner, string $repo, string $environmentName): Envelope;
 
+    /**
+     * @return Envelope<ActionsSecret>
+     */
     public function actionsGetEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
-    ): ActionsSecret;
+    ): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
         ActionsCreateOrUpdateEnvironmentSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDeleteEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsListEnvironmentVariables200Content>
+     */
     public function actionsListEnvironmentVariables(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentVariables200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsCreateEnvironmentVariable(
         string $owner,
         string $repo,
         string $environmentName,
         ActionsCreateEnvironmentVariableRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActionsVariable>
+     */
     public function actionsGetEnvironmentVariable(
         string $owner,
         string $repo,
         string $environmentName,
         string $name,
-    ): ActionsVariable;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDeleteEnvironmentVariable(
         string $owner,
         string $repo,
         string $name,
         string $environmentName,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateEnvironmentVariable(
         string $owner,
         string $repo,
         string $name,
         string $environmentName,
         ActionsUpdateEnvironmentVariableRequestContent $body,
-    ): void;
+    ): Envelope;
 }

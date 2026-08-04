@@ -11,7 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\Key;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyCreate201Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyGet200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyList200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyPatch200Content;
+use Acme\DigitalOcean\Generated\Model\SpacesKeyUpdate200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Spaces Keys` endpoints.
@@ -24,6 +31,7 @@ interface SpacesKeysClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `spaces_key:read`.
+     * @return Envelope<SpacesKeyList200Content|Error>
      */
     public function spacesKeyList(
         ?int $perPage = null,
@@ -33,30 +41,35 @@ interface SpacesKeysClientInterface
         ?string $name = null,
         ?string $bucket = null,
         ?string $permission = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:create_credentials`.
+     * @return Envelope<SpacesKeyCreate201Content|Error>
      */
-    public function spacesKeyCreate(Key $body): void;
+    public function spacesKeyCreate(Key $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:read`.
+     * @return Envelope<SpacesKeyGet200Content|Error>
      */
-    public function spacesKeyGet(string $accessKey): void;
+    public function spacesKeyGet(string $accessKey): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:update`.
+     * @return Envelope<SpacesKeyUpdate200Content|Error>
      */
-    public function spacesKeyUpdate(string $accessKey, Key $body): void;
+    public function spacesKeyUpdate(string $accessKey, Key $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:delete`.
+     * @return Envelope<null|Error>
      */
-    public function spacesKeyDelete(string $accessKey): void;
+    public function spacesKeyDelete(string $accessKey): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `spaces_key:update`.
+     * @return Envelope<SpacesKeyPatch200Content|Error>
      */
-    public function spacesKeyPatch(string $accessKey, Key $body): void;
+    public function spacesKeyPatch(string $accessKey, Key $body): Envelope;
 }

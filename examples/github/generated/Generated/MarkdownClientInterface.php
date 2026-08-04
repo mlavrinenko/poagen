@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\MarkdownRenderRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `markdown` endpoints.
@@ -22,7 +23,13 @@ use Acme\GitHub\Generated\Model\MarkdownRenderRequestContent;
  */
 interface MarkdownClientInterface
 {
-    public function markdownRender(MarkdownRenderRequestContent $body): string;
+    /**
+     * @return Envelope<string|null>
+     */
+    public function markdownRender(MarkdownRenderRequestContent $body): Envelope;
 
-    public function markdownRenderRaw(string $body): string;
+    /**
+     * @return Envelope<string|null>
+     */
+    public function markdownRenderRaw(string $body): Envelope;
 }

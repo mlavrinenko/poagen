@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\CodeSecurityGetConfigurationsForOrgTargetType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeSecurityAttachConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityAttachEnterpriseConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityConfiguration;
@@ -27,6 +28,7 @@ use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultForEnterpri
 use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityUpdateConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityUpdateEnterpriseConfigurationRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `code-security` endpoints.
@@ -38,51 +40,70 @@ use Acme\GitHub\Generated\Model\CodeSecurityUpdateEnterpriseConfigurationRequest
 interface CodeSecurityClientInterface
 {
     /**
-     * @return list<CodeSecurityConfiguration>
+     * @return Envelope<list<CodeSecurityConfiguration>|BasicError>
      */
     public function codeSecurityGetConfigurationsForEnterprise(
         string $enterprise,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|BasicError>
+     */
     public function codeSecurityCreateConfigurationForEnterprise(
         string $enterprise,
         CodeSecurityCreateConfigurationForEnterpriseRequestContent $body,
-    ): CodeSecurityConfiguration;
+    ): Envelope;
 
-    public function codeSecurityGetDefaultConfigurationsForEnterprise(
-        string $enterprise,
-    ): CodeSecurityDefaultConfigurations;
+    /**
+     * @return Envelope<CodeSecurityDefaultConfigurations>
+     */
+    public function codeSecurityGetDefaultConfigurationsForEnterprise(string $enterprise): Envelope;
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
     public function codeSecurityGetSingleConfigurationForEnterprise(
         string $enterprise,
         int $configurationId,
-    ): CodeSecurityConfiguration;
+    ): Envelope;
 
-    public function codeSecurityDeleteConfigurationForEnterprise(string $enterprise, int $configurationId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codeSecurityDeleteConfigurationForEnterprise(string $enterprise, int $configurationId): Envelope;
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
     public function codeSecurityUpdateEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
         CodeSecurityUpdateEnterpriseConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration;
+    ): Envelope;
 
+    /**
+     * @return Envelope<array<string, mixed>|BasicError>
+     */
     public function codeSecurityAttachEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
         CodeSecurityAttachEnterpriseConfigurationRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeSecuritySetConfigurationAsDefaultForEnterprise200Content|BasicError>
+     */
     public function codeSecuritySetConfigurationAsDefaultForEnterprise(
         string $enterprise,
         int $configurationId,
         CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestContent $body,
-    ): CodeSecuritySetConfigurationAsDefaultForEnterprise200Content;
+    ): Envelope;
 
     /**
-     * @return list<CodeSecurityConfigurationRepositories>
+     * @return Envelope<list<CodeSecurityConfigurationRepositories>|BasicError>
      */
     public function codeSecurityGetRepositoriesForEnterpriseConfiguration(
         string $enterprise,
@@ -91,10 +112,10 @@ interface CodeSecurityClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $status = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<CodeSecurityConfiguration>
+     * @return Envelope<list<CodeSecurityConfiguration>|BasicError>
      */
     public function codeSecurityGetConfigurationsForOrg(
         string $org,
@@ -102,44 +123,68 @@ interface CodeSecurityClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration>
+     */
     public function codeSecurityCreateConfiguration(
         string $org,
         CodeSecurityCreateConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration;
+    ): Envelope;
 
-    public function codeSecurityGetDefaultConfigurations(string $org): CodeSecurityDefaultConfigurations;
+    /**
+     * @return Envelope<CodeSecurityDefaultConfigurations|null|BasicError>
+     */
+    public function codeSecurityGetDefaultConfigurations(string $org): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function codeSecurityDetachConfiguration(
         string $org,
         CodeSecurityDetachConfigurationRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function codeSecurityGetConfiguration(string $org, int $configurationId): CodeSecurityConfiguration;
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null|BasicError>
+     */
+    public function codeSecurityGetConfiguration(string $org, int $configurationId): Envelope;
 
-    public function codeSecurityDeleteConfiguration(string $org, int $configurationId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function codeSecurityDeleteConfiguration(string $org, int $configurationId): Envelope;
 
+    /**
+     * @return Envelope<CodeSecurityConfiguration|null>
+     */
     public function codeSecurityUpdateConfiguration(
         string $org,
         int $configurationId,
         CodeSecurityUpdateConfigurationRequestContent $body,
-    ): CodeSecurityConfiguration;
+    ): Envelope;
 
+    /**
+     * @return Envelope<array<string, mixed>>
+     */
     public function codeSecurityAttachConfiguration(
         string $org,
         int $configurationId,
         CodeSecurityAttachConfigurationRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeSecuritySetConfigurationAsDefault200Content|BasicError>
+     */
     public function codeSecuritySetConfigurationAsDefault(
         string $org,
         int $configurationId,
         CodeSecuritySetConfigurationAsDefaultRequestContent $body,
-    ): CodeSecuritySetConfigurationAsDefault200Content;
+    ): Envelope;
 
     /**
-     * @return list<CodeSecurityConfigurationRepositories>
+     * @return Envelope<list<CodeSecurityConfigurationRepositories>|BasicError>
      */
     public function codeSecurityGetRepositoriesForConfiguration(
         string $org,
@@ -148,10 +193,10 @@ interface CodeSecurityClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $status = null,
-    ): array;
+    ): Envelope;
 
-    public function codeSecurityGetConfigurationForRepository(
-        string $owner,
-        string $repo,
-    ): CodeSecurityConfigurationForRepository;
+    /**
+     * @return Envelope<CodeSecurityConfigurationForRepository|null|BasicError>
+     */
+    public function codeSecurityGetConfigurationForRepository(string $owner, string $repo): Envelope;
 }

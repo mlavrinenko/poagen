@@ -11,13 +11,25 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\VpcsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\VpcsCreatePeerings202Content;
 use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequestContent;
 use Acme\DigitalOcean\Generated\Model\VpcsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsGet200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsList200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsListMembers200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsListPeerings200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsPatch200Content;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchPeerings200Content;
 use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequestContent;
 use Acme\DigitalOcean\Generated\Model\VpcsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class VPCsClient implements VPCsClientInterface
@@ -30,149 +42,189 @@ final readonly class VPCsClient implements VPCsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsList200Content|Error>
      */
-    public function vpcsList(?int $perPage = null, ?int $page = null): void
+    public function vpcsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpcs')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:create`.
+     * @return Envelope<VpcsCreate201Content|Error>
      */
-    public function vpcsCreate(VpcsCreateRequestContent $body): void
+    public function vpcsCreate(VpcsCreateRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsCreate201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/vpcs')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(VpcsCreate201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsGet200Content|Error>
      */
-    public function vpcsGet(string $vpcId): void
+    public function vpcsGet(string $vpcId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpcs/{vpc_id}')
                 ->path('vpc_id', $vpcId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
+     * @return Envelope<VpcsUpdate200Content|Error>
      */
-    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): void
+    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/vpcs/{vpc_id}')
                 ->path('vpc_id', $vpcId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:delete`.
+     * @return Envelope<null|Error>
      */
-    public function vpcsDelete(string $vpcId): void
+    public function vpcsDelete(string $vpcId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/vpcs/{vpc_id}')
                 ->path('vpc_id', $vpcId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
+     * @return Envelope<VpcsPatch200Content|Error>
      */
-    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): void
+    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsPatch200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/vpcs/{vpc_id}')
                 ->path('vpc_id', $vpcId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsPatch200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
+     * @return Envelope<VpcsListMembers200Content|Error>
      */
     public function vpcsListMembers(
         string $vpcId,
         ?string $resourceType = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VpcsListMembers200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpcs/{vpc_id}/members')
                 ->path('vpc_id', $vpcId)
                 ->query('resource_type', $resourceType)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsListMembers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:read`.
+     * @return Envelope<VpcsListPeerings200Content|Error>
      */
-    public function vpcsListPeerings(string $vpcId, ?int $perPage = null, ?int $page = null): void
+    public function vpcsListPeerings(string $vpcId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsListPeerings200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpcs/{vpc_id}/peerings')
                 ->path('vpc_id', $vpcId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsListPeerings200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
+     * @return Envelope<VpcsCreatePeerings202Content|Error>
      */
-    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): void
+    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcsCreatePeerings202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/vpcs/{vpc_id}/peerings')
                 ->path('vpc_id', $vpcId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(VpcsCreatePeerings202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
+     * @return Envelope<VpcsPatchPeerings200Content|Error>
      */
     public function vpcsPatchPeerings(
         string $vpcId,
         string $vpcPeeringId,
         VpcsPatchPeeringsRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VpcsPatchPeerings200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/vpcs/{vpc_id}/peerings/{vpc_peering_id}')
                 ->path('vpc_id', $vpcId)
                 ->path('vpc_peering_id', $vpcPeeringId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcsPatchPeerings200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

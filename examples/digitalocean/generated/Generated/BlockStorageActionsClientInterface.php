@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostAttach;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostDetach;
 use Acme\DigitalOcean\Generated\Model\VolumeActionPostResize;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsPost202Content;
+use Acme\DigitalOcean\Generated\Model\VolumeActionsPostById202Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Block Storage Actions` endpoints.
@@ -26,30 +32,39 @@ interface BlockStorageActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:create`, `api:write`.
+     * @return Envelope<VolumeActionsPost202Content|Error>
      */
     public function volumeActionsPost(
         VolumeActionPostAttach|VolumeActionPostDetach $body,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
+     * @return Envelope<VolumeActionsList200Content|Error>
      */
-    public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): void;
+    public function volumeActionsList(string $volumeId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:create`.
+     * @return Envelope<VolumeActionsPostById202Content|Error>
      */
     public function volumeActionsPostById(
         string $volumeId,
         VolumeActionPostAttach|VolumeActionPostDetach|VolumeActionPostResize $body,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `block_storage_action:read`.
+     * @return Envelope<VolumeActionsGet200Content|Error>
      */
-    public function volumeActionsGet(string $volumeId, int $actionId, ?int $perPage = null, ?int $page = null): void;
+    public function volumeActionsGet(
+        string $volumeId,
+        int $actionId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 }

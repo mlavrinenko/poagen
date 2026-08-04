@@ -11,18 +11,24 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddTagsRequestContent;
 use Acme\DigitalOcean\Generated\Model\FirewallsAssignDropletsRequestContent;
+use Acme\DigitalOcean\Generated\Model\FirewallsCreate202Content;
 use Acme\DigitalOcean\Generated\Model\FirewallsCreateInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsCreateOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteDropletsRequestContent;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesOutboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteTagsRequestContent;
+use Acme\DigitalOcean\Generated\Model\FirewallsGet200Content;
+use Acme\DigitalOcean\Generated\Model\FirewallsList200Content;
+use Acme\DigitalOcean\Generated\Model\FirewallsUpdate200Content;
 use Acme\DigitalOcean\Generated\Model\FirewallsUpdateInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsUpdateOutboundRules;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Firewalls` endpoints.
@@ -35,65 +41,76 @@ interface FirewallsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `firewall:read`.
+     * @return Envelope<FirewallsList200Content|Error>
      */
-    public function firewallsList(?int $perPage = null, ?int $page = null): void;
+    public function firewallsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:create`.
+     * @return Envelope<FirewallsCreate202Content|Error>
      */
-    public function firewallsCreate(FirewallsCreateInboundRules|FirewallsCreateOutboundRules $body): void;
+    public function firewallsCreate(FirewallsCreateInboundRules|FirewallsCreateOutboundRules $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:read`.
+     * @return Envelope<FirewallsGet200Content|Error>
      */
-    public function firewallsGet(string $firewallId): void;
+    public function firewallsGet(string $firewallId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<FirewallsUpdate200Content|Error>
      */
     public function firewallsUpdate(
         string $firewallId,
         FirewallsUpdateInboundRules|FirewallsUpdateOutboundRules $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:delete`.
+     * @return Envelope<null|Error>
      */
-    public function firewallsDelete(string $firewallId): void;
+    public function firewallsDelete(string $firewallId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
-    public function firewallsAssignDroplets(string $firewallId, FirewallsAssignDropletsRequestContent $body): void;
+    public function firewallsAssignDroplets(string $firewallId, FirewallsAssignDropletsRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
-    public function firewallsDeleteDroplets(string $firewallId, FirewallsDeleteDropletsRequestContent $body): void;
+    public function firewallsDeleteDroplets(string $firewallId, FirewallsDeleteDropletsRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
     public function firewallsAddRules(
         string $firewallId,
         FirewallsAddRulesInboundRules|FirewallsAddRulesOutboundRules $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
     public function firewallsDeleteRules(
         string $firewallId,
         FirewallsDeleteRulesInboundRules|FirewallsDeleteRulesOutboundRules $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
-    public function firewallsAddTags(string $firewallId, FirewallsAddTagsRequestContent $body): void;
+    public function firewallsAddTags(string $firewallId, FirewallsAddTagsRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
+     * @return Envelope<null|Error>
      */
-    public function firewallsDeleteTags(string $firewallId, FirewallsDeleteTagsRequestContent $body): void;
+    public function firewallsDeleteTags(string $firewallId, FirewallsDeleteTagsRequestContent $body): Envelope;
 }

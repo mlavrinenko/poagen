@@ -28,6 +28,7 @@ use Acme\GitHub\Generated\Model\AppsResetTokenRequestContent;
 use Acme\GitHub\Generated\Model\AppsScopeTokenRequestContent;
 use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequestContent;
 use Acme\GitHub\Generated\Model\Authorization;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\HookDelivery;
 use Acme\GitHub\Generated\Model\HookDeliveryItem;
 use Acme\GitHub\Generated\Model\Installation;
@@ -37,10 +38,14 @@ use Acme\GitHub\Generated\Model\IntegrationInstallationRequest;
 use Acme\GitHub\Generated\Model\MarketplaceListingPlan;
 use Acme\GitHub\Generated\Model\MarketplacePurchase;
 use Acme\GitHub\Generated\Model\UserMarketplacePurchase;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\WebhookConfig;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class AppsClient implements AppsClientInterface
@@ -50,255 +55,385 @@ final readonly class AppsClient implements AppsClientInterface
     ) {
     }
 
-    public function appsGetAuthenticated(): Integration
+    /**
+     * @return Envelope<Integration>
+     */
+    public function appsGetAuthenticated(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Integration> $result */
+        $result = $this->transport->send(
             Endpoint::get('/app'),
-            ResponseType::object(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function appsCreateFromManifest(string $code): AppsCreateFromManifest201Content
-    {
-        return $this->transport->send(
-            Endpoint::post('/app-manifests/{code}/conversions')->path('code', $code),
-            ResponseType::object(AppsCreateFromManifest201Content::class),
-        );
-    }
-
-    public function appsGetWebhookConfigForApp(): WebhookConfig
-    {
-        return $this->transport->send(
-            Endpoint::get('/app/hook/config'),
-            ResponseType::object(WebhookConfig::class),
-        );
-    }
-
-    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): WebhookConfig
-    {
-        return $this->transport->send(
-            Endpoint::patch('/app/hook/config')->json($body),
-            ResponseType::object(WebhookConfig::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<AppsCreateFromManifest201Content|BasicError|ValidationErrorSimple>
+     */
+    public function appsCreateFromManifest(string $code): Envelope
+    {
+        /** @var Envelope<AppsCreateFromManifest201Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/app-manifests/{code}/conversions')->path('code', $code),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AppsCreateFromManifest201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function appsGetWebhookConfigForApp(): Envelope
+    {
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/app/hook/config'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): Envelope
+    {
+        /** @var Envelope<WebhookConfig> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/app/hook/config')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function appsListWebhookDeliveries(
         ?int $perPage = null,
         ?string $cursor = null,
         ?AppsListWebhookDeliveriesStatus $status = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<HookDeliveryItem>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/app/hook/deliveries')
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::listOf(HookDeliveryItem::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function appsGetWebhookDelivery(int $deliveryId): HookDelivery
-    {
-        return $this->transport->send(
-            Endpoint::get('/app/hook/deliveries/{delivery_id}')
-                ->path('delivery_id', $deliveryId),
-            ResponseType::object(HookDelivery::class),
-        );
-    }
-
-    public function appsRedeliverWebhookDelivery(int $deliveryId): void
-    {
-        $this->transport->send(
-            Endpoint::post('/app/hook/deliveries/{delivery_id}/attempts')
-                ->path('delivery_id', $deliveryId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<IntegrationInstallationRequest>
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
      */
-    public function appsListInstallationRequestsForAuthenticatedApp(?int $perPage = null, ?int $page = null): array
+    public function appsGetWebhookDelivery(int $deliveryId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<HookDelivery|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/app/hook/deliveries/{delivery_id}')
+                ->path('delivery_id', $deliveryId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function appsRedeliverWebhookDelivery(int $deliveryId): Envelope
+    {
+        /** @var Envelope<array<string, mixed>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/app/hook/deliveries/{delivery_id}/attempts')
+                ->path('delivery_id', $deliveryId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<IntegrationInstallationRequest>|null|BasicError>
+     */
+    public function appsListInstallationRequestsForAuthenticatedApp(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<IntegrationInstallationRequest>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/app/installation-requests')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(IntegrationInstallationRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IntegrationInstallationRequest::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Installation>
+     * @return Envelope<list<Installation>>
      */
     public function appsListInstallations(
         ?int $perPage = null,
         ?int $page = null,
         ?\DateTimeImmutable $since = null,
         ?string $outdated = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Installation>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/app/installations')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('outdated', $outdated),
-            ResponseType::listOf(Installation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Installation::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsGetInstallation(int $installationId): Installation
+    /**
+     * @return Envelope<Installation|BasicError>
+     */
+    public function appsGetInstallation(int $installationId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Installation|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/app/installations/{installation_id}')
                 ->path('installation_id', $installationId),
-            ResponseType::object(Installation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsDeleteInstallation(int $installationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsDeleteInstallation(int $installationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/app/installations/{installation_id}')
                 ->path('installation_id', $installationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<InstallationToken|BasicError|ValidationError>
+     */
     public function appsCreateInstallationAccessToken(
         int $installationId,
         AppsCreateInstallationAccessTokenRequestContent $body,
-    ): InstallationToken {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<InstallationToken|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/app/installations/{installation_id}/access_tokens')
                 ->path('installation_id', $installationId)
                 ->json($body),
-            ResponseType::object(InstallationToken::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(InstallationToken::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsSuspendInstallation(int $installationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsSuspendInstallation(int $installationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/app/installations/{installation_id}/suspended')
                 ->path('installation_id', $installationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsUnsuspendInstallation(int $installationId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsUnsuspendInstallation(int $installationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/app/installations/{installation_id}/suspended')
                 ->path('installation_id', $installationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): void
+    /**
+     * @return Envelope<null|ValidationError>
+     */
+    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/applications/{client_id}/grant')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Authorization
+    /**
+     * @return Envelope<Authorization|ValidationError|BasicError>
+     */
+    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Authorization|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::object(Authorization::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): void
+    /**
+     * @return Envelope<null|ValidationError>
+     */
+    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Authorization
+    /**
+     * @return Envelope<Authorization|ValidationError>
+     */
+    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Authorization|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::object(Authorization::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Authorization
+    /**
+     * @return Envelope<Authorization|BasicError|ValidationError>
+     */
+    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Authorization|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/applications/{client_id}/token/scoped')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::object(Authorization::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsGetBySlug(string $appSlug): Integration
+    /**
+     * @return Envelope<Integration|BasicError>
+     */
+    public function appsGetBySlug(string $appSlug): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Integration|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/apps/{app_slug}')->path('app_slug', $appSlug),
-            ResponseType::object(Integration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsListReposAccessibleToInstallation(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): AppsListReposAccessibleToInstallation200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<AppsListReposAccessibleToInstallation200Content|BasicError|null>
+     */
+    public function appsListReposAccessibleToInstallation(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<AppsListReposAccessibleToInstallation200Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/installation/repositories')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListReposAccessibleToInstallation200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListReposAccessibleToInstallation200Content::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function appsRevokeInstallationAccessToken(): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/installation/token'),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function appsGetSubscriptionPlanForAccount(int $accountId): MarketplacePurchase
-    {
-        return $this->transport->send(
-            Endpoint::get('/marketplace_listing/accounts/{account_id}')
-                ->path('account_id', $accountId),
-            ResponseType::object(MarketplacePurchase::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<MarketplaceListingPlan>
+     * @return Envelope<null>
      */
-    public function appsListPlans(?int $perPage = null, ?int $page = null): array
+    public function appsRevokeInstallationAccessToken(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/installation/token'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<MarketplacePurchase|BasicError>
+     */
+    public function appsGetSubscriptionPlanForAccount(int $accountId): Envelope
+    {
+        /** @var Envelope<MarketplacePurchase|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/marketplace_listing/accounts/{account_id}')
+                ->path('account_id', $accountId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<MarketplaceListingPlan>|BasicError>
+     */
+    public function appsListPlans(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<MarketplaceListingPlan>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/plans')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MarketplaceListingPlan::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MarketplacePurchase>
+     * @return Envelope<list<MarketplacePurchase>|BasicError|ValidationError>
      */
     public function appsListAccountsForPlan(
         int $planId,
@@ -306,42 +441,54 @@ final readonly class AppsClient implements AppsClientInterface
         ?AppsListAccountsForPlanDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MarketplacePurchase>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/plans/{plan_id}/accounts')
                 ->path('plan_id', $planId)
                 ->query('sort', $sort)
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MarketplacePurchase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function appsGetSubscriptionPlanForAccountStubbed(int $accountId): MarketplacePurchase
-    {
-        return $this->transport->send(
-            Endpoint::get('/marketplace_listing/stubbed/accounts/{account_id}')
-                ->path('account_id', $accountId),
-            ResponseType::object(MarketplacePurchase::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<MarketplaceListingPlan>
+     * @return Envelope<MarketplacePurchase|null|BasicError>
      */
-    public function appsListPlansStubbed(?int $perPage = null, ?int $page = null): array
+    public function appsGetSubscriptionPlanForAccountStubbed(int $accountId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<MarketplacePurchase|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/marketplace_listing/stubbed/accounts/{account_id}')
+                ->path('account_id', $accountId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<MarketplaceListingPlan>|BasicError>
+     */
+    public function appsListPlansStubbed(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<MarketplaceListingPlan>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/stubbed/plans')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MarketplaceListingPlan::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MarketplacePurchase>
+     * @return Envelope<list<MarketplacePurchase>|BasicError>
      */
     public function appsListAccountsForPlanStubbed(
         int $planId,
@@ -349,113 +496,166 @@ final readonly class AppsClient implements AppsClientInterface
         ?AppsListAccountsForPlanStubbedDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<MarketplacePurchase>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/stubbed/plans/{plan_id}/accounts')
                 ->path('plan_id', $planId)
                 ->query('sort', $sort)
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MarketplacePurchase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsGetOrgInstallation(string $org): Installation
+    /**
+     * @return Envelope<Installation>
+     */
+    public function appsGetOrgInstallation(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Installation> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/installation')->path('org', $org),
-            ResponseType::object(Installation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsGetRepoInstallation(string $owner, string $repo): Installation
+    /**
+     * @return Envelope<Installation|BasicError>
+     */
+    public function appsGetRepoInstallation(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Installation|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/installation')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(Installation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsListInstallationsForAuthenticatedUser(
-        ?int $perPage = null,
-        ?int $page = null,
-    ): AppsListInstallationsForAuthenticatedUser200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<AppsListInstallationsForAuthenticatedUser200Content|null|BasicError>
+     */
+    public function appsListInstallationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<AppsListInstallationsForAuthenticatedUser200Content|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/installations')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListInstallationsForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationsForAuthenticatedUser200Content::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<AppsListInstallationReposForAuthenticatedUser200Content|BasicError|null>
+     */
     public function appsListInstallationReposForAuthenticatedUser(
         int $installationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationReposForAuthenticatedUser200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<AppsListInstallationReposForAuthenticatedUser200Content|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/installations/{installation_id}/repositories')
                 ->path('installation_id', $installationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListInstallationReposForAuthenticatedUser200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationReposForAuthenticatedUser200Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsAddRepoToInstallationForAuthenticatedUser(int $installationId, int $repositoryId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsAddRepoToInstallationForAuthenticatedUser(int $installationId, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/installations/{installation_id}/repositories/{repository_id}')
                 ->path('installation_id', $installationId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsRemoveRepoFromInstallationForAuthenticatedUser(int $installationId, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function appsRemoveRepoFromInstallationForAuthenticatedUser(
+        int $installationId,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/installations/{installation_id}/repositories/{repository_id}')
                 ->path('installation_id', $installationId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<UserMarketplacePurchase>
+     * @return Envelope<list<UserMarketplacePurchase>|null|BasicError>
      */
-    public function appsListSubscriptionsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function appsListSubscriptionsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<UserMarketplacePurchase>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/marketplace_purchases')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(UserMarketplacePurchase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<UserMarketplacePurchase>
+     * @return Envelope<list<UserMarketplacePurchase>|null|BasicError>
      */
-    public function appsListSubscriptionsForAuthenticatedUserStubbed(?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function appsListSubscriptionsForAuthenticatedUserStubbed(
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<UserMarketplacePurchase>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/marketplace_purchases/stubbed')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(UserMarketplacePurchase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function appsGetUserInstallation(string $username): Installation
+    /**
+     * @return Envelope<Installation>
+     */
+    public function appsGetUserInstallation(string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Installation> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/installation')->path('username', $username),
-            ResponseType::object(Installation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

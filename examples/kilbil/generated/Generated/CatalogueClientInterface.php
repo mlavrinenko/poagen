@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\Goods200Content;
+use Acme\Kilbil\Generated\Model\Goods403Content;
 use Acme\Kilbil\Generated\Model\GoodsList200Content;
+use Acme\Kilbil\Generated\Model\GoodsList403Content;
 use Acme\Kilbil\Generated\Model\GoodsListRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsListXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsListXml403Content;
 use Acme\Kilbil\Generated\Model\GoodsListXmlRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsXml403Content;
 use Acme\Kilbil\Generated\Model\GoodsXmlRequestContentItem;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Номенклатура` endpoints.
@@ -31,21 +36,25 @@ interface CatalogueClientInterface
 {
     /**
      * @param list<GoodsRequestContentItem> $body
+     * @return Envelope<Goods200Content|Goods403Content>
      */
-    public function goods(array $body, ?int $partial = null, ?int $id = null): Goods200Content;
+    public function goods(array $body, ?int $partial = null, ?int $id = null): Envelope;
 
     /**
      * @param list<GoodsListRequestContentItem> $body
+     * @return Envelope<GoodsList200Content|GoodsList403Content>
      */
-    public function goodsList(array $body, ?int $id = null): GoodsList200Content;
+    public function goodsList(array $body, ?int $id = null): Envelope;
 
     /**
      * @param list<GoodsListXmlRequestContentItem> $body
+     * @return Envelope<GoodsListXml200Content|GoodsListXml403Content>
      */
-    public function goodsListXml(array $body, ?int $id = null): GoodsListXml200Content;
+    public function goodsListXml(array $body, ?int $id = null): Envelope;
 
     /**
      * @param list<GoodsXmlRequestContentItem> $body
+     * @return Envelope<GoodsXml200Content|GoodsXml403Content>
      */
-    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXml200Content;
+    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): Envelope;
 }

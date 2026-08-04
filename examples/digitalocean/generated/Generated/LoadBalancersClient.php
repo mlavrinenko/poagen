@@ -11,13 +11,20 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\LoadBalancerCreate;
 use Acme\DigitalOcean\Generated\Model\LoadBalancersAddDropletsRequestContent;
 use Acme\DigitalOcean\Generated\Model\LoadBalancersAddForwardingRulesRequestContent;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersCreate202Content;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersGet200Content;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersList200Content;
 use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveDropletsRequestContent;
 use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveForwardingRulesRequestContent;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersUpdate200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class LoadBalancersClient implements LoadBalancersClientInterface
@@ -30,141 +37,183 @@ final readonly class LoadBalancersClient implements LoadBalancersClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:read`.
+     * @return Envelope<LoadBalancersList200Content|Error>
      */
-    public function loadBalancersList(?int $perPage = null, ?int $page = null): void
+    public function loadBalancersList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<LoadBalancersList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/load_balancers')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LoadBalancersList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:create`.
+     * @return Envelope<LoadBalancersCreate202Content|Error>
      */
-    public function loadBalancersCreate(LoadBalancerCreate $body): void
+    public function loadBalancersCreate(LoadBalancerCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<LoadBalancersCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/load_balancers')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(LoadBalancersCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:read`.
+     * @return Envelope<LoadBalancersGet200Content|Error>
      */
-    public function loadBalancersGet(string $lbId): void
+    public function loadBalancersGet(string $lbId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<LoadBalancersGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/load_balancers/{lb_id}')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LoadBalancersGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
+     * @return Envelope<LoadBalancersUpdate200Content|Error>
      */
-    public function loadBalancersUpdate(string $lbId, LoadBalancerCreate $body): void
+    public function loadBalancersUpdate(string $lbId, LoadBalancerCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<LoadBalancersUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/load_balancers/{lb_id}')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LoadBalancersUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:delete`.
+     * @return Envelope<null|Error>
      */
-    public function loadBalancersDelete(string $lbId): void
+    public function loadBalancersDelete(string $lbId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:delete`.
+     * @return Envelope<null|Error>
      */
-    public function loadBalancersDeleteCache(string $lbId): void
+    public function loadBalancersDeleteCache(string $lbId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}/cache')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
+     * @return Envelope<null|Error>
      */
-    public function loadBalancersAddDroplets(string $lbId, LoadBalancersAddDropletsRequestContent $body): void
+    public function loadBalancersAddDroplets(string $lbId, LoadBalancersAddDropletsRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/load_balancers/{lb_id}/droplets')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
+     * @return Envelope<null|Error>
      */
-    public function loadBalancersRemoveDroplets(string $lbId, LoadBalancersRemoveDropletsRequestContent $body): void
-    {
-        $this->transport->send(
+    public function loadBalancersRemoveDroplets(
+        string $lbId,
+        LoadBalancersRemoveDropletsRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}/droplets')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
+     * @return Envelope<null|Error>
      */
     public function loadBalancersAddForwardingRules(
         string $lbId,
         LoadBalancersAddForwardingRulesRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/load_balancers/{lb_id}/forwarding_rules')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
+     * @return Envelope<null|Error>
      */
     public function loadBalancersRemoveForwardingRules(
         string $lbId,
         LoadBalancersRemoveForwardingRulesRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}/forwarding_rules')
                 ->path('lb_id', $lbId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

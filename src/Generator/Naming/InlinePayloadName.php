@@ -71,6 +71,17 @@ final readonly class InlinePayloadName
         return $mangled === null || $mangled === '' ? '_' : $mangled;
     }
 
+    /**
+     * A range key exactly as OpenAPI 3.x spells one — `'1XX'` through
+     * `'5XX'`, uppercase. A document that lowercases it (`'4xx'`) is not
+     * spelling the keyword the specification defines, so it is read as an
+     * exact status text instead of guessed at.
+     */
+    public static function isRangeKey(string $status): bool
+    {
+        return preg_match('/^[1-5]XX$/', $status) === 1;
+    }
+
     private static function compose(string $base, string $positionToken, bool $item): string
     {
         return $base . $positionToken . self::SUFFIX . ($item ? 'Item' : '');

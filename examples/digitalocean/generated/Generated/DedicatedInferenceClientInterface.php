@@ -18,6 +18,16 @@ use Acme\DigitalOcean\Generated\Model\DedicatedInferenceGpuModelConfigsResponse;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceSizesResponse;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceTokenCreateRequest;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesCreate202Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesCreateTokens202Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesGet200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesGetCa200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesList200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesListAccelerators200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesListTokens200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesPatch202Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Dedicated Inference` endpoints.
@@ -30,88 +40,98 @@ interface DedicatedInferenceClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesList200Content|Error>
      */
     public function dedicatedInferencesList(
         ?int $perPage = null,
         ?int $page = null,
         ?DedicatedInferencesListRegion $region = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:create`.
+     * @return Envelope<DedicatedInferencesCreate202Content|Error>
      */
-    public function dedicatedInferencesCreate(DedicatedInferenceCreateRequest $body): void;
+    public function dedicatedInferencesCreate(DedicatedInferenceCreateRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceGpuModelConfigsResponse|Error>
      */
-    public function dedicatedInferencesGetGpuModelConfig(): DedicatedInferenceGpuModelConfigsResponse;
+    public function dedicatedInferencesGetGpuModelConfig(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceSizesResponse|Error>
      */
-    public function dedicatedInferencesListSizes(): DedicatedInferenceSizesResponse;
+    public function dedicatedInferencesListSizes(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesGet200Content|Error>
      */
-    public function dedicatedInferencesGet(string $dedicatedInferenceId): void;
+    public function dedicatedInferencesGet(string $dedicatedInferenceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dedicatedInferencesDelete(string $dedicatedInferenceId): void;
+    public function dedicatedInferencesDelete(string $dedicatedInferenceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:update`.
+     * @return Envelope<DedicatedInferencesPatch202Content|Error>
      */
     public function dedicatedInferencesPatch(
         string $dedicatedInferenceId,
         DedicatedInferenceUpdateRequest $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesListAccelerators200Content|Error>
      */
     public function dedicatedInferencesListAccelerators(
         string $dedicatedInferenceId,
         ?int $perPage = null,
         ?int $page = null,
         ?string $slug = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceAccelerator|Error>
      */
-    public function dedicatedInferencesGetAccelerator(
-        string $dedicatedInferenceId,
-        string $acceleratorId,
-    ): DedicatedInferenceAccelerator;
+    public function dedicatedInferencesGetAccelerator(string $dedicatedInferenceId, string $acceleratorId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesGetCa200Content|Error>
      */
-    public function dedicatedInferencesGetCa(string $dedicatedInferenceId): void;
+    public function dedicatedInferencesGetCa(string $dedicatedInferenceId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:read`.
+     * @return Envelope<DedicatedInferencesListTokens200Content|Error>
      */
     public function dedicatedInferencesListTokens(
         string $dedicatedInferenceId,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:create`.
+     * @return Envelope<DedicatedInferencesCreateTokens202Content|Error>
      */
     public function dedicatedInferencesCreateTokens(
         string $dedicatedInferenceId,
         DedicatedInferenceTokenCreateRequest $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dedicatedInferencesDeleteTokens(string $dedicatedInferenceId, string $tokenId): void;
+    public function dedicatedInferencesDeleteTokens(string $dedicatedInferenceId, string $tokenId): Envelope;
 }

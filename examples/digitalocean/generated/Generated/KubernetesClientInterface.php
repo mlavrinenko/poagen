@@ -11,16 +11,34 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AssociatedKubernetesResources;
 use Acme\DigitalOcean\Generated\Model\Cluster;
 use Acme\DigitalOcean\Generated\Model\ClusterRegistries;
 use Acme\DigitalOcean\Generated\Model\ClusterRegistry;
 use Acme\DigitalOcean\Generated\Model\ClusterUpdate;
 use Acme\DigitalOcean\Generated\Model\ClusterlintRequest;
+use Acme\DigitalOcean\Generated\Model\ClusterlintResults;
+use Acme\DigitalOcean\Generated\Model\Credentials;
 use Acme\DigitalOcean\Generated\Model\DestroyAssociatedKubernetesResources;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\KubernetesAddNodePool201Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesCreateCluster201Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetAvailableUpgrades200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetCluster200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetNodePool200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetStatusMessages200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesListClusters200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesListNodePools200Content;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePool;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePoolUpdate;
+use Acme\DigitalOcean\Generated\Model\KubernetesOptions;
 use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequestContent;
+use Acme\DigitalOcean\Generated\Model\KubernetesRunClusterLint202Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpdateCluster202Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpdateNodePool202Content;
 use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequestContent;
+use Acme\DigitalOcean\Generated\Model\User;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Kubernetes` endpoints.
@@ -33,98 +51,110 @@ interface KubernetesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesListClusters200Content|Error>
      */
-    public function kubernetesListClusters(?int $perPage = null, ?int $page = null): void;
+    public function kubernetesListClusters(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`.
+     * @return Envelope<KubernetesCreateCluster201Content|Error>
      */
-    public function kubernetesCreateCluster(Cluster $body): void;
+    public function kubernetesCreateCluster(Cluster $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetCluster200Content|Error>
      */
-    public function kubernetesGetCluster(string $clusterId): void;
+    public function kubernetesGetCluster(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesUpdateCluster202Content|Error>
      */
-    public function kubernetesUpdateCluster(string $clusterId, ClusterUpdate $body): void;
+    public function kubernetesUpdateCluster(string $clusterId, ClusterUpdate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDeleteCluster(string $clusterId): void;
+    public function kubernetesDeleteCluster(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<ClusterlintResults|Error>
      */
-    public function kubernetesGetClusterLintResults(string $clusterId, ?string $runId = null): void;
+    public function kubernetesGetClusterLintResults(string $clusterId, ?string $runId = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesRunClusterLint202Content|Error>
      */
-    public function kubernetesRunClusterLint(string $clusterId, ClusterlintRequest $body): void;
+    public function kubernetesRunClusterLint(string $clusterId, ClusterlintRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:access_cluster`.
+     * @return Envelope<Credentials|Error>
      */
-    public function kubernetesGetCredentials(string $clusterId, ?int $expirySeconds = null): void;
+    public function kubernetesGetCredentials(string $clusterId, ?int $expirySeconds = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<AssociatedKubernetesResources|Error>
      */
-    public function kubernetesListAssociatedResources(string $clusterId): void;
+    public function kubernetesListAssociatedResources(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDestroyAssociatedResourcesDangerous(string $clusterId): void;
+    public function kubernetesDestroyAssociatedResourcesDangerous(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesDestroyAssociatedResourcesSelective(
         string $clusterId,
         DestroyAssociatedKubernetesResources $body,
-    ): void;
-
-    /**
-     * Requires `bearer_auth` scopes: `kubernetes:access_cluster`.
-     */
-    public function kubernetesGetKubeconfig(string $clusterId, ?int $expirySeconds = null): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesListNodePools200Content|Error>
      */
-    public function kubernetesListNodePools(string $clusterId): void;
+    public function kubernetesListNodePools(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesAddNodePool201Content|Error>
      */
-    public function kubernetesAddNodePool(string $clusterId, KubernetesNodePool $body): void;
+    public function kubernetesAddNodePool(string $clusterId, KubernetesNodePool $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetNodePool200Content|Error>
      */
-    public function kubernetesGetNodePool(string $clusterId, string $nodePoolId): void;
+    public function kubernetesGetNodePool(string $clusterId, string $nodePoolId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesUpdateNodePool202Content|Error>
      */
     public function kubernetesUpdateNodePool(
         string $clusterId,
         string $nodePoolId,
         KubernetesNodePoolUpdate $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDeleteNodePool(string $clusterId, string $nodePoolId): void;
+    public function kubernetesDeleteNodePool(string $clusterId, string $nodePoolId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesDeleteNode(
         string $clusterId,
@@ -132,59 +162,72 @@ interface KubernetesClientInterface
         string $nodeId,
         ?int $skipDrain = null,
         ?int $replace = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesRecycleNodePool(
         string $clusterId,
         string $nodePoolId,
         KubernetesRecycleNodePoolRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetStatusMessages200Content|Error>
      */
-    public function kubernetesGetStatusMessages(string $clusterId, ?\DateTimeImmutable $since = null): void;
+    public function kubernetesGetStatusMessages(string $clusterId, ?\DateTimeImmutable $since = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequestContent $body): void;
+    public function kubernetesUpgradeCluster(
+        string $clusterId,
+        KubernetesUpgradeClusterRequestContent $body,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetAvailableUpgrades200Content|Error>
      */
-    public function kubernetesGetAvailableUpgrades(string $clusterId): void;
+    public function kubernetesGetAvailableUpgrades(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<User|Error>
      */
-    public function kubernetesGetClusterUser(string $clusterId): void;
+    public function kubernetesGetClusterUser(string $clusterId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesOptions|Error>
      */
-    public function kubernetesListOptions(): void;
+    public function kubernetesListOptions(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`, `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesAddRegistries(ClusterRegistries $body): void;
+    public function kubernetesAddRegistries(ClusterRegistries $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesRemoveRegistries(ClusterRegistries $body): void;
+    public function kubernetesRemoveRegistries(ClusterRegistries $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`, `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesAddRegistry(ClusterRegistry $body): void;
+    public function kubernetesAddRegistry(ClusterRegistry $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesRemoveRegistry(ClusterRegistry $body): void;
+    public function kubernetesRemoveRegistry(ClusterRegistry $body): Envelope;
 }

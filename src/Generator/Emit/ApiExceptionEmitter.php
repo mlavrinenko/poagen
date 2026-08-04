@@ -14,12 +14,14 @@ use RuntimeException;
 /**
  * Emits the per-profile `Generated\ApiException` class.
  *
- * One class per generation run, sat alongside `ApiClient.php`. Thrown by every
- * emitted operation when the response status is outside the 2xx range. Carries
- * status, request, response, and a best-effort JSON-decoded body. Per
- * `error-response-policy`, decode failures are swallowed (no
- * `JSON_THROW_ON_ERROR`) and surface as
- * `null` from `getDecodedBody()`.
+ * One class per generation run, sat alongside `ApiClient.php`. Per the owner
+ * ruling behind `typed-error-responses`, a declared response is a return
+ * value now — an envelope, never an exception — so this is thrown only for
+ * the one case an envelope cannot honestly represent: a status the document
+ * did not describe at all, or a declared body that failed to hydrate.
+ * Carries status, request, response and the reason, in place of
+ * `error-response-policy`'s best-effort decoded body — nothing here ever
+ * hydrated, so there was never a typed body to hand back.
  */
 final readonly class ApiExceptionEmitter
 {
@@ -60,40 +62,27 @@ final readonly class ApiExceptionEmitter
         $namespace->addUse(RequestInterface::class);
         $namespace->addUse(ResponseInterface::class);
         $namespace->addUse(RuntimeException::class);
-        $namespace->addUseFunction('json_decode');
-        $namespace->addUseFunction('json_last_error');
-        $namespace->addUseConstant('JSON_ERROR_NONE');
 
         $class = $namespace->addClass('ApiException')
             ->setFinal()
             ->setExtends(RuntimeException::class)
             ->addImplement(ApiErrorInterface::class);
 
-        $class->addComment('Thrown when the response status is outside the 2xx range.');
-        $class->addComment('');
-        $class->addComment('Carries the original PSR-7 request and response together with a');
-        $class->addComment('best-effort JSON decode of the body. Decode failures are swallowed:');
-        $class->addComment('`getDecodedBody()` returns `null` when the body is empty or not JSON.');
+        $class->addComment('Thrown for the one case an envelope cannot honestly represent: a');
+        $class->addComment('status the document declared no exact, range or `default` response for,');
+        $class->addComment('or a declared body that failed to hydrate. Every other response —');
+        $class->addComment('including one outside the 2xx range — is a return value now, not this.');
         $class->addComment('');
         $class->addComment('Named once where the transport is wired — `new HttpTransport($baseUri,');
         $class->addComment('ApiException::class)` — and thrown from there, so this stays the type');
         $class->addComment('a caller catches for this API while the sequence that raises it lives');
         $class->addComment('in the runtime.');
 
-        $class->addProperty('decodedBody')
-            ->setPrivate()
-            ->setType('mixed')
-            ->setValue(null);
-
-        $class->addProperty('decoded')
-            ->setPrivate()
-            ->setType('bool')
-            ->setValue(false);
-
         $ctor = $class->addMethod('__construct');
         $ctor->addPromotedParameter('statusCode')->setType('int')->setPrivate()->setReadOnly();
         $ctor->addPromotedParameter('request')->setType(RequestInterface::class)->setPrivate()->setReadOnly();
         $ctor->addPromotedParameter('response')->setType(ResponseInterface::class)->setPrivate()->setReadOnly();
+        $ctor->addPromotedParameter('reason')->setType('string')->setPrivate()->setReadOnly();
         $ctor->addParameter('message')->setType('string')->setDefaultValue('');
         $ctor->addBody('parent::__construct($message);');
 
@@ -112,37 +101,13 @@ final readonly class ApiExceptionEmitter
             ->setReturnType(ResponseInterface::class)
             ->addBody('return $this->response;');
 
-        $decode = $class->addMethod('getDecodedBody')
+        $reason = $class->addMethod('getReason')
             ->setPublic()
-            ->setReturnType('mixed');
-        $decode->addComment('Best-effort JSON decode of the response body.');
-        $decode->addComment('');
-        $decode->addComment('Returns `null` for an empty body or any decode failure (per `error-response-policy`).');
-        $decode->addComment('Cached on first call.');
-        $decode->addBody(<<<'PHP'
-            if ($this->decoded) {
-                return $this->decodedBody;
-            }
-
-            $this->decoded = true;
-
-            $body = (string) $this->response->getBody();
-
-            if ($body === '') {
-                return $this->decodedBody;
-            }
-
-            /** @var mixed $decoded */
-            $decoded = json_decode($body, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return $this->decodedBody;
-            }
-
-            $this->decodedBody = $decoded;
-
-            return $this->decodedBody;
-            PHP);
+            ->setReturnType('string');
+        $reason->addComment('Why the transport raised: the status this exception carries either');
+        $reason->addComment('matched nothing the document declared, or matched a declared response');
+        $reason->addComment('whose body failed to hydrate.');
+        $reason->addBody('return $this->reason;');
 
         return $this->printer->printFile($file);
     }

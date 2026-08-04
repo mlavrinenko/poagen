@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch1;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch2;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch3;
@@ -31,8 +32,11 @@ use Acme\GitHub\Generated\Model\ProjectsV2Field;
 use Acme\GitHub\Generated\Model\ProjectsV2ItemSimple;
 use Acme\GitHub\Generated\Model\ProjectsV2ItemWithContent;
 use Acme\GitHub\Generated\Model\ProjectsV2View;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ProjectsClient implements ProjectsClientInterface
@@ -43,7 +47,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     }
 
     /**
-     * @return list<ProjectsV2>
+     * @return Envelope<list<ProjectsV2>|null|BasicError>
      */
     public function projectsListForOrg(
         string $org,
@@ -51,44 +55,59 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2')
                 ->path('org', $org)
                 ->query('q', $q)
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ProjectsV2::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function projectsGetForOrg(int $projectNumber, string $org): ProjectsV2
+    /**
+     * @return Envelope<ProjectsV2|null|BasicError>
+     */
+    public function projectsGetForOrg(int $projectNumber, string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ProjectsV2|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org),
-            ResponseType::object(ProjectsV2::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsCreateDraftItemForOrg(
         string $org,
         int $projectNumber,
         ProjectsCreateDraftItemForOrgRequestContent $body,
-    ): ProjectsV2ItemSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemSimple|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/drafts')
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ProjectsV2Field>
+     * @return Envelope<list<ProjectsV2Field>|null|BasicError>
      */
     public function projectsListFieldsForOrg(
         int $projectNumber,
@@ -96,46 +115,61 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2Field>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}/fields')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::listOf(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError|ValidationError>
+     */
     public function projectsAddFieldForOrg(
         int $projectNumber,
         string $org,
         ProjectsAddFieldForOrgBranch1|ProjectsAddFieldForOrgBranch2|ProjectsAddFieldForOrgBranch3|ProjectsAddFieldForOrgBranch4 $body,
-    ): ProjectsV2Field {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2Field|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/fields')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): ProjectsV2Field
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError>
+     */
+    public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ProjectsV2Field|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}/fields/{field_id}')
                 ->path('project_number', $projectNumber)
                 ->path('field_id', $fieldId)
                 ->path('org', $org),
-            ResponseType::object(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListItemsForOrg(
         int $projectNumber,
@@ -145,8 +179,9 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2ItemWithContent>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}/items')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
@@ -155,87 +190,117 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsAddItemForOrg(
         string $org,
         int $projectNumber,
         ProjectsAddItemForOrgRequestContent $body,
-    ): ProjectsV2ItemSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemSimple|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/items')
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
+     * @return Envelope<ProjectsV2ItemWithContent|null|BasicError>
      */
     public function projectsGetOrgItem(
         int $projectNumber,
         string $org,
         int $itemId,
         string|array|null $fields = null,
-    ): ProjectsV2ItemWithContent {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemWithContent|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->path('item_id', $itemId)
                 ->query('fields', $fields),
-            ResponseType::object(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function projectsDeleteItemForOrg(int $projectNumber, string $org, int $itemId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function projectsDeleteItemForOrg(int $projectNumber, string $org, int $itemId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->path('item_id', $itemId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError>
+     */
     public function projectsUpdateItemForOrg(
         int $projectNumber,
         string $org,
         int $itemId,
         ProjectsUpdateItemForOrgRequestContent $body,
-    ): ProjectsV2ItemWithContent {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->path('item_id', $itemId)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2View|null|BasicError|ValidationError>
+     */
     public function projectsCreateViewForOrg(
         string $org,
         int $projectNumber,
         ProjectsCreateViewForOrgRequestContent $body,
-    ): ProjectsV2View {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2View|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/views')
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2View::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListViewItemsForOrg(
         int $projectNumber,
@@ -245,8 +310,9 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2ItemWithContent>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}/views/{view_number}/items')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
@@ -255,40 +321,54 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsCreateDraftItemForAuthenticatedUser(
         string $userId,
         int $projectNumber,
         ProjectsCreateDraftItemForAuthenticatedUserRequestContent $body,
-    ): ProjectsV2ItemSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemSimple|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/{user_id}/projectsV2/{project_number}/drafts')
                 ->path('user_id', $userId)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2View|null|BasicError|ValidationError>
+     */
     public function projectsCreateViewForUser(
         string $userId,
         int $projectNumber,
         ProjectsCreateViewForUserRequestContent $body,
-    ): ProjectsV2View {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2View|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{user_id}/projectsV2/{project_number}/views')
                 ->path('user_id', $userId)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2View::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ProjectsV2>
+     * @return Envelope<list<ProjectsV2>|null|BasicError>
      */
     public function projectsListForUser(
         string $username,
@@ -296,30 +376,39 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2')
                 ->path('username', $username)
                 ->query('q', $q)
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ProjectsV2::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function projectsGetForUser(int $projectNumber, string $username): ProjectsV2
-    {
-        return $this->transport->send(
-            Endpoint::get('/users/{username}/projectsV2/{project_number}')
-                ->path('project_number', $projectNumber)
-                ->path('username', $username),
-            ResponseType::object(ProjectsV2::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<ProjectsV2Field>
+     * @return Envelope<ProjectsV2|null|BasicError>
+     */
+    public function projectsGetForUser(int $projectNumber, string $username): Envelope
+    {
+        /** @var Envelope<ProjectsV2|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/users/{username}/projectsV2/{project_number}')
+                ->path('project_number', $projectNumber)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<ProjectsV2Field>|null|BasicError>
      */
     public function projectsListFieldsForUser(
         int $projectNumber,
@@ -327,46 +416,61 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2Field>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2/{project_number}/fields')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::listOf(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError|ValidationError>
+     */
     public function projectsAddFieldForUser(
         string $username,
         int $projectNumber,
         ProjectsAddFieldForUserBranch1|ProjectsAddFieldForUserBranch2|ProjectsAddFieldForUserBranch3 $body,
-    ): ProjectsV2Field {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2Field|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/projectsV2/{project_number}/fields')
                 ->path('username', $username)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): ProjectsV2Field
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError>
+     */
+    public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ProjectsV2Field|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2/{project_number}/fields/{field_id}')
                 ->path('project_number', $projectNumber)
                 ->path('field_id', $fieldId)
                 ->path('username', $username),
-            ResponseType::object(ProjectsV2Field::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListItemsForUser(
         int $projectNumber,
@@ -376,8 +480,9 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?int $perPage = null,
         ?string $q = null,
         string|array|null $fields = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2ItemWithContent>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2/{project_number}/items')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
@@ -386,73 +491,97 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('per_page', $perPage)
                 ->query('q', $q)
                 ->query('fields', $fields),
-            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsAddItemForUser(
         string $username,
         int $projectNumber,
         ProjectsAddItemForUserRequestContent $body,
-    ): ProjectsV2ItemSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemSimple|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/projectsV2/{project_number}/items')
                 ->path('username', $username)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
+     * @return Envelope<ProjectsV2ItemWithContent|null|BasicError>
      */
     public function projectsGetUserItem(
         int $projectNumber,
         string $username,
         int $itemId,
         string|array|null $fields = null,
-    ): ProjectsV2ItemWithContent {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemWithContent|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
                 ->path('item_id', $itemId)
                 ->query('fields', $fields),
-            ResponseType::object(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function projectsDeleteItemForUser(int $projectNumber, string $username, int $itemId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function projectsDeleteItemForUser(int $projectNumber, string $username, int $itemId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/users/{username}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
                 ->path('item_id', $itemId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError>
+     */
     public function projectsUpdateItemForUser(
         int $projectNumber,
         string $username,
         int $itemId,
         ProjectsUpdateItemForUserRequestContent $body,
-    ): ProjectsV2ItemWithContent {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/users/{username}/projectsV2/{project_number}/items/{item_id}')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
                 ->path('item_id', $itemId)
                 ->json($body),
-            ResponseType::object(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListViewItemsForUser(
         int $projectNumber,
@@ -462,8 +591,9 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ProjectsV2ItemWithContent>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/projectsV2/{project_number}/views/{view_number}/items')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
@@ -472,7 +602,9 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ProjectsV2ItemWithContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

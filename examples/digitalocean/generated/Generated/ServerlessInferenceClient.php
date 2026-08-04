@@ -18,10 +18,13 @@ use Acme\DigitalOcean\Generated\Model\ChatCompletionResponse;
 use Acme\DigitalOcean\Generated\Model\CreateImageRequest;
 use Acme\DigitalOcean\Generated\Model\CreateResponseRequest;
 use Acme\DigitalOcean\Generated\Model\CreateResponseResponse;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImagesResponse;
 use Acme\DigitalOcean\Generated\Model\ListModelsResponse;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ServerlessInferenceClient implements ServerlessInferenceClientInterface
@@ -32,52 +35,82 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
     ) {
     }
 
-    public function inferenceCreateAsyncInvoke(AsyncInvokeRequest $body): AsyncInvokeResponse
+    /**
+     * @return Envelope<AsyncInvokeResponse|Error>
+     */
+    public function inferenceCreateAsyncInvoke(AsyncInvokeRequest $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AsyncInvokeResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v1/async-invoke')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::object(AsyncInvokeResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AsyncInvokeResponse::class)], ['202', ResponseType::object(AsyncInvokeResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
-    public function inferenceCreateChatCompletion(ChatCompletionRequest $body): ChatCompletionResponse
+    /**
+     * @return Envelope<ChatCompletionResponse|Error>
+     */
+    public function inferenceCreateChatCompletion(ChatCompletionRequest $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ChatCompletionResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v1/chat/completions')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::object(ChatCompletionResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
-    public function inferenceCreateImage(CreateImageRequest $body): ImagesResponse
+    /**
+     * @return Envelope<ImagesResponse|Error>
+     */
+    public function inferenceCreateImage(CreateImageRequest $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ImagesResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v1/images/generations')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::object(ImagesResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
-    public function inferenceListModels(): ListModelsResponse
+    /**
+     * @return Envelope<ListModelsResponse|Error>
+     */
+    public function inferenceListModels(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ListModelsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v1/models')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth),
-            ResponseType::object(ListModelsResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ListModelsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
-    public function inferenceCreateResponse(CreateResponseRequest $body): CreateResponseResponse
+    /**
+     * @return Envelope<CreateResponseResponse|Error>
+     */
+    public function inferenceCreateResponse(CreateResponseRequest $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CreateResponseResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v1/responses')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::object(CreateResponseResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CreateResponseResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

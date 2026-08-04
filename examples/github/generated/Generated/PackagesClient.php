@@ -40,10 +40,13 @@ use Acme\GitHub\Generated\Enum\PackagesRestorePackageForUserPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForAuthenticatedUserPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForOrgPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForUserPackageType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Package;
 use Acme\GitHub\Generated\Model\PackageVersion;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class PackagesClient implements PackagesClientInterface
@@ -54,18 +57,21 @@ final readonly class PackagesClient implements PackagesClientInterface
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError>
      */
-    public function packagesListDockerMigrationConflictingPackagesForOrganization(string $org): array
+    public function packagesListDockerMigrationConflictingPackagesForOrganization(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Package>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/docker/conflicts')->path('org', $org),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError|null>
      */
     public function packagesListPackagesForOrganization(
         string $org,
@@ -73,64 +79,85 @@ final readonly class PackagesClient implements PackagesClientInterface
         ?PackagesListPackagesForOrganizationVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Package>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/packages')
                 ->path('org', $org)
                 ->query('package_type', $packageType)
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForOrganization(
         PackagesGetPackageForOrganizationPackageType $packageType,
         string $packageName,
         string $org,
-    ): Package {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Package> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org),
-            ResponseType::object(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForOrg(
         PackagesDeletePackageForOrgPackageType $packageType,
         string $packageName,
         string $org,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForOrg(
         PackagesRestorePackageForOrgPackageType $packageType,
         string $packageName,
         string $org,
         ?string $token = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/packages/{package_type}/{package_name}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->query('token', $token),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByOrg(
         PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType $packageType,
@@ -139,8 +166,9 @@ final readonly class PackagesClient implements PackagesClientInterface
         ?int $page = null,
         ?int $perPage = null,
         ?PackagesGetAllPackageVersionsForPackageOwnedByOrgState $state = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PackageVersion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/packages/{package_type}/{package_name}/versions')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
@@ -148,128 +176,172 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::listOf(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForOrganization(
         PackagesGetPackageVersionForOrganizationPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): PackageVersion {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PackageVersion> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::object(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForOrg(
         PackagesDeletePackageVersionForOrgPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForOrg(
         PackagesRestorePackageVersionForOrgPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/packages/{package_type}/{package_name}/versions/{package_version_id}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>>
      */
-    public function packagesListDockerMigrationConflictingPackagesForAuthenticatedUser(): array
+    public function packagesListDockerMigrationConflictingPackagesForAuthenticatedUser(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Package>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/docker/conflicts'),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|null>
      */
     public function packagesListPackagesForAuthenticatedUser(
         PackagesListPackagesForAuthenticatedUserPackageType $packageType,
         ?PackagesListPackagesForAuthenticatedUserVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Package>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/packages')
                 ->query('package_type', $packageType)
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForAuthenticatedUser(
         PackagesGetPackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
-    ): Package {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Package> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName),
-            ResponseType::object(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForAuthenticatedUser(
         PackagesDeletePackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForAuthenticatedUser(
         PackagesRestorePackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
         ?string $token = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/packages/{package_type}/{package_name}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->query('token', $token),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUser(
         PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType $packageType,
@@ -277,73 +349,97 @@ final readonly class PackagesClient implements PackagesClientInterface
         ?int $page = null,
         ?int $perPage = null,
         ?PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState $state = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PackageVersion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/packages/{package_type}/{package_name}/versions')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::listOf(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForAuthenticatedUser(
         PackagesGetPackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): PackageVersion {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PackageVersion> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::object(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForAuthenticatedUser(
         PackagesDeletePackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForAuthenticatedUser(
         PackagesRestorePackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/user/packages/{package_type}/{package_name}/versions/{package_version_id}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError>
      */
-    public function packagesListDockerMigrationConflictingPackagesForUser(string $username): array
+    public function packagesListDockerMigrationConflictingPackagesForUser(string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Package>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/docker/conflicts')->path('username', $username),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError|null>
      */
     public function packagesListPackagesForUser(
         string $username,
@@ -351,124 +447,166 @@ final readonly class PackagesClient implements PackagesClientInterface
         ?PackagesListPackagesForUserVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Package>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/packages')
                 ->path('username', $username)
                 ->query('package_type', $packageType)
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForUser(
         PackagesGetPackageForUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): Package {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Package> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::object(Package::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForUser(
         PackagesDeletePackageForUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/users/{username}/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForUser(
         PackagesRestorePackageForUserPackageType $packageType,
         string $packageName,
         string $username,
         ?string $token = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/packages/{package_type}/{package_name}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->query('token', $token),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByUser(
         PackagesGetAllPackageVersionsForPackageOwnedByUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PackageVersion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/packages/{package_type}/{package_name}/versions')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::listOf(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForUser(
         PackagesGetPackageVersionForUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
         string $username,
-    ): PackageVersion {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PackageVersion> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId)
                 ->path('username', $username),
-            ResponseType::object(PackageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForUser(
         PackagesDeletePackageVersionForUserPackageType $packageType,
         string $packageName,
         string $username,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForUser(
         PackagesRestorePackageVersionForUserPackageType $packageType,
         string $packageName,
         string $username,
         int $packageVersionId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/users/{username}/packages/{package_type}/{package_name}/versions/{package_version_id}/restore')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

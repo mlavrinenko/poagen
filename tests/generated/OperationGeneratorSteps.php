@@ -15,6 +15,7 @@ use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
 use Mlavrinenko\Paogen\Generator\Generator;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Generator\ProfileLoader;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient as ParametersClient;
@@ -66,8 +67,33 @@ final class OperationGeneratorSteps
 
     private ?ApiClient $client = null;
     private ?RecordingClient $http = null;
-    private ?Order $orderResult = null;
+
+    /** @var Envelope<Order>|null */
+    private ?Envelope $orderResult = null;
+
     private ?ApiException $caught = null;
+
+    /**
+     * A status the document declares decodes onto the envelope now instead
+     * of throwing (`typed-error-responses`) — `whenGetpetbyid999IsCalledOnClient()`
+     * stores the result here rather than assuming every call raises.
+     *
+     * @var Envelope<Pet|null>|null
+     */
+    private ?Envelope $result = null;
+
+    /**
+     * The "status the document did not declare" scenario cannot use
+     * petstore: every petstore operation declares its own `default`
+     * response, so no status against it is ever undeclared. The
+     * `parameters` fixture's `listOrders` declares only `200`, which is
+     * what that scenario needs — a second, differently-typed client and
+     * caught exception rather than reusing `$client`/`$caught`.
+     */
+    private ?ParametersClient $altClient = null;
+
+    private ?RecordingClient $altHttp = null;
+    private ?ParametersApiException $altCaught = null;
 
     public function __construct(TestCase $test)
     {
@@ -224,7 +250,9 @@ final class OperationGeneratorSteps
     private ?StoreClient $subClient = null;
     private ?RecordingStoreClient $seamInner = null;
     private ?CachingStoreClient $seamDecorator = null;
-    private ?Order $seamOrder = null;
+
+    /** @var Envelope<Order|null>|null */
+    private ?Envelope $seamOrder = null;
 
     /**
      * A profile over one of the tag fixtures, writing to a scratch tree.
@@ -598,10 +626,16 @@ final class OperationGeneratorSteps
     public function whenGetpetbyid999IsCalledOnClient(): void
     {
         TestCase::assertNotNull($this->client);
+        $this->caught = null;
+        $this->result = null;
 
+        // A status the document declares no longer throws
+        // (`typed-error-responses`) — only a status matching no exact,
+        // range or `default` entry, or a declared body that fails to
+        // hydrate, reaches `ApiException` now. Both outcomes are stored so
+        // the scenario that called this decides which one it expects.
         try {
-            $this->client->pet()->getPetById(999);
-            TestCase::fail('Expected ApiException to be thrown.');
+            $this->result = $this->client->pet()->getPetById(999);
         } catch (ApiException $e) {
             $this->caught = $e;
         }
@@ -740,14 +774,15 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenClientHasAMethodGetOrderByIdIntOrderIdOrderThatInterpolatesTokenIntoTheRequestPath(
+    public function thenClientHasAMethodGetOrderByIdIntOrderIdEnvelopeAnnotatedReturnEnvelopeOrderThatInterpolatesTokenIntoTheRequestPath(
         string $token,
     ): void {
         TestCase::assertSame('{orderId}', $token);
         TestCase::assertStringContainsString(
-            'public function getOrderById(int $orderId): Order',
+            'public function getOrderById(int $orderId): Envelope',
             $this->source,
         );
+        TestCase::assertStringContainsString('@return Envelope<Order|null>', $this->source);
         // The token is named and filled where the path is named. Which
         // string operation fills it is the transport's business.
         TestCase::assertStringContainsString(
@@ -763,12 +798,13 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasAMethodAddPetPetBodyPet(): void
+    public function thenEmittedClientHasAMethodAddPetPetBodyEnvelopeAnnotatedReturnEnvelopePet(): void
     {
         TestCase::assertStringContainsString(
-            'public function addPet(Pet $body): Pet',
+            'public function addPet(Pet $body): Envelope',
             $this->source,
         );
+        TestCase::assertStringContainsString('@return Envelope<Pet|null>', $this->source);
     }
 
 
@@ -822,7 +858,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenReturnValueIsModelOrderWithId42AndStatusPlaced(): void
+    public function thenReturnValueIsEnvelopeWhoseStatusIs200AndWhoseBodyIsModelOrderWithId42AndStatusPlaced(): void
     {
         TestCase::assertNotNull($this->http);
         TestCase::assertNotNull($this->http->lastRequest);
@@ -832,34 +868,38 @@ final class OperationGeneratorSteps
             (string) $this->http->lastRequest->getUri(),
         );
 
-        TestCase::assertInstanceOf(Order::class, $this->orderResult);
-        TestCase::assertSame(42, $this->orderResult->id);
+        TestCase::assertNotNull($this->orderResult);
+        TestCase::assertSame(200, $this->orderResult->status);
+        $order = $this->orderResult->body;
+        TestCase::assertInstanceOf(Order::class, $order);
+        TestCase::assertSame(42, $order->id);
         // `Order.status` declares an inline enum, so it hydrates into the
         // backed enum paogen synthesised for it rather than into the raw
         // string (inline-body-and-response-schemas).
-        TestCase::assertSame(OrderStatus::Placed, $this->orderResult->status);
-        TestCase::assertSame('placed', $this->orderResult->status->value);
+        TestCase::assertSame(OrderStatus::Placed, $order->status);
+        TestCase::assertSame('placed', $order->status->value);
     }
 
 
-    public function thenEmittedClientHasAMethodWhoseReturnTypeIsString(): void
+    public function thenEmittedClientHasAMethodWhoseReturnTypeIsEnvelopeAnnotatedReturnEnvelopeString(): void
     {
         TestCase::assertStringContainsString(
-            'public function loginUser(?string $username = null, ?string $password = null): string',
+            'public function loginUser(?string $username = null, ?string $password = null): Envelope',
             $this->source,
         );
+        TestCase::assertStringContainsString('@return Envelope<string|null>', $this->source);
     }
 
 
-    public function thenEmittedClientHasAMethodWhoseReturnTypeIsArrayAnnotatedReturnArrayStringInt(): void
+    public function thenEmittedClientHasAMethodWhoseReturnTypeIsEnvelopeAnnotatedReturnEnvelopeArrayStringInt(): void
     {
         $body = $this->methodSlice('getInventory');
-        TestCase::assertStringContainsString('public function getInventory(): array', $body);
-        TestCase::assertStringContainsString('@return array<string, int>', $body);
+        TestCase::assertStringContainsString('public function getInventory(): Envelope', $body);
+        TestCase::assertStringContainsString('@return Envelope<array<string, int>|null>', $body);
     }
 
 
-    public function thenFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusArray(
+    public function thenFileGeneratedEnumFindPetsByStatusStatusPhpIsWrittenAndTheEmittedClientHasAMethodFindPetsByStatusFindPetsByStatusStatusStatusEnvelope(
     ): void {
         TestCase::assertFileExists($this->outputDir . '/Generated/Enum/FindPetsByStatusStatus.php');
 
@@ -872,7 +912,7 @@ final class OperationGeneratorSteps
         TestCase::assertStringContainsString("case Sold = 'sold';", $enumSource);
 
         TestCase::assertStringContainsString(
-            'public function findPetsByStatus(FindPetsByStatusStatus $status): array',
+            'public function findPetsByStatus(FindPetsByStatusStatus $status): Envelope',
             $this->source,
         );
     }
@@ -898,10 +938,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasAMethodFindPetsByTagsArrayTagsArrayAnnotatedParamListStringTags(): void
+    public function thenEmittedClientHasAMethodFindPetsByTagsArrayTagsEnvelopeAnnotatedParamListStringTags(): void
     {
         $body = $this->methodSlice('findPetsByTags');
-        TestCase::assertStringContainsString('public function findPetsByTags(array $tags): array', $body);
+        TestCase::assertStringContainsString('public function findPetsByTags(array $tags): Envelope', $body);
         TestCase::assertStringContainsString('@param list<string> $tags', $body);
     }
 
@@ -926,10 +966,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullVoid(): void
+    public function thenEmittedClientHasAMethodDeletePetIntPetIdStringApiKeyNullEnvelope(): void
     {
         TestCase::assertStringContainsString(
-            'public function deletePet(int $petId, ?string $apiKey = null): void',
+            'public function deletePet(int $petId, ?string $apiKey = null): Envelope',
             $this->source,
         );
     }
@@ -938,7 +978,7 @@ final class OperationGeneratorSteps
     public function thenClientsEmittedMethodTakesAStringContentTypeNullArgument(): void
     {
         TestCase::assertStringContainsString(
-            'public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void',
+            'public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): Envelope',
             $this->source,
         );
     }
@@ -1067,10 +1107,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasAMethodListOrdersIntLimitNullArray(): void
+    public function thenEmittedClientHasAMethodListOrdersIntLimitNullEnvelope(): void
     {
         TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): Envelope',
             $this->source,
         );
     }
@@ -1085,16 +1125,16 @@ final class OperationGeneratorSteps
     public function thenClientsEmittedMethodSignatureIncludesStringApiKeyNull(): void
     {
         TestCase::assertStringContainsString(
-            'public function listOrders(?int $limit = null, ?string $apiKey = null): array',
+            'public function listOrders(?int $limit = null, ?string $apiKey = null): Envelope',
             $this->source,
         );
     }
 
 
-    public function thenEmittedClientHasAMethodPlaceOrderOrderBodyOrder(): void
+    public function thenEmittedClientHasAMethodPlaceOrderOrderBodyEnvelope(): void
     {
         TestCase::assertStringContainsString(
-            'public function placeOrder(Order $body): Order',
+            'public function placeOrder(Order $body): Envelope',
             $this->source,
         );
     }
@@ -1113,23 +1153,23 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasListStoreItemsIntStoreIdArrayAndClearStoreIntStoreIdVoid(): void
+    public function thenEmittedClientHasListStoreItemsIntStoreIdEnvelopeAndClearStoreIntStoreIdEnvelope(): void
     {
         TestCase::assertStringContainsString(
-            'public function listStoreItems(int $storeId): array',
+            'public function listStoreItems(int $storeId): Envelope',
             $this->source,
         );
         TestCase::assertStringContainsString(
-            'public function clearStore(int $storeId): void',
+            'public function clearStore(int $storeId): Envelope',
             $this->source,
         );
     }
 
 
-    public function thenEmittedClientHasAMethodGetPetByIdIntPetIdPet(): void
+    public function thenEmittedClientHasAMethodGetPetByIdIntPetIdEnvelope(): void
     {
         TestCase::assertStringContainsString(
-            'public function getPetById(int $petId): Pet',
+            'public function getPetById(int $petId): Envelope',
             $this->source,
         );
     }
@@ -1167,10 +1207,10 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullVoidWithOneMethodParameterPerDeclaredProperty(
+    public function thenEmittedClientHasAMethodIssueTokenStringGrantTypeStringClientIdStringScopeNullEnvelopeWithOneMethodParameterPerDeclaredProperty(
     ): void {
         TestCase::assertStringContainsString(
-            'public function issueToken(string $grantType, string $clientId, ?string $scope = null): void',
+            'public function issueToken(string $grantType, string $clientId, ?string $scope = null): Envelope',
             $this->source,
         );
     }
@@ -1262,34 +1302,32 @@ final class OperationGeneratorSteps
 
     public function thenCallOnClientThrowsGeneratedApiException(): void
     {
-        TestCase::assertInstanceOf(ApiException::class, $this->caught);
+        TestCase::assertTrue(
+            $this->caught instanceof ApiException || $this->altCaught instanceof ParametersApiException,
+            'expected the profile\'s ApiException to have been thrown',
+        );
     }
 
 
-    public function thenClientsExceptionsGetStatusCodeReturns404(): void
+    public function thenClientsExceptionsGetStatusCodeReturns500(): void
     {
-        TestCase::assertNotNull($this->caught);
-        TestCase::assertSame(404, $this->caught->getStatusCode());
+        TestCase::assertNotNull($this->altCaught);
+        TestCase::assertSame(500, $this->altCaught->getStatusCode());
     }
 
 
-    public function thenClientsExceptionsGetDecodedBodyReturnsTheDecodedErrorPayload(): void
+    public function thenClientsExceptionsGetReasonNamesStatus500AsMatchingNoExactRangeOrDefaultResponse(): void
     {
-        TestCase::assertNotNull($this->caught);
-        // Raw decoded array — never a Model instance, even if the schema
-        // declared a 4xx $ref-to-Model body (T-012 acceptance). The
-        // exact-shape `assertSame` itself proves the value is `array`,
-        // not an instance of `Pet` or any other Model class.
-        $decoded = $this->caught->getDecodedBody();
-        TestCase::assertSame(['message' => 'not found'], $decoded);
-
-        // Round-trips: cached after first call, same value on every call.
-        TestCase::assertSame($decoded, $this->caught->getDecodedBody());
+        TestCase::assertNotNull($this->altCaught);
+        TestCase::assertStringContainsString(
+            'no exact, range or default response declared for status 500',
+            $this->altCaught->getReason(),
+        );
 
         // Request and response are the originals carried into the exception.
-        TestCase::assertNotNull($this->http);
-        TestCase::assertSame($this->http->lastRequest, $this->caught->getRequest());
-        TestCase::assertSame(404, $this->caught->getResponse()->getStatusCode());
+        TestCase::assertNotNull($this->altHttp);
+        TestCase::assertSame($this->altHttp->lastRequest, $this->altCaught->getRequest());
+        TestCase::assertSame(500, $this->altCaught->getResponse()->getStatusCode());
     }
 
 
@@ -1358,7 +1396,7 @@ final class OperationGeneratorSteps
     ): void {
         $interface = $this->emittedSource('StoreClientInterface.php');
 
-        TestCase::assertStringContainsString('public function getOrderById(int $orderId): Order;', $interface);
+        TestCase::assertStringContainsString('public function getOrderById(int $orderId): Envelope;', $interface);
 
         // Exactly its own: a `pet` endpoint has no business on the store
         // contract, which is what makes the interface a narrower dependency
@@ -1683,7 +1721,8 @@ final class OperationGeneratorSteps
     public function thenCallReachesTheGeneratedImplementationAndTheirClassAddsBehaviourWithNoEditToGeneratedFileNoHookNoProtectedRegionNoSubclass(
     ): void {
         TestCase::assertNotNull($this->seamOrder);
-        TestCase::assertSame(42, $this->seamOrder->id);
+        TestCase::assertInstanceOf(Order::class, $this->seamOrder->body);
+        TestCase::assertSame(42, $this->seamOrder->body->id);
 
         // Reached once, not twice: the second call was served from the
         // decorator's cache. That is behaviour added without a generated file
@@ -1741,10 +1780,25 @@ final class OperationGeneratorSteps
     ): void {
         // PHPUnit's argument pipeline strips outer quotes; re-unescape the
         // spec's raw JSON so it becomes valid for the mock response.
-        // Same step services both the happy path (200) and the
-        // non-2xx ApiException scenario (404).
+        // Same step services both the happy path (200, petstore) and the
+        // undeclared-status ApiException scenario (500) — petstore declares
+        // its own `default` on every operation, so no status against it is
+        // ever undeclared; the `parameters` fixture's `listOrders` does not,
+        // which is what the 500 case needs (typed-error-responses).
         $normalized = str_replace('\\"', '"', $body);
-        TestCase::assertContains($code, [200, 404]);
+        TestCase::assertContains($code, [200, 500]);
+
+        if ($code === 500) {
+            $this->profile = $this->loadProfile('parameters');
+            $this->runGenerator($this->profile);
+
+            $this->altHttp = new RecordingClient(
+                new Response($code, ['Content-Type' => 'application/json'], $normalized),
+            );
+            $this->altClient = $this->parametersClient($this->altHttp, 'unused-api-key', 'unused-bearer-token');
+
+            return;
+        }
 
         $this->profile = $this->loadProfile('petstore');
         $this->runGenerator($this->profile);
@@ -1757,26 +1811,29 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeStringSoTheTransportReadsTheBodyAsAScalarInsteadOfHydratingItIntoAModel(
+    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeStringForStatus200SoTheTransportReadsTheBodyAsAScalarInsteadOfHydratingItIntoAModel(
     ): void {
         $body = $this->methodSlice('loginUser');
         // The scalar shape is named, so the body is read as a string rather
         // than decoded and hydrated.
-        TestCase::assertStringContainsString('ResponseType::string()', $body);
+        TestCase::assertStringContainsString("['200', ResponseType::string()]", $body);
         TestCase::assertStringNotContainsString('hydrate', $body);
 
         $http = new RecordingClient(new Response(200, ['Content-Type' => 'text/plain'], 'session-token'));
 
-        TestCase::assertSame('session-token', $this->petstoreClient($http)->user()->loginUser('ada', 'pw'));
+        TestCase::assertSame(
+            'session-token',
+            $this->petstoreClient($http)->user()->loginUser('ada', 'pw')->body,
+        );
     }
 
 
-    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeMapOfResponseTypeIntSoTheTransportDecodesThePayloadDirectlyInsteadOfHydratingItIntoAModel(
+    public function thenClientsMethodBodyNamesTheResponseShapeResponseTypeMapOfResponseTypeIntForStatus200SoTheTransportDecodesThePayloadDirectlyInsteadOfHydratingItIntoAModel(
     ): void {
         $body = $this->methodSlice('getInventory');
         // A map of the declared value type: decoded and handed back, never
         // hydrated into a Model the document did not declare.
-        TestCase::assertStringContainsString('ResponseType::mapOf(ResponseType::int())', $body);
+        TestCase::assertStringContainsString("['200', ResponseType::mapOf(ResponseType::int())]", $body);
         TestCase::assertStringNotContainsString('hydrate', $body);
 
         $http = new RecordingClient(
@@ -1785,7 +1842,7 @@ final class OperationGeneratorSteps
 
         TestCase::assertSame(
             ['available' => 7, 'sold' => 2],
-            $this->petstoreClient($http)->store()->getInventory(),
+            $this->petstoreClient($http)->store()->getInventory()->body,
         );
     }
 
@@ -1942,4 +1999,94 @@ final class OperationGeneratorSteps
         TestCase::assertStringContainsString('refuses an XML response at generation time', $message);
         TestCase::assertDirectoryDoesNotExist($this->abortOutputDir . '/Generated');
     }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhoseResponsesIncludeStatusCodeWithNoBody(
+        string $op,
+        string $id,
+        int $code,
+    ): void {
+        TestCase::assertSame('GET /pet/{petId}', $op);
+        TestCase::assertSame('operationId: getPetById', $id);
+        TestCase::assertSame(404, $code);
+    }
+
+
+    public function givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithAnEmptyBody(
+        int $code,
+    ): void {
+        TestCase::assertSame(404, $code);
+
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+
+        $this->http = new RecordingClient(
+            new Response($code, ['Content-Type' => 'application/json'], ''),
+        );
+        $this->client = $this->petstoreClient($this->http);
+    }
+
+
+    public function thenCallOnClientDoesNotThrow(): void
+    {
+        TestCase::assertNull($this->caught);
+    }
+
+
+    public function thenReturnValueIsEnvelopeWhoseStatusIs404AndWhoseBodyIsNull(): void
+    {
+        TestCase::assertNotNull($this->result);
+        TestCase::assertSame(404, $this->result->status);
+        TestCase::assertNull($this->result->body);
+    }
+
+
+    public function givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithABodyThatIsNotValidJSON(
+        int $code,
+    ): void {
+        TestCase::assertSame(200, $code);
+
+        $this->profile = $this->loadProfile('petstore');
+        $this->runGenerator($this->profile);
+
+        $this->http = new RecordingClient(
+            new Response($code, ['Content-Type' => 'application/json'], 'not json'),
+        );
+        $this->client = $this->petstoreClient($this->http);
+    }
+
+
+    public function thenClientsExceptionsGetReasonNamesStatus200AndSaysTheDeclaredBodyFailedToHydrate(): void
+    {
+        TestCase::assertNotNull($this->caught);
+        TestCase::assertStringContainsString(
+            'declared body for status 200 failed to hydrate',
+            $this->caught->getReason(),
+        );
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWithIdWhoseResponsesDeclareOnlyStatusCodeNo400No404NoDefault(
+        string $op,
+        string $id,
+        int $code,
+    ): void {
+        TestCase::assertSame('GET /order', $op);
+        TestCase::assertSame('operationId: listOrders', $id);
+        TestCase::assertSame(200, $code);
+    }
+
+
+    public function whenListordersIsCalledOnClient(): void
+    {
+        TestCase::assertNotNull($this->altClient);
+        $this->altCaught = null;
+
+        try {
+            $this->altClient->listOrders();
+        } catch (ParametersApiException $e) {
+            $this->altCaught = $e;
+        }
+    }
+
 }

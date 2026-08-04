@@ -20,6 +20,7 @@ use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForRepoSort;
 use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesDirection;
 use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeScanningAlert;
 use Acme\GitHub\Generated\Model\CodeScanningAlertInstanceList;
 use Acme\GitHub\Generated\Model\CodeScanningAlertItems;
@@ -32,18 +33,41 @@ use Acme\GitHub\Generated\Model\CodeScanningAutofix;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommits;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommitsResponse;
 use Acme\GitHub\Generated\Model\CodeScanningCodeqlDatabase;
+use Acme\GitHub\Generated\Model\CodeScanningCommitAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningCreateAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysis503Content;
 use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysisRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetup;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdate;
+use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdateResponse;
+use Acme\GitHub\Generated\Model\CodeScanningDeleteAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningDeleteCodeqlDatabase503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAlert503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetCodeqlDatabase503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetDefaultSetup503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetSarif503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetVariantAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetVariantAnalysisRepoTask503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertInstances503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertsForOrg503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertsForRepo503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListCodeqlDatabases503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListRecentAnalyses503Content;
 use Acme\GitHub\Generated\Model\CodeScanningOrganizationAlertItems;
 use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsReceipt;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsStatus;
+use Acme\GitHub\Generated\Model\CodeScanningUpdateAlert503Content;
 use Acme\GitHub\Generated\Model\CodeScanningUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\CodeScanningUpdateDefaultSetup503Content;
+use Acme\GitHub\Generated\Model\CodeScanningUploadSarif503Content;
 use Acme\GitHub\Generated\Model\CodeScanningUploadSarifRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysis;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysisRepoTask;
 use Acme\GitHub\Generated\Model\EmptyObject;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `code-scanning` endpoints.
@@ -55,7 +79,7 @@ use Acme\GitHub\Generated\Model\EmptyObject;
 interface CodeScanningClientInterface
 {
     /**
-     * @return list<CodeScanningOrganizationAlertItems>
+     * @return Envelope<list<CodeScanningOrganizationAlertItems>|BasicError|CodeScanningListAlertsForOrg503Content>
      */
     public function codeScanningListAlertsForOrg(
         string $org,
@@ -70,10 +94,10 @@ interface CodeScanningClientInterface
         ?CodeScanningListAlertsForOrgSort $sort = null,
         ?CodeScanningAlertSeverity $severity = null,
         ?string $assignees = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<CodeScanningAlertItems>
+     * @return Envelope<list<CodeScanningAlertItems>|null|BasicError|CodeScanningListAlertsForRepo503Content>
      */
     public function codeScanningListAlertsForRepo(
         string $owner,
@@ -91,34 +115,45 @@ interface CodeScanningClientInterface
         ?CodeScanningAlertStateQuery $state = null,
         ?CodeScanningAlertSeverity $severity = null,
         ?string $assignees = null,
-    ): array;
+    ): Envelope;
 
-    public function codeScanningGetAlert(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAlert;
+    /**
+     * @return Envelope<CodeScanningAlert|null|BasicError|CodeScanningGetAlert503Content>
+     */
+    public function codeScanningGetAlert(string $owner, string $repo, AlertNumber $alertNumber): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningAlert|BasicError|CodeScanningUpdateAlert503Content>
+     */
     public function codeScanningUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         CodeScanningUpdateAlertRequestContent $body,
-    ): CodeScanningAlert;
+    ): Envelope;
 
-    public function codeScanningGetAutofix(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAutofix;
+    /**
+     * @return Envelope<CodeScanningAutofix|BasicError|CodeScanningGetAutofix503Content>
+     */
+    public function codeScanningGetAutofix(string $owner, string $repo, AlertNumber $alertNumber): Envelope;
 
-    public function codeScanningCreateAutofix(
-        string $owner,
-        string $repo,
-        AlertNumber $alertNumber,
-    ): CodeScanningAutofix;
+    /**
+     * @return Envelope<CodeScanningAutofix|BasicError|null|CodeScanningCreateAutofix503Content>
+     */
+    public function codeScanningCreateAutofix(string $owner, string $repo, AlertNumber $alertNumber): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningAutofixCommitsResponse|BasicError|null|CodeScanningCommitAutofix503Content>
+     */
     public function codeScanningCommitAutofix(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         CodeScanningAutofixCommits $body,
-    ): CodeScanningAutofixCommitsResponse;
+    ): Envelope;
 
     /**
-     * @return list<CodeScanningAlertInstanceList>
+     * @return Envelope<list<CodeScanningAlertInstanceList>|BasicError|CodeScanningListAlertInstances503Content>
      */
     public function codeScanningListAlertInstances(
         string $owner,
@@ -128,10 +163,10 @@ interface CodeScanningClientInterface
         ?int $perPage = null,
         ?CodeScanningRef $ref = null,
         ?int $pr = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<CodeScanningAnalysis>
+     * @return Envelope<list<CodeScanningAnalysis>|BasicError|CodeScanningListRecentAnalyses503Content>
      */
     public function codeScanningListRecentAnalyses(
         string $owner,
@@ -145,63 +180,92 @@ interface CodeScanningClientInterface
         ?CodeScanningAnalysisSarifId $sarifId = null,
         ?CodeScanningListRecentAnalysesDirection $direction = null,
         ?CodeScanningListRecentAnalysesSort $sort = null,
-    ): array;
+    ): Envelope;
 
-    public function codeScanningGetAnalysis(string $owner, string $repo, int $analysisId): CodeScanningAnalysis;
+    /**
+     * @return Envelope<CodeScanningAnalysis|BasicError|CodeScanningGetAnalysis503Content>
+     */
+    public function codeScanningGetAnalysis(string $owner, string $repo, int $analysisId): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningAnalysisDeletion|BasicError|CodeScanningDeleteAnalysis503Content>
+     */
     public function codeScanningDeleteAnalysis(
         string $owner,
         string $repo,
         int $analysisId,
         ?string $confirmDelete = null,
-    ): CodeScanningAnalysisDeletion;
+    ): Envelope;
 
     /**
-     * @return list<CodeScanningCodeqlDatabase>
+     * @return Envelope<list<CodeScanningCodeqlDatabase>|BasicError|CodeScanningListCodeqlDatabases503Content>
      */
-    public function codeScanningListCodeqlDatabases(string $owner, string $repo): array;
+    public function codeScanningListCodeqlDatabases(string $owner, string $repo): Envelope;
 
-    public function codeScanningGetCodeqlDatabase(
-        string $owner,
-        string $repo,
-        string $language,
-    ): CodeScanningCodeqlDatabase;
+    /**
+     * @return Envelope<CodeScanningCodeqlDatabase|null|BasicError|CodeScanningGetCodeqlDatabase503Content>
+     */
+    public function codeScanningGetCodeqlDatabase(string $owner, string $repo, string $language): Envelope;
 
-    public function codeScanningDeleteCodeqlDatabase(string $owner, string $repo, string $language): void;
+    /**
+     * @return Envelope<null|BasicError|CodeScanningDeleteCodeqlDatabase503Content>
+     */
+    public function codeScanningDeleteCodeqlDatabase(string $owner, string $repo, string $language): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningCreateVariantAnalysis503Content>
+     */
     public function codeScanningCreateVariantAnalysis(
         string $owner,
         string $repo,
         CodeScanningCreateVariantAnalysisRequestContent $body,
-    ): CodeScanningVariantAnalysis;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningGetVariantAnalysis503Content>
+     */
     public function codeScanningGetVariantAnalysis(
         string $owner,
         string $repo,
         int $codeqlVariantAnalysisId,
-    ): CodeScanningVariantAnalysis;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysisRepoTask|BasicError|CodeScanningGetVariantAnalysisRepoTask503Content>
+     */
     public function codeScanningGetVariantAnalysisRepoTask(
         string $owner,
         string $repo,
         int $codeqlVariantAnalysisId,
         string $repoOwner,
         string $repoName,
-    ): CodeScanningVariantAnalysisRepoTask;
+    ): Envelope;
 
-    public function codeScanningGetDefaultSetup(string $owner, string $repo): CodeScanningDefaultSetup;
+    /**
+     * @return Envelope<CodeScanningDefaultSetup|BasicError|CodeScanningGetDefaultSetup503Content>
+     */
+    public function codeScanningGetDefaultSetup(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|CodeScanningDefaultSetupUpdateResponse|BasicError|CodeScanningUpdateDefaultSetup503Content>
+     */
     public function codeScanningUpdateDefaultSetup(
         string $owner,
         string $repo,
         CodeScanningDefaultSetupUpdate $body,
-    ): EmptyObject;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CodeScanningSarifsReceipt|null|BasicError|CodeScanningUploadSarif503Content>
+     */
     public function codeScanningUploadSarif(
         string $owner,
         string $repo,
         CodeScanningUploadSarifRequestContent $body,
-    ): CodeScanningSarifsReceipt;
+    ): Envelope;
 
-    public function codeScanningGetSarif(string $owner, string $repo, string $sarifId): CodeScanningSarifsStatus;
+    /**
+     * @return Envelope<CodeScanningSarifsStatus|BasicError|null|CodeScanningGetSarif503Content>
+     */
+    public function codeScanningGetSarif(string $owner, string $repo, string $sarifId): Envelope;
 }

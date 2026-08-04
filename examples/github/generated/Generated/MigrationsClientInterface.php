@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Import;
 use Acme\GitHub\Generated\Model\Migration;
 use Acme\GitHub\Generated\Model\MigrationsMapCommitAuthorRequestContent;
@@ -22,6 +23,8 @@ use Acme\GitHub\Generated\Model\MigrationsUpdateImportRequestContent;
 use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\PorterAuthor;
 use Acme\GitHub\Generated\Model\PorterLargeFile;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `migrations` endpoints.
@@ -34,103 +37,147 @@ interface MigrationsClientInterface
 {
     /**
      * @param list<string> $exclude
-     * @return list<Migration>
+     * @return Envelope<list<Migration>>
      */
     public function migrationsListForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?array $exclude = null,
-    ): array;
+    ): Envelope;
 
-    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequestContent $body): Migration;
+    /**
+     * @return Envelope<Migration|BasicError|ValidationError>
+     */
+    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequestContent $body): Envelope;
 
     /**
      * @param list<string> $exclude
+     * @return Envelope<Migration|BasicError>
      */
-    public function migrationsGetStatusForOrg(string $org, int $migrationId, ?array $exclude = null): Migration;
-
-    public function migrationsDownloadArchiveForOrg(string $org, int $migrationId): void;
-
-    public function migrationsDeleteArchiveForOrg(string $org, int $migrationId): void;
-
-    public function migrationsUnlockRepoForOrg(string $org, int $migrationId, string $repoName): void;
+    public function migrationsGetStatusForOrg(string $org, int $migrationId, ?array $exclude = null): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDownloadArchiveForOrg(string $org, int $migrationId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDeleteArchiveForOrg(string $org, int $migrationId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsUnlockRepoForOrg(string $org, int $migrationId, string $repoName): Envelope;
+
+    /**
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function migrationsListReposForOrg(
         string $org,
         int $migrationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function migrationsGetImportStatus(string $owner, string $repo): Import;
+    /**
+     * @return Envelope<Import|BasicError>
+     */
+    public function migrationsGetImportStatus(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<Import|ValidationError|BasicError>
+     */
     public function migrationsStartImport(
         string $owner,
         string $repo,
         MigrationsStartImportRequestContent $body,
-    ): Import;
+    ): Envelope;
 
-    public function migrationsCancelImport(string $owner, string $repo): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsCancelImport(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<Import|BasicError>
+     */
     public function migrationsUpdateImport(
         string $owner,
         string $repo,
         MigrationsUpdateImportRequestContent $body,
-    ): Import;
+    ): Envelope;
 
     /**
-     * @return list<PorterAuthor>
+     * @return Envelope<list<PorterAuthor>|BasicError>
      */
-    public function migrationsGetCommitAuthors(string $owner, string $repo, ?int $since = null): array;
+    public function migrationsGetCommitAuthors(string $owner, string $repo, ?int $since = null): Envelope;
 
+    /**
+     * @return Envelope<PorterAuthor|ValidationError|BasicError>
+     */
     public function migrationsMapCommitAuthor(
         string $owner,
         string $repo,
         int $authorId,
         MigrationsMapCommitAuthorRequestContent $body,
-    ): PorterAuthor;
+    ): Envelope;
 
     /**
-     * @return list<PorterLargeFile>
+     * @return Envelope<list<PorterLargeFile>|BasicError>
      */
-    public function migrationsGetLargeFiles(string $owner, string $repo): array;
+    public function migrationsGetLargeFiles(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<Import|ValidationError|BasicError>
+     */
     public function migrationsSetLfsPreference(
         string $owner,
         string $repo,
         MigrationsSetLfsPreferenceRequestContent $body,
-    ): Import;
+    ): Envelope;
 
     /**
-     * @return list<Migration>
+     * @return Envelope<list<Migration>|null|BasicError>
      */
-    public function migrationsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function migrationsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<Migration|ValidationError|null|BasicError>
+     */
     public function migrationsStartForAuthenticatedUser(
         MigrationsStartForAuthenticatedUserRequestContent $body,
-    ): Migration;
+    ): Envelope;
 
     /**
      * @param list<string> $exclude
+     * @return Envelope<Migration|BasicError|null>
      */
-    public function migrationsGetStatusForAuthenticatedUser(int $migrationId, ?array $exclude = null): Migration;
-
-    public function migrationsGetArchiveForAuthenticatedUser(int $migrationId): void;
-
-    public function migrationsDeleteArchiveForAuthenticatedUser(int $migrationId): void;
-
-    public function migrationsUnlockRepoForAuthenticatedUser(int $migrationId, string $repoName): void;
+    public function migrationsGetStatusForAuthenticatedUser(int $migrationId, ?array $exclude = null): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsGetArchiveForAuthenticatedUser(int $migrationId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsDeleteArchiveForAuthenticatedUser(int $migrationId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function migrationsUnlockRepoForAuthenticatedUser(int $migrationId, string $repoName): Envelope;
+
+    /**
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function migrationsListReposForAuthenticatedUser(
         int $migrationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 }

@@ -6,6 +6,7 @@ namespace Acme\Petstore;
 
 use Acme\Petstore\Generated\Model\Order;
 use Acme\Petstore\Generated\StoreClientInterface;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The wrapper architecture, demonstrated.
@@ -38,7 +39,7 @@ use Acme\Petstore\Generated\StoreClientInterface;
  */
 final class CachingStoreClient implements StoreClientInterface
 {
-    /** @var array<int,Order> */
+    /** @var array<int, Envelope<Order|null>> */
     private array $orders = [];
 
     public function __construct(
@@ -48,8 +49,10 @@ final class CachingStoreClient implements StoreClientInterface
     /**
      * The convenience the generator will not write: callers holding an `Order`
      * should not have to unpack an id to refresh it.
+     *
+     * @return Envelope<Order|null>
      */
-    public function refresh(Order $order): Order
+    public function refresh(Order $order): Envelope
     {
         $id = $order->id ?? throw new \InvalidArgumentException('cannot refresh an Order with no id');
         unset($this->orders[$id]);
@@ -57,32 +60,43 @@ final class CachingStoreClient implements StoreClientInterface
         return $this->getOrderById($id);
     }
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         return $this->orders[$orderId] ??= $this->inner->getOrderById($orderId);
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
-        $this->inner->deleteOrder($orderId);
+        $result = $this->inner->deleteOrder($orderId);
         unset($this->orders[$orderId]);
+
+        return $result;
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
         $placed = $this->inner->placeOrder($body);
 
-        if ($placed->id !== null) {
-            $this->orders[$placed->id] = $placed;
+        if ($placed->body instanceof Order && $placed->body->id !== null) {
+            $this->orders[$placed->body->id] = $placed;
         }
 
         return $placed;
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
         return $this->inner->getInventory();
     }

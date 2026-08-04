@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
@@ -35,7 +36,8 @@ final class RuntimeSubstitutionTest extends TestCase
     public function testAConsumerReplacesTheWholeTransportAndTheGeneratedClientNeverNotices(): void
     {
         $pet = new Pet(name: 'Rex', photoUrls: []);
-        $transport = new RecordingTransport([$pet]);
+        $envelope = new Envelope(200, $pet, new Response(200));
+        $transport = new RecordingTransport([$envelope]);
 
         // Petstore requires `api_key` and `petstore_auth` on this operation,
         // so the emitted constructor takes both credentials after the
@@ -45,7 +47,8 @@ final class RuntimeSubstitutionTest extends TestCase
 
         // The substitute was called, and what it returned is what the caller
         // got — no generated file was edited to make that true.
-        self::assertSame($pet, $returned);
+        self::assertSame($envelope, $returned);
+        self::assertSame($pet, $returned->body);
         self::assertCount(1, $transport->sent);
 
         $endpoint = $transport->lastEndpoint();

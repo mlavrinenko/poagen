@@ -12,11 +12,10 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * name-inline-schemas-by-operation-and-status: every response status earns a
- * class, not only the one 2xx that drives the operation's return type.
- *
- * `getWidget` declares `200`, `403` and `default`, all inline objects. Before
- * this task only `200` was ever named — the other two were dropped without a
- * word, the same shrinkage `default-deny-on-degradation` names elsewhere.
+ * class. typed-error-responses wires every one of them into the operation's
+ * envelope — `getWidget` declares `200`, `403` and `default`, all inline
+ * objects, and all three now appear in the method's body-type union rather
+ * than only the `200` that used to drive a bare return type.
  */
 final class InlineMultiStatusResponseTest extends TestCase
 {
@@ -31,32 +30,24 @@ final class InlineMultiStatusResponseTest extends TestCase
         self::removeSandboxDirs();
     }
 
-    public function testThePickedStatusStillDrivesTheReturnType(): void
+    public function testEveryStatusDrivesTheEnvelopesBodyUnion(): void
     {
         $client = self::plannedSource($this->plan()->writes, 'ApiClient');
 
-        self::assertStringContainsString('public function getWidget(string $id): GetWidget200Content', $client);
+        self::assertStringContainsString(
+            '@return Envelope<GetWidget200Content|GetWidget403Content|GetWidgetdefaultContent>',
+            $client,
+        );
+        self::assertStringContainsString('public function getWidget(string $id): Envelope', $client);
     }
 
-    public function testEveryOtherStatusStillEarnsItsOwnClass(): void
+    public function testEveryStatusEarnsItsOwnClass(): void
     {
         $models = self::emittedNames($this->plan(), 'Model');
 
         self::assertContains('GetWidget200Content', $models);
         self::assertContains('GetWidget403Content', $models);
         self::assertContains('GetWidgetdefaultContent', $models);
-    }
-
-    public function testAnExtraStatusClassIsNotReferencedByTheClientYet(): void
-    {
-        // typed-error-responses is what wires a non-picked status into the
-        // method signature or into ApiException — this task only names the
-        // class. Not asserting the model is unreferenced would silently stop
-        // covering the split the moment someone wires it in early.
-        $client = self::plannedSource($this->plan()->writes, 'ApiClient');
-
-        self::assertStringNotContainsString('GetWidget403Content', $client);
-        self::assertStringNotContainsString('GetWidgetdefaultContent', $client);
     }
 
     /**

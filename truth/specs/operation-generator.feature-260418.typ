@@ -1,7 +1,7 @@
 #import "@local/speconaut:0.1.0": *
 #import "../domain/schema.context.typ": schema-context, Schema, Operation
 #import "../domain/guidance.context.typ": guidance-context, Profile
-#import "../domain/generation.context.typ": generation-context, Generator, Client, Model, GeneratedFile
+#import "../domain/generation.context.typ": generation-context, Generator, Client, Model, GeneratedFile, Envelope
 #import "../domain/cli.context.typ": cli-context, PaogenCli
 
 #feature(
@@ -10,10 +10,12 @@
     Walks #the(Schema)'s `paths` and emits one method per OpenAPI
     #a(Operation) onto a single #the(Client) class. Path parameters appear
     as typed method parameters; `application/json` request bodies carry
-    #a(Model) payload; response JSON is deserialized back into the typed
-    #a(Model). #the(Client) is emitted as a `final readonly` class whose
-    constructor takes a `TransportInterface` together with one argument per
-    credential #the(Schema) declares.
+    #a(Model) payload; the method returns #an(Envelope) carrying the HTTP
+    status and the body hydrated into whichever #the(Model) the document
+    declared for that status — every declared status, not only a 2xx.
+    #the(Client) is emitted as a `final readonly` class whose constructor
+    takes a `TransportInterface` together with one argument per credential
+    #the(Schema) declares.
   ],
 )[
 
@@ -26,7 +28,7 @@
       #when[#the(Generator) runs against #the(Profile)]
       #then[a file `Generated/ApiClient.php` is written under #the(Profile)'s `output`]
       #and_[the emitted class is `final readonly` in #the(Profile)'s namespace `\Generated`]
-      #and_[#the(Client) has a method `getOrderById(int $orderId): Order` that interpolates #p((token: "{orderId}")) into the request path]
+      #and_[#the(Client) has a method `getOrderById(int $orderId): Envelope` annotated `@return Envelope<Order>` that interpolates #p((token: "{orderId}")) into the request path]
     ]
 
     #scenario(
@@ -36,7 +38,7 @@
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /pet")) with #p((id: "operationId: addPet"))]
       #and_[#the(Operation)'s request body is `application/json` with schema #p((ref: "#/components/schemas/Pet"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `addPet(Pet $body): Pet`]
+      #then[the emitted #the(Client) has a method `addPet(Pet $body): Envelope` annotated `@return Envelope<Pet>`]
       #and_[#the(Client)'s method JSON-encodes `$body` and attaches it as the request body]
     ]
 
@@ -54,32 +56,32 @@
 
   #rule("Response deserialization")[
     #scenario(
-      "A 2xx JSON response body is deserialized into the typed Model",
+      "A JSON response body is deserialized into the typed Model on the returned Envelope",
       stage: "unstable",
     )[
       #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "200")) with JSON body #p((body: "{\"id\":42,\"status\":\"placed\"}"))]
       #when[`getOrderById(42)` is called on #the(Client)]
-      #then[the return value is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
+      #then[the return value is #an(Envelope) whose `status` is `200` and whose `body` is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
     ]
 
     #scenario(
-      "A scalar 2xx JSON response is returned as the scalar PHP type without hydration",
+      "A scalar JSON response is decoded onto the Envelope without hydration",
       stage: "unstable",
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /user/login")) with #p((id: "operationId: loginUser")) whose 200 response schema is `type: string`]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method whose return type is `string`]
-      #and_[#the(Client)'s method body names the response shape `ResponseType::string()`, so the transport reads the body as a scalar instead of hydrating it into a Model]
+      #then[the emitted #the(Client) has a method whose return type is `Envelope` annotated `@return Envelope<string>`]
+      #and_[#the(Client)'s method body names the response shape `ResponseType::string()` for status `200`, so the transport reads the body as a scalar instead of hydrating it into a Model]
     ]
 
     #scenario(
-      "A 2xx JSON response with `additionalProperties` is returned as a typed associative array",
+      "A JSON response with `additionalProperties` is decoded onto the Envelope as a typed associative array",
       stage: "unstable",
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /store/inventory")) with #p((id: "operationId: getInventory")) whose 200 response schema is `type: object` with #p((map: "additionalProperties: integer"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method whose return type is `array` annotated `@return array<string, int>`]
-      #and_[#the(Client)'s method body names the response shape `ResponseType::mapOf(ResponseType::int())`, so the transport decodes the payload directly instead of hydrating it into a Model]
+      #then[the emitted #the(Client) has a method whose return type is `Envelope` annotated `@return Envelope<array<string, int>>`]
+      #and_[#the(Client)'s method body names the response shape `ResponseType::mapOf(ResponseType::int())` for status `200`, so the transport decodes the payload directly instead of hydrating it into a Model]
     ]
   ]
 
@@ -116,7 +118,7 @@
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByStatus")) with #p((id: "operationId: findPetsByStatus")) and a required query parameter `status` whose schema is `type: string` with #p((enum: "[available, pending, sold]"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[a file `Generated/Enum/FindPetsByStatusStatus.php` is written and the emitted #the(Client) has a method `findPetsByStatus(FindPetsByStatusStatus $status): array`]
+      #then[a file `Generated/Enum/FindPetsByStatusStatus.php` is written and the emitted #the(Client) has a method `findPetsByStatus(FindPetsByStatusStatus $status): Envelope`]
       #and_[calling #the(Client)'s method with #p((arg: "status: FindPetsByStatusStatus::Available")) sends a request whose URI ends with #p((query: "?status=available"))]
     ]
 
@@ -126,7 +128,7 @@
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/findByTags")) with #p((id: "operationId: findPetsByTags")) and a required query parameter `tags` #p((schema: "type: array, items.type: string, explode: true"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `findPetsByTags(array $tags): array` annotated `@param list<string> $tags`]
+      #then[the emitted #the(Client) has a method `findPetsByTags(array $tags): Envelope` annotated `@param list<string> $tags`]
       #and_[calling #the(Client)'s method with #p((arg: "tags: ['a', 'b']")) sends a request whose URI ends with #p((query: "?tags=a&tags=b")) instead of `tags%5B0%5D=a&tags%5B1%5D=b`]
     ]
   ]
@@ -138,7 +140,7 @@
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "DELETE /pet/{petId}")) with #p((id: "operationId: deletePet")) and an optional header parameter `api_key: string`]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $apiKey = null): void`]
+      #then[the emitted #the(Client) has a method `deletePet(int $petId, ?string $apiKey = null): Envelope`]
       #and_[#the(Client)'s method calls `->header('api_key', $apiKey)` unconditionally, with no `if` in the emitted body — the header is dropped before the request is sent when `$apiKey` is `null`]
     ]
   ]
@@ -193,7 +195,7 @@
       #given[#the(Schema) declares `#/components/parameters/Limit` #p((param: "limit: integer, in: query, required: false"))]
       #and_[#a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) lists a parameter whose value is #p((ref: "#/components/parameters/Limit"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `listOrders(?int $limit = null): array`]
+      #then[the emitted #the(Client) has a method `listOrders(?int $limit = null): Envelope`]
       #and_[#the(Operation) is *not* silently skipped even though the parameter is a `$ref`]
     ]
 
@@ -215,7 +217,7 @@
       #given[#the(Schema) declares `#/components/requestBodies/CreateOrder` with `application/json` schema #p((ref: "#/components/schemas/Order"))]
       #and_[#a(Operation) #p((op: "POST /order")) with #p((id: "operationId: placeOrder")) whose `requestBody` is a #p((ref: "#/components/requestBodies/CreateOrder"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `placeOrder(Order $body): Order`]
+      #then[the emitted #the(Client) has a method `placeOrder(Order $body): Envelope`]
       #and_[#the(Operation) is *not* silently skipped even though the request body is declared via `$ref`]
     ]
 
@@ -226,7 +228,7 @@
       #given[#the(Schema) declares a PathItem `/store/{storeId}/items` with a single PathItem-level parameter #p((param: "storeId: integer, in: path, required: true"))]
       #and_[two #the(Operation) entries under it — #p((id: "operationId: listStoreItems")) and #p((id: "operationId: clearStore")) — do not restate the parameter]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has `listStoreItems(int $storeId): array` and `clearStore(int $storeId): void`]
+      #then[the emitted #the(Client) has `listStoreItems(int $storeId): Envelope` and `clearStore(int $storeId): Envelope`]
       #and_[neither #the(Operation) is silently skipped even though the parameter lives only on the PathItem]
     ]
 
@@ -237,7 +239,7 @@
       #given[#the(Schema) declares `#/components/parameters/PetId` #p((param: "petId: integer, in: path, required: true"))]
       #and_[#a(Operation) #p((op: "GET /pet/{petId}")) with #p((id: "operationId: getPetById")) inherits a PathItem-level parameter whose value is #p((ref: "#/components/parameters/PetId"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `getPetById(int $petId): Pet`]
+      #then[the emitted #the(Client) has a method `getPetById(int $petId): Envelope`]
       #and_[#the(Operation) is *not* silently skipped even though the parameter is declared at the PathItem level via `$ref`]
     ]
 
@@ -260,7 +262,7 @@
     )[
       #given[#the(Schema) declares #a(Operation) #p((op: "POST /token")) with #p((id: "operationId: issueToken")) whose sole request-body content type is `application/x-www-form-urlencoded` and whose schema is `type: object` with #p((props: "grantType: string, clientId: string, scope: string")) and #p((required: "[grantType, clientId]"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the emitted #the(Client) has a method `issueToken(string $grantType, string $clientId, ?string $scope = null): void` with one method parameter per declared property]
+      #then[the emitted #the(Client) has a method `issueToken(string $grantType, string $clientId, ?string $scope = null): Envelope` with one method parameter per declared property]
       #and_[#the(Client)'s method body assembles the request body with `http_build_query([...])` and sends `Content-Type: application/x-www-form-urlencoded`]
       #and_[calling #the(Client)'s method through a PSR-18 recording client records a request whose body contains `grantType=password` and `clientId=my-app` pairs]
     ]
@@ -293,14 +295,36 @@
 
   #rule("Error responses")[
     #scenario(
-      "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
+      "A declared non-2xx response is returned on the Envelope instead of being thrown",
       stage: "unstable",
     )[
-      #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "404")) with JSON body #p((body: "{\"message\":\"not found\"}"))]
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /pet/{petId}")) with #p((id: "operationId: getPetById")) whose responses include status #p((code: "404")) with no body]
+      #and_[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "404")) with an empty body]
+      #when[`getPetById(999)` is called on #the(Client)]
+      #then[the call on #the(Client) does not throw]
+      #and_[the return value is #an(Envelope) whose `status` is `404` and whose `body` is `null`]
+    ]
+
+    #scenario(
+      "A status the document did not declare raises the profile's ApiException naming the status",
+      stage: "unstable",
+    )[
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /order")) with #p((id: "operationId: listOrders")) whose responses declare only status #p((code: "200")) — no `400`, no `404`, no `default`]
+      #and_[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "500")) with JSON body #p((body: "{\"message\":\"boom\"}"))]
+      #when[`listOrders()` is called on #the(Client)]
+      #then[the call on #the(Client) throws `Generated\\ApiException`]
+      #and_[#the(Client)'s exception's `getStatusCode()` returns `500`]
+      #and_[#the(Client)'s exception's `getReason()` names status `500` as matching no exact, range or default response]
+    ]
+
+    #scenario(
+      "A declared body that fails to hydrate raises the profile's ApiException naming the failure",
+      stage: "unstable",
+    )[
+      #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "200")) with a body that is not valid JSON]
       #when[`getPetById(999)` is called on #the(Client)]
       #then[the call on #the(Client) throws `Generated\\ApiException`]
-      #and_[#the(Client)'s exception's `getStatusCode()` returns `404`]
-      #and_[#the(Client)'s exception's `getDecodedBody()` returns the decoded error payload]
+      #and_[#the(Client)'s exception's `getReason()` names status `200` and says the declared body failed to hydrate]
     ]
   ]
 

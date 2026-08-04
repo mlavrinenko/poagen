@@ -23,10 +23,23 @@ use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsDirecti
 use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsInterface;
 use Acme\DigitalOcean\Generated\Model\AlertPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DestinationRequest;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\Metrics;
+use Acme\DigitalOcean\Generated\Model\MonitoringCreateAlertPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringCreateDestination200Content;
 use Acme\DigitalOcean\Generated\Model\MonitoringCreateSinkRequestContent;
+use Acme\DigitalOcean\Generated\Model\MonitoringGetAlertPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringGetDestination200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringGetSink200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringListAlertPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringListDestinations200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringListSinks200Content;
+use Acme\DigitalOcean\Generated\Model\MonitoringUpdateAlertPolicy200Content;
 use Acme\DigitalOcean\Generated\Model\Urn;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class MonitoringClient implements MonitoringClientInterface
@@ -39,188 +52,236 @@ final readonly class MonitoringClient implements MonitoringClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringListAlertPolicy200Content|Error>
      */
-    public function monitoringListAlertPolicy(?int $perPage = null, ?int $page = null): void
+    public function monitoringListAlertPolicy(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringListAlertPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/alerts')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:create`.
+     * @return Envelope<MonitoringCreateAlertPolicy200Content|Error>
      */
-    public function monitoringCreateAlertPolicy(AlertPolicyRequest $body): void
+    public function monitoringCreateAlertPolicy(AlertPolicyRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringCreateAlertPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/monitoring/alerts')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringGetAlertPolicy200Content|Error>
      */
-    public function monitoringGetAlertPolicy(string $alertUuid): void
+    public function monitoringGetAlertPolicy(string $alertUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringGetAlertPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/alerts/{alert_uuid}')
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:update`.
+     * @return Envelope<MonitoringUpdateAlertPolicy200Content|Error>
      */
-    public function monitoringUpdateAlertPolicy(string $alertUuid, AlertPolicyRequest $body): void
+    public function monitoringUpdateAlertPolicy(string $alertUuid, AlertPolicyRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringUpdateAlertPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/monitoring/alerts/{alert_uuid}')
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringUpdateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:delete`.
+     * @return Envelope<null|Error>
      */
-    public function monitoringDeleteAlertPolicy(string $alertUuid): void
+    public function monitoringDeleteAlertPolicy(string $alertUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/monitoring/alerts/{alert_uuid}')
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetAppCpupercentageMetrics(
         string $appId,
         string $start,
         string $end,
         ?string $appComponent = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/apps/cpu_percentage')
                 ->query('app_id', $appId)
                 ->query('app_component', $appComponent)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetAppMemoryPercentageMetrics(
         string $appId,
         string $start,
         string $end,
         ?string $appComponent = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/apps/memory_percentage')
                 ->query('app_id', $appId)
                 ->query('app_component', $appComponent)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetAppRestartCountMetricsYml(
         string $appId,
         string $start,
         string $end,
         ?string $appComponent = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/apps/restart_count')
                 ->query('app_id', $appId)
                 ->query('app_component', $appComponent)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlCpuUsage(
         string $dbId,
         MonitoringGetDatabaseMysqlCpuUsageAggregate $aggregate,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/cpu_usage')
                 ->query('db_id', $dbId)
                 ->query('aggregate', $aggregate)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlDiskUsage(
         string $dbId,
         MonitoringGetDatabaseMysqlDiskUsageAggregate $aggregate,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/disk_usage')
                 ->query('db_id', $dbId)
                 ->query('aggregate', $aggregate)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDatabaseMysqlIndexVsSequentialReads(string $dbId, string $start, string $end): void
-    {
-        $this->transport->send(
+    public function monitoringGetDatabaseMysqlIndexVsSequentialReads(
+        string $dbId,
+        string $start,
+        string $end,
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/index_vs_sequential_reads')
                 ->query('db_id', $dbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlLoad(
         string $dbId,
@@ -228,8 +289,9 @@ final readonly class MonitoringClient implements MonitoringClientInterface
         MonitoringGetDatabaseMysqlLoadAggregate $aggregate,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/load')
                 ->query('db_id', $dbId)
                 ->query('metric', $metric)
@@ -237,52 +299,63 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlMemoryUsage(
         string $dbId,
         MonitoringGetDatabaseMysqlMemoryUsageAggregate $aggregate,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/memory_usage')
                 ->query('db_id', $dbId)
                 ->query('aggregate', $aggregate)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlOpRates(
         string $dbId,
         MonitoringGetDatabaseMysqlOpRatesMetric $metric,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/op_rates')
                 ->query('db_id', $dbId)
                 ->query('metric', $metric)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlSchemaLatency(
         string $dbId,
@@ -290,8 +363,9 @@ final readonly class MonitoringClient implements MonitoringClientInterface
         MonitoringGetDatabaseMysqlSchemaLatencyMetric $metric,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/schema_latency')
                 ->query('db_id', $dbId)
                 ->query('schema', $schema)
@@ -299,12 +373,15 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDatabaseMysqlSchemaThroughput(
         string $dbId,
@@ -312,8 +389,9 @@ final readonly class MonitoringClient implements MonitoringClientInterface
         MonitoringGetDatabaseMysqlSchemaThroughputMetric $metric,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/schema_throughput')
                 ->query('db_id', $dbId)
                 ->query('schema', $schema)
@@ -321,57 +399,72 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDatabaseMysqlThreadsActive(string $dbId, string $start, string $end): void
+    public function monitoringGetDatabaseMysqlThreadsActive(string $dbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/threads_active')
                 ->query('db_id', $dbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDatabaseMysqlThreadsConnected(string $dbId, string $start, string $end): void
+    public function monitoringGetDatabaseMysqlThreadsConnected(string $dbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/threads_connected')
                 ->query('db_id', $dbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDatabaseMysqlThreadsCreatedRate(string $dbId, string $start, string $end): void
+    public function monitoringGetDatabaseMysqlThreadsCreatedRate(string $dbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/database/mysql/threads_created_rate')
                 ->query('db_id', $dbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletBandwidthMetrics(
         string $hostId,
@@ -379,8 +472,9 @@ final readonly class MonitoringClient implements MonitoringClientInterface
         MonitoringGetDropletBandwidthMetricsDirection $direction,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/bandwidth')
                 ->query('host_id', $hostId)
                 ->query('interface', $interface)
@@ -388,790 +482,1000 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletCpuMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletCpuMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/cpu')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletFilesystemFreeMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletFilesystemFreeMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/filesystem_free')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletFilesystemSizeMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletFilesystemSizeMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/filesystem_size')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletLoad1Metrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletLoad1Metrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/load_1')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletLoad15Metrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletLoad15Metrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/load_15')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletLoad5Metrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletLoad5Metrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/load_5')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletMemoryAvailableMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletMemoryAvailableMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/memory_available')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletMemoryCachedMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletMemoryCachedMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/memory_cached')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletMemoryFreeMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletMemoryFreeMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/memory_free')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetDropletMemoryTotalMetrics(string $hostId, string $start, string $end): void
+    public function monitoringGetDropletMemoryTotalMetrics(string $hostId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet/memory_total')
                 ->query('host_id', $hostId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleCurrentCpuUtilizationYml(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/current_cpu_utilization')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleCurrentInstances(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/current_instances')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleCurrentMemoryUtilization(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/current_memory_utilization')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleTargetCpuUtilization(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/target_cpu_utilization')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleTargetInstances(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/target_instances')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetDropletAutoscaleTargetMemoryUtilization(
         string $autoscalePoolId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/droplet_autoscale/target_memory_utilization')
                 ->query('autoscale_pool_id', $autoscalePoolId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsConnections(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsConnections(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_connections')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsDowntime(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsDowntime(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_downtime')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHealthChecks(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHealthChecks(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_health_checks')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpResponseTime50p(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpResponseTime50p(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_response_time_50p')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpResponseTime95p(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpResponseTime95p(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_response_time_95p')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpResponseTime99p(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpResponseTime99p(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_response_time_99p')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpResponseTimeAvg(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpResponseTimeAvg(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_response_time_avg')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpResponses(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpResponses(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_responses')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpSessionDuration50p(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpSessionDuration50p(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_session_duration_50p')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpSessionDuration95p(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpSessionDuration95p(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_session_duration_95p')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsHttpSessionDurationAvg(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsHttpSessionDurationAvg(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_http_session_duration_avg')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbDropletsQueueSize(string $lbId, string $start, string $end): void
+    public function monitoringGetLbDropletsQueueSize(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/droplets_queue_size')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendConnectionsCurrent(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendConnectionsCurrent(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_connections_current')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendConnectionsLimit(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendConnectionsLimit(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_connections_limit')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendCpuUtilization(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendCpuUtilization(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_cpu_utilization')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendFirewallDroppedBytes(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendFirewallDroppedBytes(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_firewall_dropped_bytes')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendFirewallDroppedPackets(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendFirewallDroppedPackets(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_firewall_dropped_packets')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendHttpRequestsPerSecond(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendHttpRequestsPerSecond(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_http_requests_per_second')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendHttpResponses(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendHttpResponses(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_http_responses')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendNetworkThroughputHttp(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendNetworkThroughputHttp(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_network_throughput_http')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendNetworkThroughputTcp(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendNetworkThroughputTcp(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_network_throughput_tcp')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendNetworkThroughputUdp(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendNetworkThroughputUdp(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_network_throughput_udp')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendNlbTcpNetworkThroughput(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendNlbTcpNetworkThroughput(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_nlb_tcp_network_throughput')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendNlbUdpNetworkThroughput(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendNlbUdpNetworkThroughput(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_nlb_udp_network_throughput')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendTlsConnectionsCurrent(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendTlsConnectionsCurrent(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_tls_connections_current')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
     public function monitoringGetLbFrontendTlsConnectionsExceedingRateLimit(
         string $lbId,
         string $start,
         string $end,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_tls_connections_exceeding_rate_limit')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<Metrics|Error>
      */
-    public function monitoringGetLbFrontendTlsConnectionsLimit(string $lbId, string $start, string $end): void
+    public function monitoringGetLbFrontendTlsConnectionsLimit(string $lbId, string $start, string $end): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Metrics|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/metrics/load_balancer/frontend_tls_connections_limit')
                 ->query('lb_id', $lbId)
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringListSinks200Content|Error>
      */
-    public function monitoringListSinks(?Urn $resourceId = null): void
+    public function monitoringListSinks(?Urn $resourceId = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringListSinks200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/sinks')
                 ->query('resource_id', $resourceId?->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListSinks200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:create`.
+     * @return Envelope<null|Error>
      */
-    public function monitoringCreateSink(MonitoringCreateSinkRequestContent $body): void
+    public function monitoringCreateSink(MonitoringCreateSinkRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/monitoring/sinks')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringListDestinations200Content|Error>
      */
-    public function monitoringListDestinations(): void
+    public function monitoringListDestinations(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringListDestinations200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/sinks/destinations')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListDestinations200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:create`.
+     * @return Envelope<MonitoringCreateDestination200Content|Error>
      */
-    public function monitoringCreateDestination(DestinationRequest $body): void
+    public function monitoringCreateDestination(DestinationRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringCreateDestination200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/monitoring/sinks/destinations')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringGetDestination200Content|Error>
      */
-    public function monitoringGetDestination(string $destinationUuid): void
+    public function monitoringGetDestination(string $destinationUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringGetDestination200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/sinks/destinations/{destination_uuid}')
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:update`.
+     * @return Envelope<null|Error>
      */
-    public function monitoringUpdateDestination(string $destinationUuid, DestinationRequest $body): void
+    public function monitoringUpdateDestination(string $destinationUuid, DestinationRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/monitoring/sinks/destinations/{destination_uuid}')
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:delete`.
+     * @return Envelope<null|Error>
      */
-    public function monitoringDeleteDestination(string $destinationUuid): void
+    public function monitoringDeleteDestination(string $destinationUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/monitoring/sinks/destinations/{destination_uuid}')
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.
+     * @return Envelope<MonitoringGetSink200Content|Error>
      */
-    public function monitoringGetSink(string $sinkUuid): void
+    public function monitoringGetSink(string $sinkUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<MonitoringGetSink200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/sinks/{sink_uuid}')
                 ->path('sink_uuid', $sinkUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetSink200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:delete`.
+     * @return Envelope<null|Error>
      */
-    public function monitoringDeleteSink(string $sinkUuid): void
+    public function monitoringDeleteSink(string $sinkUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/monitoring/sinks/{sink_uuid}')
                 ->path('sink_uuid', $sinkUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

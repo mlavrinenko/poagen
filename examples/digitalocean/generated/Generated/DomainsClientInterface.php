@@ -12,6 +12,11 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\Domain;
+use Acme\DigitalOcean\Generated\Model\DomainsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\DomainsGet200Content;
+use Acme\DigitalOcean\Generated\Model\DomainsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Domains` endpoints.
@@ -24,21 +29,25 @@ interface DomainsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsList200Content|Error>
      */
-    public function domainsList(?int $perPage = null, ?int $page = null): void;
+    public function domainsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `domain:create`.
+     * @return Envelope<DomainsCreate201Content|Error>
      */
-    public function domainsCreate(Domain $body): void;
+    public function domainsCreate(Domain $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `domain:read`.
+     * @return Envelope<DomainsGet200Content|Error>
      */
-    public function domainsGet(string $domainName): void;
+    public function domainsGet(string $domainName): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `domain:delete`.
+     * @return Envelope<null|Error>
      */
-    public function domainsDelete(string $domainName): void;
+    public function domainsDelete(string $domainName): Envelope;
 }

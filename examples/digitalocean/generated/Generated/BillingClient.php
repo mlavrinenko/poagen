@@ -11,8 +11,17 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Balance;
+use Acme\DigitalOcean\Generated\Model\BillingHistoryList200Content;
+use Acme\DigitalOcean\Generated\Model\BillingInsightsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\InvoiceSummary;
+use Acme\DigitalOcean\Generated\Model\InvoicesGetByUuid200Content;
+use Acme\DigitalOcean\Generated\Model\InvoicesList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class BillingClient implements BillingClientInterface
@@ -25,6 +34,7 @@ final readonly class BillingClient implements BillingClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<BillingInsightsList200Content|Error>
      */
     public function billingInsightsList(
         string $accountUrn,
@@ -32,8 +42,9 @@ final readonly class BillingClient implements BillingClientInterface
         \DateTimeImmutable $endDate,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<BillingInsightsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/billing/{account_urn}/insights/{start_date}/{end_date}')
                 ->path('account_urn', $accountUrn)
                 ->path('start_date', $startDate->format('Y-m-d'))
@@ -41,99 +52,112 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingInsightsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<Balance|Error>
      */
-    public function balanceGet(): void
+    public function balanceGet(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Balance|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/balance')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Balance::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<BillingHistoryList200Content|Error>
      */
-    public function billingHistoryList(): void
+    public function billingHistoryList(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<BillingHistoryList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/billing_history')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingHistoryList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoicesList200Content|Error>
      */
-    public function invoicesList(?int $perPage = null, ?int $page = null): void
+    public function invoicesList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<InvoicesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/invoices')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InvoicesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoicesGetByUuid200Content|Error>
      */
-    public function invoicesGetByUuid(string $invoiceUuid, ?int $perPage = null, ?int $page = null): void
+    public function invoicesGetByUuid(string $invoiceUuid, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<InvoicesGetByUuid200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/invoices/{invoice_uuid}')
                 ->path('invoice_uuid', $invoiceUuid)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InvoicesGetByUuid200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<string|Error>
      */
-    public function invoicesGetCsvByUuid(string $invoiceUuid): void
+    public function invoicesGetCsvByUuid(string $invoiceUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<string|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/invoices/{invoice_uuid}/csv')
                 ->path('invoice_uuid', $invoiceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoiceSummary|Error>
      */
-    public function invoicesGetPdfByUuid(string $invoiceUuid): void
+    public function invoicesGetSummaryByUuid(string $invoiceUuid): Envelope
     {
-        $this->transport->send(
-            Endpoint::get('/v2/customers/my/invoices/{invoice_uuid}/pdf')
-                ->path('invoice_uuid', $invoiceUuid)
-                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
-        );
-    }
-
-    /**
-     * Requires `bearer_auth` scopes: `billing:read`.
-     */
-    public function invoicesGetSummaryByUuid(string $invoiceUuid): void
-    {
-        $this->transport->send(
+        /** @var Envelope<InvoiceSummary|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/customers/my/invoices/{invoice_uuid}/summary')
                 ->path('invoice_uuid', $invoiceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InvoiceSummary::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

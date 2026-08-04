@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\User;
 
 /**
@@ -22,20 +23,39 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\User;
  */
 interface UserClientInterface
 {
-    public function createUser(User $body): User;
+    /**
+     * @return Envelope<User|null>
+     */
+    public function createUser(User $body): Envelope;
 
     /**
      * @param list<User> $body
+     * @return Envelope<User|null>
      */
-    public function createUsersWithListInput(array $body): User;
+    public function createUsersWithListInput(array $body): Envelope;
 
-    public function loginUser(?string $username = null, ?string $password = null): string;
+    /**
+     * @return Envelope<string|null>
+     */
+    public function loginUser(?string $username = null, ?string $password = null): Envelope;
 
-    public function logoutUser(): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function logoutUser(): Envelope;
 
-    public function getUserByName(string $username): User;
+    /**
+     * @return Envelope<User|null>
+     */
+    public function getUserByName(string $username): Envelope;
 
-    public function updateUser(string $username, User $body): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function updateUser(string $username, User $body): Envelope;
 
-    public function deleteUser(string $username): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteUser(string $username): Envelope;
 }

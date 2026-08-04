@@ -20,6 +20,12 @@ use Acme\DigitalOcean\Generated\Model\DropletActionRename;
 use Acme\DigitalOcean\Generated\Model\DropletActionResize;
 use Acme\DigitalOcean\Generated\Model\DropletActionRestore;
 use Acme\DigitalOcean\Generated\Model\DropletActionSnapshot;
+use Acme\DigitalOcean\Generated\Model\DropletActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\DropletActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\DropletActionsPost201Content;
+use Acme\DigitalOcean\Generated\Model\DropletActionsPostByTag201Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Droplet Actions` endpoints.
@@ -32,24 +38,31 @@ interface DropletActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `droplet:update`.
+     * @return Envelope<DropletActionsPostByTag201Content|Error>
      */
-    public function dropletActionsPostByTag(DropletAction|DropletActionSnapshot $body, ?string $tagName = null): void;
+    public function dropletActionsPostByTag(
+        DropletAction|DropletActionSnapshot $body,
+        ?string $tagName = null,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletActionsList200Content|Error>
      */
-    public function dropletActionsList(int $dropletId, ?int $perPage = null, ?int $page = null): void;
+    public function dropletActionsList(int $dropletId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:update`.
+     * @return Envelope<DropletActionsPost201Content|Error>
      */
     public function dropletActionsPost(
         int $dropletId,
         DropletAction|DropletActionEnableBackups|DropletActionChangeBackupPolicy|DropletActionRestore|DropletActionResize|DropletActionRebuild|DropletActionRename|DropletActionChangeKernel|DropletActionSnapshot $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<DropletActionsGet200Content|Error>
      */
-    public function dropletActionsGet(int $dropletId, int $actionId): void;
+    public function dropletActionsGet(int $dropletId, int $actionId): Envelope;
 }

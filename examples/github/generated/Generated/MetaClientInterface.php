@@ -12,8 +12,10 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\ApiOverview;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Root;
 use DateTimeImmutable;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `meta` endpoints.
@@ -24,16 +26,28 @@ use DateTimeImmutable;
  */
 interface MetaClientInterface
 {
-    public function metaRoot(): Root;
-
-    public function metaGet(): ApiOverview;
-
-    public function metaGetOctocat(?string $s = null): string;
+    /**
+     * @return Envelope<Root>
+     */
+    public function metaRoot(): Envelope;
 
     /**
-     * @return list<DateTimeImmutable>
+     * @return Envelope<ApiOverview|null>
      */
-    public function metaGetAllVersions(): array;
+    public function metaGet(): Envelope;
 
-    public function metaGetZen(): string;
+    /**
+     * @return Envelope<string>
+     */
+    public function metaGetOctocat(?string $s = null): Envelope;
+
+    /**
+     * @return Envelope<list<DateTimeImmutable>|BasicError>
+     */
+    public function metaGetAllVersions(): Envelope;
+
+    /**
+     * @return Envelope<string>
+     */
+    public function metaGetZen(): Envelope;
 }

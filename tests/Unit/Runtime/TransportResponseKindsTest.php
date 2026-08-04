@@ -6,7 +6,6 @@ namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
 use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
-use Mlavrinenko\Paogen\Runtime\Contract\ApiErrorInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
@@ -22,11 +21,9 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * The five shapes a schema produces, decoded by the runtime rather than by
- * thirty-six copies of the same emitted branch.
- *
- * The failure case is here too: `error-response-policy` says a non-2xx response throws the
- * profile's own `ApiException` carrying the original request and response,
- * and moving the status branch into the transport must not change that.
+ * thirty-six copies of the same emitted branch. `KIND_ENVELOPE` is
+ * {@see EnvelopeTransportTest}'s own file, split out to keep both under the
+ * linecop limit (`quality-gates-at-maximum-strictness`).
  */
 final class TransportResponseKindsTest extends TestCase
 {
@@ -110,47 +107,6 @@ final class TransportResponseKindsTest extends TestCase
             ['anything' => [1, 2]],
             $transport->send(Endpoint::get('/opaque'), ResponseType::mapOf(ResponseType::mixed())),
         );
-    }
-
-    public function testANon2xxThrowsTheProfilesApiExceptionCarryingRequestAndResponse(): void
-    {
-        $http = new RecordingClient(
-            new Response(404, ['Content-Type' => 'application/json'], '{"message":"not found"}'),
-        );
-        $transport = $this->transport(null, $http);
-
-        try {
-            $transport->send(Endpoint::get('/pet/999'), ResponseType::object(Pet::class));
-            self::fail('expected ApiException');
-        } catch (ApiException $e) {
-            self::assertSame(404, $e->getStatusCode());
-            self::assertSame(['message' => 'not found'], $e->getDecodedBody());
-            self::assertSame($http->lastRequest, $e->getRequest());
-            self::assertSame(404, $e->getResponse()->getStatusCode());
-            self::assertSame(
-                'https://petstore.example/api/v3/pet/999',
-                (string) $e->getRequest()->getUri(),
-            );
-        }
-    }
-
-    public function testTheFailureIsAlsoCatchableThroughTheRuntimeContract(): void
-    {
-        $http = new RecordingClient(
-            new Response(429, ['Content-Type' => 'application/json'], '{"message":"slow down"}'),
-        );
-
-        try {
-            $this->transport(null, $http)->send(Endpoint::get('/pet/1'), ResponseType::nothing());
-            self::fail('expected an API error');
-        } catch (ApiErrorInterface $e) {
-            // One handler covers every paogen client in a project, without
-            // naming any one profile's generated class.
-            self::assertSame(429, $e->getStatusCode());
-            self::assertSame(['message' => 'slow down'], $e->getDecodedBody());
-            self::assertSame($http->lastRequest, $e->getRequest());
-            self::assertSame(429, $e->getResponse()->getStatusCode());
-        }
     }
 
     public function testAScalarListIsDecodedWithoutHydratingAnything(): void

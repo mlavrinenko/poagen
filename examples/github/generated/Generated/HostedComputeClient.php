@@ -17,7 +17,9 @@ use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgReq
 use Acme\GitHub\Generated\Model\NetworkConfiguration;
 use Acme\GitHub\Generated\Model\NetworkSettings;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class HostedComputeClient implements HostedComputeClientInterface
@@ -27,75 +29,111 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
     ) {
     }
 
+    /**
+     * @return Envelope<HostedComputeListNetworkConfigurationsForOrg200Content>
+     */
     public function hostedComputeListNetworkConfigurationsForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): HostedComputeListNetworkConfigurationsForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<HostedComputeListNetworkConfigurationsForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/network-configurations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(HostedComputeListNetworkConfigurationsForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HostedComputeListNetworkConfigurationsForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
     public function hostedComputeCreateNetworkConfigurationForOrg(
         string $org,
         HostedComputeCreateNetworkConfigurationForOrgRequestContent $body,
-    ): NetworkConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<NetworkConfiguration> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/settings/network-configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(NetworkConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function hostedComputeGetNetworkConfigurationForOrg(
-        string $org,
-        string $networkConfigurationId,
-    ): NetworkConfiguration {
-        return $this->transport->send(
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
+    public function hostedComputeGetNetworkConfigurationForOrg(string $org, string $networkConfigurationId): Envelope
+    {
+        /** @var Envelope<NetworkConfiguration> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId),
-            ResponseType::object(NetworkConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function hostedComputeDeleteNetworkConfigurationFromOrg(string $org, string $networkConfigurationId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function hostedComputeDeleteNetworkConfigurationFromOrg(
+        string $org,
+        string $networkConfigurationId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
     public function hostedComputeUpdateNetworkConfigurationForOrg(
         string $org,
         string $networkConfigurationId,
         HostedComputeUpdateNetworkConfigurationForOrgRequestContent $body,
-    ): NetworkConfiguration {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<NetworkConfiguration> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId)
                 ->json($body),
-            ResponseType::object(NetworkConfiguration::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function hostedComputeGetNetworkSettingsForOrg(string $org, string $networkSettingsId): NetworkSettings
+    /**
+     * @return Envelope<NetworkSettings>
+     */
+    public function hostedComputeGetNetworkSettingsForOrg(string $org, string $networkSettingsId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<NetworkSettings> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/network-settings/{network_settings_id}')
                 ->path('org', $org)
                 ->path('network_settings_id', $networkSettingsId),
-            ResponseType::object(NetworkSettings::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkSettings::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

@@ -12,9 +12,12 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetWalletLink200Content;
+use Acme\Kilbil\Generated\Model\GetWalletLink403Content;
 use Acme\Kilbil\Generated\Model\GetWalletLinkRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class WalletClient implements WalletClientInterface
@@ -25,11 +28,17 @@ final readonly class WalletClient implements WalletClientInterface
     ) {
     }
 
-    public function getWalletLink(GetWalletLinkRequestContent $body): GetWalletLink200Content
+    /**
+     * @return Envelope<GetWalletLink200Content|GetWalletLink403Content>
+     */
+    public function getWalletLink(GetWalletLinkRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetWalletLink200Content|GetWalletLink403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getwalletlink')->query('h', $this->h)->json($body),
-            ResponseType::object(GetWalletLink200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetWalletLink200Content::class)], ['403', ResponseType::object(GetWalletLink403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
 use InvalidArgumentException;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -48,7 +50,7 @@ final class DecoratorProofTest extends TestCase
 
         $order = $decorator->getOrderById(42);
 
-        self::assertSame(42, $order->id);
+        self::assertSame(42, $order->body?->id);
         self::assertSame([42], $inner->fetched);
     }
 
@@ -69,7 +71,7 @@ final class DecoratorProofTest extends TestCase
     {
         $decorator = new CountingStoreClient(new RecordingStoreClient());
 
-        self::assertSame(7, $decorator->refresh(new Order(id: 7))->id);
+        self::assertSame(7, $decorator->refresh(new Order(id: 7))->body?->id);
     }
 
     public function testEveryMethodOnTheContractDelegates(): void
@@ -80,8 +82,8 @@ final class DecoratorProofTest extends TestCase
         $inner = new RecordingStoreClient();
         $decorator = new CountingStoreClient($inner);
 
-        self::assertSame([], $decorator->getInventory());
-        self::assertSame(3, $decorator->placeOrder(new Order(id: 3))->id);
+        self::assertSame([], $decorator->getInventory()->body);
+        self::assertSame(3, $decorator->placeOrder(new Order(id: 3))->body?->id);
         self::assertSame([3], $inner->placed);
 
         $decorator->deleteOrder(3);
@@ -111,33 +113,44 @@ final class RecordingStoreClient implements StoreClientInterface
     /** @var list<int> */
     public array $placed = [];
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         $this->fetched[] = $orderId;
 
-        return new Order(id: $orderId);
+        return new Envelope(200, new Order(id: $orderId), new Response());
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
         $this->deleted[] = $orderId;
+
+        return new Envelope(200, null, new Response());
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
         if ($body->id !== null) {
             $this->placed[] = $body->id;
         }
 
-        return $body;
+        return new Envelope(200, $body, new Response());
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
-        return [];
+        return new Envelope(200, [], new Response());
     }
 }
 
@@ -146,14 +159,17 @@ final class RecordingStoreClient implements StoreClientInterface
  */
 final class CountingStoreClient implements StoreClientInterface
 {
-    /** @var array<int,Order> */
+    /** @var array<int, Envelope<Order|null>> */
     private array $orders = [];
 
     public function __construct(
         private readonly StoreClientInterface $inner,
     ) {}
 
-    public function refresh(Order $order): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function refresh(Order $order): Envelope
     {
         $id = $order->id ?? throw new InvalidArgumentException('cannot refresh an Order with no id');
         unset($this->orders[$id]);
@@ -161,32 +177,43 @@ final class CountingStoreClient implements StoreClientInterface
         return $this->getOrderById($id);
     }
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         return $this->orders[$orderId] ??= $this->inner->getOrderById($orderId);
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
-        $this->inner->deleteOrder($orderId);
+        $result = $this->inner->deleteOrder($orderId);
         unset($this->orders[$orderId]);
+
+        return $result;
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
         $placed = $this->inner->placeOrder($body);
 
-        if ($placed->id !== null) {
-            $this->orders[$placed->id] = $placed;
+        if ($placed->body instanceof Order && $placed->body->id !== null) {
+            $this->orders[$placed->body->id] = $placed;
         }
 
         return $placed;
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
         return $this->inner->getInventory();
     }

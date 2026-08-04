@@ -50,7 +50,7 @@ final class ResponseContentTypeDegradationTest extends TestCase
 
         // `string`, not a Model and not a decoded array: the schema said
         // `type: string` and nothing about the response needs a JSON decode.
-        self::assertStringContainsString('function getPlainText(): string', $sources);
+        self::assertStringContainsString('function getPlainText(): Envelope', $sources);
         self::assertStringContainsString('ResponseType::string()', $sources);
     }
 

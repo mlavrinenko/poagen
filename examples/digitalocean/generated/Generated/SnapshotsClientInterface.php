@@ -12,6 +12,10 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SnapshotsListResourceType;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SnapshotsGet200Content;
+use Acme\DigitalOcean\Generated\Model\SnapshotsList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Snapshots` endpoints.
@@ -24,20 +28,23 @@ interface SnapshotsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `snapshot:read`.
+     * @return Envelope<SnapshotsList200Content|Error>
      */
     public function snapshotsList(
         ?int $perPage = null,
         ?int $page = null,
         ?SnapshotsListResourceType $resourceType = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `snapshot:read`, `block_storage_snapshot:read`.
+     * @return Envelope<SnapshotsGet200Content|Error>
      */
-    public function snapshotsGet(int|string $snapshotId): void;
+    public function snapshotsGet(int|string $snapshotId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:delete`, `snapshot:delete`.
+     * @return Envelope<null|Error>
      */
-    public function snapshotsDelete(int|string $snapshotId): void;
+    public function snapshotsDelete(int|string $snapshotId): Envelope;
 }

@@ -11,10 +11,17 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\ErrorWithRootCauses;
 use Acme\DigitalOcean\Generated\Model\Tags;
+use Acme\DigitalOcean\Generated\Model\TagsCreate201Content;
+use Acme\DigitalOcean\Generated\Model\TagsGet200Content;
+use Acme\DigitalOcean\Generated\Model\TagsList200Content;
 use Acme\DigitalOcean\Generated\Model\TagsResource;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class TagsClient implements TagsClientInterface
@@ -27,82 +34,106 @@ final readonly class TagsClient implements TagsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `tag:read`.
+     * @return Envelope<TagsList200Content|Error>
      */
-    public function tagsList(?int $perPage = null, ?int $page = null): void
+    public function tagsList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<TagsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/tags')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TagsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `tag:create`.
+     * @return Envelope<TagsCreate201Content|ErrorWithRootCauses|Error>
      */
-    public function tagsCreate(Tags $body): void
+    public function tagsCreate(Tags $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<TagsCreate201Content|ErrorWithRootCauses|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/tags')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(TagsCreate201Content::class)], ['400', ResponseType::object(ErrorWithRootCauses::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `tag:read`.
+     * @return Envelope<TagsGet200Content|Error>
      */
-    public function tagsGet(string $tagId): void
+    public function tagsGet(string $tagId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<TagsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/tags/{tag_id}')
                 ->path('tag_id', $tagId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TagsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `tag:delete`.
+     * @return Envelope<null|Error>
      */
-    public function tagsDelete(string $tagId): void
+    public function tagsDelete(string $tagId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/tags/{tag_id}')
                 ->path('tag_id', $tagId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `tag:create`.
+     * @return Envelope<null|Error>
      */
-    public function tagsAssignResources(string $tagId, TagsResource $body): void
+    public function tagsAssignResources(string $tagId, TagsResource $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/tags/{tag_id}/resources')
                 ->path('tag_id', $tagId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `tag:delete`.
+     * @return Envelope<null|Error>
      */
-    public function tagsUnassignResources(string $tagId, TagsResource $body): void
+    public function tagsUnassignResources(string $tagId, TagsResource $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/tags/{tag_id}/resources')
                 ->path('tag_id', $tagId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

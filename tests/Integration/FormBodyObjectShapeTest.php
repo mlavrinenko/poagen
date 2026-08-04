@@ -50,11 +50,11 @@ final class FormBodyObjectShapeTest extends TestCase
         $withoutType = self::methodSlice($client, 'formWithoutType');
 
         self::assertStringContainsString(
-            'public function formWithType(string $name, ?string $tag = null): void',
+            'public function formWithType(string $name, ?string $tag = null): Envelope',
             $withType,
         );
         self::assertStringContainsString(
-            'public function formWithoutType(string $name, ?string $tag = null): void',
+            'public function formWithoutType(string $name, ?string $tag = null): Envelope',
             $withoutType,
         );
         self::assertStringContainsString("->form(['name' => \$name, 'tag' => \$tag])", $withType);

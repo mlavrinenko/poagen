@@ -47,7 +47,7 @@ final class NonJsonBodyTest extends TestCase
         // Twice, not once: the emitted client declares it and the emitted
         // interface mirrors it. A method per content type would read four.
         self::assertSame(2, substr_count($sources, 'function renderRaw('));
-        self::assertStringContainsString('function renderRaw(string $body): string', $sources);
+        self::assertStringContainsString('function renderRaw(string $body): Envelope', $sources);
         self::assertStringContainsString("->text(\$body, 'text/plain')", $sources);
         self::assertStringNotContainsString('text/x-markdown', $sources);
     }
@@ -65,7 +65,7 @@ final class NonJsonBodyTest extends TestCase
     {
         // GitHub's `application/octocat-stream` names a stream and declares
         // `type: string`. The schema is the evidence, not the subtype.
-        self::assertStringContainsString('function getOctocat(): string', $this->sources());
+        self::assertStringContainsString('function getOctocat(): Envelope', $this->sources());
     }
 
     public function testAnOctetStreamBodyTakesAPsr7Stream(): void
@@ -73,7 +73,7 @@ final class NonJsonBodyTest extends TestCase
         $sources = $this->sources();
 
         self::assertStringContainsString('use Psr\Http\Message\StreamInterface;', $sources);
-        self::assertStringContainsString('function uploadAsset(StreamInterface $body): void', $sources);
+        self::assertStringContainsString('function uploadAsset(StreamInterface $body): Envelope', $sources);
         self::assertStringContainsString("->binary(\$body, 'application/octet-stream')", $sources);
     }
 
@@ -84,7 +84,7 @@ final class NonJsonBodyTest extends TestCase
         // DigitalOcean declares `format: binary` under application/pdf. The
         // content type travels with the body rather than being implied by
         // the kind, so the vendor's own type reaches the wire.
-        self::assertStringContainsString('function renderPdf(StreamInterface $body): void', $sources);
+        self::assertStringContainsString('function renderPdf(StreamInterface $body): Envelope', $sources);
         self::assertStringContainsString("->binary(\$body, 'application/pdf')", $sources);
     }
 

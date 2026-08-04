@@ -66,7 +66,7 @@ final class WidenedShapesTest extends TestCase
 
         self::assertContains('SaveProfile200Content', $this->modelNames($plan));
         self::assertStringContainsString(
-            'public function saveProfile(SaveProfileRequestContent $body): SaveProfile200Content',
+            'public function saveProfile(SaveProfileRequestContent $body): Envelope',
             $this->clientSource($plan),
         );
     }
@@ -99,7 +99,7 @@ final class WidenedShapesTest extends TestCase
 
         // The request side has resolved a `$ref` value since it was written;
         // the response side collapsed the identical construct to `mixed`.
-        self::assertStringContainsString('@return array<string, Part>', $client);
+        self::assertStringContainsString('@return Envelope<array<string, Part>>', $client);
         self::assertStringContainsString('ResponseType::mapOf(ResponseType::object(Part::class))', $client);
     }
 
@@ -107,9 +107,9 @@ final class WidenedShapesTest extends TestCase
     {
         $client = $this->clientSource($this->plan());
 
-        self::assertStringContainsString('@return array<string, list<Part>>', $client);
+        self::assertStringContainsString('@return Envelope<array<string, list<Part>>>', $client);
         self::assertStringContainsString('ResponseType::mapOf(ResponseType::listOf(Part::class))', $client);
-        self::assertStringContainsString('@return array<string, array<string, string>>', $client);
+        self::assertStringContainsString('@return Envelope<array<string, array<string, string>>>', $client);
         self::assertStringContainsString('ResponseType::mapOf(ResponseType::mapOf(ResponseType::string()))', $client);
     }
 

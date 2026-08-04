@@ -11,13 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshot201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphDiff;
 use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReport201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphSpdxSbom;
 use Acme\GitHub\Generated\Model\Snapshot;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DependencyGraphClient implements DependencyGraphClientInterface
@@ -27,66 +30,91 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
     ) {
     }
 
+    /**
+     * @return Envelope<DependencyGraphDiff|BasicError>
+     */
     public function dependencyGraphDiffRange(
         string $owner,
         string $repo,
         string $basehead,
         ?string $name = null,
-    ): DependencyGraphDiff {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DependencyGraphDiff|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/compare/{basehead}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('basehead', $basehead)
                 ->query('name', $name),
-            ResponseType::object(DependencyGraphDiff::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphDiff::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependencyGraphExportSbom(string $owner, string $repo): DependencyGraphSpdxSbom
+    /**
+     * @return Envelope<DependencyGraphSpdxSbom|BasicError>
+     */
+    public function dependencyGraphExportSbom(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DependencyGraphSpdxSbom|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(DependencyGraphSpdxSbom::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphSpdxSbom::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependencyGraphFetchSbomReport(string $owner, string $repo, string $sbomUuid): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function dependencyGraphFetchSbomReport(string $owner, string $repo, string $sbomUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom/fetch-report/{sbom_uuid}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('sbom_uuid', $sbomUuid),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['202', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependencyGraphGenerateSbomReport(
-        string $owner,
-        string $repo,
-    ): DependencyGraphGenerateSbomReport201Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<DependencyGraphGenerateSbomReport201Content|BasicError>
+     */
+    public function dependencyGraphGenerateSbomReport(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<DependencyGraphGenerateSbomReport201Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom/generate-report')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(DependencyGraphGenerateSbomReport201Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphGenerateSbomReport201Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependencyGraphCreateRepositorySnapshot(
-        string $owner,
-        string $repo,
-        Snapshot $body,
-    ): DependencyGraphCreateRepositorySnapshot201Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<DependencyGraphCreateRepositorySnapshot201Content>
+     */
+    public function dependencyGraphCreateRepositorySnapshot(string $owner, string $repo, Snapshot $body): Envelope
+    {
+        /** @var Envelope<DependencyGraphCreateRepositorySnapshot201Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/dependency-graph/snapshots')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(DependencyGraphCreateRepositorySnapshot201Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphCreateRepositorySnapshot201Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

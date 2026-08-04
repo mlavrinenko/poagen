@@ -15,7 +15,9 @@ use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequestContent
 use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\OrganizationSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeamOrganizationsClientInterface
@@ -26,91 +28,121 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
     }
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
     public function enterpriseTeamOrganizationsGetAssignments(
         string $enterprise,
         string $enterpriseTeam,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrganizationSimple>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams/{enterprise-team}/organizations')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
     public function enterpriseTeamOrganizationsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamOrganizationsBulkAddRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrganizationSimple>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/add')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::listOf(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function enterpriseTeamOrganizationsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamOrganizationsBulkRemoveRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/remove')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<OrganizationSimple|null>
+     */
     public function enterpriseTeamOrganizationsGetAssignment(
         string $enterprise,
         string $enterpriseTeam,
         string $org,
-    ): OrganizationSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OrganizationSimple|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/{org}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::object(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationSimple::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function enterpriseTeamOrganizationsAdd(
-        string $enterprise,
-        string $enterpriseTeam,
-        string $org,
-    ): OrganizationSimple {
-        return $this->transport->send(
+    /**
+     * @return Envelope<OrganizationSimple>
+     */
+    public function enterpriseTeamOrganizationsAdd(string $enterprise, string $enterpriseTeam, string $org): Envelope
+    {
+        /** @var Envelope<OrganizationSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/{org}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::object(OrganizationSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function enterpriseTeamOrganizationsDelete(string $enterprise, string $enterpriseTeam, string $org): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function enterpriseTeamOrganizationsDelete(
+        string $enterprise,
+        string $enterpriseTeam,
+        string $org,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/{org}')
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

@@ -40,8 +40,10 @@ use Acme\GitHub\Generated\Enum\PackagesRestorePackageForUserPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForAuthenticatedUserPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForOrgPackageType;
 use Acme\GitHub\Generated\Enum\PackagesRestorePackageVersionForUserPackageType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Package;
 use Acme\GitHub\Generated\Model\PackageVersion;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `packages` endpoints.
@@ -53,12 +55,12 @@ use Acme\GitHub\Generated\Model\PackageVersion;
 interface PackagesClientInterface
 {
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError>
      */
-    public function packagesListDockerMigrationConflictingPackagesForOrganization(string $org): array;
+    public function packagesListDockerMigrationConflictingPackagesForOrganization(string $org): Envelope;
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError|null>
      */
     public function packagesListPackagesForOrganization(
         string $org,
@@ -66,29 +68,38 @@ interface PackagesClientInterface
         ?PackagesListPackagesForOrganizationVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForOrganization(
         PackagesGetPackageForOrganizationPackageType $packageType,
         string $packageName,
         string $org,
-    ): Package;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForOrg(
         PackagesDeletePackageForOrgPackageType $packageType,
         string $packageName,
         string $org,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForOrg(
         PackagesRestorePackageForOrgPackageType $packageType,
         string $packageName,
         string $org,
         ?string $token = null,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByOrg(
         PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType $packageType,
@@ -97,62 +108,80 @@ interface PackagesClientInterface
         ?int $page = null,
         ?int $perPage = null,
         ?PackagesGetAllPackageVersionsForPackageOwnedByOrgState $state = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForOrganization(
         PackagesGetPackageVersionForOrganizationPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): PackageVersion;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForOrg(
         PackagesDeletePackageVersionForOrgPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForOrg(
         PackagesRestorePackageVersionForOrgPackageType $packageType,
         string $packageName,
         string $org,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>>
      */
-    public function packagesListDockerMigrationConflictingPackagesForAuthenticatedUser(): array;
+    public function packagesListDockerMigrationConflictingPackagesForAuthenticatedUser(): Envelope;
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|null>
      */
     public function packagesListPackagesForAuthenticatedUser(
         PackagesListPackagesForAuthenticatedUserPackageType $packageType,
         ?PackagesListPackagesForAuthenticatedUserVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForAuthenticatedUser(
         PackagesGetPackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
-    ): Package;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForAuthenticatedUser(
         PackagesDeletePackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForAuthenticatedUser(
         PackagesRestorePackageForAuthenticatedUserPackageType $packageType,
         string $packageName,
         ?string $token = null,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUser(
         PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType $packageType,
@@ -160,33 +189,42 @@ interface PackagesClientInterface
         ?int $page = null,
         ?int $perPage = null,
         ?PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState $state = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForAuthenticatedUser(
         PackagesGetPackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): PackageVersion;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForAuthenticatedUser(
         PackagesDeletePackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForAuthenticatedUser(
         PackagesRestorePackageVersionForAuthenticatedUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError>
      */
-    public function packagesListDockerMigrationConflictingPackagesForUser(string $username): array;
+    public function packagesListDockerMigrationConflictingPackagesForUser(string $username): Envelope;
 
     /**
-     * @return list<Package>
+     * @return Envelope<list<Package>|BasicError|null>
      */
     public function packagesListPackagesForUser(
         string $username,
@@ -194,54 +232,72 @@ interface PackagesClientInterface
         ?PackagesListPackagesForUserVisibility $visibility = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Package>
+     */
     public function packagesGetPackageForUser(
         PackagesGetPackageForUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): Package;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageForUser(
         PackagesDeletePackageForUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageForUser(
         PackagesRestorePackageForUserPackageType $packageType,
         string $packageName,
         string $username,
         ?string $token = null,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<PackageVersion>
+     * @return Envelope<list<PackageVersion>|BasicError>
      */
     public function packagesGetAllPackageVersionsForPackageOwnedByUser(
         PackagesGetAllPackageVersionsForPackageOwnedByUserPackageType $packageType,
         string $packageName,
         string $username,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PackageVersion>
+     */
     public function packagesGetPackageVersionForUser(
         PackagesGetPackageVersionForUserPackageType $packageType,
         string $packageName,
         int $packageVersionId,
         string $username,
-    ): PackageVersion;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesDeletePackageVersionForUser(
         PackagesDeletePackageVersionForUserPackageType $packageType,
         string $packageName,
         string $username,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function packagesRestorePackageVersionForUser(
         PackagesRestorePackageVersionForUserPackageType $packageType,
         string $packageName,
         string $username,
         int $packageVersionId,
-    ): void;
+    ): Envelope;
 }

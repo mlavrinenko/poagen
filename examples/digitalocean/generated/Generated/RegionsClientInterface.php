@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\RegionsList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `Regions` endpoints.
  *
@@ -22,6 +26,7 @@ interface RegionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `regions:read`.
+     * @return Envelope<RegionsList200Content|Error>
      */
-    public function regionsList(?int $perPage = null, ?int $page = null): void;
+    public function regionsList(?int $perPage = null, ?int $page = null): Envelope;
 }

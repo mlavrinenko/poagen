@@ -22,12 +22,16 @@ use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesDirecti
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesSort;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesState;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoryEcosystems;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\FullRepository;
 use Acme\GitHub\Generated\Model\GlobalAdvisory;
 use Acme\GitHub\Generated\Model\PrivateVulnerabilityReportCreate;
 use Acme\GitHub\Generated\Model\RepositoryAdvisory;
 use Acme\GitHub\Generated\Model\RepositoryAdvisoryCreate;
 use Acme\GitHub\Generated\Model\RepositoryAdvisoryUpdate;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `security-advisories` endpoints.
@@ -41,7 +45,7 @@ interface SecurityAdvisoriesClientInterface
     /**
      * @param string|list<string> $cwes
      * @param string|list<string> $affects
-     * @return list<GlobalAdvisory>
+     * @return Envelope<list<GlobalAdvisory>|BasicError|ValidationErrorSimple>
      */
     public function securityAdvisoriesListGlobalAdvisories(
         ?string $ghsaId = null,
@@ -62,12 +66,15 @@ interface SecurityAdvisoriesClientInterface
         ?SecurityAdvisoriesListGlobalAdvisoriesDirection $direction = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListGlobalAdvisoriesSort $sort = null,
-    ): array;
-
-    public function securityAdvisoriesGetGlobalAdvisory(string $ghsaId): GlobalAdvisory;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryAdvisory>
+     * @return Envelope<GlobalAdvisory|BasicError>
+     */
+    public function securityAdvisoriesGetGlobalAdvisory(string $ghsaId): Envelope;
+
+    /**
+     * @return Envelope<list<RepositoryAdvisory>|BasicError>
      */
     public function securityAdvisoriesListOrgRepositoryAdvisories(
         string $org,
@@ -77,10 +84,10 @@ interface SecurityAdvisoriesClientInterface
         ?string $after = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListOrgRepositoryAdvisoriesState $state = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryAdvisory>
+     * @return Envelope<list<RepositoryAdvisory>|BasicError>
      */
     public function securityAdvisoriesListRepositoryAdvisories(
         string $owner,
@@ -91,38 +98,52 @@ interface SecurityAdvisoriesClientInterface
         ?string $after = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListRepositoryAdvisoriesState $state = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreateRepositoryAdvisory(
         string $owner,
         string $repo,
         RepositoryAdvisoryCreate $body,
-    ): RepositoryAdvisory;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreatePrivateVulnerabilityReport(
         string $owner,
         string $repo,
         PrivateVulnerabilityReportCreate $body,
-    ): RepositoryAdvisory;
+    ): Envelope;
 
-    public function securityAdvisoriesGetRepositoryAdvisory(
-        string $owner,
-        string $repo,
-        string $ghsaId,
-    ): RepositoryAdvisory;
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError>
+     */
+    public function securityAdvisoriesGetRepositoryAdvisory(string $owner, string $repo, string $ghsaId): Envelope;
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesUpdateRepositoryAdvisory(
         string $owner,
         string $repo,
         string $ghsaId,
         RepositoryAdvisoryUpdate $body,
-    ): RepositoryAdvisory;
+    ): Envelope;
 
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreateRepositoryAdvisoryCveRequest(
         string $owner,
         string $repo,
         string $ghsaId,
-    ): void;
+    ): Envelope;
 
-    public function securityAdvisoriesCreateFork(string $owner, string $repo, string $ghsaId): FullRepository;
+    /**
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function securityAdvisoriesCreateFork(string $owner, string $repo, string $ghsaId): Envelope;
 }

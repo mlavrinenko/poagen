@@ -53,7 +53,7 @@ final class RequestBodyUnionTest extends TestCase
         $client = $this->clientSource($plan);
 
         self::assertStringContainsString(
-            'public function unionRefs(GadgetByWeight|GadgetByVolume $body): void',
+            'public function unionRefs(GadgetByWeight|GadgetByVolume $body): Envelope',
             $client,
         );
         // No branch selection anywhere in the emitted call — the caller's
@@ -100,7 +100,7 @@ final class RequestBodyUnionTest extends TestCase
         $client = $this->clientSource($plan);
 
         self::assertStringContainsString(
-            'public function unionWidened(UnionWidenedBranch1|UnionWidenedBranch2 $body): void',
+            'public function unionWidened(UnionWidenedBranch1|UnionWidenedBranch2 $body): Envelope',
             $client,
         );
         self::assertStringNotContainsString('unionWidened(array $body)', $client);

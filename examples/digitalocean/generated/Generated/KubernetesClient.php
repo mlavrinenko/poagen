@@ -11,19 +11,38 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\AssociatedKubernetesResources;
 use Acme\DigitalOcean\Generated\Model\Cluster;
 use Acme\DigitalOcean\Generated\Model\ClusterRegistries;
 use Acme\DigitalOcean\Generated\Model\ClusterRegistry;
 use Acme\DigitalOcean\Generated\Model\ClusterUpdate;
 use Acme\DigitalOcean\Generated\Model\ClusterlintRequest;
+use Acme\DigitalOcean\Generated\Model\ClusterlintResults;
+use Acme\DigitalOcean\Generated\Model\Credentials;
 use Acme\DigitalOcean\Generated\Model\DestroyAssociatedKubernetesResources;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\KubernetesAddNodePool201Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesCreateCluster201Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetAvailableUpgrades200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetCluster200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetNodePool200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesGetStatusMessages200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesListClusters200Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesListNodePools200Content;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePool;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePoolUpdate;
+use Acme\DigitalOcean\Generated\Model\KubernetesOptions;
 use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequestContent;
+use Acme\DigitalOcean\Generated\Model\KubernetesRunClusterLint202Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpdateCluster202Content;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpdateNodePool202Content;
 use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequestContent;
+use Acme\DigitalOcean\Generated\Model\User;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class KubernetesClient implements KubernetesClientInterface
@@ -36,244 +55,295 @@ final readonly class KubernetesClient implements KubernetesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesListClusters200Content|Error>
      */
-    public function kubernetesListClusters(?int $perPage = null, ?int $page = null): void
+    public function kubernetesListClusters(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesListClusters200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesListClusters200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`.
+     * @return Envelope<KubernetesCreateCluster201Content|Error>
      */
-    public function kubernetesCreateCluster(Cluster $body): void
+    public function kubernetesCreateCluster(Cluster $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesCreateCluster201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(KubernetesCreateCluster201Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetCluster200Content|Error>
      */
-    public function kubernetesGetCluster(string $clusterId): void
+    public function kubernetesGetCluster(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesGetCluster200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesGetCluster200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesUpdateCluster202Content|Error>
      */
-    public function kubernetesUpdateCluster(string $clusterId, ClusterUpdate $body): void
+    public function kubernetesUpdateCluster(string $clusterId, ClusterUpdate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesUpdateCluster202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/kubernetes/clusters/{cluster_id}')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(KubernetesUpdateCluster202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDeleteCluster(string $clusterId): void
+    public function kubernetesDeleteCluster(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/clusters/{cluster_id}')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<ClusterlintResults|Error>
      */
-    public function kubernetesGetClusterLintResults(string $clusterId, ?string $runId = null): void
+    public function kubernetesGetClusterLintResults(string $clusterId, ?string $runId = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ClusterlintResults|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/clusterlint')
                 ->path('cluster_id', $clusterId)
                 ->query('run_id', $runId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ClusterlintResults::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesRunClusterLint202Content|Error>
      */
-    public function kubernetesRunClusterLint(string $clusterId, ClusterlintRequest $body): void
+    public function kubernetesRunClusterLint(string $clusterId, ClusterlintRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesRunClusterLint202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/clusterlint')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(KubernetesRunClusterLint202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:access_cluster`.
+     * @return Envelope<Credentials|Error>
      */
-    public function kubernetesGetCredentials(string $clusterId, ?int $expirySeconds = null): void
+    public function kubernetesGetCredentials(string $clusterId, ?int $expirySeconds = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Credentials|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/credentials')
                 ->path('cluster_id', $clusterId)
                 ->query('expiry_seconds', $expirySeconds)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Credentials::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<AssociatedKubernetesResources|Error>
      */
-    public function kubernetesListAssociatedResources(string $clusterId): void
+    public function kubernetesListAssociatedResources(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AssociatedKubernetesResources|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/destroy_with_associated_resources')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AssociatedKubernetesResources::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDestroyAssociatedResourcesDangerous(string $clusterId): void
+    public function kubernetesDestroyAssociatedResourcesDangerous(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/clusters/{cluster_id}/destroy_with_associated_resources/dangerous')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesDestroyAssociatedResourcesSelective(
         string $clusterId,
         DestroyAssociatedKubernetesResources $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/clusters/{cluster_id}/destroy_with_associated_resources/selective')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
-    }
 
-    /**
-     * Requires `bearer_auth` scopes: `kubernetes:access_cluster`.
-     */
-    public function kubernetesGetKubeconfig(string $clusterId, ?int $expirySeconds = null): void
-    {
-        $this->transport->send(
-            Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/kubeconfig')
-                ->path('cluster_id', $clusterId)
-                ->query('expiry_seconds', $expirySeconds)
-                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesListNodePools200Content|Error>
      */
-    public function kubernetesListNodePools(string $clusterId): void
+    public function kubernetesListNodePools(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesListNodePools200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/node_pools')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesListNodePools200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesAddNodePool201Content|Error>
      */
-    public function kubernetesAddNodePool(string $clusterId, KubernetesNodePool $body): void
+    public function kubernetesAddNodePool(string $clusterId, KubernetesNodePool $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesAddNodePool201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/node_pools')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(KubernetesAddNodePool201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetNodePool200Content|Error>
      */
-    public function kubernetesGetNodePool(string $clusterId, string $nodePoolId): void
+    public function kubernetesGetNodePool(string $clusterId, string $nodePoolId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesGetNodePool200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}')
                 ->path('cluster_id', $clusterId)
                 ->path('node_pool_id', $nodePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesGetNodePool200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<KubernetesUpdateNodePool202Content|Error>
      */
     public function kubernetesUpdateNodePool(
         string $clusterId,
         string $nodePoolId,
         KubernetesNodePoolUpdate $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<KubernetesUpdateNodePool202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}')
                 ->path('cluster_id', $clusterId)
                 ->path('node_pool_id', $nodePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(KubernetesUpdateNodePool202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesDeleteNodePool(string $clusterId, string $nodePoolId): void
+    public function kubernetesDeleteNodePool(string $clusterId, string $nodePoolId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}')
                 ->path('cluster_id', $clusterId)
                 ->path('node_pool_id', $nodePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesDeleteNode(
         string $clusterId,
@@ -281,8 +351,9 @@ final readonly class KubernetesClient implements KubernetesClientInterface
         string $nodeId,
         ?int $skipDrain = null,
         ?int $replace = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}/nodes/{node_id}')
                 ->path('cluster_id', $clusterId)
                 ->path('node_pool_id', $nodePoolId)
@@ -290,143 +361,187 @@ final readonly class KubernetesClient implements KubernetesClientInterface
                 ->query('skip_drain', $skipDrain)
                 ->query('replace', $replace)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:delete`.
+     * @return Envelope<null|Error>
      */
     public function kubernetesRecycleNodePool(
         string $clusterId,
         string $nodePoolId,
         KubernetesRecycleNodePoolRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}/recycle')
                 ->path('cluster_id', $clusterId)
                 ->path('node_pool_id', $nodePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetStatusMessages200Content|Error>
      */
-    public function kubernetesGetStatusMessages(string $clusterId, ?\DateTimeImmutable $since = null): void
+    public function kubernetesGetStatusMessages(string $clusterId, ?\DateTimeImmutable $since = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesGetStatusMessages200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/status_messages')
                 ->path('cluster_id', $clusterId)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesGetStatusMessages200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequestContent $body): void
-    {
-        $this->transport->send(
+    public function kubernetesUpgradeCluster(
+        string $clusterId,
+        KubernetesUpgradeClusterRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/upgrade')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesGetAvailableUpgrades200Content|Error>
      */
-    public function kubernetesGetAvailableUpgrades(string $clusterId): void
+    public function kubernetesGetAvailableUpgrades(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesGetAvailableUpgrades200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/upgrades')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesGetAvailableUpgrades200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<User|Error>
      */
-    public function kubernetesGetClusterUser(string $clusterId): void
+    public function kubernetesGetClusterUser(string $clusterId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<User|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/clusters/{cluster_id}/user')
                 ->path('cluster_id', $clusterId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.
+     * @return Envelope<KubernetesOptions|Error>
      */
-    public function kubernetesListOptions(): void
+    public function kubernetesListOptions(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<KubernetesOptions|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/kubernetes/options')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(KubernetesOptions::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`, `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesAddRegistries(ClusterRegistries $body): void
+    public function kubernetesAddRegistries(ClusterRegistries $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/registries')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesRemoveRegistries(ClusterRegistries $body): void
+    public function kubernetesRemoveRegistries(ClusterRegistries $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/registries')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:create`, `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesAddRegistry(ClusterRegistry $body): void
+    public function kubernetesAddRegistry(ClusterRegistry $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/kubernetes/registry')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
+     * @return Envelope<null|Error>
      */
-    public function kubernetesRemoveRegistry(ClusterRegistry $body): void
+    public function kubernetesRemoveRegistry(ClusterRegistry $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/kubernetes/registry')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

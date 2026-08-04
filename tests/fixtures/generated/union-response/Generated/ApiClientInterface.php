@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Celsius;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
@@ -23,16 +24,28 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Ge
  */
 interface ApiClientInterface
 {
-    public function getCreature(): Dog|Cat;
+    /**
+     * @return Envelope<Dog|Cat>
+     */
+    public function getCreature(): Envelope;
 
     /**
-     * @return list<Dog|Cat>
+     * @return Envelope<list<Dog|Cat>>
      */
-    public function listCreatures(): array;
+    public function listCreatures(): Envelope;
 
-    public function getRestrictions(): Dog|GetRestrictionsResponseBranch2;
+    /**
+     * @return Envelope<Dog|GetRestrictionsResponseBranch2>
+     */
+    public function getRestrictions(): Envelope;
 
-    public function getTaggedCreature(): Dog|Cat;
+    /**
+     * @return Envelope<Dog|Cat>
+     */
+    public function getTaggedCreature(): Envelope;
 
-    public function getUndecidableCreature(): Celsius;
+    /**
+     * @return Envelope<Celsius>
+     */
+    public function getUndecidableCreature(): Envelope;
 }

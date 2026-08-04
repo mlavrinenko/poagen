@@ -11,9 +11,19 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\UptimeCreateAlert201Content;
 use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeGetAlert200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeGetCheck200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeGetCheckState200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeListAlerts200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeListChecks200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlert200Content;
 use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheck200Content;
 use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Uptime` endpoints.
@@ -26,51 +36,65 @@ interface UptimeClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeListChecks200Content|Error>
      */
-    public function uptimeListChecks(?int $perPage = null, ?int $page = null): void;
+    public function uptimeListChecks(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetCheck200Content|Error>
      */
-    public function uptimeGetCheck(string $checkId): void;
+    public function uptimeGetCheck(string $checkId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
+     * @return Envelope<UptimeUpdateCheck200Content|Error>
      */
-    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): void;
+    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`.
+     * @return Envelope<null|Error>
      */
-    public function uptimeDeleteCheck(string $checkId): void;
+    public function uptimeDeleteCheck(string $checkId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeListAlerts200Content|Error>
      */
-    public function uptimeListAlerts(string $checkId, ?int $perPage = null, ?int $page = null): void;
+    public function uptimeListAlerts(string $checkId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:create`, `uptime:update`.
+     * @return Envelope<UptimeCreateAlert201Content|Error>
      */
-    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): void;
+    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetAlert200Content|Error>
      */
-    public function uptimeGetAlert(string $checkId, string $alertId): void;
+    public function uptimeGetAlert(string $checkId, string $alertId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
+     * @return Envelope<UptimeUpdateAlert200Content|Error>
      */
-    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequestContent $body): void;
+    public function uptimeUpdateAlert(
+        string $checkId,
+        string $alertId,
+        UptimeUpdateAlertRequestContent $body,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`, `uptime:update`.
+     * @return Envelope<null|Error>
      */
-    public function uptimeDeleteAlert(string $checkId, string $alertId): void;
+    public function uptimeDeleteAlert(string $checkId, string $alertId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetCheckState200Content|Error>
      */
-    public function uptimeGetCheckState(string $checkId): void;
+    public function uptimeGetCheckState(string $checkId): Envelope;
 }

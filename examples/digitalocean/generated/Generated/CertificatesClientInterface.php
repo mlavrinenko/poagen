@@ -13,6 +13,11 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\CertificateRequestCustom;
 use Acme\DigitalOcean\Generated\Model\CertificateRequestLetsEncrypt;
+use Acme\DigitalOcean\Generated\Model\CertificatesCreate201Content;
+use Acme\DigitalOcean\Generated\Model\CertificatesGet200Content;
+use Acme\DigitalOcean\Generated\Model\CertificatesList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Certificates` endpoints.
@@ -25,21 +30,25 @@ interface CertificatesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `certificate:read`.
+     * @return Envelope<CertificatesList200Content|Error>
      */
-    public function certificatesList(?int $perPage = null, ?int $page = null, ?string $name = null): void;
+    public function certificatesList(?int $perPage = null, ?int $page = null, ?string $name = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `certificate:create`.
+     * @return Envelope<CertificatesCreate201Content|Error>
      */
-    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): void;
+    public function certificatesCreate(CertificateRequestLetsEncrypt|CertificateRequestCustom $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `certificate:read`.
+     * @return Envelope<CertificatesGet200Content|Error>
      */
-    public function certificatesGet(string $certificateId): void;
+    public function certificatesGet(string $certificateId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `certificate:delete`.
+     * @return Envelope<null|Error>
      */
-    public function certificatesDelete(string $certificateId): void;
+    public function certificatesDelete(string $certificateId): Envelope;
 }

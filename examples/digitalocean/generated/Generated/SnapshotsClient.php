@@ -12,8 +12,13 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SnapshotsListResourceType;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SnapshotsGet200Content;
+use Acme\DigitalOcean\Generated\Model\SnapshotsList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SnapshotsClient implements SnapshotsClientInterface
@@ -26,45 +31,57 @@ final readonly class SnapshotsClient implements SnapshotsClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `snapshot:read`.
+     * @return Envelope<SnapshotsList200Content|Error>
      */
     public function snapshotsList(
         ?int $perPage = null,
         ?int $page = null,
         ?SnapshotsListResourceType $resourceType = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SnapshotsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/snapshots')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('resource_type', $resourceType)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `snapshot:read`, `block_storage_snapshot:read`.
+     * @return Envelope<SnapshotsGet200Content|Error>
      */
-    public function snapshotsGet(int|string $snapshotId): void
+    public function snapshotsGet(int|string $snapshotId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SnapshotsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsGet200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `image:delete`, `snapshot:delete`.
+     * @return Envelope<null|Error>
      */
-    public function snapshotsDelete(int|string $snapshotId): void
+    public function snapshotsDelete(int|string $snapshotId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

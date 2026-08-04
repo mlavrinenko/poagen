@@ -14,3 +14,4 @@
 #let Client = entity("Client", props: ())
 #let Model = entity("Model", props: ())
 #let GeneratedFile = entity("Generated File", props: ())
+#let Envelope = entity("Envelope", props: ())

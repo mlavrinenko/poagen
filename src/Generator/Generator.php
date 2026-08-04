@@ -162,7 +162,7 @@ final readonly class Generator
         // Payload classes are named before anything is emitted: the model planner emits them, and
         // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
         $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, InlineModelGroups::pins($profile->inlineModels), $ledger, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, InlineModelGroups::pins($profile->inlineModels), $ledger, $bindings, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
 
         // See UnionCatalog::merge() for why the response-position half waits for this walk.
         $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());

@@ -12,9 +12,12 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone403Content;
 use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode403Content;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Код подтверждения` endpoints.
@@ -25,7 +28,13 @@ use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
  */
 interface ConfirmationCodesClientInterface
 {
-    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content;
+    /**
+     * @return Envelope<AskConfirmPhone200Content|AskConfirmPhone403Content>
+     */
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): Envelope;
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content;
+    /**
+     * @return Envelope<CheckConfirmPhoneCode200Content|CheckConfirmPhoneCode403Content>
+     */
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): Envelope;
 }

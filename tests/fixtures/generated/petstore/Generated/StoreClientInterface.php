@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 
 /**
@@ -23,13 +24,22 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 interface StoreClientInterface
 {
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array;
+    public function getInventory(): Envelope;
 
-    public function placeOrder(Order $body): Order;
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope;
 
-    public function getOrderById(int $orderId): Order;
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope;
 
-    public function deleteOrder(int $orderId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope;
 }

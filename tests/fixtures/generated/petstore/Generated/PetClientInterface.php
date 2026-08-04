@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\ApiResponse;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
@@ -27,44 +28,50 @@ interface PetClientInterface
 {
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function updatePet(Pet $body): Pet;
+    public function updatePet(Pet $body): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function addPet(Pet $body): Pet;
+    public function addPet(Pet $body): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
-     * @return list<Pet>
+     * @return Envelope<list<Pet>|null>
      */
-    public function findPetsByStatus(FindPetsByStatusStatus $status): array;
+    public function findPetsByStatus(FindPetsByStatusStatus $status): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
      * @param list<string> $tags
-     * @return list<Pet>
+     * @return Envelope<list<Pet>|null>
      */
-    public function findPetsByTags(array $tags): array;
+    public function findPetsByTags(array $tags): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function getPetById(int $petId): Pet;
+    public function getPetById(int $petId): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<Pet|null>
      */
-    public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Pet;
+    public function updatePetWithForm(int $petId, ?string $name = null, ?string $status = null): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<null>
      */
-    public function deletePet(int $petId, ?string $apiKey = null): void;
+    public function deletePet(int $petId, ?string $apiKey = null): Envelope;
 
     /**
      * Requires `petstore_auth` scopes: `write:pets`, `read:pets`.
+     * @return Envelope<ApiResponse|null>
      */
-    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): ApiResponse;
+    public function uploadFile(int $petId, StreamInterface $body, ?string $additionalMetadata = null): Envelope;
 }

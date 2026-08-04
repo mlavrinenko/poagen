@@ -45,8 +45,8 @@ final class ParameterShapeReferenceResolutionTest extends TestCase
     {
         $sources = implode("\n", array_values($this->plan()->writes));
 
-        self::assertStringContainsString('public function refQuery(?TagId $tag = null): void', $sources);
-        self::assertStringContainsString('public function refHeader(?TagId $xTagId = null): void', $sources);
+        self::assertStringContainsString('public function refQuery(?TagId $tag = null): Envelope', $sources);
+        self::assertStringContainsString('public function refHeader(?TagId $xTagId = null): Envelope', $sources);
         self::assertStringNotContainsString('mixed $tag', $sources);
     }
 
@@ -61,7 +61,7 @@ final class ParameterShapeReferenceResolutionTest extends TestCase
         $sources = implode("\n", array_values($this->plan()->writes));
 
         self::assertStringContainsString('@param list<TagId> $tags', $sources);
-        self::assertStringContainsString('public function refQueryItems(?array $tags = null): void', $sources);
+        self::assertStringContainsString('public function refQueryItems(?array $tags = null): Envelope', $sources);
         self::assertStringContainsString(
             "->query('tags', \$tags === null ? null : array_map(static fn(TagId \$__v): string => \$__v->toScalar(), \$tags))",
             $sources,
@@ -81,7 +81,7 @@ final class ParameterShapeReferenceResolutionTest extends TestCase
         $sources = implode("\n", array_values($this->plan()->writes));
 
         self::assertStringContainsString('@param string|list<string> $tags', $sources);
-        self::assertStringContainsString('public function scalarOrList(string|array|null $tags = null): void', $sources);
+        self::assertStringContainsString('public function scalarOrList(string|array|null $tags = null): Envelope', $sources);
         self::assertStringContainsString("->query('tags', \$tags)", $sources);
     }
 
@@ -114,7 +114,8 @@ final class ParameterShapeReferenceResolutionTest extends TestCase
         $sources = implode("\n", array_values($this->plan()->writes));
 
         self::assertStringContainsString(
-            'public function dangerousOp(string $widgetId, bool $xConfirm, ?bool $verbose = null, ?string $xDebug = null): void',
+            "public function dangerousOp(\n        string \$widgetId,\n        bool \$xConfirm,\n        "
+                . "?bool \$verbose = null,\n        ?string \$xDebug = null,\n    ): Envelope",
             $sources,
         );
     }

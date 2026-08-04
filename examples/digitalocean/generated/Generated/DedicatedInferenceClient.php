@@ -18,8 +18,19 @@ use Acme\DigitalOcean\Generated\Model\DedicatedInferenceGpuModelConfigsResponse;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceSizesResponse;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceTokenCreateRequest;
 use Acme\DigitalOcean\Generated\Model\DedicatedInferenceUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesCreate202Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesCreateTokens202Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesGet200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesGetCa200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesList200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesListAccelerators200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesListTokens200Content;
+use Acme\DigitalOcean\Generated\Model\DedicatedInferencesPatch202Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DedicatedInferenceClient implements DedicatedInferenceClientInterface
@@ -32,195 +43,245 @@ final readonly class DedicatedInferenceClient implements DedicatedInferenceClien
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesList200Content|Error>
      */
     public function dedicatedInferencesList(
         ?int $perPage = null,
         ?int $page = null,
         ?DedicatedInferencesListRegion $region = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DedicatedInferencesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferencesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:create`.
+     * @return Envelope<DedicatedInferencesCreate202Content|Error>
      */
-    public function dedicatedInferencesCreate(DedicatedInferenceCreateRequest $body): void
+    public function dedicatedInferencesCreate(DedicatedInferenceCreateRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DedicatedInferencesCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/dedicated-inferences')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(DedicatedInferencesCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceGpuModelConfigsResponse|Error>
      */
-    public function dedicatedInferencesGetGpuModelConfig(): DedicatedInferenceGpuModelConfigsResponse
+    public function dedicatedInferencesGetGpuModelConfig(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DedicatedInferenceGpuModelConfigsResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/gpu-model-config')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(DedicatedInferenceGpuModelConfigsResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferenceGpuModelConfigsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceSizesResponse|Error>
      */
-    public function dedicatedInferencesListSizes(): DedicatedInferenceSizesResponse
+    public function dedicatedInferencesListSizes(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DedicatedInferenceSizesResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/sizes')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(DedicatedInferenceSizesResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferenceSizesResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesGet200Content|Error>
      */
-    public function dedicatedInferencesGet(string $dedicatedInferenceId): void
+    public function dedicatedInferencesGet(string $dedicatedInferenceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DedicatedInferencesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/{dedicated_inference_id}')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferencesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dedicatedInferencesDelete(string $dedicatedInferenceId): void
+    public function dedicatedInferencesDelete(string $dedicatedInferenceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/dedicated-inferences/{dedicated_inference_id}')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:update`.
+     * @return Envelope<DedicatedInferencesPatch202Content|Error>
      */
     public function dedicatedInferencesPatch(
         string $dedicatedInferenceId,
         DedicatedInferenceUpdateRequest $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DedicatedInferencesPatch202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/dedicated-inferences/{dedicated_inference_id}')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(DedicatedInferencesPatch202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesListAccelerators200Content|Error>
      */
     public function dedicatedInferencesListAccelerators(
         string $dedicatedInferenceId,
         ?int $perPage = null,
         ?int $page = null,
         ?string $slug = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DedicatedInferencesListAccelerators200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/{dedicated_inference_id}/accelerators')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('slug', $slug)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferencesListAccelerators200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferenceAccelerator|Error>
      */
-    public function dedicatedInferencesGetAccelerator(
-        string $dedicatedInferenceId,
-        string $acceleratorId,
-    ): DedicatedInferenceAccelerator {
-        return $this->transport->send(
+    public function dedicatedInferencesGetAccelerator(string $dedicatedInferenceId, string $acceleratorId): Envelope
+    {
+        /** @var Envelope<DedicatedInferenceAccelerator|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/{dedicated_inference_id}/accelerators/{accelerator_id}')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->path('accelerator_id', $acceleratorId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(DedicatedInferenceAccelerator::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferenceAccelerator::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference:read`.
+     * @return Envelope<DedicatedInferencesGetCa200Content|Error>
      */
-    public function dedicatedInferencesGetCa(string $dedicatedInferenceId): void
+    public function dedicatedInferencesGetCa(string $dedicatedInferenceId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DedicatedInferencesGetCa200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/{dedicated_inference_id}/ca')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferencesGetCa200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:read`.
+     * @return Envelope<DedicatedInferencesListTokens200Content|Error>
      */
     public function dedicatedInferencesListTokens(
         string $dedicatedInferenceId,
         ?int $perPage = null,
         ?int $page = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DedicatedInferencesListTokens200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/dedicated-inferences/{dedicated_inference_id}/tokens')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DedicatedInferencesListTokens200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:create`.
+     * @return Envelope<DedicatedInferencesCreateTokens202Content|Error>
      */
     public function dedicatedInferencesCreateTokens(
         string $dedicatedInferenceId,
         DedicatedInferenceTokenCreateRequest $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DedicatedInferencesCreateTokens202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/dedicated-inferences/{dedicated_inference_id}/tokens')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(DedicatedInferencesCreateTokens202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `dedicated_inference_tokens:delete`.
+     * @return Envelope<null|Error>
      */
-    public function dedicatedInferencesDeleteTokens(string $dedicatedInferenceId, string $tokenId): void
+    public function dedicatedInferencesDeleteTokens(string $dedicatedInferenceId, string $tokenId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/dedicated-inferences/{dedicated_inference_id}/tokens/{token_id}')
                 ->path('dedicated_inference_id', $dedicatedInferenceId)
                 ->path('token_id', $tokenId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

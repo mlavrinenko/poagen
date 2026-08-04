@@ -36,6 +36,7 @@ use Acme\GitHub\Generated\Enum\ReposListForksSort;
 use Acme\GitHub\Generated\Enum\ReposListWebhookDeliveriesStatus;
 use Acme\GitHub\Generated\Model\Activity;
 use Acme\GitHub\Generated\Model\Autolink;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\BranchProtection;
 use Acme\GitHub\Generated\Model\BranchRestrictionPolicy;
 use Acme\GitHub\Generated\Model\BranchShort;
@@ -67,6 +68,7 @@ use Acme\GitHub\Generated\Model\DeploymentBranchPolicyNamePattern;
 use Acme\GitHub\Generated\Model\DeploymentBranchPolicyNamePatternWithType;
 use Acme\GitHub\Generated\Model\DeploymentProtectionRule;
 use Acme\GitHub\Generated\Model\DeploymentStatus;
+use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\Environment;
 use Acme\GitHub\Generated\Model\FileCommit;
 use Acme\GitHub\Generated\Model\FullRepository;
@@ -96,12 +98,14 @@ use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequestContent;
 use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequestContent;
 use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequestContent;
 use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReporting200Content;
+use Acme\GitHub\Generated\Model\ReposCompareCommits503Content;
 use Acme\GitHub\Generated\Model\ReposCreateAttestation201Content;
 use Acme\GitHub\Generated\Model\ReposCreateAttestationRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeployment202Content;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequestContent;
@@ -110,7 +114,6 @@ use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateForkRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateInOrgRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequestContent;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequestContent;
@@ -119,10 +122,13 @@ use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequestContent;
 use Acme\GitHub\Generated\Model\ReposCreateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent;
+use Acme\GitHub\Generated\Model\ReposDelete403Content;
+use Acme\GitHub\Generated\Model\ReposDeleteFile503Content;
 use Acme\GitHub\Generated\Model\ReposDeleteFileRequestContent;
 use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequestContent;
 use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRules200Content;
 use Acme\GitHub\Generated\Model\ReposGetAllEnvironments200Content;
+use Acme\GitHub\Generated\Model\ReposGetCommit503Content;
 use Acme\GitHub\Generated\Model\ReposListAttestations200Content;
 use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrations200Content;
 use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPolicies200Content;
@@ -164,8 +170,11 @@ use Acme\GitHub\Generated\Model\StatusCheckPolicy;
 use Acme\GitHub\Generated\Model\Tag;
 use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\Topic;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\ViewTraffic;
 use Acme\GitHub\Generated\Model\WebhookConfig;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Psr\Http\Message\StreamInterface;
 
 /**
@@ -178,7 +187,7 @@ use Psr\Http\Message\StreamInterface;
 interface ReposClientInterface
 {
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>>
      */
     public function reposListForOrg(
         string $org,
@@ -187,22 +196,31 @@ interface ReposClientInterface
         ?ReposListForOrgDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): FullRepository;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryRuleset>
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<RepositoryRuleset>|BasicError>
      */
     public function reposGetOrgRulesets(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $targets = null,
-    ): array;
+    ): Envelope;
 
-    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): RepositoryRuleset;
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
+    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): Envelope;
 
+    /**
+     * @return Envelope<RuleSuites|BasicError>
+     */
     public function reposGetOrgRuleSuites(
         string $org,
         ?string $ref = null,
@@ -212,28 +230,49 @@ interface ReposClientInterface
         ?ReposGetOrgRuleSuitesRuleSuiteResult $ruleSuiteResult = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): RuleSuites;
+    ): Envelope;
 
-    public function reposGetOrgRuleSuite(string $org, int $ruleSuiteId): RuleSuite;
+    /**
+     * @return Envelope<RuleSuite|BasicError>
+     */
+    public function reposGetOrgRuleSuite(string $org, int $ruleSuiteId): Envelope;
 
-    public function reposGetOrgRuleset(string $org, int $rulesetId): RepositoryRuleset;
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError>
+     */
+    public function reposGetOrgRuleset(string $org, int $rulesetId): Envelope;
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposUpdateOrgRuleset(
         string $org,
         int $rulesetId,
         ReposUpdateOrgRulesetRequestContent $body,
-    ): RepositoryRuleset;
-
-    public function reposDeleteOrgRuleset(string $org, int $rulesetId): void;
-
-    public function reposGet(string $owner, string $repo): FullRepository;
-
-    public function reposDelete(string $owner, string $repo): void;
-
-    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): FullRepository;
+    ): Envelope;
 
     /**
-     * @return list<Activity>
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteOrgRuleset(string $org, int $rulesetId): Envelope;
+
+    /**
+     * @return Envelope<FullRepository|BasicError>
+     */
+    public function reposGet(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|ReposDelete403Content|BasicError>
+     */
+    public function reposDelete(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<Activity>|ValidationErrorSimple>
      */
     public function reposListActivities(
         string $owner,
@@ -246,14 +285,20 @@ interface ReposClientInterface
         ?string $actor = null,
         ?ReposListActivitiesTimePeriod $timePeriod = null,
         ?ReposListActivitiesActivityType $activityType = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReposCreateAttestation201Content|BasicError|ValidationError>
+     */
     public function reposCreateAttestation(
         string $owner,
         string $repo,
         ReposCreateAttestationRequestContent $body,
-    ): ReposCreateAttestation201Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReposListAttestations200Content>
+     */
     public function reposListAttestations(
         string $owner,
         string $repo,
@@ -262,31 +307,49 @@ interface ReposClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): ReposListAttestations200Content;
+    ): Envelope;
 
     /**
-     * @return list<Autolink>
+     * @return Envelope<list<Autolink>>
      */
-    public function reposListAutolinks(string $owner, string $repo): array;
+    public function reposListAutolinks(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<Autolink|ValidationError>
+     */
     public function reposCreateAutolink(
         string $owner,
         string $repo,
         ReposCreateAutolinkRequestContent $body,
-    ): Autolink;
-
-    public function reposGetAutolink(string $owner, string $repo, int $autolinkId): Autolink;
-
-    public function reposDeleteAutolink(string $owner, string $repo, int $autolinkId): void;
-
-    public function reposCheckAutomatedSecurityFixes(string $owner, string $repo): CheckAutomatedSecurityFixes;
-
-    public function reposEnableAutomatedSecurityFixes(string $owner, string $repo): void;
-
-    public function reposDisableAutomatedSecurityFixes(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<ShortBranch>
+     * @return Envelope<Autolink|BasicError>
+     */
+    public function reposGetAutolink(string $owner, string $repo, int $autolinkId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteAutolink(string $owner, string $repo, int $autolinkId): Envelope;
+
+    /**
+     * @return Envelope<CheckAutomatedSecurityFixes|null>
+     */
+    public function reposCheckAutomatedSecurityFixes(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function reposEnableAutomatedSecurityFixes(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDisableAutomatedSecurityFixes(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<ShortBranch>|BasicError>
      */
     public function reposListBranches(
         string $owner,
@@ -294,170 +357,210 @@ interface ReposClientInterface
         ?bool $protected = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function reposGetBranch(string $owner, string $repo, string $branch): BranchWithProtection;
+    /**
+     * @return Envelope<BranchWithProtection|BasicError>
+     */
+    public function reposGetBranch(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposGetBranchProtection(string $owner, string $repo, string $branch): BranchProtection;
+    /**
+     * @return Envelope<BranchProtection|BasicError>
+     */
+    public function reposGetBranchProtection(string $owner, string $repo, string $branch): Envelope;
 
+    /**
+     * @return Envelope<ProtectedBranch|BasicError|ValidationErrorSimple>
+     */
     public function reposUpdateBranchProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdateBranchProtectionRequestContent $body,
-    ): ProtectedBranch;
+    ): Envelope;
 
-    public function reposDeleteBranchProtection(string $owner, string $repo, string $branch): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteBranchProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposGetAdminBranchProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced;
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced>
+     */
+    public function reposGetAdminBranchProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposSetAdminBranchProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced;
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced>
+     */
+    public function reposSetAdminBranchProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposDeleteAdminBranchProtection(string $owner, string $repo, string $branch): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteAdminBranchProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposGetPullRequestReviewProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchPullRequestReview;
+    /**
+     * @return Envelope<ProtectedBranchPullRequestReview>
+     */
+    public function reposGetPullRequestReviewProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposDeletePullRequestReviewProtection(string $owner, string $repo, string $branch): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeletePullRequestReviewProtection(string $owner, string $repo, string $branch): Envelope;
 
+    /**
+     * @return Envelope<ProtectedBranchPullRequestReview|ValidationError>
+     */
     public function reposUpdatePullRequestReviewProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdatePullRequestReviewProtectionRequestContent $body,
-    ): ProtectedBranchPullRequestReview;
+    ): Envelope;
 
-    public function reposGetCommitSignatureProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced;
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced|BasicError>
+     */
+    public function reposGetCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposCreateCommitSignatureProtection(
-        string $owner,
-        string $repo,
-        string $branch,
-    ): ProtectedBranchAdminEnforced;
+    /**
+     * @return Envelope<ProtectedBranchAdminEnforced|BasicError>
+     */
+    public function reposCreateCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposDeleteCommitSignatureProtection(string $owner, string $repo, string $branch): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteCommitSignatureProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposGetStatusChecksProtection(string $owner, string $repo, string $branch): StatusCheckPolicy;
+    /**
+     * @return Envelope<StatusCheckPolicy|BasicError>
+     */
+    public function reposGetStatusChecksProtection(string $owner, string $repo, string $branch): Envelope;
 
-    public function reposRemoveStatusCheckProtection(string $owner, string $repo, string $branch): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposRemoveStatusCheckProtection(string $owner, string $repo, string $branch): Envelope;
 
+    /**
+     * @return Envelope<StatusCheckPolicy|BasicError|ValidationError>
+     */
     public function reposUpdateStatusCheckProtection(
         string $owner,
         string $repo,
         string $branch,
         ReposUpdateStatusCheckProtectionRequestContent $body,
-    ): StatusCheckPolicy;
+    ): Envelope;
 
     /**
-     * @return list<string>
+     * @return Envelope<list<string>|BasicError>
      */
-    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): array;
-
-    public function reposGetAccessRestrictions(string $owner, string $repo, string $branch): BranchRestrictionPolicy;
-
-    public function reposDeleteAccessRestrictions(string $owner, string $repo, string $branch): void;
+    public function reposGetAllStatusCheckContexts(string $owner, string $repo, string $branch): Envelope;
 
     /**
-     * @return list<Integration>
+     * @return Envelope<BranchRestrictionPolicy|BasicError>
      */
-    public function reposGetAppsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array;
+    public function reposGetAccessRestrictions(string $owner, string $repo, string $branch): Envelope;
 
     /**
-     * @return list<Integration>
+     * @return Envelope<null>
+     */
+    public function reposDeleteAccessRestrictions(string $owner, string $repo, string $branch): Envelope;
+
+    /**
+     * @return Envelope<list<Integration>|BasicError>
+     */
+    public function reposGetAppsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope;
+
+    /**
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposSetAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposSetAppAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposAddAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposAddAppAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Integration>
+     * @return Envelope<list<Integration>|ValidationError>
      */
     public function reposRemoveAppAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposRemoveAppAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError>
      */
-    public function reposGetTeamsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array;
+    public function reposGetTeamsWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|BasicError>
      */
-    public function reposGetUsersWithAccessToProtectedBranch(string $owner, string $repo, string $branch): array;
+    public function reposGetUsersWithAccessToProtectedBranch(string $owner, string $repo, string $branch): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposSetUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposSetUserAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposAddUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposAddUserAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function reposRemoveUserAccessRestrictions(
         string $owner,
         string $repo,
         string $branch,
         ReposRemoveUserAccessRestrictionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BranchWithProtection|BasicError|ValidationError>
+     */
     public function reposRenameBranch(
         string $owner,
         string $repo,
         string $branch,
         ReposRenameBranchRequestContent $body,
-    ): BranchWithProtection;
-
-    public function reposCodeownersErrors(string $owner, string $repo, ?string $ref = null): CodeownersErrors;
+    ): Envelope;
 
     /**
-     * @return list<Collaborator>
+     * @return Envelope<CodeownersErrors|null>
+     */
+    public function reposCodeownersErrors(string $owner, string $repo, ?string $ref = null): Envelope;
+
+    /**
+     * @return Envelope<list<Collaborator>|BasicError>
      */
     public function reposListCollaborators(
         string $owner,
@@ -466,48 +569,65 @@ interface ReposClientInterface
         ?ReposListCollaboratorsPermission $permission = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function reposCheckCollaborator(string $owner, string $repo, string $username): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposCheckCollaborator(string $owner, string $repo, string $username): Envelope;
 
+    /**
+     * @return Envelope<RepositoryInvitation|null|ValidationError|BasicError>
+     */
     public function reposAddCollaborator(
         string $owner,
         string $repo,
         string $username,
         ReposAddCollaboratorRequestContent $body,
-    ): RepositoryInvitation;
-
-    public function reposRemoveCollaborator(string $owner, string $repo, string $username): void;
-
-    public function reposGetCollaboratorPermissionLevel(
-        string $owner,
-        string $repo,
-        string $username,
-    ): RepositoryCollaboratorPermission;
+    ): Envelope;
 
     /**
-     * @return list<CommitComment>
+     * @return Envelope<null|ValidationError|BasicError>
+     */
+    public function reposRemoveCollaborator(string $owner, string $repo, string $username): Envelope;
+
+    /**
+     * @return Envelope<RepositoryCollaboratorPermission|BasicError>
+     */
+    public function reposGetCollaboratorPermissionLevel(string $owner, string $repo, string $username): Envelope;
+
+    /**
+     * @return Envelope<list<CommitComment>>
      */
     public function reposListCommitCommentsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function reposGetCommitComment(string $owner, string $repo, int $commentId): CommitComment;
+    /**
+     * @return Envelope<CommitComment|BasicError>
+     */
+    public function reposGetCommitComment(string $owner, string $repo, int $commentId): Envelope;
 
-    public function reposDeleteCommitComment(string $owner, string $repo, int $commentId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteCommitComment(string $owner, string $repo, int $commentId): Envelope;
 
+    /**
+     * @return Envelope<CommitComment|BasicError>
+     */
     public function reposUpdateCommitComment(
         string $owner,
         string $repo,
         int $commentId,
         ReposUpdateCommitCommentRequestContent $body,
-    ): CommitComment;
+    ): Envelope;
 
     /**
-     * @return list<Commit>
+     * @return Envelope<list<Commit>|BasicError>
      */
     public function reposListCommits(
         string $owner,
@@ -520,15 +640,15 @@ interface ReposClientInterface
         ?\DateTimeImmutable $until = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<BranchShort>
+     * @return Envelope<list<BranchShort>|ValidationError|BasicError>
      */
-    public function reposListBranchesForHeadCommit(string $owner, string $repo, string $commitSha): array;
+    public function reposListBranchesForHeadCommit(string $owner, string $repo, string $commitSha): Envelope;
 
     /**
-     * @return list<CommitComment>
+     * @return Envelope<list<CommitComment>>
      */
     public function reposListCommentsForCommit(
         string $owner,
@@ -536,17 +656,20 @@ interface ReposClientInterface
         string $commitSha,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CommitComment|BasicError|ValidationError>
+     */
     public function reposCreateCommitComment(
         string $owner,
         string $repo,
         string $commitSha,
         ReposCreateCommitCommentRequestContent $body,
-    ): CommitComment;
+    ): Envelope;
 
     /**
-     * @return list<PullRequestSimple>
+     * @return Envelope<list<PullRequestSimple>|BasicError>
      */
     public function reposListPullRequestsAssociatedWithCommit(
         string $owner,
@@ -554,26 +677,32 @@ interface ReposClientInterface
         string $commitSha,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Commit|ValidationError|BasicError|ReposGetCommit503Content>
+     */
     public function reposGetCommit(
         string $owner,
         string $repo,
         string $ref,
         ?int $page = null,
         ?int $perPage = null,
-    ): Commit;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CombinedCommitStatus|BasicError>
+     */
     public function reposGetCombinedStatusForRef(
         string $owner,
         string $repo,
         string $ref,
         ?int $perPage = null,
         ?int $page = null,
-    ): CombinedCommitStatus;
+    ): Envelope;
 
     /**
-     * @return list<Status>
+     * @return Envelope<list<Status>|BasicError>
      */
     public function reposListCommitStatusesForRef(
         string $owner,
@@ -581,20 +710,27 @@ interface ReposClientInterface
         string $ref,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function reposGetCommunityProfileMetrics(string $owner, string $repo): CommunityProfile;
+    /**
+     * @return Envelope<CommunityProfile>
+     */
+    public function reposGetCommunityProfileMetrics(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<CommitComparison|BasicError|ReposCompareCommits503Content>
+     */
     public function reposCompareCommits(
         string $owner,
         string $repo,
         string $basehead,
         ?int $page = null,
         ?int $perPage = null,
-    ): CommitComparison;
+    ): Envelope;
 
     /**
      * @param array<string, mixed> $body
+     * @return Envelope<ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule|BasicError|null>
      */
     public function reposGetContent(
         string $owner,
@@ -602,24 +738,20 @@ interface ReposClientInterface
         string $path,
         array $body,
         ?string $ref = null,
-    ): ContentDirectory|ContentFile|ContentSymlink|ContentSubmodule;
+    ): Envelope;
 
-    public function reposCreateOrUpdateFileContents(
-        string $owner,
-        string $repo,
-        string $path,
-        ReposCreateOrUpdateFileContentsRequestContent $body,
-    ): FileCommit;
-
+    /**
+     * @return Envelope<FileCommit|ValidationError|BasicError|ReposDeleteFile503Content>
+     */
     public function reposDeleteFile(
         string $owner,
         string $repo,
         string $path,
         ReposDeleteFileRequestContent $body,
-    ): FileCommit;
+    ): Envelope;
 
     /**
-     * @return list<Contributor>
+     * @return Envelope<list<Contributor>|null|BasicError>
      */
     public function reposListContributors(
         string $owner,
@@ -627,10 +759,10 @@ interface ReposClientInterface
         ?string $anon = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Deployment>
+     * @return Envelope<list<Deployment>>
      */
     public function reposListDeployments(
         string $owner,
@@ -641,20 +773,29 @@ interface ReposClientInterface
         ?string $environment = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<Deployment|ReposCreateDeployment202Content|null|ValidationError>
+     */
     public function reposCreateDeployment(
         string $owner,
         string $repo,
         ReposCreateDeploymentRequestContent $body,
-    ): Deployment;
-
-    public function reposGetDeployment(string $owner, string $repo, int $deploymentId): Deployment;
-
-    public function reposDeleteDeployment(string $owner, string $repo, int $deploymentId): void;
+    ): Envelope;
 
     /**
-     * @return list<DeploymentStatus>
+     * @return Envelope<Deployment|BasicError>
+     */
+    public function reposGetDeployment(string $owner, string $repo, int $deploymentId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|ValidationErrorSimple>
+     */
+    public function reposDeleteDeployment(string $owner, string $repo, int $deploymentId): Envelope;
+
+    /**
+     * @return Envelope<list<DeploymentStatus>|BasicError>
      */
     public function reposListDeploymentStatuses(
         string $owner,
@@ -662,120 +803,166 @@ interface ReposClientInterface
         int $deploymentId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentStatus|ValidationError>
+     */
     public function reposCreateDeploymentStatus(
         string $owner,
         string $repo,
         int $deploymentId,
         ReposCreateDeploymentStatusRequestContent $body,
-    ): DeploymentStatus;
+    ): Envelope;
 
-    public function reposGetDeploymentStatus(
-        string $owner,
-        string $repo,
-        int $deploymentId,
-        int $statusId,
-    ): DeploymentStatus;
+    /**
+     * @return Envelope<DeploymentStatus|BasicError>
+     */
+    public function reposGetDeploymentStatus(string $owner, string $repo, int $deploymentId, int $statusId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function reposCreateDispatchEvent(
         string $owner,
         string $repo,
         ReposCreateDispatchEventRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReposGetAllEnvironments200Content>
+     */
     public function reposGetAllEnvironments(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposGetAllEnvironments200Content;
+    ): Envelope;
 
-    public function reposGetEnvironment(string $owner, string $repo, string $environmentName): Environment;
+    /**
+     * @return Envelope<Environment>
+     */
+    public function reposGetEnvironment(string $owner, string $repo, string $environmentName): Envelope;
 
+    /**
+     * @return Envelope<Environment|BasicError>
+     */
     public function reposCreateOrUpdateEnvironment(
         string $owner,
         string $repo,
         string $environmentName,
         ReposCreateOrUpdateEnvironmentRequestContent $body,
-    ): Environment;
+    ): Envelope;
 
-    public function reposDeleteAnEnvironment(string $owner, string $repo, string $environmentName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteAnEnvironment(string $owner, string $repo, string $environmentName): Envelope;
 
+    /**
+     * @return Envelope<ReposListDeploymentBranchPolicies200Content>
+     */
     public function reposListDeploymentBranchPolicies(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposListDeploymentBranchPolicies200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy|null>
+     */
     public function reposCreateDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         DeploymentBranchPolicyNamePatternWithType $body,
-    ): DeploymentBranchPolicy;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy>
+     */
     public function reposGetDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
-    ): DeploymentBranchPolicy;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentBranchPolicy>
+     */
     public function reposUpdateDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
         DeploymentBranchPolicyNamePattern $body,
-    ): DeploymentBranchPolicy;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function reposDeleteDeploymentBranchPolicy(
         string $owner,
         string $repo,
         string $environmentName,
         int $branchPolicyId,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReposGetAllDeploymentProtectionRules200Content>
+     */
     public function reposGetAllDeploymentProtectionRules(
         string $environmentName,
         string $repo,
         string $owner,
-    ): ReposGetAllDeploymentProtectionRules200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentProtectionRule>
+     */
     public function reposCreateDeploymentProtectionRule(
         string $environmentName,
         string $repo,
         string $owner,
         ReposCreateDeploymentProtectionRuleRequestContent $body,
-    ): DeploymentProtectionRule;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReposListCustomDeploymentRuleIntegrations200Content>
+     */
     public function reposListCustomDeploymentRuleIntegrations(
         string $environmentName,
         string $repo,
         string $owner,
         ?int $page = null,
         ?int $perPage = null,
-    ): ReposListCustomDeploymentRuleIntegrations200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeploymentProtectionRule>
+     */
     public function reposGetCustomDeploymentProtectionRule(
         string $owner,
         string $repo,
         string $environmentName,
         int $protectionRuleId,
-    ): DeploymentProtectionRule;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function reposDisableDeploymentProtectionRule(
         string $environmentName,
         string $repo,
         string $owner,
         int $protectionRuleId,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|BasicError>
      */
     public function reposListForks(
         string $owner,
@@ -783,39 +970,60 @@ interface ReposClientInterface
         ?ReposListForksSort $sort = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): FullRepository;
+    ): Envelope;
 
     /**
-     * @return list<Hook>
+     * @return Envelope<FullRepository|BasicError|ValidationError>
      */
-    public function reposListWebhooks(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): Envelope;
 
-    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Hook;
+    /**
+     * @return Envelope<list<Hook>|BasicError>
+     */
+    public function reposListWebhooks(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function reposGetWebhook(string $owner, string $repo, int $hookId): Hook;
+    /**
+     * @return Envelope<Hook|BasicError|ValidationError>
+     */
+    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Envelope;
 
-    public function reposDeleteWebhook(string $owner, string $repo, int $hookId): void;
+    /**
+     * @return Envelope<Hook|BasicError>
+     */
+    public function reposGetWebhook(string $owner, string $repo, int $hookId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteWebhook(string $owner, string $repo, int $hookId): Envelope;
+
+    /**
+     * @return Envelope<Hook|ValidationError|BasicError>
+     */
     public function reposUpdateWebhook(
         string $owner,
         string $repo,
         int $hookId,
         ReposUpdateWebhookRequestContent $body,
-    ): Hook;
+    ): Envelope;
 
-    public function reposGetWebhookConfigForRepo(string $owner, string $repo, int $hookId): WebhookConfig;
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function reposGetWebhookConfigForRepo(string $owner, string $repo, int $hookId): Envelope;
 
+    /**
+     * @return Envelope<WebhookConfig>
+     */
     public function reposUpdateWebhookConfigForRepo(
         string $owner,
         string $repo,
         int $hookId,
         ReposUpdateWebhookConfigForRepoRequestContent $body,
-    ): WebhookConfig;
+    ): Envelope;
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function reposListWebhookDeliveries(
         string $owner,
@@ -824,170 +1032,299 @@ interface ReposClientInterface
         ?int $perPage = null,
         ?string $cursor = null,
         ?ReposListWebhookDeliveriesStatus $status = null,
-    ): array;
-
-    public function reposGetWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): HookDelivery;
-
-    public function reposRedeliverWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): void;
-
-    public function reposPingWebhook(string $owner, string $repo, int $hookId): void;
-
-    public function reposTestPushWebhook(string $owner, string $repo, int $hookId): void;
-
-    public function reposCheckImmutableReleases(string $owner, string $repo): CheckImmutableReleases;
-
-    public function reposEnableImmutableReleases(string $owner, string $repo): void;
-
-    public function reposDisableImmutableReleases(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryInvitation>
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
      */
-    public function reposListInvitations(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposGetWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): Envelope;
 
-    public function reposDeleteInvitation(string $owner, string $repo, int $invitationId): void;
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function reposRedeliverWebhookDelivery(string $owner, string $repo, int $hookId, int $deliveryId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposPingWebhook(string $owner, string $repo, int $hookId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposTestPushWebhook(string $owner, string $repo, int $hookId): Envelope;
+
+    /**
+     * @return Envelope<CheckImmutableReleases|null>
+     */
+    public function reposCheckImmutableReleases(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposEnableImmutableReleases(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDisableImmutableReleases(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<RepositoryInvitation>>
+     */
+    public function reposListInvitations(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteInvitation(string $owner, string $repo, int $invitationId): Envelope;
+
+    /**
+     * @return Envelope<RepositoryInvitation>
+     */
     public function reposUpdateInvitation(
         string $owner,
         string $repo,
         int $invitationId,
         ReposUpdateInvitationRequestContent $body,
-    ): RepositoryInvitation;
+    ): Envelope;
 
     /**
-     * @return list<DeployKey>
+     * @return Envelope<list<DeployKey>>
      */
-    public function reposListDeployKeys(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposListDeployKeys(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
+    /**
+     * @return Envelope<DeployKey|ValidationError>
+     */
     public function reposCreateDeployKey(
         string $owner,
         string $repo,
         ReposCreateDeployKeyRequestContent $body,
-    ): DeployKey;
+    ): Envelope;
 
-    public function reposGetDeployKey(string $owner, string $repo, int $keyId): DeployKey;
+    /**
+     * @return Envelope<DeployKey|BasicError>
+     */
+    public function reposGetDeployKey(string $owner, string $repo, int $keyId): Envelope;
 
-    public function reposDeleteDeployKey(string $owner, string $repo, int $keyId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDeleteDeployKey(string $owner, string $repo, int $keyId): Envelope;
 
-    public function reposListLanguages(string $owner, string $repo): Language;
+    /**
+     * @return Envelope<Language>
+     */
+    public function reposListLanguages(string $owner, string $repo): Envelope;
 
-    public function reposMergeUpstream(
-        string $owner,
-        string $repo,
-        ReposMergeUpstreamRequestContent $body,
-    ): MergedUpstream;
+    /**
+     * @return Envelope<MergedUpstream|null>
+     */
+    public function reposMergeUpstream(string $owner, string $repo, ReposMergeUpstreamRequestContent $body): Envelope;
 
-    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Commit;
+    /**
+     * @return Envelope<Commit|null|BasicError|ValidationError>
+     */
+    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Envelope;
 
-    public function reposGetPages(string $owner, string $repo): Page;
+    /**
+     * @return Envelope<Page|BasicError>
+     */
+    public function reposGetPages(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
     public function reposUpdateInformationAboutPagesSite(
         string $owner,
         string $repo,
         ReposUpdateInformationAboutPagesSiteRequestContent $body,
-    ): void;
-
-    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequestContent $body): Page;
-
-    public function reposDeletePagesSite(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<PageBuild>
+     * @return Envelope<Page|ValidationError|BasicError>
      */
-    public function reposListPagesBuilds(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposCreatePagesSite(
+        string $owner,
+        string $repo,
+        ReposCreatePagesSiteRequestContent $body,
+    ): Envelope;
 
-    public function reposRequestPagesBuild(string $owner, string $repo): PageBuildStatus;
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
+    public function reposDeletePagesSite(string $owner, string $repo): Envelope;
 
-    public function reposGetLatestPagesBuild(string $owner, string $repo): PageBuild;
+    /**
+     * @return Envelope<list<PageBuild>>
+     */
+    public function reposListPagesBuilds(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
-    public function reposGetPagesBuild(string $owner, string $repo, int $buildId): PageBuild;
+    /**
+     * @return Envelope<PageBuildStatus>
+     */
+    public function reposRequestPagesBuild(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<PageBuild>
+     */
+    public function reposGetLatestPagesBuild(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<PageBuild>
+     */
+    public function reposGetPagesBuild(string $owner, string $repo, int $buildId): Envelope;
+
+    /**
+     * @return Envelope<PageDeployment|BasicError|ValidationError>
+     */
     public function reposCreatePagesDeployment(
         string $owner,
         string $repo,
         ReposCreatePagesDeploymentRequestContent $body,
-    ): PageDeployment;
-
-    public function reposGetPagesDeployment(
-        string $owner,
-        string $repo,
-        int|string $pagesDeploymentId,
-    ): PagesDeploymentStatus;
-
-    public function reposCancelPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): void;
-
-    public function reposGetPagesHealthCheck(string $owner, string $repo): PagesHealthCheck;
-
-    public function reposCheckPrivateVulnerabilityReporting(
-        string $owner,
-        string $repo,
-    ): ReposCheckPrivateVulnerabilityReporting200Content;
-
-    public function reposEnablePrivateVulnerabilityReporting(string $owner, string $repo): void;
-
-    public function reposDisablePrivateVulnerabilityReporting(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<CustomPropertyValue>
+     * @return Envelope<PagesDeploymentStatus|BasicError>
      */
-    public function reposCustomPropertiesForReposGetRepositoryValues(string $owner, string $repo): array;
+    public function reposGetPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposCancelPagesDeployment(string $owner, string $repo, int|string $pagesDeploymentId): Envelope;
+
+    /**
+     * @return Envelope<PagesHealthCheck|EmptyObject|null|BasicError>
+     */
+    public function reposGetPagesHealthCheck(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<ReposCheckPrivateVulnerabilityReporting200Content|BasicError>
+     */
+    public function reposCheckPrivateVulnerabilityReporting(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposEnablePrivateVulnerabilityReporting(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDisablePrivateVulnerabilityReporting(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<CustomPropertyValue>|BasicError>
+     */
+    public function reposCustomPropertiesForReposGetRepositoryValues(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function reposCustomPropertiesForReposCreateOrUpdateRepositoryValues(
         string $owner,
         string $repo,
         ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent $body,
-    ): void;
-
-    public function reposGetReadme(string $owner, string $repo, ?string $ref = null): ContentFile;
-
-    public function reposGetReadmeInDirectory(
-        string $owner,
-        string $repo,
-        string $dir,
-        ?string $ref = null,
-    ): ContentFile;
+    ): Envelope;
 
     /**
-     * @return list<Release>
+     * @return Envelope<ContentFile|null|BasicError|ValidationError>
      */
-    public function reposListReleases(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposGetReadme(string $owner, string $repo, ?string $ref = null): Envelope;
 
-    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Release;
+    /**
+     * @return Envelope<ContentFile|BasicError|ValidationError>
+     */
+    public function reposGetReadmeInDirectory(string $owner, string $repo, string $dir, ?string $ref = null): Envelope;
 
-    public function reposGetReleaseAsset(string $owner, string $repo, int $assetId): ReleaseAsset;
+    /**
+     * @return Envelope<list<Release>|BasicError>
+     */
+    public function reposListReleases(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function reposDeleteReleaseAsset(string $owner, string $repo, int $assetId): void;
+    /**
+     * @return Envelope<Release|BasicError|ValidationError>
+     */
+    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Envelope;
 
+    /**
+     * @return Envelope<ReleaseAsset|BasicError|null>
+     */
+    public function reposGetReleaseAsset(string $owner, string $repo, int $assetId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteReleaseAsset(string $owner, string $repo, int $assetId): Envelope;
+
+    /**
+     * @return Envelope<ReleaseAsset>
+     */
     public function reposUpdateReleaseAsset(
         string $owner,
         string $repo,
         int $assetId,
         ReposUpdateReleaseAssetRequestContent $body,
-    ): ReleaseAsset;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReleaseNotesContent|BasicError>
+     */
     public function reposGenerateReleaseNotes(
         string $owner,
         string $repo,
         ReposGenerateReleaseNotesRequestContent $body,
-    ): ReleaseNotesContent;
+    ): Envelope;
 
-    public function reposGetLatestRelease(string $owner, string $repo): Release;
+    /**
+     * @return Envelope<Release|BasicError>
+     */
+    public function reposGetLatestRelease(string $owner, string $repo): Envelope;
 
-    public function reposGetReleaseByTag(string $owner, string $repo, string $tag): Release;
+    /**
+     * @return Envelope<Release|BasicError>
+     */
+    public function reposGetReleaseByTag(string $owner, string $repo, string $tag): Envelope;
 
-    public function reposGetRelease(string $owner, string $repo, int $releaseId): Release;
+    /**
+     * @return Envelope<Release|null>
+     */
+    public function reposGetRelease(string $owner, string $repo, int $releaseId): Envelope;
 
-    public function reposDeleteRelease(string $owner, string $repo, int $releaseId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteRelease(string $owner, string $repo, int $releaseId): Envelope;
 
+    /**
+     * @return Envelope<Release|BasicError>
+     */
     public function reposUpdateRelease(
         string $owner,
         string $repo,
         int $releaseId,
         ReposUpdateReleaseRequestContent $body,
-    ): Release;
+    ): Envelope;
 
     /**
-     * @return list<ReleaseAsset>
+     * @return Envelope<list<ReleaseAsset>>
      */
     public function reposListReleaseAssets(
         string $owner,
@@ -995,8 +1332,11 @@ interface ReposClientInterface
         int $releaseId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ReleaseAsset|null>
+     */
     public function reposUploadReleaseAsset(
         string $owner,
         string $repo,
@@ -1004,10 +1344,10 @@ interface ReposClientInterface
         string $name,
         StreamInterface $body,
         ?string $label = null,
-    ): ReleaseAsset;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryRuleDetailed>
+     * @return Envelope<list<RepositoryRuleDetailed>>
      */
     public function reposGetBranchRules(
         string $owner,
@@ -1015,10 +1355,10 @@ interface ReposClientInterface
         string $branch,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryRuleset>
+     * @return Envelope<list<RepositoryRuleset>|BasicError>
      */
     public function reposGetRepoRulesets(
         string $owner,
@@ -1027,14 +1367,20 @@ interface ReposClientInterface
         ?int $page = null,
         ?bool $includesParents = null,
         ?string $targets = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposCreateRepoRuleset(
         string $owner,
         string $repo,
         ReposCreateRepoRulesetRequestContent $body,
-    ): RepositoryRuleset;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RuleSuites|BasicError>
+     */
     public function reposGetRepoRuleSuites(
         string $owner,
         string $repo,
@@ -1044,28 +1390,40 @@ interface ReposClientInterface
         ?ReposGetRepoRuleSuitesRuleSuiteResult $ruleSuiteResult = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): RuleSuites;
+    ): Envelope;
 
-    public function reposGetRepoRuleSuite(string $owner, string $repo, int $ruleSuiteId): RuleSuite;
+    /**
+     * @return Envelope<RuleSuite|BasicError>
+     */
+    public function reposGetRepoRuleSuite(string $owner, string $repo, int $ruleSuiteId): Envelope;
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError>
+     */
     public function reposGetRepoRuleset(
         string $owner,
         string $repo,
         int $rulesetId,
         ?bool $includesParents = null,
-    ): RepositoryRuleset;
+    ): Envelope;
 
+    /**
+     * @return Envelope<RepositoryRuleset|BasicError|ValidationError>
+     */
     public function reposUpdateRepoRuleset(
         string $owner,
         string $repo,
         int $rulesetId,
         ReposUpdateRepoRulesetRequestContent $body,
-    ): RepositoryRuleset;
-
-    public function reposDeleteRepoRuleset(string $owner, string $repo, int $rulesetId): void;
+    ): Envelope;
 
     /**
-     * @return list<RulesetVersion>
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeleteRepoRuleset(string $owner, string $repo, int $rulesetId): Envelope;
+
+    /**
+     * @return Envelope<list<RulesetVersion>|BasicError>
      */
     public function reposGetRepoRulesetHistory(
         string $owner,
@@ -1073,101 +1431,138 @@ interface ReposClientInterface
         int $rulesetId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function reposGetRepoRulesetVersion(
-        string $owner,
-        string $repo,
-        int $rulesetId,
-        int $versionId,
-    ): RulesetVersionWithState;
+    ): Envelope;
 
     /**
-     * @return list<CodeFrequencyStat>
+     * @return Envelope<RulesetVersionWithState|BasicError>
      */
-    public function reposGetCodeFrequencyStats(string $owner, string $repo): array;
+    public function reposGetRepoRulesetVersion(string $owner, string $repo, int $rulesetId, int $versionId): Envelope;
 
     /**
-     * @return list<CommitActivity>
+     * @return Envelope<list<CodeFrequencyStat>|array<string, mixed>|null>
      */
-    public function reposGetCommitActivityStats(string $owner, string $repo): array;
+    public function reposGetCodeFrequencyStats(string $owner, string $repo): Envelope;
 
     /**
-     * @return list<ContributorActivity>
+     * @return Envelope<list<CommitActivity>|array<string, mixed>|null>
      */
-    public function reposGetContributorsStats(string $owner, string $repo): array;
-
-    public function reposGetParticipationStats(string $owner, string $repo): ParticipationStats;
+    public function reposGetCommitActivityStats(string $owner, string $repo): Envelope;
 
     /**
-     * @return list<CodeFrequencyStat>
+     * @return Envelope<list<ContributorActivity>|array<string, mixed>|null>
      */
-    public function reposGetPunchCardStats(string $owner, string $repo): array;
+    public function reposGetContributorsStats(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<ParticipationStats|BasicError>
+     */
+    public function reposGetParticipationStats(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<CodeFrequencyStat>|null>
+     */
+    public function reposGetPunchCardStats(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<Status>
+     */
     public function reposCreateCommitStatus(
         string $owner,
         string $repo,
         string $sha,
         ReposCreateCommitStatusRequestContent $body,
-    ): Status;
+    ): Envelope;
 
     /**
-     * @return list<Tag>
+     * @return Envelope<list<Tag>>
      */
-    public function reposListTags(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
-
-    public function reposDownloadTarballArchive(string $owner, string $repo, string $ref): void;
+    public function reposListTags(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<Team>
+     * @return Envelope<null>
      */
-    public function reposListTeams(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
+    public function reposDownloadTarballArchive(string $owner, string $repo, string $ref): Envelope;
 
-    public function reposGetAllTopics(string $owner, string $repo, ?int $page = null, ?int $perPage = null): Topic;
+    /**
+     * @return Envelope<list<Team>|BasicError>
+     */
+    public function reposListTeams(string $owner, string $repo, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<Topic|BasicError>
+     */
+    public function reposGetAllTopics(string $owner, string $repo, ?int $page = null, ?int $perPage = null): Envelope;
+
+    /**
+     * @return Envelope<Topic|BasicError|ValidationErrorSimple>
+     */
     public function reposReplaceAllTopics(
         string $owner,
         string $repo,
         ReposReplaceAllTopicsRequestContent $body,
-    ): Topic;
-
-    public function reposGetClones(string $owner, string $repo, ?ReposGetClonesPer $per = null): CloneTraffic;
+    ): Envelope;
 
     /**
-     * @return list<ContentTraffic>
+     * @return Envelope<CloneTraffic|BasicError>
      */
-    public function reposGetTopPaths(string $owner, string $repo): array;
+    public function reposGetClones(string $owner, string $repo, ?ReposGetClonesPer $per = null): Envelope;
 
     /**
-     * @return list<ReferrerTraffic>
+     * @return Envelope<list<ContentTraffic>|BasicError>
      */
-    public function reposGetTopReferrers(string $owner, string $repo): array;
+    public function reposGetTopPaths(string $owner, string $repo): Envelope;
 
-    public function reposGetViews(string $owner, string $repo, ?ReposGetViewsPer $per = null): ViewTraffic;
+    /**
+     * @return Envelope<list<ReferrerTraffic>|BasicError>
+     */
+    public function reposGetTopReferrers(string $owner, string $repo): Envelope;
 
-    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): MinimalRepository;
+    /**
+     * @return Envelope<ViewTraffic|BasicError>
+     */
+    public function reposGetViews(string $owner, string $repo, ?ReposGetViewsPer $per = null): Envelope;
 
-    public function reposCheckVulnerabilityAlerts(string $owner, string $repo): void;
+    /**
+     * @return Envelope<MinimalRepository>
+     */
+    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): Envelope;
 
-    public function reposEnableVulnerabilityAlerts(string $owner, string $repo): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposCheckVulnerabilityAlerts(string $owner, string $repo): Envelope;
 
-    public function reposDisableVulnerabilityAlerts(string $owner, string $repo): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposEnableVulnerabilityAlerts(string $owner, string $repo): Envelope;
 
-    public function reposDownloadZipballArchive(string $owner, string $repo, string $ref): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDisableVulnerabilityAlerts(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
+    public function reposDownloadZipballArchive(string $owner, string $repo, string $ref): Envelope;
+
+    /**
+     * @return Envelope<FullRepository>
+     */
     public function reposCreateUsingTemplate(
         string $templateOwner,
         string $templateRepo,
         ReposCreateUsingTemplateRequestContent $body,
-    ): FullRepository;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|ValidationError|null>
      */
-    public function reposListPublic(?int $since = null): array;
+    public function reposListPublic(?int $since = null): Envelope;
 
     /**
-     * @return list<Repository>
+     * @return Envelope<list<Repository>|ValidationError|null|BasicError>
      */
     public function reposListForAuthenticatedUser(
         ?ReposListForAuthenticatedUserVisibility $visibility = null,
@@ -1179,23 +1574,30 @@ interface ReposClientInterface
         ?int $page = null,
         ?\DateTimeImmutable $since = null,
         ?\DateTimeImmutable $before = null,
-    ): array;
-
-    public function reposCreateForAuthenticatedUser(
-        ReposCreateForAuthenticatedUserRequestContent $body,
-    ): FullRepository;
+    ): Envelope;
 
     /**
-     * @return list<RepositoryInvitation>
+     * @return Envelope<FullRepository|BasicError|null|ValidationError>
      */
-    public function reposListInvitationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
-
-    public function reposDeclineInvitationForAuthenticatedUser(int $invitationId): void;
-
-    public function reposAcceptInvitationForAuthenticatedUser(int $invitationId): void;
+    public function reposCreateForAuthenticatedUser(ReposCreateForAuthenticatedUserRequestContent $body): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<RepositoryInvitation>|null|BasicError>
+     */
+    public function reposListInvitationsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposDeclineInvitationForAuthenticatedUser(int $invitationId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function reposAcceptInvitationForAuthenticatedUser(int $invitationId): Envelope;
+
+    /**
+     * @return Envelope<list<MinimalRepository>>
      */
     public function reposListForUser(
         string $username,
@@ -1204,5 +1606,5 @@ interface ReposClientInterface
         ?ReposListForUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 }

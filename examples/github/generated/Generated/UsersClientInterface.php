@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\UsersGetContextForUserSubjectType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Email;
+use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\GpgKey;
 use Acme\GitHub\Generated\Model\Hovercard;
 use Acme\GitHub\Generated\Model\Key;
@@ -34,6 +36,8 @@ use Acme\GitHub\Generated\Model\UsersListAttestationsBulk200Content;
 use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequestContent;
 use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `users` endpoints.
@@ -44,135 +48,210 @@ use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequestContent;
  */
 interface UsersClientInterface
 {
-    public function usersGetAuthenticated(): PrivateUser|PublicUser;
-
-    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): PrivateUser;
-
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<PrivateUser|PublicUser|null|BasicError>
      */
-    public function usersListBlockedByAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
-
-    public function usersCheckBlocked(string $username): void;
-
-    public function usersBlock(string $username): void;
-
-    public function usersUnblock(string $username): void;
+    public function usersGetAuthenticated(): Envelope;
 
     /**
-     * @return list<Email>
+     * @return Envelope<PrivateUser|null|BasicError|ValidationError>
+     */
+    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleUser>|null|BasicError>
+     */
+    public function usersListBlockedByAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersCheckBlocked(string $username): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersBlock(string $username): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersUnblock(string $username): Envelope;
+
+    /**
+     * @return Envelope<list<Email>|null|BasicError|ValidationError>
      */
     public function usersSetPrimaryEmailVisibilityForAuthenticatedUser(
         UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Email>
+     * @return Envelope<list<Email>|null|BasicError>
      */
-    public function usersListEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersListEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|null|BasicError>
      */
-    public function usersListFollowersForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersListFollowersForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|null|BasicError>
      */
-    public function usersListFollowedByAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
-
-    public function usersCheckPersonIsFollowedByAuthenticated(string $username): void;
-
-    public function usersFollow(string $username): void;
-
-    public function usersUnfollow(string $username): void;
+    public function usersListFollowedByAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<GpgKey>
+     * @return Envelope<null|BasicError>
      */
-    public function usersListGpgKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersCheckPersonIsFollowedByAuthenticated(string $username): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersFollow(string $username): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersUnfollow(string $username): Envelope;
+
+    /**
+     * @return Envelope<list<GpgKey>|null|BasicError>
+     */
+    public function usersListGpgKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<GpgKey|ValidationError|null|BasicError>
+     */
     public function usersCreateGpgKeyForAuthenticatedUser(
         UsersCreateGpgKeyForAuthenticatedUserRequestContent $body,
-    ): GpgKey;
-
-    public function usersGetGpgKeyForAuthenticatedUser(int $gpgKeyId): GpgKey;
-
-    public function usersDeleteGpgKeyForAuthenticatedUser(int $gpgKeyId): void;
+    ): Envelope;
 
     /**
-     * @return list<Key>
+     * @return Envelope<GpgKey|BasicError|null>
      */
-    public function usersListPublicSshKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersGetGpgKeyForAuthenticatedUser(int $gpgKeyId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function usersDeleteGpgKeyForAuthenticatedUser(int $gpgKeyId): Envelope;
+
+    /**
+     * @return Envelope<list<Key>|null|BasicError>
+     */
+    public function usersListPublicSshKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<Key|ValidationError|null|BasicError>
+     */
     public function usersCreatePublicSshKeyForAuthenticatedUser(
         UsersCreatePublicSshKeyForAuthenticatedUserRequestContent $body,
-    ): Key;
-
-    public function usersGetPublicSshKeyForAuthenticatedUser(int $keyId): Key;
-
-    public function usersDeletePublicSshKeyForAuthenticatedUser(int $keyId): void;
+    ): Envelope;
 
     /**
-     * @return list<Email>
+     * @return Envelope<Key|BasicError|null>
      */
-    public function usersListPublicEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersGetPublicSshKeyForAuthenticatedUser(int $keyId): Envelope;
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<null|BasicError>
      */
-    public function usersListSocialAccountsForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersDeletePublicSshKeyForAuthenticatedUser(int $keyId): Envelope;
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<list<Email>|null|BasicError>
+     */
+    public function usersListPublicEmailsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<SocialAccount>|null|BasicError>
+     */
+    public function usersListSocialAccountsForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<SocialAccount>|ValidationError|null|BasicError>
      */
     public function usersAddSocialAccountForAuthenticatedUser(
         UsersAddSocialAccountForAuthenticatedUserRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
     public function usersDeleteSocialAccountForAuthenticatedUser(
         UsersDeleteSocialAccountForAuthenticatedUserRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<SshSigningKey>
+     * @return Envelope<list<SshSigningKey>|null|BasicError>
      */
-    public function usersListSshSigningKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function usersListSshSigningKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<SshSigningKey|ValidationError|null|BasicError>
+     */
     public function usersCreateSshSigningKeyForAuthenticatedUser(
         UsersCreateSshSigningKeyForAuthenticatedUserRequestContent $body,
-    ): SshSigningKey;
-
-    public function usersGetSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): SshSigningKey;
-
-    public function usersDeleteSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): void;
-
-    public function usersGetById(int $accountId): PrivateUser|PublicUser;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<SshSigningKey|BasicError|null>
      */
-    public function usersList(?int $since = null, ?int $perPage = null): array;
+    public function usersGetSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): Envelope;
 
-    public function usersGetByUsername(string $username): PrivateUser|PublicUser;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): Envelope;
 
+    /**
+     * @return Envelope<PrivateUser|PublicUser|BasicError>
+     */
+    public function usersGetById(int $accountId): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleUser>|null>
+     */
+    public function usersList(?int $since = null, ?int $perPage = null): Envelope;
+
+    /**
+     * @return Envelope<PrivateUser|PublicUser|BasicError>
+     */
+    public function usersGetByUsername(string $username): Envelope;
+
+    /**
+     * @return Envelope<UsersListAttestationsBulk200Content>
+     */
     public function usersListAttestationsBulk(
         string $username,
         UsersListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): UsersListAttestationsBulk200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function usersDeleteAttestationsBulk(
         string $username,
         UsersDeleteAttestationsBulkBranch1|UsersDeleteAttestationsBulkBranch2 $body,
-    ): void;
+    ): Envelope;
 
-    public function usersDeleteAttestationsBySubjectDigest(string $username, string $subjectDigest): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteAttestationsBySubjectDigest(string $username, string $subjectDigest): Envelope;
 
-    public function usersDeleteAttestationsById(string $username, int $attestationId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function usersDeleteAttestationsById(string $username, int $attestationId): Envelope;
 
+    /**
+     * @return Envelope<UsersListAttestations200Content|EmptyObject|null|BasicError>
+     */
     public function usersListAttestations(
         string $username,
         string $subjectDigest,
@@ -180,43 +259,57 @@ interface UsersClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): UsersListAttestations200Content;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function usersListFollowersForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function usersListFollowersForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function usersListFollowingForUser(string $username, ?int $perPage = null, ?int $page = null): array;
-
-    public function usersCheckFollowingForUser(string $username, string $targetUser): void;
+    public function usersListFollowingForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<GpgKey>
+     * @return Envelope<null>
      */
-    public function usersListGpgKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function usersCheckFollowingForUser(string $username, string $targetUser): Envelope;
 
+    /**
+     * @return Envelope<list<GpgKey>>
+     */
+    public function usersListGpgKeysForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<Hovercard|BasicError|ValidationError>
+     */
     public function usersGetContextForUser(
         string $username,
         ?UsersGetContextForUserSubjectType $subjectType = null,
         ?string $subjectId = null,
-    ): Hovercard;
+    ): Envelope;
 
     /**
-     * @return list<KeySimple>
+     * @return Envelope<list<KeySimple>>
      */
-    public function usersListPublicKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function usersListPublicKeysForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<SocialAccount>
+     * @return Envelope<list<SocialAccount>>
      */
-    public function usersListSocialAccountsForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function usersListSocialAccountsForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
-     * @return list<SshSigningKey>
+     * @return Envelope<list<SshSigningKey>>
      */
-    public function usersListSshSigningKeysForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function usersListSshSigningKeysForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 }

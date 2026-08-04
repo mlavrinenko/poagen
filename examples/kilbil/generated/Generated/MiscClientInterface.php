@@ -12,12 +12,17 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\CloseSession200Content;
+use Acme\Kilbil\Generated\Model\CloseSession403Content;
 use Acme\Kilbil\Generated\Model\CloseSessionRequestContent;
 use Acme\Kilbil\Generated\Model\ExchangePosSettings200Content;
+use Acme\Kilbil\Generated\Model\ExchangePosSettings403Content;
 use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequestContent;
 use Acme\Kilbil\Generated\Model\GenerateCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateCard403Content;
 use Acme\Kilbil\Generated\Model\GenerateCardRequestContent;
 use Acme\Kilbil\Generated\Model\LegalInfo200Content;
+use Acme\Kilbil\Generated\Model\LegalInfo403Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Другое` endpoints.
@@ -28,11 +33,23 @@ use Acme\Kilbil\Generated\Model\LegalInfo200Content;
  */
 interface MiscClientInterface
 {
-    public function closeSession(CloseSessionRequestContent $body): CloseSession200Content;
+    /**
+     * @return Envelope<CloseSession200Content|CloseSession403Content>
+     */
+    public function closeSession(CloseSessionRequestContent $body): Envelope;
 
-    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): ExchangePosSettings200Content;
+    /**
+     * @return Envelope<ExchangePosSettings200Content|ExchangePosSettings403Content>
+     */
+    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): Envelope;
 
-    public function generateCard(GenerateCardRequestContent $body): GenerateCard200Content;
+    /**
+     * @return Envelope<GenerateCard200Content|GenerateCard403Content>
+     */
+    public function generateCard(GenerateCardRequestContent $body): Envelope;
 
-    public function legalInfo(): LegalInfo200Content;
+    /**
+     * @return Envelope<LegalInfo200Content|LegalInfo403Content>
+     */
+    public function legalInfo(): Envelope;
 }

@@ -13,32 +13,78 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ConnectionPool;
 use Acme\DigitalOcean\Generated\Model\ConnectionPoolUpdate;
+use Acme\DigitalOcean\Generated\Model\ConnectionPools;
 use Acme\DigitalOcean\Generated\Model\Database;
 use Acme\DigitalOcean\Generated\Model\DatabaseAutoscaleParams;
 use Acme\DigitalOcean\Generated\Model\DatabaseClusterResize;
 use Acme\DigitalOcean\Generated\Model\DatabaseConfig;
 use Acme\DigitalOcean\Generated\Model\DatabaseMaintenanceWindow;
+use Acme\DigitalOcean\Generated\Model\DatabasesAdd201Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddConnectionPool201Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesAddUser201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesAddUserRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateCluster201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateClusterRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchema201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaSchemaRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopic201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateKafkaTopicRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsink201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateLogsinkRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplica201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesCreateReplicaRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesGet200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetAutoscale200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetCa200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetCluster200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetClusterMetricsCredentials200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetConnectionPool200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetEvictionPolicy200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchema200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaSubjectConfig200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaSchemaVersion200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetKafkaTopic200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetReplica200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesGetUser200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesList200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListBackups200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListClusters200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListEventsLogs200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListFirewallRules200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListKafkaSchemas200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListKafkaTopics200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListLogsink200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListOpeasearchIndexes200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListReplicas200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesListUsers200Content;
+use Acme\DigitalOcean\Generated\Model\DatabasesResetAuth200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesResetAuthRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateClusterMetricsCredentialsRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateEvictionPolicyRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateFirewallRulesRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfig200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaConfigRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfig200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaSchemaSubjectConfigRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopic200Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateKafkaTopicRequestContent;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateRegionRequestContent;
+use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUser201Content;
 use Acme\DigitalOcean\Generated\Model\DatabasesUpdateUserRequestContent;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\LogsinkSchema;
 use Acme\DigitalOcean\Generated\Model\LogsinkUpdate;
+use Acme\DigitalOcean\Generated\Model\OnlineMigration;
+use Acme\DigitalOcean\Generated\Model\Options;
 use Acme\DigitalOcean\Generated\Model\SourceDatabase;
 use Acme\DigitalOcean\Generated\Model\SqlMode;
 use Acme\DigitalOcean\Generated\Model\Version2;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DatabasesClient implements DatabasesClientInterface
@@ -51,983 +97,1262 @@ final readonly class DatabasesClient implements DatabasesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListClusters200Content|Error>
      */
-    public function databasesListClusters(?string $tagName = null): void
+    public function databasesListClusters(?string $tagName = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListClusters200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases')
                 ->query('tag_name', $tagName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListClusters200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateCluster201Content|Error>
      */
-    public function databasesCreateCluster(DatabasesCreateClusterRequestContent $body): void
+    public function databasesCreateCluster(DatabasesCreateClusterRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesCreateCluster201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesCreateCluster201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`, `database:view_credentials`.
+     * @return Envelope<DatabasesGetClusterMetricsCredentials200Content|Error>
      */
-    public function databasesGetClusterMetricsCredentials(): void
+    public function databasesGetClusterMetricsCredentials(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetClusterMetricsCredentials200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/metrics/credentials')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetClusterMetricsCredentials200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateClusterMetricsCredentials(
         DatabasesUpdateClusterMetricsCredentialsRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/metrics/credentials')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<Options|Error>
      */
-    public function databasesListOptions(): void
+    public function databasesListOptions(): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<Options|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/options')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Options::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetCluster200Content|Error>
      */
-    public function databasesGetCluster(string $databaseClusterUuid): void
+    public function databasesGetCluster(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetCluster200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetCluster200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDestroyCluster(string $databaseClusterUuid): void
+    public function databasesDestroyCluster(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetAutoscale200Content|Error>
      */
-    public function databasesGetAutoscale(string $databaseClusterUuid): void
+    public function databasesGetAutoscale(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetAutoscale200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/autoscale')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetAutoscale200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateAutoscale(string $databaseClusterUuid, DatabaseAutoscaleParams $body): void
+    public function databasesUpdateAutoscale(string $databaseClusterUuid, DatabaseAutoscaleParams $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/autoscale')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListBackups200Content|Error>
      */
-    public function databasesListBackups(string $databaseClusterUuid): void
+    public function databasesListBackups(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListBackups200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/backups')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListBackups200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetCa200Content|Error>
      */
-    public function databasesGetCa(string $databaseClusterUuid): void
+    public function databasesGetCa(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetCa200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/ca')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetCa200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetConfig200Content|Error>
      */
-    public function databasesGetConfig(string $databaseClusterUuid): void
+    public function databasesGetConfig(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetConfig200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/config')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetConfig200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesPatchConfig(string $databaseClusterUuid, DatabaseConfig $body): void
+    public function databasesPatchConfig(string $databaseClusterUuid, DatabaseConfig $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/v2/databases/{database_cluster_uuid}/config')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesList200Content|Error>
      */
-    public function databasesList(string $databaseClusterUuid): void
+    public function databasesList(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/dbs')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAdd201Content|Error>
      */
-    public function databasesAdd(string $databaseClusterUuid, Database $body): void
+    public function databasesAdd(string $databaseClusterUuid, Database $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesAdd201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/dbs')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesAdd201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGet200Content|Error>
      */
-    public function databasesGet(string $databaseClusterUuid, string $databaseName): void
+    public function databasesGet(string $databaseClusterUuid, string $databaseName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/dbs/{database_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('database_name', $databaseName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDelete(string $databaseClusterUuid, string $databaseName): void
+    public function databasesDelete(string $databaseClusterUuid, string $databaseName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/dbs/{database_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('database_name', $databaseName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListEventsLogs200Content|Error>
      */
-    public function databasesListEventsLogs(string $databaseClusterUuid): void
+    public function databasesListEventsLogs(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListEventsLogs200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/events')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListEventsLogs200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetEvictionPolicy200Content|Error>
      */
-    public function databasesGetEvictionPolicy(string $databaseClusterUuid): void
+    public function databasesGetEvictionPolicy(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetEvictionPolicy200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/eviction_policy')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetEvictionPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateEvictionPolicy(
         string $databaseClusterUuid,
         DatabasesUpdateEvictionPolicyRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/eviction_policy')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListFirewallRules200Content|Error>
      */
-    public function databasesListFirewallRules(string $databaseClusterUuid): void
+    public function databasesListFirewallRules(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListFirewallRules200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/firewall')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListFirewallRules200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateFirewallRules(
         string $databaseClusterUuid,
         DatabasesUpdateFirewallRulesRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/firewall')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListOpeasearchIndexes200Content|Error>
      */
-    public function databasesListOpeasearchIndexes(string $databaseClusterUuid): void
+    public function databasesListOpeasearchIndexes(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListOpeasearchIndexes200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/indexes')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListOpeasearchIndexes200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteOpensearchIndex(string $databaseClusterUuid, string $indexName): void
+    public function databasesDeleteOpensearchIndex(string $databaseClusterUuid, string $indexName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/indexes/{index_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('index_name', $indexName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesInstallUpdate(string $databaseClusterUuid): void
+    public function databasesInstallUpdate(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/install_update')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListLogsink200Content|Error>
      */
-    public function databasesListLogsink(string $databaseClusterUuid): void
+    public function databasesListLogsink(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListLogsink200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/logsink')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListLogsink200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateLogsink201Content|Error>
      */
     public function databasesCreateLogsink(
         string $databaseClusterUuid,
         DatabasesCreateLogsinkRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesCreateLogsink201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/logsink')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesCreateLogsink201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<LogsinkSchema|Error>
      */
-    public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): void
+    public function databasesGetLogsink(string $databaseClusterUuid, string $logsinkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<LogsinkSchema|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/logsink/{logsink_id}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('logsink_id', $logsinkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LogsinkSchema::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateLogsink(string $databaseClusterUuid, string $logsinkId, LogsinkUpdate $body): void
-    {
-        $this->transport->send(
+    public function databasesUpdateLogsink(
+        string $databaseClusterUuid,
+        string $logsinkId,
+        LogsinkUpdate $body,
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/logsink/{logsink_id}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('logsink_id', $logsinkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteLogsink(string $databaseClusterUuid, string $logsinkId): void
+    public function databasesDeleteLogsink(string $databaseClusterUuid, string $logsinkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/logsink/{logsink_id}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('logsink_id', $logsinkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateMaintenanceWindow(
         string $databaseClusterUuid,
         DatabaseMaintenanceWindow $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/maintenance')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateRegion(
         string $databaseClusterUuid,
         DatabasesUpdateRegionRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/migrate')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<OnlineMigration|Error>
      */
-    public function databasesGetMigrationStatus(string $databaseClusterUuid): void
+    public function databasesGetMigrationStatus(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<OnlineMigration|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/online-migration')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OnlineMigration::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<OnlineMigration|Error>
      */
-    public function databasesUpdateOnlineMigration(string $databaseClusterUuid, SourceDatabase $body): void
+    public function databasesUpdateOnlineMigration(string $databaseClusterUuid, SourceDatabase $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<OnlineMigration|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/online-migration')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OnlineMigration::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteOnlineMigration(string $databaseClusterUuid, string $migrationId): void
+    public function databasesDeleteOnlineMigration(string $databaseClusterUuid, string $migrationId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/online-migration/{migration_id}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('migration_id', $migrationId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<ConnectionPools|Error>
      */
-    public function databasesListConnectionPools(string $databaseClusterUuid): void
+    public function databasesListConnectionPools(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ConnectionPools|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/pools')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ConnectionPools::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAddConnectionPool201Content|Error>
      */
-    public function databasesAddConnectionPool(string $databaseClusterUuid, ConnectionPool $body): void
+    public function databasesAddConnectionPool(string $databaseClusterUuid, ConnectionPool $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesAddConnectionPool201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/pools')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesAddConnectionPool201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetConnectionPool200Content|Error>
      */
-    public function databasesGetConnectionPool(string $databaseClusterUuid, string $poolName): void
+    public function databasesGetConnectionPool(string $databaseClusterUuid, string $poolName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetConnectionPool200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/pools/{pool_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('pool_name', $poolName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetConnectionPool200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
     public function databasesUpdateConnectionPool(
         string $databaseClusterUuid,
         string $poolName,
         ConnectionPoolUpdate $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/pools/{pool_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('pool_name', $poolName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteConnectionPool(string $databaseClusterUuid, string $poolName): void
+    public function databasesDeleteConnectionPool(string $databaseClusterUuid, string $poolName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/pools/{pool_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('pool_name', $poolName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListReplicas200Content|Error>
      */
-    public function databasesListReplicas(string $databaseClusterUuid): void
+    public function databasesListReplicas(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListReplicas200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/replicas')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListReplicas200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateReplica201Content|Error>
      */
     public function databasesCreateReplica(
         string $databaseClusterUuid,
         DatabasesCreateReplicaRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesCreateReplica201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/replicas')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesCreateReplica201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetReplica200Content|Error>
      */
-    public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): void
+    public function databasesGetReplica(string $databaseClusterUuid, string $replicaName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetReplica200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/replicas/{replica_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('replica_name', $replicaName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetReplica200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDestroyReplica(string $databaseClusterUuid, string $replicaName): void
+    public function databasesDestroyReplica(string $databaseClusterUuid, string $replicaName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/replicas/{replica_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('replica_name', $replicaName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesPromoteReplica(string $databaseClusterUuid, string $replicaName): void
+    public function databasesPromoteReplica(string $databaseClusterUuid, string $replicaName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/replicas/{replica_name}/promote')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('replica_name', $replicaName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateClusterSize(string $databaseClusterUuid, DatabaseClusterResize $body): void
+    public function databasesUpdateClusterSize(string $databaseClusterUuid, DatabaseClusterResize $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/resize')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListKafkaSchemas200Content|Error>
      */
-    public function databasesListKafkaSchemas(string $databaseClusterUuid): void
+    public function databasesListKafkaSchemas(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListKafkaSchemas200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListKafkaSchemas200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateKafkaSchema201Content|Error>
      */
     public function databasesCreateKafkaSchema(
         string $databaseClusterUuid,
         DatabasesCreateKafkaSchemaRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesCreateKafkaSchema201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/schema-registry')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesCreateKafkaSchema201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaConfig200Content|Error>
      */
-    public function databasesGetKafkaSchemaConfig(string $databaseClusterUuid): void
+    public function databasesGetKafkaSchemaConfig(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetKafkaSchemaConfig200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry/config')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetKafkaSchemaConfig200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:write`.
+     * @return Envelope<DatabasesUpdateKafkaSchemaConfig200Content|Error>
      */
     public function databasesUpdateKafkaSchemaConfig(
         string $databaseClusterUuid,
         DatabasesUpdateKafkaSchemaConfigRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesUpdateKafkaSchemaConfig200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/schema-registry/config')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesUpdateKafkaSchemaConfig200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaSubjectConfig200Content|Error>
      */
-    public function databasesGetKafkaSchemaSubjectConfig(string $databaseClusterUuid, string $subjectName): void
+    public function databasesGetKafkaSchemaSubjectConfig(string $databaseClusterUuid, string $subjectName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetKafkaSchemaSubjectConfig200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry/config/{subject_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('subject_name', $subjectName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetKafkaSchemaSubjectConfig200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:write`.
+     * @return Envelope<DatabasesUpdateKafkaSchemaSubjectConfig200Content|Error>
      */
     public function databasesUpdateKafkaSchemaSubjectConfig(
         string $databaseClusterUuid,
         string $subjectName,
         DatabasesUpdateKafkaSchemaSubjectConfigRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesUpdateKafkaSchemaSubjectConfig200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/schema-registry/config/{subject_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('subject_name', $subjectName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesUpdateKafkaSchemaSubjectConfig200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchema200Content|Error>
      */
-    public function databasesGetKafkaSchema(string $databaseClusterUuid, string $subjectName): void
+    public function databasesGetKafkaSchema(string $databaseClusterUuid, string $subjectName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetKafkaSchema200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry/{subject_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('subject_name', $subjectName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetKafkaSchema200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteKafkaSchema(string $databaseClusterUuid, string $subjectName): void
+    public function databasesDeleteKafkaSchema(string $databaseClusterUuid, string $subjectName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/schema-registry/{subject_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('subject_name', $subjectName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaSchemaVersion200Content|Error>
      */
     public function databasesGetKafkaSchemaVersion(
         string $databaseClusterUuid,
         string $subjectName,
         string $version,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesGetKafkaSchemaVersion200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/schema-registry/{subject_name}/versions/{version}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('subject_name', $subjectName)
                 ->path('version', $version)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetKafkaSchemaVersion200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<SqlMode|Error>
      */
-    public function databasesGetSqlMode(string $databaseClusterUuid): void
+    public function databasesGetSqlMode(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SqlMode|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/sql_mode')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SqlMode::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateSqlMode(string $databaseClusterUuid, SqlMode $body): void
+    public function databasesUpdateSqlMode(string $databaseClusterUuid, SqlMode $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/sql_mode')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListKafkaTopics200Content|Error>
      */
-    public function databasesListKafkaTopics(string $databaseClusterUuid): void
+    public function databasesListKafkaTopics(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListKafkaTopics200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/topics')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListKafkaTopics200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesCreateKafkaTopic201Content|Error>
      */
     public function databasesCreateKafkaTopic(
         string $databaseClusterUuid,
         DatabasesCreateKafkaTopicRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesCreateKafkaTopic201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/topics')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesCreateKafkaTopic201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetKafkaTopic200Content|Error>
      */
-    public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): void
+    public function databasesGetKafkaTopic(string $databaseClusterUuid, string $topicName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetKafkaTopic200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/topics/{topic_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('topic_name', $topicName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetKafkaTopic200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesUpdateKafkaTopic200Content|Error>
      */
     public function databasesUpdateKafkaTopic(
         string $databaseClusterUuid,
         string $topicName,
         DatabasesUpdateKafkaTopicRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesUpdateKafkaTopic200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/topics/{topic_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('topic_name', $topicName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesUpdateKafkaTopic200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteKafkaTopic(string $databaseClusterUuid, string $topicName): void
+    public function databasesDeleteKafkaTopic(string $databaseClusterUuid, string $topicName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/topics/{topic_name}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('topic_name', $topicName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<null|Error>
      */
-    public function databasesUpdateMajorVersion(string $databaseClusterUuid, Version2 $body): void
+    public function databasesUpdateMajorVersion(string $databaseClusterUuid, Version2 $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/upgrade')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesListUsers200Content|Error>
      */
-    public function databasesListUsers(string $databaseClusterUuid): void
+    public function databasesListUsers(string $databaseClusterUuid): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesListUsers200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/users')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesListUsers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:create`.
+     * @return Envelope<DatabasesAddUser201Content|Error>
      */
-    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequestContent $body): void
+    public function databasesAddUser(string $databaseClusterUuid, DatabasesAddUserRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesAddUser201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/users')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesAddUser201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:read`.
+     * @return Envelope<DatabasesGetUser200Content|Error>
      */
-    public function databasesGetUser(string $databaseClusterUuid, string $username): void
+    public function databasesGetUser(string $databaseClusterUuid, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<DatabasesGetUser200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/databases/{database_cluster_uuid}/users/{username}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('username', $username)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesGetUser200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesUpdateUser201Content|Error>
      */
     public function databasesUpdateUser(
         string $databaseClusterUuid,
         string $username,
         DatabasesUpdateUserRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesUpdateUser201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/databases/{database_cluster_uuid}/users/{username}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('username', $username)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DatabasesUpdateUser201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:delete`.
+     * @return Envelope<null|Error>
      */
-    public function databasesDeleteUser(string $databaseClusterUuid, string $username): void
+    public function databasesDeleteUser(string $databaseClusterUuid, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/databases/{database_cluster_uuid}/users/{username}')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('username', $username)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `database:update`.
+     * @return Envelope<DatabasesResetAuth200Content|Error>
      */
     public function databasesResetAuth(
         string $databaseClusterUuid,
         string $username,
         DatabasesResetAuthRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DatabasesResetAuth200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/databases/{database_cluster_uuid}/users/{username}/reset_auth')
                 ->path('database_cluster_uuid', $databaseClusterUuid)
                 ->path('username', $username)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DatabasesResetAuth200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

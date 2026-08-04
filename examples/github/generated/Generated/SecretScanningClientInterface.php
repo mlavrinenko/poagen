@@ -18,16 +18,26 @@ use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoDirection;
 use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoSort;
 use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoState;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\OrganizationSecretScanningAlert;
 use Acme\GitHub\Generated\Model\SecretScanningAlert;
+use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypass503Content;
 use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequestContent;
+use Acme\GitHub\Generated\Model\SecretScanningGetAlert503Content;
+use Acme\GitHub\Generated\Model\SecretScanningGetScanHistory503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListAlertsForOrg503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListAlertsForRepo503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListLocationsForAlert503Content;
 use Acme\GitHub\Generated\Model\SecretScanningLocation;
 use Acme\GitHub\Generated\Model\SecretScanningPatternConfiguration;
 use Acme\GitHub\Generated\Model\SecretScanningPushProtectionBypass;
 use Acme\GitHub\Generated\Model\SecretScanningScanHistory;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateAlert503Content;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequestContent;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigs200Content;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `secret-scanning` endpoints.
@@ -39,7 +49,7 @@ use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequestCont
 interface SecretScanningClientInterface
 {
     /**
-     * @return list<OrganizationSecretScanningAlert>
+     * @return Envelope<list<OrganizationSecretScanningAlert>|BasicError|SecretScanningListAlertsForOrg503Content>
      */
     public function secretScanningListAlertsForOrg(
         string $org,
@@ -60,17 +70,23 @@ interface SecretScanningClientInterface
         ?bool $isPubliclyLeaked = null,
         ?bool $isMultiRepo = null,
         ?bool $hideSecret = null,
-    ): array;
+    ): Envelope;
 
-    public function secretScanningListOrgPatternConfigs(string $org): SecretScanningPatternConfiguration;
+    /**
+     * @return Envelope<SecretScanningPatternConfiguration|BasicError>
+     */
+    public function secretScanningListOrgPatternConfigs(string $org): Envelope;
 
+    /**
+     * @return Envelope<SecretScanningUpdateOrgPatternConfigs200Content|BasicError|ValidationError>
+     */
     public function secretScanningUpdateOrgPatternConfigs(
         string $org,
         SecretScanningUpdateOrgPatternConfigsRequestContent $body,
-    ): SecretScanningUpdateOrgPatternConfigs200Content;
+    ): Envelope;
 
     /**
-     * @return list<SecretScanningAlert>
+     * @return Envelope<list<SecretScanningAlert>|null|SecretScanningListAlertsForRepo503Content>
      */
     public function secretScanningListAlertsForRepo(
         string $owner,
@@ -92,24 +108,30 @@ interface SecretScanningClientInterface
         ?bool $isPubliclyLeaked = null,
         ?bool $isMultiRepo = null,
         ?bool $hideSecret = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SecretScanningAlert|null|SecretScanningGetAlert503Content>
+     */
     public function secretScanningGetAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         ?bool $hideSecret = null,
-    ): SecretScanningAlert;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SecretScanningAlert|null|SecretScanningUpdateAlert503Content>
+     */
     public function secretScanningUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         SecretScanningUpdateAlertRequestContent $body,
-    ): SecretScanningAlert;
+    ): Envelope;
 
     /**
-     * @return list<SecretScanningLocation>
+     * @return Envelope<list<SecretScanningLocation>|null|SecretScanningListLocationsForAlert503Content>
      */
     public function secretScanningListLocationsForAlert(
         string $owner,
@@ -117,13 +139,19 @@ interface SecretScanningClientInterface
         AlertNumber $alertNumber,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SecretScanningPushProtectionBypass|null|SecretScanningCreatePushProtectionBypass503Content>
+     */
     public function secretScanningCreatePushProtectionBypass(
         string $owner,
         string $repo,
         SecretScanningCreatePushProtectionBypassRequestContent $body,
-    ): SecretScanningPushProtectionBypass;
+    ): Envelope;
 
-    public function secretScanningGetScanHistory(string $owner, string $repo): SecretScanningScanHistory;
+    /**
+     * @return Envelope<null|SecretScanningGetScanHistory503Content|SecretScanningScanHistory>
+     */
+    public function secretScanningGetScanHistory(string $owner, string $repo): Envelope;
 }

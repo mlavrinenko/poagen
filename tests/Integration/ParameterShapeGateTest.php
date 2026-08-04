@@ -137,7 +137,7 @@ final class ParameterShapeGateTest extends TestCase
         $sources = implode("\n", array_values($this->plan(self::REFUSED)->writes));
 
         self::assertStringContainsString(
-            'public function listWidgets(string $catalogue, ?int $limit = null, ?string $xRequestId = null): void',
+            'public function listWidgets(string $catalogue, ?int $limit = null, ?string $xRequestId = null): Envelope',
             $sources,
         );
         self::assertStringNotContainsString('mixed $catalogue', $sources);
@@ -153,7 +153,7 @@ final class ParameterShapeGateTest extends TestCase
     {
         $sources = implode("\n", array_values($this->plan(self::REFUSED)->writes));
 
-        self::assertStringContainsString('public function getKey(WidgetId|WidgetSlug $keyIdentifier): void', $sources);
+        self::assertStringContainsString('public function getKey(WidgetId|WidgetSlug $keyIdentifier): Envelope', $sources);
         self::assertStringNotContainsString('mixed $keyIdentifier', $sources);
     }
 
@@ -166,7 +166,7 @@ final class ParameterShapeGateTest extends TestCase
     {
         $sources = implode("\n", array_values($this->plan(self::REFUSED)->writes));
 
-        self::assertStringContainsString('public function describeWidget(string $xTraceId): void', $sources);
+        self::assertStringContainsString('public function describeWidget(string $xTraceId): Envelope', $sources);
         self::assertStringNotContainsString("'X-Trace-Id' (in: header", $sources);
     }
 
