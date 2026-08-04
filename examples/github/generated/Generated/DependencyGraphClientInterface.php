@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshotResponse;
+use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshot201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphDiff;
-use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReportResponse;
+use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReport201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphSpdxSbom;
 use Acme\GitHub\Generated\Model\Snapshot;
 
@@ -40,11 +40,11 @@ interface DependencyGraphClientInterface
     public function dependencyGraphGenerateSbomReport(
         string $owner,
         string $repo,
-    ): DependencyGraphGenerateSbomReportResponse;
+    ): DependencyGraphGenerateSbomReport201Content;
 
     public function dependencyGraphCreateRepositorySnapshot(
         string $owner,
         string $repo,
         Snapshot $body,
-    ): DependencyGraphCreateRepositorySnapshotResponse;
+    ): DependencyGraphCreateRepositorySnapshot201Content;
 }

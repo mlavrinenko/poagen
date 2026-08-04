@@ -14,37 +14,37 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
-use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequest;
-use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrgResponse;
-use Acme\GitHub\Generated\Model\CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListInOrganizationResponse;
-use Acme\GitHub\Generated\Model\CodespacesListInRepositoryForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListOrgSecretsResponse;
-use Acme\GitHub\Generated\Model\CodespacesListRepoSecretsResponse;
-use Acme\GitHub\Generated\Model\CodespacesListRepositoriesForSecretForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListSecretsForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListSelectedReposForOrgSecretResponse;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrg200Content;
+use Acme\GitHub\Generated\Model\CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListInOrganization200Content;
+use Acme\GitHub\Generated\Model\CodespacesListInRepositoryForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListOrgSecrets200Content;
+use Acme\GitHub\Generated\Model\CodespacesListRepoSecrets200Content;
+use Acme\GitHub\Generated\Model\CodespacesListRepositoriesForSecretForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListSecretsForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListSelectedReposForOrgSecret200Content;
 use Acme\GitHub\Generated\Model\CodespacesOrgSecret;
 use Acme\GitHub\Generated\Model\CodespacesPermissionsCheckForDevcontainer;
-use Acme\GitHub\Generated\Model\CodespacesPreFlightWithRepoForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesPreFlightWithRepoForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesPublicKey;
-use Acme\GitHub\Generated\Model\CodespacesPublishForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesRepoMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesPublishForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesRepoMachinesForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesSecret;
-use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessUsersRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetSelectedReposForOrgSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequest;
+use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessUsersRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetSelectedReposForOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesUserPublicKey;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\RepoCodespacesSecret;
@@ -63,18 +63,20 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInOrganizationResponse {
+    ): CodespacesListInOrganization200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListInOrganizationResponse::class),
+            ResponseType::object(CodespacesListInOrganization200Content::class),
         );
     }
 
-    public function codespacesSetCodespacesAccess(string $org, CodespacesSetCodespacesAccessRequest $body): void
-    {
+    public function codespacesSetCodespacesAccess(
+        string $org,
+        CodespacesSetCodespacesAccessRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/access')->path('org', $org)->json($body),
             ResponseType::nothing(),
@@ -83,7 +85,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesSetCodespacesAccessUsers(
         string $org,
-        CodespacesSetCodespacesAccessUsersRequest $body,
+        CodespacesSetCodespacesAccessUsersRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/orgs/{org}/codespaces/access/selected_users')
@@ -95,7 +97,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesDeleteCodespacesAccessUsers(
         string $org,
-        CodespacesDeleteCodespacesAccessUsersRequest $body,
+        CodespacesDeleteCodespacesAccessUsersRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::delete('/orgs/{org}/codespaces/access/selected_users')
@@ -109,13 +111,13 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListOrgSecretsResponse {
+    ): CodespacesListOrgSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListOrgSecretsResponse::class),
+            ResponseType::object(CodespacesListOrgSecrets200Content::class),
         );
     }
 
@@ -140,7 +142,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
     public function codespacesCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
-        CodespacesCreateOrUpdateOrgSecretRequest $body,
+        CodespacesCreateOrUpdateOrgSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/secrets/{secret_name}')
@@ -166,21 +168,21 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): CodespacesListSelectedReposForOrgSecretResponse {
+    ): CodespacesListSelectedReposForOrgSecret200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(CodespacesListSelectedReposForOrgSecretResponse::class),
+            ResponseType::object(CodespacesListSelectedReposForOrgSecret200Content::class),
         );
     }
 
     public function codespacesSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
-        CodespacesSetSelectedReposForOrgSecretRequest $body,
+        CodespacesSetSelectedReposForOrgSecretRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/secrets/{secret_name}/repositories')
@@ -221,14 +223,14 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesGetCodespacesForUserInOrgResponse {
+    ): CodespacesGetCodespacesForUserInOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/members/{username}/codespaces')
                 ->path('org', $org)
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesGetCodespacesForUserInOrgResponse::class),
+            ResponseType::object(CodespacesGetCodespacesForUserInOrg200Content::class),
         );
     }
 
@@ -259,21 +261,21 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInRepositoryForAuthenticatedUserResponse {
+    ): CodespacesListInRepositoryForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListInRepositoryForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesListInRepositoryForAuthenticatedUser200Content::class),
         );
     }
 
     public function codespacesCreateWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
-        CodespacesCreateWithRepoForAuthenticatedUserRequest $body,
+        CodespacesCreateWithRepoForAuthenticatedUserRequestContent $body,
     ): Codespace {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/codespaces')
@@ -289,14 +291,14 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse {
+    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/devcontainers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content::class),
         );
     }
 
@@ -306,7 +308,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         ?string $location = null,
         ?string $clientIp = null,
         ?string $ref = null,
-    ): CodespacesRepoMachinesForAuthenticatedUserResponse {
+    ): CodespacesRepoMachinesForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/machines')
                 ->path('owner', $owner)
@@ -314,7 +316,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->query('location', $location)
                 ->query('client_ip', $clientIp)
                 ->query('ref', $ref),
-            ResponseType::object(CodespacesRepoMachinesForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesRepoMachinesForAuthenticatedUser200Content::class),
         );
     }
 
@@ -323,14 +325,14 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $repo,
         ?string $ref = null,
         ?string $clientIp = null,
-    ): CodespacesPreFlightWithRepoForAuthenticatedUserResponse {
+    ): CodespacesPreFlightWithRepoForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/new')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref)
                 ->query('client_ip', $clientIp),
-            ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUser200Content::class),
         );
     }
 
@@ -355,14 +357,14 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListRepoSecretsResponse {
+    ): CodespacesListRepoSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/codespaces/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListRepoSecretsResponse::class),
+            ResponseType::object(CodespacesListRepoSecrets200Content::class),
         );
     }
 
@@ -391,7 +393,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $owner,
         string $repo,
         string $secretName,
-        CodespacesCreateOrUpdateRepoSecretRequest $body,
+        CodespacesCreateOrUpdateRepoSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/codespaces/secrets/{secret_name}')
@@ -418,7 +420,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        CodespacesCreateWithPrForAuthenticatedUserRequest $body,
+        CodespacesCreateWithPrForAuthenticatedUserRequestContent $body,
     ): Codespace {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/codespaces')
@@ -434,13 +436,13 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?int $repositoryId = null,
-    ): CodespacesListForAuthenticatedUserResponse {
+    ): CodespacesListForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/codespaces')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('repository_id', $repositoryId),
-            ResponseType::object(CodespacesListForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesListForAuthenticatedUser200Content::class),
         );
     }
 
@@ -456,12 +458,12 @@ final readonly class CodespacesClient implements CodespacesClientInterface
     public function codespacesListSecretsForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListSecretsForAuthenticatedUserResponse {
+    ): CodespacesListSecretsForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/codespaces/secrets')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CodespacesListSecretsForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesListSecretsForAuthenticatedUser200Content::class),
         );
     }
 
@@ -484,7 +486,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesCreateOrUpdateSecretForAuthenticatedUser(
         string $secretName,
-        CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest $body,
+        CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/user/codespaces/secrets/{secret_name}')
@@ -505,17 +507,17 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesListRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
-    ): CodespacesListRepositoriesForSecretForAuthenticatedUserResponse {
+    ): CodespacesListRepositoriesForSecretForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/{secret_name}/repositories')
                 ->path('secret_name', $secretName),
-            ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUser200Content::class),
         );
     }
 
     public function codespacesSetRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
-        CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest $body,
+        CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/user/codespaces/secrets/{secret_name}/repositories')
@@ -567,7 +569,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesUpdateForAuthenticatedUser(
         string $codespaceName,
-        CodespacesUpdateForAuthenticatedUserRequest $body,
+        CodespacesUpdateForAuthenticatedUserRequestContent $body,
     ): Codespace {
         return $this->transport->send(
             Endpoint::patch('/user/codespaces/{codespace_name}')
@@ -600,17 +602,17 @@ final readonly class CodespacesClient implements CodespacesClientInterface
 
     public function codespacesCodespaceMachinesForAuthenticatedUser(
         string $codespaceName,
-    ): CodespacesCodespaceMachinesForAuthenticatedUserResponse {
+    ): CodespacesCodespaceMachinesForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}/machines')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUserResponse::class),
+            ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUser200Content::class),
         );
     }
 
     public function codespacesPublishForAuthenticatedUser(
         string $codespaceName,
-        CodespacesPublishForAuthenticatedUserRequest $body,
+        CodespacesPublishForAuthenticatedUserRequestContent $body,
     ): CodespaceWithFullRepository {
         return $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/publish')

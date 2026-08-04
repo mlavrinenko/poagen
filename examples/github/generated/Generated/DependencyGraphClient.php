@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshotResponse;
+use Acme\GitHub\Generated\Model\DependencyGraphCreateRepositorySnapshot201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphDiff;
-use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReportResponse;
+use Acme\GitHub\Generated\Model\DependencyGraphGenerateSbomReport201Content;
 use Acme\GitHub\Generated\Model\DependencyGraphSpdxSbom;
 use Acme\GitHub\Generated\Model\Snapshot;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -67,12 +67,12 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
     public function dependencyGraphGenerateSbomReport(
         string $owner,
         string $repo,
-    ): DependencyGraphGenerateSbomReportResponse {
+    ): DependencyGraphGenerateSbomReport201Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom/generate-report')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(DependencyGraphGenerateSbomReportResponse::class),
+            ResponseType::object(DependencyGraphGenerateSbomReport201Content::class),
         );
     }
 
@@ -80,13 +80,13 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
         string $owner,
         string $repo,
         Snapshot $body,
-    ): DependencyGraphCreateRepositorySnapshotResponse {
+    ): DependencyGraphCreateRepositorySnapshot201Content {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/dependency-graph/snapshots')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(DependencyGraphCreateRepositorySnapshotResponse::class),
+            ResponseType::object(DependencyGraphCreateRepositorySnapshot201Content::class),
         );
     }
 }

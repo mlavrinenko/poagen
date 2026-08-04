@@ -22,18 +22,18 @@ use Acme\GitHub\Generated\Model\PublicUser;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Acme\GitHub\Generated\Model\SocialAccount;
 use Acme\GitHub\Generated\Model\SshSigningKey;
-use Acme\GitHub\Generated\Model\UsersAddSocialAccountForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreateGpgKeyForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreatePublicSshKeyForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreateSshSigningKeyForAuthenticatedUserRequest;
+use Acme\GitHub\Generated\Model\UsersAddSocialAccountForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreateGpgKeyForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreatePublicSshKeyForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreateSshSigningKeyForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch1;
 use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch2;
-use Acme\GitHub\Generated\Model\UsersDeleteSocialAccountForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequest;
-use Acme\GitHub\Generated\Model\UsersListAttestationsBulkResponse;
-use Acme\GitHub\Generated\Model\UsersListAttestationsResponse;
-use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequest;
+use Acme\GitHub\Generated\Model\UsersDeleteSocialAccountForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersListAttestations200Content;
+use Acme\GitHub\Generated\Model\UsersListAttestationsBulk200Content;
+use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequestContent;
+use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequestContent;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -57,7 +57,7 @@ final readonly class UsersClient implements UsersClientInterface
         return $result;
     }
 
-    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequest $body): PrivateUser
+    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): PrivateUser
     {
         return $this->transport->send(
             Endpoint::patch('/user')->json($body),
@@ -104,7 +104,7 @@ final readonly class UsersClient implements UsersClientInterface
      * @return list<Email>
      */
     public function usersSetPrimaryEmailVisibilityForAuthenticatedUser(
-        UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $body,
+        UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::patch('/user/email/visibility')->json($body),
@@ -180,8 +180,9 @@ final readonly class UsersClient implements UsersClientInterface
         );
     }
 
-    public function usersCreateGpgKeyForAuthenticatedUser(UsersCreateGpgKeyForAuthenticatedUserRequest $body): GpgKey
-    {
+    public function usersCreateGpgKeyForAuthenticatedUser(
+        UsersCreateGpgKeyForAuthenticatedUserRequestContent $body,
+    ): GpgKey {
         return $this->transport->send(
             Endpoint::post('/user/gpg_keys')->json($body),
             ResponseType::object(GpgKey::class),
@@ -216,7 +217,7 @@ final readonly class UsersClient implements UsersClientInterface
     }
 
     public function usersCreatePublicSshKeyForAuthenticatedUser(
-        UsersCreatePublicSshKeyForAuthenticatedUserRequest $body,
+        UsersCreatePublicSshKeyForAuthenticatedUserRequestContent $body,
     ): Key {
         return $this->transport->send(
             Endpoint::post('/user/keys')->json($body),
@@ -270,7 +271,7 @@ final readonly class UsersClient implements UsersClientInterface
      * @return list<SocialAccount>
      */
     public function usersAddSocialAccountForAuthenticatedUser(
-        UsersAddSocialAccountForAuthenticatedUserRequest $body,
+        UsersAddSocialAccountForAuthenticatedUserRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::post('/user/social_accounts')->json($body),
@@ -279,7 +280,7 @@ final readonly class UsersClient implements UsersClientInterface
     }
 
     public function usersDeleteSocialAccountForAuthenticatedUser(
-        UsersDeleteSocialAccountForAuthenticatedUserRequest $body,
+        UsersDeleteSocialAccountForAuthenticatedUserRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::delete('/user/social_accounts')->json($body),
@@ -301,7 +302,7 @@ final readonly class UsersClient implements UsersClientInterface
     }
 
     public function usersCreateSshSigningKeyForAuthenticatedUser(
-        UsersCreateSshSigningKeyForAuthenticatedUserRequest $body,
+        UsersCreateSshSigningKeyForAuthenticatedUserRequestContent $body,
     ): SshSigningKey {
         return $this->transport->send(
             Endpoint::post('/user/ssh_signing_keys')->json($body),
@@ -362,11 +363,11 @@ final readonly class UsersClient implements UsersClientInterface
 
     public function usersListAttestationsBulk(
         string $username,
-        UsersListAttestationsBulkRequest $body,
+        UsersListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): UsersListAttestationsBulkResponse {
+    ): UsersListAttestationsBulk200Content {
         return $this->transport->send(
             Endpoint::post('/users/{username}/attestations/bulk-list')
                 ->path('username', $username)
@@ -374,7 +375,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->json($body),
-            ResponseType::object(UsersListAttestationsBulkResponse::class),
+            ResponseType::object(UsersListAttestationsBulk200Content::class),
         );
     }
 
@@ -417,7 +418,7 @@ final readonly class UsersClient implements UsersClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): UsersListAttestationsResponse {
+    ): UsersListAttestations200Content {
         return $this->transport->send(
             Endpoint::get('/users/{username}/attestations/{subject_digest}')
                 ->path('username', $username)
@@ -426,7 +427,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::object(UsersListAttestationsResponse::class),
+            ResponseType::object(UsersListAttestations200Content::class),
         );
     }
 

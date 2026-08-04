@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsPatchRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequestContent;
 
 /**
  * The contract for the `VPCs` endpoints.
@@ -34,7 +34,7 @@ interface VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:create`.
      */
-    public function vpcsCreate(VpcsCreateRequest $body): void;
+    public function vpcsCreate(VpcsCreateRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
@@ -44,7 +44,7 @@ interface VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
      */
-    public function vpcsUpdate(string $vpcId, VpcsUpdateRequest $body): void;
+    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:delete`.
@@ -54,7 +54,7 @@ interface VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
      */
-    public function vpcsPatch(string $vpcId, VpcsPatchRequest $body): void;
+    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc:read`.
@@ -74,10 +74,14 @@ interface VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
      */
-    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequest $body): void;
+    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
      */
-    public function vpcsPatchPeerings(string $vpcId, string $vpcPeeringId, VpcsPatchPeeringsRequest $body): void;
+    public function vpcsPatchPeerings(
+        string $vpcId,
+        string $vpcPeeringId,
+        VpcsPatchPeeringsRequestContent $body,
+    ): void;
 }

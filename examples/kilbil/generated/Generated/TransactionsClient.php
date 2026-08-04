@@ -11,16 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\ConfirmSaleRequest;
-use Acme\Kilbil\Generated\Model\ConfirmSaleResponse;
-use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequest;
-use Acme\Kilbil\Generated\Model\GetDetailingByMoveResponse;
-use Acme\Kilbil\Generated\Model\GetMovesByClientRequest;
-use Acme\Kilbil\Generated\Model\GetMovesByClientResponse;
-use Acme\Kilbil\Generated\Model\ManualAddRequest;
-use Acme\Kilbil\Generated\Model\ManualAddResponse;
-use Acme\Kilbil\Generated\Model\ProcessSaleRequest;
-use Acme\Kilbil\Generated\Model\ProcessSaleResponse;
+use Acme\Kilbil\Generated\Model\ConfirmSale200Content;
+use Acme\Kilbil\Generated\Model\ConfirmSaleRequestContent;
+use Acme\Kilbil\Generated\Model\GetDetailingByMove200Content;
+use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequestContent;
+use Acme\Kilbil\Generated\Model\GetMovesByClient200Content;
+use Acme\Kilbil\Generated\Model\GetMovesByClientRequestContent;
+use Acme\Kilbil\Generated\Model\ManualAdd200Content;
+use Acme\Kilbil\Generated\Model\ManualAddRequestContent;
+use Acme\Kilbil\Generated\Model\ProcessSale200Content;
+use Acme\Kilbil\Generated\Model\ProcessSaleRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -33,43 +33,43 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     ) {
     }
 
-    public function confirmSale(ConfirmSaleRequest $body): ConfirmSaleResponse
+    public function confirmSale(ConfirmSaleRequestContent $body): ConfirmSale200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/confirmsale')->query('h', $this->h)->json($body),
-            ResponseType::object(ConfirmSaleResponse::class),
+            ResponseType::object(ConfirmSale200Content::class),
         );
     }
 
-    public function getDetailingByMove(GetDetailingByMoveRequest $body): GetDetailingByMoveResponse
+    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): GetDetailingByMove200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getdetailingbymove')->query('h', $this->h)->json($body),
-            ResponseType::object(GetDetailingByMoveResponse::class),
+            ResponseType::object(GetDetailingByMove200Content::class),
         );
     }
 
-    public function getMovesByClient(GetMovesByClientRequest $body): GetMovesByClientResponse
+    public function getMovesByClient(GetMovesByClientRequestContent $body): GetMovesByClient200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getmovesbyclient')->query('h', $this->h)->json($body),
-            ResponseType::object(GetMovesByClientResponse::class),
+            ResponseType::object(GetMovesByClient200Content::class),
         );
     }
 
-    public function manualAdd(ManualAddRequest $body): ManualAddResponse
+    public function manualAdd(ManualAddRequestContent $body): ManualAdd200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/manualadd')->query('h', $this->h)->json($body),
-            ResponseType::object(ManualAddResponse::class),
+            ResponseType::object(ManualAdd200Content::class),
         );
     }
 
-    public function processSale(ProcessSaleRequest $body): ProcessSaleResponse
+    public function processSale(ProcessSaleRequestContent $body): ProcessSale200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/processsale')->query('h', $this->h)->json($body),
-            ResponseType::object(ProcessSaleResponse::class),
+            ResponseType::object(ProcessSale200Content::class),
         );
     }
 }

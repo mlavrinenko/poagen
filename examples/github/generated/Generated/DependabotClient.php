@@ -23,18 +23,18 @@ use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\DependabotAlert;
 use Acme\GitHub\Generated\Model\DependabotAlertWithRepository;
-use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequest;
-use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateRepoSecretRequest;
-use Acme\GitHub\Generated\Model\DependabotListOrgSecretsResponse;
-use Acme\GitHub\Generated\Model\DependabotListRepoSecretsResponse;
-use Acme\GitHub\Generated\Model\DependabotListSelectedReposForOrgSecretResponse;
+use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateRepoSecretRequestContent;
+use Acme\GitHub\Generated\Model\DependabotListOrgSecrets200Content;
+use Acme\GitHub\Generated\Model\DependabotListRepoSecrets200Content;
+use Acme\GitHub\Generated\Model\DependabotListSelectedReposForOrgSecret200Content;
 use Acme\GitHub\Generated\Model\DependabotPublicKey;
 use Acme\GitHub\Generated\Model\DependabotRepositoryAccessDetails;
 use Acme\GitHub\Generated\Model\DependabotSecret;
-use Acme\GitHub\Generated\Model\DependabotSetRepositoryAccessDefaultLevelRequest;
-use Acme\GitHub\Generated\Model\DependabotSetSelectedReposForOrgSecretRequest;
-use Acme\GitHub\Generated\Model\DependabotUpdateAlertRequest;
-use Acme\GitHub\Generated\Model\DependabotUpdateRepositoryAccessForOrgRequest;
+use Acme\GitHub\Generated\Model\DependabotSetRepositoryAccessDefaultLevelRequestContent;
+use Acme\GitHub\Generated\Model\DependabotSetSelectedReposForOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\DependabotUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\DependabotUpdateRepositoryAccessForOrgRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OrganizationDependabotSecret;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -154,7 +154,7 @@ final readonly class DependabotClient implements DependabotClientInterface
 
     public function dependabotUpdateRepositoryAccessForOrg(
         string $org,
-        DependabotUpdateRepositoryAccessForOrgRequest $body,
+        DependabotUpdateRepositoryAccessForOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::patch('/orgs/{org}/dependabot/repository-access')
@@ -166,7 +166,7 @@ final readonly class DependabotClient implements DependabotClientInterface
 
     public function dependabotSetRepositoryAccessDefaultLevel(
         string $org,
-        DependabotSetRepositoryAccessDefaultLevelRequest $body,
+        DependabotSetRepositoryAccessDefaultLevelRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/repository-access/default-level')
@@ -180,13 +180,13 @@ final readonly class DependabotClient implements DependabotClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): DependabotListOrgSecretsResponse {
+    ): DependabotListOrgSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(DependabotListOrgSecretsResponse::class),
+            ResponseType::object(DependabotListOrgSecrets200Content::class),
         );
     }
 
@@ -211,7 +211,7 @@ final readonly class DependabotClient implements DependabotClientInterface
     public function dependabotCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
-        DependabotCreateOrUpdateOrgSecretRequest $body,
+        DependabotCreateOrUpdateOrgSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/secrets/{secret_name}')
@@ -237,21 +237,21 @@ final readonly class DependabotClient implements DependabotClientInterface
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): DependabotListSelectedReposForOrgSecretResponse {
+    ): DependabotListSelectedReposForOrgSecret200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(DependabotListSelectedReposForOrgSecretResponse::class),
+            ResponseType::object(DependabotListSelectedReposForOrgSecret200Content::class),
         );
     }
 
     public function dependabotSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
-        DependabotSetSelectedReposForOrgSecretRequest $body,
+        DependabotSetSelectedReposForOrgSecretRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/secrets/{secret_name}/repositories')
@@ -348,7 +348,7 @@ final readonly class DependabotClient implements DependabotClientInterface
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
-        DependabotUpdateAlertRequest $body,
+        DependabotUpdateAlertRequestContent $body,
     ): DependabotAlert {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/dependabot/alerts/{alert_number}')
@@ -365,14 +365,14 @@ final readonly class DependabotClient implements DependabotClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): DependabotListRepoSecretsResponse {
+    ): DependabotListRepoSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(DependabotListRepoSecretsResponse::class),
+            ResponseType::object(DependabotListRepoSecrets200Content::class),
         );
     }
 
@@ -401,7 +401,7 @@ final readonly class DependabotClient implements DependabotClientInterface
         string $owner,
         string $repo,
         string $secretName,
-        DependabotCreateOrUpdateRepoSecretRequest $body,
+        DependabotCreateOrUpdateRepoSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/dependabot/secrets/{secret_name}')

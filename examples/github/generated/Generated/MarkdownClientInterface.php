@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\MarkdownRenderRequest;
+use Acme\GitHub\Generated\Model\MarkdownRenderRequestContent;
 
 /**
  * The contract for the `markdown` endpoints.
@@ -22,7 +22,7 @@ use Acme\GitHub\Generated\Model\MarkdownRenderRequest;
  */
 interface MarkdownClientInterface
 {
-    public function markdownRender(MarkdownRenderRequest $body): string;
+    public function markdownRender(MarkdownRenderRequestContent $body): string;
 
     public function markdownRenderRaw(string $body): string;
 }

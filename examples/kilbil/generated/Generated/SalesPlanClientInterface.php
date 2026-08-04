@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequest;
-use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesResponse;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides200Content;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequestContent;
 
 /**
  * The contract for the `План-факт` endpoints.
@@ -23,5 +23,5 @@ use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesResponse;
  */
 interface SalesPlanClientInterface
 {
-    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequest $body): GetSalesIndicesSlidesResponse;
+    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): GetSalesIndicesSlides200Content;
 }

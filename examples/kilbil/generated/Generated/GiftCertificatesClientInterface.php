@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GenerateGiftCardRequest;
-use Acme\Kilbil\Generated\Model\GenerateGiftCardResponse;
-use Acme\Kilbil\Generated\Model\GetProgramGiftCardResponse;
-use Acme\Kilbil\Generated\Model\SearchGiftCardRequest;
-use Acme\Kilbil\Generated\Model\SearchGiftCardResponse;
+use Acme\Kilbil\Generated\Model\GenerateGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateGiftCardRequestContent;
+use Acme\Kilbil\Generated\Model\GetProgramGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCardRequestContent;
 
 /**
  * The contract for the `Подарочные сертификаты` endpoints.
@@ -26,9 +26,9 @@ use Acme\Kilbil\Generated\Model\SearchGiftCardResponse;
  */
 interface GiftCertificatesClientInterface
 {
-    public function generateGiftCard(GenerateGiftCardRequest $body): GenerateGiftCardResponse;
+    public function generateGiftCard(GenerateGiftCardRequestContent $body): GenerateGiftCard200Content;
 
-    public function getProgramGiftCard(): GetProgramGiftCardResponse;
+    public function getProgramGiftCard(): GetProgramGiftCard200Content;
 
-    public function searchGiftCard(SearchGiftCardRequest $body): SearchGiftCardResponse;
+    public function searchGiftCard(SearchGiftCardRequestContent $body): SearchGiftCard200Content;
 }

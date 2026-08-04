@@ -13,7 +13,7 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\RegistryCreate;
 use Acme\DigitalOcean\Generated\Model\RegistryRunGc;
-use Acme\DigitalOcean\Generated\Model\RegistryUpdateSubscriptionRequest;
+use Acme\DigitalOcean\Generated\Model\RegistryUpdateSubscriptionRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateRegistry;
 use Acme\DigitalOcean\Generated\Model\ValidateRegistry;
 
@@ -59,7 +59,7 @@ interface ContainerRegistryClientInterface
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
      */
-    public function registryUpdateSubscription(RegistryUpdateSubscriptionRequest $body): void;
+    public function registryUpdateSubscription(RegistryUpdateSubscriptionRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.

@@ -14,7 +14,7 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\AccessKeyCreateRequest;
 use Acme\DigitalOcean\Generated\Model\CreateNamespace;
 use Acme\DigitalOcean\Generated\Model\CreateTrigger;
-use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateTrigger;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -112,7 +112,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
     public function functionsAccessKeyUpdate(
         string $namespaceId,
         string $keyId,
-        FunctionsAccessKeyUpdateRequest $body,
+        FunctionsAccessKeyUpdateRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/v2/functions/namespaces/{namespace_id}/keys/{key_id}')

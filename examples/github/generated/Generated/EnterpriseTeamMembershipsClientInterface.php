@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkAddRequest;
-use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkRemoveRequest;
+use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkAddRequestContent;
+use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\SimpleUser;
 
 /**
@@ -40,7 +40,7 @@ interface EnterpriseTeamMembershipsClientInterface
     public function enterpriseTeamMembershipsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamMembershipsBulkAddRequest $body,
+        EnterpriseTeamMembershipsBulkAddRequestContent $body,
     ): array;
 
     /**
@@ -49,7 +49,7 @@ interface EnterpriseTeamMembershipsClientInterface
     public function enterpriseTeamMembershipsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamMembershipsBulkRemoveRequest $body,
+        EnterpriseTeamMembershipsBulkRemoveRequestContent $body,
     ): array;
 
     public function enterpriseTeamMembershipsGet(

@@ -138,7 +138,7 @@ final class JsonSchema2020ConstructsTest extends TestCase
         self::assertStringContainsString('public function createCoupon(', $written['ApiClient.php']);
         self::assertStringNotContainsString('public function createBadge(', $written['ApiClient.php']);
 
-        $model = $written['CreateCouponRequest.php'];
+        $model = $written['CreateCouponRequestContent.php'];
         self::assertStringContainsString('public ?string $code,', $model);
         self::assertStringContainsString('public ?int $redeemedCount,', $model);
         self::assertStringContainsString('public string|int|null $identifier = null,', $model);

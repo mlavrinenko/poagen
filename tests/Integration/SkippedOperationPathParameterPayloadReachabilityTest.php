@@ -88,8 +88,7 @@ final class SkippedOperationPathParameterPayloadReachabilityTest extends TestCas
                 'soleOwner' => "parameter 'selector' (in: path, type: object) is outside paogen's supported parameter shapes",
             ],
             inlineModels: [
-                'keepsShared.request' => 'SharedPayload',
-                'dropsShared.request' => 'SharedPayload',
+                'SharedPayload' => ['keepsShared.request', 'dropsShared.request'],
             ],
         ));
     }

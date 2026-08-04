@@ -677,16 +677,16 @@ final class ModelGeneratorTest extends TestCase
      *
      * Given Schema declares an empty components.schemas and Operation placeOrder whose application/json request body and 2xx response are each an inline type: object with declared properties
      * When Generator runs against Profile
-     * Then Generated File Generated/Model/PlaceOrderRequest.php and Generated File Generated/Model/PlaceOrderResponse.php are both written
-     *   And the emitted Client declares placeOrder(PlaceOrderRequest $body): PlaceOrderResponse
+     * Then Generated File Generated/Model/PlaceOrderRequestContent.php and Generated File Generated/Model/PlaceOrder200Content.php are both written
+     *   And the emitted Client declares placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content
      *   And Operation is not reported as a skip
      */
     public function testADocumentDeclaringNoComponentsStillEmitsAModelForEveryPayload(): void
     {
         $this->steps->givenSchemaDeclaresAnEmptyComponentsSchemasAndOperationIdWhoseApplicationJsonRequestBodyAnd2xxResponseAreEachAnInlineTypeObjectWithDeclaredProperties('placeOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenGeneratedFileGeneratedModelPlaceOrderRequestPhpAndGeneratedFileGeneratedModelPlaceOrderResponsePhpAreBothWritten();
-        $this->steps->thenEmittedClientDeclaresPlaceOrderPlaceOrderRequestBodyPlaceOrderResponse();
+        $this->steps->thenGeneratedFileGeneratedModelPlaceOrderRequestContentPhpAndGeneratedFileGeneratedModelPlaceOrder200ContentPhpAreBothWritten();
+        $this->steps->thenEmittedClientDeclaresPlaceOrderPlaceOrderRequestContentBodyPlaceOrder200Content();
         $this->steps->thenOperationIsNotReportedAsASkip();
     }
 
@@ -697,15 +697,15 @@ final class ModelGeneratorTest extends TestCase
      *
      * Given Operation placeOrdersBulk whose request body and 2xx response are each type: array whose items is an inline type: object with declared properties
      * When Generator runs against Profile
-     * Then Generated File Generated/Model/PlaceOrdersBulkRequestItem.php and Generated File Generated/Model/PlaceOrdersBulkResponseItem.php are written for the item shapes
-     *   And the emitted Client types the parameter list<PlaceOrdersBulkRequestItem> and the return list<PlaceOrdersBulkResponseItem> in phpdoc
+     * Then Generated File Generated/Model/PlaceOrdersBulkRequestContentItem.php and Generated File Generated/Model/PlaceOrdersBulk200ContentItem.php are written for the item shapes
+     *   And the emitted Client types the parameter list<PlaceOrdersBulkRequestContentItem> and the return list<PlaceOrdersBulk200ContentItem> in phpdoc
      */
     public function testAnInlineArrayOfInlineObjectsIsTypedAtBothEnds(): void
     {
         $this->steps->givenOperationIdWhoseRequestBodyAnd2xxResponseAreEachTypeArrayWhoseItemsIsAnInlineTypeObjectWithDeclaredProperties('placeOrdersBulk');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenGeneratedFileGeneratedModelPlaceOrdersBulkRequestItemPhpAndGeneratedFileGeneratedModelPlaceOrdersBulkResponseItemPhpAreWrittenForTheItemShapes();
-        $this->steps->thenEmittedClientTypesTheParameterListPlaceOrdersBulkRequestItemAndTheReturnListPlaceOrdersBulkResponseItemInPhpdoc();
+        $this->steps->thenGeneratedFileGeneratedModelPlaceOrdersBulkRequestContentItemPhpAndGeneratedFileGeneratedModelPlaceOrdersBulk200ContentItemPhpAreWrittenForTheItemShapes();
+        $this->steps->thenEmittedClientTypesTheParameterListPlaceOrdersBulkRequestContentItemAndTheReturnListPlaceOrdersBulk200ContentItemInPhpdoc();
     }
 
 
@@ -715,14 +715,14 @@ final class ModelGeneratorTest extends TestCase
      *
      * Given Operation placeOrder whose inline response carries an inline object property shipping and an array property lines whose items are an inline object
      * When Generator runs against Profile
-     * Then Generated File Generated/Model/PlaceOrderResponseShipping.php and Generated File Generated/Model/PlaceOrderResponseLinesItem.php are written
+     * Then Generated File Generated/Model/PlaceOrder200ContentShipping.php and Generated File Generated/Model/PlaceOrder200ContentLinesItem.php are written
      *   And Model two properties are typed as those classes rather than array<string, mixed>
      */
     public function testNestingBelowASynthesisedPayloadIsReachedByTheSameQueueAsNestingBelowAComponent(): void
     {
         $this->steps->givenOperationIdWhoseInlineResponseCarriesAnInlineObjectPropertyShippingAndAnArrayPropertyLinesWhoseItemsAreAnInlineObject('placeOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenGeneratedFileGeneratedModelPlaceOrderResponseShippingPhpAndGeneratedFileGeneratedModelPlaceOrderResponseLinesItemPhpAreWritten();
+        $this->steps->thenGeneratedFileGeneratedModelPlaceOrder200ContentShippingPhpAndGeneratedFileGeneratedModelPlaceOrder200ContentLinesItemPhpAreWritten();
         $this->steps->thenModelTwoPropertiesAreTypedAsThoseClassesRatherThanArrayStringMixed();
     }
 
@@ -733,14 +733,14 @@ final class ModelGeneratorTest extends TestCase
      *
      * Given Operation placeOrder whose inline request body has a property channel with type: string and enum: [web, phone, store]
      * When Generator runs against Profile
-     * Then Generated File Generated/Enum/PlaceOrderRequestChannel.php is a backed enum with those three cases
+     * Then Generated File Generated/Enum/PlaceOrderRequestContentChannel.php is a backed enum with those three cases
      *   And Model nested inside a named component resolves an identical inline enum the same way, so the reading does not depend on where the property was declared
      */
     public function testAnInlineEnumInsideAPayloadBecomesABackedEnumWhereverThePayloadCameFrom(): void
     {
         $this->steps->givenOperationIdWhoseInlineRequestBodyHasAPropertyChannelWithTypeStringAndCases('placeOrder', 'enum: [web, phone, store]');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenGeneratedFileGeneratedEnumPlaceOrderRequestChannelPhpIsABackedEnumWithThoseThreeCases();
+        $this->steps->thenGeneratedFileGeneratedEnumPlaceOrderRequestContentChannelPhpIsABackedEnumWithThoseThreeCases();
         $this->steps->thenModelNestedInsideANamedComponentResolvesAnIdenticalInlineEnumTheSameWaySoTheReadingDoesNotDependOnWhereThePropertyWasDeclared();
     }
 
@@ -767,34 +767,34 @@ final class ModelGeneratorTest extends TestCase
      * Scenario: The profile pins the class name for a synthesised payload
      * @source truth/specs/model-generator.feature-260418.typ:433
      *
-     * Given Profile whose inlineModels map carries 'placeOrder.response' => 'PlacedOrder'
+     * Given Profile whose inlineModels map carries 'PlacedOrder' => 'placeOrder.200'
      * When Generator runs against Profile
-     * Then Generated File Generated/Model/PlacedOrder.php is written and no PlaceOrderResponse.php is
+     * Then Generated File Generated/Model/PlacedOrder.php is written and no PlaceOrder200Content.php is
      *   And the pin renames the root alone, so Model nested under it is emitted as PlacedOrderShipping
      */
     public function testTheProfilePinsTheClassNameForASynthesisedPayload(): void
     {
-        $this->steps->givenProfileWhoseInlineModelsMapCarriesPin('\'placeOrder.response\' => \'PlacedOrder\'');
+        $this->steps->givenProfileWhoseInlineModelsMapCarriesPin('\'PlacedOrder\' => \'placeOrder.200\'');
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenGeneratedFileGeneratedModelPlacedOrderPhpIsWrittenAndNoPlaceOrderResponsePhpIs();
+        $this->steps->thenGeneratedFileGeneratedModelPlacedOrderPhpIsWrittenAndNoPlaceOrder200ContentPhpIs();
         $this->steps->thenPinRenamesTheRootAloneSoModelNestedUnderItIsEmittedAsPlacedOrderShipping();
     }
 
 
     /**
-     * Scenario: A pin naming an operation absent from the document fails the run
+     * Scenario: A pin naming a site absent from the document fails the run
      * @source truth/specs/model-generator.feature-260418.typ:443
      *
-     * Given Profile whose inlineModels map carries a key 'noSuchOperation.response'
+     * Given Profile whose inlineModels map carries a value 'noSuchOperation.request'
      * When Generator runs against Profile
-     * Then the run fails naming the key and saying the operation id is absent from Schema
+     * Then the run fails naming the site and saying it is absent from Schema
      *   And no Generated File is written, so guidance that has outlived Operation it named cannot pass unnoticed
      */
-    public function testAPinNamingAnOperationAbsentFromTheDocumentFailsTheRun(): void
+    public function testAPinNamingASiteAbsentFromTheDocumentFailsTheRun(): void
     {
-        $this->steps->givenProfileWhoseInlineModelsMapCarriesAKeyNoSuchOperationResponse();
+        $this->steps->givenProfileWhoseInlineModelsMapCarriesAValueNoSuchOperationRequest();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenRunFailsNamingTheKeyAndSayingTheOperationIdIsAbsentFromSchema();
+        $this->steps->thenRunFailsNamingTheSiteAndSayingItIsAbsentFromSchema();
         $this->steps->thenNoGeneratedFileIsWrittenSoGuidanceThatHasOutlivedOperationItNamedCannotPassUnnoticed();
     }
 
@@ -803,14 +803,14 @@ final class ModelGeneratorTest extends TestCase
      * Scenario: Two shapes deriving one class name fail the run rather than overwriting a file
      * @source truth/specs/model-generator.feature-260418.typ:453
      *
-     * Given Schema declares a component named PlaceOrderResponse and Operation placeOrder whose inline response derives that same name
+     * Given Schema declares a component named PlaceOrder200Content and Operation placeOrder whose inline response derives that same name
      * When Generator runs against Profile
      * Then the run fails naming Model and both origins — the component name, and the JSON pointer of the inline response
      *   And the message names Profile key that resolves it, so the reader is not left to guess which knob applies
      */
     public function testTwoShapesDerivingOneClassNameFailTheRunRatherThanOverwritingAFile(): void
     {
-        $this->steps->givenSchemaDeclaresAComponentNamedPlaceOrderResponseAndOperationIdWhoseInlineResponseDerivesThatSameName('placeOrder');
+        $this->steps->givenSchemaDeclaresAComponentNamedPlaceOrder200ContentAndOperationIdWhoseInlineResponseDerivesThatSameName('placeOrder');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenRunFailsNamingModelAndBothOriginsTheComponentNameAndTheJSONPointerOfTheInlineResponse();
         $this->steps->thenMessageNamesProfileKeyThatResolvesItSoTheReaderIsNotLeftToGuessWhichKnobApplies();

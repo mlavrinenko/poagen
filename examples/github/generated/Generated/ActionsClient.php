@@ -17,8 +17,8 @@ use Acme\GitHub\Generated\Enum\ActionsListJobsForWorkflowRunFilter;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunArtifactsDirection;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsForRepoStatus;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsStatus;
-use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequest;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetention;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetentionResponse;
 use Acme\GitHub\Generated\Model\ActionsCacheList;
@@ -30,84 +30,84 @@ use Acme\GitHub\Generated\Model\ActionsCacheStorageLimitForOrganization;
 use Acme\GitHub\Generated\Model\ActionsCacheStorageLimitForRepository;
 use Acme\GitHub\Generated\Model\ActionsCacheUsageByRepository;
 use Acme\GitHub\Generated\Model\ActionsCacheUsageOrgEnterprise;
-use Acme\GitHub\Generated\Model\ActionsCreateEnvironmentVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateHostedRunnerForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateEnvironmentSecretRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateOrgSecretRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateRepoSecretRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateOrgVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateRepoVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsCreateWorkflowDispatchRequest;
+use Acme\GitHub\Generated\Model\ActionsCreateEnvironmentVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateEnvironmentSecretRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateOrUpdateRepoSecretRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateOrgVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateRepoVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateSelfHostedRunnerGroupForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsCreateWorkflowDispatchRequestContent;
 use Acme\GitHub\Generated\Model\ActionsForkPrContributorApproval;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateRepos;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateReposRequest;
-use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepoRequest;
-use Acme\GitHub\Generated\Model\ActionsGetActionsCacheUsageByRepoForOrgResponse;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepoRequestContent;
+use Acme\GitHub\Generated\Model\ActionsGetActionsCacheUsageByRepoForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsGetDefaultWorkflowPermissions;
-use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersMachineSpecsForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersPartnerImagesForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersPlatformsForOrgResponse;
+use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersMachineSpecsForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersPartnerImagesForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsGetHostedRunnersPlatformsForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsHostedRunner;
 use Acme\GitHub\Generated\Model\ActionsHostedRunnerCustomImage;
 use Acme\GitHub\Generated\Model\ActionsHostedRunnerCustomImageVersion;
 use Acme\GitHub\Generated\Model\ActionsHostedRunnerLimits;
-use Acme\GitHub\Generated\Model\ActionsListArtifactsForRepoResponse;
-use Acme\GitHub\Generated\Model\ActionsListCustomImageVersionsForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListCustomImagesForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListEnvironmentSecretsResponse;
-use Acme\GitHub\Generated\Model\ActionsListEnvironmentVariablesResponse;
-use Acme\GitHub\Generated\Model\ActionsListGithubHostedRunnersInGroupForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListHostedRunnersForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRunAttemptResponse;
-use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRunResponse;
-use Acme\GitHub\Generated\Model\ActionsListOrgSecretsResponse;
-use Acme\GitHub\Generated\Model\ActionsListOrgVariablesResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoOrganizationSecretsResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoOrganizationVariablesResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoSecretsResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoVariablesResponse;
-use Acme\GitHub\Generated\Model\ActionsListRepoWorkflowsResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelectedReposForOrgSecretResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelectedReposForOrgVariableResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelectedRepositoriesEnabledGithubActionsOrganizationResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnerGroupsForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersForRepoResponse;
-use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersInGroupForOrgResponse;
-use Acme\GitHub\Generated\Model\ActionsListWorkflowRunArtifactsResponse;
-use Acme\GitHub\Generated\Model\ActionsListWorkflowRunsForRepoResponse;
-use Acme\GitHub\Generated\Model\ActionsListWorkflowRunsResponse;
+use Acme\GitHub\Generated\Model\ActionsListArtifactsForRepo200Content;
+use Acme\GitHub\Generated\Model\ActionsListCustomImageVersionsForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListCustomImagesForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListEnvironmentSecrets200Content;
+use Acme\GitHub\Generated\Model\ActionsListEnvironmentVariables200Content;
+use Acme\GitHub\Generated\Model\ActionsListGithubHostedRunnersInGroupForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListHostedRunnersForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRun200Content;
+use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRunAttempt200Content;
+use Acme\GitHub\Generated\Model\ActionsListOrgSecrets200Content;
+use Acme\GitHub\Generated\Model\ActionsListOrgVariables200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoOrganizationSecrets200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoOrganizationVariables200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoSecrets200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoVariables200Content;
+use Acme\GitHub\Generated\Model\ActionsListRepoWorkflows200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelectedReposForOrgSecret200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelectedReposForOrgVariable200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnerGroupsForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersForRepo200Content;
+use Acme\GitHub\Generated\Model\ActionsListSelfHostedRunnersInGroupForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListWorkflowRunArtifacts200Content;
+use Acme\GitHub\Generated\Model\ActionsListWorkflowRuns200Content;
+use Acme\GitHub\Generated\Model\ActionsListWorkflowRunsForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsOrganizationPermissions;
 use Acme\GitHub\Generated\Model\ActionsPublicKey;
-use Acme\GitHub\Generated\Model\ActionsReRunJobForWorkflowRunRequest;
-use Acme\GitHub\Generated\Model\ActionsReRunWorkflowFailedJobsRequest;
-use Acme\GitHub\Generated\Model\ActionsReRunWorkflowRequest;
+use Acme\GitHub\Generated\Model\ActionsReRunJobForWorkflowRunRequestContent;
+use Acme\GitHub\Generated\Model\ActionsReRunWorkflowFailedJobsRequestContent;
+use Acme\GitHub\Generated\Model\ActionsReRunWorkflowRequestContent;
 use Acme\GitHub\Generated\Model\ActionsRepositoryPermissions;
-use Acme\GitHub\Generated\Model\ActionsReviewPendingDeploymentsForRunRequest;
+use Acme\GitHub\Generated\Model\ActionsReviewPendingDeploymentsForRunRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSecret;
-use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequest;
-use Acme\GitHub\Generated\Model\ActionsSetCustomOidcSubClaimForRepoRequest;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetCustomOidcSubClaimForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSetDefaultWorkflowPermissions;
-use Acme\GitHub\Generated\Model\ActionsSetGithubActionsPermissionsOrganizationRequest;
-use Acme\GitHub\Generated\Model\ActionsSetGithubActionsPermissionsRepositoryRequest;
-use Acme\GitHub\Generated\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelectedReposForOrgSecretRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelectedReposForOrgVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelfHostedRunnersInGroupForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsSetSelfHostedRunnersPermissionsOrganizationRequest;
-use Acme\GitHub\Generated\Model\ActionsUpdateEnvironmentVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsUpdateHostedRunnerForOrgRequest;
-use Acme\GitHub\Generated\Model\ActionsUpdateOrgVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsUpdateRepoVariableRequest;
-use Acme\GitHub\Generated\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequest;
+use Acme\GitHub\Generated\Model\ActionsSetGithubActionsPermissionsOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetGithubActionsPermissionsRepositoryRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelectedReposForOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelectedReposForOrgVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelfHostedRunnersInGroupForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetSelfHostedRunnersPermissionsOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\ActionsUpdateEnvironmentVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsUpdateHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsUpdateOrgVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsUpdateRepoVariableRequestContent;
+use Acme\GitHub\Generated\Model\ActionsUpdateSelfHostedRunnerGroupForOrgRequestContent;
 use Acme\GitHub\Generated\Model\ActionsVariable;
 use Acme\GitHub\Generated\Model\ActionsWorkflowAccessToRepository;
 use Acme\GitHub\Generated\Model\Artifact;
@@ -242,13 +242,13 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsGetActionsCacheUsageByRepoForOrgResponse {
+    ): ActionsGetActionsCacheUsageByRepoForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/cache/usage-by-repository')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrgResponse::class),
+            ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrg200Content::class),
         );
     }
 
@@ -256,19 +256,19 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListHostedRunnersForOrgResponse {
+    ): ActionsListHostedRunnersForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListHostedRunnersForOrgResponse::class),
+            ResponseType::object(ActionsListHostedRunnersForOrg200Content::class),
         );
     }
 
     public function actionsCreateHostedRunnerForOrg(
         string $org,
-        ActionsCreateHostedRunnerForOrgRequest $body,
+        ActionsCreateHostedRunnerForOrgRequestContent $body,
     ): ActionsHostedRunner {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/hosted-runners')->path('org', $org)->json($body),
@@ -276,11 +276,11 @@ final readonly class ActionsClient implements ActionsClientInterface
         );
     }
 
-    public function actionsListCustomImagesForOrg(string $org): ActionsListCustomImagesForOrgResponse
+    public function actionsListCustomImagesForOrg(string $org): ActionsListCustomImagesForOrg200Content
     {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom')->path('org', $org),
-            ResponseType::object(ActionsListCustomImagesForOrgResponse::class),
+            ResponseType::object(ActionsListCustomImagesForOrg200Content::class),
         );
     }
 
@@ -307,12 +307,12 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsListCustomImageVersionsForOrg(
         int $imageDefinitionId,
         string $org,
-    ): ActionsListCustomImageVersionsForOrgResponse {
+    ): ActionsListCustomImageVersionsForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}/versions')
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('org', $org),
-            ResponseType::object(ActionsListCustomImageVersionsForOrgResponse::class),
+            ResponseType::object(ActionsListCustomImageVersionsForOrg200Content::class),
         );
     }
 
@@ -343,21 +343,21 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     public function actionsGetHostedRunnersGithubOwnedImagesForOrg(
         string $org,
-    ): ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse {
+    ): ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/github-owned')
                 ->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse::class),
+            ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content::class),
         );
     }
 
     public function actionsGetHostedRunnersPartnerImagesForOrg(
         string $org,
-    ): ActionsGetHostedRunnersPartnerImagesForOrgResponse {
+    ): ActionsGetHostedRunnersPartnerImagesForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/partner')
                 ->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrgResponse::class),
+            ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrg200Content::class),
         );
     }
 
@@ -371,19 +371,19 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     public function actionsGetHostedRunnersMachineSpecsForOrg(
         string $org,
-    ): ActionsGetHostedRunnersMachineSpecsForOrgResponse {
+    ): ActionsGetHostedRunnersMachineSpecsForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/machine-sizes')->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrgResponse::class),
+            ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrg200Content::class),
         );
     }
 
     public function actionsGetHostedRunnersPlatformsForOrg(
         string $org,
-    ): ActionsGetHostedRunnersPlatformsForOrgResponse {
+    ): ActionsGetHostedRunnersPlatformsForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/platforms')->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersPlatformsForOrgResponse::class),
+            ResponseType::object(ActionsGetHostedRunnersPlatformsForOrg200Content::class),
         );
     }
 
@@ -410,7 +410,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsUpdateHostedRunnerForOrg(
         string $org,
         int $hostedRunnerId,
-        ActionsUpdateHostedRunnerForOrgRequest $body,
+        ActionsUpdateHostedRunnerForOrgRequestContent $body,
     ): ActionsHostedRunner {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
@@ -431,7 +431,7 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     public function actionsSetGithubActionsPermissionsOrganization(
         string $org,
-        ActionsSetGithubActionsPermissionsOrganizationRequest $body,
+        ActionsSetGithubActionsPermissionsOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions')->path('org', $org)->json($body),
@@ -509,19 +509,19 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesEnabledGithubActionsOrganizationResponse {
+    ): ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganizationResponse::class),
+            ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content::class),
         );
     }
 
     public function actionsSetSelectedRepositoriesEnabledGithubActionsOrganization(
         string $org,
-        ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest $body,
+        ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/repositories')
@@ -580,7 +580,7 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     public function actionsSetSelfHostedRunnersPermissionsOrganization(
         string $org,
-        ActionsSetSelfHostedRunnersPermissionsOrganizationRequest $body,
+        ActionsSetSelfHostedRunnersPermissionsOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners')
@@ -594,19 +594,19 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse {
+    ): ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/self-hosted-runners/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse::class),
+            ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content::class),
         );
     }
 
     public function actionsSetSelectedRepositoriesSelfHostedRunnersOrganization(
         string $org,
-        ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest $body,
+        ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners/repositories')
@@ -664,20 +664,20 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?string $visibleToRepository = null,
-    ): ActionsListSelfHostedRunnerGroupsForOrgResponse {
+    ): ActionsListSelfHostedRunnerGroupsForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('visible_to_repository', $visibleToRepository),
-            ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrgResponse::class),
+            ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrg200Content::class),
         );
     }
 
     public function actionsCreateSelfHostedRunnerGroupForOrg(
         string $org,
-        ActionsCreateSelfHostedRunnerGroupForOrgRequest $body,
+        ActionsCreateSelfHostedRunnerGroupForOrgRequestContent $body,
     ): RunnerGroupsOrg {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runner-groups')->path('org', $org)->json($body),
@@ -708,7 +708,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsUpdateSelfHostedRunnerGroupForOrg(
         string $org,
         int $runnerGroupId,
-        ActionsUpdateSelfHostedRunnerGroupForOrgRequest $body,
+        ActionsUpdateSelfHostedRunnerGroupForOrgRequestContent $body,
     ): RunnerGroupsOrg {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/runner-groups/{runner_group_id}')
@@ -724,14 +724,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListGithubHostedRunnersInGroupForOrgResponse {
+    ): ActionsListGithubHostedRunnersInGroupForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/hosted-runners')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrgResponse::class),
+            ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrg200Content::class),
         );
     }
 
@@ -740,21 +740,21 @@ final readonly class ActionsClient implements ActionsClientInterface
         int $runnerGroupId,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListRepoAccessToSelfHostedRunnerGroupInOrgResponse {
+    ): ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrgResponse::class),
+            ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content::class),
         );
     }
 
     public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
-        ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest $body,
+        ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories')
@@ -798,21 +798,21 @@ final readonly class ActionsClient implements ActionsClientInterface
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersInGroupForOrgResponse {
+    ): ActionsListSelfHostedRunnersInGroupForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrgResponse::class),
+            ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrg200Content::class),
         );
     }
 
     public function actionsSetSelfHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
-        ActionsSetSelfHostedRunnersInGroupForOrgRequest $body,
+        ActionsSetSelfHostedRunnersInGroupForOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners')
@@ -850,14 +850,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForOrgResponse {
+    ): ActionsListSelfHostedRunnersForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners')
                 ->path('org', $org)
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersForOrgResponse::class),
+            ResponseType::object(ActionsListSelfHostedRunnersForOrg200Content::class),
         );
     }
 
@@ -874,7 +874,7 @@ final readonly class ActionsClient implements ActionsClientInterface
 
     public function actionsGenerateRunnerJitconfigForOrg(
         string $org,
-        ActionsGenerateRunnerJitconfigForOrgRequest $body,
+        ActionsGenerateRunnerJitconfigForOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/generate-jitconfig')
@@ -933,7 +933,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsSetCustomLabelsForSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
-        ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest $body,
+        ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runners/{runner_id}/labels')
@@ -947,7 +947,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsAddCustomLabelsToSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
-        ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest $body,
+        ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/{runner_id}/labels')
@@ -983,13 +983,13 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListOrgSecretsResponse {
+    ): ActionsListOrgSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListOrgSecretsResponse::class),
+            ResponseType::object(ActionsListOrgSecrets200Content::class),
         );
     }
 
@@ -1014,7 +1014,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
-        ActionsCreateOrUpdateOrgSecretRequest $body,
+        ActionsCreateOrUpdateOrgSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/secrets/{secret_name}')
@@ -1040,21 +1040,21 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgSecretResponse {
+    ): ActionsListSelectedReposForOrgSecret200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListSelectedReposForOrgSecretResponse::class),
+            ResponseType::object(ActionsListSelectedReposForOrgSecret200Content::class),
         );
     }
 
     public function actionsSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
-        ActionsSetSelectedReposForOrgSecretRequest $body,
+        ActionsSetSelectedReposForOrgSecretRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/secrets/{secret_name}/repositories')
@@ -1091,17 +1091,17 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListOrgVariablesResponse {
+    ): ActionsListOrgVariables200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/variables')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListOrgVariablesResponse::class),
+            ResponseType::object(ActionsListOrgVariables200Content::class),
         );
     }
 
-    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequest $body): EmptyObject
+    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequestContent $body): EmptyObject
     {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/variables')->path('org', $org)->json($body),
@@ -1129,8 +1129,11 @@ final readonly class ActionsClient implements ActionsClientInterface
         );
     }
 
-    public function actionsUpdateOrgVariable(string $org, string $name, ActionsUpdateOrgVariableRequest $body): void
-    {
+    public function actionsUpdateOrgVariable(
+        string $org,
+        string $name,
+        ActionsUpdateOrgVariableRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
@@ -1145,21 +1148,21 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $name,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgVariableResponse {
+    ): ActionsListSelectedReposForOrgVariable200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/variables/{name}/repositories')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListSelectedReposForOrgVariableResponse::class),
+            ResponseType::object(ActionsListSelectedReposForOrgVariable200Content::class),
         );
     }
 
     public function actionsSetSelectedReposForOrgVariable(
         string $org,
         string $name,
-        ActionsSetSelectedReposForOrgVariableRequest $body,
+        ActionsSetSelectedReposForOrgVariableRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/variables/{name}/repositories')
@@ -1198,7 +1201,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?string $name = null,
-    ): ActionsListArtifactsForRepoResponse {
+    ): ActionsListArtifactsForRepo200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/artifacts')
                 ->path('owner', $owner)
@@ -1206,7 +1209,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('name', $name),
-            ResponseType::object(ActionsListArtifactsForRepoResponse::class),
+            ResponseType::object(ActionsListArtifactsForRepo200Content::class),
         );
     }
 
@@ -1383,7 +1386,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $jobId,
-        ActionsReRunJobForWorkflowRunRequest $body,
+        ActionsReRunJobForWorkflowRunRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/jobs/{job_id}/rerun')
@@ -1408,7 +1411,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsSetCustomOidcSubClaimForRepo(
         string $owner,
         string $repo,
-        ActionsSetCustomOidcSubClaimForRepoRequest $body,
+        ActionsSetCustomOidcSubClaimForRepoRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/oidc/customization/sub')
@@ -1424,14 +1427,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationSecretsResponse {
+    ): ActionsListRepoOrganizationSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/organization-secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoOrganizationSecretsResponse::class),
+            ResponseType::object(ActionsListRepoOrganizationSecrets200Content::class),
         );
     }
 
@@ -1440,14 +1443,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationVariablesResponse {
+    ): ActionsListRepoOrganizationVariables200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/organization-variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoOrganizationVariablesResponse::class),
+            ResponseType::object(ActionsListRepoOrganizationVariables200Content::class),
         );
     }
 
@@ -1466,7 +1469,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsSetGithubActionsPermissionsRepository(
         string $owner,
         string $repo,
-        ActionsSetGithubActionsPermissionsRepositoryRequest $body,
+        ActionsSetGithubActionsPermissionsRepositoryRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions')
@@ -1634,7 +1637,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForRepoResponse {
+    ): ActionsListSelfHostedRunnersForRepo200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runners')
                 ->path('owner', $owner)
@@ -1642,7 +1645,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersForRepoResponse::class),
+            ResponseType::object(ActionsListSelfHostedRunnersForRepo200Content::class),
         );
     }
 
@@ -1662,7 +1665,7 @@ final readonly class ActionsClient implements ActionsClientInterface
     public function actionsGenerateRunnerJitconfigForRepo(
         string $owner,
         string $repo,
-        ActionsGenerateRunnerJitconfigForRepoRequest $body,
+        ActionsGenerateRunnerJitconfigForRepoRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/generate-jitconfig')
@@ -1730,7 +1733,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $runnerId,
-        ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequest $body,
+        ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
@@ -1746,7 +1749,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $runnerId,
-        ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequest $body,
+        ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
@@ -1801,7 +1804,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRunsForRepoResponse {
+    ): ActionsListWorkflowRunsForRepo200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs')
                 ->path('owner', $owner)
@@ -1816,7 +1819,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::object(ActionsListWorkflowRunsForRepoResponse::class),
+            ResponseType::object(ActionsListWorkflowRunsForRepo200Content::class),
         );
     }
 
@@ -1880,7 +1883,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?int $page = null,
         ?string $name = null,
         ?ActionsListWorkflowRunArtifactsDirection $direction = null,
-    ): ActionsListWorkflowRunArtifactsResponse {
+    ): ActionsListWorkflowRunArtifacts200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts')
                 ->path('owner', $owner)
@@ -1890,7 +1893,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('page', $page)
                 ->query('name', $name)
                 ->query('direction', $direction),
-            ResponseType::object(ActionsListWorkflowRunArtifactsResponse::class),
+            ResponseType::object(ActionsListWorkflowRunArtifacts200Content::class),
         );
     }
 
@@ -1919,7 +1922,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         int $attemptNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRunAttemptResponse {
+    ): ActionsListJobsForWorkflowRunAttempt200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs')
                 ->path('owner', $owner)
@@ -1928,7 +1931,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('attempt_number', $attemptNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListJobsForWorkflowRunAttemptResponse::class),
+            ResponseType::object(ActionsListJobsForWorkflowRunAttempt200Content::class),
         );
     }
 
@@ -1993,7 +1996,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?ActionsListJobsForWorkflowRunFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRunResponse {
+    ): ActionsListJobsForWorkflowRun200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/jobs')
                 ->path('owner', $owner)
@@ -2002,7 +2005,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListJobsForWorkflowRunResponse::class),
+            ResponseType::object(ActionsListJobsForWorkflowRun200Content::class),
         );
     }
 
@@ -2049,7 +2052,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $runId,
-        ActionsReviewPendingDeploymentsForRunRequest $body,
+        ActionsReviewPendingDeploymentsForRunRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments')
@@ -2065,7 +2068,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $runId,
-        ActionsReRunWorkflowRequest $body,
+        ActionsReRunWorkflowRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/rerun')
@@ -2081,7 +2084,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int $runId,
-        ActionsReRunWorkflowFailedJobsRequest $body,
+        ActionsReRunWorkflowFailedJobsRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs')
@@ -2109,14 +2112,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoSecretsResponse {
+    ): ActionsListRepoSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoSecretsResponse::class),
+            ResponseType::object(ActionsListRepoSecrets200Content::class),
         );
     }
 
@@ -2145,7 +2148,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         string $secretName,
-        ActionsCreateOrUpdateRepoSecretRequest $body,
+        ActionsCreateOrUpdateRepoSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/secrets/{secret_name}')
@@ -2173,21 +2176,21 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoVariablesResponse {
+    ): ActionsListRepoVariables200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoVariablesResponse::class),
+            ResponseType::object(ActionsListRepoVariables200Content::class),
         );
     }
 
     public function actionsCreateRepoVariable(
         string $owner,
         string $repo,
-        ActionsCreateRepoVariableRequest $body,
+        ActionsCreateRepoVariableRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/variables')
@@ -2224,7 +2227,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         string $name,
-        ActionsUpdateRepoVariableRequest $body,
+        ActionsUpdateRepoVariableRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/actions/variables/{name}')
@@ -2241,14 +2244,14 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoWorkflowsResponse {
+    ): ActionsListRepoWorkflows200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoWorkflowsResponse::class),
+            ResponseType::object(ActionsListRepoWorkflows200Content::class),
         );
     }
 
@@ -2278,7 +2281,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         int|string $workflowId,
-        ActionsCreateWorkflowDispatchRequest $body,
+        ActionsCreateWorkflowDispatchRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches')
@@ -2315,7 +2318,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRunsResponse {
+    ): ActionsListWorkflowRuns200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs')
                 ->path('owner', $owner)
@@ -2331,7 +2334,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::object(ActionsListWorkflowRunsResponse::class),
+            ResponseType::object(ActionsListWorkflowRuns200Content::class),
         );
     }
 
@@ -2352,7 +2355,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentSecretsResponse {
+    ): ActionsListEnvironmentSecrets200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/secrets')
                 ->path('owner', $owner)
@@ -2360,7 +2363,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListEnvironmentSecretsResponse::class),
+            ResponseType::object(ActionsListEnvironmentSecrets200Content::class),
         );
     }
 
@@ -2399,7 +2402,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         string $environmentName,
         string $secretName,
-        ActionsCreateOrUpdateEnvironmentSecretRequest $body,
+        ActionsCreateOrUpdateEnvironmentSecretRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/environments/{environment_name}/secrets/{secret_name}')
@@ -2434,7 +2437,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentVariablesResponse {
+    ): ActionsListEnvironmentVariables200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/variables')
                 ->path('owner', $owner)
@@ -2442,7 +2445,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListEnvironmentVariablesResponse::class),
+            ResponseType::object(ActionsListEnvironmentVariables200Content::class),
         );
     }
 
@@ -2450,7 +2453,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $owner,
         string $repo,
         string $environmentName,
-        ActionsCreateEnvironmentVariableRequest $body,
+        ActionsCreateEnvironmentVariableRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/environments/{environment_name}/variables')
@@ -2499,7 +2502,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         string $repo,
         string $name,
         string $environmentName,
-        ActionsUpdateEnvironmentVariableRequest $body,
+        ActionsUpdateEnvironmentVariableRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/environments/{environment_name}/variables/{name}')

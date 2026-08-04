@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
-use Acme\Kilbil\Generated\Enum\SearchClientRequestSearchMode;
-use Acme\Kilbil\Generated\Model\SearchClientRequest;
-use Acme\Kilbil\Generated\Model\SearchClientResponse;
+use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
+use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +29,7 @@ use const JSON_UNESCAPED_UNICODE;
  * form that `TypeResolver::resolve()` already read correctly. The gap hit
  * every property `PropertySynthesiser` resolves itself rather than
  * delegating to `TypeResolver`: a synthesised inline enum (`state`, backed
- * by `SearchClientResponseState`, case `Null` for the vendor's *quoted*
+ * by `SearchClient200ContentState`, case `Null` for the vendor's *quoted*
  * `'null'` enum member — a different thing from JSON `null`) and a
  * synthesised array-of-object (`special_days_types`, items are a
  * synthesised model). Both emitted a non-nullable PHP type despite their
@@ -67,14 +67,14 @@ final class KilbilNullableTypeArrayDefectTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    private function searchClientWith(array $data): SearchClientResponse
+    private function searchClientWith(array $data): SearchClient200Content
     {
         $body = json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, $body));
         $client = KilbilHttpHarness::client($http);
 
-        return $client->customers()->searchClient(new SearchClientRequest(
-            search_mode: SearchClientRequestSearchMode::_1,
+        return $client->customers()->searchClient(new SearchClientRequestContent(
+            search_mode: SearchClientRequestContentSearchMode::_1,
             search_value: '79129999999',
         ));
     }

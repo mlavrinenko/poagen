@@ -13,10 +13,10 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfiguration;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfigurationWithSelectedRepositories;
-use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequest;
-use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKeyResponse;
-use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistriesResponse;
-use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequest;
+use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequestContent;
+use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKey200Content;
+use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistries200Content;
+use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequestContent;
 
 /**
  * The contract for the `private-registries` endpoints.
@@ -31,14 +31,14 @@ interface PrivateRegistriesClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): PrivateRegistriesListOrgPrivateRegistriesResponse;
+    ): PrivateRegistriesListOrgPrivateRegistries200Content;
 
     public function privateRegistriesCreateOrgPrivateRegistry(
         string $org,
-        PrivateRegistriesCreateOrgPrivateRegistryRequest $body,
+        PrivateRegistriesCreateOrgPrivateRegistryRequestContent $body,
     ): OrgPrivateRegistryConfigurationWithSelectedRepositories;
 
-    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKeyResponse;
+    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKey200Content;
 
     public function privateRegistriesGetOrgPrivateRegistry(
         string $org,
@@ -50,6 +50,6 @@ interface PrivateRegistriesClientInterface
     public function privateRegistriesUpdateOrgPrivateRegistry(
         string $org,
         string $secretName,
-        PrivateRegistriesUpdateOrgPrivateRegistryRequest $body,
+        PrivateRegistriesUpdateOrgPrivateRegistryRequestContent $body,
     ): void;
 }

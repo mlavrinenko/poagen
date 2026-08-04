@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GetWalletLinkRequest;
-use Acme\Kilbil\Generated\Model\GetWalletLinkResponse;
+use Acme\Kilbil\Generated\Model\GetWalletLink200Content;
+use Acme\Kilbil\Generated\Model\GetWalletLinkRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -25,11 +25,11 @@ final readonly class WalletClient implements WalletClientInterface
     ) {
     }
 
-    public function getWalletLink(GetWalletLinkRequest $body): GetWalletLinkResponse
+    public function getWalletLink(GetWalletLinkRequestContent $body): GetWalletLink200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getwalletlink')->query('h', $this->h)->json($body),
-            ResponseType::object(GetWalletLinkResponse::class),
+            ResponseType::object(GetWalletLink200Content::class),
         );
     }
 }

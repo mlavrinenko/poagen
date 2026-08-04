@@ -32,15 +32,15 @@ use Acme\GitHub\Generated\Model\CodeScanningAutofix;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommits;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommitsResponse;
 use Acme\GitHub\Generated\Model\CodeScanningCodeqlDatabase;
-use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysisRequest;
+use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysisRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetup;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdate;
 use Acme\GitHub\Generated\Model\CodeScanningOrganizationAlertItems;
 use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsReceipt;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsStatus;
-use Acme\GitHub\Generated\Model\CodeScanningUpdateAlertRequest;
-use Acme\GitHub\Generated\Model\CodeScanningUploadSarifRequest;
+use Acme\GitHub\Generated\Model\CodeScanningUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\CodeScanningUploadSarifRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysis;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysisRepoTask;
 use Acme\GitHub\Generated\Model\EmptyObject;
@@ -99,7 +99,7 @@ interface CodeScanningClientInterface
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
-        CodeScanningUpdateAlertRequest $body,
+        CodeScanningUpdateAlertRequestContent $body,
     ): CodeScanningAlert;
 
     public function codeScanningGetAutofix(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAutofix;
@@ -172,7 +172,7 @@ interface CodeScanningClientInterface
     public function codeScanningCreateVariantAnalysis(
         string $owner,
         string $repo,
-        CodeScanningCreateVariantAnalysisRequest $body,
+        CodeScanningCreateVariantAnalysisRequestContent $body,
     ): CodeScanningVariantAnalysis;
 
     public function codeScanningGetVariantAnalysis(
@@ -200,7 +200,7 @@ interface CodeScanningClientInterface
     public function codeScanningUploadSarif(
         string $owner,
         string $repo,
-        CodeScanningUploadSarifRequest $body,
+        CodeScanningUploadSarifRequestContent $body,
     ): CodeScanningSarifsReceipt;
 
     public function codeScanningGetSarif(string $owner, string $repo, string $sarifId): CodeScanningSarifsStatus;

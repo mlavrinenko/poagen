@@ -11,26 +11,26 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequest;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsResponse;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersRequest;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersResponse;
-use Acme\GitHub\Generated\Model\CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsResponse;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersResponse;
-use Acme\GitHub\Generated\Model\CopilotGetCopilotCodingAgentPermissionsOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotListCopilotSeatsResponse;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeams201Content;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequestContent;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsers201Content;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersRequestContent;
+use Acme\GitHub\Generated\Model\CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeams200Content;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsRequestContent;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsers200Content;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersRequestContent;
+use Acme\GitHub\Generated\Model\CopilotGetCopilotCodingAgentPermissionsOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotListCopilotSeats200Content;
 use Acme\GitHub\Generated\Model\CopilotOrganizationContentExclusionDetails;
 use Acme\GitHub\Generated\Model\CopilotOrganizationDetails;
-use Acme\GitHub\Generated\Model\CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequest;
+use Acme\GitHub\Generated\Model\CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent;
 use Acme\GitHub\Generated\Model\CopilotSeatDetails;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentPermissionsOrganizationRequest;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotContentExclusionForOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequest;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotContentExclusionForOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequestContent;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics1DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics28DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetricsDay;
@@ -60,17 +60,17 @@ interface CopilotClientInterface
 
     public function copilotSetEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotSetEnterpriseCodingAgentPolicyRequest $body,
+        CopilotSetEnterpriseCodingAgentPolicyRequestContent $body,
     ): void;
 
     public function copilotAddOrganizationsToEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequest $body,
+        CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent $body,
     ): void;
 
     public function copilotRemoveOrganizationsFromEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequest $body,
+        CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent $body,
     ): void;
 
     public function copilotGetCopilotOrganizationDetails(string $org): CopilotOrganizationDetails;
@@ -79,46 +79,46 @@ interface CopilotClientInterface
         string $org,
         ?int $page = null,
         ?int $perPage = null,
-    ): CopilotListCopilotSeatsResponse;
+    ): CopilotListCopilotSeats200Content;
 
     public function copilotAddCopilotSeatsForTeams(
         string $org,
-        CopilotAddCopilotSeatsForTeamsRequest $body,
-    ): CopilotAddCopilotSeatsForTeamsResponse;
+        CopilotAddCopilotSeatsForTeamsRequestContent $body,
+    ): CopilotAddCopilotSeatsForTeams201Content;
 
     public function copilotCancelCopilotSeatAssignmentForTeams(
         string $org,
-        CopilotCancelCopilotSeatAssignmentForTeamsRequest $body,
-    ): CopilotCancelCopilotSeatAssignmentForTeamsResponse;
+        CopilotCancelCopilotSeatAssignmentForTeamsRequestContent $body,
+    ): CopilotCancelCopilotSeatAssignmentForTeams200Content;
 
     public function copilotAddCopilotSeatsForUsers(
         string $org,
-        CopilotAddCopilotSeatsForUsersRequest $body,
-    ): CopilotAddCopilotSeatsForUsersResponse;
+        CopilotAddCopilotSeatsForUsersRequestContent $body,
+    ): CopilotAddCopilotSeatsForUsers201Content;
 
     public function copilotCancelCopilotSeatAssignmentForUsers(
         string $org,
-        CopilotCancelCopilotSeatAssignmentForUsersRequest $body,
-    ): CopilotCancelCopilotSeatAssignmentForUsersResponse;
+        CopilotCancelCopilotSeatAssignmentForUsersRequestContent $body,
+    ): CopilotCancelCopilotSeatAssignmentForUsers200Content;
 
     public function copilotGetCopilotCodingAgentPermissionsOrganization(
         string $org,
-    ): CopilotGetCopilotCodingAgentPermissionsOrganizationResponse;
+    ): CopilotGetCopilotCodingAgentPermissionsOrganization200Content;
 
     public function copilotSetCopilotCodingAgentPermissionsOrganization(
         string $org,
-        CopilotSetCopilotCodingAgentPermissionsOrganizationRequest $body,
+        CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent $body,
     ): void;
 
     public function copilotListCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse;
+    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content;
 
     public function copilotSetCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
-        CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest $body,
+        CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent $body,
     ): void;
 
     public function copilotEnableCopilotCodingAgentForRepositoryInOrganization(string $org, int $repositoryId): void;
@@ -135,7 +135,7 @@ interface CopilotClientInterface
     public function copilotSetCopilotContentExclusionForOrganization(
         string $org,
         array $body,
-    ): CopilotSetCopilotContentExclusionForOrganizationResponse;
+    ): CopilotSetCopilotContentExclusionForOrganization200Content;
 
     /**
      * @return list<CopilotUsageMetricsDay>

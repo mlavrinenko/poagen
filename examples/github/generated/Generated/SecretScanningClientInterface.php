@@ -20,14 +20,14 @@ use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoState;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\OrganizationSecretScanningAlert;
 use Acme\GitHub\Generated\Model\SecretScanningAlert;
-use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequest;
+use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequestContent;
 use Acme\GitHub\Generated\Model\SecretScanningLocation;
 use Acme\GitHub\Generated\Model\SecretScanningPatternConfiguration;
 use Acme\GitHub\Generated\Model\SecretScanningPushProtectionBypass;
 use Acme\GitHub\Generated\Model\SecretScanningScanHistory;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequest;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequest;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsResponse;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigs200Content;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequestContent;
 
 /**
  * The contract for the `secret-scanning` endpoints.
@@ -66,8 +66,8 @@ interface SecretScanningClientInterface
 
     public function secretScanningUpdateOrgPatternConfigs(
         string $org,
-        SecretScanningUpdateOrgPatternConfigsRequest $body,
-    ): SecretScanningUpdateOrgPatternConfigsResponse;
+        SecretScanningUpdateOrgPatternConfigsRequestContent $body,
+    ): SecretScanningUpdateOrgPatternConfigs200Content;
 
     /**
      * @return list<SecretScanningAlert>
@@ -105,7 +105,7 @@ interface SecretScanningClientInterface
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
-        SecretScanningUpdateAlertRequest $body,
+        SecretScanningUpdateAlertRequestContent $body,
     ): SecretScanningAlert;
 
     /**
@@ -122,7 +122,7 @@ interface SecretScanningClientInterface
     public function secretScanningCreatePushProtectionBypass(
         string $owner,
         string $repo,
-        SecretScanningCreatePushProtectionBypassRequest $body,
+        SecretScanningCreatePushProtectionBypassRequestContent $body,
     ): SecretScanningPushProtectionBypass;
 
     public function secretScanningGetScanHistory(string $owner, string $repo): SecretScanningScanHistory;

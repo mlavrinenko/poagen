@@ -149,6 +149,8 @@
 #include "decisions/generated-duplication-ceiling-is-per-tree.decision-260803.typ"
 #pagebreak()
 #include "decisions/payload-envelope-stays-the-consumers-business.decision-260804.typ"
+#pagebreak()
+#include "decisions/name-inline-schemas-by-status-and-merge-on-request.decision-260804.typ"
 
 // --- Supplementary artefacts ---
 //

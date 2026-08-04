@@ -21,13 +21,13 @@ use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\TeamFull;
 use Acme\GitHub\Generated\Model\TeamMembership;
 use Acme\GitHub\Generated\Model\TeamRepository;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserLegacyRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequest;
-use Acme\GitHub\Generated\Model\TeamsCreateRequest;
-use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequest;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserLegacyRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequestContent;
+use Acme\GitHub\Generated\Model\TeamsCreateRequestContent;
+use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -58,7 +58,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         );
     }
 
-    public function teamsCreate(string $org, TeamsCreateRequest $body): TeamFull
+    public function teamsCreate(string $org, TeamsCreateRequestContent $body): TeamFull
     {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/teams')->path('org', $org)->json($body),
@@ -86,7 +86,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         );
     }
 
-    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequest $body): TeamFull
+    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): TeamFull
     {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/teams/{team_slug}')
@@ -152,7 +152,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         string $org,
         string $teamSlug,
         string $username,
-        TeamsAddOrUpdateMembershipForUserInOrgRequest $body,
+        TeamsAddOrUpdateMembershipForUserInOrgRequestContent $body,
     ): TeamMembership {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/teams/{team_slug}/memberships/{username}')
@@ -211,7 +211,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         string $teamSlug,
         string $owner,
         string $repo,
-        TeamsAddOrUpdateRepoPermissionsInOrgRequest $body,
+        TeamsAddOrUpdateRepoPermissionsInOrgRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}')
@@ -267,7 +267,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         );
     }
 
-    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequest $body): TeamFull
+    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): TeamFull
     {
         return $this->transport->send(
             Endpoint::patch('/teams/{team_id}')->path('team_id', $teamId)->json($body),
@@ -351,7 +351,7 @@ final readonly class TeamsClient implements TeamsClientInterface
     public function teamsAddOrUpdateMembershipForUserLegacy(
         int $teamId,
         string $username,
-        TeamsAddOrUpdateMembershipForUserLegacyRequest $body,
+        TeamsAddOrUpdateMembershipForUserLegacyRequestContent $body,
     ): TeamMembership {
         return $this->transport->send(
             Endpoint::put('/teams/{team_id}/memberships/{username}')
@@ -401,7 +401,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         int $teamId,
         string $owner,
         string $repo,
-        TeamsAddOrUpdateRepoPermissionsLegacyRequest $body,
+        TeamsAddOrUpdateRepoPermissionsLegacyRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/teams/{team_id}/repos/{owner}/{repo}')

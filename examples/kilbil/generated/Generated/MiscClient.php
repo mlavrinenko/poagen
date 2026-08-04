@@ -11,13 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\CloseSessionRequest;
-use Acme\Kilbil\Generated\Model\CloseSessionResponse;
-use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequest;
-use Acme\Kilbil\Generated\Model\ExchangePosSettingsResponse;
-use Acme\Kilbil\Generated\Model\GenerateCardRequest;
-use Acme\Kilbil\Generated\Model\GenerateCardResponse;
-use Acme\Kilbil\Generated\Model\LegalInfoResponse;
+use Acme\Kilbil\Generated\Model\CloseSession200Content;
+use Acme\Kilbil\Generated\Model\CloseSessionRequestContent;
+use Acme\Kilbil\Generated\Model\ExchangePosSettings200Content;
+use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequestContent;
+use Acme\Kilbil\Generated\Model\GenerateCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateCardRequestContent;
+use Acme\Kilbil\Generated\Model\LegalInfo200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -30,35 +30,35 @@ final readonly class MiscClient implements MiscClientInterface
     ) {
     }
 
-    public function closeSession(CloseSessionRequest $body): CloseSessionResponse
+    public function closeSession(CloseSessionRequestContent $body): CloseSession200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/closesession')->query('h', $this->h)->json($body),
-            ResponseType::object(CloseSessionResponse::class),
+            ResponseType::object(CloseSession200Content::class),
         );
     }
 
-    public function exchangePosSettings(ExchangePosSettingsRequest $body): ExchangePosSettingsResponse
+    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): ExchangePosSettings200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/exchangepossettings')->query('h', $this->h)->json($body),
-            ResponseType::object(ExchangePosSettingsResponse::class),
+            ResponseType::object(ExchangePosSettings200Content::class),
         );
     }
 
-    public function generateCard(GenerateCardRequest $body): GenerateCardResponse
+    public function generateCard(GenerateCardRequestContent $body): GenerateCard200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/generatecard')->query('h', $this->h)->json($body),
-            ResponseType::object(GenerateCardResponse::class),
+            ResponseType::object(GenerateCard200Content::class),
         );
     }
 
-    public function legalInfo(): LegalInfoResponse
+    public function legalInfo(): LegalInfo200Content
     {
         return $this->transport->send(
             Endpoint::get('/load/legal_info')->query('h', $this->h),
-            ResponseType::object(LegalInfoResponse::class),
+            ResponseType::object(LegalInfo200Content::class),
         );
     }
 }

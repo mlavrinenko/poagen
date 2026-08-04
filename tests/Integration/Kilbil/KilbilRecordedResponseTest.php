@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
-use Acme\Kilbil\Generated\Enum\SearchClientRequestSearchMode;
-use Acme\Kilbil\Generated\Enum\SearchClientResponseActivateClientType;
-use Acme\Kilbil\Generated\Enum\SearchClientResponseInterfacesItemInterfaceType;
-use Acme\Kilbil\Generated\Enum\SearchClientResponseProgramType;
-use Acme\Kilbil\Generated\Model\SearchClientRequest;
-use Acme\Kilbil\Generated\Model\SearchClientResponse;
-use Acme\Kilbil\Generated\Model\SearchClientResponseCardsItem;
-use Acme\Kilbil\Generated\Model\SearchClientResponseInterfacesItem;
+use Acme\Kilbil\Generated\Enum\SearchClient200ContentActivateClientType;
+use Acme\Kilbil\Generated\Enum\SearchClient200ContentInterfacesItemInterfaceType;
+use Acme\Kilbil\Generated\Enum\SearchClient200ContentProgramType;
+use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
+use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClient200ContentCardsItem;
+use Acme\Kilbil\Generated\Model\SearchClient200ContentInterfacesItem;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
 use DateTimeImmutable;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
@@ -74,15 +74,15 @@ final class KilbilRecordedResponseTest extends TestCase
 
         self::assertCount(1, $response->cards ?? []);
         $card = ($response->cards ?? [])[0];
-        self::assertInstanceOf(SearchClientResponseCardsItem::class, $card);
+        self::assertInstanceOf(SearchClient200ContentCardsItem::class, $card);
         self::assertSame(10963328, $card->card_id);
         self::assertSame('0061', $card->code);
 
         self::assertCount(1, $response->interfaces ?? []);
         $interface = ($response->interfaces ?? [])[0];
-        self::assertInstanceOf(SearchClientResponseInterfacesItem::class, $interface);
+        self::assertInstanceOf(SearchClient200ContentInterfacesItem::class, $interface);
         self::assertSame('Telegram', $interface->interface_name);
-        self::assertSame(SearchClientResponseInterfacesItemInterfaceType::_0, $interface->interface_type);
+        self::assertSame(SearchClient200ContentInterfacesItemInterfaceType::_0, $interface->interface_type);
 
         // A second nested list, doubly nested under `_bill_data`.
         $billItems = $response->_bill_data->items ?? [];
@@ -116,17 +116,17 @@ final class KilbilRecordedResponseTest extends TestCase
     {
         $response = $this->searchClientFound();
 
-        self::assertSame(SearchClientResponseActivateClientType::_1, $response->activate_client_type);
-        self::assertSame(SearchClientResponseProgramType::_0, $response->program_type);
+        self::assertSame(SearchClient200ContentActivateClientType::_1, $response->activate_client_type);
+        self::assertSame(SearchClient200ContentProgramType::_0, $response->program_type);
     }
 
-    private function searchClientFound(): SearchClientResponse
+    private function searchClientFound(): SearchClient200Content
     {
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, KilbilFixture::raw('searchclient-found')));
         $client = KilbilHttpHarness::client($http);
 
-        return $client->customers()->searchClient(new SearchClientRequest(
-            search_mode: SearchClientRequestSearchMode::_1,
+        return $client->customers()->searchClient(new SearchClientRequestContent(
+            search_mode: SearchClientRequestContentSearchMode::_1,
             search_value: '79129999999',
         ));
     }

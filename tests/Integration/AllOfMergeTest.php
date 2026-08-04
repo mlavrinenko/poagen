@@ -51,7 +51,7 @@ final class AllOfMergeTest extends TestCase
             'mergeMissingRequired' => 'fixture-only refusal',
         ]));
 
-        self::assertStringContainsString('public function mergeRecursive(MergeRecursiveRequest $body): void', $client);
+        self::assertStringContainsString('public function mergeRecursive(MergeRecursiveRequestContent $body): void', $client);
     }
 
     public function testARecursiveMergeModelCarriesBothLevelsProperties(): void
@@ -61,7 +61,7 @@ final class AllOfMergeTest extends TestCase
             'mergeBranchNotObject' => 'fixture-only refusal',
             'mergeMissingRequired' => 'fixture-only refusal',
         ]);
-        $model = $this->modelSource($plan, 'MergeRecursiveRequest');
+        $model = $this->modelSource($plan, 'MergeRecursiveRequestContent');
 
         // sku sits on widget_core, color sits on widget_extra — both a $ref
         // away from `widget`, itself a $ref away from the request body.
@@ -83,7 +83,7 @@ final class AllOfMergeTest extends TestCase
             'mergeMissingRequired' => 'fixture-only refusal',
         ]));
 
-        self::assertStringContainsString('public function mergeWidened(MergeWidenedRequest $body): void', $client);
+        self::assertStringContainsString('public function mergeWidened(MergeWidenedRequestContent $body): void', $client);
         self::assertStringNotContainsString('mergeWidened(array $body)', $client);
     }
 

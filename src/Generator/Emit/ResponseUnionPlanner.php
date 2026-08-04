@@ -210,10 +210,14 @@ final readonly class ResponseUnionPlanner
 
     /**
      * Layer three (property position's fourth): {@see Profile::$unionPins},
-     * keyed the same way {@see InlinePayloadPlanner}
-     * already keys `Profile::$inlineModels` — `'<rawOperationId>.response'`
-     * — because a response has no `<Component>.<property>` pair to name it
-     * by.
+     * keyed `'<rawOperationId>.response'` — a fixed literal rather than the
+     * status this union actually resolved at, because a response has no
+     * `<Component>.<property>` pair to name it by and a union pin names the
+     * whole response position, not one status among several. `Profile::$inlineModels`
+     * moved to a per-status key
+     * (name-inline-schemas-by-operation-and-status), but that change is
+     * about naming a *class*; this key names a *decision*, and one operation
+     * has only ever had one response-position union to decide.
      *
      * @param  array<string,array{branch:string,reason:string}> $pins
      * @param  array<string,string>                             $models identity => PHP model name

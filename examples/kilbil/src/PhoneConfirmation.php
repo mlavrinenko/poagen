@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Acme\Kilbil;
 
 use Acme\Kilbil\Generated\ConfirmationCodesClientInterface;
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequest;
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneResponse;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequest;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeResponse;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
 
 /**
@@ -53,7 +53,7 @@ final class PhoneConfirmation implements ConfirmationCodesClientInterface
      */
     public function isCodeValid(PhoneNumber $phone, string $code, ?int $clientId = null): bool
     {
-        $response = $this->checkConfirmPhoneCode(new CheckConfirmPhoneCodeRequest(
+        $response = $this->checkConfirmPhoneCode(new CheckConfirmPhoneCodeRequestContent(
             client_id: $clientId,
             phone: $phone,
             code: $code,
@@ -66,12 +66,12 @@ final class PhoneConfirmation implements ConfirmationCodesClientInterface
         return $response->result_code === '0';
     }
 
-    public function askConfirmPhone(AskConfirmPhoneRequest $body): AskConfirmPhoneResponse
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content
     {
         return $this->inner->askConfirmPhone($body);
     }
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequest $body): CheckConfirmPhoneCodeResponse
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content
     {
         return $this->inner->checkConfirmPhoneCode($body);
     }

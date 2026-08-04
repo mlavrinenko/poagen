@@ -15,12 +15,12 @@ use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserDirect
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserSort;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserDirection;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserSort;
-use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequest;
-use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadResponse;
-use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequest;
-use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadResponse;
-use Acme\GitHub\Generated\Model\ActivitySetRepoSubscriptionRequest;
-use Acme\GitHub\Generated\Model\ActivitySetThreadSubscriptionRequest;
+use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsRead202Content;
+use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequestContent;
+use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsRead202Content;
+use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequestContent;
+use Acme\GitHub\Generated\Model\ActivitySetRepoSubscriptionRequestContent;
+use Acme\GitHub\Generated\Model\ActivitySetThreadSubscriptionRequestContent;
 use Acme\GitHub\Generated\Model\Event;
 use Acme\GitHub\Generated\Model\Feed;
 use Acme\GitHub\Generated\Model\MinimalRepository;
@@ -71,8 +71,8 @@ interface ActivityClientInterface
     ): array;
 
     public function activityMarkNotificationsAsRead(
-        ActivityMarkNotificationsAsReadRequest $body,
-    ): ActivityMarkNotificationsAsReadResponse;
+        ActivityMarkNotificationsAsReadRequestContent $body,
+    ): ActivityMarkNotificationsAsRead202Content;
 
     public function activityGetThread(int $threadId): Thread;
 
@@ -84,7 +84,7 @@ interface ActivityClientInterface
 
     public function activitySetThreadSubscription(
         int $threadId,
-        ActivitySetThreadSubscriptionRequest $body,
+        ActivitySetThreadSubscriptionRequestContent $body,
     ): ThreadSubscription;
 
     public function activityDeleteThreadSubscription(int $threadId): void;
@@ -121,8 +121,8 @@ interface ActivityClientInterface
     public function activityMarkRepoNotificationsAsRead(
         string $owner,
         string $repo,
-        ActivityMarkRepoNotificationsAsReadRequest $body,
-    ): ActivityMarkRepoNotificationsAsReadResponse;
+        ActivityMarkRepoNotificationsAsReadRequestContent $body,
+    ): ActivityMarkRepoNotificationsAsRead202Content;
 
     /**
      * @return list<SimpleUser|Stargazer>
@@ -149,7 +149,7 @@ interface ActivityClientInterface
     public function activitySetRepoSubscription(
         string $owner,
         string $repo,
-        ActivitySetRepoSubscriptionRequest $body,
+        ActivitySetRepoSubscriptionRequestContent $body,
     ): RepositorySubscription;
 
     public function activityDeleteRepoSubscription(string $owner, string $repo): void;

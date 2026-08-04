@@ -16,17 +16,17 @@ use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanSort;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedDirection;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedSort;
 use Acme\GitHub\Generated\Enum\AppsListWebhookDeliveriesStatus;
-use Acme\GitHub\Generated\Model\AppsCheckTokenRequest;
-use Acme\GitHub\Generated\Model\AppsCreateFromManifestResponse;
-use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequest;
-use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequest;
-use Acme\GitHub\Generated\Model\AppsDeleteTokenRequest;
-use Acme\GitHub\Generated\Model\AppsListInstallationReposForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\AppsListInstallationsForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\AppsListReposAccessibleToInstallationResponse;
-use Acme\GitHub\Generated\Model\AppsResetTokenRequest;
-use Acme\GitHub\Generated\Model\AppsScopeTokenRequest;
-use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequest;
+use Acme\GitHub\Generated\Model\AppsCheckTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsCreateFromManifest201Content;
+use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequestContent;
+use Acme\GitHub\Generated\Model\AppsDeleteTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsListInstallationReposForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\AppsListInstallationsForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\AppsListReposAccessibleToInstallation200Content;
+use Acme\GitHub\Generated\Model\AppsResetTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsScopeTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequestContent;
 use Acme\GitHub\Generated\Model\Authorization;
 use Acme\GitHub\Generated\Model\HookDelivery;
 use Acme\GitHub\Generated\Model\HookDeliveryItem;
@@ -58,11 +58,11 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsCreateFromManifest(string $code): AppsCreateFromManifestResponse
+    public function appsCreateFromManifest(string $code): AppsCreateFromManifest201Content
     {
         return $this->transport->send(
             Endpoint::post('/app-manifests/{code}/conversions')->path('code', $code),
-            ResponseType::object(AppsCreateFromManifestResponse::class),
+            ResponseType::object(AppsCreateFromManifest201Content::class),
         );
     }
 
@@ -74,7 +74,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequest $body): WebhookConfig
+    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): WebhookConfig
     {
         return $this->transport->send(
             Endpoint::patch('/app/hook/config')->json($body),
@@ -169,7 +169,7 @@ final readonly class AppsClient implements AppsClientInterface
 
     public function appsCreateInstallationAccessToken(
         int $installationId,
-        AppsCreateInstallationAccessTokenRequest $body,
+        AppsCreateInstallationAccessTokenRequestContent $body,
     ): InstallationToken {
         return $this->transport->send(
             Endpoint::post('/app/installations/{installation_id}/access_tokens')
@@ -197,7 +197,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequest $body): void
+    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::delete('/applications/{client_id}/grant')
@@ -207,7 +207,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsCheckToken(string $clientId, AppsCheckTokenRequest $body): Authorization
+    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Authorization
     {
         return $this->transport->send(
             Endpoint::post('/applications/{client_id}/token')
@@ -217,7 +217,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequest $body): void
+    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::delete('/applications/{client_id}/token')
@@ -227,7 +227,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsResetToken(string $clientId, AppsResetTokenRequest $body): Authorization
+    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Authorization
     {
         return $this->transport->send(
             Endpoint::patch('/applications/{client_id}/token')
@@ -237,7 +237,7 @@ final readonly class AppsClient implements AppsClientInterface
         );
     }
 
-    public function appsScopeToken(string $clientId, AppsScopeTokenRequest $body): Authorization
+    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Authorization
     {
         return $this->transport->send(
             Endpoint::post('/applications/{client_id}/token/scoped')
@@ -258,12 +258,12 @@ final readonly class AppsClient implements AppsClientInterface
     public function appsListReposAccessibleToInstallation(
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListReposAccessibleToInstallationResponse {
+    ): AppsListReposAccessibleToInstallation200Content {
         return $this->transport->send(
             Endpoint::get('/installation/repositories')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListReposAccessibleToInstallationResponse::class),
+            ResponseType::object(AppsListReposAccessibleToInstallation200Content::class),
         );
     }
 
@@ -382,12 +382,12 @@ final readonly class AppsClient implements AppsClientInterface
     public function appsListInstallationsForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationsForAuthenticatedUserResponse {
+    ): AppsListInstallationsForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/installations')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListInstallationsForAuthenticatedUserResponse::class),
+            ResponseType::object(AppsListInstallationsForAuthenticatedUser200Content::class),
         );
     }
 
@@ -395,13 +395,13 @@ final readonly class AppsClient implements AppsClientInterface
         int $installationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationReposForAuthenticatedUserResponse {
+    ): AppsListInstallationReposForAuthenticatedUser200Content {
         return $this->transport->send(
             Endpoint::get('/user/installations/{installation_id}/repositories')
                 ->path('installation_id', $installationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(AppsListInstallationReposForAuthenticatedUserResponse::class),
+            ResponseType::object(AppsListInstallationReposForAuthenticatedUser200Content::class),
         );
     }
 

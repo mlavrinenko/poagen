@@ -6,7 +6,11 @@ namespace Mlavrinenko\Paogen\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
-use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
+use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelGroups;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelMergeValidator;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelSite;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelSiteResolver;
 use Mlavrinenko\Paogen\Generator\Emit\TagCatalogue;
 
 use function in_array;
@@ -24,6 +28,12 @@ use function sprintf;
  * {@see SkipListValidator}: guidance that outlives its target is worse than no
  * guidance, because nothing surfaces it.
  *
+ * `$inlineModels` reads as one class name to many sites
+ * (name-inline-schemas-by-operation-and-status): a site absent from the
+ * document fails the same way any other stale entry here does, and a merge
+ * whose sites do not all emit the identical shape fails naming the two that
+ * differ and the property they differ on — {@see InlineModelMergeValidator}.
+ *
  * Returns failure lines rather than throwing, so the run reports every problem
  * it found in one pass (abort-on-unrepresentable-constructs).
  */
@@ -32,16 +42,16 @@ final readonly class ProfileTargetValidator
     private const string IDENTIFIER = '/^[A-Za-z_]\w*$/';
 
     /**
-     * @param  array<string,string> $pins          Profile::$inlineModels
-     * @param  array<string,string> $methodRenames Profile::$methodRenames
-     * @return list<string>         failure lines; empty means the run may proceed
+     * @param  array<string, string|list<string>> $inlineModels  Profile::$inlineModels
+     * @param  array<string,string>                $methodRenames Profile::$methodRenames
+     * @return list<string>                        failure lines; empty means the run may proceed
      */
-    public function validate(OpenApi $openApi, array $pins, array $methodRenames = [], ?Profile $profile = null): array
+    public function validate(OpenApi $openApi, array $inlineModels, array $methodRenames = [], ?Profile $profile = null): array
     {
         $known = array_fill_keys($this->operationIds($openApi), true);
 
         return [
-            ...$this->validatePins($pins, $known),
+            ...$this->validateInlineModels($openApi, $inlineModels),
             ...$this->validateMethodRenames($methodRenames, $known),
             ...($profile instanceof Profile ? $this->validateTags($openApi, $profile, $known) : []),
         ];
@@ -122,50 +132,57 @@ final readonly class ProfileTargetValidator
     }
 
     /**
-     * @param  array<string,string> $pins
-     * @param  array<string,true>   $known
+     * @param  array<string, string|list<string>> $inlineModels
      * @return list<string>
      */
-    private function validatePins(array $pins, array $known): array
+    private function validateInlineModels(OpenApi $openApi, array $inlineModels): array
     {
-        $roles = [InlinePayloadPlanner::ROLE_REQUEST, InlinePayloadPlanner::ROLE_RESPONSE];
         $failures = [];
 
-        foreach ($pins as $key => $className) {
+        foreach (InlineModelGroups::normalise($inlineModels) as $className => $sites) {
             if (preg_match(self::IDENTIFIER, $className) !== 1) {
-                $failures[] = sprintf(
-                    "Profile::\$inlineModels['%s'] => '%s' is not a valid PHP class name.",
-                    $key,
-                    $className,
-                );
+                $failures[] = sprintf("Profile::\$inlineModels['%s'] is not a valid PHP class name.", $className);
 
                 continue;
             }
 
-            $split = strrpos($key, '.');
-            $operationId = $split === false ? $key : substr($key, 0, $split);
-            $role = $split === false ? '' : substr($key, $split + 1);
-
-            if (!in_array($role, $roles, true)) {
-                $failures[] = sprintf(
-                    "Profile::\$inlineModels['%s'] does not name a payload role — a key is "
-                        . "'<operationId>.request' or '<operationId>.response'.",
-                    $key,
-                );
-
-                continue;
-            }
-
-            if (!isset($known[$operationId])) {
-                $failures[] = sprintf(
-                    "Profile::\$inlineModels['%s'] names an operation id absent from the schema — remove this "
-                        . 'entry, or point it at the operation id the vendor now uses.',
-                    $key,
-                );
-            }
+            $failures = [...$failures, ...$this->validateSites($openApi, $className, $sites)];
         }
 
         return $failures;
+    }
+
+    /**
+     * @param  list<string> $sites
+     * @return list<string>
+     */
+    private function validateSites(OpenApi $openApi, string $className, array $sites): array
+    {
+        $failures = [];
+        $schemas = [];
+
+        foreach ($sites as $site) {
+            $schema = InlineModelSiteResolver::schema($openApi, InlineModelSite::parse($site));
+
+            if (!$schema instanceof Schema) {
+                $failures[] = sprintf(
+                    "Profile::\$inlineModels['%s'] names the site '%s', which is absent from the schema — remove "
+                        . 'this entry, or point it at the site the vendor now uses.',
+                    $className,
+                    $site,
+                );
+
+                continue;
+            }
+
+            $schemas[$site] = $schema;
+        }
+
+        if ($failures !== [] || count($schemas) < 2) {
+            return $failures;
+        }
+
+        return InlineModelMergeValidator::mismatches($className, $schemas);
     }
 
     /**

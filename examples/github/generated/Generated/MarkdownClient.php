@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\MarkdownRenderRequest;
+use Acme\GitHub\Generated\Model\MarkdownRenderRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -23,7 +23,7 @@ final readonly class MarkdownClient implements MarkdownClientInterface
     ) {
     }
 
-    public function markdownRender(MarkdownRenderRequest $body): string
+    public function markdownRender(MarkdownRenderRequestContent $body): string
     {
         return $this->transport->send(
             Endpoint::post('/markdown')->json($body),

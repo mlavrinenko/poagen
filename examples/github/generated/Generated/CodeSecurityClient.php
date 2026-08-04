@@ -12,21 +12,21 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\CodeSecurityGetConfigurationsForOrgTargetType;
-use Acme\GitHub\Generated\Model\CodeSecurityAttachConfigurationRequest;
-use Acme\GitHub\Generated\Model\CodeSecurityAttachEnterpriseConfigurationRequest;
+use Acme\GitHub\Generated\Model\CodeSecurityAttachConfigurationRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecurityAttachEnterpriseConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityConfiguration;
 use Acme\GitHub\Generated\Model\CodeSecurityConfigurationForRepository;
 use Acme\GitHub\Generated\Model\CodeSecurityConfigurationRepositories;
-use Acme\GitHub\Generated\Model\CodeSecurityCreateConfigurationForEnterpriseRequest;
-use Acme\GitHub\Generated\Model\CodeSecurityCreateConfigurationRequest;
+use Acme\GitHub\Generated\Model\CodeSecurityCreateConfigurationForEnterpriseRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecurityCreateConfigurationRequestContent;
 use Acme\GitHub\Generated\Model\CodeSecurityDefaultConfigurations;
-use Acme\GitHub\Generated\Model\CodeSecurityDetachConfigurationRequest;
-use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultForEnterpriseRequest;
-use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultForEnterpriseResponse;
-use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultRequest;
-use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultResponse;
-use Acme\GitHub\Generated\Model\CodeSecurityUpdateConfigurationRequest;
-use Acme\GitHub\Generated\Model\CodeSecurityUpdateEnterpriseConfigurationRequest;
+use Acme\GitHub\Generated\Model\CodeSecurityDetachConfigurationRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefault200Content;
+use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultForEnterprise200Content;
+use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecuritySetConfigurationAsDefaultRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecurityUpdateConfigurationRequestContent;
+use Acme\GitHub\Generated\Model\CodeSecurityUpdateEnterpriseConfigurationRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -59,7 +59,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
 
     public function codeSecurityCreateConfigurationForEnterprise(
         string $enterprise,
-        CodeSecurityCreateConfigurationForEnterpriseRequest $body,
+        CodeSecurityCreateConfigurationForEnterpriseRequestContent $body,
     ): CodeSecurityConfiguration {
         return $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/code-security/configurations')
@@ -104,7 +104,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecurityUpdateEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
-        CodeSecurityUpdateEnterpriseConfigurationRequest $body,
+        CodeSecurityUpdateEnterpriseConfigurationRequestContent $body,
     ): CodeSecurityConfiguration {
         return $this->transport->send(
             Endpoint::patch('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
@@ -118,7 +118,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecurityAttachEnterpriseConfiguration(
         string $enterprise,
         int $configurationId,
-        CodeSecurityAttachEnterpriseConfigurationRequest $body,
+        CodeSecurityAttachEnterpriseConfigurationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/code-security/configurations/{configuration_id}/attach')
@@ -132,14 +132,14 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecuritySetConfigurationAsDefaultForEnterprise(
         string $enterprise,
         int $configurationId,
-        CodeSecuritySetConfigurationAsDefaultForEnterpriseRequest $body,
-    ): CodeSecuritySetConfigurationAsDefaultForEnterpriseResponse {
+        CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestContent $body,
+    ): CodeSecuritySetConfigurationAsDefaultForEnterprise200Content {
         return $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/code-security/configurations/{configuration_id}/defaults')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterpriseResponse::class),
+            ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterprise200Content::class),
         );
     }
 
@@ -189,7 +189,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
 
     public function codeSecurityCreateConfiguration(
         string $org,
-        CodeSecurityCreateConfigurationRequest $body,
+        CodeSecurityCreateConfigurationRequestContent $body,
     ): CodeSecurityConfiguration {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/code-security/configurations')
@@ -208,8 +208,10 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         );
     }
 
-    public function codeSecurityDetachConfiguration(string $org, CodeSecurityDetachConfigurationRequest $body): void
-    {
+    public function codeSecurityDetachConfiguration(
+        string $org,
+        CodeSecurityDetachConfigurationRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::delete('/orgs/{org}/code-security/configurations/detach')
                 ->path('org', $org)
@@ -241,7 +243,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecurityUpdateConfiguration(
         string $org,
         int $configurationId,
-        CodeSecurityUpdateConfigurationRequest $body,
+        CodeSecurityUpdateConfigurationRequestContent $body,
     ): CodeSecurityConfiguration {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/code-security/configurations/{configuration_id}')
@@ -255,7 +257,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecurityAttachConfiguration(
         string $org,
         int $configurationId,
-        CodeSecurityAttachConfigurationRequest $body,
+        CodeSecurityAttachConfigurationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/orgs/{org}/code-security/configurations/{configuration_id}/attach')
@@ -269,14 +271,14 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
     public function codeSecuritySetConfigurationAsDefault(
         string $org,
         int $configurationId,
-        CodeSecuritySetConfigurationAsDefaultRequest $body,
-    ): CodeSecuritySetConfigurationAsDefaultResponse {
+        CodeSecuritySetConfigurationAsDefaultRequestContent $body,
+    ): CodeSecuritySetConfigurationAsDefault200Content {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/code-security/configurations/{configuration_id}/defaults')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::object(CodeSecuritySetConfigurationAsDefaultResponse::class),
+            ResponseType::object(CodeSecuritySetConfigurationAsDefault200Content::class),
         );
     }
 

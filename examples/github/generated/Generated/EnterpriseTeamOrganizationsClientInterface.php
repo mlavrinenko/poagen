@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequest;
-use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequest;
+use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequestContent;
+use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\OrganizationSimple;
 
 /**
@@ -40,13 +40,13 @@ interface EnterpriseTeamOrganizationsClientInterface
     public function enterpriseTeamOrganizationsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamOrganizationsBulkAddRequest $body,
+        EnterpriseTeamOrganizationsBulkAddRequestContent $body,
     ): array;
 
     public function enterpriseTeamOrganizationsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamOrganizationsBulkRemoveRequest $body,
+        EnterpriseTeamOrganizationsBulkRemoveRequestContent $body,
     ): void;
 
     public function enterpriseTeamOrganizationsGetAssignment(

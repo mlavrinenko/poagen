@@ -16,17 +16,17 @@ use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanSort;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedDirection;
 use Acme\GitHub\Generated\Enum\AppsListAccountsForPlanStubbedSort;
 use Acme\GitHub\Generated\Enum\AppsListWebhookDeliveriesStatus;
-use Acme\GitHub\Generated\Model\AppsCheckTokenRequest;
-use Acme\GitHub\Generated\Model\AppsCreateFromManifestResponse;
-use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequest;
-use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequest;
-use Acme\GitHub\Generated\Model\AppsDeleteTokenRequest;
-use Acme\GitHub\Generated\Model\AppsListInstallationReposForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\AppsListInstallationsForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\AppsListReposAccessibleToInstallationResponse;
-use Acme\GitHub\Generated\Model\AppsResetTokenRequest;
-use Acme\GitHub\Generated\Model\AppsScopeTokenRequest;
-use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequest;
+use Acme\GitHub\Generated\Model\AppsCheckTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsCreateFromManifest201Content;
+use Acme\GitHub\Generated\Model\AppsCreateInstallationAccessTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsDeleteAuthorizationRequestContent;
+use Acme\GitHub\Generated\Model\AppsDeleteTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsListInstallationReposForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\AppsListInstallationsForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\AppsListReposAccessibleToInstallation200Content;
+use Acme\GitHub\Generated\Model\AppsResetTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsScopeTokenRequestContent;
+use Acme\GitHub\Generated\Model\AppsUpdateWebhookConfigForAppRequestContent;
 use Acme\GitHub\Generated\Model\Authorization;
 use Acme\GitHub\Generated\Model\HookDelivery;
 use Acme\GitHub\Generated\Model\HookDeliveryItem;
@@ -50,11 +50,11 @@ interface AppsClientInterface
 {
     public function appsGetAuthenticated(): Integration;
 
-    public function appsCreateFromManifest(string $code): AppsCreateFromManifestResponse;
+    public function appsCreateFromManifest(string $code): AppsCreateFromManifest201Content;
 
     public function appsGetWebhookConfigForApp(): WebhookConfig;
 
-    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequest $body): WebhookConfig;
+    public function appsUpdateWebhookConfigForApp(AppsUpdateWebhookConfigForAppRequestContent $body): WebhookConfig;
 
     /**
      * @return list<HookDeliveryItem>
@@ -90,29 +90,29 @@ interface AppsClientInterface
 
     public function appsCreateInstallationAccessToken(
         int $installationId,
-        AppsCreateInstallationAccessTokenRequest $body,
+        AppsCreateInstallationAccessTokenRequestContent $body,
     ): InstallationToken;
 
     public function appsSuspendInstallation(int $installationId): void;
 
     public function appsUnsuspendInstallation(int $installationId): void;
 
-    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequest $body): void;
+    public function appsDeleteAuthorization(string $clientId, AppsDeleteAuthorizationRequestContent $body): void;
 
-    public function appsCheckToken(string $clientId, AppsCheckTokenRequest $body): Authorization;
+    public function appsCheckToken(string $clientId, AppsCheckTokenRequestContent $body): Authorization;
 
-    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequest $body): void;
+    public function appsDeleteToken(string $clientId, AppsDeleteTokenRequestContent $body): void;
 
-    public function appsResetToken(string $clientId, AppsResetTokenRequest $body): Authorization;
+    public function appsResetToken(string $clientId, AppsResetTokenRequestContent $body): Authorization;
 
-    public function appsScopeToken(string $clientId, AppsScopeTokenRequest $body): Authorization;
+    public function appsScopeToken(string $clientId, AppsScopeTokenRequestContent $body): Authorization;
 
     public function appsGetBySlug(string $appSlug): Integration;
 
     public function appsListReposAccessibleToInstallation(
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListReposAccessibleToInstallationResponse;
+    ): AppsListReposAccessibleToInstallation200Content;
 
     public function appsRevokeInstallationAccessToken(): void;
 
@@ -159,13 +159,13 @@ interface AppsClientInterface
     public function appsListInstallationsForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationsForAuthenticatedUserResponse;
+    ): AppsListInstallationsForAuthenticatedUser200Content;
 
     public function appsListInstallationReposForAuthenticatedUser(
         int $installationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): AppsListInstallationReposForAuthenticatedUserResponse;
+    ): AppsListInstallationReposForAuthenticatedUser200Content;
 
     public function appsAddRepoToInstallationForAuthenticatedUser(int $installationId, int $repositoryId): void;
 

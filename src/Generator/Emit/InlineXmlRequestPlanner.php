@@ -7,6 +7,7 @@ namespace Mlavrinenko\Paogen\Generator\Emit;
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
+use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
 
 use function is_string;
 
@@ -57,7 +58,7 @@ final readonly class InlineXmlRequestPlanner
         }
 
         if (InlinePayloadPlanner::isSynthesisableObject($schema)) {
-            return BodySpec::xml(InlinePayloadPlanner::claim($pin ?? $base . 'Request', $schema, $ledger, $roots), $root);
+            return BodySpec::xml(InlineModelClaim::named($pin, InlinePayloadName::request($base), $schema, $ledger, $roots), $root);
         }
 
         $items = InlinePayloadPlanner::inlineObjectItemsOf($schema);
@@ -65,7 +66,7 @@ final readonly class InlineXmlRequestPlanner
 
         if ($items instanceof Schema && is_string($item) && $item !== '') {
             return BodySpec::xmlList(
-                InlinePayloadPlanner::claim($pin ?? $base . 'RequestItem', $items, $ledger, $roots),
+                InlineModelClaim::named($pin, InlinePayloadName::request($base, item: true), $items, $ledger, $roots),
                 $root,
                 $item,
             );

@@ -13,9 +13,9 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SecurityGetLatestScanSeverity;
 use Acme\DigitalOcean\Generated\Enum\SecurityGetScanSeverity;
-use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequest;
-use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequest;
-use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequest;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequestContent;
 
 /**
  * The contract for the `Security` endpoints.
@@ -49,7 +49,7 @@ interface SecurityClientInterface
     /**
      * Requires `bearer_auth` scopes: `security:create`.
      */
-    public function securityCreateScanRule(SecurityCreateScanRuleRequest $body): void;
+    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
@@ -80,12 +80,12 @@ interface SecurityClientInterface
     /**
      * Requires `bearer_auth` scopes: `security:update`.
      */
-    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequest $body): void;
+    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
      */
-    public function securityCreateSuppression(SecurityCreateSuppressionRequest $body): void;
+    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `security:delete`.

@@ -22,18 +22,18 @@ use Acme\GitHub\Generated\Model\PublicUser;
 use Acme\GitHub\Generated\Model\SimpleUser;
 use Acme\GitHub\Generated\Model\SocialAccount;
 use Acme\GitHub\Generated\Model\SshSigningKey;
-use Acme\GitHub\Generated\Model\UsersAddSocialAccountForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreateGpgKeyForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreatePublicSshKeyForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersCreateSshSigningKeyForAuthenticatedUserRequest;
+use Acme\GitHub\Generated\Model\UsersAddSocialAccountForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreateGpgKeyForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreatePublicSshKeyForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersCreateSshSigningKeyForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch1;
 use Acme\GitHub\Generated\Model\UsersDeleteAttestationsBulkBranch2;
-use Acme\GitHub\Generated\Model\UsersDeleteSocialAccountForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequest;
-use Acme\GitHub\Generated\Model\UsersListAttestationsBulkResponse;
-use Acme\GitHub\Generated\Model\UsersListAttestationsResponse;
-use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequest;
+use Acme\GitHub\Generated\Model\UsersDeleteSocialAccountForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersListAttestations200Content;
+use Acme\GitHub\Generated\Model\UsersListAttestationsBulk200Content;
+use Acme\GitHub\Generated\Model\UsersListAttestationsBulkRequestContent;
+use Acme\GitHub\Generated\Model\UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\UsersUpdateAuthenticatedRequestContent;
 
 /**
  * The contract for the `users` endpoints.
@@ -46,7 +46,7 @@ interface UsersClientInterface
 {
     public function usersGetAuthenticated(): PrivateUser|PublicUser;
 
-    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequest $body): PrivateUser;
+    public function usersUpdateAuthenticated(UsersUpdateAuthenticatedRequestContent $body): PrivateUser;
 
     /**
      * @return list<SimpleUser>
@@ -63,7 +63,7 @@ interface UsersClientInterface
      * @return list<Email>
      */
     public function usersSetPrimaryEmailVisibilityForAuthenticatedUser(
-        UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest $body,
+        UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestContent $body,
     ): array;
 
     /**
@@ -92,7 +92,9 @@ interface UsersClientInterface
      */
     public function usersListGpgKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
 
-    public function usersCreateGpgKeyForAuthenticatedUser(UsersCreateGpgKeyForAuthenticatedUserRequest $body): GpgKey;
+    public function usersCreateGpgKeyForAuthenticatedUser(
+        UsersCreateGpgKeyForAuthenticatedUserRequestContent $body,
+    ): GpgKey;
 
     public function usersGetGpgKeyForAuthenticatedUser(int $gpgKeyId): GpgKey;
 
@@ -104,7 +106,7 @@ interface UsersClientInterface
     public function usersListPublicSshKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
 
     public function usersCreatePublicSshKeyForAuthenticatedUser(
-        UsersCreatePublicSshKeyForAuthenticatedUserRequest $body,
+        UsersCreatePublicSshKeyForAuthenticatedUserRequestContent $body,
     ): Key;
 
     public function usersGetPublicSshKeyForAuthenticatedUser(int $keyId): Key;
@@ -125,11 +127,11 @@ interface UsersClientInterface
      * @return list<SocialAccount>
      */
     public function usersAddSocialAccountForAuthenticatedUser(
-        UsersAddSocialAccountForAuthenticatedUserRequest $body,
+        UsersAddSocialAccountForAuthenticatedUserRequestContent $body,
     ): array;
 
     public function usersDeleteSocialAccountForAuthenticatedUser(
-        UsersDeleteSocialAccountForAuthenticatedUserRequest $body,
+        UsersDeleteSocialAccountForAuthenticatedUserRequestContent $body,
     ): void;
 
     /**
@@ -138,7 +140,7 @@ interface UsersClientInterface
     public function usersListSshSigningKeysForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
 
     public function usersCreateSshSigningKeyForAuthenticatedUser(
-        UsersCreateSshSigningKeyForAuthenticatedUserRequest $body,
+        UsersCreateSshSigningKeyForAuthenticatedUserRequestContent $body,
     ): SshSigningKey;
 
     public function usersGetSshSigningKeyForAuthenticatedUser(int $sshSigningKeyId): SshSigningKey;
@@ -156,11 +158,11 @@ interface UsersClientInterface
 
     public function usersListAttestationsBulk(
         string $username,
-        UsersListAttestationsBulkRequest $body,
+        UsersListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): UsersListAttestationsBulkResponse;
+    ): UsersListAttestationsBulk200Content;
 
     public function usersDeleteAttestationsBulk(
         string $username,
@@ -178,7 +180,7 @@ interface UsersClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): UsersListAttestationsResponse;
+    ): UsersListAttestations200Content;
 
     /**
      * @return list<SimpleUser>

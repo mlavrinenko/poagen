@@ -475,9 +475,9 @@
             "stage": "unstable"
         },
         {
-            "test_id": "ModelGeneratorTest::testAPinNamingAnOperationAbsentFromTheDocumentFailsTheRun",
+            "test_id": "ModelGeneratorTest::testAPinNamingASiteAbsentFromTheDocumentFailsTheRun",
             "feature": "Model Generator",
-            "scenario": "A pin naming an operation absent from the document fails the run",
+            "scenario": "A pin naming a site absent from the document fails the run",
             "spec_file": "truth/specs/model-generator.feature-260418.typ",
             "spec_line": 443,
             "stage": "unstable"

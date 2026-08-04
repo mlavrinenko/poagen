@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\EnterpriseTeam;
-use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequest;
-use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequest;
+use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequestContent;
+use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -39,8 +39,10 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
         );
     }
 
-    public function enterpriseTeamsCreate(string $enterprise, EnterpriseTeamsCreateRequest $body): EnterpriseTeam
-    {
+    public function enterpriseTeamsCreate(
+        string $enterprise,
+        EnterpriseTeamsCreateRequestContent $body,
+    ): EnterpriseTeam {
         return $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams')
                 ->path('enterprise', $enterprise)
@@ -72,7 +74,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
     public function enterpriseTeamsUpdate(
         string $enterprise,
         string $teamSlug,
-        EnterpriseTeamsUpdateRequest $body,
+        EnterpriseTeamsUpdateRequestContent $body,
     ): EnterpriseTeam {
         return $this->transport->send(
             Endpoint::patch('/enterprises/{enterprise}/teams/{team_slug}')

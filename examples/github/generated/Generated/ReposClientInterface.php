@@ -92,62 +92,62 @@ use Acme\GitHub\Generated\Model\ReferrerTraffic;
 use Acme\GitHub\Generated\Model\Release;
 use Acme\GitHub\Generated\Model\ReleaseAsset;
 use Acme\GitHub\Generated\Model\ReleaseNotesContent;
-use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequest;
-use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReportingResponse;
-use Acme\GitHub\Generated\Model\ReposCreateAttestationRequest;
-use Acme\GitHub\Generated\Model\ReposCreateAttestationResponse;
-use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequest;
-use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDispatchEventRequest;
-use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\ReposCreateForkRequest;
-use Acme\GitHub\Generated\Model\ReposCreateInOrgRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequest;
-use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequest;
-use Acme\GitHub\Generated\Model\ReposCreateReleaseRequest;
-use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequest;
-use Acme\GitHub\Generated\Model\ReposCreateWebhookRequest;
-use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest;
-use Acme\GitHub\Generated\Model\ReposDeleteFileRequest;
-use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequest;
-use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRulesResponse;
-use Acme\GitHub\Generated\Model\ReposGetAllEnvironmentsResponse;
-use Acme\GitHub\Generated\Model\ReposListAttestationsResponse;
-use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrationsResponse;
-use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPoliciesResponse;
-use Acme\GitHub\Generated\Model\ReposMergeRequest;
-use Acme\GitHub\Generated\Model\ReposMergeUpstreamRequest;
-use Acme\GitHub\Generated\Model\ReposRemoveAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposRemoveUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposRenameBranchRequest;
-use Acme\GitHub\Generated\Model\ReposReplaceAllTopicsRequest;
-use Acme\GitHub\Generated\Model\ReposSetAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposSetUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposTransferRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateBranchProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateInformationAboutPagesSiteRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateInvitationRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateOrgRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdatePullRequestReviewProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateReleaseAssetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateReleaseRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateRepoRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateStatusCheckProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateWebhookConfigForRepoRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateWebhookRequest;
+use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequestContent;
+use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReporting200Content;
+use Acme\GitHub\Generated\Model\ReposCreateAttestation201Content;
+use Acme\GitHub\Generated\Model\ReposCreateAttestationRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDispatchEventRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateForkRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateInOrgRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateWebhookRequestContent;
+use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent;
+use Acme\GitHub\Generated\Model\ReposDeleteFileRequestContent;
+use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequestContent;
+use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRules200Content;
+use Acme\GitHub\Generated\Model\ReposGetAllEnvironments200Content;
+use Acme\GitHub\Generated\Model\ReposListAttestations200Content;
+use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrations200Content;
+use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPolicies200Content;
+use Acme\GitHub\Generated\Model\ReposMergeRequestContent;
+use Acme\GitHub\Generated\Model\ReposMergeUpstreamRequestContent;
+use Acme\GitHub\Generated\Model\ReposRemoveAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposRemoveUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposRenameBranchRequestContent;
+use Acme\GitHub\Generated\Model\ReposReplaceAllTopicsRequestContent;
+use Acme\GitHub\Generated\Model\ReposSetAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposSetUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposTransferRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateBranchProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateInformationAboutPagesSiteRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateInvitationRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateOrgRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdatePullRequestReviewProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateReleaseAssetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateRepoRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateStatusCheckProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateWebhookConfigForRepoRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\Repository;
 use Acme\GitHub\Generated\Model\RepositoryCollaboratorPermission;
 use Acme\GitHub\Generated\Model\RepositoryInvitation;
@@ -189,7 +189,7 @@ interface ReposClientInterface
         ?int $page = null,
     ): array;
 
-    public function reposCreateInOrg(string $org, ReposCreateInOrgRequest $body): FullRepository;
+    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): FullRepository;
 
     /**
      * @return list<RepositoryRuleset>
@@ -201,7 +201,7 @@ interface ReposClientInterface
         ?string $targets = null,
     ): array;
 
-    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequest $body): RepositoryRuleset;
+    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): RepositoryRuleset;
 
     public function reposGetOrgRuleSuites(
         string $org,
@@ -221,7 +221,7 @@ interface ReposClientInterface
     public function reposUpdateOrgRuleset(
         string $org,
         int $rulesetId,
-        ReposUpdateOrgRulesetRequest $body,
+        ReposUpdateOrgRulesetRequestContent $body,
     ): RepositoryRuleset;
 
     public function reposDeleteOrgRuleset(string $org, int $rulesetId): void;
@@ -230,7 +230,7 @@ interface ReposClientInterface
 
     public function reposDelete(string $owner, string $repo): void;
 
-    public function reposUpdate(string $owner, string $repo, ReposUpdateRequest $body): FullRepository;
+    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): FullRepository;
 
     /**
      * @return list<Activity>
@@ -251,8 +251,8 @@ interface ReposClientInterface
     public function reposCreateAttestation(
         string $owner,
         string $repo,
-        ReposCreateAttestationRequest $body,
-    ): ReposCreateAttestationResponse;
+        ReposCreateAttestationRequestContent $body,
+    ): ReposCreateAttestation201Content;
 
     public function reposListAttestations(
         string $owner,
@@ -262,14 +262,18 @@ interface ReposClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): ReposListAttestationsResponse;
+    ): ReposListAttestations200Content;
 
     /**
      * @return list<Autolink>
      */
     public function reposListAutolinks(string $owner, string $repo): array;
 
-    public function reposCreateAutolink(string $owner, string $repo, ReposCreateAutolinkRequest $body): Autolink;
+    public function reposCreateAutolink(
+        string $owner,
+        string $repo,
+        ReposCreateAutolinkRequestContent $body,
+    ): Autolink;
 
     public function reposGetAutolink(string $owner, string $repo, int $autolinkId): Autolink;
 
@@ -300,7 +304,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdateBranchProtectionRequest $body,
+        ReposUpdateBranchProtectionRequestContent $body,
     ): ProtectedBranch;
 
     public function reposDeleteBranchProtection(string $owner, string $repo, string $branch): void;
@@ -331,7 +335,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdatePullRequestReviewProtectionRequest $body,
+        ReposUpdatePullRequestReviewProtectionRequestContent $body,
     ): ProtectedBranchPullRequestReview;
 
     public function reposGetCommitSignatureProtection(
@@ -356,7 +360,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdateStatusCheckProtectionRequest $body,
+        ReposUpdateStatusCheckProtectionRequestContent $body,
     ): StatusCheckPolicy;
 
     /**
@@ -380,7 +384,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposSetAppAccessRestrictionsRequest $body,
+        ReposSetAppAccessRestrictionsRequestContent $body,
     ): array;
 
     /**
@@ -390,7 +394,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposAddAppAccessRestrictionsRequest $body,
+        ReposAddAppAccessRestrictionsRequestContent $body,
     ): array;
 
     /**
@@ -400,7 +404,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposRemoveAppAccessRestrictionsRequest $body,
+        ReposRemoveAppAccessRestrictionsRequestContent $body,
     ): array;
 
     /**
@@ -420,7 +424,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposSetUserAccessRestrictionsRequest $body,
+        ReposSetUserAccessRestrictionsRequestContent $body,
     ): array;
 
     /**
@@ -430,7 +434,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposAddUserAccessRestrictionsRequest $body,
+        ReposAddUserAccessRestrictionsRequestContent $body,
     ): array;
 
     /**
@@ -440,14 +444,14 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposRemoveUserAccessRestrictionsRequest $body,
+        ReposRemoveUserAccessRestrictionsRequestContent $body,
     ): array;
 
     public function reposRenameBranch(
         string $owner,
         string $repo,
         string $branch,
-        ReposRenameBranchRequest $body,
+        ReposRenameBranchRequestContent $body,
     ): BranchWithProtection;
 
     public function reposCodeownersErrors(string $owner, string $repo, ?string $ref = null): CodeownersErrors;
@@ -470,7 +474,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $username,
-        ReposAddCollaboratorRequest $body,
+        ReposAddCollaboratorRequestContent $body,
     ): RepositoryInvitation;
 
     public function reposRemoveCollaborator(string $owner, string $repo, string $username): void;
@@ -499,7 +503,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReposUpdateCommitCommentRequest $body,
+        ReposUpdateCommitCommentRequestContent $body,
     ): CommitComment;
 
     /**
@@ -538,7 +542,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $commitSha,
-        ReposCreateCommitCommentRequest $body,
+        ReposCreateCommitCommentRequestContent $body,
     ): CommitComment;
 
     /**
@@ -604,14 +608,14 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $path,
-        ReposCreateOrUpdateFileContentsRequest $body,
+        ReposCreateOrUpdateFileContentsRequestContent $body,
     ): FileCommit;
 
     public function reposDeleteFile(
         string $owner,
         string $repo,
         string $path,
-        ReposDeleteFileRequest $body,
+        ReposDeleteFileRequestContent $body,
     ): FileCommit;
 
     /**
@@ -639,7 +643,11 @@ interface ReposClientInterface
         ?int $page = null,
     ): array;
 
-    public function reposCreateDeployment(string $owner, string $repo, ReposCreateDeploymentRequest $body): Deployment;
+    public function reposCreateDeployment(
+        string $owner,
+        string $repo,
+        ReposCreateDeploymentRequestContent $body,
+    ): Deployment;
 
     public function reposGetDeployment(string $owner, string $repo, int $deploymentId): Deployment;
 
@@ -660,7 +668,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $deploymentId,
-        ReposCreateDeploymentStatusRequest $body,
+        ReposCreateDeploymentStatusRequestContent $body,
     ): DeploymentStatus;
 
     public function reposGetDeploymentStatus(
@@ -670,14 +678,18 @@ interface ReposClientInterface
         int $statusId,
     ): DeploymentStatus;
 
-    public function reposCreateDispatchEvent(string $owner, string $repo, ReposCreateDispatchEventRequest $body): void;
+    public function reposCreateDispatchEvent(
+        string $owner,
+        string $repo,
+        ReposCreateDispatchEventRequestContent $body,
+    ): void;
 
     public function reposGetAllEnvironments(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposGetAllEnvironmentsResponse;
+    ): ReposGetAllEnvironments200Content;
 
     public function reposGetEnvironment(string $owner, string $repo, string $environmentName): Environment;
 
@@ -685,7 +697,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $environmentName,
-        ReposCreateOrUpdateEnvironmentRequest $body,
+        ReposCreateOrUpdateEnvironmentRequestContent $body,
     ): Environment;
 
     public function reposDeleteAnEnvironment(string $owner, string $repo, string $environmentName): void;
@@ -696,7 +708,7 @@ interface ReposClientInterface
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposListDeploymentBranchPoliciesResponse;
+    ): ReposListDeploymentBranchPolicies200Content;
 
     public function reposCreateDeploymentBranchPolicy(
         string $owner,
@@ -731,13 +743,13 @@ interface ReposClientInterface
         string $environmentName,
         string $repo,
         string $owner,
-    ): ReposGetAllDeploymentProtectionRulesResponse;
+    ): ReposGetAllDeploymentProtectionRules200Content;
 
     public function reposCreateDeploymentProtectionRule(
         string $environmentName,
         string $repo,
         string $owner,
-        ReposCreateDeploymentProtectionRuleRequest $body,
+        ReposCreateDeploymentProtectionRuleRequestContent $body,
     ): DeploymentProtectionRule;
 
     public function reposListCustomDeploymentRuleIntegrations(
@@ -746,7 +758,7 @@ interface ReposClientInterface
         string $owner,
         ?int $page = null,
         ?int $perPage = null,
-    ): ReposListCustomDeploymentRuleIntegrationsResponse;
+    ): ReposListCustomDeploymentRuleIntegrations200Content;
 
     public function reposGetCustomDeploymentProtectionRule(
         string $owner,
@@ -773,14 +785,14 @@ interface ReposClientInterface
         ?int $page = null,
     ): array;
 
-    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequest $body): FullRepository;
+    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): FullRepository;
 
     /**
      * @return list<Hook>
      */
     public function reposListWebhooks(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
 
-    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequest $body): Hook;
+    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Hook;
 
     public function reposGetWebhook(string $owner, string $repo, int $hookId): Hook;
 
@@ -790,7 +802,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $hookId,
-        ReposUpdateWebhookRequest $body,
+        ReposUpdateWebhookRequestContent $body,
     ): Hook;
 
     public function reposGetWebhookConfigForRepo(string $owner, string $repo, int $hookId): WebhookConfig;
@@ -799,7 +811,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $hookId,
-        ReposUpdateWebhookConfigForRepoRequest $body,
+        ReposUpdateWebhookConfigForRepoRequestContent $body,
     ): WebhookConfig;
 
     /**
@@ -839,7 +851,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $invitationId,
-        ReposUpdateInvitationRequest $body,
+        ReposUpdateInvitationRequestContent $body,
     ): RepositoryInvitation;
 
     /**
@@ -847,7 +859,11 @@ interface ReposClientInterface
      */
     public function reposListDeployKeys(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
 
-    public function reposCreateDeployKey(string $owner, string $repo, ReposCreateDeployKeyRequest $body): DeployKey;
+    public function reposCreateDeployKey(
+        string $owner,
+        string $repo,
+        ReposCreateDeployKeyRequestContent $body,
+    ): DeployKey;
 
     public function reposGetDeployKey(string $owner, string $repo, int $keyId): DeployKey;
 
@@ -855,19 +871,23 @@ interface ReposClientInterface
 
     public function reposListLanguages(string $owner, string $repo): Language;
 
-    public function reposMergeUpstream(string $owner, string $repo, ReposMergeUpstreamRequest $body): MergedUpstream;
+    public function reposMergeUpstream(
+        string $owner,
+        string $repo,
+        ReposMergeUpstreamRequestContent $body,
+    ): MergedUpstream;
 
-    public function reposMerge(string $owner, string $repo, ReposMergeRequest $body): Commit;
+    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Commit;
 
     public function reposGetPages(string $owner, string $repo): Page;
 
     public function reposUpdateInformationAboutPagesSite(
         string $owner,
         string $repo,
-        ReposUpdateInformationAboutPagesSiteRequest $body,
+        ReposUpdateInformationAboutPagesSiteRequestContent $body,
     ): void;
 
-    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequest $body): Page;
+    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequestContent $body): Page;
 
     public function reposDeletePagesSite(string $owner, string $repo): void;
 
@@ -885,7 +905,7 @@ interface ReposClientInterface
     public function reposCreatePagesDeployment(
         string $owner,
         string $repo,
-        ReposCreatePagesDeploymentRequest $body,
+        ReposCreatePagesDeploymentRequestContent $body,
     ): PageDeployment;
 
     public function reposGetPagesDeployment(
@@ -901,7 +921,7 @@ interface ReposClientInterface
     public function reposCheckPrivateVulnerabilityReporting(
         string $owner,
         string $repo,
-    ): ReposCheckPrivateVulnerabilityReportingResponse;
+    ): ReposCheckPrivateVulnerabilityReporting200Content;
 
     public function reposEnablePrivateVulnerabilityReporting(string $owner, string $repo): void;
 
@@ -915,7 +935,7 @@ interface ReposClientInterface
     public function reposCustomPropertiesForReposCreateOrUpdateRepositoryValues(
         string $owner,
         string $repo,
-        ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest $body,
+        ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent $body,
     ): void;
 
     public function reposGetReadme(string $owner, string $repo, ?string $ref = null): ContentFile;
@@ -932,7 +952,7 @@ interface ReposClientInterface
      */
     public function reposListReleases(string $owner, string $repo, ?int $perPage = null, ?int $page = null): array;
 
-    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequest $body): Release;
+    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Release;
 
     public function reposGetReleaseAsset(string $owner, string $repo, int $assetId): ReleaseAsset;
 
@@ -942,13 +962,13 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $assetId,
-        ReposUpdateReleaseAssetRequest $body,
+        ReposUpdateReleaseAssetRequestContent $body,
     ): ReleaseAsset;
 
     public function reposGenerateReleaseNotes(
         string $owner,
         string $repo,
-        ReposGenerateReleaseNotesRequest $body,
+        ReposGenerateReleaseNotesRequestContent $body,
     ): ReleaseNotesContent;
 
     public function reposGetLatestRelease(string $owner, string $repo): Release;
@@ -963,7 +983,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $releaseId,
-        ReposUpdateReleaseRequest $body,
+        ReposUpdateReleaseRequestContent $body,
     ): Release;
 
     /**
@@ -1012,7 +1032,7 @@ interface ReposClientInterface
     public function reposCreateRepoRuleset(
         string $owner,
         string $repo,
-        ReposCreateRepoRulesetRequest $body,
+        ReposCreateRepoRulesetRequestContent $body,
     ): RepositoryRuleset;
 
     public function reposGetRepoRuleSuites(
@@ -1039,7 +1059,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         int $rulesetId,
-        ReposUpdateRepoRulesetRequest $body,
+        ReposUpdateRepoRulesetRequestContent $body,
     ): RepositoryRuleset;
 
     public function reposDeleteRepoRuleset(string $owner, string $repo, int $rulesetId): void;
@@ -1088,7 +1108,7 @@ interface ReposClientInterface
         string $owner,
         string $repo,
         string $sha,
-        ReposCreateCommitStatusRequest $body,
+        ReposCreateCommitStatusRequestContent $body,
     ): Status;
 
     /**
@@ -1105,7 +1125,11 @@ interface ReposClientInterface
 
     public function reposGetAllTopics(string $owner, string $repo, ?int $page = null, ?int $perPage = null): Topic;
 
-    public function reposReplaceAllTopics(string $owner, string $repo, ReposReplaceAllTopicsRequest $body): Topic;
+    public function reposReplaceAllTopics(
+        string $owner,
+        string $repo,
+        ReposReplaceAllTopicsRequestContent $body,
+    ): Topic;
 
     public function reposGetClones(string $owner, string $repo, ?ReposGetClonesPer $per = null): CloneTraffic;
 
@@ -1121,7 +1145,7 @@ interface ReposClientInterface
 
     public function reposGetViews(string $owner, string $repo, ?ReposGetViewsPer $per = null): ViewTraffic;
 
-    public function reposTransfer(string $owner, string $repo, ReposTransferRequest $body): MinimalRepository;
+    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): MinimalRepository;
 
     public function reposCheckVulnerabilityAlerts(string $owner, string $repo): void;
 
@@ -1134,7 +1158,7 @@ interface ReposClientInterface
     public function reposCreateUsingTemplate(
         string $templateOwner,
         string $templateRepo,
-        ReposCreateUsingTemplateRequest $body,
+        ReposCreateUsingTemplateRequestContent $body,
     ): FullRepository;
 
     /**
@@ -1157,7 +1181,9 @@ interface ReposClientInterface
         ?\DateTimeImmutable $before = null,
     ): array;
 
-    public function reposCreateForAuthenticatedUser(ReposCreateForAuthenticatedUserRequest $body): FullRepository;
+    public function reposCreateForAuthenticatedUser(
+        ReposCreateForAuthenticatedUserRequestContent $body,
+    ): FullRepository;
 
     /**
      * @return list<RepositoryInvitation>

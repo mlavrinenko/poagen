@@ -64,15 +64,23 @@ final readonly class Profile
      *                                              XML body with no entry here fails the run rather than guessing.
      *                                              A wrong root element is a 400 from the vendor, and asking at
      *                                              generation time is cheaper than finding out at runtime.
-     * @param array<string,string>  $inlineModels   Pins the class name paogen synthesises for an operation's
-     *                                              inline payload. Keys are `'<operationId>.request'` or
-     *                                              `'<operationId>.response'` using the raw operation id from
-     *                                              the document; values are the PHP class name. Overrides the
-     *                                              derivation from the operation's method name. A key naming an
-     *                                              operation id absent from the document, or a role outside the
-     *                                              two above, fails the run. When a vendor renames an operation
-     *                                              id, moving the pin to the new id keeps the class name the
-     *                                              consumer's own callers already reference.
+     * @param array<string, string|list<string>> $inlineModels Names — and optionally merges — the class(es)
+     *                                              paogen synthesises for an operation's inline payloads. Keys are
+     *                                              the PHP class name; values are one site or several, each
+     *                                              `'<operationId>.request'` or `'<operationId>.<status>'` using
+     *                                              the raw operation id and the response status exactly as the
+     *                                              document spells it
+     *                                              (name-inline-schemas-by-operation-and-status). A single site
+     *                                              renames the class the derivation would have picked, the same
+     *                                              way a one-entry map always has. Several sites merge: every site
+     *                                              named under one class shares that one class instead of each
+     *                                              getting its own — nothing merges without an entry here, so
+     *                                              thirty-six structurally identical bodies stay thirty-six
+     *                                              classes until this map says otherwise. A site absent from the
+     *                                              document fails the run, as does a merge whose sites do not all
+     *                                              emit the identical shape — naming the two sites that differ and
+     *                                              the property they differ on, so a consumer cannot merge two
+     *                                              classes into one and silently lose a field.
      * @param array<string,string>  $propertyRenames Map of `'<RawComponentName>.<wirePropertyName>'` → desired
      *                                              PHP property name, for a model property whose vendor spelling
      *                                              is not one a consumer wants to read on every access —

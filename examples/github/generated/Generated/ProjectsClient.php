@@ -18,14 +18,14 @@ use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch4;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch1;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch2;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForUserBranch3;
-use Acme\GitHub\Generated\Model\ProjectsAddItemForOrgRequest;
-use Acme\GitHub\Generated\Model\ProjectsAddItemForUserRequest;
-use Acme\GitHub\Generated\Model\ProjectsCreateDraftItemForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\ProjectsCreateDraftItemForOrgRequest;
-use Acme\GitHub\Generated\Model\ProjectsCreateViewForOrgRequest;
-use Acme\GitHub\Generated\Model\ProjectsCreateViewForUserRequest;
-use Acme\GitHub\Generated\Model\ProjectsUpdateItemForOrgRequest;
-use Acme\GitHub\Generated\Model\ProjectsUpdateItemForUserRequest;
+use Acme\GitHub\Generated\Model\ProjectsAddItemForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsAddItemForUserRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsCreateDraftItemForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsCreateDraftItemForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsCreateViewForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsCreateViewForUserRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsUpdateItemForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ProjectsUpdateItemForUserRequestContent;
 use Acme\GitHub\Generated\Model\ProjectsV2;
 use Acme\GitHub\Generated\Model\ProjectsV2Field;
 use Acme\GitHub\Generated\Model\ProjectsV2ItemSimple;
@@ -76,7 +76,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsCreateDraftItemForOrg(
         string $org,
         int $projectNumber,
-        ProjectsCreateDraftItemForOrgRequest $body,
+        ProjectsCreateDraftItemForOrgRequestContent $body,
     ): ProjectsV2ItemSimple {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/drafts')
@@ -162,7 +162,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsAddItemForOrg(
         string $org,
         int $projectNumber,
-        ProjectsAddItemForOrgRequest $body,
+        ProjectsAddItemForOrgRequestContent $body,
     ): ProjectsV2ItemSimple {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/items')
@@ -207,7 +207,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         int $projectNumber,
         string $org,
         int $itemId,
-        ProjectsUpdateItemForOrgRequest $body,
+        ProjectsUpdateItemForOrgRequestContent $body,
     ): ProjectsV2ItemWithContent {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/projectsV2/{project_number}/items/{item_id}')
@@ -222,7 +222,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsCreateViewForOrg(
         string $org,
         int $projectNumber,
-        ProjectsCreateViewForOrgRequest $body,
+        ProjectsCreateViewForOrgRequestContent $body,
     ): ProjectsV2View {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/projectsV2/{project_number}/views')
@@ -262,7 +262,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsCreateDraftItemForAuthenticatedUser(
         string $userId,
         int $projectNumber,
-        ProjectsCreateDraftItemForAuthenticatedUserRequest $body,
+        ProjectsCreateDraftItemForAuthenticatedUserRequestContent $body,
     ): ProjectsV2ItemSimple {
         return $this->transport->send(
             Endpoint::post('/user/{user_id}/projectsV2/{project_number}/drafts')
@@ -276,7 +276,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsCreateViewForUser(
         string $userId,
         int $projectNumber,
-        ProjectsCreateViewForUserRequest $body,
+        ProjectsCreateViewForUserRequestContent $body,
     ): ProjectsV2View {
         return $this->transport->send(
             Endpoint::post('/users/{user_id}/projectsV2/{project_number}/views')
@@ -393,7 +393,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     public function projectsAddItemForUser(
         string $username,
         int $projectNumber,
-        ProjectsAddItemForUserRequest $body,
+        ProjectsAddItemForUserRequestContent $body,
     ): ProjectsV2ItemSimple {
         return $this->transport->send(
             Endpoint::post('/users/{username}/projectsV2/{project_number}/items')
@@ -438,7 +438,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
         int $projectNumber,
         string $username,
         int $itemId,
-        ProjectsUpdateItemForUserRequest $body,
+        ProjectsUpdateItemForUserRequestContent $body,
     ): ProjectsV2ItemWithContent {
         return $this->transport->send(
             Endpoint::patch('/users/{username}/projectsV2/{project_number}/items/{item_id}')

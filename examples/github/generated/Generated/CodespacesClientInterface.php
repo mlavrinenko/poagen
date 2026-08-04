@@ -14,37 +14,37 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Model\Codespace;
 use Acme\GitHub\Generated\Model\CodespaceExportDetails;
 use Acme\GitHub\Generated\Model\CodespaceWithFullRepository;
-use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesCodespaceMachinesForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch1;
 use Acme\GitHub\Generated\Model\CodespacesCreateForAuthenticatedUserBranch2;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequest;
-use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrgResponse;
-use Acme\GitHub\Generated\Model\CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListInOrganizationResponse;
-use Acme\GitHub\Generated\Model\CodespacesListInRepositoryForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListOrgSecretsResponse;
-use Acme\GitHub\Generated\Model\CodespacesListRepoSecretsResponse;
-use Acme\GitHub\Generated\Model\CodespacesListRepositoriesForSecretForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListSecretsForAuthenticatedUserResponse;
-use Acme\GitHub\Generated\Model\CodespacesListSelectedReposForOrgSecretResponse;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateRepoSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithPrForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesCreateWithRepoForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesDeleteCodespacesAccessUsersRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesGetCodespacesForUserInOrg200Content;
+use Acme\GitHub\Generated\Model\CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListInOrganization200Content;
+use Acme\GitHub\Generated\Model\CodespacesListInRepositoryForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListOrgSecrets200Content;
+use Acme\GitHub\Generated\Model\CodespacesListRepoSecrets200Content;
+use Acme\GitHub\Generated\Model\CodespacesListRepositoriesForSecretForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListSecretsForAuthenticatedUser200Content;
+use Acme\GitHub\Generated\Model\CodespacesListSelectedReposForOrgSecret200Content;
 use Acme\GitHub\Generated\Model\CodespacesOrgSecret;
 use Acme\GitHub\Generated\Model\CodespacesPermissionsCheckForDevcontainer;
-use Acme\GitHub\Generated\Model\CodespacesPreFlightWithRepoForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesPreFlightWithRepoForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesPublicKey;
-use Acme\GitHub\Generated\Model\CodespacesPublishForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesRepoMachinesForAuthenticatedUserResponse;
+use Acme\GitHub\Generated\Model\CodespacesPublishForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesRepoMachinesForAuthenticatedUser200Content;
 use Acme\GitHub\Generated\Model\CodespacesSecret;
-use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessUsersRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\CodespacesSetSelectedReposForOrgSecretRequest;
-use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequest;
+use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetCodespacesAccessUsersRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesSetSelectedReposForOrgSecretRequestContent;
+use Acme\GitHub\Generated\Model\CodespacesUpdateForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\CodespacesUserPublicKey;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\RepoCodespacesSecret;
@@ -62,25 +62,28 @@ interface CodespacesClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInOrganizationResponse;
+    ): CodespacesListInOrganization200Content;
 
-    public function codespacesSetCodespacesAccess(string $org, CodespacesSetCodespacesAccessRequest $body): void;
+    public function codespacesSetCodespacesAccess(
+        string $org,
+        CodespacesSetCodespacesAccessRequestContent $body,
+    ): void;
 
     public function codespacesSetCodespacesAccessUsers(
         string $org,
-        CodespacesSetCodespacesAccessUsersRequest $body,
+        CodespacesSetCodespacesAccessUsersRequestContent $body,
     ): void;
 
     public function codespacesDeleteCodespacesAccessUsers(
         string $org,
-        CodespacesDeleteCodespacesAccessUsersRequest $body,
+        CodespacesDeleteCodespacesAccessUsersRequestContent $body,
     ): void;
 
     public function codespacesListOrgSecrets(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListOrgSecretsResponse;
+    ): CodespacesListOrgSecrets200Content;
 
     public function codespacesGetOrgPublicKey(string $org): CodespacesPublicKey;
 
@@ -89,7 +92,7 @@ interface CodespacesClientInterface
     public function codespacesCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
-        CodespacesCreateOrUpdateOrgSecretRequest $body,
+        CodespacesCreateOrUpdateOrgSecretRequestContent $body,
     ): EmptyObject;
 
     public function codespacesDeleteOrgSecret(string $org, string $secretName): void;
@@ -99,12 +102,12 @@ interface CodespacesClientInterface
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): CodespacesListSelectedReposForOrgSecretResponse;
+    ): CodespacesListSelectedReposForOrgSecret200Content;
 
     public function codespacesSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
-        CodespacesSetSelectedReposForOrgSecretRequest $body,
+        CodespacesSetSelectedReposForOrgSecretRequestContent $body,
     ): void;
 
     public function codespacesAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void;
@@ -120,7 +123,7 @@ interface CodespacesClientInterface
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesGetCodespacesForUserInOrgResponse;
+    ): CodespacesGetCodespacesForUserInOrg200Content;
 
     public function codespacesDeleteFromOrganization(string $org, string $username, string $codespaceName): void;
 
@@ -131,12 +134,12 @@ interface CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListInRepositoryForAuthenticatedUserResponse;
+    ): CodespacesListInRepositoryForAuthenticatedUser200Content;
 
     public function codespacesCreateWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
-        CodespacesCreateWithRepoForAuthenticatedUserRequest $body,
+        CodespacesCreateWithRepoForAuthenticatedUserRequestContent $body,
     ): Codespace;
 
     public function codespacesListDevcontainersInRepositoryForAuthenticatedUser(
@@ -144,7 +147,7 @@ interface CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse;
+    ): CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content;
 
     public function codespacesRepoMachinesForAuthenticatedUser(
         string $owner,
@@ -152,14 +155,14 @@ interface CodespacesClientInterface
         ?string $location = null,
         ?string $clientIp = null,
         ?string $ref = null,
-    ): CodespacesRepoMachinesForAuthenticatedUserResponse;
+    ): CodespacesRepoMachinesForAuthenticatedUser200Content;
 
     public function codespacesPreFlightWithRepoForAuthenticatedUser(
         string $owner,
         string $repo,
         ?string $ref = null,
         ?string $clientIp = null,
-    ): CodespacesPreFlightWithRepoForAuthenticatedUserResponse;
+    ): CodespacesPreFlightWithRepoForAuthenticatedUser200Content;
 
     public function codespacesCheckPermissionsForDevcontainer(
         string $owner,
@@ -173,7 +176,7 @@ interface CodespacesClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListRepoSecretsResponse;
+    ): CodespacesListRepoSecrets200Content;
 
     public function codespacesGetRepoPublicKey(string $owner, string $repo): CodespacesPublicKey;
 
@@ -183,7 +186,7 @@ interface CodespacesClientInterface
         string $owner,
         string $repo,
         string $secretName,
-        CodespacesCreateOrUpdateRepoSecretRequest $body,
+        CodespacesCreateOrUpdateRepoSecretRequestContent $body,
     ): EmptyObject;
 
     public function codespacesDeleteRepoSecret(string $owner, string $repo, string $secretName): void;
@@ -192,14 +195,14 @@ interface CodespacesClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        CodespacesCreateWithPrForAuthenticatedUserRequest $body,
+        CodespacesCreateWithPrForAuthenticatedUserRequestContent $body,
     ): Codespace;
 
     public function codespacesListForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
         ?int $repositoryId = null,
-    ): CodespacesListForAuthenticatedUserResponse;
+    ): CodespacesListForAuthenticatedUser200Content;
 
     public function codespacesCreateForAuthenticatedUser(
         CodespacesCreateForAuthenticatedUserBranch1|CodespacesCreateForAuthenticatedUserBranch2 $body,
@@ -208,7 +211,7 @@ interface CodespacesClientInterface
     public function codespacesListSecretsForAuthenticatedUser(
         ?int $perPage = null,
         ?int $page = null,
-    ): CodespacesListSecretsForAuthenticatedUserResponse;
+    ): CodespacesListSecretsForAuthenticatedUser200Content;
 
     public function codespacesGetPublicKeyForAuthenticatedUser(): CodespacesUserPublicKey;
 
@@ -216,18 +219,18 @@ interface CodespacesClientInterface
 
     public function codespacesCreateOrUpdateSecretForAuthenticatedUser(
         string $secretName,
-        CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest $body,
+        CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestContent $body,
     ): EmptyObject;
 
     public function codespacesDeleteSecretForAuthenticatedUser(string $secretName): void;
 
     public function codespacesListRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
-    ): CodespacesListRepositoriesForSecretForAuthenticatedUserResponse;
+    ): CodespacesListRepositoriesForSecretForAuthenticatedUser200Content;
 
     public function codespacesSetRepositoriesForSecretForAuthenticatedUser(
         string $secretName,
-        CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest $body,
+        CodespacesSetRepositoriesForSecretForAuthenticatedUserRequestContent $body,
     ): void;
 
     public function codespacesAddRepositoryForSecretForAuthenticatedUser(string $secretName, int $repositoryId): void;
@@ -243,7 +246,7 @@ interface CodespacesClientInterface
 
     public function codespacesUpdateForAuthenticatedUser(
         string $codespaceName,
-        CodespacesUpdateForAuthenticatedUserRequest $body,
+        CodespacesUpdateForAuthenticatedUserRequestContent $body,
     ): Codespace;
 
     public function codespacesExportForAuthenticatedUser(string $codespaceName): CodespaceExportDetails;
@@ -255,11 +258,11 @@ interface CodespacesClientInterface
 
     public function codespacesCodespaceMachinesForAuthenticatedUser(
         string $codespaceName,
-    ): CodespacesCodespaceMachinesForAuthenticatedUserResponse;
+    ): CodespacesCodespaceMachinesForAuthenticatedUser200Content;
 
     public function codespacesPublishForAuthenticatedUser(
         string $codespaceName,
-        CodespacesPublishForAuthenticatedUserRequest $body,
+        CodespacesPublishForAuthenticatedUserRequestContent $body,
     ): CodespaceWithFullRepository;
 
     public function codespacesStartForAuthenticatedUser(string $codespaceName): Codespace;

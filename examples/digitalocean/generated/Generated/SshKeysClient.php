@@ -14,7 +14,7 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\SshKeyFingerprint;
 use Acme\DigitalOcean\Generated\Model\SshKeyId;
 use Acme\DigitalOcean\Generated\Model\SshKeys;
-use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -70,8 +70,10 @@ final readonly class SshKeysClient implements SshKeysClientInterface
     /**
      * Requires `bearer_auth` scopes: `ssh_key:update`.
      */
-    public function sshKeysUpdate(SshKeyId|SshKeyFingerprint $sshKeyIdentifier, SshKeysUpdateRequest $body): void
-    {
+    public function sshKeysUpdate(
+        SshKeyId|SshKeyFingerprint $sshKeyIdentifier,
+        SshKeysUpdateRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::put('/v2/account/keys/{ssh_key_identifier}')
                 ->path('ssh_key_identifier', $sshKeyIdentifier->toScalar())

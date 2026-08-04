@@ -15,8 +15,8 @@ use Acme\GitHub\Generated\Enum\CampaignState;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
 use Acme\GitHub\Generated\Model\CampaignSummary;
-use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequest;
-use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequest;
+use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequestContent;
+use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -51,7 +51,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
         );
     }
 
-    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequest $body): CampaignSummary
+    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): CampaignSummary
     {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/campaigns')->path('org', $org)->json($body),
@@ -82,7 +82,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
     public function campaignsUpdateCampaign(
         string $org,
         int $campaignNumber,
-        CampaignsUpdateCampaignRequest $body,
+        CampaignsUpdateCampaignRequestContent $body,
     ): CampaignSummary {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/campaigns/{campaign_number}')

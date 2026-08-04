@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\BillingGetAllBudgetsOrgScope;
-use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequest;
-use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgResponse;
+use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrg200Content;
+use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -64,14 +64,14 @@ final readonly class BillingClient implements BillingClientInterface
     public function billingUpdateBudgetOrg(
         string $org,
         string $budgetId,
-        BillingUpdateBudgetOrgRequest $body,
-    ): BillingUpdateBudgetOrgResponse {
+        BillingUpdateBudgetOrgRequestContent $body,
+    ): BillingUpdateBudgetOrg200Content {
         return $this->transport->send(
             Endpoint::patch('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId)
                 ->json($body),
-            ResponseType::object(BillingUpdateBudgetOrgResponse::class),
+            ResponseType::object(BillingUpdateBudgetOrg200Content::class),
         );
     }
 

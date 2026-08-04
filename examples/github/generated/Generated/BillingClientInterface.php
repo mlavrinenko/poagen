@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\BillingGetAllBudgetsOrgScope;
-use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequest;
-use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgResponse;
+use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrg200Content;
+use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequestContent;
 
 /**
  * The contract for the `billing` endpoints.
@@ -38,8 +38,8 @@ interface BillingClientInterface
     public function billingUpdateBudgetOrg(
         string $org,
         string $budgetId,
-        BillingUpdateBudgetOrgRequest $body,
-    ): BillingUpdateBudgetOrgResponse;
+        BillingUpdateBudgetOrgRequestContent $body,
+    ): BillingUpdateBudgetOrg200Content;
 
     public function billingGetGithubBillingPremiumRequestUsageReportOrg(
         string $org,

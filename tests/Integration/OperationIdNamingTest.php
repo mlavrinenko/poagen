@@ -91,9 +91,9 @@ final class OperationIdNamingTest extends TestCase
         // operation's 2xx response is an array of inline objects, so the class
         // paogen names for it is the item.
         $models = $this->emittedNames($plan);
-        self::assertContains('GetClientFullBalanceRequest', $models);
-        self::assertContains('GetClientFullBalanceResponseItem', $models);
-        self::assertNotContains('GetclientfullbalanceRequest', $models);
+        self::assertContains('GetClientFullBalanceRequestContent', $models);
+        self::assertContains('GetClientFullBalance200ContentItem', $models);
+        self::assertNotContains('GetclientfullbalanceRequestContent', $models);
     }
 
     public function testAnAnsweredIdentifierDropsOutOfTheReport(): void

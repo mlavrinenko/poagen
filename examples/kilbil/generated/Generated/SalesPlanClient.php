@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequest;
-use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesResponse;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides200Content;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -25,11 +25,11 @@ final readonly class SalesPlanClient implements SalesPlanClientInterface
     ) {
     }
 
-    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequest $body): GetSalesIndicesSlidesResponse
+    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): GetSalesIndicesSlides200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getsalesindicesslides')->query('h', $this->h)->json($body),
-            ResponseType::object(GetSalesIndicesSlidesResponse::class),
+            ResponseType::object(GetSalesIndicesSlides200Content::class),
         );
     }
 }

@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GetActionsListRequest;
-use Acme\Kilbil\Generated\Model\GetActionsListResponse;
-use Acme\Kilbil\Generated\Model\GetProgramsResponse;
+use Acme\Kilbil\Generated\Model\GetActionsList200Content;
+use Acme\Kilbil\Generated\Model\GetActionsListRequestContent;
+use Acme\Kilbil\Generated\Model\GetPrograms200Content;
 
 /**
  * The contract for the `Информация о лояльности` endpoints.
@@ -24,10 +24,10 @@ use Acme\Kilbil\Generated\Model\GetProgramsResponse;
  */
 interface LoyaltySettingsClientInterface
 {
-    public function getActionsList(GetActionsListRequest $body): GetActionsListResponse;
+    public function getActionsList(GetActionsListRequestContent $body): GetActionsList200Content;
 
     /**
      * @param array<string, mixed> $body
      */
-    public function getPrograms(array $body): GetProgramsResponse;
+    public function getPrograms(array $body): GetPrograms200Content;
 }

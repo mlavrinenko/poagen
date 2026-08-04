@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\CredentialsRevokeRequest;
+use Acme\GitHub\Generated\Model\CredentialsRevokeRequestContent;
 
 /**
  * The contract for the `credentials` endpoints.
@@ -22,5 +22,5 @@ use Acme\GitHub\Generated\Model\CredentialsRevokeRequest;
  */
 interface CredentialsClientInterface
 {
-    public function credentialsRevoke(CredentialsRevokeRequest $body): void;
+    public function credentialsRevoke(CredentialsRevokeRequestContent $body): void;
 }

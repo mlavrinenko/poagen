@@ -385,8 +385,8 @@
     )[
       #given[#the(Schema) declares an empty `components.schemas` and #an(Operation) #p((id: "placeOrder")) whose `application/json` request body and 2xx response are each an inline `type: object` with declared properties]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#a(GeneratedFile) `Generated/Model/PlaceOrderRequest.php` and #a(GeneratedFile) `Generated/Model/PlaceOrderResponse.php` are both written]
-      #and_[the emitted #the(Client) declares `placeOrder(PlaceOrderRequest $body): PlaceOrderResponse`]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrderRequestContent.php` and #a(GeneratedFile) `Generated/Model/PlaceOrder200Content.php` are both written]
+      #and_[the emitted #the(Client) declares `placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content`]
       #and_[#the(Operation) is *not* reported as a skip]
     ]
 
@@ -396,8 +396,8 @@
     )[
       #given[#an(Operation) #p((id: "placeOrdersBulk")) whose request body and 2xx response are each `type: array` whose `items` is an inline `type: object` with declared properties]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#a(GeneratedFile) `Generated/Model/PlaceOrdersBulkRequestItem.php` and #a(GeneratedFile) `Generated/Model/PlaceOrdersBulkResponseItem.php` are written for the item shapes]
-      #and_[the emitted #the(Client) types the parameter `list<PlaceOrdersBulkRequestItem>` and the return `list<PlaceOrdersBulkResponseItem>` in phpdoc]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrdersBulkRequestContentItem.php` and #a(GeneratedFile) `Generated/Model/PlaceOrdersBulk200ContentItem.php` are written for the item shapes]
+      #and_[the emitted #the(Client) types the parameter `list<PlaceOrdersBulkRequestContentItem>` and the return `list<PlaceOrdersBulk200ContentItem>` in phpdoc]
     ]
 
     #scenario(
@@ -406,7 +406,7 @@
     )[
       #given[#an(Operation) #p((id: "placeOrder")) whose inline response carries an inline object property `shipping` and an array property `lines` whose items are an inline object]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#a(GeneratedFile) `Generated/Model/PlaceOrderResponseShipping.php` and #a(GeneratedFile) `Generated/Model/PlaceOrderResponseLinesItem.php` are written]
+      #then[#a(GeneratedFile) `Generated/Model/PlaceOrder200ContentShipping.php` and #a(GeneratedFile) `Generated/Model/PlaceOrder200ContentLinesItem.php` are written]
       #and_[#the(Model) two properties are typed as those classes rather than `array<string, mixed>`]
     ]
 
@@ -416,7 +416,7 @@
     )[
       #given[#an(Operation) #p((id: "placeOrder")) whose inline request body has a property `channel` with `type: string` and #p((cases: "enum: [web, phone, store]"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#a(GeneratedFile) `Generated/Enum/PlaceOrderRequestChannel.php` is a backed enum with those three cases]
+      #then[#a(GeneratedFile) `Generated/Enum/PlaceOrderRequestContentChannel.php` is a backed enum with those three cases]
       #and_[#a(Model) nested inside a named component resolves an identical inline `enum` the same way, so the reading does not depend on where the property was declared]
     ]
 
@@ -434,19 +434,19 @@
       "The profile pins the class name for a synthesised payload",
       stage: "unstable",
     )[
-      #given[#the(Profile) whose `inlineModels` map carries #p((pin: "'placeOrder.response' => 'PlacedOrder'"))]
+      #given[#the(Profile) whose `inlineModels` map carries #p((pin: "'PlacedOrder' => 'placeOrder.200'"))]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[#a(GeneratedFile) `Generated/Model/PlacedOrder.php` is written and no `PlaceOrderResponse.php` is]
+      #then[#a(GeneratedFile) `Generated/Model/PlacedOrder.php` is written and no `PlaceOrder200Content.php` is]
       #and_[the pin renames the root alone, so #a(Model) nested under it is emitted as `PlacedOrderShipping`]
     ]
 
     #scenario(
-      "A pin naming an operation absent from the document fails the run",
+      "A pin naming a site absent from the document fails the run",
       stage: "unstable",
     )[
-      #given[#the(Profile) whose `inlineModels` map carries a key `'noSuchOperation.response'`]
+      #given[#the(Profile) whose `inlineModels` map carries a value `'noSuchOperation.request'`]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the run fails naming the key and saying the operation id is absent from #the(Schema)]
+      #then[the run fails naming the site and saying it is absent from #the(Schema)]
       #and_[no #a(GeneratedFile) is written, so guidance that has outlived #the(Operation) it named cannot pass unnoticed]
     ]
 
@@ -454,7 +454,7 @@
       "Two shapes deriving one class name fail the run rather than overwriting a file",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares a component named `PlaceOrderResponse` and #an(Operation) #p((id: "placeOrder")) whose inline response derives that same name]
+      #given[#the(Schema) declares a component named `PlaceOrder200Content` and #an(Operation) #p((id: "placeOrder")) whose inline response derives that same name]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the run fails naming #the(Model) and both origins — the component name, and the JSON pointer of the inline response]
       #and_[the message names #the(Profile) key that resolves it, so the reader is not left to guess which knob applies]

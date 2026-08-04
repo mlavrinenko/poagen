@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\EnterpriseTeam;
-use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequest;
-use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequest;
+use Acme\GitHub\Generated\Model\EnterpriseTeamsCreateRequestContent;
+use Acme\GitHub\Generated\Model\EnterpriseTeamsUpdateRequestContent;
 
 /**
  * The contract for the `enterprise-teams` endpoints.
@@ -29,7 +29,10 @@ interface EnterpriseTeamsClientInterface
      */
     public function enterpriseTeamsList(string $enterprise, ?int $perPage = null, ?int $page = null): array;
 
-    public function enterpriseTeamsCreate(string $enterprise, EnterpriseTeamsCreateRequest $body): EnterpriseTeam;
+    public function enterpriseTeamsCreate(
+        string $enterprise,
+        EnterpriseTeamsCreateRequestContent $body,
+    ): EnterpriseTeam;
 
     public function enterpriseTeamsGet(string $enterprise, string $teamSlug): EnterpriseTeam;
 
@@ -38,6 +41,6 @@ interface EnterpriseTeamsClientInterface
     public function enterpriseTeamsUpdate(
         string $enterprise,
         string $teamSlug,
-        EnterpriseTeamsUpdateRequest $body,
+        EnterpriseTeamsUpdateRequestContent $body,
     ): EnterpriseTeam;
 }

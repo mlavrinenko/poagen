@@ -17,11 +17,11 @@ use Acme\GitHub\Generated\Enum\ReactionsListForIssueContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForPullRequestReviewCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForReleaseContent;
 use Acme\GitHub\Generated\Model\Reaction;
-use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequest;
+use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -60,7 +60,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForCommitCommentRequest $body,
+        ReactionsCreateForCommitCommentRequestContent $body,
     ): Reaction {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/comments/{comment_id}/reactions')
@@ -115,7 +115,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForIssueCommentRequest $body,
+        ReactionsCreateForIssueCommentRequestContent $body,
     ): Reaction {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/issues/comments/{comment_id}/reactions')
@@ -166,7 +166,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        ReactionsCreateForIssueRequest $body,
+        ReactionsCreateForIssueRequestContent $body,
     ): Reaction {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/issues/{issue_number}/reactions')
@@ -217,7 +217,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForPullRequestReviewCommentRequest $body,
+        ReactionsCreateForPullRequestReviewCommentRequestContent $body,
     ): Reaction {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions')
@@ -272,7 +272,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
         string $owner,
         string $repo,
         int $releaseId,
-        ReactionsCreateForReleaseRequest $body,
+        ReactionsCreateForReleaseRequestContent $body,
     ): Reaction {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases/{release_id}/reactions')

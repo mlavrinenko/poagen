@@ -230,8 +230,8 @@ final class OpenShapesTest extends TestCase
      */
     public static function payloadModels(): iterable
     {
-        yield 'an inline request body' => ['SaveOpenRequest', 'public string $handle,'];
-        yield 'an inline response body' => ['SaveOpenResponse', 'public ?bool $saved = null,'];
+        yield 'an inline request body' => ['SaveOpenRequestContent', 'public string $handle,'];
+        yield 'an inline response body' => ['SaveOpen200Content', 'public ?bool $saved = null,'];
     }
 
     private function model(string $basename): string

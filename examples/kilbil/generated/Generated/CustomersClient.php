@@ -11,20 +11,20 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\AddClientRequest;
-use Acme\Kilbil\Generated\Model\AddClientResponse;
-use Acme\Kilbil\Generated\Model\BlockCardRequest;
-use Acme\Kilbil\Generated\Model\BlockCardResponse;
-use Acme\Kilbil\Generated\Model\GetClientCardsRequest;
-use Acme\Kilbil\Generated\Model\GetClientCardsResponse;
-use Acme\Kilbil\Generated\Model\GetClientFullBalanceRequest;
-use Acme\Kilbil\Generated\Model\GetClientFullBalanceResponseItem;
-use Acme\Kilbil\Generated\Model\GetConfirmationCodeRequest;
-use Acme\Kilbil\Generated\Model\GetConfirmationCodeResponse;
-use Acme\Kilbil\Generated\Model\ReplaceCardRequest;
-use Acme\Kilbil\Generated\Model\ReplaceCardResponse;
-use Acme\Kilbil\Generated\Model\SearchClientRequest;
-use Acme\Kilbil\Generated\Model\SearchClientResponse;
+use Acme\Kilbil\Generated\Model\AddClient200Content;
+use Acme\Kilbil\Generated\Model\AddClientRequestContent;
+use Acme\Kilbil\Generated\Model\BlockCard200Content;
+use Acme\Kilbil\Generated\Model\BlockCardRequestContent;
+use Acme\Kilbil\Generated\Model\GetClientCards200Content;
+use Acme\Kilbil\Generated\Model\GetClientCardsRequestContent;
+use Acme\Kilbil\Generated\Model\GetClientFullBalance200ContentItem;
+use Acme\Kilbil\Generated\Model\GetClientFullBalanceRequestContent;
+use Acme\Kilbil\Generated\Model\GetConfirmationCode200Content;
+use Acme\Kilbil\Generated\Model\GetConfirmationCodeRequestContent;
+use Acme\Kilbil\Generated\Model\ReplaceCard200Content;
+use Acme\Kilbil\Generated\Model\ReplaceCardRequestContent;
+use Acme\Kilbil\Generated\Model\SearchClient200Content;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -37,62 +37,62 @@ final readonly class CustomersClient implements CustomersClientInterface
     ) {
     }
 
-    public function addClient(AddClientRequest $body): AddClientResponse
+    public function addClient(AddClientRequestContent $body): AddClient200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/addclient')->query('h', $this->h)->json($body),
-            ResponseType::object(AddClientResponse::class),
+            ResponseType::object(AddClient200Content::class),
         );
     }
 
-    public function blockCard(BlockCardRequest $body): BlockCardResponse
+    public function blockCard(BlockCardRequestContent $body): BlockCard200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/blockcard')->query('h', $this->h)->json($body),
-            ResponseType::object(BlockCardResponse::class),
+            ResponseType::object(BlockCard200Content::class),
         );
     }
 
-    public function getClientCards(GetClientCardsRequest $body): GetClientCardsResponse
+    public function getClientCards(GetClientCardsRequestContent $body): GetClientCards200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getclientcards')->query('h', $this->h)->json($body),
-            ResponseType::object(GetClientCardsResponse::class),
+            ResponseType::object(GetClientCards200Content::class),
         );
     }
 
     /**
-     * @return list<GetClientFullBalanceResponseItem>
+     * @return list<GetClientFullBalance200ContentItem>
      */
-    public function getClientFullBalance(GetClientFullBalanceRequest $body): array
+    public function getClientFullBalance(GetClientFullBalanceRequestContent $body): array
     {
         return $this->transport->send(
             Endpoint::post('/load/getclientfullbalance')->query('h', $this->h)->json($body),
-            ResponseType::listOf(GetClientFullBalanceResponseItem::class),
+            ResponseType::listOf(GetClientFullBalance200ContentItem::class),
         );
     }
 
-    public function getConfirmationCode(GetConfirmationCodeRequest $body): GetConfirmationCodeResponse
+    public function getConfirmationCode(GetConfirmationCodeRequestContent $body): GetConfirmationCode200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getconfirmationcode')->query('h', $this->h)->json($body),
-            ResponseType::object(GetConfirmationCodeResponse::class),
+            ResponseType::object(GetConfirmationCode200Content::class),
         );
     }
 
-    public function replaceCard(ReplaceCardRequest $body): ReplaceCardResponse
+    public function replaceCard(ReplaceCardRequestContent $body): ReplaceCard200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/replacecard')->query('h', $this->h)->json($body),
-            ResponseType::object(ReplaceCardResponse::class),
+            ResponseType::object(ReplaceCard200Content::class),
         );
     }
 
-    public function searchClient(SearchClientRequest $body): SearchClientResponse
+    public function searchClient(SearchClientRequestContent $body): SearchClient200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/searchclient')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchClientResponse::class),
+            ResponseType::object(SearchClient200Content::class),
         );
     }
 }

@@ -15,10 +15,10 @@ use Acme\GitHub\Generated\Model\BaseGist;
 use Acme\GitHub\Generated\Model\GistComment;
 use Acme\GitHub\Generated\Model\GistCommit;
 use Acme\GitHub\Generated\Model\GistSimple;
-use Acme\GitHub\Generated\Model\GistsCreateCommentRequest;
-use Acme\GitHub\Generated\Model\GistsCreateRequest;
-use Acme\GitHub\Generated\Model\GistsUpdateCommentRequest;
-use Acme\GitHub\Generated\Model\GistsUpdateRequest;
+use Acme\GitHub\Generated\Model\GistsCreateCommentRequestContent;
+use Acme\GitHub\Generated\Model\GistsCreateRequestContent;
+use Acme\GitHub\Generated\Model\GistsUpdateCommentRequestContent;
+use Acme\GitHub\Generated\Model\GistsUpdateRequestContent;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -45,7 +45,7 @@ final readonly class GistsClient implements GistsClientInterface
         );
     }
 
-    public function gistsCreate(GistsCreateRequest $body): GistSimple
+    public function gistsCreate(GistsCreateRequestContent $body): GistSimple
     {
         return $this->transport->send(
             Endpoint::post('/gists')->json($body),
@@ -100,7 +100,7 @@ final readonly class GistsClient implements GistsClientInterface
         );
     }
 
-    public function gistsUpdate(string $gistId, GistsUpdateRequest $body): GistSimple
+    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): GistSimple
     {
         return $this->transport->send(
             Endpoint::patch('/gists/{gist_id}')->path('gist_id', $gistId)->json($body),
@@ -122,7 +122,7 @@ final readonly class GistsClient implements GistsClientInterface
         );
     }
 
-    public function gistsCreateComment(string $gistId, GistsCreateCommentRequest $body): GistComment
+    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): GistComment
     {
         return $this->transport->send(
             Endpoint::post('/gists/{gist_id}/comments')->path('gist_id', $gistId)->json($body),
@@ -150,8 +150,11 @@ final readonly class GistsClient implements GistsClientInterface
         );
     }
 
-    public function gistsUpdateComment(string $gistId, int $commentId, GistsUpdateCommentRequest $body): GistComment
-    {
+    public function gistsUpdateComment(
+        string $gistId,
+        int $commentId,
+        GistsUpdateCommentRequestContent $body,
+    ): GistComment {
         return $this->transport->send(
             Endpoint::patch('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)

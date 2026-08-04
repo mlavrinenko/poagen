@@ -19,8 +19,8 @@ use Acme\DigitalOcean\Generated\Model\ClusterlintRequest;
 use Acme\DigitalOcean\Generated\Model\DestroyAssociatedKubernetesResources;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePool;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePoolUpdate;
-use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequest;
-use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequest;
+use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequestContent;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequestContent;
 
 /**
  * The contract for the `Kubernetes` endpoints.
@@ -140,7 +140,7 @@ interface KubernetesClientInterface
     public function kubernetesRecycleNodePool(
         string $clusterId,
         string $nodePoolId,
-        KubernetesRecycleNodePoolRequest $body,
+        KubernetesRecycleNodePoolRequestContent $body,
     ): void;
 
     /**
@@ -151,7 +151,7 @@ interface KubernetesClientInterface
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
      */
-    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequest $body): void;
+    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:read`.

@@ -23,7 +23,7 @@ use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsDirecti
 use Acme\DigitalOcean\Generated\Enum\MonitoringGetDropletBandwidthMetricsInterface;
 use Acme\DigitalOcean\Generated\Model\AlertPolicyRequest;
 use Acme\DigitalOcean\Generated\Model\DestinationRequest;
-use Acme\DigitalOcean\Generated\Model\MonitoringCreateSinkRequest;
+use Acme\DigitalOcean\Generated\Model\MonitoringCreateSinkRequestContent;
 use Acme\DigitalOcean\Generated\Model\Urn;
 
 /**
@@ -445,7 +445,7 @@ interface MonitoringClientInterface
     /**
      * Requires `bearer_auth` scopes: `monitoring:create`.
      */
-    public function monitoringCreateSink(MonitoringCreateSinkRequest $body): void;
+    public function monitoringCreateSink(MonitoringCreateSinkRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `monitoring:read`.

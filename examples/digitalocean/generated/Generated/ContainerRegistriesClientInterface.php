@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\MultiregistryCreate;
-use Acme\DigitalOcean\Generated\Model\RegistriesUpdateSubscriptionRequest;
+use Acme\DigitalOcean\Generated\Model\RegistriesUpdateSubscriptionRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateRegistry;
 use Acme\DigitalOcean\Generated\Model\ValidateRegistry;
 
@@ -48,7 +48,7 @@ interface ContainerRegistriesClientInterface
     /**
      * Requires `bearer_auth` scopes: `registry:update`.
      */
-    public function registriesUpdateSubscription(RegistriesUpdateSubscriptionRequest $body): void;
+    public function registriesUpdateSubscription(RegistriesUpdateSubscriptionRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `registry:create`.

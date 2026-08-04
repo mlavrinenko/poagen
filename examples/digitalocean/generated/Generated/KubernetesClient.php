@@ -19,8 +19,8 @@ use Acme\DigitalOcean\Generated\Model\ClusterlintRequest;
 use Acme\DigitalOcean\Generated\Model\DestroyAssociatedKubernetesResources;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePool;
 use Acme\DigitalOcean\Generated\Model\KubernetesNodePoolUpdate;
-use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequest;
-use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequest;
+use Acme\DigitalOcean\Generated\Model\KubernetesRecycleNodePoolRequestContent;
+use Acme\DigitalOcean\Generated\Model\KubernetesUpgradeClusterRequestContent;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -300,7 +300,7 @@ final readonly class KubernetesClient implements KubernetesClientInterface
     public function kubernetesRecycleNodePool(
         string $clusterId,
         string $nodePoolId,
-        KubernetesRecycleNodePoolRequest $body,
+        KubernetesRecycleNodePoolRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/node_pools/{node_pool_id}/recycle')
@@ -329,7 +329,7 @@ final readonly class KubernetesClient implements KubernetesClientInterface
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`.
      */
-    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequest $body): void
+    public function kubernetesUpgradeCluster(string $clusterId, KubernetesUpgradeClusterRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/kubernetes/clusters/{cluster_id}/upgrade')

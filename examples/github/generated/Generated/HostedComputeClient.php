@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\HostedComputeCreateNetworkConfigurationForOrgRequest;
-use Acme\GitHub\Generated\Model\HostedComputeListNetworkConfigurationsForOrgResponse;
-use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgRequest;
+use Acme\GitHub\Generated\Model\HostedComputeCreateNetworkConfigurationForOrgRequestContent;
+use Acme\GitHub\Generated\Model\HostedComputeListNetworkConfigurationsForOrg200Content;
+use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgRequestContent;
 use Acme\GitHub\Generated\Model\NetworkConfiguration;
 use Acme\GitHub\Generated\Model\NetworkSettings;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -31,19 +31,19 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): HostedComputeListNetworkConfigurationsForOrgResponse {
+    ): HostedComputeListNetworkConfigurationsForOrg200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/network-configurations')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(HostedComputeListNetworkConfigurationsForOrgResponse::class),
+            ResponseType::object(HostedComputeListNetworkConfigurationsForOrg200Content::class),
         );
     }
 
     public function hostedComputeCreateNetworkConfigurationForOrg(
         string $org,
-        HostedComputeCreateNetworkConfigurationForOrgRequest $body,
+        HostedComputeCreateNetworkConfigurationForOrgRequestContent $body,
     ): NetworkConfiguration {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/settings/network-configurations')
@@ -78,7 +78,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
     public function hostedComputeUpdateNetworkConfigurationForOrg(
         string $org,
         string $networkConfigurationId,
-        HostedComputeUpdateNetworkConfigurationForOrgRequest $body,
+        HostedComputeUpdateNetworkConfigurationForOrgRequestContent $body,
     ): NetworkConfiguration {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
