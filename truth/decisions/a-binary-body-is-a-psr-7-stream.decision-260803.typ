@@ -37,7 +37,10 @@ type in the envelope's body slot, which looks like the same thing and is not.
 == Choice
 
 `Psr\Http\Message\StreamInterface`, for a binary request body and a binary
-response body alike.
+response body alike. This decides the *type* once, for both directions — it
+is not a claim that both directions are wired. Only the request side has
+landed; see "What would lift the response-side refusal" under Consequences
+for what is actually true on the tree today.
 
 The deciding fact is not preference. PHP has no `resource` type declaration —
 a resource cannot be written into a property type or a return type at all. A
@@ -67,12 +70,23 @@ different things, and only the first was ruled out.
 
 == Consequences
 
-- An `application/octet-stream` request body is handed to the request as it
-  stands. Nothing on that path casts it or calls `getContents()`, so a large
-  upload is never read into memory whole. This is pinned by a decorator fixture
-  whose `__toString()` and `getContents()` both throw while chunked `read()`
-  delegates normally, so a later `(string)` cast fails with a message naming
-  what went wrong rather than quietly buffering a file.
+- On the request side, an `application/octet-stream` request body is handed
+  to the request as it stands. Nothing on that path casts it or calls
+  `getContents()`, so a large upload is never read into memory whole. This is
+  pinned by a decorator fixture whose `__toString()` and `getContents()` both
+  throw while chunked `read()` delegates normally, so a later `(string)` cast
+  fails with a message naming what went wrong rather than quietly buffering a
+  file.
+- On the response side, nothing has landed. `ResponseAnalyzer::textResponse()`
+  still refuses any 2xx response whose schema declares `format: binary`, and
+  the operation aborts generation rather than falling back to a decoded value
+  (`default-deny-on-degradation`) — `ResponseRefusal` names the gap in the
+  message it prints: "paogen sends a binary request body as a PSR-7 stream
+  but does not yet return one." Both sides are pinned by an integration test:
+  one proving the request stream is sent unread, the other,
+  `testABinaryResponseStillAbortsBecauseTheReturnContractCannotNameAStream`,
+  proving the response still aborts — so the request side's landing cannot
+  silently start reading as the response side's too.
 - Binary is decided by the schema, not the media type: any `format: binary`
   schema is binary under whatever subtype the vendor named it. That is why
   DigitalOcean's `application/pdf` works without being enumerated, and why
@@ -84,3 +98,25 @@ different things, and only the first was ruled out.
 - `multipart/form-data` stays refused, now with a reason naming its own shape
   rather than a content-type list. It carries per-part content types and
   encodings and is a larger job than every other media type here combined.
+
+=== What would lift the response-side refusal
+
+`ReturnSpec` has eight kinds — void, model, list, scalar, scalar list, map,
+mixed and union — and none of them means "hand back the body unread".
+`ResponseTypeEmitter` maps every `ReturnSpec` kind onto the runtime
+`ResponseType` one-to-one, and `ResponseType` has the identical gap, so
+`ResponseDecoder` has nothing to decode a stream kind into either. Lifting
+the refusal means adding a stream-carrying kind across that whole chain —
+`ReturnSpec`, `ResponseTypeEmitter`, `ResponseType`, `ResponseDecoder`, and
+the emitted method's own return type — not a change local to
+`ResponseAnalyzer`.
+
+No task in `truth/tasks/` currently does this work.
+`represent-non-json-request-and-response-bodies`, the task that landed the
+request side, listed "a binary 2xx response returns the stream rather than a
+decoded value" as one of its own acceptance criteria, but closed without
+delivering it; the gap this section describes is that unmet criterion,
+still open. Closing it needs a task of its own before `ResponseAnalyzer`'s
+refusal can move — this decision only says what the type would be once that
+task lands, the same `Psr\Http\Message\StreamInterface` the request side
+already uses.
