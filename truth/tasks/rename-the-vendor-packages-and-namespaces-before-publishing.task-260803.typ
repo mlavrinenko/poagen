@@ -5,11 +5,11 @@
   tags: ("release", "naming"),
   priority: 4,
   difficulty: 4,
-  status: wip(
+  status: done(
     2026,
     8,
-    4,
-  )[Dispatched to a worktree agent off 9ecdea04. Namespaces settled as Poagen\\Generator and Poagen\\Runtime - siblings, since they are two separately published packages. Reversible by another rector pass until the runtime publishes.],
+    5,
+  )[Packages are poagen/client-generator and poagen/client-runtime; namespaces Poagen\\Generator and Poagen\\Runtime, siblings rather than nested, because they publish separately. Binary, profile filenames, the hook's env var, prose and every emitted header moved with them. rg paogen returns only truth/tasks, the deliberate CHANGELOG entry, one literal disk path, three task-slug references whose targets are unrenamed filenames, and four session notes quoting the ruling's own before-and-after. Gated on the merged HEAD: 555 tests, unchanged as a rename should be. verify-runtime-standalone passes, after fixing two pre-existing breaks it had accumulated outside the gate - see keep-the-standalone-runtime-check-from-rotting-outside-the-gate.],
 )
 
 == Summary
