@@ -5,11 +5,7 @@
   tags: ("docs", "process"),
   priority: 3,
   difficulty: 2,
-  status: accepted(
-    2026,
-    8,
-    3,
-  )[Split from agent-guide-is-nine-lines-from-its-own-cap so that task stays a pure move and can be reviewed as one. Four lessons were bought with real time on 2026-08-03 and none of them is written down where the next agent will look.],
+  status: wip(2026, 8, 4)[wave 1 agent dispatched],
 )
 
 == Summary

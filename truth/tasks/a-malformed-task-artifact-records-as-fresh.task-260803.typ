@@ -5,11 +5,7 @@
   tags: ("tooling", "gates"),
   priority: 4,
   difficulty: 3,
-  status: accepted(
-    2026,
-    8,
-    3,
-  )[Found by walking into it. Filed rather than folded into gate-freshness-misses-the-files-linecop-lints, because that task's own criteria require the exclusion this one questions, and its comment's reason for the exclusion is sound.],
+  status: wip(2026, 8, 4)[wave 1 agent dispatched],
 )
 
 == Summary

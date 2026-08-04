@@ -5,7 +5,7 @@
   tags: ("generator", "strictness"),
   priority: 3,
   difficulty: 3,
-  status: proposed(2026, 8, 3),
+  status: wip(2026, 8, 4)[wave 1 agent dispatched],
 )
 
 == Summary
