@@ -164,29 +164,41 @@ spec-roots = ["truth/specs"]
 
 # The code-ref sweep forbids file paths, member chains, and call shapes in
 # specs, decisions, standards, and domain artifacts, so those layers stay
-# portable across reimplementations. paogen exempts the output vocabulary
-# alone; it used to also exempt debt pointing at paogen's own tree.
+# portable across reimplementations. paogen decided portability of truth/
+# across a reimplementation is not a value this project pays for
+# (`the-code-ref-exemption-becomes-total`, 2026-08-04, superseding
+# `code-references-permitted-in-generator-specs`), so the exemption below is
+# total rather than scoped: every artifact kind may name a path into paogen's
+# own tree, the same freedom task artifacts always had by design.
 #
-# The call shapes and attribute forms are legitimate. paogen's product IS
-# emitted PHP, so `addPet(Pet $body): Pet` and `#[BindsFormat('date-time')]`
-# are the observable behaviour a scenario asserts, not an implementation leak.
-# Rephrasing them behaviourally would describe the generator by describing
-# nothing.
+# The call shapes and attribute forms were always legitimate on their own
+# terms, ruling aside. paogen's product IS emitted PHP, so `addPet(Pet
+# $body): Pet` and `#[BindsFormat('date-time')]` are the observable
+# behaviour a scenario asserts, not an implementation leak. Rephrasing them
+# behaviourally would describe the generator by describing nothing.
 #
-# `src/`, `bin/`, and `tests/` paths were exempted here too, as debt: 32
-# references (measured directly with a grep sweep, not estimated) pointed at
-# paogen's own tree across truth/specs/ and truth/decisions/, none under
-# truth/standards/ or truth/domain/. An earlier pass had claimed 140 —
-# wrong, and likely a conflation with truth/tasks/, which separately carries
-# 258 such references and stays exempt by design, since tasks are the
-# implementation bridge and are meant to name files. `narrow-the-code-ref-
-# exemption` rewrote the 32 behaviourally and dropped the debt entries below.
+# `src/`, `bin/`, and `tests/` paths are exempted here too, not as debt
+# awaiting a further rewrite but because naming paogen's own tree is now
+# permitted outright. `narrow-the-code-ref-exemption` had removed these same
+# three entries after rewriting 32 references behaviourally; the ruling this
+# time reverses that direction rather than repeating its sweep, so nothing
+# already rewritten is put back and nothing currently file-free is made to
+# name one. `code-refs-blind-to-bare-basenames` found the removal had a blind
+# spot too — a bare basename in a `structural:` slot carries no `src/` prefix
+# for the matcher to see — and the ruling leaves that gap unpatched on
+# purpose: with the allowlist total, a bare basename slipping past the
+# matcher costs nothing, since a fully spelled-out path would pass anyway.
 [check.code-refs]
 source-extensions = []
 allowlist = [
   # Output vocabulary: emitted signatures, attributes, member references.
   "(",
   "::",
+  # paogen's own tree, every artifact kind, total rather than scoped — see
+  # `the-code-ref-exemption-becomes-total`.
+  "src/",
+  "bin/",
+  "tests/",
 ]
 
 # Required L2 sections on decisions and standards. This restates, on purpose,
