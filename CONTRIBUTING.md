@@ -97,10 +97,11 @@ under the exact command the recipe runs.
 
 ### Regenerating a fixture golden tree
 
-`tests/fixtures/profiles/*.php` describe the generator's own test fixtures —
-`petstore`, `parameters`, `contact`, `composition`,
-`undiscriminated-oneof-resolved`, `widened-shapes`, `open-shapes`, and
-`ls tests/fixtures/profiles/` is the copy of that list which cannot go stale.
+`tests/fixtures/profiles/*.php` describe the generator's own test fixtures.
+`ls tests/fixtures/profiles/` is the list, and it is the only copy of it
+kept here on purpose — an enumeration in this file drifts the moment a
+fixture lands, and this one had drifted to seven names against eleven
+entries before it was removed.
 Each one's `output:` defaults to a scratch directory under `$TMPDIR`
 (`tests/fixtures/profiles/scratch-output.php`), never to the committed
 golden tree it has the same name as. A `just test` or `just check` run loads
