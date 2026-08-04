@@ -55,7 +55,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     public function testAnInlineObjectBodyAndResponseAreBothTyped(): void
     {
         self::assertStringContainsString(
-            'public function placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content',
+            'public function placeOrder(PlaceOrderRequestContent $body): Envelope',
             $this->clientSource($this->plan()),
         );
     }
@@ -68,8 +68,8 @@ final class InlinePayloadSynthesisTest extends TestCase
         // emitter shortens the doc type to the imported alias (T-260730)
         // rather than repeating the FQCN nette already resolves in the signature.
         self::assertStringContainsString('@param list<PlaceOrdersBulkRequestContentItem> $body', $client);
-        self::assertStringContainsString('@return list<PlaceOrdersBulk200ContentItem>', $client);
-        self::assertStringContainsString('public function placeOrdersBulk(array $body): array', $client);
+        self::assertStringContainsString('@return Envelope<list<PlaceOrdersBulk200ContentItem>>', $client);
+        self::assertStringContainsString('public function placeOrdersBulk(array $body): Envelope', $client);
     }
 
     public function testNestingBelowASynthesisedPayloadIsReachedToo(): void
@@ -96,7 +96,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     {
         $client = $this->clientSource($this->plan());
 
-        self::assertStringContainsString('public function ping(array $body): void', $client);
+        self::assertStringContainsString('public function ping(array $body): Envelope', $client);
         self::assertStringContainsString('@param array<string, mixed> $body', $client);
     }
 
@@ -116,7 +116,7 @@ final class InlinePayloadSynthesisTest extends TestCase
 
         self::assertContains('PlacedOrder', $models);
         self::assertNotContains('PlaceOrder200Content', $models);
-        self::assertStringContainsString(': PlacedOrder', $this->clientSource($plan));
+        self::assertStringContainsString('@return Envelope<PlacedOrder>', $this->clientSource($plan));
 
         // The pin renames the root only; children still hang off it, so a
         // consumer who pins one name does not have to pin the whole subtree.
@@ -139,7 +139,7 @@ final class InlinePayloadSynthesisTest extends TestCase
 
         self::assertContains('BulkOrderConfirmation', $models);
         self::assertNotContains('PlaceOrdersBulk200ContentItem', $models);
-        self::assertStringContainsString('@return list<BulkOrderConfirmation>', $this->clientSource($plan));
+        self::assertStringContainsString('@return Envelope<list<BulkOrderConfirmation>>', $this->clientSource($plan));
     }
 
     public function testAPinNamingAnAbsentOperationIdFailsTheRun(): void

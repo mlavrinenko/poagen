@@ -160,6 +160,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Order'
+        '404':
+          description: store not found
     delete:
       operationId: clearStore
       responses:

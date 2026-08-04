@@ -35,6 +35,7 @@ use Acme\GitHub\Generated\Model\ApiInsightsSubjectStats;
 use Acme\GitHub\Generated\Model\ApiInsightsSummaryStats;
 use Acme\GitHub\Generated\Model\ApiInsightsTimeStats;
 use Acme\GitHub\Generated\Model\ApiInsightsUserStats;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CustomProperty;
 use Acme\GitHub\Generated\Model\CustomPropertySetPayload;
 use Acme\GitHub\Generated\Model\HookDelivery;
@@ -77,6 +78,7 @@ use Acme\GitHub\Generated\Model\OrgsListAttestations200Content;
 use Acme\GitHub\Generated\Model\OrgsListAttestationsBulk200Content;
 use Acme\GitHub\Generated\Model\OrgsListAttestationsBulkRequestContent;
 use Acme\GitHub\Generated\Model\OrgsListOrgRoles200Content;
+use Acme\GitHub\Generated\Model\OrgsRemoveOutsideCollaborator422Content;
 use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestRequestContent;
 use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestsInBulkRequestContent;
 use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecords200Content;
@@ -87,7 +89,6 @@ use Acme\GitHub\Generated\Model\OrgsSetMembershipForUserRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateMembershipForAuthenticatedUserRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessesRequestContent;
-use Acme\GitHub\Generated\Model\OrgsUpdateRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateWebhookConfigForOrgRequestContent;
 use Acme\GitHub\Generated\Model\OrgsUpdateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\RulesetVersion;
@@ -97,7 +98,10 @@ use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\TeamRoleAssignment;
 use Acme\GitHub\Generated\Model\TeamSimple;
 use Acme\GitHub\Generated\Model\UserRoleAssignment;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\WebhookConfig;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `orgs` endpoints.
@@ -109,59 +113,81 @@ use Acme\GitHub\Generated\Model\WebhookConfig;
 interface OrgsClientInterface
 {
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>|null>
      */
-    public function orgsList(?int $since = null, ?int $perPage = null): array;
+    public function orgsList(?int $since = null, ?int $perPage = null): Envelope;
 
-    public function orgsGet(string $org): OrganizationFull;
+    /**
+     * @return Envelope<OrganizationFull|BasicError>
+     */
+    public function orgsGet(string $org): Envelope;
 
-    public function orgsDelete(string $org): void;
+    /**
+     * @return Envelope<array<string, mixed>|BasicError>
+     */
+    public function orgsDelete(string $org): Envelope;
 
-    public function orgsUpdate(string $org, OrgsUpdateRequestContent $body): OrganizationFull;
-
+    /**
+     * @return Envelope<OrgsCreateArtifactDeploymentRecord200Content|BasicError>
+     */
     public function orgsCreateArtifactDeploymentRecord(
         string $org,
         OrgsCreateArtifactDeploymentRecordRequestContent $body,
-    ): OrgsCreateArtifactDeploymentRecord200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<OrgsSetClusterDeploymentRecords200Content|BasicError>
+     */
     public function orgsSetClusterDeploymentRecords(
         string $org,
         string $cluster,
         OrgsSetClusterDeploymentRecordsRequestContent $body,
-    ): OrgsSetClusterDeploymentRecords200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<OrgsCreateArtifactStorageRecord200Content|BasicError>
+     */
     public function orgsCreateArtifactStorageRecord(
         string $org,
         OrgsCreateArtifactStorageRecordRequestContent $body,
-    ): OrgsCreateArtifactStorageRecord200Content;
+    ): Envelope;
 
-    public function orgsListArtifactDeploymentRecords(
-        string $org,
-        string $subjectDigest,
-    ): OrgsListArtifactDeploymentRecords200Content;
+    /**
+     * @return Envelope<OrgsListArtifactDeploymentRecords200Content>
+     */
+    public function orgsListArtifactDeploymentRecords(string $org, string $subjectDigest): Envelope;
 
-    public function orgsListArtifactStorageRecords(
-        string $org,
-        string $subjectDigest,
-    ): OrgsListArtifactStorageRecords200Content;
+    /**
+     * @return Envelope<OrgsListArtifactStorageRecords200Content>
+     */
+    public function orgsListArtifactStorageRecords(string $org, string $subjectDigest): Envelope;
 
+    /**
+     * @return Envelope<OrgsListAttestationsBulk200Content>
+     */
     public function orgsListAttestationsBulk(
         string $org,
         OrgsListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): OrgsListAttestationsBulk200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function orgsDeleteAttestationsBulk(
         string $org,
         OrgsDeleteAttestationsBulkBranch1|OrgsDeleteAttestationsBulkBranch2 $body,
-    ): void;
-
-    public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): void;
+    ): Envelope;
 
     /**
-     * @return list<OrgsListAttestationRepositories200ContentItem>
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): Envelope;
+
+    /**
+     * @return Envelope<list<OrgsListAttestationRepositories200ContentItem>>
      */
     public function orgsListAttestationRepositories(
         string $org,
@@ -169,10 +195,16 @@ interface OrgsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): array;
+    ): Envelope;
 
-    public function orgsDeleteAttestationsById(string $org, int $attestationId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteAttestationsById(string $org, int $attestationId): Envelope;
 
+    /**
+     * @return Envelope<OrgsListAttestations200Content>
+     */
     public function orgsListAttestations(
         string $org,
         string $subjectDigest,
@@ -180,47 +212,74 @@ interface OrgsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): OrgsListAttestations200Content;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function orgsListBlockedUsers(string $org, ?int $perPage = null, ?int $page = null): array;
-
-    public function orgsCheckBlockedUser(string $org, string $username): void;
-
-    public function orgsBlockUser(string $org, string $username): void;
-
-    public function orgsUnblockUser(string $org, string $username): void;
+    public function orgsListBlockedUsers(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<null|BasicError>
      */
-    public function orgsListFailedInvitations(string $org, ?int $perPage = null, ?int $page = null): array;
+    public function orgsCheckBlockedUser(string $org, string $username): Envelope;
 
     /**
-     * @return list<OrgHook>
+     * @return Envelope<null|ValidationError>
      */
-    public function orgsListWebhooks(string $org, ?int $perPage = null, ?int $page = null): array;
+    public function orgsBlockUser(string $org, string $username): Envelope;
 
-    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequestContent $body): OrgHook;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsUnblockUser(string $org, string $username): Envelope;
 
-    public function orgsGetWebhook(string $org, int $hookId): OrgHook;
+    /**
+     * @return Envelope<list<OrganizationInvitation>|BasicError>
+     */
+    public function orgsListFailedInvitations(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function orgsDeleteWebhook(string $org, int $hookId): void;
+    /**
+     * @return Envelope<list<OrgHook>|BasicError>
+     */
+    public function orgsListWebhooks(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequestContent $body): OrgHook;
+    /**
+     * @return Envelope<OrgHook|ValidationError|BasicError>
+     */
+    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequestContent $body): Envelope;
 
-    public function orgsGetWebhookConfigForOrg(string $org, int $hookId): WebhookConfig;
+    /**
+     * @return Envelope<OrgHook|BasicError>
+     */
+    public function orgsGetWebhook(string $org, int $hookId): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsDeleteWebhook(string $org, int $hookId): Envelope;
+
+    /**
+     * @return Envelope<OrgHook|ValidationError|BasicError>
+     */
+    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
+    public function orgsGetWebhookConfigForOrg(string $org, int $hookId): Envelope;
+
+    /**
+     * @return Envelope<WebhookConfig>
+     */
     public function orgsUpdateWebhookConfigForOrg(
         string $org,
         int $hookId,
         OrgsUpdateWebhookConfigForOrgRequestContent $body,
-    ): WebhookConfig;
+    ): Envelope;
 
     /**
-     * @return list<HookDeliveryItem>
+     * @return Envelope<list<HookDeliveryItem>|BasicError|ValidationError>
      */
     public function orgsListWebhookDeliveries(
         string $org,
@@ -228,16 +287,26 @@ interface OrgsClientInterface
         ?int $perPage = null,
         ?string $cursor = null,
         ?OrgsListWebhookDeliveriesStatus $status = null,
-    ): array;
+    ): Envelope;
 
-    public function orgsGetWebhookDelivery(string $org, int $hookId, int $deliveryId): HookDelivery;
+    /**
+     * @return Envelope<HookDelivery|BasicError|ValidationError>
+     */
+    public function orgsGetWebhookDelivery(string $org, int $hookId, int $deliveryId): Envelope;
 
-    public function orgsRedeliverWebhookDelivery(string $org, int $hookId, int $deliveryId): void;
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
+    public function orgsRedeliverWebhookDelivery(string $org, int $hookId, int $deliveryId): Envelope;
 
-    public function orgsPingWebhook(string $org, int $hookId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsPingWebhook(string $org, int $hookId): Envelope;
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsRouteStats>
      */
     public function apiInsightsGetRouteStatsByActor(
         string $org,
@@ -250,10 +319,11 @@ interface OrgsClientInterface
         ?ApiInsightsGetRouteStatsByActorDirection $direction = null,
         ?array $sort = null,
         ?string $apiRouteSubstring = null,
-    ): ApiInsightsRouteStats;
+    ): Envelope;
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsSubjectStats>
      */
     public function apiInsightsGetSubjectStats(
         string $org,
@@ -264,44 +334,62 @@ interface OrgsClientInterface
         ?ApiInsightsGetSubjectStatsDirection $direction = null,
         ?array $sort = null,
         ?string $subjectNameSubstring = null,
-    ): ApiInsightsSubjectStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStats(
         string $org,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStatsByUser(
         string $org,
         string $userId,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsSummaryStats>
+     */
     public function apiInsightsGetSummaryStatsByActor(
         string $org,
         ApiInsightsGetSummaryStatsByActorActorType $actorType,
         int $actorId,
         string $minTimestamp,
         ?string $maxTimestamp = null,
-    ): ApiInsightsSummaryStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStats(
         string $org,
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStatsByUser(
         string $org,
         string $userId,
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ApiInsightsTimeStats>
+     */
     public function apiInsightsGetTimeStatsByActor(
         string $org,
         ApiInsightsGetTimeStatsByActorActorType $actorType,
@@ -309,10 +397,11 @@ interface OrgsClientInterface
         string $minTimestamp,
         string $timestampIncrement,
         ?string $maxTimestamp = null,
-    ): ApiInsightsTimeStats;
+    ): Envelope;
 
     /**
      * @param list<string> $sort
+     * @return Envelope<ApiInsightsUserStats>
      */
     public function apiInsightsGetUserStats(
         string $org,
@@ -324,16 +413,15 @@ interface OrgsClientInterface
         ?ApiInsightsGetUserStatsDirection $direction = null,
         ?array $sort = null,
         ?string $actorNameSubstring = null,
-    ): ApiInsightsUserStats;
-
-    public function orgsListAppInstallations(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): OrgsListAppInstallations200Content;
+    ): Envelope;
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<OrgsListAppInstallations200Content>
+     */
+    public function orgsListAppInstallations(string $org, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<OrganizationInvitation>|BasicError>
      */
     public function orgsListPendingInvitations(
         string $org,
@@ -341,53 +429,70 @@ interface OrgsClientInterface
         ?int $page = null,
         ?OrgsListPendingInvitationsRole $role = null,
         ?OrgsListPendingInvitationsInvitationSource $invitationSource = null,
-    ): array;
-
-    public function orgsCreateInvitation(
-        string $org,
-        OrgsCreateInvitationRequestContent $body,
-    ): OrganizationInvitation;
-
-    public function orgsCancelInvitation(string $org, int $invitationId): void;
+    ): Envelope;
 
     /**
-     * @return list<Team>
+     * @return Envelope<OrganizationInvitation|ValidationError|BasicError>
+     */
+    public function orgsCreateInvitation(string $org, OrgsCreateInvitationRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<null|ValidationError|BasicError>
+     */
+    public function orgsCancelInvitation(string $org, int $invitationId): Envelope;
+
+    /**
+     * @return Envelope<list<Team>|BasicError>
      */
     public function orgsListInvitationTeams(
         string $org,
         int $invitationId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<IssueField>
+     * @return Envelope<list<IssueField>|BasicError>
      */
-    public function orgsListIssueFields(string $org): array;
-
-    public function orgsCreateIssueField(string $org, OrganizationCreateIssueField $body): IssueField;
-
-    public function orgsDeleteIssueField(string $org, int $issueFieldId): void;
-
-    public function orgsUpdateIssueField(
-        string $org,
-        int $issueFieldId,
-        OrganizationUpdateIssueField $body,
-    ): IssueField;
+    public function orgsListIssueFields(string $org): Envelope;
 
     /**
-     * @return list<IssueType>
+     * @return Envelope<IssueField|BasicError|ValidationErrorSimple>
      */
-    public function orgsListIssueTypes(string $org): array;
-
-    public function orgsCreateIssueType(string $org, OrganizationCreateIssueType $body): IssueType;
-
-    public function orgsUpdateIssueType(string $org, int $issueTypeId, OrganizationUpdateIssueType $body): IssueType;
-
-    public function orgsDeleteIssueType(string $org, int $issueTypeId): void;
+    public function orgsCreateIssueField(string $org, OrganizationCreateIssueField $body): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<null|BasicError|ValidationErrorSimple>
+     */
+    public function orgsDeleteIssueField(string $org, int $issueFieldId): Envelope;
+
+    /**
+     * @return Envelope<IssueField|BasicError|ValidationErrorSimple>
+     */
+    public function orgsUpdateIssueField(string $org, int $issueFieldId, OrganizationUpdateIssueField $body): Envelope;
+
+    /**
+     * @return Envelope<list<IssueType>|BasicError>
+     */
+    public function orgsListIssueTypes(string $org): Envelope;
+
+    /**
+     * @return Envelope<IssueType|BasicError|ValidationErrorSimple>
+     */
+    public function orgsCreateIssueType(string $org, OrganizationCreateIssueType $body): Envelope;
+
+    /**
+     * @return Envelope<IssueType|BasicError|ValidationErrorSimple>
+     */
+    public function orgsUpdateIssueType(string $org, int $issueTypeId, OrganizationUpdateIssueType $body): Envelope;
+
+    /**
+     * @return Envelope<null|ValidationErrorSimple|BasicError>
+     */
+    public function orgsDeleteIssueType(string $org, int $issueTypeId): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleUser>|ValidationError>
      */
     public function orgsListMembers(
         string $org,
@@ -395,73 +500,115 @@ interface OrgsClientInterface
         ?OrgsListMembersRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function orgsCheckMembershipForUser(string $org, string $username): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsCheckMembershipForUser(string $org, string $username): Envelope;
 
-    public function orgsRemoveMember(string $org, string $username): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsRemoveMember(string $org, string $username): Envelope;
 
-    public function orgsGetMembershipForUser(string $org, string $username): OrgMembership;
+    /**
+     * @return Envelope<OrgMembership|BasicError>
+     */
+    public function orgsGetMembershipForUser(string $org, string $username): Envelope;
 
+    /**
+     * @return Envelope<OrgMembership|ValidationError|BasicError>
+     */
     public function orgsSetMembershipForUser(
         string $org,
         string $username,
         OrgsSetMembershipForUserRequestContent $body,
-    ): OrgMembership;
-
-    public function orgsRemoveMembershipForUser(string $org, string $username): void;
-
-    public function orgsListOrgRoles(string $org): OrgsListOrgRoles200Content;
-
-    public function orgsRevokeAllOrgRolesTeam(string $org, string $teamSlug): void;
-
-    public function orgsAssignTeamToOrgRole(string $org, string $teamSlug, int $roleId): void;
-
-    public function orgsRevokeOrgRoleTeam(string $org, string $teamSlug, int $roleId): void;
-
-    public function orgsRevokeAllOrgRolesUser(string $org, string $username): void;
-
-    public function orgsAssignUserToOrgRole(string $org, string $username, int $roleId): void;
-
-    public function orgsRevokeOrgRoleUser(string $org, string $username, int $roleId): void;
-
-    public function orgsGetOrgRole(string $org, int $roleId): OrganizationRole;
+    ): Envelope;
 
     /**
-     * @return list<TeamRoleAssignment>
+     * @return Envelope<null|BasicError>
      */
-    public function orgsListOrgRoleTeams(string $org, int $roleId, ?int $perPage = null, ?int $page = null): array;
+    public function orgsRemoveMembershipForUser(string $org, string $username): Envelope;
 
     /**
-     * @return list<UserRoleAssignment>
+     * @return Envelope<OrgsListOrgRoles200Content|BasicError|ValidationError>
      */
-    public function orgsListOrgRoleUsers(string $org, int $roleId, ?int $perPage = null, ?int $page = null): array;
+    public function orgsListOrgRoles(string $org): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<null>
+     */
+    public function orgsRevokeAllOrgRolesTeam(string $org, string $teamSlug): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAssignTeamToOrgRole(string $org, string $teamSlug, int $roleId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeOrgRoleTeam(string $org, string $teamSlug, int $roleId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeAllOrgRolesUser(string $org, string $username): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAssignUserToOrgRole(string $org, string $username, int $roleId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRevokeOrgRoleUser(string $org, string $username, int $roleId): Envelope;
+
+    /**
+     * @return Envelope<OrganizationRole|BasicError|ValidationError>
+     */
+    public function orgsGetOrgRole(string $org, int $roleId): Envelope;
+
+    /**
+     * @return Envelope<list<TeamRoleAssignment>|null>
+     */
+    public function orgsListOrgRoleTeams(string $org, int $roleId, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<UserRoleAssignment>|null>
+     */
+    public function orgsListOrgRoleUsers(string $org, int $roleId, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleUser>>
      */
     public function orgsListOutsideCollaborators(
         string $org,
         ?OrgsListOutsideCollaboratorsFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>|null|BasicError>
      */
     public function orgsConvertMemberToOutsideCollaborator(
         string $org,
         string $username,
         OrgsConvertMemberToOutsideCollaboratorRequestContent $body,
-    ): array;
+    ): Envelope;
 
-    public function orgsRemoveOutsideCollaborator(string $org, string $username): void;
+    /**
+     * @return Envelope<null|OrgsRemoveOutsideCollaborator422Content>
+     */
+    public function orgsRemoveOutsideCollaborator(string $org, string $username): Envelope;
 
     /**
      * @param list<string> $owner
      * @param list<string> $tokenId
-     * @return list<OrganizationProgrammaticAccessGrantRequest>
+     * @return Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrantRequest>>
      */
     public function orgsListPatGrantRequests(
         string $org,
@@ -475,33 +622,39 @@ interface OrgsClientInterface
         ?\DateTimeImmutable $lastUsedBefore = null,
         ?\DateTimeImmutable $lastUsedAfter = null,
         ?array $tokenId = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BasicError|ValidationError|array<string, mixed>>
+     */
     public function orgsReviewPatGrantRequestsInBulk(
         string $org,
         OrgsReviewPatGrantRequestsInBulkRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BasicError|ValidationError|null>
+     */
     public function orgsReviewPatGrantRequest(
         string $org,
         int $patRequestId,
         OrgsReviewPatGrantRequestRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<BasicError|list<MinimalRepository>>
      */
     public function orgsListPatGrantRequestRepositories(
         string $org,
         int $patRequestId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
      * @param list<string> $owner
      * @param list<string> $tokenId
-     * @return list<OrganizationProgrammaticAccessGrant>
+     * @return Envelope<BasicError|ValidationError|list<OrganizationProgrammaticAccessGrant>>
      */
     public function orgsListPatGrants(
         string $org,
@@ -515,150 +668,219 @@ interface OrgsClientInterface
         ?\DateTimeImmutable $lastUsedBefore = null,
         ?\DateTimeImmutable $lastUsedAfter = null,
         ?array $tokenId = null,
-    ): array;
-
-    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequestContent $body): void;
-
-    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequestContent $body): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<BasicError|array<string, mixed>|ValidationError>
+     */
+    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<BasicError|null|ValidationError>
+     */
+    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<BasicError|list<MinimalRepository>>
      */
     public function orgsListPatGrantRepositories(
         string $org,
         int $patId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<CustomProperty>
+     * @return Envelope<list<CustomProperty>|BasicError>
      */
-    public function orgsCustomPropertiesForReposGetOrganizationDefinitions(string $org): array;
+    public function orgsCustomPropertiesForReposGetOrganizationDefinitions(string $org): Envelope;
 
     /**
-     * @return list<CustomProperty>
+     * @return Envelope<list<CustomProperty>|BasicError>
      */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitions(
         string $org,
         OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CustomProperty|BasicError>
+     */
     public function orgsCustomPropertiesForReposGetOrganizationDefinition(
         string $org,
         string $customPropertyName,
-    ): CustomProperty;
+    ): Envelope;
 
+    /**
+     * @return Envelope<CustomProperty|BasicError>
+     */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinition(
         string $org,
         string $customPropertyName,
         CustomPropertySetPayload $body,
-    ): CustomProperty;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function orgsCustomPropertiesForReposDeleteOrganizationDefinition(
         string $org,
         string $customPropertyName,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<OrgRepoCustomPropertyValues>
+     * @return Envelope<list<OrgRepoCustomPropertyValues>|BasicError>
      */
     public function orgsCustomPropertiesForReposGetOrganizationValues(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $repositoryQuery = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationValues(
         string $org,
         OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
-    public function orgsListPublicMembers(string $org, ?int $perPage = null, ?int $page = null): array;
-
-    public function orgsCheckPublicMembershipForUser(string $org, string $username): void;
-
-    public function orgsSetPublicMembershipForAuthenticatedUser(string $org, string $username): void;
-
-    public function orgsRemovePublicMembershipForAuthenticatedUser(string $org, string $username): void;
+    public function orgsListPublicMembers(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<RulesetVersion>
+     * @return Envelope<null>
+     */
+    public function orgsCheckPublicMembershipForUser(string $org, string $username): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function orgsSetPublicMembershipForAuthenticatedUser(string $org, string $username): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRemovePublicMembershipForAuthenticatedUser(string $org, string $username): Envelope;
+
+    /**
+     * @return Envelope<list<RulesetVersion>|BasicError>
      */
     public function orgsGetOrgRulesetHistory(
         string $org,
         int $rulesetId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function orgsGetOrgRulesetVersion(string $org, int $rulesetId, int $versionId): RulesetVersionWithState;
+    ): Envelope;
 
     /**
-     * @return list<TeamSimple>
+     * @return Envelope<RulesetVersionWithState|BasicError>
      */
-    public function orgsListSecurityManagerTeams(string $org): array;
+    public function orgsGetOrgRulesetVersion(string $org, int $rulesetId, int $versionId): Envelope;
 
-    public function orgsAddSecurityManagerTeam(string $org, string $teamSlug): void;
+    /**
+     * @return Envelope<list<TeamSimple>>
+     */
+    public function orgsListSecurityManagerTeams(string $org): Envelope;
 
-    public function orgsRemoveSecurityManagerTeam(string $org, string $teamSlug): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsAddSecurityManagerTeam(string $org, string $teamSlug): Envelope;
 
-    public function orgsGetImmutableReleasesSettings(string $org): ImmutableReleasesOrganizationSettings;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsRemoveSecurityManagerTeam(string $org, string $teamSlug): Envelope;
 
+    /**
+     * @return Envelope<ImmutableReleasesOrganizationSettings>
+     */
+    public function orgsGetImmutableReleasesSettings(string $org): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
     public function orgsSetImmutableReleasesSettings(
         string $org,
         OrgsSetImmutableReleasesSettingsRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<OrgsGetImmutableReleasesSettingsRepositories200Content>
+     */
     public function orgsGetImmutableReleasesSettingsRepositories(
         string $org,
         ?int $page = null,
         ?int $perPage = null,
-    ): OrgsGetImmutableReleasesSettingsRepositories200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function orgsSetImmutableReleasesSettingsRepositories(
         string $org,
         OrgsSetImmutableReleasesSettingsRepositoriesRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function orgsEnableSelectedRepositoryImmutableReleasesOrganization(string $org, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsEnableSelectedRepositoryImmutableReleasesOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope;
 
-    public function orgsDisableSelectedRepositoryImmutableReleasesOrganization(string $org, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function orgsDisableSelectedRepositoryImmutableReleasesOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function orgsEnableOrDisableSecurityProductOnAllOrgRepos(
         string $org,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct $securityProduct,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement $enablement,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestContent $body,
-    ): void;
+    ): Envelope;
 
     /**
-     * @return list<OrgMembership>
+     * @return Envelope<list<OrgMembership>|null|BasicError|ValidationError>
      */
     public function orgsListMembershipsForAuthenticatedUser(
         ?OrgsListMembershipsForAuthenticatedUserState $state = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function orgsGetMembershipForAuthenticatedUser(string $org): OrgMembership;
+    /**
+     * @return Envelope<OrgMembership|BasicError>
+     */
+    public function orgsGetMembershipForAuthenticatedUser(string $org): Envelope;
 
+    /**
+     * @return Envelope<OrgMembership|BasicError|ValidationError>
+     */
     public function orgsUpdateMembershipForAuthenticatedUser(
         string $org,
         OrgsUpdateMembershipForAuthenticatedUserRequestContent $body,
-    ): OrgMembership;
+    ): Envelope;
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>|null|BasicError>
      */
-    public function orgsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function orgsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<OrganizationSimple>
+     * @return Envelope<list<OrganizationSimple>>
      */
-    public function orgsListForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function orgsListForUser(string $username, ?int $perPage = null, ?int $page = null): Envelope;
 }

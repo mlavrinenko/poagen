@@ -11,6 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\ActionsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ActionsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `Actions` endpoints.
  *
@@ -22,11 +27,13 @@ interface ActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `actions:read`.
+     * @return Envelope<ActionsList200Content|Error>
      */
-    public function actionsList(?int $perPage = null, ?int $page = null): void;
+    public function actionsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `actions:read`.
+     * @return Envelope<ActionsGet200Content|Error>
      */
-    public function actionsGet(int $actionId): void;
+    public function actionsGet(int $actionId): Envelope;
 }

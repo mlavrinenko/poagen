@@ -17,7 +17,9 @@ use Acme\GitHub\Generated\Enum\ActionsListJobsForWorkflowRunFilter;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunArtifactsDirection;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsForRepoStatus;
 use Acme\GitHub\Generated\Enum\ActionsListWorkflowRunsStatus;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetention;
 use Acme\GitHub\Generated\Model\ActionsArtifactAndLogRetentionResponse;
@@ -42,7 +44,9 @@ use Acme\GitHub\Generated\Model\ActionsCreateWorkflowDispatchRequestContent;
 use Acme\GitHub\Generated\Model\ActionsForkPrContributorApproval;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateRepos;
 use Acme\GitHub\Generated\Model\ActionsForkPrWorkflowsPrivateReposRequest;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrg201Content;
 use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepo201Content;
 use Acme\GitHub\Generated\Model\ActionsGenerateRunnerJitconfigForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsGetActionsCacheUsageByRepoForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsGetDefaultWorkflowPermissions;
@@ -63,6 +67,8 @@ use Acme\GitHub\Generated\Model\ActionsListGithubHostedRunnersInGroupForOrg200Co
 use Acme\GitHub\Generated\Model\ActionsListHostedRunnersForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRun200Content;
 use Acme\GitHub\Generated\Model\ActionsListJobsForWorkflowRunAttempt200Content;
+use Acme\GitHub\Generated\Model\ActionsListLabelsForSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsListLabelsForSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsListOrgSecrets200Content;
 use Acme\GitHub\Generated\Model\ActionsListOrgVariables200Content;
 use Acme\GitHub\Generated\Model\ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content;
@@ -87,10 +93,16 @@ use Acme\GitHub\Generated\Model\ActionsPublicKey;
 use Acme\GitHub\Generated\Model\ActionsReRunJobForWorkflowRunRequestContent;
 use Acme\GitHub\Generated\Model\ActionsReRunWorkflowFailedJobsRequestContent;
 use Acme\GitHub\Generated\Model\ActionsReRunWorkflowRequestContent;
+use Acme\GitHub\Generated\Model\ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content;
+use Acme\GitHub\Generated\Model\ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsRepositoryPermissions;
 use Acme\GitHub\Generated\Model\ActionsReviewPendingDeploymentsForRunRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSecret;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content;
 use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent;
+use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content;
 use Acme\GitHub\Generated\Model\ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSetCustomOidcSubClaimForRepoRequestContent;
 use Acme\GitHub\Generated\Model\ActionsSetDefaultWorkflowPermissions;
@@ -112,6 +124,7 @@ use Acme\GitHub\Generated\Model\ActionsVariable;
 use Acme\GitHub\Generated\Model\ActionsWorkflowAccessToRepository;
 use Acme\GitHub\Generated\Model\Artifact;
 use Acme\GitHub\Generated\Model\AuthenticationToken;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Deployment;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\EnvironmentApprovals;
@@ -127,13 +140,18 @@ use Acme\GitHub\Generated\Model\RunnerApplication;
 use Acme\GitHub\Generated\Model\RunnerGroupsOrg;
 use Acme\GitHub\Generated\Model\SelectedActions;
 use Acme\GitHub\Generated\Model\SelfHostedRunnersSettings;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Acme\GitHub\Generated\Model\Workflow;
+use Acme\GitHub\Generated\Model\WorkflowDispatchResponse;
 use Acme\GitHub\Generated\Model\WorkflowRun;
 use Acme\GitHub\Generated\Model\WorkflowRunUsage;
 use Acme\GitHub\Generated\Model\WorkflowUsage;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ActionsClient implements ActionsClientInterface
@@ -143,1172 +161,1768 @@ final readonly class ActionsClient implements ActionsClientInterface
     ) {
     }
 
-    public function actionsGetActionsCacheRetentionLimitForEnterprise(
-        string $enterprise,
-    ): ActionsCacheRetentionLimitForEnterprise {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForEnterprise|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForEnterprise(string $enterprise): Envelope
+    {
+        /** @var Envelope<ActionsCacheRetentionLimitForEnterprise|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/cache/retention-limit')
                 ->path('enterprise', $enterprise),
-            ResponseType::object(ActionsCacheRetentionLimitForEnterprise::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForEnterprise(
         string $enterprise,
         ActionsCacheRetentionLimitForEnterprise $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/actions/cache/retention-limit')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheStorageLimitForEnterprise(
-        string $enterprise,
-    ): ActionsCacheStorageLimitForEnterprise {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForEnterprise|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForEnterprise(string $enterprise): Envelope
+    {
+        /** @var Envelope<ActionsCacheStorageLimitForEnterprise|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/cache/storage-limit')
                 ->path('enterprise', $enterprise),
-            ResponseType::object(ActionsCacheStorageLimitForEnterprise::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForEnterprise(
         string $enterprise,
         ActionsCacheStorageLimitForEnterprise $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/actions/cache/storage-limit')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheRetentionLimitForOrganization(
-        string $org,
-    ): ActionsCacheRetentionLimitForOrganization {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForOrganization|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsCacheRetentionLimitForOrganization|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/actions/cache/retention-limit')
                 ->path('org', $org),
-            ResponseType::object(ActionsCacheRetentionLimitForOrganization::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForOrganization(
         string $org,
         ActionsCacheRetentionLimitForOrganization $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/organizations/{org}/actions/cache/retention-limit')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheStorageLimitForOrganization(
-        string $org,
-    ): ActionsCacheStorageLimitForOrganization {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForOrganization|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsCacheStorageLimitForOrganization|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/actions/cache/storage-limit')->path('org', $org),
-            ResponseType::object(ActionsCacheStorageLimitForOrganization::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForOrganization(
         string $org,
         ActionsCacheStorageLimitForOrganization $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/organizations/{org}/actions/cache/storage-limit')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheUsageForOrg(string $org): ActionsCacheUsageOrgEnterprise
+    /**
+     * @return Envelope<ActionsCacheUsageOrgEnterprise>
+     */
+    public function actionsGetActionsCacheUsageForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsCacheUsageOrgEnterprise> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/cache/usage')->path('org', $org),
-            ResponseType::object(ActionsCacheUsageOrgEnterprise::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageOrgEnterprise::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsGetActionsCacheUsageByRepoForOrg200Content>
+     */
     public function actionsGetActionsCacheUsageByRepoForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsGetActionsCacheUsageByRepoForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsGetActionsCacheUsageByRepoForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/cache/usage-by-repository')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListHostedRunnersForOrg(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListHostedRunnersForOrg200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsListHostedRunnersForOrg200Content>
+     */
+    public function actionsListHostedRunnersForOrg(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<ActionsListHostedRunnersForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListHostedRunnersForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListHostedRunnersForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
     public function actionsCreateHostedRunnerForOrg(
         string $org,
         ActionsCreateHostedRunnerForOrgRequestContent $body,
-    ): ActionsHostedRunner {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsHostedRunner> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/hosted-runners')->path('org', $org)->json($body),
-            ResponseType::object(ActionsHostedRunner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListCustomImagesForOrg(string $org): ActionsListCustomImagesForOrg200Content
+    /**
+     * @return Envelope<ActionsListCustomImagesForOrg200Content>
+     */
+    public function actionsListCustomImagesForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsListCustomImagesForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom')->path('org', $org),
-            ResponseType::object(ActionsListCustomImagesForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImagesForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetCustomImageForOrg(string $org, int $imageDefinitionId): ActionsHostedRunnerCustomImage
+    /**
+     * @return Envelope<ActionsHostedRunnerCustomImage>
+     */
+    public function actionsGetCustomImageForOrg(string $org, int $imageDefinitionId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsHostedRunnerCustomImage> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId),
-            ResponseType::object(ActionsHostedRunnerCustomImage::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImage::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteCustomImageFromOrg(string $org, int $imageDefinitionId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteCustomImageFromOrg(string $org, int $imageDefinitionId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListCustomImageVersionsForOrg(
-        int $imageDefinitionId,
-        string $org,
-    ): ActionsListCustomImageVersionsForOrg200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsListCustomImageVersionsForOrg200Content>
+     */
+    public function actionsListCustomImageVersionsForOrg(int $imageDefinitionId, string $org): Envelope
+    {
+        /** @var Envelope<ActionsListCustomImageVersionsForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}/versions')
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('org', $org),
-            ResponseType::object(ActionsListCustomImageVersionsForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImageVersionsForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetCustomImageVersionForOrg(
-        string $org,
-        int $imageDefinitionId,
-        string $version,
-    ): ActionsHostedRunnerCustomImageVersion {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsHostedRunnerCustomImageVersion>
+     */
+    public function actionsGetCustomImageVersionForOrg(string $org, int $imageDefinitionId, string $version): Envelope
+    {
+        /** @var Envelope<ActionsHostedRunnerCustomImageVersion> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}/versions/{version}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('version', $version),
-            ResponseType::object(ActionsHostedRunnerCustomImageVersion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImageVersion::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteCustomImageVersionFromOrg(string $org, int $imageDefinitionId, string $version): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteCustomImageVersionFromOrg(
+        string $org,
+        int $imageDefinitionId,
+        string $version,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}/versions/{version}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('version', $version),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetHostedRunnersGithubOwnedImagesForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content>
+     */
+    public function actionsGetHostedRunnersGithubOwnedImagesForOrg(string $org): Envelope
+    {
+        /** @var Envelope<ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/github-owned')
                 ->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetHostedRunnersPartnerImagesForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersPartnerImagesForOrg200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsGetHostedRunnersPartnerImagesForOrg200Content>
+     */
+    public function actionsGetHostedRunnersPartnerImagesForOrg(string $org): Envelope
+    {
+        /** @var Envelope<ActionsGetHostedRunnersPartnerImagesForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/partner')
                 ->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetHostedRunnersLimitsForOrg(string $org): ActionsHostedRunnerLimits
+    /**
+     * @return Envelope<ActionsHostedRunnerLimits>
+     */
+    public function actionsGetHostedRunnersLimitsForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsHostedRunnerLimits> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/limits')->path('org', $org),
-            ResponseType::object(ActionsHostedRunnerLimits::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerLimits::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetHostedRunnersMachineSpecsForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersMachineSpecsForOrg200Content {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/actions/hosted-runners/machine-sizes')->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrg200Content::class),
-        );
-    }
-
-    public function actionsGetHostedRunnersPlatformsForOrg(
-        string $org,
-    ): ActionsGetHostedRunnersPlatformsForOrg200Content {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/actions/hosted-runners/platforms')->path('org', $org),
-            ResponseType::object(ActionsGetHostedRunnersPlatformsForOrg200Content::class),
-        );
-    }
-
-    public function actionsGetHostedRunnerForOrg(string $org, int $hostedRunnerId): ActionsHostedRunner
+    /**
+     * @return Envelope<ActionsGetHostedRunnersMachineSpecsForOrg200Content>
+     */
+    public function actionsGetHostedRunnersMachineSpecsForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsGetHostedRunnersMachineSpecsForOrg200Content> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/actions/hosted-runners/machine-sizes')->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrg200Content::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<ActionsGetHostedRunnersPlatformsForOrg200Content>
+     */
+    public function actionsGetHostedRunnersPlatformsForOrg(string $org): Envelope
+    {
+        /** @var Envelope<ActionsGetHostedRunnersPlatformsForOrg200Content> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/actions/hosted-runners/platforms')->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPlatformsForOrg200Content::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
+    public function actionsGetHostedRunnerForOrg(string $org, int $hostedRunnerId): Envelope
+    {
+        /** @var Envelope<ActionsHostedRunner> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId),
-            ResponseType::object(ActionsHostedRunner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteHostedRunnerForOrg(string $org, int $hostedRunnerId): ActionsHostedRunner
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
+    public function actionsDeleteHostedRunnerForOrg(string $org, int $hostedRunnerId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsHostedRunner> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId),
-            ResponseType::object(ActionsHostedRunner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsHostedRunner>
+     */
     public function actionsUpdateHostedRunnerForOrg(
         string $org,
         int $hostedRunnerId,
         ActionsUpdateHostedRunnerForOrgRequestContent $body,
-    ): ActionsHostedRunner {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsHostedRunner> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId)
                 ->json($body),
-            ResponseType::object(ActionsHostedRunner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetGithubActionsPermissionsOrganization(string $org): ActionsOrganizationPermissions
+    /**
+     * @return Envelope<ActionsOrganizationPermissions>
+     */
+    public function actionsGetGithubActionsPermissionsOrganization(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsOrganizationPermissions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions')->path('org', $org),
-            ResponseType::object(ActionsOrganizationPermissions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsOrganizationPermissions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsPermissionsOrganization(
         string $org,
         ActionsSetGithubActionsPermissionsOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions')->path('org', $org)->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetArtifactAndLogRetentionSettingsOrganization(
-        string $org,
-    ): ActionsArtifactAndLogRetentionResponse {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsArtifactAndLogRetentionResponse|BasicError>
+     */
+    public function actionsGetArtifactAndLogRetentionSettingsOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsArtifactAndLogRetentionResponse|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/artifact-and-log-retention')
                 ->path('org', $org),
-            ResponseType::object(ActionsArtifactAndLogRetentionResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetArtifactAndLogRetentionSettingsOrganization(
         string $org,
         ActionsArtifactAndLogRetention $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/artifact-and-log-retention')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetForkPrContributorApprovalPermissionsOrganization(
-        string $org,
-    ): ActionsForkPrContributorApproval {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsForkPrContributorApproval|BasicError>
+     */
+    public function actionsGetForkPrContributorApprovalPermissionsOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsForkPrContributorApproval|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/fork-pr-contributor-approval')
                 ->path('org', $org),
-            ResponseType::object(ActionsForkPrContributorApproval::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetForkPrContributorApprovalPermissionsOrganization(
         string $org,
         ActionsForkPrContributorApproval $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/fork-pr-contributor-approval')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetPrivateRepoForkPrWorkflowsSettingsOrganization(
-        string $org,
-    ): ActionsForkPrWorkflowsPrivateRepos {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError>
+     */
+    public function actionsGetPrivateRepoForkPrWorkflowsSettingsOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('org', $org),
-            ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetPrivateRepoForkPrWorkflowsSettingsOrganization(
         string $org,
         ActionsForkPrWorkflowsPrivateReposRequest $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content>
+     */
     public function actionsListSelectedRepositoriesEnabledGithubActionsOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedRepositoriesEnabledGithubActionsOrganization(
         string $org,
         ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsEnableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsEnableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDisableSelectedRepositoryGithubActionsOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDisableSelectedRepositoryGithubActionsOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetAllowedActionsOrganization(string $org): SelectedActions
+    /**
+     * @return Envelope<SelectedActions>
+     */
+    public function actionsGetAllowedActionsOrganization(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SelectedActions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/selected-actions')->path('org', $org),
-            ResponseType::object(SelectedActions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsSetAllowedActionsOrganization(string $org, SelectedActions $body): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsSetAllowedActionsOrganization(string $org, SelectedActions $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/selected-actions')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetSelfHostedRunnersPermissionsOrganization(string $org): SelfHostedRunnersSettings
+    /**
+     * @return Envelope<SelfHostedRunnersSettings|BasicError>
+     */
+    public function actionsGetSelfHostedRunnersPermissionsOrganization(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SelfHostedRunnersSettings|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/self-hosted-runners')
                 ->path('org', $org),
-            ResponseType::object(SelfHostedRunnersSettings::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelfHostedRunnersSettings::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetSelfHostedRunnersPermissionsOrganization(
         string $org,
         ActionsSetSelfHostedRunnersPermissionsOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content|BasicError>
+     */
     public function actionsListSelectedRepositoriesSelfHostedRunnersOrganization(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/self-hosted-runners/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetSelectedRepositoriesSelfHostedRunnersOrganization(
         string $org,
         ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsEnableSelectedRepositorySelfHostedRunnersOrganization(string $org, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function actionsEnableSelectedRepositorySelfHostedRunnersOrganization(
+        string $org,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsDisableSelectedRepositorySelfHostedRunnersOrganization(
         string $org,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/permissions/self-hosted-runners/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsOrganization(
-        string $org,
-    ): ActionsGetDefaultWorkflowPermissions {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsGetDefaultWorkflowPermissions>
+     */
+    public function actionsGetGithubActionsDefaultWorkflowPermissionsOrganization(string $org): Envelope
+    {
+        /** @var Envelope<ActionsGetDefaultWorkflowPermissions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/workflow')->path('org', $org),
-            ResponseType::object(ActionsGetDefaultWorkflowPermissions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsDefaultWorkflowPermissionsOrganization(
         string $org,
         ActionsSetDefaultWorkflowPermissions $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions/workflow')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnerGroupsForOrg200Content>
+     */
     public function actionsListSelfHostedRunnerGroupsForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?string $visibleToRepository = null,
-    ): ActionsListSelfHostedRunnerGroupsForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelfHostedRunnerGroupsForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('visible_to_repository', $visibleToRepository),
-            ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
     public function actionsCreateSelfHostedRunnerGroupForOrg(
         string $org,
         ActionsCreateSelfHostedRunnerGroupForOrgRequestContent $body,
-    ): RunnerGroupsOrg {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RunnerGroupsOrg> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runner-groups')->path('org', $org)->json($body),
-            ResponseType::object(RunnerGroupsOrg::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetSelfHostedRunnerGroupForOrg(string $org, int $runnerGroupId): RunnerGroupsOrg
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
+    public function actionsGetSelfHostedRunnerGroupForOrg(string $org, int $runnerGroupId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RunnerGroupsOrg> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId),
-            ResponseType::object(RunnerGroupsOrg::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteSelfHostedRunnerGroupFromOrg(string $org, int $runnerGroupId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteSelfHostedRunnerGroupFromOrg(string $org, int $runnerGroupId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runner-groups/{runner_group_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RunnerGroupsOrg>
+     */
     public function actionsUpdateSelfHostedRunnerGroupForOrg(
         string $org,
         int $runnerGroupId,
         ActionsUpdateSelfHostedRunnerGroupForOrgRequestContent $body,
-    ): RunnerGroupsOrg {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RunnerGroupsOrg> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/runner-groups/{runner_group_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::object(RunnerGroupsOrg::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListGithubHostedRunnersInGroupForOrg200Content>
+     */
     public function actionsListGithubHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListGithubHostedRunnersInGroupForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListGithubHostedRunnersInGroupForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/hosted-runners')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content>
+     */
     public function actionsListRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsAddRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsRemoveRepoAccessToSelfHostedRunnerGroupInOrg(
         string $org,
         int $runnerGroupId,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersInGroupForOrg200Content>
+     */
     public function actionsListSelfHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersInGroupForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelfHostedRunnersInGroupForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelfHostedRunnersInGroupForOrg(
         string $org,
         int $runnerGroupId,
         ActionsSetSelfHostedRunnersInGroupForOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsAddSelfHostedRunnerToGroupForOrg(string $org, int $runnerGroupId, int $runnerId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelfHostedRunnerToGroupForOrg(string $org, int $runnerGroupId, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsRemoveSelfHostedRunnerFromGroupForOrg(string $org, int $runnerGroupId, int $runnerId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelfHostedRunnerFromGroupForOrg(
+        string $org,
+        int $runnerGroupId,
+        int $runnerId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runner-groups/{runner_group_id}/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersForOrg200Content>
+     */
     public function actionsListSelfHostedRunnersForOrg(
         string $org,
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForOrg200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelfHostedRunnersForOrg200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners')
                 ->path('org', $org)
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersForOrg200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForOrg200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RunnerApplication>
+     * @return Envelope<list<RunnerApplication>>
      */
-    public function actionsListRunnerApplicationsForOrg(string $org): array
+    public function actionsListRunnerApplicationsForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<RunnerApplication>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners/downloads')->path('org', $org),
-            ResponseType::listOf(RunnerApplication::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsGenerateRunnerJitconfigForOrg201Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsGenerateRunnerJitconfigForOrg(
         string $org,
         ActionsGenerateRunnerJitconfigForOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsGenerateRunnerJitconfigForOrg201Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/generate-jitconfig')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForOrg201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCreateRegistrationTokenForOrg(string $org): AuthenticationToken
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRegistrationTokenForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AuthenticationToken> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/registration-token')->path('org', $org),
-            ResponseType::object(AuthenticationToken::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCreateRemoveTokenForOrg(string $org): AuthenticationToken
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRemoveTokenForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AuthenticationToken> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/remove-token')->path('org', $org),
-            ResponseType::object(AuthenticationToken::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetSelfHostedRunnerForOrg(string $org, int $runnerId): Runner
+    /**
+     * @return Envelope<Runner>
+     */
+    public function actionsGetSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Runner> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::object(Runner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteSelfHostedRunnerFromOrg(string $org, int $runnerId): void
+    /**
+     * @return Envelope<null|ValidationErrorSimple>
+     */
+    public function actionsDeleteSelfHostedRunnerFromOrg(string $org, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListLabelsForSelfHostedRunnerForOrg(string $org, int $runnerId): void
+    /**
+     * @return Envelope<ActionsListLabelsForSelfHostedRunnerForOrg200Content|BasicError>
+     */
+    public function actionsListLabelsForSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ActionsListLabelsForSelfHostedRunnerForOrg200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomLabelsForSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
         ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsAddCustomLabelsToSelfHostedRunnerForOrg(
         string $org,
         int $runnerId,
         ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg(string $org, int $runnerId): void
+    /**
+     * @return Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content|BasicError>
+     */
+    public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg(string $org, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrg(string $org, int $runnerId, string $name): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple>
+     */
+    public function actionsRemoveCustomLabelFromSelfHostedRunnerForOrg(
+        string $org,
+        int $runnerId,
+        string $name,
+    ): Envelope {
+        /** @var Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/runners/{runner_id}/labels/{name}')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->path('name', $name),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListOrgSecrets(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListOrgSecrets200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsListOrgSecrets200Content>
+     */
+    public function actionsListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<ActionsListOrgSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListOrgSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetOrgPublicKey(string $org): ActionsPublicKey
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetOrgPublicKey(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets/public-key')->path('org', $org),
-            ResponseType::object(ActionsPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetOrgSecret(string $org, string $secretName): OrganizationActionsSecret
+    /**
+     * @return Envelope<OrganizationActionsSecret>
+     */
+    public function actionsGetOrgSecret(string $org, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrganizationActionsSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::object(OrganizationActionsSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsSecret::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         ActionsCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteOrgSecret(string $org, string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteOrgSecret(string $org, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelectedReposForOrgSecret200Content>
+     */
     public function actionsListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgSecret200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelectedReposForOrgSecret200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListSelectedReposForOrgSecret200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgSecret200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ActionsSetSelectedReposForOrgSecretRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsRemoveSelectedRepoFromOrgSecret(string $org, string $secretName, int $repositoryId): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelectedRepoFromOrgSecret(
+        string $org,
+        string $secretName,
+        int $repositoryId,
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListOrgVariables(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): ActionsListOrgVariables200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsListOrgVariables200Content>
+     */
+    public function actionsListOrgVariables(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<ActionsListOrgVariables200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/variables')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListOrgVariables200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgVariables200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequestContent $body): EmptyObject
+    /**
+     * @return Envelope<EmptyObject>
+     */
+    public function actionsCreateOrgVariable(string $org, ActionsCreateOrgVariableRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/variables')->path('org', $org)->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetOrgVariable(string $org, string $name): OrganizationActionsVariable
+    /**
+     * @return Envelope<OrganizationActionsVariable>
+     */
+    public function actionsGetOrgVariable(string $org, string $name): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrganizationActionsVariable> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
                 ->path('name', $name),
-            ResponseType::object(OrganizationActionsVariable::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsVariable::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteOrgVariable(string $org, string $name): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteOrgVariable(string $org, string $name): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
                 ->path('name', $name),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateOrgVariable(
         string $org,
         string $name,
         ActionsUpdateOrgVariableRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelectedReposForOrgVariable200Content|null>
+     */
     public function actionsListSelectedReposForOrgVariable(
         string $org,
         string $name,
         ?int $page = null,
         ?int $perPage = null,
-    ): ActionsListSelectedReposForOrgVariable200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelectedReposForOrgVariable200Content|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/variables/{name}/repositories')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ActionsListSelectedReposForOrgVariable200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgVariable200Content::class)], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetSelectedReposForOrgVariable(
         string $org,
         string $name,
         ActionsSetSelectedReposForOrgVariableRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/variables/{name}/repositories')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsAddSelectedRepoToOrgVariable(string $org, string $name, int $repositoryId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsAddSelectedRepoToOrgVariable(string $org, string $name, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/variables/{name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsRemoveSelectedRepoFromOrgVariable(string $org, string $name, int $repositoryId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsRemoveSelectedRepoFromOrgVariable(string $org, string $name, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/variables/{name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('name', $name)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListArtifactsForRepo200Content>
+     */
     public function actionsListArtifactsForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
         ?string $name = null,
-    ): ActionsListArtifactsForRepo200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListArtifactsForRepo200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/artifacts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('name', $name),
-            ResponseType::object(ActionsListArtifactsForRepo200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListArtifactsForRepo200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetArtifact(string $owner, string $repo, int $artifactId): Artifact
+    /**
+     * @return Envelope<Artifact>
+     */
+    public function actionsGetArtifact(string $owner, string $repo, int $artifactId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Artifact> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/artifacts/{artifact_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId),
-            ResponseType::object(Artifact::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Artifact::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteArtifact(string $owner, string $repo, int $artifactId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteArtifact(string $owner, string $repo, int $artifactId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/artifacts/{artifact_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDownloadArtifact(string $owner, string $repo, int $artifactId, string $archiveFormat): void
-    {
-        $this->transport->send(
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function actionsDownloadArtifact(
+        string $owner,
+        string $repo,
+        int $artifactId,
+        string $archiveFormat,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId)
                 ->path('archive_format', $archiveFormat),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheRetentionLimitForRepository(
-        string $owner,
-        string $repo,
-    ): ActionsCacheRetentionLimitForRepository {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheRetentionLimitForRepository|BasicError>
+     */
+    public function actionsGetActionsCacheRetentionLimitForRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsCacheRetentionLimitForRepository|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/retention-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsCacheRetentionLimitForRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheRetentionLimitForRepository(
         string $owner,
         string $repo,
         ActionsCacheRetentionLimitForRepository $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/cache/retention-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheStorageLimitForRepository(
-        string $owner,
-        string $repo,
-    ): ActionsCacheStorageLimitForRepository {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsCacheStorageLimitForRepository|BasicError>
+     */
+    public function actionsGetActionsCacheStorageLimitForRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsCacheStorageLimitForRepository|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/storage-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsCacheStorageLimitForRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function actionsSetActionsCacheStorageLimitForRepository(
         string $owner,
         string $repo,
         ActionsCacheStorageLimitForRepository $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/cache/storage-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetActionsCacheUsage(string $owner, string $repo): ActionsCacheUsageByRepository
+    /**
+     * @return Envelope<ActionsCacheUsageByRepository>
+     */
+    public function actionsGetActionsCacheUsage(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsCacheUsageByRepository> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/usage')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsCacheUsageByRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageByRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsCacheList>
+     */
     public function actionsGetActionsCacheList(
         string $owner,
         string $repo,
@@ -1318,8 +1932,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?string $key = null,
         ?ActionsGetActionsCacheListSort $sort = null,
         ?ActionsGetActionsCacheListDirection $direction = null,
-    ): ActionsCacheList {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsCacheList> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/caches')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1329,468 +1944,668 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('key', $key)
                 ->query('sort', $sort)
                 ->query('direction', $direction),
-            ResponseType::object(ActionsCacheList::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsCacheList>
+     */
     public function actionsDeleteActionsCacheByKey(
         string $owner,
         string $repo,
         string $key,
         ?string $ref = null,
-    ): ActionsCacheList {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsCacheList> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/caches')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('key', $key)
                 ->query('ref', $ref),
-            ResponseType::object(ActionsCacheList::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteActionsCacheById(string $owner, string $repo, int $cacheId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteActionsCacheById(string $owner, string $repo, int $cacheId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/caches/{cache_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('cache_id', $cacheId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetJobForWorkflowRun(string $owner, string $repo, int $jobId): Job
+    /**
+     * @return Envelope<Job>
+     */
+    public function actionsGetJobForWorkflowRun(string $owner, string $repo, int $jobId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Job> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/jobs/{job_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('job_id', $jobId),
-            ResponseType::object(Job::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Job::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDownloadJobLogsForWorkflowRun(string $owner, string $repo, int $jobId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDownloadJobLogsForWorkflowRun(string $owner, string $repo, int $jobId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/jobs/{job_id}/logs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('job_id', $jobId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
     public function actionsReRunJobForWorkflowRun(
         string $owner,
         string $repo,
         int $jobId,
         ActionsReRunJobForWorkflowRunRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/jobs/{job_id}/rerun')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('job_id', $jobId)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetCustomOidcSubClaimForRepo(string $owner, string $repo): OidcCustomSubRepo
+    /**
+     * @return Envelope<OidcCustomSubRepo|BasicError>
+     */
+    public function actionsGetCustomOidcSubClaimForRepo(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OidcCustomSubRepo|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/oidc/customization/sub')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(OidcCustomSubRepo::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSubRepo::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomOidcSubClaimForRepo(
         string $owner,
         string $repo,
         ActionsSetCustomOidcSubClaimForRepoRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/oidc/customization/sub')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoOrganizationSecrets200Content>
+     */
     public function actionsListRepoOrganizationSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationSecrets200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoOrganizationSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/organization-secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoOrganizationSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoOrganizationVariables200Content>
+     */
     public function actionsListRepoOrganizationVariables(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoOrganizationVariables200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoOrganizationVariables200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/organization-variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoOrganizationVariables200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationVariables200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetGithubActionsPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsRepositoryPermissions {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsRepositoryPermissions>
+     */
+    public function actionsGetGithubActionsPermissionsRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsRepositoryPermissions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsRepositoryPermissions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRepositoryPermissions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsPermissionsRepository(
         string $owner,
         string $repo,
         ActionsSetGithubActionsPermissionsRepositoryRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetWorkflowAccessToRepository(
-        string $owner,
-        string $repo,
-    ): ActionsWorkflowAccessToRepository {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsWorkflowAccessToRepository>
+     */
+    public function actionsGetWorkflowAccessToRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsWorkflowAccessToRepository> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/access')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsWorkflowAccessToRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsWorkflowAccessToRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetWorkflowAccessToRepository(
         string $owner,
         string $repo,
         ActionsWorkflowAccessToRepository $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/access')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetArtifactAndLogRetentionSettingsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsArtifactAndLogRetentionResponse {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsArtifactAndLogRetentionResponse|BasicError>
+     */
+    public function actionsGetArtifactAndLogRetentionSettingsRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsArtifactAndLogRetentionResponse|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/artifact-and-log-retention')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsArtifactAndLogRetentionResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetArtifactAndLogRetentionSettingsRepository(
         string $owner,
         string $repo,
         ActionsArtifactAndLogRetention $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/artifact-and-log-retention')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetForkPrContributorApprovalPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsForkPrContributorApproval {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsForkPrContributorApproval|BasicError>
+     */
+    public function actionsGetForkPrContributorApprovalPermissionsRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsForkPrContributorApproval|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsForkPrContributorApproval::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetForkPrContributorApprovalPermissionsRepository(
         string $owner,
         string $repo,
         ActionsForkPrContributorApproval $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetPrivateRepoForkPrWorkflowsSettingsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsForkPrWorkflowsPrivateRepos {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError>
+     */
+    public function actionsGetPrivateRepoForkPrWorkflowsSettingsRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsForkPrWorkflowsPrivateRepos|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function actionsSetPrivateRepoForkPrWorkflowsSettingsRepository(
         string $owner,
         string $repo,
         ActionsForkPrWorkflowsPrivateReposRequest $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetAllowedActionsRepository(string $owner, string $repo): SelectedActions
+    /**
+     * @return Envelope<SelectedActions>
+     */
+    public function actionsGetAllowedActionsRepository(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SelectedActions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/selected-actions')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(SelectedActions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsSetAllowedActionsRepository(string $owner, string $repo, SelectedActions $body): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsSetAllowedActionsRepository(string $owner, string $repo, SelectedActions $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/selected-actions')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetGithubActionsDefaultWorkflowPermissionsRepository(
-        string $owner,
-        string $repo,
-    ): ActionsGetDefaultWorkflowPermissions {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsGetDefaultWorkflowPermissions>
+     */
+    public function actionsGetGithubActionsDefaultWorkflowPermissionsRepository(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<ActionsGetDefaultWorkflowPermissions> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/workflow')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsGetDefaultWorkflowPermissions::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsSetGithubActionsDefaultWorkflowPermissionsRepository(
         string $owner,
         string $repo,
         ActionsSetDefaultWorkflowPermissions $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/permissions/workflow')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListSelfHostedRunnersForRepo200Content>
+     */
     public function actionsListSelfHostedRunnersForRepo(
         string $owner,
         string $repo,
         ?string $name = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListSelfHostedRunnersForRepo200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListSelfHostedRunnersForRepo200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runners')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListSelfHostedRunnersForRepo200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForRepo200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RunnerApplication>
+     * @return Envelope<list<RunnerApplication>>
      */
-    public function actionsListRunnerApplicationsForRepo(string $owner, string $repo): array
+    public function actionsListRunnerApplicationsForRepo(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<RunnerApplication>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runners/downloads')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(RunnerApplication::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsGenerateRunnerJitconfigForRepo201Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsGenerateRunnerJitconfigForRepo(
         string $owner,
         string $repo,
         ActionsGenerateRunnerJitconfigForRepoRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsGenerateRunnerJitconfigForRepo201Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/generate-jitconfig')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForRepo201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCreateRegistrationTokenForRepo(string $owner, string $repo): AuthenticationToken
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRegistrationTokenForRepo(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AuthenticationToken> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/registration-token')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(AuthenticationToken::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCreateRemoveTokenForRepo(string $owner, string $repo): AuthenticationToken
+    /**
+     * @return Envelope<AuthenticationToken>
+     */
+    public function actionsCreateRemoveTokenForRepo(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AuthenticationToken> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/remove-token')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(AuthenticationToken::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Runner
+    /**
+     * @return Envelope<Runner>
+     */
+    public function actionsGetSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Runner> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runners/{runner_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::object(Runner::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteSelfHostedRunnerFromRepo(string $owner, string $repo, int $runnerId): void
+    /**
+     * @return Envelope<null|ValidationErrorSimple>
+     */
+    public function actionsDeleteSelfHostedRunnerFromRepo(string $owner, string $repo, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/runners/{runner_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsListLabelsForSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): void
+    /**
+     * @return Envelope<ActionsListLabelsForSelfHostedRunnerForRepo200Content|BasicError>
+     */
+    public function actionsListLabelsForSelfHostedRunnerForRepo(string $owner, string $repo, int $runnerId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<ActionsListLabelsForSelfHostedRunnerForRepo200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsSetCustomLabelsForSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsAddCustomLabelsToSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content|BasicError>
+     */
     public function actionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple>
+     */
     public function actionsRemoveCustomLabelFromSelfHostedRunnerForRepo(
         string $owner,
         string $repo,
         int $runnerId,
         string $name,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/runners/{runner_id}/labels/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->path('name', $name),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListWorkflowRunsForRepo200Content>
+     */
     public function actionsListWorkflowRunsForRepo(
         string $owner,
         string $repo,
@@ -1804,8 +2619,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRunsForRepo200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListWorkflowRunsForRepo200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1819,62 +2635,88 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::object(ActionsListWorkflowRunsForRepo200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunsForRepo200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<WorkflowRun>
+     */
     public function actionsGetWorkflowRun(
         string $owner,
         string $repo,
         int $runId,
         ?bool $excludePullRequests = null,
-    ): WorkflowRun {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<WorkflowRun> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->query('exclude_pull_requests', $excludePullRequests),
-            ResponseType::object(WorkflowRun::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteWorkflowRun(string $owner, string $repo, int $runId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteWorkflowRun(string $owner, string $repo, int $runId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/runs/{run_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<EnvironmentApprovals>
+     * @return Envelope<list<EnvironmentApprovals>>
      */
-    public function actionsGetReviewsForRun(string $owner, string $repo, int $runId): array
+    public function actionsGetReviewsForRun(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<EnvironmentApprovals>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/approvals')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::listOf(EnvironmentApprovals::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnvironmentApprovals::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsApproveWorkflowRun(string $owner, string $repo, int $runId): EmptyObject
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsApproveWorkflowRun(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/approve')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListWorkflowRunArtifacts200Content>
+     */
     public function actionsListWorkflowRunArtifacts(
         string $owner,
         string $repo,
@@ -1883,8 +2725,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?int $page = null,
         ?string $name = null,
         ?ActionsListWorkflowRunArtifactsDirection $direction = null,
-    ): ActionsListWorkflowRunArtifacts200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListWorkflowRunArtifacts200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1893,28 +2736,39 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('page', $page)
                 ->query('name', $name)
                 ->query('direction', $direction),
-            ResponseType::object(ActionsListWorkflowRunArtifacts200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunArtifacts200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<WorkflowRun>
+     */
     public function actionsGetWorkflowRunAttempt(
         string $owner,
         string $repo,
         int $runId,
         int $attemptNumber,
         ?bool $excludePullRequests = null,
-    ): WorkflowRun {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<WorkflowRun> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->path('attempt_number', $attemptNumber)
                 ->query('exclude_pull_requests', $excludePullRequests),
-            ResponseType::object(WorkflowRun::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListJobsForWorkflowRunAttempt200Content|BasicError>
+     */
     public function actionsListJobsForWorkflowRunAttempt(
         string $owner,
         string $repo,
@@ -1922,8 +2776,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         int $attemptNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRunAttempt200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListJobsForWorkflowRunAttempt200Content|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/jobs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -1931,64 +2786,93 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('attempt_number', $attemptNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListJobsForWorkflowRunAttempt200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRunAttempt200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDownloadWorkflowRunAttemptLogs(
         string $owner,
         string $repo,
         int $runId,
         int $attemptNumber,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/attempts/{attempt_number}/logs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->path('attempt_number', $attemptNumber),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsCancelWorkflowRun(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/cancel')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsReviewCustomGatesForRun(
         string $owner,
         string $repo,
         int $runId,
         ReviewCustomGatesCommentRequired|ReviewCustomGatesStateRequired $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/deployment_protection_rule')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsForceCancelWorkflowRun(string $owner, string $repo, int $runId): EmptyObject
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
+    public function actionsForceCancelWorkflowRun(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/force-cancel')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListJobsForWorkflowRun200Content>
+     */
     public function actionsListJobsForWorkflowRun(
         string $owner,
         string $repo,
@@ -1996,8 +2880,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?ActionsListJobsForWorkflowRunFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListJobsForWorkflowRun200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListJobsForWorkflowRun200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/jobs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -2005,305 +2890,436 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListJobsForWorkflowRun200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRun200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDownloadWorkflowRunLogs(string $owner, string $repo, int $runId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDownloadWorkflowRunLogs(string $owner, string $repo, int $runId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/logs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteWorkflowRunLogs(string $owner, string $repo, int $runId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function actionsDeleteWorkflowRunLogs(string $owner, string $repo, int $runId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/runs/{run_id}/logs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PendingDeployment>
+     * @return Envelope<list<PendingDeployment>>
      */
-    public function actionsGetPendingDeploymentsForRun(string $owner, string $repo, int $runId): array
+    public function actionsGetPendingDeploymentsForRun(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<PendingDeployment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::listOf(PendingDeployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PendingDeployment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Deployment>
+     * @return Envelope<list<Deployment>>
      */
     public function actionsReviewPendingDeploymentsForRun(
         string $owner,
         string $repo,
         int $runId,
         ActionsReviewPendingDeploymentsForRunRequestContent $body,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Deployment>> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/pending_deployments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::listOf(Deployment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsReRunWorkflow(
         string $owner,
         string $repo,
         int $runId,
         ActionsReRunWorkflowRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/rerun')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsReRunWorkflowFailedJobs(
         string $owner,
         string $repo,
         int $runId,
         ActionsReRunWorkflowFailedJobsRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/runs/{run_id}/rerun-failed-jobs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetWorkflowRunUsage(string $owner, string $repo, int $runId): WorkflowRunUsage
+    /**
+     * @return Envelope<WorkflowRunUsage>
+     */
+    public function actionsGetWorkflowRunUsage(string $owner, string $repo, int $runId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<WorkflowRunUsage> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/runs/{run_id}/timing')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::object(WorkflowRunUsage::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRunUsage::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoSecrets200Content>
+     */
     public function actionsListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoSecrets200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetRepoPublicKey(string $owner, string $repo): ActionsPublicKey
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetRepoPublicKey(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ActionsPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetRepoSecret(string $owner, string $repo, string $secretName): ActionsSecret
+    /**
+     * @return Envelope<ActionsSecret>
+     */
+    public function actionsGetRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::object(ActionsSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         ActionsCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteRepoSecret(string $owner, string $repo, string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoVariables200Content>
+     */
     public function actionsListRepoVariables(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoVariables200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoVariables200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoVariables200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoVariables200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsCreateRepoVariable(
         string $owner,
         string $repo,
         ActionsCreateRepoVariableRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetRepoVariable(string $owner, string $repo, string $name): ActionsVariable
+    /**
+     * @return Envelope<ActionsVariable>
+     */
+    public function actionsGetRepoVariable(string $owner, string $repo, string $name): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActionsVariable> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::object(ActionsVariable::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDeleteRepoVariable(string $owner, string $repo, string $name): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDeleteRepoVariable(string $owner, string $repo, string $name): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/actions/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateRepoVariable(
         string $owner,
         string $repo,
         string $name,
         ActionsUpdateRepoVariableRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/actions/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListRepoWorkflows200Content>
+     */
     public function actionsListRepoWorkflows(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListRepoWorkflows200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListRepoWorkflows200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListRepoWorkflows200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoWorkflows200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetWorkflow(string $owner, string $repo, int|string $workflowId): Workflow
+    /**
+     * @return Envelope<Workflow>
+     */
+    public function actionsGetWorkflow(string $owner, string $repo, int|string $workflowId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Workflow> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows/{workflow_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::object(Workflow::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Workflow::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsDisableWorkflow(string $owner, string $repo, int|string $workflowId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsDisableWorkflow(string $owner, string $repo, int|string $workflowId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/disable')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|WorkflowDispatchResponse>
+     */
     public function actionsCreateWorkflowDispatch(
         string $owner,
         string $repo,
         int|string $workflowId,
         ActionsCreateWorkflowDispatchRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|WorkflowDispatchResponse> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['200', ResponseType::object(WorkflowDispatchResponse::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsEnableWorkflow(string $owner, string $repo, int|string $workflowId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function actionsEnableWorkflow(string $owner, string $repo, int|string $workflowId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/enable')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListWorkflowRuns200Content>
+     */
     public function actionsListWorkflowRuns(
         string $owner,
         string $repo,
@@ -2318,8 +3334,9 @@ final readonly class ActionsClient implements ActionsClientInterface
         ?bool $excludePullRequests = null,
         ?int $checkSuiteId = null,
         ?string $headSha = null,
-    ): ActionsListWorkflowRuns200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListWorkflowRuns200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/runs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -2334,184 +3351,249 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::object(ActionsListWorkflowRuns200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRuns200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetWorkflowUsage(string $owner, string $repo, int|string $workflowId): WorkflowUsage
+    /**
+     * @return Envelope<WorkflowUsage>
+     */
+    public function actionsGetWorkflowUsage(string $owner, string $repo, int|string $workflowId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<WorkflowUsage> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/actions/workflows/{workflow_id}/timing')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::object(WorkflowUsage::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowUsage::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListEnvironmentSecrets200Content>
+     */
     public function actionsListEnvironmentSecrets(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentSecrets200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListEnvironmentSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListEnvironmentSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function actionsGetEnvironmentPublicKey(
-        string $owner,
-        string $repo,
-        string $environmentName,
-    ): ActionsPublicKey {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ActionsPublicKey>
+     */
+    public function actionsGetEnvironmentPublicKey(string $owner, string $repo, string $environmentName): Envelope
+    {
+        /** @var Envelope<ActionsPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::object(ActionsPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsSecret>
+     */
     public function actionsGetEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
-    ): ActionsSecret {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName),
-            ResponseType::object(ActionsSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function actionsCreateOrUpdateEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
         ActionsCreateOrUpdateEnvironmentSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/environments/{environment_name}/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDeleteEnvironmentSecret(
         string $owner,
         string $repo,
         string $environmentName,
         string $secretName,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/environments/{environment_name}/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsListEnvironmentVariables200Content>
+     */
     public function actionsListEnvironmentVariables(
         string $owner,
         string $repo,
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ActionsListEnvironmentVariables200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsListEnvironmentVariables200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ActionsListEnvironmentVariables200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentVariables200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject>
+     */
     public function actionsCreateEnvironmentVariable(
         string $owner,
         string $repo,
         string $environmentName,
         ActionsCreateEnvironmentVariableRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/environments/{environment_name}/variables')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<ActionsVariable>
+     */
     public function actionsGetEnvironmentVariable(
         string $owner,
         string $repo,
         string $environmentName,
         string $name,
-    ): ActionsVariable {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ActionsVariable> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('name', $name),
-            ResponseType::object(ActionsVariable::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsDeleteEnvironmentVariable(
         string $owner,
         string $repo,
         string $name,
         string $environmentName,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/environments/{environment_name}/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->path('environment_name', $environmentName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function actionsUpdateEnvironmentVariable(
         string $owner,
         string $repo,
         string $name,
         string $environmentName,
         ActionsUpdateEnvironmentVariableRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/environments/{environment_name}/variables/{name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

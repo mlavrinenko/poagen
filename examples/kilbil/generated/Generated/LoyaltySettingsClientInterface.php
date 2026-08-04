@@ -12,8 +12,11 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetActionsList200Content;
+use Acme\Kilbil\Generated\Model\GetActionsList403Content;
 use Acme\Kilbil\Generated\Model\GetActionsListRequestContent;
 use Acme\Kilbil\Generated\Model\GetPrograms200Content;
+use Acme\Kilbil\Generated\Model\GetPrograms403Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Информация о лояльности` endpoints.
@@ -24,10 +27,14 @@ use Acme\Kilbil\Generated\Model\GetPrograms200Content;
  */
 interface LoyaltySettingsClientInterface
 {
-    public function getActionsList(GetActionsListRequestContent $body): GetActionsList200Content;
+    /**
+     * @return Envelope<GetActionsList200Content|GetActionsList403Content>
+     */
+    public function getActionsList(GetActionsListRequestContent $body): Envelope;
 
     /**
      * @param array<string, mixed> $body
+     * @return Envelope<GetPrograms200Content|GetPrograms403Content>
      */
-    public function getPrograms(array $body): GetPrograms200Content;
+    public function getPrograms(array $body): Envelope;
 }

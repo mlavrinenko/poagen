@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\FloatingIpActionAssign;
 use Acme\DigitalOcean\Generated\Model\FloatingIpActionUnassign;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionGet200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionList200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsActionPost201Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Floating IP Actions` endpoints.
@@ -25,19 +30,22 @@ interface FloatingIpActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsActionList200Content|Error>
      */
-    public function floatingIpsActionList(string $floatingIp): void;
+    public function floatingIpsActionList(string $floatingIp): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<FloatingIpsActionPost201Content|Error>
      */
     public function floatingIpsActionPost(
         string $floatingIp,
         FloatingIpActionUnassign|FloatingIpActionAssign $body,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsActionGet200Content|Error>
      */
-    public function floatingIpsActionGet(string $floatingIp, int $actionId): void;
+    public function floatingIpsActionGet(string $floatingIp, int $actionId): Envelope;
 }

@@ -20,6 +20,7 @@ use Acme\GitHub\Generated\Enum\CodeScanningListAlertsForRepoSort;
 use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesDirection;
 use Acme\GitHub\Generated\Enum\CodeScanningListRecentAnalysesSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeScanningAlert;
 use Acme\GitHub\Generated\Model\CodeScanningAlertInstanceList;
 use Acme\GitHub\Generated\Model\CodeScanningAlertItems;
@@ -32,20 +33,44 @@ use Acme\GitHub\Generated\Model\CodeScanningAutofix;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommits;
 use Acme\GitHub\Generated\Model\CodeScanningAutofixCommitsResponse;
 use Acme\GitHub\Generated\Model\CodeScanningCodeqlDatabase;
+use Acme\GitHub\Generated\Model\CodeScanningCommitAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningCreateAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysis503Content;
 use Acme\GitHub\Generated\Model\CodeScanningCreateVariantAnalysisRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetup;
 use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdate;
+use Acme\GitHub\Generated\Model\CodeScanningDefaultSetupUpdateResponse;
+use Acme\GitHub\Generated\Model\CodeScanningDeleteAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningDeleteCodeqlDatabase503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAlert503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetAutofix503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetCodeqlDatabase503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetDefaultSetup503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetSarif503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetVariantAnalysis503Content;
+use Acme\GitHub\Generated\Model\CodeScanningGetVariantAnalysisRepoTask503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertInstances503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertsForOrg503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListAlertsForRepo503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListCodeqlDatabases503Content;
+use Acme\GitHub\Generated\Model\CodeScanningListRecentAnalyses503Content;
 use Acme\GitHub\Generated\Model\CodeScanningOrganizationAlertItems;
 use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsReceipt;
 use Acme\GitHub\Generated\Model\CodeScanningSarifsStatus;
+use Acme\GitHub\Generated\Model\CodeScanningUpdateAlert503Content;
 use Acme\GitHub\Generated\Model\CodeScanningUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\CodeScanningUpdateDefaultSetup503Content;
+use Acme\GitHub\Generated\Model\CodeScanningUploadSarif503Content;
 use Acme\GitHub\Generated\Model\CodeScanningUploadSarifRequestContent;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysis;
 use Acme\GitHub\Generated\Model\CodeScanningVariantAnalysisRepoTask;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CodeScanningClient implements CodeScanningClientInterface
@@ -56,7 +81,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
     }
 
     /**
-     * @return list<CodeScanningOrganizationAlertItems>
+     * @return Envelope<list<CodeScanningOrganizationAlertItems>|BasicError|CodeScanningListAlertsForOrg503Content>
      */
     public function codeScanningListAlertsForOrg(
         string $org,
@@ -71,8 +96,9 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
         ?CodeScanningListAlertsForOrgSort $sort = null,
         ?CodeScanningAlertSeverity $severity = null,
         ?string $assignees = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeScanningOrganizationAlertItems>|BasicError|CodeScanningListAlertsForOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-scanning/alerts')
                 ->path('org', $org)
                 ->query('tool_name', $toolName?->toScalar())
@@ -86,12 +112,14 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('sort', $sort)
                 ->query('severity', $severity)
                 ->query('assignees', $assignees),
-            ResponseType::listOf(CodeScanningOrganizationAlertItems::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningOrganizationAlertItems::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForOrg503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeScanningAlertItems>
+     * @return Envelope<list<CodeScanningAlertItems>|null|BasicError|CodeScanningListAlertsForRepo503Content>
      */
     public function codeScanningListAlertsForRepo(
         string $owner,
@@ -109,8 +137,9 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
         ?CodeScanningAlertStateQuery $state = null,
         ?CodeScanningAlertSeverity $severity = null,
         ?string $assignees = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeScanningAlertItems>|null|BasicError|CodeScanningListAlertsForRepo503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -127,80 +156,109 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('state', $state)
                 ->query('severity', $severity)
                 ->query('assignees', $assignees),
-            ResponseType::listOf(CodeScanningAlertItems::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertItems::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForRepo503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetAlert(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAlert
+    /**
+     * @return Envelope<CodeScanningAlert|null|BasicError|CodeScanningGetAlert503Content>
+     */
+    public function codeScanningGetAlert(string $owner, string $repo, AlertNumber $alertNumber): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeScanningAlert|null|BasicError|CodeScanningGetAlert503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::object(CodeScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAlert503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningAlert|BasicError|CodeScanningUpdateAlert503Content>
+     */
     public function codeScanningUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         CodeScanningUpdateAlertRequestContent $body,
-    ): CodeScanningAlert {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningAlert|BasicError|CodeScanningUpdateAlert503Content> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::object(CodeScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateAlert503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetAutofix(string $owner, string $repo, AlertNumber $alertNumber): CodeScanningAutofix
+    /**
+     * @return Envelope<CodeScanningAutofix|BasicError|CodeScanningGetAutofix503Content>
+     */
+    public function codeScanningGetAutofix(string $owner, string $repo, AlertNumber $alertNumber): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeScanningAutofix|BasicError|CodeScanningGetAutofix503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::object(CodeScanningAutofix::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAutofix503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningCreateAutofix(
-        string $owner,
-        string $repo,
-        AlertNumber $alertNumber,
-    ): CodeScanningAutofix {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodeScanningAutofix|BasicError|null|CodeScanningCreateAutofix503Content>
+     */
+    public function codeScanningCreateAutofix(string $owner, string $repo, AlertNumber $alertNumber): Envelope
+    {
+        /** @var Envelope<CodeScanningAutofix|BasicError|null|CodeScanningCreateAutofix503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::object(CodeScanningAutofix::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['202', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningCreateAutofix503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningAutofixCommitsResponse|BasicError|null|CodeScanningCommitAutofix503Content>
+     */
     public function codeScanningCommitAutofix(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         CodeScanningAutofixCommits $body,
-    ): CodeScanningAutofixCommitsResponse {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningAutofixCommitsResponse|BasicError|null|CodeScanningCommitAutofix503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/autofix/commits')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::object(CodeScanningAutofixCommitsResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningAutofixCommitsResponse::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningCommitAutofix503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeScanningAlertInstanceList>
+     * @return Envelope<list<CodeScanningAlertInstanceList>|BasicError|CodeScanningListAlertInstances503Content>
      */
     public function codeScanningListAlertInstances(
         string $owner,
@@ -210,8 +268,9 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
         ?int $perPage = null,
         ?CodeScanningRef $ref = null,
         ?int $pr = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeScanningAlertInstanceList>|BasicError|CodeScanningListAlertInstances503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/alerts/{alert_number}/instances')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -220,12 +279,14 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('per_page', $perPage)
                 ->query('ref', $ref?->toScalar())
                 ->query('pr', $pr),
-            ResponseType::listOf(CodeScanningAlertInstanceList::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertInstanceList::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertInstances503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeScanningAnalysis>
+     * @return Envelope<list<CodeScanningAnalysis>|BasicError|CodeScanningListRecentAnalyses503Content>
      */
     public function codeScanningListRecentAnalyses(
         string $owner,
@@ -239,8 +300,9 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
         ?CodeScanningAnalysisSarifId $sarifId = null,
         ?CodeScanningListRecentAnalysesDirection $direction = null,
         ?CodeScanningListRecentAnalysesSort $sort = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<CodeScanningAnalysis>|BasicError|CodeScanningListRecentAnalyses503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/analyses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -253,167 +315,235 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('sarif_id', $sarifId?->toScalar())
                 ->query('direction', $direction)
                 ->query('sort', $sort),
-            ResponseType::listOf(CodeScanningAnalysis::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListRecentAnalyses503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetAnalysis(string $owner, string $repo, int $analysisId): CodeScanningAnalysis
+    /**
+     * @return Envelope<CodeScanningAnalysis|BasicError|CodeScanningGetAnalysis503Content>
+     */
+    public function codeScanningGetAnalysis(string $owner, string $repo, int $analysisId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeScanningAnalysis|BasicError|CodeScanningGetAnalysis503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('analysis_id', $analysisId),
-            ResponseType::object(CodeScanningAnalysis::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAnalysis503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningAnalysisDeletion|BasicError|CodeScanningDeleteAnalysis503Content>
+     */
     public function codeScanningDeleteAnalysis(
         string $owner,
         string $repo,
         int $analysisId,
         ?string $confirmDelete = null,
-    ): CodeScanningAnalysisDeletion {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningAnalysisDeletion|BasicError|CodeScanningDeleteAnalysis503Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/code-scanning/analyses/{analysis_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('analysis_id', $analysisId)
                 ->query('confirm_delete', $confirmDelete),
-            ResponseType::object(CodeScanningAnalysisDeletion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysisDeletion::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteAnalysis503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<CodeScanningCodeqlDatabase>
+     * @return Envelope<list<CodeScanningCodeqlDatabase>|BasicError|CodeScanningListCodeqlDatabases503Content>
      */
-    public function codeScanningListCodeqlDatabases(string $owner, string $repo): array
+    public function codeScanningListCodeqlDatabases(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<CodeScanningCodeqlDatabase>|BasicError|CodeScanningListCodeqlDatabases503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/codeql/databases')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::listOf(CodeScanningCodeqlDatabase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningCodeqlDatabase::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListCodeqlDatabases503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetCodeqlDatabase(
-        string $owner,
-        string $repo,
-        string $language,
-    ): CodeScanningCodeqlDatabase {
-        return $this->transport->send(
+    /**
+     * @return Envelope<CodeScanningCodeqlDatabase|null|BasicError|CodeScanningGetCodeqlDatabase503Content>
+     */
+    public function codeScanningGetCodeqlDatabase(string $owner, string $repo, string $language): Envelope
+    {
+        /** @var Envelope<CodeScanningCodeqlDatabase|null|BasicError|CodeScanningGetCodeqlDatabase503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/codeql/databases/{language}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('language', $language),
-            ResponseType::object(CodeScanningCodeqlDatabase::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningCodeqlDatabase::class)], ['302', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetCodeqlDatabase503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningDeleteCodeqlDatabase(string $owner, string $repo, string $language): void
+    /**
+     * @return Envelope<null|BasicError|CodeScanningDeleteCodeqlDatabase503Content>
+     */
+    public function codeScanningDeleteCodeqlDatabase(string $owner, string $repo, string $language): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError|CodeScanningDeleteCodeqlDatabase503Content> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/code-scanning/codeql/databases/{language}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('language', $language),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteCodeqlDatabase503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningCreateVariantAnalysis503Content>
+     */
     public function codeScanningCreateVariantAnalysis(
         string $owner,
         string $repo,
         CodeScanningCreateVariantAnalysisRequestContent $body,
-    ): CodeScanningVariantAnalysis {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningCreateVariantAnalysis503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(CodeScanningVariantAnalysis::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningCreateVariantAnalysis503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningGetVariantAnalysis503Content>
+     */
     public function codeScanningGetVariantAnalysis(
         string $owner,
         string $repo,
         int $codeqlVariantAnalysisId,
-    ): CodeScanningVariantAnalysis {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningVariantAnalysis|BasicError|CodeScanningGetVariantAnalysis503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses/{codeql_variant_analysis_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('codeql_variant_analysis_id', $codeqlVariantAnalysisId),
-            ResponseType::object(CodeScanningVariantAnalysis::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysis503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningVariantAnalysisRepoTask|BasicError|CodeScanningGetVariantAnalysisRepoTask503Content>
+     */
     public function codeScanningGetVariantAnalysisRepoTask(
         string $owner,
         string $repo,
         int $codeqlVariantAnalysisId,
         string $repoOwner,
         string $repoName,
-    ): CodeScanningVariantAnalysisRepoTask {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningVariantAnalysisRepoTask|BasicError|CodeScanningGetVariantAnalysisRepoTask503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses/{codeql_variant_analysis_id}/repos/{repo_owner}/{repo_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('codeql_variant_analysis_id', $codeqlVariantAnalysisId)
                 ->path('repo_owner', $repoOwner)
                 ->path('repo_name', $repoName),
-            ResponseType::object(CodeScanningVariantAnalysisRepoTask::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysisRepoTask::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysisRepoTask503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetDefaultSetup(string $owner, string $repo): CodeScanningDefaultSetup
+    /**
+     * @return Envelope<CodeScanningDefaultSetup|BasicError|CodeScanningGetDefaultSetup503Content>
+     */
+    public function codeScanningGetDefaultSetup(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeScanningDefaultSetup|BasicError|CodeScanningGetDefaultSetup503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/default-setup')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(CodeScanningDefaultSetup::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningDefaultSetup::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetDefaultSetup503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|CodeScanningDefaultSetupUpdateResponse|BasicError|CodeScanningUpdateDefaultSetup503Content>
+     */
     public function codeScanningUpdateDefaultSetup(
         string $owner,
         string $repo,
         CodeScanningDefaultSetupUpdate $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|CodeScanningDefaultSetupUpdateResponse|BasicError|CodeScanningUpdateDefaultSetup503Content> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/code-scanning/default-setup')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EmptyObject::class)], ['202', ResponseType::object(CodeScanningDefaultSetupUpdateResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateDefaultSetup503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<CodeScanningSarifsReceipt|null|BasicError|CodeScanningUploadSarif503Content>
+     */
     public function codeScanningUploadSarif(
         string $owner,
         string $repo,
         CodeScanningUploadSarifRequestContent $body,
-    ): CodeScanningSarifsReceipt {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<CodeScanningSarifsReceipt|null|BasicError|CodeScanningUploadSarif503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/code-scanning/sarifs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(CodeScanningSarifsReceipt::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodeScanningSarifsReceipt::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningUploadSarif503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codeScanningGetSarif(string $owner, string $repo, string $sarifId): CodeScanningSarifsStatus
+    /**
+     * @return Envelope<CodeScanningSarifsStatus|BasicError|null|CodeScanningGetSarif503Content>
+     */
+    public function codeScanningGetSarif(string $owner, string $repo, string $sarifId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeScanningSarifsStatus|BasicError|null|CodeScanningGetSarif503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/sarifs/{sarif_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('sarif_id', $sarifId),
-            ResponseType::object(CodeScanningSarifsStatus::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningSarifsStatus::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningGetSarif503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

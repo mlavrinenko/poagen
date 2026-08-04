@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated;
 
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\Part;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileRequest;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileResponse;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfile200Content;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileRequestContent;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\Widget;
 
 final readonly class ApiClient implements ApiClientInterface
@@ -27,62 +29,86 @@ final readonly class ApiClient implements ApiClientInterface
     }
 
     /**
-     * @return array<string, Part>
+     * @return Envelope<array<string, Part>>
      */
-    public function getCatalogue(): array
+    public function getCatalogue(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, Part>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/catalogue'),
-            ResponseType::mapOf(ResponseType::object(Part::class)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::object(Part::class))]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return array<string, list<Part>>
+     * @return Envelope<array<string, list<Part>>>
      */
-    public function getPartLists(): array
+    public function getPartLists(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, list<Part>>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/catalogue/lists'),
-            ResponseType::mapOf(ResponseType::listOf(Part::class)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::listOf(Part::class))]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @return Envelope<array<string, array<string, string>>>
      */
-    public function getNestedCatalogue(): array
+    public function getNestedCatalogue(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, array<string, string>>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/catalogue/nested'),
-            ResponseType::mapOf(ResponseType::mapOf(ResponseType::string())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mapOf(ResponseType::string()))]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>>
      */
-    public function getOpaque(): array
+    public function getOpaque(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, mixed>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/opaque'),
-            ResponseType::mapOf(ResponseType::mixed()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function saveProfile(SaveProfileRequest $body): SaveProfileResponse
+    /**
+     * @return Envelope<SaveProfile200Content>
+     */
+    public function saveProfile(SaveProfileRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SaveProfile200Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/profile')->json($body),
-            ResponseType::object(SaveProfileResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveProfile200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function getWidget(): Widget
+    /**
+     * @return Envelope<Widget>
+     */
+    public function getWidget(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Widget> $result */
+        $result = $this->transport->send(
             Endpoint::get('/widget'),
-            ResponseType::object(Widget::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Widget::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

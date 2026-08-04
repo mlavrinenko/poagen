@@ -13,8 +13,11 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ChatCompletionRequest;
 use Acme\DigitalOcean\Generated\Model\ChatCompletionResponse;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class AgentInferenceClient implements AgentInferenceClientInterface
@@ -25,16 +28,20 @@ final readonly class AgentInferenceClient implements AgentInferenceClientInterfa
     ) {
     }
 
-    public function agentInferenceCreateChatCompletion(
-        bool $agent,
-        ChatCompletionRequest $body,
-    ): ChatCompletionResponse {
-        return $this->transport->send(
+    /**
+     * @return Envelope<ChatCompletionResponse|Error>
+     */
+    public function agentInferenceCreateChatCompletion(bool $agent, ChatCompletionRequest $body): Envelope
+    {
+        /** @var Envelope<ChatCompletionResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/api/v1/chat/completions')
                 ->query('agent', $agent)
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::object(ChatCompletionResponse::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

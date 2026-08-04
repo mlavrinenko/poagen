@@ -11,7 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpCreate;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsGet200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpsList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Reserved IPs` endpoints.
@@ -24,21 +29,25 @@ interface ReservedIpsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsList200Content|Error>
      */
-    public function reservedIpsList(?int $perPage = null, ?int $page = null): void;
+    public function reservedIpsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<ReservedIpsCreate202Content|Error>
      */
-    public function reservedIpsCreate(ReservedIpCreate $body): void;
+    public function reservedIpsCreate(ReservedIpCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpsGet200Content|Error>
      */
-    public function reservedIpsGet(string $reservedIp): void;
+    public function reservedIpsGet(string $reservedIp): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function reservedIpsDelete(string $reservedIp): void;
+    public function reservedIpsDelete(string $reservedIp): Envelope;
 }

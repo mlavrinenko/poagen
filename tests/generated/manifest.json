@@ -535,7 +535,7 @@
             "feature": "Operation Generator",
             "scenario": "A GET operation with a path parameter becomes a typed client method",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 21,
+            "spec_line": 23,
             "stage": "unstable"
         },
         {
@@ -543,7 +543,7 @@
             "feature": "Operation Generator",
             "scenario": "A POST operation with a JSON body takes a typed Model parameter",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 32,
+            "spec_line": 34,
             "stage": "unstable"
         },
         {
@@ -551,31 +551,31 @@
             "feature": "Operation Generator",
             "scenario": "A JSON body whose schema is a list of $ref becomes a typed list parameter",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 43,
+            "spec_line": 45,
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testA2xxJSONResponseBodyIsDeserializedIntoTheTypedModel",
+            "test_id": "OperationGeneratorTest::testAJSONResponseBodyIsDeserializedIntoTheTypedModelOnTheReturnedEnvelope",
             "feature": "Operation Generator",
-            "scenario": "A 2xx JSON response body is deserialized into the typed Model",
+            "scenario": "A JSON response body is deserialized into the typed Model on the returned Envelope",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 56,
+            "spec_line": 58,
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testAScalar2xxJSONResponseIsReturnedAsTheScalarPHPTypeWithoutHydration",
+            "test_id": "OperationGeneratorTest::testAScalarJSONResponseIsDecodedOntoTheEnvelopeWithoutHydration",
             "feature": "Operation Generator",
-            "scenario": "A scalar 2xx JSON response is returned as the scalar PHP type without hydration",
+            "scenario": "A scalar JSON response is decoded onto the Envelope without hydration",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 65,
+            "spec_line": 67,
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testA2xxJSONResponseWithAdditionalPropertiesIsReturnedAsATypedAssociativeArray",
+            "test_id": "OperationGeneratorTest::testAJSONResponseWithAdditionalPropertiesIsDecodedOntoTheEnvelopeAsATypedAssociativeArray",
             "feature": "Operation Generator",
-            "scenario": "A 2xx JSON response with `additionalProperties` is returned as a typed associative array",
+            "scenario": "A JSON response with `additionalProperties` is decoded onto the Envelope as a typed associative array",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 75,
+            "spec_line": 77,
             "stage": "unstable"
         },
         {
@@ -583,7 +583,7 @@
             "feature": "Operation Generator",
             "scenario": "A response declaring an unsupported content type aborts the run",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 87,
+            "spec_line": 89,
             "stage": "unstable"
         },
         {
@@ -591,7 +591,7 @@
             "feature": "Operation Generator",
             "scenario": "An application/xml response aborts the run because XML is refused at generation time, not because it is non-JSON",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 99,
+            "spec_line": 101,
             "stage": "unstable"
         },
         {
@@ -599,7 +599,7 @@
             "feature": "Operation Generator",
             "scenario": "An inline enum query parameter becomes a synthesised backed enum method argument",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 113,
+            "spec_line": 115,
             "stage": "unstable"
         },
         {
@@ -607,7 +607,7 @@
             "feature": "Operation Generator",
             "scenario": "An `explode: true` array query parameter is serialised as repeated `name=value` pairs",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 123,
+            "spec_line": 125,
             "stage": "unstable"
         },
         {
@@ -615,7 +615,7 @@
             "feature": "Operation Generator",
             "scenario": "An optional header parameter becomes a nullable typed argument and is attached only when non-null",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 135,
+            "spec_line": 137,
             "stage": "unstable"
         },
         {
@@ -623,7 +623,7 @@
             "feature": "Operation Generator",
             "scenario": "A header parameter whose raw name is not a PHP identifier is normalised but the wire key is preserved",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 147,
+            "spec_line": 149,
             "stage": "unstable"
         },
         {
@@ -631,7 +631,7 @@
             "feature": "Operation Generator",
             "scenario": "An operationId with non-identifier characters is camelCased into a PHP method name",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 157,
+            "spec_line": 159,
             "stage": "unstable"
         },
         {
@@ -639,7 +639,7 @@
             "feature": "Operation Generator",
             "scenario": "Profile.methodRenames overrides an operationId verbatim",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 167,
+            "spec_line": 169,
             "stage": "unstable"
         },
         {
@@ -647,7 +647,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 177,
+            "spec_line": 179,
             "stage": "unstable"
         },
         {
@@ -655,7 +655,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation-level `$ref` to a component parameter is resolved to a typed method argument",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 189,
+            "spec_line": 191,
             "stage": "unstable"
         },
         {
@@ -663,7 +663,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation-level `$ref` to a header component parameter becomes an optional typed header argument",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 200,
+            "spec_line": 202,
             "stage": "unstable"
         },
         {
@@ -671,7 +671,7 @@
             "feature": "Operation Generator",
             "scenario": "A `$ref` to a component requestBody is resolved to the expected Model body parameter",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 211,
+            "spec_line": 213,
             "stage": "unstable"
         },
         {
@@ -679,7 +679,7 @@
             "feature": "Operation Generator",
             "scenario": "A PathItem-level inline parameter is inherited by every operation under that path",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 222,
+            "spec_line": 224,
             "stage": "unstable"
         },
         {
@@ -687,7 +687,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation whose PathItem declares a `$ref` parameter is still emitted",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 233,
+            "spec_line": 235,
             "stage": "unstable"
         },
         {
@@ -695,7 +695,7 @@
             "feature": "Operation Generator",
             "scenario": "A path parameter whose schema $refs a scalar-VO component is interpolated through toScalar()",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 244,
+            "spec_line": 246,
             "stage": "unstable"
         },
         {
@@ -703,7 +703,7 @@
             "feature": "Operation Generator",
             "scenario": "A form-urlencoded body becomes typed params serialised with http_build_query",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 257,
+            "spec_line": 259,
             "stage": "unstable"
         },
         {
@@ -711,7 +711,7 @@
             "feature": "Operation Generator",
             "scenario": "An unsupported body content type aborts the run",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 268,
+            "spec_line": 270,
             "stage": "unstable"
         },
         {
@@ -719,15 +719,31 @@
             "feature": "Operation Generator",
             "scenario": "An explicitly skipped operation is omitted rather than stubbed",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 280,
+            "spec_line": 282,
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testANon2xxResponseThrowsATypedApiExceptionInsteadOfAGenericRuntimeException",
+            "test_id": "OperationGeneratorTest::testADeclaredNon2xxResponseIsReturnedOnTheEnvelopeInsteadOfBeingThrown",
             "feature": "Operation Generator",
-            "scenario": "A non-2xx response throws a typed ApiException instead of a generic RuntimeException",
+            "scenario": "A declared non-2xx response is returned on the Envelope instead of being thrown",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 295,
+            "spec_line": 297,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testAStatusTheDocumentDidNotDeclareRaisesTheProfilesApiExceptionNamingTheStatus",
+            "feature": "Operation Generator",
+            "scenario": "A status the document did not declare raises the profile's ApiException naming the status",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 308,
+            "stage": "unstable"
+        },
+        {
+            "test_id": "OperationGeneratorTest::testADeclaredBodyThatFailsToHydrateRaisesTheProfilesApiExceptionNamingTheFailure",
+            "feature": "Operation Generator",
+            "scenario": "A declared body that fails to hydrate raises the profile's ApiException naming the failure",
+            "spec_file": "truth/specs/operation-generator.feature-260418.typ",
+            "spec_line": 320,
             "stage": "unstable"
         },
         {
@@ -735,7 +751,7 @@
             "feature": "Operation Generator",
             "scenario": "An apiKey header scheme becomes a constructor arg attached as a header on secured ops",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 308,
+            "spec_line": 332,
             "stage": "unstable"
         },
         {
@@ -743,7 +759,7 @@
             "feature": "Operation Generator",
             "scenario": "An http bearer scheme becomes a $bearerToken ctor arg attached as Authorization",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 319,
+            "spec_line": 343,
             "stage": "unstable"
         },
         {
@@ -751,7 +767,7 @@
             "feature": "Operation Generator",
             "scenario": "An http basic scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 330,
+            "spec_line": 354,
             "stage": "draft"
         },
         {
@@ -759,7 +775,7 @@
             "feature": "Operation Generator",
             "scenario": "An oauth2 scheme is left as a placeholder pending no-inheritance-no-protected-regions runtime design",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 339,
+            "spec_line": 363,
             "stage": "draft"
         },
         {
@@ -767,7 +783,7 @@
             "feature": "Operation Generator",
             "scenario": "Each tag becomes a sub-client behind an interface declaring exactly its own methods",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 350,
+            "spec_line": 374,
             "stage": "unstable"
         },
         {
@@ -775,7 +791,7 @@
             "feature": "Operation Generator",
             "scenario": "The root client hands out sub-clients and carries no flat operation methods",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 363,
+            "spec_line": 387,
             "stage": "unstable"
         },
         {
@@ -783,7 +799,7 @@
             "feature": "Operation Generator",
             "scenario": "A sub-client is constructible without the root",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 373,
+            "spec_line": 397,
             "stage": "unstable"
         },
         {
@@ -791,7 +807,7 @@
             "feature": "Operation Generator",
             "scenario": "An untagged operation stays on the root and no DefaultApi type is invented",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 384,
+            "spec_line": 408,
             "stage": "unstable"
         },
         {
@@ -799,7 +815,7 @@
             "feature": "Operation Generator",
             "scenario": "An operation carrying several tags appears on every one of its sub-clients",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 394,
+            "spec_line": 418,
             "stage": "unstable"
         },
         {
@@ -807,7 +823,7 @@
             "feature": "Operation Generator",
             "scenario": "A tag that is not a legal readable identifier is transliterated deterministically",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 404,
+            "spec_line": 428,
             "stage": "unstable"
         },
         {
@@ -815,7 +831,7 @@
             "feature": "Operation Generator",
             "scenario": "The profile renames a tag, and a rename matching nothing fails the run",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 414,
+            "spec_line": 438,
             "stage": "unstable"
         },
         {
@@ -823,7 +839,7 @@
             "feature": "Operation Generator",
             "scenario": "A hand-written decorator implements a sub-client interface and delegates",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
-            "spec_line": 424,
+            "spec_line": 448,
             "stage": "unstable"
         }
     ]

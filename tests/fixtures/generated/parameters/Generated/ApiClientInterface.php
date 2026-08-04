@@ -11,9 +11,10 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequest;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\PostInlineBodyRequestContent;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
 
 /**
@@ -23,27 +24,48 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKe
  */
 interface ApiClientInterface
 {
-    public function postInlineBody(PostInlineBodyRequest $body): void;
-
-    public function getSshKeyById(SshKeyId $sshKeyId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function postInlineBody(PostInlineBodyRequestContent $body): Envelope;
 
     /**
-     * @return list<Order>
+     * @return Envelope<null>
      */
-    public function listOrders(?int $limit = null, ?string $apiKey = null): array;
-
-    public function placeOrder(Order $body): Order;
-
-    public function getPetById(int $petId): Pet;
-
-    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): void;
+    public function getSshKeyById(SshKeyId $sshKeyId): Envelope;
 
     /**
-     * @return list<Order>
+     * @return Envelope<list<Order>>
      */
-    public function listStoreItems(int $storeId): array;
+    public function listOrders(?int $limit = null, ?string $apiKey = null): Envelope;
 
-    public function clearStore(int $storeId): void;
+    /**
+     * @return Envelope<Order>
+     */
+    public function placeOrder(Order $body): Envelope;
 
-    public function issueToken(string $grantType, string $clientId, ?string $scope = null): void;
+    /**
+     * @return Envelope<Pet>
+     */
+    public function getPetById(int $petId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function monitoringGetFooYml(?string $contentType = null, ?string $xTraceId = null): Envelope;
+
+    /**
+     * @return Envelope<list<Order>|null>
+     */
+    public function listStoreItems(int $storeId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function clearStore(int $storeId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function issueToken(string $grantType, string $clientId, ?string $scope = null): Envelope;
 }

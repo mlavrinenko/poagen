@@ -12,9 +12,12 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides200Content;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides403Content;
 use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SalesPlanClient implements SalesPlanClientInterface
@@ -25,11 +28,17 @@ final readonly class SalesPlanClient implements SalesPlanClientInterface
     ) {
     }
 
-    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): GetSalesIndicesSlides200Content
+    /**
+     * @return Envelope<GetSalesIndicesSlides200Content|GetSalesIndicesSlides403Content>
+     */
+    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetSalesIndicesSlides200Content|GetSalesIndicesSlides403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getsalesindicesslides')->query('h', $this->h)->json($body),
-            ResponseType::object(GetSalesIndicesSlides200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetSalesIndicesSlides200Content::class)], ['403', ResponseType::object(GetSalesIndicesSlides403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

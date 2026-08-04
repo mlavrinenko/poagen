@@ -54,7 +54,7 @@ final class TaggedSubClientTest extends TestCase
         }
 
         $interface = $this->sourceOf($plan, 'StoreClientInterface');
-        self::assertStringContainsString('public function getOrderById(int $orderId): Order;', $interface);
+        self::assertStringContainsString('public function getOrderById(int $orderId): Envelope;', $interface);
         // Exactly its own: a `pet` endpoint has no business on the store contract.
         self::assertStringNotContainsString('addPet', $interface);
         // The constructor is not part of the contract a decorator satisfies.

@@ -13,9 +13,19 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SecurityGetLatestScanSeverity;
 use Acme\DigitalOcean\Generated\Enum\SecurityGetScanSeverity;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateScan201Content;
 use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequestContent;
 use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityGetLatestScan200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityGetScan200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityListScanFindingAffectedResources200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityListScans200Content;
+use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlan200Content;
 use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequestContent;
+use Acme\DigitalOcean\Generated\Model\Settings;
+use Acme\DigitalOcean\Generated\Model\SuppressedResourceRoot;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Security` endpoints.
@@ -28,31 +38,36 @@ interface SecurityClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityListScans200Content|Error>
      */
-    public function securityListScans(?int $perPage = null, ?int $page = null): void;
+    public function securityListScans(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<SecurityCreateScan201Content|Error>
      */
-    public function securityCreateScan(): void;
+    public function securityCreateScan(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityGetLatestScan200Content|Error>
      */
     public function securityGetLatestScan(
         ?int $perPage = null,
         ?int $page = null,
         ?SecurityGetLatestScanSeverity $severity = null,
         ?string $type = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<null|Error>
      */
-    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): void;
+    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityGetScan200Content|Error>
      */
     public function securityGetScan(
         string $scanId,
@@ -60,35 +75,40 @@ interface SecurityClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?string $type = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<SecurityListScanFindingAffectedResources200Content|Error>
      */
     public function securityListScanFindingAffectedResources(
         string $scanId,
         string $findingUuid,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:read`.
+     * @return Envelope<Settings|Error>
      */
-    public function securityListSettings(?int $perPage = null, ?int $page = null): void;
+    public function securityListSettings(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:update`.
+     * @return Envelope<SecurityUpdateSettingsPlan200Content|Error>
      */
-    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): void;
+    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:create`.
+     * @return Envelope<SuppressedResourceRoot|Error>
      */
-    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): void;
+    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `security:delete`.
+     * @return Envelope<null|Error>
      */
-    public function securityDeleteSuppression(string $suppressionUuid): void;
+    public function securityDeleteSuppression(string $suppressionUuid): Envelope;
 }

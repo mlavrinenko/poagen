@@ -11,10 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionAssign;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionUnassign;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6ActionsPost201Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ReservedIpv6ActionsClient implements ReservedIpv6ActionsClientInterface
@@ -27,17 +31,21 @@ final readonly class ReservedIpv6ActionsClient implements ReservedIpv6ActionsCli
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:update`.
+     * @return Envelope<ReservedIpv6ActionsPost201Content|Error>
      */
     public function reservedIpv6ActionsPost(
         string $reservedIpv6,
         ReservedIpv6ActionUnassign|ReservedIpv6ActionAssign $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ReservedIpv6ActionsPost201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/reserved_ipv6/{reserved_ipv6}/actions')
                 ->path('reserved_ipv6', $reservedIpv6)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReservedIpv6ActionsPost201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

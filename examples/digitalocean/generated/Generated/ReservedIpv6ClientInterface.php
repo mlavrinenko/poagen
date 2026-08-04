@@ -11,7 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ReservedIpv6Create;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6Create201Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6Get200Content;
+use Acme\DigitalOcean\Generated\Model\ReservedIpv6List200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Reserved IPv6` endpoints.
@@ -24,21 +29,25 @@ interface ReservedIpv6ClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpv6List200Content|Error>
      */
-    public function reservedIpv6List(?int $perPage = null, ?int $page = null): void;
+    public function reservedIpv6List(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<ReservedIpv6Create201Content|Error>
      */
-    public function reservedIpv6Create(ReservedIpv6Create $body): void;
+    public function reservedIpv6Create(ReservedIpv6Create $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<ReservedIpv6Get200Content|Error>
      */
-    public function reservedIpv6Get(string $reservedIpv6): void;
+    public function reservedIpv6Get(string $reservedIpv6): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function reservedIpv6Delete(string $reservedIpv6): void;
+    public function reservedIpv6Delete(string $reservedIpv6): Envelope;
 }

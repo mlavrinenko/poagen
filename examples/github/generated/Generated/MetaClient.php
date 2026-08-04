@@ -12,10 +12,13 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\ApiOverview;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Root;
 use DateTimeImmutable;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class MetaClient implements MetaClientInterface
@@ -25,46 +28,73 @@ final readonly class MetaClient implements MetaClientInterface
     ) {
     }
 
-    public function metaRoot(): Root
+    /**
+     * @return Envelope<Root>
+     */
+    public function metaRoot(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Root> $result */
+        $result = $this->transport->send(
             Endpoint::get('/'),
-            ResponseType::object(Root::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Root::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function metaGet(): ApiOverview
-    {
-        return $this->transport->send(
-            Endpoint::get('/meta'),
-            ResponseType::object(ApiOverview::class),
-        );
-    }
-
-    public function metaGetOctocat(?string $s = null): string
-    {
-        return $this->transport->send(
-            Endpoint::get('/octocat')->query('s', $s),
-            ResponseType::string(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<DateTimeImmutable>
+     * @return Envelope<ApiOverview|null>
      */
-    public function metaGetAllVersions(): array
+    public function metaGet(): Envelope
     {
-        return $this->transport->send(
-            Endpoint::get('/versions'),
-            ResponseType::scalarListOf(ResponseType::dateTime()),
+        /** @var Envelope<ApiOverview|null> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/meta'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiOverview::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function metaGetZen(): string
+    /**
+     * @return Envelope<string>
+     */
+    public function metaGetOctocat(?string $s = null): Envelope
     {
-        return $this->transport->send(
-            Endpoint::get('/zen'),
-            ResponseType::string(),
+        /** @var Envelope<string> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/octocat')->query('s', $s),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]], ranges: [], default: null)),
         );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<DateTimeImmutable>|BasicError>
+     */
+    public function metaGetAllVersions(): Envelope
+    {
+        /** @var Envelope<list<DateTimeImmutable>|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/versions'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::dateTime())], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<string>
+     */
+    public function metaGetZen(): Envelope
+    {
+        /** @var Envelope<string> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/zen'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]], ranges: [], default: null)),
+        );
+
+        return $result;
     }
 }

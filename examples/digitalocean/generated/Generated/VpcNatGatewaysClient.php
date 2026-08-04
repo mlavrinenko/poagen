@@ -14,10 +14,17 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListRegion;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListState;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayCreate;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayUpdate;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysCreate202Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysGet200Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysList200Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysUpdate200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class VpcNatGatewaysClient implements VpcNatGatewaysClientInterface
@@ -30,6 +37,7 @@ final readonly class VpcNatGatewaysClient implements VpcNatGatewaysClientInterfa
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:read`.
+     * @return Envelope<VpcnatgatewaysList200Content|Error>
      */
     public function vpcnatgatewaysList(
         ?int $perPage = null,
@@ -38,8 +46,9 @@ final readonly class VpcNatGatewaysClient implements VpcNatGatewaysClientInterfa
         ?VpcnatgatewaysListRegion $region = null,
         ?VpcnatgatewaysListType $type = null,
         ?string $name = null,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<VpcnatgatewaysList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpc_nat_gateways')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
@@ -48,60 +57,78 @@ final readonly class VpcNatGatewaysClient implements VpcNatGatewaysClientInterfa
                 ->query('type', $type)
                 ->query('name', $name)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcnatgatewaysList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:create`.
+     * @return Envelope<VpcnatgatewaysCreate202Content|Error>
      */
-    public function vpcnatgatewaysCreate(VpcNatGatewayCreate $body): void
+    public function vpcnatgatewaysCreate(VpcNatGatewayCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcnatgatewaysCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/vpc_nat_gateways')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(VpcnatgatewaysCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:read`.
+     * @return Envelope<VpcnatgatewaysGet200Content|Error>
      */
-    public function vpcnatgatewaysGet(string $id): void
+    public function vpcnatgatewaysGet(string $id): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcnatgatewaysGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/vpc_nat_gateways/{id}')
                 ->path('id', $id)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcnatgatewaysGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:update`.
+     * @return Envelope<VpcnatgatewaysUpdate200Content|Error>
      */
-    public function vpcnatgatewaysUpdate(string $id, VpcNatGatewayUpdate $body): void
+    public function vpcnatgatewaysUpdate(string $id, VpcNatGatewayUpdate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<VpcnatgatewaysUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/vpc_nat_gateways/{id}')
                 ->path('id', $id)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(VpcnatgatewaysUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:delete`.
+     * @return Envelope<null|Error>
      */
-    public function vpcnatgatewaysDelete(string $id): void
+    public function vpcnatgatewaysDelete(string $id): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/vpc_nat_gateways/{id}')
                 ->path('id', $id)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

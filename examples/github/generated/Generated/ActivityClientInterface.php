@@ -15,12 +15,14 @@ use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserDirect
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserSort;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserDirection;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserSort;
+use Acme\GitHub\Generated\Model\ActivityListPublicEvents503Content;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsRead202Content;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequestContent;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsRead202Content;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequestContent;
 use Acme\GitHub\Generated\Model\ActivitySetRepoSubscriptionRequestContent;
 use Acme\GitHub\Generated\Model\ActivitySetThreadSubscriptionRequestContent;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Event;
 use Acme\GitHub\Generated\Model\Feed;
 use Acme\GitHub\Generated\Model\MinimalRepository;
@@ -31,6 +33,8 @@ use Acme\GitHub\Generated\Model\Stargazer;
 use Acme\GitHub\Generated\Model\StarredRepository;
 use Acme\GitHub\Generated\Model\Thread;
 use Acme\GitHub\Generated\Model\ThreadSubscription;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `activity` endpoints.
@@ -42,24 +46,27 @@ use Acme\GitHub\Generated\Model\ThreadSubscription;
 interface ActivityClientInterface
 {
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>|null|BasicError|ActivityListPublicEvents503Content>
      */
-    public function activityListPublicEvents(?int $perPage = null, ?int $page = null): array;
-
-    public function activityGetFeeds(): Feed;
+    public function activityListPublicEvents(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<Feed>
+     */
+    public function activityGetFeeds(): Envelope;
+
+    /**
+     * @return Envelope<list<Event>|BasicError|null>
      */
     public function activityListPublicEventsForRepoNetwork(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Thread>
+     * @return Envelope<list<Thread>|null|BasicError|ValidationError>
      */
     public function activityListNotificationsForAuthenticatedUser(
         ?bool $all = null,
@@ -68,44 +75,63 @@ interface ActivityClientInterface
         ?\DateTimeImmutable $before = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
-    public function activityMarkNotificationsAsRead(
-        ActivityMarkNotificationsAsReadRequestContent $body,
-    ): ActivityMarkNotificationsAsRead202Content;
+    /**
+     * @return Envelope<ActivityMarkNotificationsAsRead202Content|null|BasicError>
+     */
+    public function activityMarkNotificationsAsRead(ActivityMarkNotificationsAsReadRequestContent $body): Envelope;
 
-    public function activityGetThread(int $threadId): Thread;
+    /**
+     * @return Envelope<Thread|null|BasicError>
+     */
+    public function activityGetThread(int $threadId): Envelope;
 
-    public function activityMarkThreadAsDone(int $threadId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function activityMarkThreadAsDone(int $threadId): Envelope;
 
-    public function activityMarkThreadAsRead(int $threadId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityMarkThreadAsRead(int $threadId): Envelope;
 
-    public function activityGetThreadSubscriptionForAuthenticatedUser(int $threadId): ThreadSubscription;
+    /**
+     * @return Envelope<ThreadSubscription|null|BasicError>
+     */
+    public function activityGetThreadSubscriptionForAuthenticatedUser(int $threadId): Envelope;
 
+    /**
+     * @return Envelope<ThreadSubscription|null|BasicError>
+     */
     public function activitySetThreadSubscription(
         int $threadId,
         ActivitySetThreadSubscriptionRequestContent $body,
-    ): ThreadSubscription;
-
-    public function activityDeleteThreadSubscription(int $threadId): void;
+    ): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<null|BasicError>
      */
-    public function activityListPublicOrgEvents(string $org, ?int $perPage = null, ?int $page = null): array;
+    public function activityDeleteThreadSubscription(int $threadId): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
+     */
+    public function activityListPublicOrgEvents(string $org, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<Event>>
      */
     public function activityListRepoEvents(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Thread>
+     * @return Envelope<list<Thread>>
      */
     public function activityListRepoNotificationsForAuthenticatedUser(
         string $owner,
@@ -116,109 +142,134 @@ interface ActivityClientInterface
         ?\DateTimeImmutable $before = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ActivityMarkRepoNotificationsAsRead202Content|null>
+     */
     public function activityMarkRepoNotificationsAsRead(
         string $owner,
         string $repo,
         ActivityMarkRepoNotificationsAsReadRequestContent $body,
-    ): ActivityMarkRepoNotificationsAsRead202Content;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser|Stargazer>
+     * @return Envelope<list<SimpleUser|Stargazer>|ValidationError>
      */
     public function activityListStargazersForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function activityListWatchersForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function activityGetRepoSubscription(string $owner, string $repo): RepositorySubscription;
+    /**
+     * @return Envelope<RepositorySubscription|null|BasicError>
+     */
+    public function activityGetRepoSubscription(string $owner, string $repo): Envelope;
 
+    /**
+     * @return Envelope<RepositorySubscription>
+     */
     public function activitySetRepoSubscription(
         string $owner,
         string $repo,
         ActivitySetRepoSubscriptionRequestContent $body,
-    ): RepositorySubscription;
-
-    public function activityDeleteRepoSubscription(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<Repository>
+     * @return Envelope<null>
+     */
+    public function activityDeleteRepoSubscription(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<Repository>|null|BasicError>
      */
     public function activityListReposStarredByAuthenticatedUser(
         ?ActivityListReposStarredByAuthenticatedUserSort $sort = null,
         ?ActivityListReposStarredByAuthenticatedUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function activityCheckRepoIsStarredByAuthenticatedUser(string $owner, string $repo): void;
-
-    public function activityStarRepoForAuthenticatedUser(string $owner, string $repo): void;
-
-    public function activityUnstarRepoForAuthenticatedUser(string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null|BasicError>
      */
-    public function activityListWatchedReposForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function activityCheckRepoIsStarredByAuthenticatedUser(string $owner, string $repo): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<null|BasicError>
+     */
+    public function activityStarRepoForAuthenticatedUser(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityUnstarRepoForAuthenticatedUser(string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<list<MinimalRepository>|null|BasicError>
+     */
+    public function activityListWatchedReposForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<Event>>
      */
     public function activityListEventsForAuthenticatedUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListOrgEventsForAuthenticatedUser(
         string $username,
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
-    public function activityListPublicEventsForUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function activityListPublicEventsForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListReceivedEventsForUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListReceivedPublicEventsForUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<StarredRepository|Repository>
+     * @return Envelope<list<StarredRepository|Repository>>
      */
     public function activityListReposStarredByUser(
         string $username,
@@ -226,10 +277,14 @@ interface ActivityClientInterface
         ?ActivityListReposStarredByUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>>
      */
-    public function activityListReposWatchedByUser(string $username, ?int $perPage = null, ?int $page = null): array;
+    public function activityListReposWatchedByUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 }

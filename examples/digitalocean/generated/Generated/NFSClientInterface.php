@@ -11,7 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\NfsCreateResponse;
+use Acme\DigitalOcean\Generated\Model\NfsGetResponse;
+use Acme\DigitalOcean\Generated\Model\NfsListResponse;
 use Acme\DigitalOcean\Generated\Model\NfsRequest;
+use Acme\DigitalOcean\Generated\Model\NfsSnapshotGetResponse;
+use Acme\DigitalOcean\Generated\Model\NfsSnapshotListResponse;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `NFS` endpoints.
@@ -24,36 +31,43 @@ interface NFSClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `nfs:list`.
+     * @return Envelope<NfsListResponse|Error>
      */
-    public function nfsList(?string $region = null): void;
+    public function nfsList(?string $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:create`.
+     * @return Envelope<NfsCreateResponse|Error>
      */
-    public function nfsCreate(NfsRequest $body): void;
+    public function nfsCreate(NfsRequest $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:list`.
+     * @return Envelope<NfsSnapshotListResponse|Error>
      */
-    public function nfsListSnapshot(?string $region = null, ?string $shareId = null): void;
+    public function nfsListSnapshot(?string $region = null, ?string $shareId = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:read`.
+     * @return Envelope<NfsSnapshotGetResponse|Error>
      */
-    public function nfsGetSnapshot(string $nfsSnapshotId, ?string $region = null): void;
+    public function nfsGetSnapshot(string $nfsSnapshotId, ?string $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:delete`.
+     * @return Envelope<null|Error>
      */
-    public function nfsDeleteSnapshot(string $nfsSnapshotId, ?string $region = null): void;
+    public function nfsDeleteSnapshot(string $nfsSnapshotId, ?string $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:read`.
+     * @return Envelope<NfsGetResponse|Error>
      */
-    public function nfsGet(string $nfsId, ?string $region = null): void;
+    public function nfsGet(string $nfsId, ?string $region = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nfs:delete`.
+     * @return Envelope<null|Error>
      */
-    public function nfsDelete(string $nfsId, ?string $region = null): void;
+    public function nfsDelete(string $nfsId, ?string $region = null): Envelope;
 }

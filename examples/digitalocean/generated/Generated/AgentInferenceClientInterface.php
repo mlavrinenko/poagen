@@ -13,6 +13,8 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ChatCompletionRequest;
 use Acme\DigitalOcean\Generated\Model\ChatCompletionResponse;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Agent Inference` endpoints.
@@ -23,8 +25,8 @@ use Acme\DigitalOcean\Generated\Model\ChatCompletionResponse;
  */
 interface AgentInferenceClientInterface
 {
-    public function agentInferenceCreateChatCompletion(
-        bool $agent,
-        ChatCompletionRequest $body,
-    ): ChatCompletionResponse;
+    /**
+     * @return Envelope<ChatCompletionResponse|Error>
+     */
+    public function agentInferenceCreateChatCompletion(bool $agent, ChatCompletionRequest $body): Envelope;
 }

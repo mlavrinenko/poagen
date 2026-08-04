@@ -12,8 +12,17 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\AutoscalePoolCreate;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsGet200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsList200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsListHistory200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsListMembers200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsUpdate200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DropletAutoscalePoolsClient implements DropletAutoscalePoolsClientInterface
@@ -26,113 +35,151 @@ final readonly class DropletAutoscalePoolsClient implements DropletAutoscalePool
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsList200Content|Error>
      */
-    public function autoscalepoolsList(?int $perPage = null, ?int $page = null, ?string $name = null): void
+    public function autoscalepoolsList(?int $perPage = null, ?int $page = null, ?string $name = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AutoscalepoolsList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/autoscale')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('name', $name)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AutoscalepoolsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<AutoscalepoolsCreate202Content|Error>
      */
-    public function autoscalepoolsCreate(AutoscalePoolCreate $body): void
+    public function autoscalepoolsCreate(AutoscalePoolCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AutoscalepoolsCreate202Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/droplets/autoscale')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(AutoscalepoolsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsGet200Content|Error>
      */
-    public function autoscalepoolsGet(string $autoscalePoolId): void
+    public function autoscalepoolsGet(string $autoscalePoolId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AutoscalepoolsGet200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/autoscale/{autoscale_pool_id}')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AutoscalepoolsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<AutoscalepoolsUpdate200Content|Error>
      */
-    public function autoscalepoolsUpdate(string $autoscalePoolId, AutoscalePoolCreate $body): void
+    public function autoscalepoolsUpdate(string $autoscalePoolId, AutoscalePoolCreate $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<AutoscalepoolsUpdate200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/droplets/autoscale/{autoscale_pool_id}')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AutoscalepoolsUpdate200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function autoscalepoolsDelete(string $autoscalePoolId): void
+    public function autoscalepoolsDelete(string $autoscalePoolId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets/autoscale/{autoscale_pool_id}')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): void
+    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/droplets/autoscale/{autoscale_pool_id}/dangerous')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->header('X-Dangerous', $xDangerous)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsListHistory200Content|Error>
      */
-    public function autoscalepoolsListHistory(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void
-    {
-        $this->transport->send(
+    public function autoscalepoolsListHistory(
+        string $autoscalePoolId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<AutoscalepoolsListHistory200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/autoscale/{autoscale_pool_id}/history')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AutoscalepoolsListHistory200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsListMembers200Content|Error>
      */
-    public function autoscalepoolsListMembers(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void
-    {
-        $this->transport->send(
+    public function autoscalepoolsListMembers(
+        string $autoscalePoolId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<AutoscalepoolsListMembers200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/droplets/autoscale/{autoscale_pool_id}/members')
                 ->path('autoscale_pool_id', $autoscalePoolId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AutoscalepoolsListMembers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

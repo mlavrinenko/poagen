@@ -15,12 +15,14 @@ use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserDirect
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByAuthenticatedUserSort;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserDirection;
 use Acme\GitHub\Generated\Enum\ActivityListReposStarredByUserSort;
+use Acme\GitHub\Generated\Model\ActivityListPublicEvents503Content;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsRead202Content;
 use Acme\GitHub\Generated\Model\ActivityMarkNotificationsAsReadRequestContent;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsRead202Content;
 use Acme\GitHub\Generated\Model\ActivityMarkRepoNotificationsAsReadRequestContent;
 use Acme\GitHub\Generated\Model\ActivitySetRepoSubscriptionRequestContent;
 use Acme\GitHub\Generated\Model\ActivitySetThreadSubscriptionRequestContent;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Event;
 use Acme\GitHub\Generated\Model\Feed;
 use Acme\GitHub\Generated\Model\MinimalRepository;
@@ -31,10 +33,13 @@ use Acme\GitHub\Generated\Model\Stargazer;
 use Acme\GitHub\Generated\Model\StarredRepository;
 use Acme\GitHub\Generated\Model\Thread;
 use Acme\GitHub\Generated\Model\ThreadSubscription;
+use Acme\GitHub\Generated\Model\ValidationError;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ActivityClient implements ActivityClientInterface
@@ -45,45 +50,57 @@ final readonly class ActivityClient implements ActivityClientInterface
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>|null|BasicError|ActivityListPublicEvents503Content>
      */
-    public function activityListPublicEvents(?int $perPage = null, ?int $page = null): array
+    public function activityListPublicEvents(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Event>|null|BasicError|ActivityListPublicEvents503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/events')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ActivityListPublicEvents503Content::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function activityGetFeeds(): Feed
-    {
-        return $this->transport->send(
-            Endpoint::get('/feeds'),
-            ResponseType::object(Feed::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<Feed>
+     */
+    public function activityGetFeeds(): Envelope
+    {
+        /** @var Envelope<Feed> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/feeds'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Feed::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Event>|BasicError|null>
      */
     public function activityListPublicEventsForRepoNetwork(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/networks/{owner}/{repo}/events')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['301', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Thread>
+     * @return Envelope<list<Thread>|null|BasicError|ValidationError>
      */
     public function activityListNotificationsForAuthenticatedUser(
         ?bool $all = null,
@@ -92,8 +109,9 @@ final readonly class ActivityClient implements ActivityClientInterface
         ?\DateTimeImmutable $before = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Thread>|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/notifications')
                 ->query('all', $all)
                 ->query('participating', $participating)
@@ -101,108 +119,157 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('before', $before?->format(DateTimeInterface::RFC3339))
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(Thread::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function activityMarkNotificationsAsRead(
-        ActivityMarkNotificationsAsReadRequestContent $body,
-    ): ActivityMarkNotificationsAsRead202Content {
-        return $this->transport->send(
-            Endpoint::put('/notifications')->json($body),
-            ResponseType::object(ActivityMarkNotificationsAsRead202Content::class),
-        );
-    }
-
-    public function activityGetThread(int $threadId): Thread
-    {
-        return $this->transport->send(
-            Endpoint::get('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::object(Thread::class),
-        );
-    }
-
-    public function activityMarkThreadAsDone(int $threadId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function activityMarkThreadAsRead(int $threadId): void
-    {
-        $this->transport->send(
-            Endpoint::patch('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function activityGetThreadSubscriptionForAuthenticatedUser(int $threadId): ThreadSubscription
-    {
-        return $this->transport->send(
-            Endpoint::get('/notifications/threads/{thread_id}/subscription')
-                ->path('thread_id', $threadId),
-            ResponseType::object(ThreadSubscription::class),
-        );
-    }
-
-    public function activitySetThreadSubscription(
-        int $threadId,
-        ActivitySetThreadSubscriptionRequestContent $body,
-    ): ThreadSubscription {
-        return $this->transport->send(
-            Endpoint::put('/notifications/threads/{thread_id}/subscription')
-                ->path('thread_id', $threadId)
-                ->json($body),
-            ResponseType::object(ThreadSubscription::class),
-        );
-    }
-
-    public function activityDeleteThreadSubscription(int $threadId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/notifications/threads/{thread_id}/subscription')
-                ->path('thread_id', $threadId),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<ActivityMarkNotificationsAsRead202Content|null|BasicError>
      */
-    public function activityListPublicOrgEvents(string $org, ?int $perPage = null, ?int $page = null): array
+    public function activityMarkNotificationsAsRead(ActivityMarkNotificationsAsReadRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ActivityMarkNotificationsAsRead202Content|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/notifications')->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkNotificationsAsRead202Content::class)], ['205', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<Thread|null|BasicError>
+     */
+    public function activityGetThread(int $threadId): Envelope
+    {
+        /** @var Envelope<Thread|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Thread::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null>
+     */
+    public function activityMarkThreadAsDone(int $threadId): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityMarkThreadAsRead(int $threadId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['205', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<ThreadSubscription|null|BasicError>
+     */
+    public function activityGetThreadSubscriptionForAuthenticatedUser(int $threadId): Envelope
+    {
+        /** @var Envelope<ThreadSubscription|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/notifications/threads/{thread_id}/subscription')
+                ->path('thread_id', $threadId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<ThreadSubscription|null|BasicError>
+     */
+    public function activitySetThreadSubscription(
+        int $threadId,
+        ActivitySetThreadSubscriptionRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<ThreadSubscription|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/notifications/threads/{thread_id}/subscription')
+                ->path('thread_id', $threadId)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityDeleteThreadSubscription(int $threadId): Envelope
+    {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/notifications/threads/{thread_id}/subscription')
+                ->path('thread_id', $threadId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Event>>
+     */
+    public function activityListPublicOrgEvents(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/events')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListRepoEvents(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/events')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Thread>
+     * @return Envelope<list<Thread>>
      */
     public function activityListRepoNotificationsForAuthenticatedUser(
         string $owner,
@@ -213,8 +280,9 @@ final readonly class ActivityClient implements ActivityClientInterface
         ?\DateTimeImmutable $before = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Thread>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/notifications')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -224,247 +292,318 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('before', $before?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Thread::class),
-        );
-    }
-
-    public function activityMarkRepoNotificationsAsRead(
-        string $owner,
-        string $repo,
-        ActivityMarkRepoNotificationsAsReadRequestContent $body,
-    ): ActivityMarkRepoNotificationsAsRead202Content {
-        return $this->transport->send(
-            Endpoint::put('/repos/{owner}/{repo}/notifications')
-                ->path('owner', $owner)
-                ->path('repo', $repo)
-                ->json($body),
-            ResponseType::object(ActivityMarkRepoNotificationsAsRead202Content::class),
-        );
-    }
-
-    /**
-     * @return list<SimpleUser|Stargazer>
-     */
-    public function activityListStargazersForRepo(
-        string $owner,
-        string $repo,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): array {
-        /** @var list<SimpleUser|Stargazer> $result */
-        $result = $this->transport->send(
-            Endpoint::get('/repos/{owner}/{repo}/stargazers')
-                ->path('owner', $owner)
-                ->path('repo', $repo)
-                ->query('per_page', $perPage)
-                ->query('page', $page),
-            ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['avatar_url' => SimpleUser::class, 'user' => Stargazer::class]), '/paths/~1repos~1{owner}~1{repo}~1stargazers/get/responses/200/content/application~1json/schema')),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<ActivityMarkRepoNotificationsAsRead202Content|null>
+     */
+    public function activityMarkRepoNotificationsAsRead(
+        string $owner,
+        string $repo,
+        ActivityMarkRepoNotificationsAsReadRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<ActivityMarkRepoNotificationsAsRead202Content|null> $result */
+        $result = $this->transport->send(
+            Endpoint::put('/repos/{owner}/{repo}/notifications')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkRepoNotificationsAsRead202Content::class)], ['205', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleUser|Stargazer>|ValidationError>
+     */
+    public function activityListStargazersForRepo(
+        string $owner,
+        string $repo,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser|Stargazer>|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/repos/{owner}/{repo}/stargazers')
+                ->path('owner', $owner)
+                ->path('repo', $repo)
+                ->query('per_page', $perPage)
+                ->query('page', $page),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['avatar_url' => SimpleUser::class, 'user' => Stargazer::class]), '/paths/~1repos~1{owner}~1{repo}~1stargazers/get/responses/200/content/application~1json/schema'))], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleUser>>
      */
     public function activityListWatchersForRepo(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/subscribers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function activityGetRepoSubscription(string $owner, string $repo): RepositorySubscription
+    /**
+     * @return Envelope<RepositorySubscription|null|BasicError>
+     */
+    public function activityGetRepoSubscription(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<RepositorySubscription|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/subscription')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(RepositorySubscription::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)], ['404', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositorySubscription>
+     */
     public function activitySetRepoSubscription(
         string $owner,
         string $repo,
         ActivitySetRepoSubscriptionRequestContent $body,
-    ): RepositorySubscription {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositorySubscription> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/subscription')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(RepositorySubscription::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function activityDeleteRepoSubscription(string $owner, string $repo): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/repos/{owner}/{repo}/subscription')
-                ->path('owner', $owner)
-                ->path('repo', $repo),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<Repository>
+     * @return Envelope<null>
+     */
+    public function activityDeleteRepoSubscription(string $owner, string $repo): Envelope
+    {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/repos/{owner}/{repo}/subscription')
+                ->path('owner', $owner)
+                ->path('repo', $repo),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<Repository>|null|BasicError>
      */
     public function activityListReposStarredByAuthenticatedUser(
         ?ActivityListReposStarredByAuthenticatedUserSort $sort = null,
         ?ActivityListReposStarredByAuthenticatedUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Repository>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/starred')
                 ->query('sort', $sort)
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Repository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function activityCheckRepoIsStarredByAuthenticatedUser(string $owner, string $repo): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityCheckRepoIsStarredByAuthenticatedUser(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function activityStarRepoForAuthenticatedUser(string $owner, string $repo): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityStarRepoForAuthenticatedUser(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function activityUnstarRepoForAuthenticatedUser(string $owner, string $repo): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function activityUnstarRepoForAuthenticatedUser(string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>|null|BasicError>
      */
-    public function activityListWatchedReposForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function activityListWatchedReposForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<MinimalRepository>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/subscriptions')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListEventsForAuthenticatedUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/events')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListOrgEventsForAuthenticatedUser(
         string $username,
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/events/orgs/{org}')
                 ->path('username', $username)
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
-    public function activityListPublicEventsForUser(string $username, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function activityListPublicEventsForUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/events/public')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListReceivedEventsForUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/received_events')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Event>
+     * @return Envelope<list<Event>>
      */
     public function activityListReceivedPublicEventsForUser(
         string $username,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Event>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/received_events/public')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Event::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<StarredRepository|Repository>
+     * @return Envelope<list<StarredRepository|Repository>>
      */
     public function activityListReposStarredByUser(
         string $username,
@@ -472,8 +611,8 @@ final readonly class ActivityClient implements ActivityClientInterface
         ?ActivityListReposStarredByUserDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        /** @var list<StarredRepository|Repository> $result */
+    ): Envelope {
+        /** @var Envelope<list<StarredRepository|Repository>> $result */
         $result = $this->transport->send(
             Endpoint::get('/users/{username}/starred')
                 ->path('username', $username)
@@ -481,23 +620,29 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['repo' => StarredRepository::class, 'archive_url' => Repository::class]), '/paths/~1users~1{username}~1starred/get/responses/200/content/application~1json/schema')),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['repo' => StarredRepository::class, 'archive_url' => Repository::class]), '/paths/~1users~1{username}~1starred/get/responses/200/content/application~1json/schema'))]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>>
      */
-    public function activityListReposWatchedByUser(string $username, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function activityListReposWatchedByUser(
+        string $username,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/users/{username}/subscriptions')
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\GitignoreTemplate;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `gitignore` endpoints.
@@ -23,9 +24,12 @@ use Acme\GitHub\Generated\Model\GitignoreTemplate;
 interface GitignoreClientInterface
 {
     /**
-     * @return list<string>
+     * @return Envelope<list<string>|null>
      */
-    public function gitignoreGetAllTemplates(): array;
+    public function gitignoreGetAllTemplates(): Envelope;
 
-    public function gitignoreGetTemplate(string $name): GitignoreTemplate;
+    /**
+     * @return Envelope<GitignoreTemplate|null>
+     */
+    public function gitignoreGetTemplate(string $name): Envelope;
 }

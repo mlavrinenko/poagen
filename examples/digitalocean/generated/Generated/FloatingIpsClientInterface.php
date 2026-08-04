@@ -11,7 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\FloatingIpCreate;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsGet200Content;
+use Acme\DigitalOcean\Generated\Model\FloatingIpsList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Floating IPs` endpoints.
@@ -24,21 +29,25 @@ interface FloatingIpsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsList200Content|Error>
      */
-    public function floatingIpsList(?int $perPage = null, ?int $page = null): void;
+    public function floatingIpsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:create`.
+     * @return Envelope<FloatingIpsCreate202Content|Error>
      */
-    public function floatingIpsCreate(FloatingIpCreate $body): void;
+    public function floatingIpsCreate(FloatingIpCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:read`.
+     * @return Envelope<FloatingIpsGet200Content|Error>
      */
-    public function floatingIpsGet(string $floatingIp): void;
+    public function floatingIpsGet(string $floatingIp): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `reserved_ip:delete`.
+     * @return Envelope<null|Error>
      */
-    public function floatingIpsDelete(string $floatingIp): void;
+    public function floatingIpsDelete(string $floatingIp): Envelope;
 }

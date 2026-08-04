@@ -18,6 +18,7 @@ use Acme\GitHub\Generated\Enum\PullsListReviewCommentsForRepoSort;
 use Acme\GitHub\Generated\Enum\PullsListReviewCommentsSort;
 use Acme\GitHub\Generated\Enum\PullsListSort;
 use Acme\GitHub\Generated\Enum\PullsListState;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Commit;
 use Acme\GitHub\Generated\Model\DiffEntry;
 use Acme\GitHub\Generated\Model\PullRequest;
@@ -31,6 +32,10 @@ use Acme\GitHub\Generated\Model\PullsCreateRequestContent;
 use Acme\GitHub\Generated\Model\PullsCreateReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\PullsCreateReviewRequestContent;
 use Acme\GitHub\Generated\Model\PullsDismissReviewRequestContent;
+use Acme\GitHub\Generated\Model\PullsGet503Content;
+use Acme\GitHub\Generated\Model\PullsListFiles503Content;
+use Acme\GitHub\Generated\Model\PullsMerge405Content;
+use Acme\GitHub\Generated\Model\PullsMerge409Content;
 use Acme\GitHub\Generated\Model\PullsMergeRequestContent;
 use Acme\GitHub\Generated\Model\PullsRemoveRequestedReviewersRequestContent;
 use Acme\GitHub\Generated\Model\PullsRequestReviewersRequestContent;
@@ -41,6 +46,9 @@ use Acme\GitHub\Generated\Model\PullsUpdateRequestContent;
 use Acme\GitHub\Generated\Model\PullsUpdateReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\PullsUpdateReviewRequestContent;
 use Acme\GitHub\Generated\Model\ReviewComment;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `pulls` endpoints.
@@ -52,7 +60,7 @@ use Acme\GitHub\Generated\Model\ReviewComment;
 interface PullsClientInterface
 {
     /**
-     * @return list<PullRequestSimple>
+     * @return Envelope<list<PullRequestSimple>|null|ValidationError>
      */
     public function pullsList(
         string $owner,
@@ -64,12 +72,15 @@ interface PullsClientInterface
         ?PullsListDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function pullsCreate(string $owner, string $repo, PullsCreateRequestContent $body): PullRequest;
+    ): Envelope;
 
     /**
-     * @return list<PullRequestReviewComment>
+     * @return Envelope<PullRequest|BasicError|ValidationError>
+     */
+    public function pullsCreate(string $owner, string $repo, PullsCreateRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<PullRequestReviewComment>>
      */
     public function pullsListReviewCommentsForRepo(
         string $owner,
@@ -79,30 +90,45 @@ interface PullsClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function pullsGetReviewComment(string $owner, string $repo, int $commentId): PullRequestReviewComment;
+    /**
+     * @return Envelope<PullRequestReviewComment|BasicError>
+     */
+    public function pullsGetReviewComment(string $owner, string $repo, int $commentId): Envelope;
 
-    public function pullsDeleteReviewComment(string $owner, string $repo, int $commentId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function pullsDeleteReviewComment(string $owner, string $repo, int $commentId): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReviewComment>
+     */
     public function pullsUpdateReviewComment(
         string $owner,
         string $repo,
         int $commentId,
         PullsUpdateReviewCommentRequestContent $body,
-    ): PullRequestReviewComment;
+    ): Envelope;
 
-    public function pullsGet(string $owner, string $repo, int $pullNumber): PullRequest;
+    /**
+     * @return Envelope<PullRequest|null|BasicError|PullsGet503Content>
+     */
+    public function pullsGet(string $owner, string $repo, int $pullNumber): Envelope;
 
+    /**
+     * @return Envelope<PullRequest|ValidationError|BasicError>
+     */
     public function pullsUpdate(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsUpdateRequestContent $body,
-    ): PullRequest;
+    ): Envelope;
 
     /**
-     * @return list<PullRequestReviewComment>
+     * @return Envelope<list<PullRequestReviewComment>>
      */
     public function pullsListReviewComments(
         string $owner,
@@ -113,25 +139,31 @@ interface PullsClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReviewComment|ValidationError|BasicError>
+     */
     public function pullsCreateReviewComment(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsCreateReviewCommentRequestContent $body,
-    ): PullRequestReviewComment;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReviewComment|BasicError>
+     */
     public function pullsCreateReplyForReviewComment(
         string $owner,
         string $repo,
         int $pullNumber,
         int $commentId,
         PullsCreateReplyForReviewCommentRequestContent $body,
-    ): PullRequestReviewComment;
+    ): Envelope;
 
     /**
-     * @return list<Commit>
+     * @return Envelope<list<Commit>>
      */
     public function pullsListCommits(
         string $owner,
@@ -139,10 +171,10 @@ interface PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<DiffEntry>
+     * @return Envelope<list<DiffEntry>|ValidationError|BasicError|PullsListFiles503Content>
      */
     public function pullsListFiles(
         string $owner,
@@ -150,39 +182,45 @@ interface PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function pullsCheckIfMerged(string $owner, string $repo, int $pullNumber): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function pullsCheckIfMerged(string $owner, string $repo, int $pullNumber): Envelope;
 
-    public function pullsMerge(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-        PullsMergeRequestContent $body,
-    ): PullRequestMergeResult;
+    /**
+     * @return Envelope<PullRequestMergeResult|PullsMerge405Content|PullsMerge409Content|ValidationError|BasicError>
+     */
+    public function pullsMerge(string $owner, string $repo, int $pullNumber, PullsMergeRequestContent $body): Envelope;
 
-    public function pullsListRequestedReviewers(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-    ): PullRequestReviewRequest;
+    /**
+     * @return Envelope<PullRequestReviewRequest>
+     */
+    public function pullsListRequestedReviewers(string $owner, string $repo, int $pullNumber): Envelope;
 
+    /**
+     * @return Envelope<PullRequestSimple|null|BasicError>
+     */
     public function pullsRequestReviewers(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsRequestReviewersRequestContent $body,
-    ): PullRequestSimple;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestSimple|ValidationError>
+     */
     public function pullsRemoveRequestedReviewers(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsRemoveRequestedReviewersRequestContent $body,
-    ): PullRequestSimple;
+    ): Envelope;
 
     /**
-     * @return list<PullRequestReview>
+     * @return Envelope<list<PullRequestReview>>
      */
     public function pullsListReviews(
         string $owner,
@@ -190,34 +228,41 @@ interface PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReview|ValidationErrorSimple|BasicError>
+     */
     public function pullsCreateReview(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsCreateReviewRequestContent $body,
-    ): PullRequestReview;
+    ): Envelope;
 
-    public function pullsGetReview(string $owner, string $repo, int $pullNumber, int $reviewId): PullRequestReview;
+    /**
+     * @return Envelope<PullRequestReview|BasicError>
+     */
+    public function pullsGetReview(string $owner, string $repo, int $pullNumber, int $reviewId): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReview|ValidationErrorSimple>
+     */
     public function pullsUpdateReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsUpdateReviewRequestContent $body,
-    ): PullRequestReview;
-
-    public function pullsDeletePendingReview(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-        int $reviewId,
-    ): PullRequestReview;
+    ): Envelope;
 
     /**
-     * @return list<ReviewComment>
+     * @return Envelope<PullRequestReview|ValidationErrorSimple|BasicError>
+     */
+    public function pullsDeletePendingReview(string $owner, string $repo, int $pullNumber, int $reviewId): Envelope;
+
+    /**
+     * @return Envelope<list<ReviewComment>|BasicError>
      */
     public function pullsListCommentsForReview(
         string $owner,
@@ -226,28 +271,37 @@ interface PullsClientInterface
         int $reviewId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReview|BasicError|ValidationErrorSimple>
+     */
     public function pullsDismissReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsDismissReviewRequestContent $body,
-    ): PullRequestReview;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullRequestReview|BasicError|ValidationErrorSimple>
+     */
     public function pullsSubmitReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsSubmitReviewRequestContent $body,
-    ): PullRequestReview;
+    ): Envelope;
 
+    /**
+     * @return Envelope<PullsUpdateBranch202Content|ValidationError|BasicError>
+     */
     public function pullsUpdateBranch(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsUpdateBranchRequestContent $body,
-    ): PullsUpdateBranch202Content;
+    ): Envelope;
 }

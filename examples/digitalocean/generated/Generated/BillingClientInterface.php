@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Balance;
+use Acme\DigitalOcean\Generated\Model\BillingHistoryList200Content;
+use Acme\DigitalOcean\Generated\Model\BillingInsightsList200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\InvoiceSummary;
+use Acme\DigitalOcean\Generated\Model\InvoicesGetByUuid200Content;
+use Acme\DigitalOcean\Generated\Model\InvoicesList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `Billing` endpoints.
  *
@@ -22,6 +31,7 @@ interface BillingClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<BillingInsightsList200Content|Error>
      */
     public function billingInsightsList(
         string $accountUrn,
@@ -29,40 +39,41 @@ interface BillingClientInterface
         \DateTimeImmutable $endDate,
         ?int $perPage = null,
         ?int $page = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<Balance|Error>
      */
-    public function balanceGet(): void;
+    public function balanceGet(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<BillingHistoryList200Content|Error>
      */
-    public function billingHistoryList(): void;
+    public function billingHistoryList(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoicesList200Content|Error>
      */
-    public function invoicesList(?int $perPage = null, ?int $page = null): void;
+    public function invoicesList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoicesGetByUuid200Content|Error>
      */
-    public function invoicesGetByUuid(string $invoiceUuid, ?int $perPage = null, ?int $page = null): void;
+    public function invoicesGetByUuid(string $invoiceUuid, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<string|Error>
      */
-    public function invoicesGetCsvByUuid(string $invoiceUuid): void;
+    public function invoicesGetCsvByUuid(string $invoiceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<InvoiceSummary|Error>
      */
-    public function invoicesGetPdfByUuid(string $invoiceUuid): void;
-
-    /**
-     * Requires `bearer_auth` scopes: `billing:read`.
-     */
-    public function invoicesGetSummaryByUuid(string $invoiceUuid): void;
+    public function invoicesGetSummaryByUuid(string $invoiceUuid): Envelope;
 }

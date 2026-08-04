@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Blob;
 use Acme\GitHub\Generated\Model\GitCommit;
-use Acme\GitHub\Generated\Model\GitCreateBlobRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateCommitRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateRefRequestContent;
 use Acme\GitHub\Generated\Model\GitCreateTagRequestContent;
@@ -22,9 +22,11 @@ use Acme\GitHub\Generated\Model\GitRef;
 use Acme\GitHub\Generated\Model\GitTag;
 use Acme\GitHub\Generated\Model\GitTree;
 use Acme\GitHub\Generated\Model\GitUpdateRefRequestContent;
-use Acme\GitHub\Generated\Model\ShortBlob;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GitClient implements GitClientInterface
@@ -34,151 +36,209 @@ final readonly class GitClient implements GitClientInterface
     ) {
     }
 
-    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequestContent $body): ShortBlob
+    /**
+     * @return Envelope<Blob|BasicError|ValidationError>
+     */
+    public function gitGetBlob(string $owner, string $repo, string $fileSha): Envelope
     {
-        return $this->transport->send(
-            Endpoint::post('/repos/{owner}/{repo}/git/blobs')
-                ->path('owner', $owner)
-                ->path('repo', $repo)
-                ->json($body),
-            ResponseType::object(ShortBlob::class),
-        );
-    }
-
-    public function gitGetBlob(string $owner, string $repo, string $fileSha): Blob
-    {
-        return $this->transport->send(
+        /** @var Envelope<Blob|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/blobs/{file_sha}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('file_sha', $fileSha),
-            ResponseType::object(Blob::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Blob::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): GitCommit
+    /**
+     * @return Envelope<GitCommit|ValidationError|BasicError>
+     */
+    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitCommit|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/commits')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(GitCommit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitGetCommit(string $owner, string $repo, string $commitSha): GitCommit
+    /**
+     * @return Envelope<GitCommit|BasicError>
+     */
+    public function gitGetCommit(string $owner, string $repo, string $commitSha): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitCommit|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/commits/{commit_sha}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha),
-            ResponseType::object(GitCommit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitCommit::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<GitRef>
+     * @return Envelope<list<GitRef>|BasicError>
      */
-    public function gitListMatchingRefs(string $owner, string $repo, string $ref): array
+    public function gitListMatchingRefs(string $owner, string $repo, string $ref): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<GitRef>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/matching-refs/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::listOf(GitRef::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GitRef::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitGetRef(string $owner, string $repo, string $ref): GitRef
+    /**
+     * @return Envelope<GitRef|BasicError>
+     */
+    public function gitGetRef(string $owner, string $repo, string $ref): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitRef|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/ref/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::object(GitRef::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): GitRef
+    /**
+     * @return Envelope<GitRef|ValidationError|BasicError>
+     */
+    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitRef|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/refs')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(GitRef::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitDeleteRef(string $owner, string $repo, string $ref): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gitDeleteRef(string $owner, string $repo, string $ref): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/git/refs/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): GitRef
+    /**
+     * @return Envelope<GitRef|ValidationError|BasicError>
+     */
+    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitRef|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/git/refs/{ref}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref)
                 ->json($body),
-            ResponseType::object(GitRef::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): GitTag
+    /**
+     * @return Envelope<GitTag|ValidationError|BasicError>
+     */
+    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitTag|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/tags')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(GitTag::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTag::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitGetTag(string $owner, string $repo, string $tagSha): GitTag
+    /**
+     * @return Envelope<GitTag|BasicError>
+     */
+    public function gitGetTag(string $owner, string $repo, string $tagSha): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitTag|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/tags/{tag_sha}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('tag_sha', $tagSha),
-            ResponseType::object(GitTag::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTag::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): GitTree
+    /**
+     * @return Envelope<GitTree|ValidationError|BasicError>
+     */
+    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitTree|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/trees')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(GitTree::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function gitGetTree(string $owner, string $repo, string $treeSha, ?string $recursive = null): GitTree
+    /**
+     * @return Envelope<GitTree|ValidationError|BasicError>
+     */
+    public function gitGetTree(string $owner, string $repo, string $treeSha, ?string $recursive = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GitTree|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/git/trees/{tree_sha}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('tree_sha', $treeSha)
                 ->query('recursive', $recursive),
-            ResponseType::object(GitTree::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

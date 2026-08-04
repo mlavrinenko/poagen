@@ -13,7 +13,9 @@ namespace Acme\Petstore\Generated;
 
 use Acme\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class StoreClient implements StoreClientInterface
@@ -25,37 +27,58 @@ final readonly class StoreClient implements StoreClientInterface
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<array<string, int>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/store/inventory')->header('api_key', $this->apiKey),
-            ResponseType::mapOf(ResponseType::int()),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::int())]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Order|null> $result */
+        $result = $this->transport->send(
             Endpoint::post('/store/order')->json($body),
-            ResponseType::object(Order::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Order|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/store/order/{orderId}')->path('orderId', $orderId),
-            ResponseType::object(Order::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/store/order/{orderId}')->path('orderId', $orderId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
         );
+
+        return $result;
     }
 }

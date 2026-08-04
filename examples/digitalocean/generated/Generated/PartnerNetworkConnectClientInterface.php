@@ -11,8 +11,18 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\PartnerAttachmentUpdatable;
 use Acme\DigitalOcean\Generated\Model\PartnerAttachmentWritable;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsDelete202Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGet200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGetBgpAuthKey200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsGetServiceKey200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsList200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsListRemoteRoutes200Content;
+use Acme\DigitalOcean\Generated\Model\PartnerAttachmentsPatch202Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Partner Network Connect` endpoints.
@@ -25,46 +35,59 @@ interface PartnerNetworkConnectClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsList200Content|Error>
      */
-    public function partnerAttachmentsList(?int $perPage = null, ?int $page = null): void;
+    public function partnerAttachmentsList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:create`.
+     * @return Envelope<PartnerAttachmentsCreate202Content|Error>
      */
-    public function partnerAttachmentsCreate(PartnerAttachmentWritable $body): void;
+    public function partnerAttachmentsCreate(PartnerAttachmentWritable $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGet200Content|Error>
      */
-    public function partnerAttachmentsGet(string $paId): void;
+    public function partnerAttachmentsGet(string $paId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsDelete202Content|Error>
      */
-    public function partnerAttachmentsDelete(string $paId): void;
+    public function partnerAttachmentsDelete(string $paId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsPatch202Content|Error>
      */
-    public function partnerAttachmentsPatch(string $paId, PartnerAttachmentUpdatable $body): void;
+    public function partnerAttachmentsPatch(string $paId, PartnerAttachmentUpdatable $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGetBgpAuthKey200Content|Error>
      */
-    public function partnerAttachmentsGetBgpAuthKey(string $paId): void;
+    public function partnerAttachmentsGetBgpAuthKey(string $paId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsListRemoteRoutes200Content|Error>
      */
-    public function partnerAttachmentsListRemoteRoutes(string $paId, ?int $perPage = null, ?int $page = null): void;
+    public function partnerAttachmentsListRemoteRoutes(
+        string $paId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:read`.
+     * @return Envelope<PartnerAttachmentsGetServiceKey200Content|Error>
      */
-    public function partnerAttachmentsGetServiceKey(string $paId): void;
+    public function partnerAttachmentsGetServiceKey(string $paId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `partner_network_connect:write`.
+     * @return Envelope<array<string, mixed>|Error>
      */
-    public function partnerAttachmentsCreateServiceKey(string $paId): void;
+    public function partnerAttachmentsCreateServiceKey(string $paId): Envelope;
 }

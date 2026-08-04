@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Nyholm\Psr7\Response;
 
 /**
  * Stands in for the generated `StoreClient` in the decorator-seam scenario.
@@ -33,25 +35,37 @@ final class RecordingStoreClient implements StoreClientInterface
      */
     public array $fetched = [];
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         $this->fetched[] = $orderId;
 
-        return new Order(id: $orderId);
-    }
-
-    public function deleteOrder(int $orderId): void {}
-
-    public function placeOrder(Order $body): Order
-    {
-        return $body;
+        return new Envelope(200, new Order(id: $orderId), new Response());
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<null>
      */
-    public function getInventory(): array
+    public function deleteOrder(int $orderId): Envelope
     {
-        return [];
+        return new Envelope(200, null, new Response());
+    }
+
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
+    {
+        return new Envelope(200, $body, new Response());
+    }
+
+    /**
+     * @return Envelope<array<string, int>|null>
+     */
+    public function getInventory(): Envelope
+    {
+        return new Envelope(200, [], new Response());
     }
 }

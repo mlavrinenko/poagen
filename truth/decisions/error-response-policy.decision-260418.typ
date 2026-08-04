@@ -3,7 +3,7 @@
 
 #show: decision.with(
   title: "Error response policy: non-2xx handling in the generated client",
-  status: accepted(2026, 4, 18),
+  status: superseded(2026, 8, 4),
   contexts: (generation-context,),
   goals: (link("../goals/typed-injectable-surface.goal.typ"),),
   standards: (link("../standards/caller-surface-is-injectable.standard-260729.typ"),),
@@ -94,3 +94,11 @@ have to supersede this decision with a new one.
   review; swallows status code; unusable from consumer try/catch.
 - *PSR-18 `ClientExceptionInterface`-only.* PSR-18 covers transport
   failures, not HTTP semantics. Wrong layer.
+
+=== Superseded
+
+This decision was superseded on 2026-08-04 by
+#link("envelope-supersedes-error-response-policy.decision-260804.typ")[Every operation returns a status-and-body envelope, typed per declared response], which took the upgrade path named above — kilbil is the real
+schema this decision asked for, measured and found to justify moving past
+`getDecodedBody(): mixed`. The analysis above is a record of what was known
+at the PoC stage and is left unchanged.

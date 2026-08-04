@@ -11,9 +11,10 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\Part;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileRequest;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileResponse;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfile200Content;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\SaveProfileRequestContent;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\Widget;
 
 /**
@@ -24,26 +25,32 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\WidenedShapes\Generated\Model\Wi
 interface ApiClientInterface
 {
     /**
-     * @return array<string, Part>
+     * @return Envelope<array<string, Part>>
      */
-    public function getCatalogue(): array;
+    public function getCatalogue(): Envelope;
 
     /**
-     * @return array<string, list<Part>>
+     * @return Envelope<array<string, list<Part>>>
      */
-    public function getPartLists(): array;
+    public function getPartLists(): Envelope;
 
     /**
-     * @return array<string, array<string, string>>
+     * @return Envelope<array<string, array<string, string>>>
      */
-    public function getNestedCatalogue(): array;
+    public function getNestedCatalogue(): Envelope;
 
     /**
-     * @return array<string, mixed>
+     * @return Envelope<array<string, mixed>>
      */
-    public function getOpaque(): array;
+    public function getOpaque(): Envelope;
 
-    public function saveProfile(SaveProfileRequest $body): SaveProfileResponse;
+    /**
+     * @return Envelope<SaveProfile200Content>
+     */
+    public function saveProfile(SaveProfileRequestContent $body): Envelope;
 
-    public function getWidget(): Widget;
+    /**
+     * @return Envelope<Widget>
+     */
+    public function getWidget(): Envelope;
 }

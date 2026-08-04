@@ -12,11 +12,15 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone403Content;
 use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode403Content;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ConfirmationCodesClient implements ConfirmationCodesClientInterface
@@ -27,19 +31,31 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
     ) {
     }
 
-    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content
+    /**
+     * @return Envelope<AskConfirmPhone200Content|AskConfirmPhone403Content>
+     */
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<AskConfirmPhone200Content|AskConfirmPhone403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/askconfirmphone')->query('h', $this->h)->json($body),
-            ResponseType::object(AskConfirmPhone200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AskConfirmPhone200Content::class)], ['403', ResponseType::object(AskConfirmPhone403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content
+    /**
+     * @return Envelope<CheckConfirmPhoneCode200Content|CheckConfirmPhoneCode403Content>
+     */
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CheckConfirmPhoneCode200Content|CheckConfirmPhoneCode403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/checkconfirmphonecode')->query('h', $this->h)->json($body),
-            ResponseType::object(CheckConfirmPhoneCode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckConfirmPhoneCode200Content::class)], ['403', ResponseType::object(CheckConfirmPhoneCode403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

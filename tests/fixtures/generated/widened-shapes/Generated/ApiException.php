@@ -16,17 +16,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
-use function json_decode;
-use function json_last_error;
-
-use const JSON_ERROR_NONE;
-
 /**
- * Thrown when the response status is outside the 2xx range.
- *
- * Carries the original PSR-7 request and response together with a
- * best-effort JSON decode of the body. Decode failures are swallowed:
- * `getDecodedBody()` returns `null` when the body is empty or not JSON.
+ * Thrown for the one case an envelope cannot honestly represent: a
+ * status the document declared no exact, range or `default` response for,
+ * or a declared body that failed to hydrate. Every other response —
+ * including one outside the 2xx range — is a return value now, not this.
  *
  * Named once where the transport is wired — `new HttpTransport($baseUri,
  * ApiException::class)` — and thrown from there, so this stays the type
@@ -35,13 +29,11 @@ use const JSON_ERROR_NONE;
  */
 final class ApiException extends RuntimeException implements ApiErrorInterface
 {
-    private mixed $decodedBody = null;
-    private bool $decoded = false;
-
     public function __construct(
         private readonly int $statusCode,
         private readonly RequestInterface $request,
         private readonly ResponseInterface $response,
+        private readonly string $reason,
         string $message = '',
     ) {
         parent::__construct($message);
@@ -63,34 +55,12 @@ final class ApiException extends RuntimeException implements ApiErrorInterface
     }
 
     /**
-     * Best-effort JSON decode of the response body.
-     *
-     * Returns `null` for an empty body or any decode failure (per `error-response-policy`).
-     * Cached on first call.
+     * Why the transport raised: the status this exception carries either
+     * matched nothing the document declared, or matched a declared response
+     * whose body failed to hydrate.
      */
-    public function getDecodedBody(): mixed
+    public function getReason(): string
     {
-        if ($this->decoded) {
-            return $this->decodedBody;
-        }
-
-        $this->decoded = true;
-
-        $body = (string) $this->response->getBody();
-
-        if ($body === '') {
-            return $this->decodedBody;
-        }
-
-        /** @var mixed $decoded */
-        $decoded = json_decode($body, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->decodedBody;
-        }
-
-        $this->decodedBody = $decoded;
-
-        return $this->decodedBody;
+        return $this->reason;
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Classroom;
 use Acme\GitHub\Generated\Model\ClassroomAcceptedAssignment;
 use Acme\GitHub\Generated\Model\ClassroomAssignment;
@@ -18,7 +19,9 @@ use Acme\GitHub\Generated\Model\ClassroomAssignmentGrade;
 use Acme\GitHub\Generated\Model\SimpleClassroom;
 use Acme\GitHub\Generated\Model\SimpleClassroomAssignment;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class ClassroomClient implements ClassroomClientInterface
@@ -28,76 +31,100 @@ final readonly class ClassroomClient implements ClassroomClientInterface
     ) {
     }
 
-    public function classroomGetAnAssignment(int $assignmentId): ClassroomAssignment
+    /**
+     * @return Envelope<ClassroomAssignment|BasicError>
+     */
+    public function classroomGetAnAssignment(int $assignmentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ClassroomAssignment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/assignments/{assignment_id}')->path('assignment_id', $assignmentId),
-            ResponseType::object(ClassroomAssignment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ClassroomAssignment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ClassroomAcceptedAssignment>
+     * @return Envelope<list<ClassroomAcceptedAssignment>>
      */
     public function classroomListAcceptedAssignmentsForAnAssignment(
         int $assignmentId,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ClassroomAcceptedAssignment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/assignments/{assignment_id}/accepted_assignments')
                 ->path('assignment_id', $assignmentId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(ClassroomAcceptedAssignment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAcceptedAssignment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ClassroomAssignmentGrade>
+     * @return Envelope<list<ClassroomAssignmentGrade>|BasicError>
      */
-    public function classroomGetAssignmentGrades(int $assignmentId): array
+    public function classroomGetAssignmentGrades(int $assignmentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<ClassroomAssignmentGrade>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/assignments/{assignment_id}/grades')
                 ->path('assignment_id', $assignmentId),
-            ResponseType::listOf(ClassroomAssignmentGrade::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAssignmentGrade::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleClassroom>
+     * @return Envelope<list<SimpleClassroom>>
      */
-    public function classroomListClassrooms(?int $page = null, ?int $perPage = null): array
+    public function classroomListClassrooms(?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<SimpleClassroom>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/classrooms')->query('page', $page)->query('per_page', $perPage),
-            ResponseType::listOf(SimpleClassroom::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroom::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function classroomGetAClassroom(int $classroomId): Classroom
-    {
-        return $this->transport->send(
-            Endpoint::get('/classrooms/{classroom_id}')->path('classroom_id', $classroomId),
-            ResponseType::object(Classroom::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<SimpleClassroomAssignment>
+     * @return Envelope<Classroom|BasicError>
+     */
+    public function classroomGetAClassroom(int $classroomId): Envelope
+    {
+        /** @var Envelope<Classroom|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/classrooms/{classroom_id}')->path('classroom_id', $classroomId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Classroom::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SimpleClassroomAssignment>>
      */
     public function classroomListAssignmentsForAClassroom(
         int $classroomId,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleClassroomAssignment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/classrooms/{classroom_id}/assignments')
                 ->path('classroom_id', $classroomId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(SimpleClassroomAssignment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroomAssignment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

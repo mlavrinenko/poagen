@@ -14,8 +14,14 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListRegion;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListState;
 use Acme\DigitalOcean\Generated\Enum\VpcnatgatewaysListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayCreate;
 use Acme\DigitalOcean\Generated\Model\VpcNatGatewayUpdate;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysCreate202Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysGet200Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysList200Content;
+use Acme\DigitalOcean\Generated\Model\VpcnatgatewaysUpdate200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `VPC NAT Gateways` endpoints.
@@ -28,6 +34,7 @@ interface VpcNatGatewaysClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:read`.
+     * @return Envelope<VpcnatgatewaysList200Content|Error>
      */
     public function vpcnatgatewaysList(
         ?int $perPage = null,
@@ -36,25 +43,29 @@ interface VpcNatGatewaysClientInterface
         ?VpcnatgatewaysListRegion $region = null,
         ?VpcnatgatewaysListType $type = null,
         ?string $name = null,
-    ): void;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:create`.
+     * @return Envelope<VpcnatgatewaysCreate202Content|Error>
      */
-    public function vpcnatgatewaysCreate(VpcNatGatewayCreate $body): void;
+    public function vpcnatgatewaysCreate(VpcNatGatewayCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:read`.
+     * @return Envelope<VpcnatgatewaysGet200Content|Error>
      */
-    public function vpcnatgatewaysGet(string $id): void;
+    public function vpcnatgatewaysGet(string $id): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:update`.
+     * @return Envelope<VpcnatgatewaysUpdate200Content|Error>
      */
-    public function vpcnatgatewaysUpdate(string $id, VpcNatGatewayUpdate $body): void;
+    public function vpcnatgatewaysUpdate(string $id, VpcNatGatewayUpdate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `nat_gateway:delete`.
+     * @return Envelope<null|Error>
      */
-    public function vpcnatgatewaysDelete(string $id): void;
+    public function vpcnatgatewaysDelete(string $id): Envelope;
 }

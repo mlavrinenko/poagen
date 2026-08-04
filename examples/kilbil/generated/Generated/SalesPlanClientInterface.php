@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides200Content;
+use Acme\Kilbil\Generated\Model\GetSalesIndicesSlides403Content;
 use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `План-факт` endpoints.
@@ -23,5 +25,8 @@ use Acme\Kilbil\Generated\Model\GetSalesIndicesSlidesRequestContent;
  */
 interface SalesPlanClientInterface
 {
-    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): GetSalesIndicesSlides200Content;
+    /**
+     * @return Envelope<GetSalesIndicesSlides200Content|GetSalesIndicesSlides403Content>
+     */
+    public function getSalesIndicesSlides(GetSalesIndicesSlidesRequestContent $body): Envelope;
 }

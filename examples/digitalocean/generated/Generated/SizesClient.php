@@ -11,8 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\SizesList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SizesClient implements SizesClientInterface
@@ -25,15 +29,19 @@ final readonly class SizesClient implements SizesClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `sizes:read`, `regions:read`.
+     * @return Envelope<SizesList200Content|Error>
      */
-    public function sizesList(?int $perPage = null, ?int $page = null): void
+    public function sizesList(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<SizesList200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/sizes')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SizesList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

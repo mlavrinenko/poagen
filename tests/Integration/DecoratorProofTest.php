@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration;
 
-use InvalidArgumentException;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Mlavrinenko\Paogen\Tests\Generated\CachingStoreClient;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,7 +35,7 @@ final class DecoratorProofTest extends TestCase
     public function testAHandWrittenDecoratorSatisfiesTheEmittedInterface(): void
     {
         $inner = new RecordingStoreClient();
-        $decorator = new CountingStoreClient($inner);
+        $decorator = new CachingStoreClient($inner);
 
         // Type-hinting the interface is the point: consumer code depends on the
         // contract, not on either implementation.
@@ -44,18 +46,18 @@ final class DecoratorProofTest extends TestCase
     public function testDelegationReachesTheGeneratedImplementation(): void
     {
         $inner = new RecordingStoreClient();
-        $decorator = new CountingStoreClient($inner);
+        $decorator = new CachingStoreClient($inner);
 
         $order = $decorator->getOrderById(42);
 
-        self::assertSame(42, $order->id);
+        self::assertSame(42, $order->body?->id);
         self::assertSame([42], $inner->fetched);
     }
 
     public function testTheDecoratorAddsBehaviourWithoutTouchingTheGeneratedTree(): void
     {
         $inner = new RecordingStoreClient();
-        $decorator = new CountingStoreClient($inner);
+        $decorator = new CachingStoreClient($inner);
 
         $decorator->getOrderById(42);
         $decorator->getOrderById(42);
@@ -67,9 +69,9 @@ final class DecoratorProofTest extends TestCase
 
     public function testAConvenienceMethodMayTakeADomainObjectTheGeneratorWouldNotEmit(): void
     {
-        $decorator = new CountingStoreClient(new RecordingStoreClient());
+        $decorator = new CachingStoreClient(new RecordingStoreClient());
 
-        self::assertSame(7, $decorator->refresh(new Order(id: 7))->id);
+        self::assertSame(7, $decorator->refresh(new Order(id: 7))->body?->id);
     }
 
     public function testEveryMethodOnTheContractDelegates(): void
@@ -78,10 +80,10 @@ final class DecoratorProofTest extends TestCase
         // silently dropped a call would still satisfy the interface, so the seam
         // is only proven by exercising all of it.
         $inner = new RecordingStoreClient();
-        $decorator = new CountingStoreClient($inner);
+        $decorator = new CachingStoreClient($inner);
 
-        self::assertSame([], $decorator->getInventory());
-        self::assertSame(3, $decorator->placeOrder(new Order(id: 3))->id);
+        self::assertSame([], $decorator->getInventory()->body);
+        self::assertSame(3, $decorator->placeOrder(new Order(id: 3))->body?->id);
         self::assertSame([3], $inner->placed);
 
         $decorator->deleteOrder(3);
@@ -111,83 +113,43 @@ final class RecordingStoreClient implements StoreClientInterface
     /** @var list<int> */
     public array $placed = [];
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         $this->fetched[] = $orderId;
 
-        return new Order(id: $orderId);
+        return new Envelope(200, new Order(id: $orderId), new Response());
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
         $this->deleted[] = $orderId;
+
+        return new Envelope(200, null, new Response());
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
         if ($body->id !== null) {
             $this->placed[] = $body->id;
         }
 
-        return $body;
+        return new Envelope(200, $body, new Response());
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
-        return [];
-    }
-}
-
-/**
- * The same shape as the committed `examples/petstore/src/CachingStoreClient.php`.
- */
-final class CountingStoreClient implements StoreClientInterface
-{
-    /** @var array<int,Order> */
-    private array $orders = [];
-
-    public function __construct(
-        private readonly StoreClientInterface $inner,
-    ) {}
-
-    public function refresh(Order $order): Order
-    {
-        $id = $order->id ?? throw new InvalidArgumentException('cannot refresh an Order with no id');
-        unset($this->orders[$id]);
-
-        return $this->getOrderById($id);
-    }
-
-    public function getOrderById(int $orderId): Order
-    {
-        return $this->orders[$orderId] ??= $this->inner->getOrderById($orderId);
-    }
-
-    public function deleteOrder(int $orderId): void
-    {
-        $this->inner->deleteOrder($orderId);
-        unset($this->orders[$orderId]);
-    }
-
-    public function placeOrder(Order $body): Order
-    {
-        $placed = $this->inner->placeOrder($body);
-
-        if ($placed->id !== null) {
-            $this->orders[$placed->id] = $placed;
-        }
-
-        return $placed;
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    public function getInventory(): array
-    {
-        return $this->inner->getInventory();
+        return new Envelope(200, [], new Response());
     }
 }

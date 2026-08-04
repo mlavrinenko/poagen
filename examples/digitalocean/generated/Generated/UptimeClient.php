@@ -11,11 +11,22 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\UptimeCreateAlert201Content;
 use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeGetAlert200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeGetCheck200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeGetCheckState200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeListAlerts200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeListChecks200Content;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlert200Content;
 use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheck200Content;
 use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class UptimeClient implements UptimeClientInterface
@@ -28,140 +39,183 @@ final readonly class UptimeClient implements UptimeClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeListChecks200Content|Error>
      */
-    public function uptimeListChecks(?int $perPage = null, ?int $page = null): void
+    public function uptimeListChecks(?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeListChecks200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/uptime/checks')
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeListChecks200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetCheck200Content|Error>
      */
-    public function uptimeGetCheck(string $checkId): void
+    public function uptimeGetCheck(string $checkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeGetCheck200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/uptime/checks/{check_id}')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeGetCheck200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
+     * @return Envelope<UptimeUpdateCheck200Content|Error>
      */
-    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): void
+    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeUpdateCheck200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeUpdateCheck200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`.
+     * @return Envelope<null|Error>
      */
-    public function uptimeDeleteCheck(string $checkId): void
+    public function uptimeDeleteCheck(string $checkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/uptime/checks/{check_id}')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeListAlerts200Content|Error>
      */
-    public function uptimeListAlerts(string $checkId, ?int $perPage = null, ?int $page = null): void
+    public function uptimeListAlerts(string $checkId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeListAlerts200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/uptime/checks/{check_id}/alerts')
                 ->path('check_id', $checkId)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeListAlerts200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:create`, `uptime:update`.
+     * @return Envelope<UptimeCreateAlert201Content|Error>
      */
-    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): void
+    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeCreateAlert201Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/uptime/checks/{check_id}/alerts')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(UptimeCreateAlert201Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetAlert200Content|Error>
      */
-    public function uptimeGetAlert(string $checkId, string $alertId): void
+    public function uptimeGetAlert(string $checkId, string $alertId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeGetAlert200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/uptime/checks/{check_id}/alerts/{alert_id}')
                 ->path('check_id', $checkId)
                 ->path('alert_id', $alertId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeGetAlert200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
+     * @return Envelope<UptimeUpdateAlert200Content|Error>
      */
-    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequestContent $body): void
-    {
-        $this->transport->send(
+    public function uptimeUpdateAlert(
+        string $checkId,
+        string $alertId,
+        UptimeUpdateAlertRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<UptimeUpdateAlert200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}/alerts/{alert_id}')
                 ->path('check_id', $checkId)
                 ->path('alert_id', $alertId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeUpdateAlert200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`, `uptime:update`.
+     * @return Envelope<null|Error>
      */
-    public function uptimeDeleteAlert(string $checkId, string $alertId): void
+    public function uptimeDeleteAlert(string $checkId, string $alertId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/uptime/checks/{check_id}/alerts/{alert_id}')
                 ->path('check_id', $checkId)
                 ->path('alert_id', $alertId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
+     * @return Envelope<UptimeGetCheckState200Content|Error>
      */
-    public function uptimeGetCheckState(string $checkId): void
+    public function uptimeGetCheckState(string $checkId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<UptimeGetCheckState200Content|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/uptime/checks/{check_id}/state')
                 ->path('check_id', $checkId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UptimeGetCheckState200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

@@ -11,7 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ProjectAssignment;
+use Acme\DigitalOcean\Generated\Model\ProjectsAssignResources200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsAssignResourcesDefault200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsListResources200Content;
+use Acme\DigitalOcean\Generated\Model\ProjectsListResourcesDefault200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Project Resources` endpoints.
@@ -24,21 +30,25 @@ interface ProjectResourcesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsListResourcesDefault200Content|Error>
      */
-    public function projectsListResourcesDefault(): void;
+    public function projectsListResourcesDefault(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsAssignResourcesDefault200Content|Error>
      */
-    public function projectsAssignResourcesDefault(ProjectAssignment $body): void;
+    public function projectsAssignResourcesDefault(ProjectAssignment $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
+     * @return Envelope<ProjectsListResources200Content|Error>
      */
-    public function projectsListResources(string $projectId, ?int $perPage = null, ?int $page = null): void;
+    public function projectsListResources(string $projectId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
+     * @return Envelope<ProjectsAssignResources200Content|Error>
      */
-    public function projectsAssignResources(string $projectId, ProjectAssignment $body): void;
+    public function projectsAssignResources(string $projectId, ProjectAssignment $body): Envelope;
 }

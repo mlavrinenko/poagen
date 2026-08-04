@@ -24,15 +24,23 @@ use Acme\GitHub\Generated\Enum\SearchReposOrder;
 use Acme\GitHub\Generated\Enum\SearchReposSort;
 use Acme\GitHub\Generated\Enum\SearchUsersOrder;
 use Acme\GitHub\Generated\Enum\SearchUsersSort;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\SearchCode200Content;
+use Acme\GitHub\Generated\Model\SearchCode503Content;
 use Acme\GitHub\Generated\Model\SearchCommits200Content;
 use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests200Content;
+use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests503Content;
 use Acme\GitHub\Generated\Model\SearchLabels200Content;
 use Acme\GitHub\Generated\Model\SearchRepos200Content;
+use Acme\GitHub\Generated\Model\SearchRepos503Content;
 use Acme\GitHub\Generated\Model\SearchTopics200Content;
 use Acme\GitHub\Generated\Model\SearchUsers200Content;
+use Acme\GitHub\Generated\Model\SearchUsers503Content;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SearchClient implements SearchClientInterface
@@ -42,42 +50,57 @@ final readonly class SearchClient implements SearchClientInterface
     ) {
     }
 
+    /**
+     * @return Envelope<SearchCode200Content|null|SearchCode503Content|ValidationError|BasicError>
+     */
     public function searchCode(
         string $q,
         ?SearchCodeSort $sort = null,
         ?SearchCodeOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCode200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchCode200Content|null|SearchCode503Content|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/code')
                 ->query('q', $q)
                 ->query('sort', $sort)
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchCode200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCode200Content::class)], ['304', ResponseType::nothing()], ['503', ResponseType::object(SearchCode503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SearchCommits200Content|null>
+     */
     public function searchCommits(
         string $q,
         ?SearchCommitsSort $sort = null,
         ?SearchCommitsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCommits200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchCommits200Content|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/commits')
                 ->query('q', $q)
                 ->query('sort', $sort)
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchCommits200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCommits200Content::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SearchIssuesAndPullRequests200Content|SearchIssuesAndPullRequests503Content|ValidationError|null|BasicError>
+     */
     public function searchIssuesAndPullRequests(
         string $q,
         ?SearchIssuesAndPullRequestsSort $sort = null,
@@ -86,8 +109,9 @@ final readonly class SearchClient implements SearchClientInterface
         ?int $page = null,
         ?string $advancedSearch = null,
         ?SearchIssuesAndPullRequestsSearchType $searchType = null,
-    ): SearchIssuesAndPullRequests200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchIssuesAndPullRequests200Content|SearchIssuesAndPullRequests503Content|ValidationError|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/issues')
                 ->query('q', $q)
                 ->query('sort', $sort)
@@ -96,10 +120,15 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('page', $page)
                 ->query('advanced_search', $advancedSearch)
                 ->query('search_type', $searchType),
-            ResponseType::object(SearchIssuesAndPullRequests200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchIssuesAndPullRequests200Content::class)], ['503', ResponseType::object(SearchIssuesAndPullRequests503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SearchLabels200Content|null|BasicError|ValidationError>
+     */
     public function searchLabels(
         int $repositoryId,
         string $q,
@@ -107,8 +136,9 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchLabelsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchLabels200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchLabels200Content|null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/labels')
                 ->query('repository_id', $repositoryId)
                 ->query('q', $q)
@@ -116,54 +146,74 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchLabels200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchLabels200Content::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SearchRepos200Content|SearchRepos503Content|ValidationError|null>
+     */
     public function searchRepos(
         string $q,
         ?SearchReposSort $sort = null,
         ?SearchReposOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchRepos200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchRepos200Content|SearchRepos503Content|ValidationError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/repositories')
                 ->query('q', $q)
                 ->query('sort', $sort)
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchRepos200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchRepos200Content::class)], ['503', ResponseType::object(SearchRepos503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopics200Content
+    /**
+     * @return Envelope<SearchTopics200Content|null>
+     */
+    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<SearchTopics200Content|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/topics')
                 ->query('q', $q)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchTopics200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchTopics200Content::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SearchUsers200Content|null|SearchUsers503Content|ValidationError>
+     */
     public function searchUsers(
         string $q,
         ?SearchUsersSort $sort = null,
         ?SearchUsersOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchUsers200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SearchUsers200Content|null|SearchUsers503Content|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/search/users')
                 ->query('q', $q)
                 ->query('sort', $sort)
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchUsers200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchUsers200Content::class)], ['304', ResponseType::nothing()], ['503', ResponseType::object(SearchUsers503Content::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

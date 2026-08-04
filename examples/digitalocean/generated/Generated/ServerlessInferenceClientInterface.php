@@ -18,8 +18,10 @@ use Acme\DigitalOcean\Generated\Model\ChatCompletionResponse;
 use Acme\DigitalOcean\Generated\Model\CreateImageRequest;
 use Acme\DigitalOcean\Generated\Model\CreateResponseRequest;
 use Acme\DigitalOcean\Generated\Model\CreateResponseResponse;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImagesResponse;
 use Acme\DigitalOcean\Generated\Model\ListModelsResponse;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Serverless Inference` endpoints.
@@ -30,13 +32,28 @@ use Acme\DigitalOcean\Generated\Model\ListModelsResponse;
  */
 interface ServerlessInferenceClientInterface
 {
-    public function inferenceCreateAsyncInvoke(AsyncInvokeRequest $body): AsyncInvokeResponse;
+    /**
+     * @return Envelope<AsyncInvokeResponse|Error>
+     */
+    public function inferenceCreateAsyncInvoke(AsyncInvokeRequest $body): Envelope;
 
-    public function inferenceCreateChatCompletion(ChatCompletionRequest $body): ChatCompletionResponse;
+    /**
+     * @return Envelope<ChatCompletionResponse|Error>
+     */
+    public function inferenceCreateChatCompletion(ChatCompletionRequest $body): Envelope;
 
-    public function inferenceCreateImage(CreateImageRequest $body): ImagesResponse;
+    /**
+     * @return Envelope<ImagesResponse|Error>
+     */
+    public function inferenceCreateImage(CreateImageRequest $body): Envelope;
 
-    public function inferenceListModels(): ListModelsResponse;
+    /**
+     * @return Envelope<ListModelsResponse|Error>
+     */
+    public function inferenceListModels(): Envelope;
 
-    public function inferenceCreateResponse(CreateResponseRequest $body): CreateResponseResponse;
+    /**
+     * @return Envelope<CreateResponseResponse|Error>
+     */
+    public function inferenceCreateResponse(CreateResponseRequest $body): Envelope;
 }

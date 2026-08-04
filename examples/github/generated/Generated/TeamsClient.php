@@ -14,6 +14,7 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Enum\TeamsListMembersInOrgRole;
 use Acme\GitHub\Generated\Enum\TeamsListMembersLegacyRole;
 use Acme\GitHub\Generated\Enum\TeamsListTeamType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\OrganizationInvitation;
 use Acme\GitHub\Generated\Model\SimpleUser;
@@ -28,8 +29,11 @@ use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequestCont
 use Acme\GitHub\Generated\Model\TeamsCreateRequestContent;
 use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequestContent;
 use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class TeamsClient implements TeamsClientInterface
@@ -40,84 +44,114 @@ final readonly class TeamsClient implements TeamsClientInterface
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError>
      */
     public function teamsList(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?TeamsListTeamType $teamType = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Team>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('team_type', $teamType),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsCreate(string $org, TeamsCreateRequestContent $body): TeamFull
+    /**
+     * @return Envelope<TeamFull|ValidationError|BasicError>
+     */
+    public function teamsCreate(string $org, TeamsCreateRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamFull|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/teams')->path('org', $org)->json($body),
-            ResponseType::object(TeamFull::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(TeamFull::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsGetByName(string $org, string $teamSlug): TeamFull
+    /**
+     * @return Envelope<TeamFull|BasicError>
+     */
+    public function teamsGetByName(string $org, string $teamSlug): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamFull|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::object(TeamFull::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsDeleteInOrg(string $org, string $teamSlug): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsDeleteInOrg(string $org, string $teamSlug): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): TeamFull
+    /**
+     * @return Envelope<TeamFull|BasicError|ValidationError>
+     */
+    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamFull|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->json($body),
-            ResponseType::object(TeamFull::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<list<OrganizationInvitation>|null>
      */
     public function teamsListPendingInvitationsInOrg(
         string $org,
         string $teamSlug,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrganizationInvitation>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/invitations')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrganizationInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function teamsListMembersInOrg(
         string $org,
@@ -125,327 +159,467 @@ final readonly class TeamsClient implements TeamsClientInterface
         ?TeamsListMembersInOrgRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/members')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsGetMembershipForUserInOrg(string $org, string $teamSlug, string $username): TeamMembership
+    /**
+     * @return Envelope<TeamMembership|null>
+     */
+    public function teamsGetMembershipForUserInOrg(string $org, string $teamSlug, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamMembership|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/memberships/{username}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username),
-            ResponseType::object(TeamMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<TeamMembership|null>
+     */
     public function teamsAddOrUpdateMembershipForUserInOrg(
         string $org,
         string $teamSlug,
         string $username,
         TeamsAddOrUpdateMembershipForUserInOrgRequestContent $body,
-    ): TeamMembership {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<TeamMembership|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/teams/{team_slug}/memberships/{username}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::object(TeamMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsRemoveMembershipForUserInOrg(string $org, string $teamSlug, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsRemoveMembershipForUserInOrg(string $org, string $teamSlug, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/teams/{team_slug}/memberships/{username}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<list<MinimalRepository>>
      */
-    public function teamsListReposInOrg(string $org, string $teamSlug, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function teamsListReposInOrg(
+        string $org,
+        string $teamSlug,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<MinimalRepository>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/repos')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<TeamRepository|null>
+     */
     public function teamsCheckPermissionsForRepoInOrg(
         string $org,
         string $teamSlug,
         string $owner,
         string $repo,
-    ): TeamRepository {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<TeamRepository|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(TeamRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function teamsAddOrUpdateRepoPermissionsInOrg(
         string $org,
         string $teamSlug,
         string $owner,
         string $repo,
         TeamsAddOrUpdateRepoPermissionsInOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsRemoveRepoInOrg(string $org, string $teamSlug, string $owner, string $repo): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsRemoveRepoInOrg(string $org, string $teamSlug, string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>>
      */
-    public function teamsListChildInOrg(string $org, string $teamSlug, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function teamsListChildInOrg(
+        string $org,
+        string $teamSlug,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<Team>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/teams/{team_slug}/teams')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function teamsGetLegacy(int $teamId): TeamFull
-    {
-        return $this->transport->send(
-            Endpoint::get('/teams/{team_id}')->path('team_id', $teamId),
-            ResponseType::object(TeamFull::class),
-        );
-    }
-
-    public function teamsDeleteLegacy(int $teamId): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/teams/{team_id}')->path('team_id', $teamId),
-            ResponseType::nothing(),
-        );
-    }
-
-    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): TeamFull
-    {
-        return $this->transport->send(
-            Endpoint::patch('/teams/{team_id}')->path('team_id', $teamId)->json($body),
-            ResponseType::object(TeamFull::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<TeamFull|BasicError>
      */
-    public function teamsListPendingInvitationsLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array
+    public function teamsGetLegacy(int $teamId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamFull|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/teams/{team_id}')->path('team_id', $teamId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function teamsDeleteLegacy(int $teamId): Envelope
+    {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/teams/{team_id}')->path('team_id', $teamId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<TeamFull|BasicError|ValidationError>
+     */
+    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): Envelope
+    {
+        /** @var Envelope<TeamFull|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/teams/{team_id}')->path('team_id', $teamId)->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<OrganizationInvitation>>
+     */
+    public function teamsListPendingInvitationsLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<OrganizationInvitation>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/invitations')
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(OrganizationInvitation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>|BasicError>
      */
     public function teamsListMembersLegacy(
         int $teamId,
         ?TeamsListMembersLegacyRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SimpleUser>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/members')
                 ->path('team_id', $teamId)
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(SimpleUser::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsGetMemberLegacy(int $teamId, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsGetMemberLegacy(int $teamId, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsAddMemberLegacy(int $teamId, string $username): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function teamsAddMemberLegacy(int $teamId, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsRemoveMemberLegacy(int $teamId, string $username): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsRemoveMemberLegacy(int $teamId, string $username): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsGetMembershipForUserLegacy(int $teamId, string $username): TeamMembership
+    /**
+     * @return Envelope<TeamMembership|BasicError>
+     */
+    public function teamsGetMembershipForUserLegacy(int $teamId, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamMembership|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/memberships/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::object(TeamMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<TeamMembership|null|BasicError>
+     */
     public function teamsAddOrUpdateMembershipForUserLegacy(
         int $teamId,
         string $username,
         TeamsAddOrUpdateMembershipForUserLegacyRequestContent $body,
-    ): TeamMembership {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<TeamMembership|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/teams/{team_id}/memberships/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::object(TeamMembership::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', ResponseType::nothing()], ['422', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function teamsRemoveMembershipForUserLegacy(int $teamId, string $username): void
-    {
-        $this->transport->send(
-            Endpoint::delete('/teams/{team_id}/memberships/{username}')
-                ->path('team_id', $teamId)
-                ->path('username', $username),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null>
      */
-    public function teamsListReposLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array
+    public function teamsRemoveMembershipForUserLegacy(int $teamId, string $username): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/teams/{team_id}/memberships/{username}')
+                ->path('team_id', $teamId)
+                ->path('username', $username),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<MinimalRepository>|BasicError>
+     */
+    public function teamsListReposLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<list<MinimalRepository>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/repos')
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(MinimalRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsCheckPermissionsForRepoLegacy(int $teamId, string $owner, string $repo): TeamRepository
+    /**
+     * @return Envelope<TeamRepository|null>
+     */
+    public function teamsCheckPermissionsForRepoLegacy(int $teamId, string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<TeamRepository|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/repos/{owner}/{repo}')
                 ->path('team_id', $teamId)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(TeamRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function teamsAddOrUpdateRepoPermissionsLegacy(
         int $teamId,
         string $owner,
         string $repo,
         TeamsAddOrUpdateRepoPermissionsLegacyRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/teams/{team_id}/repos/{owner}/{repo}')
                 ->path('team_id', $teamId)
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function teamsRemoveRepoLegacy(int $teamId, string $owner, string $repo): void
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsRemoveRepoLegacy(int $teamId, string $owner, string $repo): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/teams/{team_id}/repos/{owner}/{repo}')
                 ->path('team_id', $teamId)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError|ValidationError>
      */
-    public function teamsListChildLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array
+    public function teamsListChildLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<Team>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}/teams')
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Team::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<TeamFull>
+     * @return Envelope<list<TeamFull>|null|BasicError>
      */
-    public function teamsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array
+    public function teamsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<TeamFull>|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/user/teams')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::listOf(TeamFull::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamFull::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

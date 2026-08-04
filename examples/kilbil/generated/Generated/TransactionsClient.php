@@ -12,17 +12,24 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\ConfirmSale200Content;
+use Acme\Kilbil\Generated\Model\ConfirmSale403Content;
 use Acme\Kilbil\Generated\Model\ConfirmSaleRequestContent;
 use Acme\Kilbil\Generated\Model\GetDetailingByMove200Content;
+use Acme\Kilbil\Generated\Model\GetDetailingByMove403Content;
 use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequestContent;
 use Acme\Kilbil\Generated\Model\GetMovesByClient200Content;
+use Acme\Kilbil\Generated\Model\GetMovesByClient403Content;
 use Acme\Kilbil\Generated\Model\GetMovesByClientRequestContent;
 use Acme\Kilbil\Generated\Model\ManualAdd200Content;
+use Acme\Kilbil\Generated\Model\ManualAdd403Content;
 use Acme\Kilbil\Generated\Model\ManualAddRequestContent;
 use Acme\Kilbil\Generated\Model\ProcessSale200Content;
+use Acme\Kilbil\Generated\Model\ProcessSale403Content;
 use Acme\Kilbil\Generated\Model\ProcessSaleRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class TransactionsClient implements TransactionsClientInterface
@@ -33,43 +40,73 @@ final readonly class TransactionsClient implements TransactionsClientInterface
     ) {
     }
 
-    public function confirmSale(ConfirmSaleRequestContent $body): ConfirmSale200Content
+    /**
+     * @return Envelope<ConfirmSale200Content|ConfirmSale403Content>
+     */
+    public function confirmSale(ConfirmSaleRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ConfirmSale200Content|ConfirmSale403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/confirmsale')->query('h', $this->h)->json($body),
-            ResponseType::object(ConfirmSale200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ConfirmSale200Content::class)], ['403', ResponseType::object(ConfirmSale403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): GetDetailingByMove200Content
+    /**
+     * @return Envelope<GetDetailingByMove200Content|GetDetailingByMove403Content>
+     */
+    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetDetailingByMove200Content|GetDetailingByMove403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getdetailingbymove')->query('h', $this->h)->json($body),
-            ResponseType::object(GetDetailingByMove200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetDetailingByMove200Content::class)], ['403', ResponseType::object(GetDetailingByMove403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function getMovesByClient(GetMovesByClientRequestContent $body): GetMovesByClient200Content
+    /**
+     * @return Envelope<GetMovesByClient200Content|GetMovesByClient403Content>
+     */
+    public function getMovesByClient(GetMovesByClientRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<GetMovesByClient200Content|GetMovesByClient403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/getmovesbyclient')->query('h', $this->h)->json($body),
-            ResponseType::object(GetMovesByClient200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetMovesByClient200Content::class)], ['403', ResponseType::object(GetMovesByClient403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function manualAdd(ManualAddRequestContent $body): ManualAdd200Content
+    /**
+     * @return Envelope<ManualAdd200Content|ManualAdd403Content>
+     */
+    public function manualAdd(ManualAddRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ManualAdd200Content|ManualAdd403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/manualadd')->query('h', $this->h)->json($body),
-            ResponseType::object(ManualAdd200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ManualAdd200Content::class)], ['403', ResponseType::object(ManualAdd403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function processSale(ProcessSaleRequestContent $body): ProcessSale200Content
+    /**
+     * @return Envelope<ProcessSale200Content|ProcessSale403Content>
+     */
+    public function processSale(ProcessSaleRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ProcessSale200Content|ProcessSale403Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/load/processsale')->query('h', $this->h)->json($body),
-            ResponseType::object(ProcessSale200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProcessSale200Content::class)], ['403', ResponseType::object(ProcessSale403Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

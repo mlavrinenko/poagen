@@ -12,15 +12,21 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\ConfirmSale200Content;
+use Acme\Kilbil\Generated\Model\ConfirmSale403Content;
 use Acme\Kilbil\Generated\Model\ConfirmSaleRequestContent;
 use Acme\Kilbil\Generated\Model\GetDetailingByMove200Content;
+use Acme\Kilbil\Generated\Model\GetDetailingByMove403Content;
 use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequestContent;
 use Acme\Kilbil\Generated\Model\GetMovesByClient200Content;
+use Acme\Kilbil\Generated\Model\GetMovesByClient403Content;
 use Acme\Kilbil\Generated\Model\GetMovesByClientRequestContent;
 use Acme\Kilbil\Generated\Model\ManualAdd200Content;
+use Acme\Kilbil\Generated\Model\ManualAdd403Content;
 use Acme\Kilbil\Generated\Model\ManualAddRequestContent;
 use Acme\Kilbil\Generated\Model\ProcessSale200Content;
+use Acme\Kilbil\Generated\Model\ProcessSale403Content;
 use Acme\Kilbil\Generated\Model\ProcessSaleRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Операции` endpoints.
@@ -31,13 +37,28 @@ use Acme\Kilbil\Generated\Model\ProcessSaleRequestContent;
  */
 interface TransactionsClientInterface
 {
-    public function confirmSale(ConfirmSaleRequestContent $body): ConfirmSale200Content;
+    /**
+     * @return Envelope<ConfirmSale200Content|ConfirmSale403Content>
+     */
+    public function confirmSale(ConfirmSaleRequestContent $body): Envelope;
 
-    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): GetDetailingByMove200Content;
+    /**
+     * @return Envelope<GetDetailingByMove200Content|GetDetailingByMove403Content>
+     */
+    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): Envelope;
 
-    public function getMovesByClient(GetMovesByClientRequestContent $body): GetMovesByClient200Content;
+    /**
+     * @return Envelope<GetMovesByClient200Content|GetMovesByClient403Content>
+     */
+    public function getMovesByClient(GetMovesByClientRequestContent $body): Envelope;
 
-    public function manualAdd(ManualAddRequestContent $body): ManualAdd200Content;
+    /**
+     * @return Envelope<ManualAdd200Content|ManualAdd403Content>
+     */
+    public function manualAdd(ManualAddRequestContent $body): Envelope;
 
-    public function processSale(ProcessSaleRequestContent $body): ProcessSale200Content;
+    /**
+     * @return Envelope<ProcessSale200Content|ProcessSale403Content>
+     */
+    public function processSale(ProcessSaleRequestContent $body): Envelope;
 }

@@ -44,29 +44,6 @@ final readonly class ResponseTypeEmitter
     }
 
     /**
-     * A `@var` type for an intermediate variable, or null when the call
-     * expression's own inferred type already matches the declared return —
-     * true of every kind except a union, top-level or nested inside a list.
-     *
-     * `TransportInterface::send()`'s generic return follows a single
-     * `class-string<T>` for every other kind, but a union names several
-     * branch classes at once and PHPStan's generics have no way to combine
-     * them into `A|B` on their own — the same reason
-     * {@see OperationEmitter} cannot just declare the method `: A|B` and
-     * trust the call expression to match it. This names that one exception
-     * rather than adding a suppression: a fact the generator already knows
-     * and PHPStan cannot derive, stated once, the way a `@return` on a
-     * scalar list already is.
-     */
-    public function varType(PhpNamespace $namespace, ReturnSpec $return, string $modelNamespace): ?string
-    {
-        $isUnion = $return->kind === ReturnSpec::KIND_UNION
-            || ($return->kind === ReturnSpec::KIND_SCALAR_LIST && $return->listItem?->kind === ReturnSpec::KIND_UNION);
-
-        return $isUnion ? DocTypeSimplifier::shorten($namespace, $this->docType($return, $modelNamespace)) : null;
-    }
-
-    /**
      * The PHPDoc type an emitted `@return` (or a nested map value) spells.
      * FQCNs are left long here; {@see DocTypeSimplifier} shortens the finished
      * string and registers the `use` statements it needs.

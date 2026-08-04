@@ -11,12 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeScanningRef;
 use Acme\GitHub\Generated\Model\License;
 use Acme\GitHub\Generated\Model\LicenseContent;
 use Acme\GitHub\Generated\Model\LicenseSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class LicensesClient implements LicensesClientInterface
@@ -27,35 +30,53 @@ final readonly class LicensesClient implements LicensesClientInterface
     }
 
     /**
-     * @return list<LicenseSimple>
+     * @return Envelope<list<LicenseSimple>|null>
      */
-    public function licensesGetAllCommonlyUsed(?bool $featured = null, ?int $perPage = null, ?int $page = null): array
-    {
-        return $this->transport->send(
+    public function licensesGetAllCommonlyUsed(
+        ?bool $featured = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope {
+        /** @var Envelope<list<LicenseSimple>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/licenses')
                 ->query('featured', $featured)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(LicenseSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(LicenseSimple::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function licensesGet(string $license): License
+    /**
+     * @return Envelope<License|BasicError|null>
+     */
+    public function licensesGet(string $license): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<License|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/licenses/{license}')->path('license', $license),
-            ResponseType::object(License::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(License::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): LicenseContent
+    /**
+     * @return Envelope<LicenseContent|BasicError>
+     */
+    public function licensesGetForRepo(string $owner, string $repo, ?CodeScanningRef $ref = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<LicenseContent|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/license')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref?->toScalar()),
-            ResponseType::object(LicenseContent::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LicenseContent::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

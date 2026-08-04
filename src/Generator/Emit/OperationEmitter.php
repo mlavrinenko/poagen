@@ -15,6 +15,7 @@ use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
@@ -30,19 +31,23 @@ use function is_string;
  *   - request body may be absent, `application/json` (`$ref`-to-Model or
  *     `list<$ref>`), or `application/x-www-form-urlencoded` with declared
  *     properties;
- *   - 2xx response body may be absent, `$ref`-to-Model, `list<$ref>`, a scalar, a map, or a `oneOf`/`anyOf` union.
+ *   - every declared response's body may be absent, `$ref`-to-Model,
+ *     `list<$ref>`, a scalar, a map, or a `oneOf`/`anyOf` union — the status
+ *     no longer picks one response to type; every one of them does
+ *     (`typed-error-responses`).
  *
  * Anything else — including `multipart/form-data` and
  * `application/octet-stream` bodies, which used to be emitted as a
- * throwing stub, and a 2xx response declaring a content type other than
- * `application/json` (or a JSON shape this emitter does not represent),
- * which used to collapse to `void` and silently throw the vendor's body
- * away — returns an {@see EmitOutcome::skipped()} carrying a
+ * throwing stub, and a response declaring a content type other than
+ * `application/json` (or a JSON shape this emitter does not represent) —
+ * returns an {@see EmitOutcome::skipped()} carrying a
  * {@see SkippedOperation} with a full construct/location/remedy diagnostic,
  * so the caller can report *which* endpoint did not make it into the
  * client and *why* instead of emitting a method that only fails, or
  * degrades, at call time (T-025, abort-on-unrepresentable-constructs,
- * default-deny-on-degradation).
+ * default-deny-on-degradation). A single status whose shape cannot be
+ * represented skips the whole operation now, naming that status, rather
+ * than dropping just that branch quietly.
  */
 final readonly class OperationEmitter
 {
@@ -65,7 +70,7 @@ final readonly class OperationEmitter
         private ?NameRegistry $operationIdRegistry = null,
         private ?NameNormaliser $paramNormaliser = null,
         ?ComponentCatalog $components = null,
-        private ResponseTypeEmitter $responseTypes = new ResponseTypeEmitter(),
+        private EnvelopeTypeEmitter $envelopeTypes = new EnvelopeTypeEmitter(),
         private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
         private array $preScannedSkips = [],
     ) {
@@ -155,16 +160,15 @@ final readonly class OperationEmitter
         $requiredHeader = array_values(array_filter($headerParams, static fn(ResolvedParameter $p): bool => $p->param->required));
         $optionalHeader = array_values(array_filter($headerParams, static fn(ResolvedParameter $p): bool => !$p->param->required));
 
-        $return = $this->inlinePayloads->returnFor($rawOperationId)
-            ?? OperationAnalyzer::returnType($operation->responses, $this->registry, $bindings);
+        $envelope = $this->inlinePayloads->envelopeFor($rawOperationId);
 
-        if (!$return instanceof ReturnSpec) {
+        if (!$envelope instanceof EnvelopeSpec) {
             return EmitOutcome::skipped(new SkippedOperation(
                 $httpMethod,
                 $pathUri,
                 $rawOperationId,
                 $this->inlinePayloads->responseRefusalFor($rawOperationId)
-                    ?? OperationAnalyzer::describeUnsupportedResponse($operation->responses),
+                    ?? "this operation's responses could not be resolved to an envelope — this should not happen",
             ));
         }
 
@@ -191,7 +195,8 @@ final readonly class OperationEmitter
         $this->paramAdder->addQuery($method, $namespace, $optionalQuery, $bindings, required: false, operationId: $rawOperationId);
         $this->paramAdder->addHeader($method, $namespace, $optionalHeader, $bindings, $rawOperationId);
 
-        $this->applyReturnType($method, $namespace, $return);
+        $envelopeDoc = DocTypeSimplifier::shorten($namespace, $this->envelopeTypes->docType($envelope, $this->modelNamespace));
+        $this->applyReturnType($method, $namespace, $envelopeDoc);
 
         $activeSchemes = $securityCatalog instanceof SecuritySchemeCatalog
             ? $securityCatalog->activeSchemesFor($operation)
@@ -210,25 +215,29 @@ final readonly class OperationEmitter
         );
         $method->setBody($this->callBody(
             $segments,
-            $this->responseTypes->expr($namespace, $return, $this->modelNamespace),
-            $return->kind === ReturnSpec::KIND_VOID,
-            $this->responseTypes->varType($namespace, $return, $this->modelNamespace),
+            $this->envelopeTypes->expr($namespace, $envelope, $this->modelNamespace),
+            $envelopeDoc,
         ));
 
         return EmitOutcome::emitted();
     }
 
     /**
-     * The whole emitted body: one call describing the request and naming the response shape.
+     * The whole emitted body: one call describing the request and naming the
+     * response shape.
      *
-     * The chain stays on one line while it reads as one — past that, one segment per line, so an
-     * operation with many parameters is still read top to bottom rather than scrolled sideways. A
-     * `void` operation drops the `return`; a non-null `$varType` routes through an intermediate
-     * `@var`-annotated variable instead — see {@see ResponseTypeEmitter::varType()} for why.
+     * The chain stays on one line while it reads as one — past that, one
+     * segment per line, so an operation with many parameters is still read
+     * top to bottom rather than scrolled sideways. Every operation routes
+     * through the `@var`-annotated intermediate variable now — `send()`'s
+     * own generic return is the bare {@see Envelope}, and PHP has no native
+     * generics to spell `Envelope<Pet>` as the declared return type itself
+     * (`typed-error-responses`, the same reason a top-level union always
+     * needed one).
      *
      * @param list<string> $segments
      */
-    private function callBody(array $segments, string $responseType, bool $isVoid, ?string $varType): string
+    private function callBody(array $segments, string $responseType, string $varType): string
     {
         $oneLine = implode('', $segments);
         $chain = strlen($oneLine) <= self::CHAIN_WIDTH
@@ -237,11 +246,7 @@ final readonly class OperationEmitter
 
         $call = "\$this->transport->send(\n    " . $chain . ",\n    " . $responseType . ",\n)";
 
-        if ($varType !== null) {
-            return "/** @var {$varType} \$result */\n\$result = {$call};\n\nreturn \$result;";
-        }
-
-        return ($isVoid ? '' : 'return ') . $call . ';';
+        return "/** @var {$varType} \$result */\n\$result = {$call};\n\nreturn \$result;";
     }
 
     private function describeUnsupportedBody(RequestBody|Reference $body): string
@@ -253,45 +258,18 @@ final readonly class OperationEmitter
             : 'request body $ref does not resolve to a component requestBody — fix the $ref or inline the body';
     }
 
-    private function applyReturnType(Method $method, PhpNamespace $namespace, ReturnSpec $return): void
+    /**
+     * Every operation returns the bare {@see Envelope} natively — nothing
+     * about the shape a status hydrates into changes what class the method
+     * is declared to return — with `$envelopeDoc` (already shortened for
+     * this namespace) narrowing it to `Envelope<...>` in the `@return` tag,
+     * the same way a `list<Pet>` return already rides a doc tag over a bare
+     * `array` native type.
+     */
+    private function applyReturnType(Method $method, PhpNamespace $namespace, string $envelopeDoc): void
     {
-        switch ($return->kind) {
-            case ReturnSpec::KIND_VOID:
-                $method->setReturnType('void');
-
-                return;
-
-            case ReturnSpec::KIND_SCALAR:
-                $method->setReturnType((string) $return->scalarPhpType);
-
-                return;
-
-            case ReturnSpec::KIND_MAP:
-            case ReturnSpec::KIND_SCALAR_LIST:
-                $method->setReturnType('array');
-                $method->addComment('@return ' . DocTypeSimplifier::shorten(
-                    $namespace,
-                    $this->responseTypes->docType($return, $this->modelNamespace),
-                ));
-
-                return;
-
-            case ReturnSpec::KIND_UNION:
-                UnionReturnTypeApplier::apply($method, $namespace, $return, $this->modelNamespace);
-
-                return;
-        }
-
-        $fqcn = '\\' . trim($this->modelNamespace, '\\') . '\\' . $return->model;
-        $namespace->addUse(ltrim($fqcn, '\\'));
-
-        if ($return->kind === ReturnSpec::KIND_LIST) {
-            $method->setReturnType('array');
-            $method->addComment('@return ' . DocTypeSimplifier::shorten($namespace, 'list<' . $fqcn . '>'));
-
-            return;
-        }
-
-        $method->setReturnType($fqcn);
+        $namespace->addUse(Envelope::class);
+        $method->setReturnType('\\' . Envelope::class);
+        $method->addComment('@return ' . $envelopeDoc);
     }
 }

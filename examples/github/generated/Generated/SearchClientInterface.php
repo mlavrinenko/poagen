@@ -24,13 +24,20 @@ use Acme\GitHub\Generated\Enum\SearchReposOrder;
 use Acme\GitHub\Generated\Enum\SearchReposSort;
 use Acme\GitHub\Generated\Enum\SearchUsersOrder;
 use Acme\GitHub\Generated\Enum\SearchUsersSort;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\SearchCode200Content;
+use Acme\GitHub\Generated\Model\SearchCode503Content;
 use Acme\GitHub\Generated\Model\SearchCommits200Content;
 use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests200Content;
+use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests503Content;
 use Acme\GitHub\Generated\Model\SearchLabels200Content;
 use Acme\GitHub\Generated\Model\SearchRepos200Content;
+use Acme\GitHub\Generated\Model\SearchRepos503Content;
 use Acme\GitHub\Generated\Model\SearchTopics200Content;
 use Acme\GitHub\Generated\Model\SearchUsers200Content;
+use Acme\GitHub\Generated\Model\SearchUsers503Content;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `search` endpoints.
@@ -41,22 +48,31 @@ use Acme\GitHub\Generated\Model\SearchUsers200Content;
  */
 interface SearchClientInterface
 {
+    /**
+     * @return Envelope<SearchCode200Content|null|SearchCode503Content|ValidationError|BasicError>
+     */
     public function searchCode(
         string $q,
         ?SearchCodeSort $sort = null,
         ?SearchCodeOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCode200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SearchCommits200Content|null>
+     */
     public function searchCommits(
         string $q,
         ?SearchCommitsSort $sort = null,
         ?SearchCommitsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCommits200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SearchIssuesAndPullRequests200Content|SearchIssuesAndPullRequests503Content|ValidationError|null|BasicError>
+     */
     public function searchIssuesAndPullRequests(
         string $q,
         ?SearchIssuesAndPullRequestsSort $sort = null,
@@ -65,8 +81,11 @@ interface SearchClientInterface
         ?int $page = null,
         ?string $advancedSearch = null,
         ?SearchIssuesAndPullRequestsSearchType $searchType = null,
-    ): SearchIssuesAndPullRequests200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SearchLabels200Content|null|BasicError|ValidationError>
+     */
     public function searchLabels(
         int $repositoryId,
         string $q,
@@ -74,23 +93,32 @@ interface SearchClientInterface
         ?SearchLabelsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchLabels200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SearchRepos200Content|SearchRepos503Content|ValidationError|null>
+     */
     public function searchRepos(
         string $q,
         ?SearchReposSort $sort = null,
         ?SearchReposOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchRepos200Content;
+    ): Envelope;
 
-    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopics200Content;
+    /**
+     * @return Envelope<SearchTopics200Content|null>
+     */
+    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<SearchUsers200Content|null|SearchUsers503Content|ValidationError>
+     */
     public function searchUsers(
         string $q,
         ?SearchUsersSort $sort = null,
         ?SearchUsersOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchUsers200Content;
+    ): Envelope;
 }

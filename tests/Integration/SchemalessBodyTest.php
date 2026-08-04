@@ -46,7 +46,7 @@ final class SchemalessBodyTest extends TestCase
         $client = $this->clientSource();
 
         self::assertStringContainsString('@param array<string, mixed> $body', $client);
-        self::assertStringContainsString('public function postRaw(array $body): void', $client);
+        self::assertStringContainsString('public function postRaw(array $body): Envelope', $client);
     }
 
     /**

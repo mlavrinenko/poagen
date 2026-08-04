@@ -12,13 +12,18 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\BaseGist;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\GistComment;
 use Acme\GitHub\Generated\Model\GistCommit;
 use Acme\GitHub\Generated\Model\GistSimple;
 use Acme\GitHub\Generated\Model\GistsCreateCommentRequestContent;
 use Acme\GitHub\Generated\Model\GistsCreateRequestContent;
+use Acme\GitHub\Generated\Model\GistsGet403Content;
+use Acme\GitHub\Generated\Model\GistsGetComment403Content;
 use Acme\GitHub\Generated\Model\GistsUpdateCommentRequestContent;
 use Acme\GitHub\Generated\Model\GistsUpdateRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `gists` endpoints.
@@ -30,76 +35,119 @@ use Acme\GitHub\Generated\Model\GistsUpdateRequestContent;
 interface GistsClientInterface
 {
     /**
-     * @return list<BaseGist>
+     * @return Envelope<list<BaseGist>|null|BasicError>
      */
-    public function gistsList(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): array;
-
-    public function gistsCreate(GistsCreateRequestContent $body): GistSimple;
+    public function gistsList(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<GistSimple|ValidationError|null|BasicError>
      */
-    public function gistsListPublic(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): array;
+    public function gistsCreate(GistsCreateRequestContent $body): Envelope;
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<list<BaseGist>|ValidationError|null|BasicError>
+     */
+    public function gistsListPublic(
+        ?\DateTimeImmutable $since = null,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
+
+    /**
+     * @return Envelope<list<BaseGist>|BasicError|null>
      */
     public function gistsListStarred(
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
-
-    public function gistsGet(string $gistId): GistSimple;
-
-    public function gistsDelete(string $gistId): void;
-
-    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): GistSimple;
+    ): Envelope;
 
     /**
-     * @return list<GistComment>
+     * @return Envelope<GistSimple|GistsGet403Content|BasicError|null>
      */
-    public function gistsListComments(string $gistId, ?int $perPage = null, ?int $page = null): array;
+    public function gistsGet(string $gistId): Envelope;
 
-    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): GistComment;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsDelete(string $gistId): Envelope;
 
-    public function gistsGetComment(string $gistId, int $commentId): GistComment;
+    /**
+     * @return Envelope<GistSimple|ValidationError|BasicError>
+     */
+    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): Envelope;
 
-    public function gistsDeleteComment(string $gistId, int $commentId): void;
+    /**
+     * @return Envelope<list<GistComment>|null|BasicError>
+     */
+    public function gistsListComments(string $gistId, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<GistComment|null|BasicError>
+     */
+    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<GistComment|null|BasicError|GistsGetComment403Content>
+     */
+    public function gistsGetComment(string $gistId, int $commentId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsDeleteComment(string $gistId, int $commentId): Envelope;
+
+    /**
+     * @return Envelope<GistComment|BasicError>
+     */
     public function gistsUpdateComment(
         string $gistId,
         int $commentId,
         GistsUpdateCommentRequestContent $body,
-    ): GistComment;
+    ): Envelope;
 
     /**
-     * @return list<GistCommit>
+     * @return Envelope<list<GistCommit>|BasicError|null>
      */
-    public function gistsListCommits(string $gistId, ?int $perPage = null, ?int $page = null): array;
+    public function gistsListCommits(string $gistId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<GistSimple>
+     * @return Envelope<list<GistSimple>|BasicError|null>
      */
-    public function gistsListForks(string $gistId, ?int $perPage = null, ?int $page = null): array;
-
-    public function gistsFork(string $gistId): BaseGist;
-
-    public function gistsCheckIsStarred(string $gistId): void;
-
-    public function gistsStar(string $gistId): void;
-
-    public function gistsUnstar(string $gistId): void;
-
-    public function gistsGetRevision(string $gistId, string $sha): GistSimple;
+    public function gistsListForks(string $gistId, ?int $perPage = null, ?int $page = null): Envelope;
 
     /**
-     * @return list<BaseGist>
+     * @return Envelope<BaseGist|BasicError|ValidationError|null>
+     */
+    public function gistsFork(string $gistId): Envelope;
+
+    /**
+     * @return Envelope<null|array<string, mixed>|BasicError>
+     */
+    public function gistsCheckIsStarred(string $gistId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsStar(string $gistId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function gistsUnstar(string $gistId): Envelope;
+
+    /**
+     * @return Envelope<GistSimple|ValidationError|BasicError>
+     */
+    public function gistsGetRevision(string $gistId, string $sha): Envelope;
+
+    /**
+     * @return Envelope<list<BaseGist>|ValidationError>
      */
     public function gistsListForUser(
         string $username,
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 }

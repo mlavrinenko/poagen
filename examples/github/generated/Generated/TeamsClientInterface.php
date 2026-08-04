@@ -14,6 +14,7 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Enum\TeamsListMembersInOrgRole;
 use Acme\GitHub\Generated\Enum\TeamsListMembersLegacyRole;
 use Acme\GitHub\Generated\Enum\TeamsListTeamType;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\OrganizationInvitation;
 use Acme\GitHub\Generated\Model\SimpleUser;
@@ -28,6 +29,8 @@ use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequestCont
 use Acme\GitHub\Generated\Model\TeamsCreateRequestContent;
 use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequestContent;
 use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `teams` endpoints.
@@ -39,35 +42,47 @@ use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequestContent;
 interface TeamsClientInterface
 {
     /**
-     * @return list<Team>
+     * @return Envelope<list<Team>|BasicError>
      */
     public function teamsList(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
         ?TeamsListTeamType $teamType = null,
-    ): array;
-
-    public function teamsCreate(string $org, TeamsCreateRequestContent $body): TeamFull;
-
-    public function teamsGetByName(string $org, string $teamSlug): TeamFull;
-
-    public function teamsDeleteInOrg(string $org, string $teamSlug): void;
-
-    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): TeamFull;
+    ): Envelope;
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<TeamFull|ValidationError|BasicError>
+     */
+    public function teamsCreate(string $org, TeamsCreateRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<TeamFull|BasicError>
+     */
+    public function teamsGetByName(string $org, string $teamSlug): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsDeleteInOrg(string $org, string $teamSlug): Envelope;
+
+    /**
+     * @return Envelope<TeamFull|BasicError|ValidationError>
+     */
+    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<OrganizationInvitation>|null>
      */
     public function teamsListPendingInvitationsInOrg(
         string $org,
         string $teamSlug,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function teamsListMembersInOrg(
         string $org,
@@ -75,106 +90,170 @@ interface TeamsClientInterface
         ?TeamsListMembersInOrgRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function teamsGetMembershipForUserInOrg(string $org, string $teamSlug, string $username): TeamMembership;
+    /**
+     * @return Envelope<TeamMembership|null>
+     */
+    public function teamsGetMembershipForUserInOrg(string $org, string $teamSlug, string $username): Envelope;
 
+    /**
+     * @return Envelope<TeamMembership|null>
+     */
     public function teamsAddOrUpdateMembershipForUserInOrg(
         string $org,
         string $teamSlug,
         string $username,
         TeamsAddOrUpdateMembershipForUserInOrgRequestContent $body,
-    ): TeamMembership;
-
-    public function teamsRemoveMembershipForUserInOrg(string $org, string $teamSlug, string $username): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null>
      */
-    public function teamsListReposInOrg(string $org, string $teamSlug, ?int $perPage = null, ?int $page = null): array;
+    public function teamsRemoveMembershipForUserInOrg(string $org, string $teamSlug, string $username): Envelope;
 
+    /**
+     * @return Envelope<list<MinimalRepository>>
+     */
+    public function teamsListReposInOrg(
+        string $org,
+        string $teamSlug,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
+
+    /**
+     * @return Envelope<TeamRepository|null>
+     */
     public function teamsCheckPermissionsForRepoInOrg(
         string $org,
         string $teamSlug,
         string $owner,
         string $repo,
-    ): TeamRepository;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function teamsAddOrUpdateRepoPermissionsInOrg(
         string $org,
         string $teamSlug,
         string $owner,
         string $repo,
         TeamsAddOrUpdateRepoPermissionsInOrgRequestContent $body,
-    ): void;
-
-    public function teamsRemoveRepoInOrg(string $org, string $teamSlug, string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<Team>
+     * @return Envelope<null>
      */
-    public function teamsListChildInOrg(string $org, string $teamSlug, ?int $perPage = null, ?int $page = null): array;
-
-    public function teamsGetLegacy(int $teamId): TeamFull;
-
-    public function teamsDeleteLegacy(int $teamId): void;
-
-    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): TeamFull;
+    public function teamsRemoveRepoInOrg(string $org, string $teamSlug, string $owner, string $repo): Envelope;
 
     /**
-     * @return list<OrganizationInvitation>
+     * @return Envelope<list<Team>>
      */
-    public function teamsListPendingInvitationsLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array;
+    public function teamsListChildInOrg(
+        string $org,
+        string $teamSlug,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<TeamFull|BasicError>
+     */
+    public function teamsGetLegacy(int $teamId): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
+    public function teamsDeleteLegacy(int $teamId): Envelope;
+
+    /**
+     * @return Envelope<TeamFull|BasicError|ValidationError>
+     */
+    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): Envelope;
+
+    /**
+     * @return Envelope<list<OrganizationInvitation>>
+     */
+    public function teamsListPendingInvitationsLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<SimpleUser>|BasicError>
      */
     public function teamsListMembersLegacy(
         int $teamId,
         ?TeamsListMembersLegacyRole $role = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
-    public function teamsGetMemberLegacy(int $teamId, string $username): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsGetMemberLegacy(int $teamId, string $username): Envelope;
 
-    public function teamsAddMemberLegacy(int $teamId, string $username): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function teamsAddMemberLegacy(int $teamId, string $username): Envelope;
 
-    public function teamsRemoveMemberLegacy(int $teamId, string $username): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function teamsRemoveMemberLegacy(int $teamId, string $username): Envelope;
 
-    public function teamsGetMembershipForUserLegacy(int $teamId, string $username): TeamMembership;
+    /**
+     * @return Envelope<TeamMembership|BasicError>
+     */
+    public function teamsGetMembershipForUserLegacy(int $teamId, string $username): Envelope;
 
+    /**
+     * @return Envelope<TeamMembership|null|BasicError>
+     */
     public function teamsAddOrUpdateMembershipForUserLegacy(
         int $teamId,
         string $username,
         TeamsAddOrUpdateMembershipForUserLegacyRequestContent $body,
-    ): TeamMembership;
-
-    public function teamsRemoveMembershipForUserLegacy(int $teamId, string $username): void;
+    ): Envelope;
 
     /**
-     * @return list<MinimalRepository>
+     * @return Envelope<null>
      */
-    public function teamsListReposLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array;
+    public function teamsRemoveMembershipForUserLegacy(int $teamId, string $username): Envelope;
 
-    public function teamsCheckPermissionsForRepoLegacy(int $teamId, string $owner, string $repo): TeamRepository;
+    /**
+     * @return Envelope<list<MinimalRepository>|BasicError>
+     */
+    public function teamsListReposLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope;
 
+    /**
+     * @return Envelope<TeamRepository|null>
+     */
+    public function teamsCheckPermissionsForRepoLegacy(int $teamId, string $owner, string $repo): Envelope;
+
+    /**
+     * @return Envelope<null|BasicError|ValidationError>
+     */
     public function teamsAddOrUpdateRepoPermissionsLegacy(
         int $teamId,
         string $owner,
         string $repo,
         TeamsAddOrUpdateRepoPermissionsLegacyRequestContent $body,
-    ): void;
-
-    public function teamsRemoveRepoLegacy(int $teamId, string $owner, string $repo): void;
+    ): Envelope;
 
     /**
-     * @return list<Team>
+     * @return Envelope<null>
      */
-    public function teamsListChildLegacy(int $teamId, ?int $perPage = null, ?int $page = null): array;
+    public function teamsRemoveRepoLegacy(int $teamId, string $owner, string $repo): Envelope;
 
     /**
-     * @return list<TeamFull>
+     * @return Envelope<list<Team>|BasicError|ValidationError>
      */
-    public function teamsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
+    public function teamsListChildLegacy(int $teamId, ?int $perPage = null, ?int $page = null): Envelope;
+
+    /**
+     * @return Envelope<list<TeamFull>|null|BasicError>
+     */
+    public function teamsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): Envelope;
 }

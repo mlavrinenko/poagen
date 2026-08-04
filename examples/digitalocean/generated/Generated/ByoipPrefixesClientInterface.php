@@ -13,6 +13,13 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\ByoipPrefixCreate;
 use Acme\DigitalOcean\Generated\Model\ByoipPrefixUpdate;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesCreate202Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesGet200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesList200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesListResources200Content;
+use Acme\DigitalOcean\Generated\Model\ByoipPrefixesPatch202Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `BYOIP Prefixes` endpoints.
@@ -25,31 +32,41 @@ interface ByoipPrefixesClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesList200Content|Error>
      */
-    public function byoipPrefixesList(?int $perPage = null, ?int $page = null): void;
+    public function byoipPrefixesList(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:create`.
+     * @return Envelope<ByoipPrefixesCreate202Content|Error>
      */
-    public function byoipPrefixesCreate(ByoipPrefixCreate $body): void;
+    public function byoipPrefixesCreate(ByoipPrefixCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesGet200Content|Error>
      */
-    public function byoipPrefixesGet(string $byoipPrefixUuid): void;
+    public function byoipPrefixesGet(string $byoipPrefixUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:delete`.
+     * @return Envelope<null|Error>
      */
-    public function byoipPrefixesDelete(string $byoipPrefixUuid): void;
+    public function byoipPrefixesDelete(string $byoipPrefixUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:write`.
+     * @return Envelope<ByoipPrefixesPatch202Content|Error>
      */
-    public function byoipPrefixesPatch(string $byoipPrefixUuid, ByoipPrefixUpdate $body): void;
+    public function byoipPrefixesPatch(string $byoipPrefixUuid, ByoipPrefixUpdate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `byoip_prefix:read`.
+     * @return Envelope<ByoipPrefixesListResources200Content|Error>
      */
-    public function byoipPrefixesListResources(string $byoipPrefixUuid, ?int $perPage = null, ?int $page = null): void;
+    public function byoipPrefixesListResources(
+        string $byoipPrefixUuid,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 }

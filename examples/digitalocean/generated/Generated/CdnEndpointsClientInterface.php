@@ -11,9 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\CdnCreateEndpoint201Content;
 use Acme\DigitalOcean\Generated\Model\CdnEndpoint;
+use Acme\DigitalOcean\Generated\Model\CdnGetEndpoint200Content;
+use Acme\DigitalOcean\Generated\Model\CdnListEndpoints200Content;
+use Acme\DigitalOcean\Generated\Model\CdnUpdateEndpoints200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\PurgeCache;
 use Acme\DigitalOcean\Generated\Model\UpdateEndpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `CDN Endpoints` endpoints.
@@ -26,31 +32,37 @@ interface CdnEndpointsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `cdn:read`.
+     * @return Envelope<CdnListEndpoints200Content|Error>
      */
-    public function cdnListEndpoints(?int $perPage = null, ?int $page = null): void;
+    public function cdnListEndpoints(?int $perPage = null, ?int $page = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `cdn:create`.
+     * @return Envelope<CdnCreateEndpoint201Content|Error>
      */
-    public function cdnCreateEndpoint(CdnEndpoint $body): void;
+    public function cdnCreateEndpoint(CdnEndpoint $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `cdn:read`.
+     * @return Envelope<CdnGetEndpoint200Content|Error>
      */
-    public function cdnGetEndpoint(string $cdnId): void;
+    public function cdnGetEndpoint(string $cdnId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `cdn:update`.
+     * @return Envelope<CdnUpdateEndpoints200Content|Error>
      */
-    public function cdnUpdateEndpoints(string $cdnId, UpdateEndpoint $body): void;
+    public function cdnUpdateEndpoints(string $cdnId, UpdateEndpoint $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `cdn:delete`.
+     * @return Envelope<null|Error>
      */
-    public function cdnDeleteEndpoint(string $cdnId): void;
+    public function cdnDeleteEndpoint(string $cdnId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `cdn:delete`.
+     * @return Envelope<null|Error>
      */
-    public function cdnPurgeCache(string $cdnId, PurgeCache $body): void;
+    public function cdnPurgeCache(string $cdnId, PurgeCache $body): Envelope;
 }

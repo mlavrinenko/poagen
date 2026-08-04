@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeOfConduct;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `codes-of-conduct` endpoints.
@@ -23,9 +25,12 @@ use Acme\GitHub\Generated\Model\CodeOfConduct;
 interface CodesOfConductClientInterface
 {
     /**
-     * @return list<CodeOfConduct>
+     * @return Envelope<list<CodeOfConduct>|null>
      */
-    public function codesOfConductGetAllCodesOfConduct(): array;
+    public function codesOfConductGetAllCodesOfConduct(): Envelope;
 
-    public function codesOfConductGetConductCode(string $key): CodeOfConduct;
+    /**
+     * @return Envelope<CodeOfConduct|BasicError|null>
+     */
+    public function codesOfConductGetConductCode(string $key): Envelope;
 }

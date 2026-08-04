@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+
 /**
  * The contract for the `emojis` endpoints.
  *
@@ -21,7 +23,7 @@ namespace Acme\GitHub\Generated;
 interface EmojisClientInterface
 {
     /**
-     * @return array<string, string>
+     * @return Envelope<array<string, string>|null>
      */
-    public function emojisGet(): array;
+    public function emojisGet(): Envelope;
 }

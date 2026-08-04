@@ -11,12 +11,15 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\NfsActionAttach;
 use Acme\DigitalOcean\Generated\Model\NfsActionDetach;
 use Acme\DigitalOcean\Generated\Model\NfsActionReassign;
 use Acme\DigitalOcean\Generated\Model\NfsActionResize;
 use Acme\DigitalOcean\Generated\Model\NfsActionSnapshot;
 use Acme\DigitalOcean\Generated\Model\NfsActionSwitchPerformanceTier;
+use Acme\DigitalOcean\Generated\Model\NfsActionsResponse;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `NFS Actions` endpoints.
@@ -29,9 +32,10 @@ interface NfsActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `nfs:create`.
+     * @return Envelope<NfsActionsResponse|Error>
      */
     public function nfsCreateAction(
         string $nfsId,
         NfsActionResize|NfsActionSnapshot|NfsActionAttach|NfsActionDetach|NfsActionReassign|NfsActionSwitchPerformanceTier $body,
-    ): void;
+    ): Envelope;
 }

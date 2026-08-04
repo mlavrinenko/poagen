@@ -11,9 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkAddRequestContent;
 use Acme\GitHub\Generated\Model\EnterpriseTeamMembershipsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\SimpleUser;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `enterprise-team-memberships` endpoints.
@@ -25,48 +27,57 @@ use Acme\GitHub\Generated\Model\SimpleUser;
 interface EnterpriseTeamMembershipsClientInterface
 {
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsList(
         string $enterprise,
         string $enterpriseTeam,
         ?int $perPage = null,
         ?int $page = null,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamMembershipsBulkAddRequestContent $body,
-    ): array;
+    ): Envelope;
 
     /**
-     * @return list<SimpleUser>
+     * @return Envelope<list<SimpleUser>>
      */
     public function enterpriseTeamMembershipsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
         EnterpriseTeamMembershipsBulkRemoveRequestContent $body,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SimpleUser>
+     */
     public function enterpriseTeamMembershipsGet(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): SimpleUser;
+    ): Envelope;
 
+    /**
+     * @return Envelope<SimpleUser>
+     */
     public function enterpriseTeamMembershipsAdd(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): SimpleUser;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function enterpriseTeamMembershipsRemove(
         string $enterprise,
         string $enterpriseTeam,
         string $username,
-    ): void;
+    ): Envelope;
 }

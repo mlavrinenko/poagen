@@ -1338,9 +1338,10 @@ final class ModelGeneratorSteps
     public function thenEmittedClientDeclaresPlaceOrderPlaceOrderRequestContentBodyPlaceOrder200Content(): void
     {
         TestCase::assertStringContainsString(
-            'public function placeOrder(PlaceOrderRequestContent $body): PlaceOrder200Content',
+            'public function placeOrder(PlaceOrderRequestContent $body): Envelope',
             $this->inlineClientSource(),
         );
+        TestCase::assertStringContainsString('@return Envelope<PlaceOrder200Content>', $this->inlineClientSource());
     }
 
 
@@ -1376,8 +1377,8 @@ final class ModelGeneratorSteps
         // The signature is `array`; the element type lives in phpdoc, which is
         // the only place PHP lets it be said.
         TestCase::assertStringContainsString('@param list<PlaceOrdersBulkRequestContentItem> $body', $client);
-        TestCase::assertStringContainsString('@return list<PlaceOrdersBulk200ContentItem>', $client);
-        TestCase::assertStringContainsString('public function placeOrdersBulk(array $body): array', $client);
+        TestCase::assertStringContainsString('@return Envelope<list<PlaceOrdersBulk200ContentItem>>', $client);
+        TestCase::assertStringContainsString('public function placeOrdersBulk(array $body): Envelope', $client);
     }
 
 
@@ -1479,7 +1480,7 @@ final class ModelGeneratorSteps
     {
         $client = $this->inlineClientSource();
 
-        TestCase::assertStringContainsString('public function ping(array $body): void', $client);
+        TestCase::assertStringContainsString('public function ping(array $body): Envelope', $client);
         TestCase::assertStringContainsString('@param array<string, mixed> $body', $client);
     }
 
@@ -1510,7 +1511,7 @@ final class ModelGeneratorSteps
 
         // The pinned name is what the client returns, not merely what a file
         // is called.
-        TestCase::assertStringContainsString(': PlacedOrder', $this->inlineClientSource());
+        TestCase::assertStringContainsString('@return Envelope<PlacedOrder>', $this->inlineClientSource());
     }
 
 

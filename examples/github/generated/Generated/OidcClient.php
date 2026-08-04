@@ -11,13 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusion;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusionInput;
 use Acme\GitHub\Generated\Model\OidcCustomSub;
 use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class OidcClient implements OidcClientInterface
@@ -28,92 +31,134 @@ final readonly class OidcClient implements OidcClientInterface
     }
 
     /**
-     * @return list<OidcCustomPropertyInclusion>
+     * @return Envelope<list<OidcCustomPropertyInclusion>|BasicError>
      */
-    public function oidcListOidcCustomPropertyInclusionsForEnterprise(string $enterprise): array
+    public function oidcListOidcCustomPropertyInclusionsForEnterprise(string $enterprise): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<OidcCustomPropertyInclusion>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/oidc/customization/properties/repo')
                 ->path('enterprise', $enterprise),
-            ResponseType::listOf(OidcCustomPropertyInclusion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function oidcCreateOidcCustomPropertyInclusionForEnterprise(
-        string $enterprise,
-        OidcCustomPropertyInclusionInput $body,
-    ): OidcCustomPropertyInclusion {
-        return $this->transport->send(
-            Endpoint::post('/enterprises/{enterprise}/actions/oidc/customization/properties/repo')
-                ->path('enterprise', $enterprise)
-                ->json($body),
-            ResponseType::object(OidcCustomPropertyInclusion::class),
-        );
-    }
-
-    public function oidcDeleteOidcCustomPropertyInclusionForEnterprise(
-        string $enterprise,
-        string $customPropertyName,
-    ): void {
-        $this->transport->send(
-            Endpoint::delete('/enterprises/{enterprise}/actions/oidc/customization/properties/repo/{custom_property_name}')
-                ->path('enterprise', $enterprise)
-                ->path('custom_property_name', $customPropertyName),
-            ResponseType::nothing(),
-        );
+        return $result;
     }
 
     /**
-     * @return list<OidcCustomPropertyInclusion>
+     * @return Envelope<OidcCustomPropertyInclusion|null|BasicError>
      */
-    public function oidcListOidcCustomPropertyInclusionsForOrg(string $org): array
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/actions/oidc/customization/properties/repo')
-                ->path('org', $org),
-            ResponseType::listOf(OidcCustomPropertyInclusion::class),
+    public function oidcCreateOidcCustomPropertyInclusionForEnterprise(
+        string $enterprise,
+        OidcCustomPropertyInclusionInput $body,
+    ): Envelope {
+        /** @var Envelope<OidcCustomPropertyInclusion|null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::post('/enterprises/{enterprise}/actions/oidc/customization/properties/repo')
+                ->path('enterprise', $enterprise)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function oidcDeleteOidcCustomPropertyInclusionForEnterprise(
+        string $enterprise,
+        string $customPropertyName,
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::delete('/enterprises/{enterprise}/actions/oidc/customization/properties/repo/{custom_property_name}')
+                ->path('enterprise', $enterprise)
+                ->path('custom_property_name', $customPropertyName),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<OidcCustomPropertyInclusion>|BasicError>
+     */
+    public function oidcListOidcCustomPropertyInclusionsForOrg(string $org): Envelope
+    {
+        /** @var Envelope<list<OidcCustomPropertyInclusion>|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/actions/oidc/customization/properties/repo')
+                ->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<OidcCustomPropertyInclusion|null|BasicError>
+     */
     public function oidcCreateOidcCustomPropertyInclusionForOrg(
         string $org,
         OidcCustomPropertyInclusionInput $body,
-    ): OidcCustomPropertyInclusion {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<OidcCustomPropertyInclusion|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/oidc/customization/properties/repo')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(OidcCustomPropertyInclusion::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function oidcDeleteOidcCustomPropertyInclusionForOrg(string $org, string $customPropertyName): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function oidcDeleteOidcCustomPropertyInclusionForOrg(string $org, string $customPropertyName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/actions/oidc/customization/properties/repo/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function oidcGetOidcCustomSubTemplateForOrg(string $org): OidcCustomSub
+    /**
+     * @return Envelope<OidcCustomSub>
+     */
+    public function oidcGetOidcCustomSubTemplateForOrg(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OidcCustomSub> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/oidc/customization/sub')->path('org', $org),
-            ResponseType::object(OidcCustomSub::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSub::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|BasicError>
+     */
     public function oidcUpdateOidcCustomSubTemplateForOrg(
         string $org,
         OidcUpdateOidcCustomSubTemplateForOrgRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/oidc/customization/sub')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

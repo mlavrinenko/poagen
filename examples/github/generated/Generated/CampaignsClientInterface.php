@@ -14,9 +14,16 @@ namespace Acme\GitHub\Generated;
 use Acme\GitHub\Generated\Enum\CampaignState;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CampaignSummary;
+use Acme\GitHub\Generated\Model\CampaignsCreateCampaign503Content;
 use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequestContent;
+use Acme\GitHub\Generated\Model\CampaignsDeleteCampaign503Content;
+use Acme\GitHub\Generated\Model\CampaignsGetCampaignSummary503Content;
+use Acme\GitHub\Generated\Model\CampaignsListOrgCampaigns503Content;
+use Acme\GitHub\Generated\Model\CampaignsUpdateCampaign503Content;
 use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `campaigns` endpoints.
@@ -28,7 +35,7 @@ use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequestContent;
 interface CampaignsClientInterface
 {
     /**
-     * @return list<CampaignSummary>
+     * @return Envelope<list<CampaignSummary>|BasicError|CampaignsListOrgCampaigns503Content>
      */
     public function campaignsListOrgCampaigns(
         string $org,
@@ -37,17 +44,29 @@ interface CampaignsClientInterface
         ?CampaignsListOrgCampaignsDirection $direction = null,
         ?CampaignState $state = null,
         ?CampaignsListOrgCampaignsSort $sort = null,
-    ): array;
+    ): Envelope;
 
-    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): CampaignSummary;
+    /**
+     * @return Envelope<CampaignSummary|BasicError|null|CampaignsCreateCampaign503Content>
+     */
+    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): Envelope;
 
-    public function campaignsGetCampaignSummary(string $org, int $campaignNumber): CampaignSummary;
+    /**
+     * @return Envelope<CampaignSummary|BasicError|CampaignsGetCampaignSummary503Content>
+     */
+    public function campaignsGetCampaignSummary(string $org, int $campaignNumber): Envelope;
 
-    public function campaignsDeleteCampaign(string $org, int $campaignNumber): void;
+    /**
+     * @return Envelope<null|BasicError|CampaignsDeleteCampaign503Content>
+     */
+    public function campaignsDeleteCampaign(string $org, int $campaignNumber): Envelope;
 
+    /**
+     * @return Envelope<CampaignSummary|BasicError|CampaignsUpdateCampaign503Content>
+     */
     public function campaignsUpdateCampaign(
         string $org,
         int $campaignNumber,
         CampaignsUpdateCampaignRequestContent $body,
-    ): CampaignSummary;
+    ): Envelope;
 }

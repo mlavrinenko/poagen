@@ -12,7 +12,11 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\OneClicksListType;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\OneClicksCreate;
+use Acme\DigitalOcean\Generated\Model\OneClicksInstallKubernetes200Content;
+use Acme\DigitalOcean\Generated\Model\OneClicksList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `1-Click Applications` endpoints.
@@ -23,10 +27,14 @@ use Acme\DigitalOcean\Generated\Model\OneClicksCreate;
  */
 interface _1ClickApplicationsClientInterface
 {
-    public function oneClicksList(?OneClicksListType $type = null): void;
+    /**
+     * @return Envelope<OneClicksList200Content|Error>
+     */
+    public function oneClicksList(?OneClicksListType $type = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `kubernetes:update`, `addon:create`.
+     * @return Envelope<OneClicksInstallKubernetes200Content|Error>
      */
-    public function oneClicksInstallKubernetes(OneClicksCreate $body): void;
+    public function oneClicksInstallKubernetes(OneClicksCreate $body): Envelope;
 }

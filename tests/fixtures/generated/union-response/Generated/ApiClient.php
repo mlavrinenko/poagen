@@ -14,7 +14,9 @@ namespace Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated;
 use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
 use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Celsius;
@@ -28,58 +30,73 @@ final readonly class ApiClient implements ApiClientInterface
     ) {
     }
 
-    public function getCreature(): Dog|Cat
+    /**
+     * @return Envelope<Dog|Cat>
+     */
+    public function getCreature(): Envelope
     {
-        /** @var Dog|Cat $result */
+        /** @var Envelope<Dog|Cat> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures'),
-            ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
     /**
-     * @return list<Dog|Cat>
+     * @return Envelope<list<Dog|Cat>>
      */
-    public function listCreatures(): array
+    public function listCreatures(): Envelope
     {
-        /** @var list<Dog|Cat> $result */
+        /** @var Envelope<list<Dog|Cat>> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/list'),
-            ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures~1list/get/responses/200/content/application~1json/schema')),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures~1list/get/responses/200/content/application~1json/schema'))]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
-    public function getRestrictions(): Dog|GetRestrictionsResponseBranch2
+    /**
+     * @return Envelope<Dog|GetRestrictionsResponseBranch2>
+     */
+    public function getRestrictions(): Envelope
     {
-        /** @var Dog|GetRestrictionsResponseBranch2 $result */
+        /** @var Envelope<Dog|GetRestrictionsResponseBranch2> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/restrictions'),
-            ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class], empty: GetRestrictionsResponseBranch2::class), '/paths/~1creatures~1restrictions/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class], empty: GetRestrictionsResponseBranch2::class), '/paths/~1creatures~1restrictions/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
-    public function getTaggedCreature(): Dog|Cat
+    /**
+     * @return Envelope<Dog|Cat>
+     */
+    public function getTaggedCreature(): Envelope
     {
-        /** @var Dog|Cat $result */
+        /** @var Envelope<Dog|Cat> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/tagged'),
-            ResponseType::union(new Discriminator(field: 'kind', map: ['canine' => Dog::class, 'feline' => Cat::class], onParent: false), null, '/paths/~1creatures~1tagged/get/responses/200/content/application~1json/schema'),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'kind', map: ['canine' => Dog::class, 'feline' => Cat::class], onParent: false), null, '/paths/~1creatures~1tagged/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
         );
 
         return $result;
     }
 
-    public function getUndecidableCreature(): Celsius
+    /**
+     * @return Envelope<Celsius>
+     */
+    public function getUndecidableCreature(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<Celsius> $result */
+        $result = $this->transport->send(
             Endpoint::get('/creatures/undecidable'),
-            ResponseType::object(Celsius::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Celsius::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

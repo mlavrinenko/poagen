@@ -3,11 +3,13 @@ info:
   title: Inline Payload Multi-Status Fixture
   version: "1.0.0"
   description: >
-    name-inline-schemas-by-operation-and-status fixture. One operation
-    declares three inline object responses: the `200` that drives the return
-    type, a `403`, and a `default` — every status besides the picked one
-    still earns its own class, unwired from the return type until
-    typed-error-responses lands.
+    name-inline-schemas-by-operation-and-status fixture, extended by
+    typed-error-responses to also cover OpenAPI's exact/range/default
+    precedence: one operation declares four inline object responses — the
+    `200` that drives the return type, an exact `403`, a `4XX` range key
+    that the exact `403` must still win over on the wire, and a `default`.
+    Every status earns its own class, and every one of them now wires into
+    the operation's envelope.
 paths:
   /widgets/{id}:
     get:
@@ -41,6 +43,17 @@ paths:
                 properties:
                   reason:
                     type: string
+        '4XX':
+          description: any other client error
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                properties:
+                  code:
+                    type: integer
         default:
           description: anything else
           content:

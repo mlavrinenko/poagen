@@ -21,6 +21,7 @@ use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoDirection;
 use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoScope;
 use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\DependabotAlert;
 use Acme\GitHub\Generated\Model\DependabotAlertWithRepository;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequestContent;
@@ -37,6 +38,8 @@ use Acme\GitHub\Generated\Model\DependabotUpdateAlertRequestContent;
 use Acme\GitHub\Generated\Model\DependabotUpdateRepositoryAccessForOrgRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OrganizationDependabotSecret;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `dependabot` endpoints.
@@ -49,7 +52,7 @@ interface DependabotClientInterface
 {
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlertWithRepository>
+     * @return Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForEnterprise(
         string $enterprise,
@@ -67,11 +70,11 @@ interface DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlertWithRepository>
+     * @return Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForOrg(
         string $org,
@@ -92,66 +95,94 @@ interface DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
-    public function dependabotRepositoryAccessForOrg(
-        string $org,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): DependabotRepositoryAccessDetails;
+    /**
+     * @return Envelope<DependabotRepositoryAccessDetails|BasicError>
+     */
+    public function dependabotRepositoryAccessForOrg(string $org, ?int $page = null, ?int $perPage = null): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function dependabotUpdateRepositoryAccessForOrg(
         string $org,
         DependabotUpdateRepositoryAccessForOrgRequestContent $body,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function dependabotSetRepositoryAccessDefaultLevel(
         string $org,
         DependabotSetRepositoryAccessDefaultLevelRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function dependabotListOrgSecrets(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): DependabotListOrgSecrets200Content;
+    /**
+     * @return Envelope<DependabotListOrgSecrets200Content>
+     */
+    public function dependabotListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope;
 
-    public function dependabotGetOrgPublicKey(string $org): DependabotPublicKey;
+    /**
+     * @return Envelope<DependabotPublicKey>
+     */
+    public function dependabotGetOrgPublicKey(string $org): Envelope;
 
-    public function dependabotGetOrgSecret(string $org, string $secretName): OrganizationDependabotSecret;
+    /**
+     * @return Envelope<OrganizationDependabotSecret>
+     */
+    public function dependabotGetOrgSecret(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function dependabotCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         DependabotCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function dependabotDeleteOrgSecret(string $org, string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotDeleteOrgSecret(string $org, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<DependabotListSelectedReposForOrgSecret200Content>
+     */
     public function dependabotListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): DependabotListSelectedReposForOrgSecret200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function dependabotSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         DependabotSetSelectedReposForOrgSecretRequestContent $body,
-    ): void;
+    ): Envelope;
 
-    public function dependabotAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope;
 
+    /**
+     * @return Envelope<null>
+     */
     public function dependabotRemoveSelectedRepoFromOrgSecret(
         string $org,
         string $secretName,
         int $repositoryId,
-    ): void;
+    ): Envelope;
 
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlert>
+     * @return Envelope<list<DependabotAlert>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForRepo(
         string $owner,
@@ -171,34 +202,55 @@ interface DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
-    public function dependabotGetAlert(string $owner, string $repo, AlertNumber $alertNumber): DependabotAlert;
+    /**
+     * @return Envelope<DependabotAlert|null|BasicError>
+     */
+    public function dependabotGetAlert(string $owner, string $repo, AlertNumber $alertNumber): Envelope;
 
+    /**
+     * @return Envelope<DependabotAlert|BasicError|ValidationErrorSimple>
+     */
     public function dependabotUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         DependabotUpdateAlertRequestContent $body,
-    ): DependabotAlert;
+    ): Envelope;
 
+    /**
+     * @return Envelope<DependabotListRepoSecrets200Content>
+     */
     public function dependabotListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): DependabotListRepoSecrets200Content;
+    ): Envelope;
 
-    public function dependabotGetRepoPublicKey(string $owner, string $repo): DependabotPublicKey;
+    /**
+     * @return Envelope<DependabotPublicKey>
+     */
+    public function dependabotGetRepoPublicKey(string $owner, string $repo): Envelope;
 
-    public function dependabotGetRepoSecret(string $owner, string $repo, string $secretName): DependabotSecret;
+    /**
+     * @return Envelope<DependabotSecret>
+     */
+    public function dependabotGetRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function dependabotCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         DependabotCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject;
+    ): Envelope;
 
-    public function dependabotDeleteRepoSecret(string $owner, string $repo, string $secretName): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope;
 }

@@ -18,6 +18,7 @@ use Acme\GitHub\Generated\Enum\PullsListReviewCommentsForRepoSort;
 use Acme\GitHub\Generated\Enum\PullsListReviewCommentsSort;
 use Acme\GitHub\Generated\Enum\PullsListSort;
 use Acme\GitHub\Generated\Enum\PullsListState;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\Commit;
 use Acme\GitHub\Generated\Model\DiffEntry;
 use Acme\GitHub\Generated\Model\PullRequest;
@@ -31,6 +32,10 @@ use Acme\GitHub\Generated\Model\PullsCreateRequestContent;
 use Acme\GitHub\Generated\Model\PullsCreateReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\PullsCreateReviewRequestContent;
 use Acme\GitHub\Generated\Model\PullsDismissReviewRequestContent;
+use Acme\GitHub\Generated\Model\PullsGet503Content;
+use Acme\GitHub\Generated\Model\PullsListFiles503Content;
+use Acme\GitHub\Generated\Model\PullsMerge405Content;
+use Acme\GitHub\Generated\Model\PullsMerge409Content;
 use Acme\GitHub\Generated\Model\PullsMergeRequestContent;
 use Acme\GitHub\Generated\Model\PullsRemoveRequestedReviewersRequestContent;
 use Acme\GitHub\Generated\Model\PullsRequestReviewersRequestContent;
@@ -41,9 +46,13 @@ use Acme\GitHub\Generated\Model\PullsUpdateRequestContent;
 use Acme\GitHub\Generated\Model\PullsUpdateReviewCommentRequestContent;
 use Acme\GitHub\Generated\Model\PullsUpdateReviewRequestContent;
 use Acme\GitHub\Generated\Model\ReviewComment;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use DateTimeInterface;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class PullsClient implements PullsClientInterface
@@ -54,7 +63,7 @@ final readonly class PullsClient implements PullsClientInterface
     }
 
     /**
-     * @return list<PullRequestSimple>
+     * @return Envelope<list<PullRequestSimple>|null|ValidationError>
      */
     public function pullsList(
         string $owner,
@@ -66,8 +75,9 @@ final readonly class PullsClient implements PullsClientInterface
         ?PullsListDirection $direction = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PullRequestSimple>|null|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -78,23 +88,31 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PullRequestSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['304', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsCreate(string $owner, string $repo, PullsCreateRequestContent $body): PullRequest
+    /**
+     * @return Envelope<PullRequest|BasicError|ValidationError>
+     */
+    public function pullsCreate(string $owner, string $repo, PullsCreateRequestContent $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PullRequest|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(PullRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequest::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PullRequestReviewComment>
+     * @return Envelope<list<PullRequestReviewComment>>
      */
     public function pullsListReviewCommentsForRepo(
         string $owner,
@@ -104,8 +122,9 @@ final readonly class PullsClient implements PullsClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PullRequestReviewComment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -114,77 +133,109 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsGetReviewComment(string $owner, string $repo, int $commentId): PullRequestReviewComment
+    /**
+     * @return Envelope<PullRequestReviewComment|BasicError>
+     */
+    public function pullsGetReviewComment(string $owner, string $repo, int $commentId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PullRequestReviewComment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::object(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsDeleteReviewComment(string $owner, string $repo, int $commentId): void
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function pullsDeleteReviewComment(string $owner, string $repo, int $commentId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/pulls/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReviewComment>
+     */
     public function pullsUpdateReviewComment(
         string $owner,
         string $repo,
         int $commentId,
         PullsUpdateReviewCommentRequestContent $body,
-    ): PullRequestReviewComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReviewComment> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/pulls/comments/{comment_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsGet(string $owner, string $repo, int $pullNumber): PullRequest
+    /**
+     * @return Envelope<PullRequest|null|BasicError|PullsGet503Content>
+     */
+    public function pullsGet(string $owner, string $repo, int $pullNumber): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PullRequest|null|BasicError|PullsGet503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::object(PullRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['406', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsGet503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequest|ValidationError|BasicError>
+     */
     public function pullsUpdate(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsUpdateRequestContent $body,
-    ): PullRequest {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequest|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/pulls/{pull_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PullRequestReviewComment>
+     * @return Envelope<list<PullRequestReviewComment>>
      */
     public function pullsListReviewComments(
         string $owner,
@@ -195,8 +246,9 @@ final readonly class PullsClient implements PullsClientInterface
         ?\DateTimeImmutable $since = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PullRequestReviewComment>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -206,46 +258,60 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReviewComment|ValidationError|BasicError>
+     */
     public function pullsCreateReviewComment(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsCreateReviewCommentRequestContent $body,
-    ): PullRequestReviewComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReviewComment|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReviewComment|BasicError>
+     */
     public function pullsCreateReplyForReviewComment(
         string $owner,
         string $repo,
         int $pullNumber,
         int $commentId,
         PullsCreateReplyForReviewCommentRequestContent $body,
-    ): PullRequestReviewComment {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReviewComment|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::object(PullRequestReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<Commit>
+     * @return Envelope<list<Commit>>
      */
     public function pullsListCommits(
         string $owner,
@@ -253,20 +319,23 @@ final readonly class PullsClient implements PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<Commit>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/commits')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(Commit::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<DiffEntry>
+     * @return Envelope<list<DiffEntry>|ValidationError|BasicError|PullsListFiles503Content>
      */
     public function pullsListFiles(
         string $owner,
@@ -274,93 +343,119 @@ final readonly class PullsClient implements PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<DiffEntry>|ValidationError|BasicError|PullsListFiles503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/files')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(DiffEntry::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DiffEntry::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsListFiles503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsCheckIfMerged(string $owner, string $repo, int $pullNumber): void
+    /**
+     * @return Envelope<null>
+     */
+    public function pullsCheckIfMerged(string $owner, string $repo, int $pullNumber): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/merge')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsMerge(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-        PullsMergeRequestContent $body,
-    ): PullRequestMergeResult {
-        return $this->transport->send(
+    /**
+     * @return Envelope<PullRequestMergeResult|PullsMerge405Content|PullsMerge409Content|ValidationError|BasicError>
+     */
+    public function pullsMerge(string $owner, string $repo, int $pullNumber, PullsMergeRequestContent $body): Envelope
+    {
+        /** @var Envelope<PullRequestMergeResult|PullsMerge405Content|PullsMerge409Content|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pulls/{pull_number}/merge')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequestMergeResult::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestMergeResult::class)], ['405', ResponseType::object(PullsMerge405Content::class)], ['409', ResponseType::object(PullsMerge409Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsListRequestedReviewers(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-    ): PullRequestReviewRequest {
-        return $this->transport->send(
+    /**
+     * @return Envelope<PullRequestReviewRequest>
+     */
+    public function pullsListRequestedReviewers(string $owner, string $repo, int $pullNumber): Envelope
+    {
+        /** @var Envelope<PullRequestReviewRequest> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::object(PullRequestReviewRequest::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewRequest::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestSimple|null|BasicError>
+     */
     public function pullsRequestReviewers(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsRequestReviewersRequestContent $body,
-    ): PullRequestSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestSimple|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequestSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestSimple::class)], ['422', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestSimple|ValidationError>
+     */
     public function pullsRemoveRequestedReviewers(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsRemoveRequestedReviewersRequestContent $body,
-    ): PullRequestSimple {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestSimple|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequestSimple::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestSimple::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<PullRequestReview>
+     * @return Envelope<list<PullRequestReview>>
      */
     public function pullsListReviews(
         string $owner,
@@ -368,82 +463,105 @@ final readonly class PullsClient implements PullsClientInterface
         int $pullNumber,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<PullRequestReview>> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/reviews')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReview::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReview|ValidationErrorSimple|BasicError>
+     */
     public function pullsCreateReview(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsCreateReviewRequestContent $body,
-    ): PullRequestReview {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReview|ValidationErrorSimple|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/reviews')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsGetReview(string $owner, string $repo, int $pullNumber, int $reviewId): PullRequestReview
+    /**
+     * @return Envelope<PullRequestReview|BasicError>
+     */
+    public function pullsGetReview(string $owner, string $repo, int $pullNumber, int $reviewId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<PullRequestReview|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReview|ValidationErrorSimple>
+     */
     public function pullsUpdateReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsUpdateReviewRequestContent $body,
-    ): PullRequestReview {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReview|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function pullsDeletePendingReview(
-        string $owner,
-        string $repo,
-        int $pullNumber,
-        int $reviewId,
-    ): PullRequestReview {
-        return $this->transport->send(
+    /**
+     * @return Envelope<PullRequestReview|ValidationErrorSimple|BasicError>
+     */
+    public function pullsDeletePendingReview(string $owner, string $repo, int $pullNumber, int $reviewId): Envelope
+    {
+        /** @var Envelope<PullRequestReview|ValidationErrorSimple|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<ReviewComment>
+     * @return Envelope<list<ReviewComment>|BasicError>
      */
     public function pullsListCommentsForReview(
         string $owner,
@@ -452,8 +570,9 @@ final readonly class PullsClient implements PullsClientInterface
         int $reviewId,
         ?int $perPage = null,
         ?int $page = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<ReviewComment>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/comments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -461,59 +580,79 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('review_id', $reviewId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::listOf(ReviewComment::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReview|BasicError|ValidationErrorSimple>
+     */
     public function pullsDismissReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsDismissReviewRequestContent $body,
-    ): PullRequestReview {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReview|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/dismissals')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullRequestReview|BasicError|ValidationErrorSimple>
+     */
     public function pullsSubmitReview(
         string $owner,
         string $repo,
         int $pullNumber,
         int $reviewId,
         PullsSubmitReviewRequestContent $body,
-    ): PullRequestReview {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullRequestReview|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pulls/{pull_number}/reviews/{review_id}/events')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::object(PullRequestReview::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<PullsUpdateBranch202Content|ValidationError|BasicError>
+     */
     public function pullsUpdateBranch(
         string $owner,
         string $repo,
         int $pullNumber,
         PullsUpdateBranchRequestContent $body,
-    ): PullsUpdateBranch202Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<PullsUpdateBranch202Content|ValidationError|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pulls/{pull_number}/update-branch')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::object(PullsUpdateBranch202Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PullsUpdateBranch202Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

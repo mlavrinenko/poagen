@@ -11,8 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Action;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Acme\DigitalOcean\Generated\Model\ImageActionBase;
 use Acme\DigitalOcean\Generated\Model\ImageActionTransfer;
+use Acme\DigitalOcean\Generated\Model\ImageActionsList200Content;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Image Actions` endpoints.
@@ -25,16 +29,19 @@ interface ImageActionsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<ImageActionsList200Content|Error>
      */
-    public function imageActionsList(int $imageId): void;
+    public function imageActionsList(int $imageId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:update`.
+     * @return Envelope<Action|Error>
      */
-    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): void;
+    public function imageActionsPost(int $imageId, ImageActionBase|ImageActionTransfer $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `image:read`.
+     * @return Envelope<Action|Error>
      */
-    public function imageActionsGet(int $imageId, int $actionId): void;
+    public function imageActionsGet(int $imageId, int $actionId): Envelope;
 }

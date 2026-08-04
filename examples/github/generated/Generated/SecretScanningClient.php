@@ -18,18 +18,29 @@ use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoDirection;
 use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoSort;
 use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoState;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\OrganizationSecretScanningAlert;
 use Acme\GitHub\Generated\Model\SecretScanningAlert;
+use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypass503Content;
 use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequestContent;
+use Acme\GitHub\Generated\Model\SecretScanningGetAlert503Content;
+use Acme\GitHub\Generated\Model\SecretScanningGetScanHistory503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListAlertsForOrg503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListAlertsForRepo503Content;
+use Acme\GitHub\Generated\Model\SecretScanningListLocationsForAlert503Content;
 use Acme\GitHub\Generated\Model\SecretScanningLocation;
 use Acme\GitHub\Generated\Model\SecretScanningPatternConfiguration;
 use Acme\GitHub\Generated\Model\SecretScanningPushProtectionBypass;
 use Acme\GitHub\Generated\Model\SecretScanningScanHistory;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateAlert503Content;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequestContent;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigs200Content;
 use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequestContent;
+use Acme\GitHub\Generated\Model\ValidationError;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SecretScanningClient implements SecretScanningClientInterface
@@ -40,7 +51,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
     }
 
     /**
-     * @return list<OrganizationSecretScanningAlert>
+     * @return Envelope<list<OrganizationSecretScanningAlert>|BasicError|SecretScanningListAlertsForOrg503Content>
      */
     public function secretScanningListAlertsForOrg(
         string $org,
@@ -61,8 +72,9 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
         ?bool $isPubliclyLeaked = null,
         ?bool $isMultiRepo = null,
         ?bool $hideSecret = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<OrganizationSecretScanningAlert>|BasicError|SecretScanningListAlertsForOrg503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/secret-scanning/alerts')
                 ->path('org', $org)
                 ->query('state', $state)
@@ -82,33 +94,47 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->query('is_publicly_leaked', $isPubliclyLeaked)
                 ->query('is_multi_repo', $isMultiRepo)
                 ->query('hide_secret', $hideSecret),
-            ResponseType::listOf(OrganizationSecretScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSecretScanningAlert::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(SecretScanningListAlertsForOrg503Content::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function secretScanningListOrgPatternConfigs(string $org): SecretScanningPatternConfiguration
-    {
-        return $this->transport->send(
-            Endpoint::get('/orgs/{org}/secret-scanning/pattern-configurations')
-                ->path('org', $org),
-            ResponseType::object(SecretScanningPatternConfiguration::class),
-        );
-    }
-
-    public function secretScanningUpdateOrgPatternConfigs(
-        string $org,
-        SecretScanningUpdateOrgPatternConfigsRequestContent $body,
-    ): SecretScanningUpdateOrgPatternConfigs200Content {
-        return $this->transport->send(
-            Endpoint::patch('/orgs/{org}/secret-scanning/pattern-configurations')
-                ->path('org', $org)
-                ->json($body),
-            ResponseType::object(SecretScanningUpdateOrgPatternConfigs200Content::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<SecretScanningAlert>
+     * @return Envelope<SecretScanningPatternConfiguration|BasicError>
+     */
+    public function secretScanningListOrgPatternConfigs(string $org): Envelope
+    {
+        /** @var Envelope<SecretScanningPatternConfiguration|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/orgs/{org}/secret-scanning/pattern-configurations')
+                ->path('org', $org),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPatternConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<SecretScanningUpdateOrgPatternConfigs200Content|BasicError|ValidationError>
+     */
+    public function secretScanningUpdateOrgPatternConfigs(
+        string $org,
+        SecretScanningUpdateOrgPatternConfigsRequestContent $body,
+    ): Envelope {
+        /** @var Envelope<SecretScanningUpdateOrgPatternConfigs200Content|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
+            Endpoint::patch('/orgs/{org}/secret-scanning/pattern-configurations')
+                ->path('org', $org)
+                ->json($body),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningUpdateOrgPatternConfigs200Content::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<SecretScanningAlert>|null|SecretScanningListAlertsForRepo503Content>
      */
     public function secretScanningListAlertsForRepo(
         string $owner,
@@ -130,8 +156,9 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
         ?bool $isPubliclyLeaked = null,
         ?bool $isMultiRepo = null,
         ?bool $hideSecret = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SecretScanningAlert>|null|SecretScanningListAlertsForRepo503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/secret-scanning/alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -152,44 +179,58 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->query('is_publicly_leaked', $isPubliclyLeaked)
                 ->query('is_multi_repo', $isMultiRepo)
                 ->query('hide_secret', $hideSecret),
-            ResponseType::listOf(SecretScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningAlert::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningListAlertsForRepo503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SecretScanningAlert|null|SecretScanningGetAlert503Content>
+     */
     public function secretScanningGetAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         ?bool $hideSecret = null,
-    ): SecretScanningAlert {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecretScanningAlert|null|SecretScanningGetAlert503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->query('hide_secret', $hideSecret),
-            ResponseType::object(SecretScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['304', ResponseType::nothing()], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningGetAlert503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SecretScanningAlert|null|SecretScanningUpdateAlert503Content>
+     */
     public function secretScanningUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         SecretScanningUpdateAlertRequestContent $body,
-    ): SecretScanningAlert {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecretScanningAlert|null|SecretScanningUpdateAlert503Content> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::object(SecretScanningAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningUpdateAlert503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<SecretScanningLocation>
+     * @return Envelope<list<SecretScanningLocation>|null|SecretScanningListLocationsForAlert503Content>
      */
     public function secretScanningListLocationsForAlert(
         string $owner,
@@ -197,39 +238,54 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
         AlertNumber $alertNumber,
         ?int $page = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<SecretScanningLocation>|null|SecretScanningListLocationsForAlert503Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(SecretScanningLocation::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningLocation::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningListLocationsForAlert503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<SecretScanningPushProtectionBypass|null|SecretScanningCreatePushProtectionBypass503Content>
+     */
     public function secretScanningCreatePushProtectionBypass(
         string $owner,
         string $repo,
         SecretScanningCreatePushProtectionBypassRequestContent $body,
-    ): SecretScanningPushProtectionBypass {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<SecretScanningPushProtectionBypass|null|SecretScanningCreatePushProtectionBypass503Content> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/secret-scanning/push-protection-bypasses')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(SecretScanningPushProtectionBypass::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPushProtectionBypass::class)], ['403', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningCreatePushProtectionBypass503Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function secretScanningGetScanHistory(string $owner, string $repo): SecretScanningScanHistory
+    /**
+     * @return Envelope<null|SecretScanningGetScanHistory503Content|SecretScanningScanHistory>
+     */
+    public function secretScanningGetScanHistory(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<null|SecretScanningGetScanHistory503Content|SecretScanningScanHistory> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/secret-scanning/scan-history')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(SecretScanningScanHistory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningGetScanHistory503Content::class)], ['200', ResponseType::object(SecretScanningScanHistory::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

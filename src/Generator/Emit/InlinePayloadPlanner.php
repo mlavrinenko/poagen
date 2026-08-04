@@ -9,13 +9,11 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
+use Mlavrinenko\Paogen\Generator\Bindings;
 use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
-
-use function is_array;
 
 /**
  * Names a model class for every operation payload the document declared inline.
@@ -31,11 +29,12 @@ use function is_array;
  * below the root — nested objects, arrays, inline enums — is then reached by
  * the machinery that was always there.
  *
- * The one 2xx response {@see successResponse()} picks still drives the
- * operation's parameter and return type; every other status — kilbil
- * declares a `403` alongside every `200` — still earns a class through
- * {@see ExtraResponsePlanner}, but claims no parameter or return type of its
- * own (`typed-error-responses` is what wires one in).
+ * Every declared status earns a class the same way — kilbil declares a `403`
+ * alongside every `200`, and both wire into the operation's envelope return
+ * type (`typed-error-responses`); {@see successResponse()} still names
+ * *a* 2xx for the response-union guidance index, which validates
+ * `Profile::$unionPins`/`$unionTags` against one response position per
+ * operation.
  *
  * The derivation reads the *normalised* method name, so a profile rename
  * improves the model names too: renaming `getclientfullbalance` to
@@ -78,12 +77,13 @@ final readonly class InlinePayloadPlanner
         NameRegistry $registry,
         array $pins,
         ModelNameLedger $ledger,
+        Bindings $bindings = new Bindings([]),
         array $xmlElements = [],
         array $preScannedSkips = [],
         array $unionPins = [],
     ): InlinePayloadCatalog {
         $bodies = [];
-        $returns = [];
+        $envelopes = [];
         $roots = [];
         $requestRefusals = [];
         $responseRefusals = [];
@@ -109,94 +109,36 @@ final readonly class InlinePayloadPlanner
                 $bodies[$rawId] = $body;
             }
 
-            $picked = self::successResponse($operation);
             $unionResolution = null;
-            $return = self::planResponse($picked, $rawId, $base, $pins, $unionPins, $registry, $ledger, $roots, $openApi, $responseRefusals, $unionResolution);
+            $envelopeRefusal = null;
+            $envelope = EnvelopeResponsePlanner::plan(
+                $operation,
+                $rawId,
+                $base,
+                $pins,
+                $unionPins,
+                $registry,
+                $bindings,
+                $ledger,
+                $roots,
+                $openApi,
+                $unionResolution,
+                $envelopeRefusal,
+            );
 
-            if ($return instanceof ReturnSpec) {
-                $returns[$rawId] = $return;
+            if ($envelope instanceof EnvelopeSpec) {
+                $envelopes[$rawId] = $envelope;
+            } elseif ($envelopeRefusal !== null) {
+                $responseRefusals[$rawId] = $envelopeRefusal;
             }
 
             if ($unionResolution instanceof UnionResolution) {
                 $unionByPointer[$unionResolution->position] = $unionResolution;
                 $unionByKey[$rawId . '.' . self::ROLE_RESPONSE] = $unionResolution;
             }
-
-            ExtraResponsePlanner::plan($operation, $rawId, $base, $picked[0] ?? null, $pins, $ledger, $roots);
         }
 
-        return new InlinePayloadCatalog($bodies, $returns, $roots, $requestRefusals, $responseRefusals, new UnionCatalog($unionByPointer, $unionByKey));
-    }
-
-    /**
-     * @param array{0:string,1:Schema}|null                    $picked {@see successResponse()}'s result, so this and
-     *                                                                  {@see ExtraResponsePlanner} agree which status is picked
-     * @param array<string,string>                             $pins
-     * @param array<string,array{branch:string,reason:string}> $unionPins
-     * @param list<SynthesisedModel>                            $roots
-     * @param array<string,string>                              $refusals keyed by raw operationId, mirrors {@see RequestBodyPlanner::plan()}'s
-     */
-    private static function planResponse(
-        ?array $picked,
-        string $rawId,
-        string $base,
-        array $pins,
-        array $unionPins,
-        NameRegistry $registry,
-        ModelNameLedger $ledger,
-        array &$roots,
-        OpenApi $openApi,
-        array &$refusals,
-        ?UnionResolution &$unionResolution,
-    ): ?ReturnSpec {
-        if ($picked === null) {
-            return null;
-        }
-
-        [$status, $schema] = $picked;
-        $pin = $pins[$rawId . '.' . $status] ?? null;
-
-        if (is_array($schema->allOf) && $schema->allOf !== []) {
-            $refusal = null;
-            $return = InlineAllOfPlanner::planResponse($schema, $base, $status, $pin, $openApi, $ledger, $roots, $refusal);
-
-            if ($refusal !== null) {
-                $refusals[$rawId] = $refusal;
-            }
-
-            return $return;
-        }
-
-        // Checked ahead of the `isSynthesisableObject()` fallback below —
-        // a `oneOf`/`anyOf` schema never satisfies it (it has no properties
-        // of its own), but the ordering mirrors {@see RequestBodyPlanner}'s
-        // for the same reason: one construct, checked once, in one place.
-        $unionRefusal = null;
-        $union = ResponseUnionPlanner::planResponse($schema, $status, $base, $rawId, $openApi, $registry, $ledger, $roots, $unionPins, $unionResolution, $unionRefusal);
-
-        if ($union instanceof ReturnSpec || $unionRefusal !== null) {
-            if ($unionRefusal !== null) {
-                $refusals[$rawId] = $unionRefusal;
-            }
-
-            return $union;
-        }
-
-        if (self::isSynthesisableObject($schema)) {
-            $name = InlineModelClaim::named($pin, InlinePayloadName::response($base, $status), $schema, $ledger, $roots);
-
-            return ReturnSpec::model($name);
-        }
-
-        $items = self::inlineObjectItemsOf($schema);
-
-        if ($items instanceof Schema) {
-            $name = InlineModelClaim::named($pin, InlinePayloadName::response($base, $status, item: true), $items, $ledger, $roots);
-
-            return ReturnSpec::listOf($name);
-        }
-
-        return null;
+        return new InlinePayloadCatalog($bodies, $envelopes, $roots, $requestRefusals, $responseRefusals, new UnionCatalog($unionByPointer, $unionByKey));
     }
 
     /**

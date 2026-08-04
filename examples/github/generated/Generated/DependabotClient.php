@@ -21,6 +21,7 @@ use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoDirection;
 use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoScope;
 use Acme\GitHub\Generated\Enum\DependabotListAlertsForRepoSort;
 use Acme\GitHub\Generated\Model\AlertNumber;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\DependabotAlert;
 use Acme\GitHub\Generated\Model\DependabotAlertWithRepository;
 use Acme\GitHub\Generated\Model\DependabotCreateOrUpdateOrgSecretRequestContent;
@@ -37,8 +38,11 @@ use Acme\GitHub\Generated\Model\DependabotUpdateAlertRequestContent;
 use Acme\GitHub\Generated\Model\DependabotUpdateRepositoryAccessForOrgRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OrganizationDependabotSecret;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class DependabotClient implements DependabotClientInterface
@@ -50,7 +54,7 @@ final readonly class DependabotClient implements DependabotClientInterface
 
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlertWithRepository>
+     * @return Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForEnterprise(
         string $enterprise,
@@ -68,8 +72,9 @@ final readonly class DependabotClient implements DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/dependabot/alerts')
                 ->path('enterprise', $enterprise)
                 ->query('classification', $classification)
@@ -86,13 +91,15 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(DependabotAlertWithRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlertWithRepository>
+     * @return Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForOrg(
         string $org,
@@ -113,8 +120,9 @@ final readonly class DependabotClient implements DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<DependabotAlertWithRepository>|null|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/alerts')
                 ->path('org', $org)
                 ->query('classification', $classification)
@@ -134,162 +142,230 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(DependabotAlertWithRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotRepositoryAccessForOrg(
-        string $org,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): DependabotRepositoryAccessDetails {
-        return $this->transport->send(
+    /**
+     * @return Envelope<DependabotRepositoryAccessDetails|BasicError>
+     */
+    public function dependabotRepositoryAccessForOrg(string $org, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<DependabotRepositoryAccessDetails|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/repository-access')
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(DependabotRepositoryAccessDetails::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotRepositoryAccessDetails::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function dependabotUpdateRepositoryAccessForOrg(
         string $org,
         DependabotUpdateRepositoryAccessForOrgRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/dependabot/repository-access')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null|BasicError>
+     */
     public function dependabotSetRepositoryAccessDefaultLevel(
         string $org,
         DependabotSetRepositoryAccessDefaultLevelRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/repository-access/default-level')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotListOrgSecrets(
-        string $org,
-        ?int $perPage = null,
-        ?int $page = null,
-    ): DependabotListOrgSecrets200Content {
-        return $this->transport->send(
+    /**
+     * @return Envelope<DependabotListOrgSecrets200Content>
+     */
+    public function dependabotListOrgSecrets(string $org, ?int $perPage = null, ?int $page = null): Envelope
+    {
+        /** @var Envelope<DependabotListOrgSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(DependabotListOrgSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListOrgSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotGetOrgPublicKey(string $org): DependabotPublicKey
+    /**
+     * @return Envelope<DependabotPublicKey>
+     */
+    public function dependabotGetOrgPublicKey(string $org): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DependabotPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets/public-key')->path('org', $org),
-            ResponseType::object(DependabotPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotGetOrgSecret(string $org, string $secretName): OrganizationDependabotSecret
+    /**
+     * @return Envelope<OrganizationDependabotSecret>
+     */
+    public function dependabotGetOrgSecret(string $org, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<OrganizationDependabotSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::object(OrganizationDependabotSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationDependabotSecret::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function dependabotCreateOrUpdateOrgSecret(
         string $org,
         string $secretName,
         DependabotCreateOrUpdateOrgSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotDeleteOrgSecret(string $org, string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotDeleteOrgSecret(string $org, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/dependabot/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DependabotListSelectedReposForOrgSecret200Content>
+     */
     public function dependabotListSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         ?int $page = null,
         ?int $perPage = null,
-    ): DependabotListSelectedReposForOrgSecret200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DependabotListSelectedReposForOrgSecret200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(DependabotListSelectedReposForOrgSecret200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListSelectedReposForOrgSecret200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function dependabotSetSelectedReposForOrgSecret(
         string $org,
         string $secretName,
         DependabotSetSelectedReposForOrgSecretRequestContent $body,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/secrets/{secret_name}/repositories')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotAddSelectedRepoToOrgSecret(string $org, string $secretName, int $repositoryId): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<null>
+     */
     public function dependabotRemoveSelectedRepoFromOrgSecret(
         string $org,
         string $secretName,
         int $repositoryId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/dependabot/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
      * @param string|list<string> $has
-     * @return list<DependabotAlert>
+     * @return Envelope<list<DependabotAlert>|null|BasicError|ValidationErrorSimple>
      */
     public function dependabotListAlertsForRepo(
         string $owner,
@@ -309,8 +385,9 @@ final readonly class DependabotClient implements DependabotClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<DependabotAlert>|null|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -329,98 +406,142 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::listOf(DependabotAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlert::class)], ['304', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotGetAlert(string $owner, string $repo, AlertNumber $alertNumber): DependabotAlert
+    /**
+     * @return Envelope<DependabotAlert|null|BasicError>
+     */
+    public function dependabotGetAlert(string $owner, string $repo, AlertNumber $alertNumber): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DependabotAlert|null|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::object(DependabotAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DependabotAlert|BasicError|ValidationErrorSimple>
+     */
     public function dependabotUpdateAlert(
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
         DependabotUpdateAlertRequestContent $body,
-    ): DependabotAlert {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DependabotAlert|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/dependabot/alerts/{alert_number}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::object(DependabotAlert::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<DependabotListRepoSecrets200Content>
+     */
     public function dependabotListRepoSecrets(
         string $owner,
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): DependabotListRepoSecrets200Content {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<DependabotListRepoSecrets200Content> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/secrets')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(DependabotListRepoSecrets200Content::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListRepoSecrets200Content::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotGetRepoPublicKey(string $owner, string $repo): DependabotPublicKey
+    /**
+     * @return Envelope<DependabotPublicKey>
+     */
+    public function dependabotGetRepoPublicKey(string $owner, string $repo): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DependabotPublicKey> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(DependabotPublicKey::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotGetRepoSecret(string $owner, string $repo, string $secretName): DependabotSecret
+    /**
+     * @return Envelope<DependabotSecret>
+     */
+    public function dependabotGetRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<DependabotSecret> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/dependabot/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::object(DependabotSecret::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotSecret::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<EmptyObject|null>
+     */
     public function dependabotCreateOrUpdateRepoSecret(
         string $owner,
         string $repo,
         string $secretName,
         DependabotCreateOrUpdateRepoSecretRequestContent $body,
-    ): EmptyObject {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<EmptyObject|null> $result */
+        $result = $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/dependabot/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::object(EmptyObject::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function dependabotDeleteRepoSecret(string $owner, string $repo, string $secretName): void
+    /**
+     * @return Envelope<null>
+     */
+    public function dependabotDeleteRepoSecret(string $owner, string $repo, string $secretName): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/dependabot/secrets/{secret_name}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

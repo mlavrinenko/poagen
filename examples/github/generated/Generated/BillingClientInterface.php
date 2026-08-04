@@ -12,8 +12,28 @@ declare(strict_types=1);
 namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Enum\BillingGetAllBudgetsOrgScope;
+use Acme\GitHub\Generated\Model\BasicError;
+use Acme\GitHub\Generated\Model\BillingDeleteBudgetOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetBudgetOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingPremiumRequestUsageReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingPremiumRequestUsageReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageSummaryReportOrg503Content;
+use Acme\GitHub\Generated\Model\BillingGetGithubBillingUsageSummaryReportUser503Content;
+use Acme\GitHub\Generated\Model\BillingPremiumRequestUsageReportOrg;
+use Acme\GitHub\Generated\Model\BillingPremiumRequestUsageReportUser;
 use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrg200Content;
 use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequestContent;
+use Acme\GitHub\Generated\Model\BillingUsageReport;
+use Acme\GitHub\Generated\Model\BillingUsageReportUser;
+use Acme\GitHub\Generated\Model\BillingUsageSummaryReportOrg;
+use Acme\GitHub\Generated\Model\BillingUsageSummaryReportUser;
+use Acme\GitHub\Generated\Model\DeleteBudget;
+use Acme\GitHub\Generated\Model\GetAllBudgets;
+use Acme\GitHub\Generated\Model\GetBudget;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `billing` endpoints.
@@ -24,23 +44,38 @@ use Acme\GitHub\Generated\Model\BillingUpdateBudgetOrgRequestContent;
  */
 interface BillingClientInterface
 {
+    /**
+     * @return Envelope<GetAllBudgets|BasicError>
+     */
     public function billingGetAllBudgetsOrg(
         string $org,
         ?int $page = null,
         ?int $perPage = null,
         ?BillingGetAllBudgetsOrgScope $scope = null,
-    ): void;
+    ): Envelope;
 
-    public function billingGetBudgetOrg(string $org, string $budgetId): void;
+    /**
+     * @return Envelope<GetBudget|BasicError|BillingGetBudgetOrg503Content>
+     */
+    public function billingGetBudgetOrg(string $org, string $budgetId): Envelope;
 
-    public function billingDeleteBudgetOrg(string $org, string $budgetId): void;
+    /**
+     * @return Envelope<DeleteBudget|BasicError|BillingDeleteBudgetOrg503Content>
+     */
+    public function billingDeleteBudgetOrg(string $org, string $budgetId): Envelope;
 
+    /**
+     * @return Envelope<BillingUpdateBudgetOrg200Content|BasicError|ValidationError>
+     */
     public function billingUpdateBudgetOrg(
         string $org,
         string $budgetId,
         BillingUpdateBudgetOrgRequestContent $body,
-    ): BillingUpdateBudgetOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingPremiumRequestUsageReportOrg|BasicError|BillingGetGithubBillingPremiumRequestUsageReportOrg503Content>
+     */
     public function billingGetGithubBillingPremiumRequestUsageReportOrg(
         string $org,
         ?int $year = null,
@@ -49,15 +84,21 @@ interface BillingClientInterface
         ?string $user = null,
         ?string $model = null,
         ?string $product = null,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingUsageReport|BasicError|BillingGetGithubBillingUsageReportOrg503Content>
+     */
     public function billingGetGithubBillingUsageReportOrg(
         string $org,
         ?int $year = null,
         ?int $month = null,
         ?int $day = null,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingUsageSummaryReportOrg|BasicError|BillingGetGithubBillingUsageSummaryReportOrg503Content>
+     */
     public function billingGetGithubBillingUsageSummaryReportOrg(
         string $org,
         ?int $year = null,
@@ -66,8 +107,11 @@ interface BillingClientInterface
         ?string $repository = null,
         ?string $product = null,
         ?string $sku = null,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingPremiumRequestUsageReportUser|BasicError|BillingGetGithubBillingPremiumRequestUsageReportUser503Content>
+     */
     public function billingGetGithubBillingPremiumRequestUsageReportUser(
         string $username,
         ?int $year = null,
@@ -75,15 +119,21 @@ interface BillingClientInterface
         ?int $day = null,
         ?string $model = null,
         ?string $product = null,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingUsageReportUser|BasicError|BillingGetGithubBillingUsageReportUser503Content>
+     */
     public function billingGetGithubBillingUsageReportUser(
         string $username,
         ?int $year = null,
         ?int $month = null,
         ?int $day = null,
-    ): void;
+    ): Envelope;
 
+    /**
+     * @return Envelope<BillingUsageSummaryReportUser|BasicError|BillingGetGithubBillingUsageSummaryReportUser503Content>
+     */
     public function billingGetGithubBillingUsageSummaryReportUser(
         string $username,
         ?int $year = null,
@@ -92,5 +142,5 @@ interface BillingClientInterface
         ?string $repository = null,
         ?string $product = null,
         ?string $sku = null,
-    ): void;
+    ): Envelope;
 }

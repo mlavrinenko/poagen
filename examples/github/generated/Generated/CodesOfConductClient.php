@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\CodeOfConduct;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class CodesOfConductClient implements CodesOfConductClientInterface
@@ -24,21 +27,30 @@ final readonly class CodesOfConductClient implements CodesOfConductClientInterfa
     }
 
     /**
-     * @return list<CodeOfConduct>
+     * @return Envelope<list<CodeOfConduct>|null>
      */
-    public function codesOfConductGetAllCodesOfConduct(): array
+    public function codesOfConductGetAllCodesOfConduct(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<list<CodeOfConduct>|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/codes_of_conduct'),
-            ResponseType::listOf(CodeOfConduct::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeOfConduct::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function codesOfConductGetConductCode(string $key): CodeOfConduct
+    /**
+     * @return Envelope<CodeOfConduct|BasicError|null>
+     */
+    public function codesOfConductGetConductCode(string $key): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<CodeOfConduct|BasicError|null> $result */
+        $result = $this->transport->send(
             Endpoint::get('/codes_of_conduct/{key}')->path('key', $key),
-            ResponseType::object(CodeOfConduct::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeOfConduct::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

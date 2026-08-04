@@ -128,8 +128,11 @@ use Acme\DigitalOcean\Generated\Model\ApiUpdateOpenAiapikeyInputPublic;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateOpenAiapikeyOutput;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateWorkspaceInputPublic;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateWorkspaceOutput;
+use Acme\DigitalOcean\Generated\Model\Error;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class GradientAiPlatformClient implements GradientAiPlatformClientInterface
@@ -142,1296 +145,1586 @@ final readonly class GradientAiPlatformClient implements GradientAiPlatformClien
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsOutputPublic|Error>
      */
-    public function genaiListAgents(
-        ?bool $onlyDeployed = null,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsOutputPublic {
-        return $this->transport->send(
+    public function genaiListAgents(?bool $onlyDeployed = null, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListAgentsOutputPublic|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents')
                 ->query('only_deployed', $onlyDeployed)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentsOutputPublic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentsOutputPublic::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAgentOutput|Error>
      */
-    public function genaiCreateAgent(ApiCreateAgentInputPublic $body): ApiCreateAgentOutput
+    public function genaiCreateAgent(ApiCreateAgentInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiCreateAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentApikeysOutput|Error>
      */
-    public function genaiListAgentApiKeys(
-        string $agentUuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentApikeysOutput {
-        return $this->transport->send(
+    public function genaiListAgentApiKeys(string $agentUuid, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListAgentApikeysOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents/{agent_uuid}/api_keys')
                 ->path('agent_uuid', $agentUuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentApikeysOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentApikeysOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAgentApikeyOutput|Error>
      */
-    public function genaiCreateAgentApiKey(
-        string $agentUuid,
-        ApiCreateAgentApikeyInputPublic $body,
-    ): ApiCreateAgentApikeyOutput {
-        return $this->transport->send(
+    public function genaiCreateAgentApiKey(string $agentUuid, ApiCreateAgentApikeyInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCreateAgentApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{agent_uuid}/api_keys')
                 ->path('agent_uuid', $agentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateAgentApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateAgentApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentApikeyOutput|Error>
      */
     public function genaiUpdateAgentApiKey(
         string $agentUuid,
         string $apiKeyUuid,
         ApiUpdateAgentApikeyInputPublic $body,
-    ): ApiUpdateAgentApikeyOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateAgentApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{agent_uuid}/api_keys/{api_key_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateAgentApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateAgentApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAgentApikeyOutput|Error>
      */
-    public function genaiDeleteAgentApiKey(string $agentUuid, string $apiKeyUuid): ApiDeleteAgentApikeyOutput
+    public function genaiDeleteAgentApiKey(string $agentUuid, string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteAgentApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{agent_uuid}/api_keys/{api_key_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteAgentApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteAgentApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRegenerateAgentApikeyOutput|Error>
      */
-    public function genaiRegenerateAgentApiKey(string $agentUuid, string $apiKeyUuid): ApiRegenerateAgentApikeyOutput
+    public function genaiRegenerateAgentApiKey(string $agentUuid, string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiRegenerateAgentApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{agent_uuid}/api_keys/{api_key_uuid}/regenerate')
                 ->path('agent_uuid', $agentUuid)
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiRegenerateAgentApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiRegenerateAgentApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentFunctionOutput|Error>
      */
-    public function genaiAttachAgentFunction(
-        string $agentUuid,
-        ApiLinkAgentFunctionInputPublic $body,
-    ): ApiLinkAgentFunctionOutput {
-        return $this->transport->send(
+    public function genaiAttachAgentFunction(string $agentUuid, ApiLinkAgentFunctionInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiLinkAgentFunctionOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{agent_uuid}/functions')
                 ->path('agent_uuid', $agentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiLinkAgentFunctionOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiLinkAgentFunctionOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentFunctionOutput|Error>
      */
     public function genaiUpdateAgentFunction(
         string $agentUuid,
         string $functionUuid,
         ApiUpdateAgentFunctionInputPublic $body,
-    ): ApiUpdateAgentFunctionOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateAgentFunctionOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{agent_uuid}/functions/{function_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('function_uuid', $functionUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateAgentFunctionOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateAgentFunctionOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentFunctionOutput|Error>
      */
-    public function genaiDetachAgentFunction(string $agentUuid, string $functionUuid): ApiUnlinkAgentFunctionOutput
+    public function genaiDetachAgentFunction(string $agentUuid, string $functionUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiUnlinkAgentFunctionOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{agent_uuid}/functions/{function_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('function_uuid', $functionUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiUnlinkAgentFunctionOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUnlinkAgentFunctionOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentGuardrailOutput|Error>
      */
-    public function genaiAttachAgentGuardrails(
-        string $agentUuid,
-        ApiLinkAgentGuardrailsInputPublic $body,
-    ): ApiLinkAgentGuardrailOutput {
-        return $this->transport->send(
+    public function genaiAttachAgentGuardrails(string $agentUuid, ApiLinkAgentGuardrailsInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiLinkAgentGuardrailOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{agent_uuid}/guardrails')
                 ->path('agent_uuid', $agentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiLinkAgentGuardrailOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiLinkAgentGuardrailOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentGuardrailOutput|Error>
      */
-    public function genaiDetachAgentGuardrail(string $agentUuid, string $guardrailUuid): ApiUnlinkAgentGuardrailOutput
+    public function genaiDetachAgentGuardrail(string $agentUuid, string $guardrailUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiUnlinkAgentGuardrailOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{agent_uuid}/guardrails/{guardrail_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('guardrail_uuid', $guardrailUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiUnlinkAgentGuardrailOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUnlinkAgentGuardrailOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkKnowledgeBaseOutput|Error>
      */
-    public function genaiAttachKnowledgeBases(string $agentUuid): ApiLinkKnowledgeBaseOutput
+    public function genaiAttachKnowledgeBases(string $agentUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiLinkKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{agent_uuid}/knowledge_bases')
                 ->path('agent_uuid', $agentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiLinkKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiLinkKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkKnowledgeBaseOutput|Error>
      */
-    public function genaiAttachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): ApiLinkKnowledgeBaseOutput
+    public function genaiAttachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiLinkKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{agent_uuid}/knowledge_bases/{knowledge_base_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiLinkKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiLinkKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkKnowledgeBaseOutput|Error>
      */
-    public function genaiDetachKnowledgeBase(
-        string $agentUuid,
-        string $knowledgeBaseUuid,
-    ): ApiUnlinkKnowledgeBaseOutput {
-        return $this->transport->send(
+    public function genaiDetachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): Envelope
+    {
+        /** @var Envelope<ApiUnlinkKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{agent_uuid}/knowledge_bases/{knowledge_base_uuid}')
                 ->path('agent_uuid', $agentUuid)
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiUnlinkKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUnlinkKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateLinkedAgentOutput|Error>
      */
     public function genaiUpdateAttachedAgent(
         string $parentAgentUuid,
         string $childAgentUuid,
         ApiUpdateLinkedAgentInputPublic $body,
-    ): ApiUpdateLinkedAgentOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateLinkedAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{parent_agent_uuid}/child_agents/{child_agent_uuid}')
                 ->path('parent_agent_uuid', $parentAgentUuid)
                 ->path('child_agent_uuid', $childAgentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateLinkedAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateLinkedAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentOutput|Error>
      */
     public function genaiAttachAgent(
         string $parentAgentUuid,
         string $childAgentUuid,
         ApiLinkAgentInputPublic $body,
-    ): ApiLinkAgentOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiLinkAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/agents/{parent_agent_uuid}/child_agents/{child_agent_uuid}')
                 ->path('parent_agent_uuid', $parentAgentUuid)
                 ->path('child_agent_uuid', $childAgentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiLinkAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiLinkAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentOutput|Error>
      */
-    public function genaiDetachAgent(string $parentAgentUuid, string $childAgentUuid): ApiUnlinkAgentOutput
+    public function genaiDetachAgent(string $parentAgentUuid, string $childAgentUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiUnlinkAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{parent_agent_uuid}/child_agents/{child_agent_uuid}')
                 ->path('parent_agent_uuid', $parentAgentUuid)
                 ->path('child_agent_uuid', $childAgentUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiUnlinkAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUnlinkAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAgentOutput|Error>
      */
-    public function genaiGetAgent(string $uuid): ApiGetAgentOutput
+    public function genaiGetAgent(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentOutput|Error>
      */
-    public function genaiUpdateAgent(string $uuid, ApiUpdateAgentInputPublic $body): ApiUpdateAgentOutput
+    public function genaiUpdateAgent(string $uuid, ApiUpdateAgentInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiUpdateAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAgentOutput|Error>
      */
-    public function genaiDeleteAgent(string $uuid): ApiDeleteAgentOutput
+    public function genaiDeleteAgent(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteAgentOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/agents/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteAgentOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteAgentOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetChildrenOutput|Error>
      */
-    public function genaiGetAgentChildren(string $uuid): ApiGetChildrenOutput
+    public function genaiGetAgentChildren(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetChildrenOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents/{uuid}/child_agents')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetChildrenOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetChildrenOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentDeploymentVisbilityOutput|Error>
      */
     public function genaiUpdateAgentDeploymentVisibility(
         string $uuid,
         ApiUpdateAgentDeploymentVisibilityInputPublic $body,
-    ): ApiUpdateAgentDeploymentVisbilityOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateAgentDeploymentVisbilityOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{uuid}/deployment_visibility')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateAgentDeploymentVisbilityOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateAgentDeploymentVisbilityOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAgentUsageOutput|Error>
      */
-    public function genaiGetAgentUsage(
-        string $uuid,
-        ?string $start = null,
-        ?string $stop = null,
-    ): ApiGetAgentUsageOutput {
-        return $this->transport->send(
+    public function genaiGetAgentUsage(string $uuid, ?string $start = null, ?string $stop = null): Envelope
+    {
+        /** @var Envelope<ApiGetAgentUsageOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents/{uuid}/usage')
                 ->path('uuid', $uuid)
                 ->query('start', $start)
                 ->query('stop', $stop)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetAgentUsageOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetAgentUsageOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentVersionsOutput|Error>
      */
-    public function genaiListAgentVersions(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentVersionsOutput {
-        return $this->transport->send(
+    public function genaiListAgentVersions(string $uuid, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListAgentVersionsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/agents/{uuid}/versions')
                 ->path('uuid', $uuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentVersionsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentVersionsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRollbackToAgentVersionOutput|Error>
      */
-    public function genaiRollbackToAgentVersion(
-        string $uuid,
-        ApiRollbackToAgentVersionInputPublic $body,
-    ): ApiRollbackToAgentVersionOutput {
-        return $this->transport->send(
+    public function genaiRollbackToAgentVersion(string $uuid, ApiRollbackToAgentVersionInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiRollbackToAgentVersionOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/agents/{uuid}/versions')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiRollbackToAgentVersionOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiRollbackToAgentVersionOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAnthropicApikeysOutput|Error>
      */
-    public function genaiListAnthropicApiKeys(?int $page = null, ?int $perPage = null): ApiListAnthropicApikeysOutput
+    public function genaiListAnthropicApiKeys(?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListAnthropicApikeysOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/anthropic/keys')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAnthropicApikeysOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAnthropicApikeysOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAnthropicApikeyOutput|Error>
      */
-    public function genaiCreateAnthropicApiKey(
-        ApiCreateAnthropicApikeyInputPublic $body,
-    ): ApiCreateAnthropicApikeyOutput {
-        return $this->transport->send(
+    public function genaiCreateAnthropicApiKey(ApiCreateAnthropicApikeyInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCreateAnthropicApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/anthropic/keys')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateAnthropicApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateAnthropicApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAnthropicApikeyOutput|Error>
      */
-    public function genaiGetAnthropicApiKey(string $apiKeyUuid): ApiGetAnthropicApikeyOutput
+    public function genaiGetAnthropicApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetAnthropicApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/anthropic/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetAnthropicApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetAnthropicApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAnthropicApikeyOutput|Error>
      */
     public function genaiUpdateAnthropicApiKey(
         string $apiKeyUuid,
         ApiUpdateAnthropicApikeyInputPublic $body,
-    ): ApiUpdateAnthropicApikeyOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateAnthropicApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/anthropic/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateAnthropicApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateAnthropicApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAnthropicApikeyOutput|Error>
      */
-    public function genaiDeleteAnthropicApiKey(string $apiKeyUuid): ApiDeleteAnthropicApikeyOutput
+    public function genaiDeleteAnthropicApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteAnthropicApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/anthropic/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteAnthropicApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteAnthropicApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByAnthropicKeyOutput|Error>
      */
-    public function genaiListAgentsByAnthropicKey(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsByAnthropicKeyOutput {
-        return $this->transport->send(
+    public function genaiListAgentsByAnthropicKey(string $uuid, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListAgentsByAnthropicKeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/anthropic/keys/{uuid}/agents')
                 ->path('uuid', $uuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentsByAnthropicKeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentsByAnthropicKeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateEvaluationDatasetOutput|Error>
      */
-    public function genaiCreateEvaluationDataset(
-        ApiCreateEvaluationDatasetInputPublic $body,
-    ): ApiCreateEvaluationDatasetOutput {
-        return $this->transport->send(
+    public function genaiCreateEvaluationDataset(ApiCreateEvaluationDatasetInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCreateEvaluationDatasetOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/evaluation_datasets')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateEvaluationDatasetOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateEvaluationDatasetOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error>
      */
     public function genaiCreateEvaluationDatasetFileUploadPresignedUrls(
         ApiCreateDataSourceFileUploadPresignedUrlsInputPublic $body,
-    ): ApiCreateDataSourceFileUploadPresignedUrlsOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/evaluation_datasets/file_upload_presigned_urls')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationMetricsOutput|Error>
      */
-    public function genaiListEvaluationMetrics(): ApiListEvaluationMetricsOutput
+    public function genaiListEvaluationMetrics(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListEvaluationMetricsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_metrics')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListEvaluationMetricsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListEvaluationMetricsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiRunEvaluationTestCaseOutput|Error>
      */
-    public function genaiRunEvaluationTestCase(
-        ApiRunEvaluationTestCaseInputPublic $body,
-    ): ApiRunEvaluationTestCaseOutput {
-        return $this->transport->send(
+    public function genaiRunEvaluationTestCase(ApiRunEvaluationTestCaseInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiRunEvaluationTestCaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/evaluation_runs')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiRunEvaluationTestCaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiRunEvaluationTestCaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunOutput|Error>
      */
-    public function genaiGetEvaluationRun(string $evaluationRunUuid): ApiGetEvaluationRunOutput
+    public function genaiGetEvaluationRun(string $evaluationRunUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetEvaluationRunOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_runs/{evaluation_run_uuid}')
                 ->path('evaluation_run_uuid', $evaluationRunUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetEvaluationRunOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetEvaluationRunOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunResultsOutput|Error>
      */
     public function genaiGetEvaluationRunResults(
         string $evaluationRunUuid,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiGetEvaluationRunResultsOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiGetEvaluationRunResultsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_runs/{evaluation_run_uuid}/results')
                 ->path('evaluation_run_uuid', $evaluationRunUuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetEvaluationRunResultsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetEvaluationRunResultsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunPromptResultsOutput|Error>
      */
-    public function genaiGetEvaluationRunPromptResults(
-        string $evaluationRunUuid,
-        int $promptId,
-    ): ApiGetEvaluationRunPromptResultsOutput {
-        return $this->transport->send(
+    public function genaiGetEvaluationRunPromptResults(string $evaluationRunUuid, int $promptId): Envelope
+    {
+        /** @var Envelope<ApiGetEvaluationRunPromptResultsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_runs/{evaluation_run_uuid}/results/{prompt_id}')
                 ->path('evaluation_run_uuid', $evaluationRunUuid)
                 ->path('prompt_id', $promptId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetEvaluationRunPromptResultsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetEvaluationRunPromptResultsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationTestCasesOutput|Error>
      */
-    public function genaiListEvaluationTestCases(): ApiListEvaluationTestCasesOutput
+    public function genaiListEvaluationTestCases(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListEvaluationTestCasesOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_test_cases')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListEvaluationTestCasesOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListEvaluationTestCasesOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateEvaluationTestCaseOutput|Error>
      */
-    public function genaiCreateEvaluationTestCase(
-        ApiCreateEvaluationTestCaseInputPublic $body,
-    ): ApiCreateEvaluationTestCaseOutput {
-        return $this->transport->send(
+    public function genaiCreateEvaluationTestCase(ApiCreateEvaluationTestCaseInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCreateEvaluationTestCaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/evaluation_test_cases')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateEvaluationTestCaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateEvaluationTestCaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationRunsByTestCaseOutput|Error>
      */
     public function genaiListEvaluationRunsByTestCase(
         string $evaluationTestCaseUuid,
         ?int $evaluationTestCaseVersion = null,
-    ): ApiListEvaluationRunsByTestCaseOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiListEvaluationRunsByTestCaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_test_cases/{evaluation_test_case_uuid}/evaluation_runs')
                 ->path('evaluation_test_case_uuid', $evaluationTestCaseUuid)
                 ->query('evaluation_test_case_version', $evaluationTestCaseVersion)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListEvaluationRunsByTestCaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListEvaluationRunsByTestCaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationTestCaseOutput|Error>
      */
-    public function genaiGetEvaluationTestCase(
-        string $testCaseUuid,
-        ?int $evaluationTestCaseVersion = null,
-    ): ApiGetEvaluationTestCaseOutput {
-        return $this->transport->send(
+    public function genaiGetEvaluationTestCase(string $testCaseUuid, ?int $evaluationTestCaseVersion = null): Envelope
+    {
+        /** @var Envelope<ApiGetEvaluationTestCaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/evaluation_test_cases/{test_case_uuid}')
                 ->path('test_case_uuid', $testCaseUuid)
                 ->query('evaluation_test_case_version', $evaluationTestCaseVersion)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetEvaluationTestCaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetEvaluationTestCaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateEvaluationTestCaseOutput|Error>
      */
     public function genaiUpdateEvaluationTestCase(
         string $testCaseUuid,
         ApiUpdateEvaluationTestCaseInputPublic $body,
-    ): ApiUpdateEvaluationTestCaseOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateEvaluationTestCaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/evaluation_test_cases/{test_case_uuid}')
                 ->path('test_case_uuid', $testCaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateEvaluationTestCaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateEvaluationTestCaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error>
      */
-    public function genaiListIndexingJobs(
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListKnowledgeBaseIndexingJobsOutput {
-        return $this->transport->send(
+    public function genaiListIndexingJobs(?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/indexing_jobs')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListKnowledgeBaseIndexingJobsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListKnowledgeBaseIndexingJobsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiStartKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiCreateIndexingJob(
-        ApiStartKnowledgeBaseIndexingJobInputPublic $body,
-    ): ApiStartKnowledgeBaseIndexingJobOutput {
-        return $this->transport->send(
+    public function genaiCreateIndexingJob(ApiStartKnowledgeBaseIndexingJobInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiStartKnowledgeBaseIndexingJobOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/indexing_jobs')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiStartKnowledgeBaseIndexingJobOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiStartKnowledgeBaseIndexingJobOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListIndexingJobDataSourcesOutput|Error>
      */
-    public function genaiListIndexingJobDataSources(string $indexingJobUuid): ApiListIndexingJobDataSourcesOutput
+    public function genaiListIndexingJobDataSources(string $indexingJobUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListIndexingJobDataSourcesOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/indexing_jobs/{indexing_job_uuid}/data_sources')
                 ->path('indexing_job_uuid', $indexingJobUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListIndexingJobDataSourcesOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListIndexingJobDataSourcesOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetIndexingJobDetailsSignedUrloutput|Error>
      */
-    public function genaiGetIndexingJobDetailsSignedUrl(
-        string $indexingJobUuid,
-    ): ApiGetIndexingJobDetailsSignedUrloutput {
-        return $this->transport->send(
+    public function genaiGetIndexingJobDetailsSignedUrl(string $indexingJobUuid): Envelope
+    {
+        /** @var Envelope<ApiGetIndexingJobDetailsSignedUrloutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/indexing_jobs/{indexing_job_uuid}/details_signed_url')
                 ->path('indexing_job_uuid', $indexingJobUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetIndexingJobDetailsSignedUrloutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetIndexingJobDetailsSignedUrloutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiGetIndexingJob(string $uuid): ApiGetKnowledgeBaseIndexingJobOutput
+    public function genaiGetIndexingJob(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetKnowledgeBaseIndexingJobOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/indexing_jobs/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetKnowledgeBaseIndexingJobOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetKnowledgeBaseIndexingJobOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiCancelKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiCancelIndexingJob(
-        string $uuid,
-        ApiCancelKnowledgeBaseIndexingJobInputPublic $body,
-    ): ApiCancelKnowledgeBaseIndexingJobOutput {
-        return $this->transport->send(
+    public function genaiCancelIndexingJob(string $uuid, ApiCancelKnowledgeBaseIndexingJobInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCancelKnowledgeBaseIndexingJobOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/indexing_jobs/{uuid}/cancel')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCancelKnowledgeBaseIndexingJobOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCancelKnowledgeBaseIndexingJobOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBasesOutput|Error>
      */
-    public function genaiListKnowledgeBases(?int $page = null, ?int $perPage = null): ApiListKnowledgeBasesOutput
+    public function genaiListKnowledgeBases(?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListKnowledgeBasesOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/knowledge_bases')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListKnowledgeBasesOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListKnowledgeBasesOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateKnowledgeBaseOutput|Error>
      */
-    public function genaiCreateKnowledgeBase(ApiCreateKnowledgeBaseInputPublic $body): ApiCreateKnowledgeBaseOutput
+    public function genaiCreateKnowledgeBase(ApiCreateKnowledgeBaseInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiCreateKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/knowledge_bases')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error>
      */
     public function genaiCreateDataSourceFileUploadPresignedUrls(
         ApiCreateDataSourceFileUploadPresignedUrlsInputPublic $body,
-    ): ApiCreateDataSourceFileUploadPresignedUrlsOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/knowledge_bases/data_sources/file_upload_presigned_urls')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateDataSourceFileUploadPresignedUrlsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseDataSourcesOutput|Error>
      */
     public function genaiListKnowledgeBaseDataSources(
         string $knowledgeBaseUuid,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListKnowledgeBaseDataSourcesOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiListKnowledgeBaseDataSourcesOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/knowledge_bases/{knowledge_base_uuid}/data_sources')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListKnowledgeBaseDataSourcesOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListKnowledgeBaseDataSourcesOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateKnowledgeBaseDataSourceOutput|Error>
      */
     public function genaiCreateKnowledgeBaseDataSource(
         string $knowledgeBaseUuid,
         ApiCreateKnowledgeBaseDataSourceInputPublic $body,
-    ): ApiCreateKnowledgeBaseDataSourceOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiCreateKnowledgeBaseDataSourceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/knowledge_bases/{knowledge_base_uuid}/data_sources')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateKnowledgeBaseDataSourceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateKnowledgeBaseDataSourceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateKnowledgeBaseDataSourceOutput|Error>
      */
     public function genaiUpdateKnowledgeBaseDataSource(
         string $knowledgeBaseUuid,
         string $dataSourceUuid,
         ApiUpdateKnowledgeBaseDataSourceInputPublic $body,
-    ): ApiUpdateKnowledgeBaseDataSourceOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiUpdateKnowledgeBaseDataSourceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/knowledge_bases/{knowledge_base_uuid}/data_sources/{data_source_uuid}')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->path('data_source_uuid', $dataSourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateKnowledgeBaseDataSourceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateKnowledgeBaseDataSourceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteKnowledgeBaseDataSourceOutput|Error>
      */
-    public function genaiDeleteKnowledgeBaseDataSource(
-        string $knowledgeBaseUuid,
-        string $dataSourceUuid,
-    ): ApiDeleteKnowledgeBaseDataSourceOutput {
-        return $this->transport->send(
+    public function genaiDeleteKnowledgeBaseDataSource(string $knowledgeBaseUuid, string $dataSourceUuid): Envelope
+    {
+        /** @var Envelope<ApiDeleteKnowledgeBaseDataSourceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/knowledge_bases/{knowledge_base_uuid}/data_sources/{data_source_uuid}')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->path('data_source_uuid', $dataSourceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteKnowledgeBaseDataSourceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteKnowledgeBaseDataSourceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error>
      */
-    public function genaiListIndexingJobsByKnowledgeBase(
-        string $knowledgeBaseUuid,
-    ): ApiListKnowledgeBaseIndexingJobsOutput {
-        return $this->transport->send(
+    public function genaiListIndexingJobsByKnowledgeBase(string $knowledgeBaseUuid): Envelope
+    {
+        /** @var Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/knowledge_bases/{knowledge_base_uuid}/indexing_jobs')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListKnowledgeBaseIndexingJobsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListKnowledgeBaseIndexingJobsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetKnowledgeBaseOutput|Error>
      */
-    public function genaiGetKnowledgeBase(string $uuid): ApiGetKnowledgeBaseOutput
+    public function genaiGetKnowledgeBase(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/knowledge_bases/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateKnowledgeBaseOutput|Error>
      */
-    public function genaiUpdateKnowledgeBase(
-        string $uuid,
-        ApiUpdateKnowledgeBaseInputPublic $body,
-    ): ApiUpdateKnowledgeBaseOutput {
-        return $this->transport->send(
+    public function genaiUpdateKnowledgeBase(string $uuid, ApiUpdateKnowledgeBaseInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiUpdateKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/knowledge_bases/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteKnowledgeBaseOutput|Error>
      */
-    public function genaiDeleteKnowledgeBase(string $uuid): ApiDeleteKnowledgeBaseOutput
+    public function genaiDeleteKnowledgeBase(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteKnowledgeBaseOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/knowledge_bases/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteKnowledgeBaseOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteKnowledgeBaseOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
      * @param list<string> $usecases
+     * @return Envelope<ApiListModelsOutputPublic|Error>
      */
     public function genaiListModels(
         ?array $usecases = null,
         ?bool $publicOnly = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListModelsOutputPublic {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiListModelsOutputPublic|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/models')
                 ->query('usecases', $usecases)
                 ->query('public_only', $publicOnly)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListModelsOutputPublic::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListModelsOutputPublic::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListModelApikeysOutput|Error>
      */
-    public function genaiListModelApiKeys(?int $page = null, ?int $perPage = null): ApiListModelApikeysOutput
+    public function genaiListModelApiKeys(?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListModelApikeysOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/models/api_keys')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListModelApikeysOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListModelApikeysOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateModelApikeyOutput|Error>
      */
-    public function genaiCreateModelApiKey(ApiCreateModelApikeyInputPublic $body): ApiCreateModelApikeyOutput
+    public function genaiCreateModelApiKey(ApiCreateModelApikeyInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiCreateModelApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/models/api_keys')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateModelApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateModelApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateModelApikeyOutput|Error>
      */
-    public function genaiUpdateModelApiKey(
-        string $apiKeyUuid,
-        ApiUpdateModelApikeyInputPublic $body,
-    ): ApiUpdateModelApikeyOutput {
-        return $this->transport->send(
+    public function genaiUpdateModelApiKey(string $apiKeyUuid, ApiUpdateModelApikeyInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiUpdateModelApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/models/api_keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateModelApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateModelApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteModelApikeyOutput|Error>
      */
-    public function genaiDeleteModelApiKey(string $apiKeyUuid): ApiDeleteModelApikeyOutput
+    public function genaiDeleteModelApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteModelApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/models/api_keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteModelApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteModelApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRegenerateModelApikeyOutput|Error>
      */
-    public function genaiRegenerateModelApiKey(string $apiKeyUuid): ApiRegenerateModelApikeyOutput
+    public function genaiRegenerateModelApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiRegenerateModelApikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/models/api_keys/{api_key_uuid}/regenerate')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiRegenerateModelApikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiRegenerateModelApikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiDropboxOauth2GetTokensOutput|Error>
      */
-    public function genaiCreateOauth2DropboxTokens(
-        ApiDropboxOauth2GetTokensInput $body,
-    ): ApiDropboxOauth2GetTokensOutput {
-        return $this->transport->send(
+    public function genaiCreateOauth2DropboxTokens(ApiDropboxOauth2GetTokensInput $body): Envelope
+    {
+        /** @var Envelope<ApiDropboxOauth2GetTokensOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/oauth2/dropbox/tokens')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiDropboxOauth2GetTokensOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDropboxOauth2GetTokensOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGenerateOauth2Urloutput|Error>
      */
-    public function genaiGetOauth2Url(?string $type = null, ?string $redirectUrl = null): ApiGenerateOauth2Urloutput
+    public function genaiGetOauth2Url(?string $type = null, ?string $redirectUrl = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGenerateOauth2Urloutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/oauth2/url')
                 ->query('type', $type)
                 ->query('redirect_url', $redirectUrl)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGenerateOauth2Urloutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGenerateOauth2Urloutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListOpenAiapikeysOutput|Error>
      */
-    public function genaiListOpenaiApiKeys(?int $page = null, ?int $perPage = null): ApiListOpenAiapikeysOutput
+    public function genaiListOpenaiApiKeys(?int $page = null, ?int $perPage = null): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListOpenAiapikeysOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/openai/keys')
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListOpenAiapikeysOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListOpenAiapikeysOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateOpenAiapikeyOutput|Error>
      */
-    public function genaiCreateOpenaiApiKey(ApiCreateOpenAiapikeyInputPublic $body): ApiCreateOpenAiapikeyOutput
+    public function genaiCreateOpenaiApiKey(ApiCreateOpenAiapikeyInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiCreateOpenAiapikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/openai/keys')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateOpenAiapikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateOpenAiapikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetOpenAiapikeyOutput|Error>
      */
-    public function genaiGetOpenaiApiKey(string $apiKeyUuid): ApiGetOpenAiapikeyOutput
+    public function genaiGetOpenaiApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetOpenAiapikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/openai/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetOpenAiapikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetOpenAiapikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateOpenAiapikeyOutput|Error>
      */
-    public function genaiUpdateOpenaiApiKey(
-        string $apiKeyUuid,
-        ApiUpdateOpenAiapikeyInputPublic $body,
-    ): ApiUpdateOpenAiapikeyOutput {
-        return $this->transport->send(
+    public function genaiUpdateOpenaiApiKey(string $apiKeyUuid, ApiUpdateOpenAiapikeyInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiUpdateOpenAiapikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/openai/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateOpenAiapikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateOpenAiapikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteOpenAiapikeyOutput|Error>
      */
-    public function genaiDeleteOpenaiApiKey(string $apiKeyUuid): ApiDeleteOpenAiapikeyOutput
+    public function genaiDeleteOpenaiApiKey(string $apiKeyUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteOpenAiapikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/openai/keys/{api_key_uuid}')
                 ->path('api_key_uuid', $apiKeyUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteOpenAiapikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteOpenAiapikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByOpenAikeyOutput|Error>
      */
-    public function genaiListAgentsByOpenaiKey(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsByOpenAikeyOutput {
-        return $this->transport->send(
+    public function genaiListAgentsByOpenaiKey(string $uuid, ?int $page = null, ?int $perPage = null): Envelope
+    {
+        /** @var Envelope<ApiListAgentsByOpenAikeyOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/openai/keys/{uuid}/agents')
                 ->path('uuid', $uuid)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentsByOpenAikeyOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentsByOpenAikeyOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListRegionsOutput|Error>
      */
-    public function genaiListDatacenterRegions(
-        ?bool $servesInference = null,
-        ?bool $servesBatch = null,
-    ): ApiListRegionsOutput {
-        return $this->transport->send(
+    public function genaiListDatacenterRegions(?bool $servesInference = null, ?bool $servesBatch = null): Envelope
+    {
+        /** @var Envelope<ApiListRegionsOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/regions')
                 ->query('serves_inference', $servesInference)
                 ->query('serves_batch', $servesBatch)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListRegionsOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListRegionsOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateScheduledIndexingOutput|Error>
      */
-    public function genaiCreateScheduledIndexing(
-        ApiCreateScheduledIndexingInputPublic $body,
-    ): ApiCreateScheduledIndexingOutput {
-        return $this->transport->send(
+    public function genaiCreateScheduledIndexing(ApiCreateScheduledIndexingInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiCreateScheduledIndexingOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/scheduled-indexing')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateScheduledIndexingOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateScheduledIndexingOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetScheduledIndexingOutput|Error>
      */
-    public function genaiGetScheduledIndexing(string $knowledgeBaseUuid): ApiGetScheduledIndexingOutput
+    public function genaiGetScheduledIndexing(string $knowledgeBaseUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetScheduledIndexingOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/scheduled-indexing/knowledge-base/{knowledge_base_uuid}')
                 ->path('knowledge_base_uuid', $knowledgeBaseUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetScheduledIndexingOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetScheduledIndexingOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteScheduledIndexingOutput|Error>
      */
-    public function genaiDeleteScheduledIndexing(string $uuid): ApiDeleteScheduledIndexingOutput
+    public function genaiDeleteScheduledIndexing(string $uuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteScheduledIndexingOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/scheduled-indexing/{uuid}')
                 ->path('uuid', $uuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteScheduledIndexingOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteScheduledIndexingOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListWorkspacesOutput|Error>
      */
-    public function genaiListWorkspaces(): ApiListWorkspacesOutput
+    public function genaiListWorkspaces(): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiListWorkspacesOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/workspaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListWorkspacesOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListWorkspacesOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateWorkspaceOutput|Error>
      */
-    public function genaiCreateWorkspace(ApiCreateWorkspaceInputPublic $body): ApiCreateWorkspaceOutput
+    public function genaiCreateWorkspace(ApiCreateWorkspaceInputPublic $body): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiCreateWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/gen-ai/workspaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiCreateWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiCreateWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetWorkspaceOutput|Error>
      */
-    public function genaiGetWorkspace(string $workspaceUuid): ApiGetWorkspaceOutput
+    public function genaiGetWorkspace(string $workspaceUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiGetWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/workspaces/{workspace_uuid}')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiGetWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiGetWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateWorkspaceOutput|Error>
      */
-    public function genaiUpdateWorkspace(
-        string $workspaceUuid,
-        ApiUpdateWorkspaceInputPublic $body,
-    ): ApiUpdateWorkspaceOutput {
-        return $this->transport->send(
+    public function genaiUpdateWorkspace(string $workspaceUuid, ApiUpdateWorkspaceInputPublic $body): Envelope
+    {
+        /** @var Envelope<ApiUpdateWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/workspaces/{workspace_uuid}')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiUpdateWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiUpdateWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteWorkspaceOutput|Error>
      */
-    public function genaiDeleteWorkspace(string $workspaceUuid): ApiDeleteWorkspaceOutput
+    public function genaiDeleteWorkspace(string $workspaceUuid): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<ApiDeleteWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/gen-ai/workspaces/{workspace_uuid}')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiDeleteWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiDeleteWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByWorkspaceOutput|Error>
      */
     public function genaiListAgentsByWorkspace(
         string $workspaceUuid,
         ?bool $onlyDeployed = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListAgentsByWorkspaceOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiListAgentsByWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/workspaces/{workspace_uuid}/agents')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->query('only_deployed', $onlyDeployed)
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListAgentsByWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListAgentsByWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiMoveAgentsToWorkspaceOutput|Error>
      */
     public function genaiUpdateAgentsWorkspace(
         string $workspaceUuid,
         ApiMoveAgentsToWorkspaceInputPublic $body,
-    ): ApiMoveAgentsToWorkspaceOutput {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<ApiMoveAgentsToWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::put('/v2/gen-ai/workspaces/{workspace_uuid}/agents')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::object(ApiMoveAgentsToWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiMoveAgentsToWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationTestCasesByWorkspaceOutput|Error>
      */
-    public function genaiListEvaluationTestCasesByWorkspace(
-        string $workspaceUuid,
-    ): ApiListEvaluationTestCasesByWorkspaceOutput {
-        return $this->transport->send(
+    public function genaiListEvaluationTestCasesByWorkspace(string $workspaceUuid): Envelope
+    {
+        /** @var Envelope<ApiListEvaluationTestCasesByWorkspaceOutput|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/gen-ai/workspaces/{workspace_uuid}/evaluation_test_cases')
                 ->path('workspace_uuid', $workspaceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::object(ApiListEvaluationTestCasesByWorkspaceOutput::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiListEvaluationTestCasesByWorkspaceOutput::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

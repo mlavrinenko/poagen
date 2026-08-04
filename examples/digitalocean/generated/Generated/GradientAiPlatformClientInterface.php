@@ -128,6 +128,8 @@ use Acme\DigitalOcean\Generated\Model\ApiUpdateOpenAiapikeyInputPublic;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateOpenAiapikeyOutput;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateWorkspaceInputPublic;
 use Acme\DigitalOcean\Generated\Model\ApiUpdateWorkspaceOutput;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `GradientAI Platform` endpoints.
@@ -140,586 +142,584 @@ interface GradientAiPlatformClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsOutputPublic|Error>
      */
-    public function genaiListAgents(
-        ?bool $onlyDeployed = null,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsOutputPublic;
+    public function genaiListAgents(?bool $onlyDeployed = null, ?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAgentOutput|Error>
      */
-    public function genaiCreateAgent(ApiCreateAgentInputPublic $body): ApiCreateAgentOutput;
+    public function genaiCreateAgent(ApiCreateAgentInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentApikeysOutput|Error>
      */
-    public function genaiListAgentApiKeys(
-        string $agentUuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentApikeysOutput;
+    public function genaiListAgentApiKeys(string $agentUuid, ?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAgentApikeyOutput|Error>
      */
-    public function genaiCreateAgentApiKey(
-        string $agentUuid,
-        ApiCreateAgentApikeyInputPublic $body,
-    ): ApiCreateAgentApikeyOutput;
+    public function genaiCreateAgentApiKey(string $agentUuid, ApiCreateAgentApikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentApikeyOutput|Error>
      */
     public function genaiUpdateAgentApiKey(
         string $agentUuid,
         string $apiKeyUuid,
         ApiUpdateAgentApikeyInputPublic $body,
-    ): ApiUpdateAgentApikeyOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAgentApikeyOutput|Error>
      */
-    public function genaiDeleteAgentApiKey(string $agentUuid, string $apiKeyUuid): ApiDeleteAgentApikeyOutput;
+    public function genaiDeleteAgentApiKey(string $agentUuid, string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRegenerateAgentApikeyOutput|Error>
      */
-    public function genaiRegenerateAgentApiKey(string $agentUuid, string $apiKeyUuid): ApiRegenerateAgentApikeyOutput;
+    public function genaiRegenerateAgentApiKey(string $agentUuid, string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentFunctionOutput|Error>
      */
-    public function genaiAttachAgentFunction(
-        string $agentUuid,
-        ApiLinkAgentFunctionInputPublic $body,
-    ): ApiLinkAgentFunctionOutput;
+    public function genaiAttachAgentFunction(string $agentUuid, ApiLinkAgentFunctionInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentFunctionOutput|Error>
      */
     public function genaiUpdateAgentFunction(
         string $agentUuid,
         string $functionUuid,
         ApiUpdateAgentFunctionInputPublic $body,
-    ): ApiUpdateAgentFunctionOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentFunctionOutput|Error>
      */
-    public function genaiDetachAgentFunction(string $agentUuid, string $functionUuid): ApiUnlinkAgentFunctionOutput;
+    public function genaiDetachAgentFunction(string $agentUuid, string $functionUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentGuardrailOutput|Error>
      */
-    public function genaiAttachAgentGuardrails(
-        string $agentUuid,
-        ApiLinkAgentGuardrailsInputPublic $body,
-    ): ApiLinkAgentGuardrailOutput;
+    public function genaiAttachAgentGuardrails(string $agentUuid, ApiLinkAgentGuardrailsInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentGuardrailOutput|Error>
      */
-    public function genaiDetachAgentGuardrail(string $agentUuid, string $guardrailUuid): ApiUnlinkAgentGuardrailOutput;
+    public function genaiDetachAgentGuardrail(string $agentUuid, string $guardrailUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkKnowledgeBaseOutput|Error>
      */
-    public function genaiAttachKnowledgeBases(string $agentUuid): ApiLinkKnowledgeBaseOutput;
+    public function genaiAttachKnowledgeBases(string $agentUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkKnowledgeBaseOutput|Error>
      */
-    public function genaiAttachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): ApiLinkKnowledgeBaseOutput;
+    public function genaiAttachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkKnowledgeBaseOutput|Error>
      */
-    public function genaiDetachKnowledgeBase(
-        string $agentUuid,
-        string $knowledgeBaseUuid,
-    ): ApiUnlinkKnowledgeBaseOutput;
+    public function genaiDetachKnowledgeBase(string $agentUuid, string $knowledgeBaseUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateLinkedAgentOutput|Error>
      */
     public function genaiUpdateAttachedAgent(
         string $parentAgentUuid,
         string $childAgentUuid,
         ApiUpdateLinkedAgentInputPublic $body,
-    ): ApiUpdateLinkedAgentOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiLinkAgentOutput|Error>
      */
     public function genaiAttachAgent(
         string $parentAgentUuid,
         string $childAgentUuid,
         ApiLinkAgentInputPublic $body,
-    ): ApiLinkAgentOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiUnlinkAgentOutput|Error>
      */
-    public function genaiDetachAgent(string $parentAgentUuid, string $childAgentUuid): ApiUnlinkAgentOutput;
+    public function genaiDetachAgent(string $parentAgentUuid, string $childAgentUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAgentOutput|Error>
      */
-    public function genaiGetAgent(string $uuid): ApiGetAgentOutput;
+    public function genaiGetAgent(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentOutput|Error>
      */
-    public function genaiUpdateAgent(string $uuid, ApiUpdateAgentInputPublic $body): ApiUpdateAgentOutput;
+    public function genaiUpdateAgent(string $uuid, ApiUpdateAgentInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAgentOutput|Error>
      */
-    public function genaiDeleteAgent(string $uuid): ApiDeleteAgentOutput;
+    public function genaiDeleteAgent(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetChildrenOutput|Error>
      */
-    public function genaiGetAgentChildren(string $uuid): ApiGetChildrenOutput;
+    public function genaiGetAgentChildren(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAgentDeploymentVisbilityOutput|Error>
      */
     public function genaiUpdateAgentDeploymentVisibility(
         string $uuid,
         ApiUpdateAgentDeploymentVisibilityInputPublic $body,
-    ): ApiUpdateAgentDeploymentVisbilityOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAgentUsageOutput|Error>
      */
-    public function genaiGetAgentUsage(
-        string $uuid,
-        ?string $start = null,
-        ?string $stop = null,
-    ): ApiGetAgentUsageOutput;
+    public function genaiGetAgentUsage(string $uuid, ?string $start = null, ?string $stop = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentVersionsOutput|Error>
      */
-    public function genaiListAgentVersions(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentVersionsOutput;
+    public function genaiListAgentVersions(string $uuid, ?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRollbackToAgentVersionOutput|Error>
      */
-    public function genaiRollbackToAgentVersion(
-        string $uuid,
-        ApiRollbackToAgentVersionInputPublic $body,
-    ): ApiRollbackToAgentVersionOutput;
+    public function genaiRollbackToAgentVersion(string $uuid, ApiRollbackToAgentVersionInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAnthropicApikeysOutput|Error>
      */
-    public function genaiListAnthropicApiKeys(?int $page = null, ?int $perPage = null): ApiListAnthropicApikeysOutput;
+    public function genaiListAnthropicApiKeys(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateAnthropicApikeyOutput|Error>
      */
-    public function genaiCreateAnthropicApiKey(
-        ApiCreateAnthropicApikeyInputPublic $body,
-    ): ApiCreateAnthropicApikeyOutput;
+    public function genaiCreateAnthropicApiKey(ApiCreateAnthropicApikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetAnthropicApikeyOutput|Error>
      */
-    public function genaiGetAnthropicApiKey(string $apiKeyUuid): ApiGetAnthropicApikeyOutput;
+    public function genaiGetAnthropicApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateAnthropicApikeyOutput|Error>
      */
     public function genaiUpdateAnthropicApiKey(
         string $apiKeyUuid,
         ApiUpdateAnthropicApikeyInputPublic $body,
-    ): ApiUpdateAnthropicApikeyOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteAnthropicApikeyOutput|Error>
      */
-    public function genaiDeleteAnthropicApiKey(string $apiKeyUuid): ApiDeleteAnthropicApikeyOutput;
+    public function genaiDeleteAnthropicApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByAnthropicKeyOutput|Error>
      */
-    public function genaiListAgentsByAnthropicKey(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsByAnthropicKeyOutput;
+    public function genaiListAgentsByAnthropicKey(string $uuid, ?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateEvaluationDatasetOutput|Error>
      */
-    public function genaiCreateEvaluationDataset(
-        ApiCreateEvaluationDatasetInputPublic $body,
-    ): ApiCreateEvaluationDatasetOutput;
+    public function genaiCreateEvaluationDataset(ApiCreateEvaluationDatasetInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error>
      */
     public function genaiCreateEvaluationDatasetFileUploadPresignedUrls(
         ApiCreateDataSourceFileUploadPresignedUrlsInputPublic $body,
-    ): ApiCreateDataSourceFileUploadPresignedUrlsOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationMetricsOutput|Error>
      */
-    public function genaiListEvaluationMetrics(): ApiListEvaluationMetricsOutput;
+    public function genaiListEvaluationMetrics(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiRunEvaluationTestCaseOutput|Error>
      */
-    public function genaiRunEvaluationTestCase(
-        ApiRunEvaluationTestCaseInputPublic $body,
-    ): ApiRunEvaluationTestCaseOutput;
+    public function genaiRunEvaluationTestCase(ApiRunEvaluationTestCaseInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunOutput|Error>
      */
-    public function genaiGetEvaluationRun(string $evaluationRunUuid): ApiGetEvaluationRunOutput;
+    public function genaiGetEvaluationRun(string $evaluationRunUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunResultsOutput|Error>
      */
     public function genaiGetEvaluationRunResults(
         string $evaluationRunUuid,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiGetEvaluationRunResultsOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationRunPromptResultsOutput|Error>
      */
-    public function genaiGetEvaluationRunPromptResults(
-        string $evaluationRunUuid,
-        int $promptId,
-    ): ApiGetEvaluationRunPromptResultsOutput;
+    public function genaiGetEvaluationRunPromptResults(string $evaluationRunUuid, int $promptId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationTestCasesOutput|Error>
      */
-    public function genaiListEvaluationTestCases(): ApiListEvaluationTestCasesOutput;
+    public function genaiListEvaluationTestCases(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateEvaluationTestCaseOutput|Error>
      */
-    public function genaiCreateEvaluationTestCase(
-        ApiCreateEvaluationTestCaseInputPublic $body,
-    ): ApiCreateEvaluationTestCaseOutput;
+    public function genaiCreateEvaluationTestCase(ApiCreateEvaluationTestCaseInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationRunsByTestCaseOutput|Error>
      */
     public function genaiListEvaluationRunsByTestCase(
         string $evaluationTestCaseUuid,
         ?int $evaluationTestCaseVersion = null,
-    ): ApiListEvaluationRunsByTestCaseOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetEvaluationTestCaseOutput|Error>
      */
-    public function genaiGetEvaluationTestCase(
-        string $testCaseUuid,
-        ?int $evaluationTestCaseVersion = null,
-    ): ApiGetEvaluationTestCaseOutput;
+    public function genaiGetEvaluationTestCase(string $testCaseUuid, ?int $evaluationTestCaseVersion = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateEvaluationTestCaseOutput|Error>
      */
     public function genaiUpdateEvaluationTestCase(
         string $testCaseUuid,
         ApiUpdateEvaluationTestCaseInputPublic $body,
-    ): ApiUpdateEvaluationTestCaseOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error>
      */
-    public function genaiListIndexingJobs(
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListKnowledgeBaseIndexingJobsOutput;
+    public function genaiListIndexingJobs(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiStartKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiCreateIndexingJob(
-        ApiStartKnowledgeBaseIndexingJobInputPublic $body,
-    ): ApiStartKnowledgeBaseIndexingJobOutput;
+    public function genaiCreateIndexingJob(ApiStartKnowledgeBaseIndexingJobInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListIndexingJobDataSourcesOutput|Error>
      */
-    public function genaiListIndexingJobDataSources(string $indexingJobUuid): ApiListIndexingJobDataSourcesOutput;
+    public function genaiListIndexingJobDataSources(string $indexingJobUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetIndexingJobDetailsSignedUrloutput|Error>
      */
-    public function genaiGetIndexingJobDetailsSignedUrl(
-        string $indexingJobUuid,
-    ): ApiGetIndexingJobDetailsSignedUrloutput;
+    public function genaiGetIndexingJobDetailsSignedUrl(string $indexingJobUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiGetIndexingJob(string $uuid): ApiGetKnowledgeBaseIndexingJobOutput;
+    public function genaiGetIndexingJob(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiCancelKnowledgeBaseIndexingJobOutput|Error>
      */
-    public function genaiCancelIndexingJob(
-        string $uuid,
-        ApiCancelKnowledgeBaseIndexingJobInputPublic $body,
-    ): ApiCancelKnowledgeBaseIndexingJobOutput;
+    public function genaiCancelIndexingJob(string $uuid, ApiCancelKnowledgeBaseIndexingJobInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBasesOutput|Error>
      */
-    public function genaiListKnowledgeBases(?int $page = null, ?int $perPage = null): ApiListKnowledgeBasesOutput;
+    public function genaiListKnowledgeBases(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateKnowledgeBaseOutput|Error>
      */
-    public function genaiCreateKnowledgeBase(ApiCreateKnowledgeBaseInputPublic $body): ApiCreateKnowledgeBaseOutput;
+    public function genaiCreateKnowledgeBase(ApiCreateKnowledgeBaseInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateDataSourceFileUploadPresignedUrlsOutput|Error>
      */
     public function genaiCreateDataSourceFileUploadPresignedUrls(
         ApiCreateDataSourceFileUploadPresignedUrlsInputPublic $body,
-    ): ApiCreateDataSourceFileUploadPresignedUrlsOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseDataSourcesOutput|Error>
      */
     public function genaiListKnowledgeBaseDataSources(
         string $knowledgeBaseUuid,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListKnowledgeBaseDataSourcesOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateKnowledgeBaseDataSourceOutput|Error>
      */
     public function genaiCreateKnowledgeBaseDataSource(
         string $knowledgeBaseUuid,
         ApiCreateKnowledgeBaseDataSourceInputPublic $body,
-    ): ApiCreateKnowledgeBaseDataSourceOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateKnowledgeBaseDataSourceOutput|Error>
      */
     public function genaiUpdateKnowledgeBaseDataSource(
         string $knowledgeBaseUuid,
         string $dataSourceUuid,
         ApiUpdateKnowledgeBaseDataSourceInputPublic $body,
-    ): ApiUpdateKnowledgeBaseDataSourceOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteKnowledgeBaseDataSourceOutput|Error>
      */
-    public function genaiDeleteKnowledgeBaseDataSource(
-        string $knowledgeBaseUuid,
-        string $dataSourceUuid,
-    ): ApiDeleteKnowledgeBaseDataSourceOutput;
+    public function genaiDeleteKnowledgeBaseDataSource(string $knowledgeBaseUuid, string $dataSourceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListKnowledgeBaseIndexingJobsOutput|Error>
      */
-    public function genaiListIndexingJobsByKnowledgeBase(
-        string $knowledgeBaseUuid,
-    ): ApiListKnowledgeBaseIndexingJobsOutput;
+    public function genaiListIndexingJobsByKnowledgeBase(string $knowledgeBaseUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetKnowledgeBaseOutput|Error>
      */
-    public function genaiGetKnowledgeBase(string $uuid): ApiGetKnowledgeBaseOutput;
+    public function genaiGetKnowledgeBase(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateKnowledgeBaseOutput|Error>
      */
-    public function genaiUpdateKnowledgeBase(
-        string $uuid,
-        ApiUpdateKnowledgeBaseInputPublic $body,
-    ): ApiUpdateKnowledgeBaseOutput;
+    public function genaiUpdateKnowledgeBase(string $uuid, ApiUpdateKnowledgeBaseInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteKnowledgeBaseOutput|Error>
      */
-    public function genaiDeleteKnowledgeBase(string $uuid): ApiDeleteKnowledgeBaseOutput;
+    public function genaiDeleteKnowledgeBase(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
      * @param list<string> $usecases
+     * @return Envelope<ApiListModelsOutputPublic|Error>
      */
     public function genaiListModels(
         ?array $usecases = null,
         ?bool $publicOnly = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListModelsOutputPublic;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListModelApikeysOutput|Error>
      */
-    public function genaiListModelApiKeys(?int $page = null, ?int $perPage = null): ApiListModelApikeysOutput;
+    public function genaiListModelApiKeys(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateModelApikeyOutput|Error>
      */
-    public function genaiCreateModelApiKey(ApiCreateModelApikeyInputPublic $body): ApiCreateModelApikeyOutput;
+    public function genaiCreateModelApiKey(ApiCreateModelApikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateModelApikeyOutput|Error>
      */
-    public function genaiUpdateModelApiKey(
-        string $apiKeyUuid,
-        ApiUpdateModelApikeyInputPublic $body,
-    ): ApiUpdateModelApikeyOutput;
+    public function genaiUpdateModelApiKey(string $apiKeyUuid, ApiUpdateModelApikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteModelApikeyOutput|Error>
      */
-    public function genaiDeleteModelApiKey(string $apiKeyUuid): ApiDeleteModelApikeyOutput;
+    public function genaiDeleteModelApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiRegenerateModelApikeyOutput|Error>
      */
-    public function genaiRegenerateModelApiKey(string $apiKeyUuid): ApiRegenerateModelApikeyOutput;
+    public function genaiRegenerateModelApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiDropboxOauth2GetTokensOutput|Error>
      */
-    public function genaiCreateOauth2DropboxTokens(
-        ApiDropboxOauth2GetTokensInput $body,
-    ): ApiDropboxOauth2GetTokensOutput;
+    public function genaiCreateOauth2DropboxTokens(ApiDropboxOauth2GetTokensInput $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGenerateOauth2Urloutput|Error>
      */
-    public function genaiGetOauth2Url(?string $type = null, ?string $redirectUrl = null): ApiGenerateOauth2Urloutput;
+    public function genaiGetOauth2Url(?string $type = null, ?string $redirectUrl = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListOpenAiapikeysOutput|Error>
      */
-    public function genaiListOpenaiApiKeys(?int $page = null, ?int $perPage = null): ApiListOpenAiapikeysOutput;
+    public function genaiListOpenaiApiKeys(?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateOpenAiapikeyOutput|Error>
      */
-    public function genaiCreateOpenaiApiKey(ApiCreateOpenAiapikeyInputPublic $body): ApiCreateOpenAiapikeyOutput;
+    public function genaiCreateOpenaiApiKey(ApiCreateOpenAiapikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetOpenAiapikeyOutput|Error>
      */
-    public function genaiGetOpenaiApiKey(string $apiKeyUuid): ApiGetOpenAiapikeyOutput;
+    public function genaiGetOpenaiApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateOpenAiapikeyOutput|Error>
      */
-    public function genaiUpdateOpenaiApiKey(
-        string $apiKeyUuid,
-        ApiUpdateOpenAiapikeyInputPublic $body,
-    ): ApiUpdateOpenAiapikeyOutput;
+    public function genaiUpdateOpenaiApiKey(string $apiKeyUuid, ApiUpdateOpenAiapikeyInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteOpenAiapikeyOutput|Error>
      */
-    public function genaiDeleteOpenaiApiKey(string $apiKeyUuid): ApiDeleteOpenAiapikeyOutput;
+    public function genaiDeleteOpenaiApiKey(string $apiKeyUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByOpenAikeyOutput|Error>
      */
-    public function genaiListAgentsByOpenaiKey(
-        string $uuid,
-        ?int $page = null,
-        ?int $perPage = null,
-    ): ApiListAgentsByOpenAikeyOutput;
+    public function genaiListAgentsByOpenaiKey(string $uuid, ?int $page = null, ?int $perPage = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListRegionsOutput|Error>
      */
-    public function genaiListDatacenterRegions(
-        ?bool $servesInference = null,
-        ?bool $servesBatch = null,
-    ): ApiListRegionsOutput;
+    public function genaiListDatacenterRegions(?bool $servesInference = null, ?bool $servesBatch = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateScheduledIndexingOutput|Error>
      */
-    public function genaiCreateScheduledIndexing(
-        ApiCreateScheduledIndexingInputPublic $body,
-    ): ApiCreateScheduledIndexingOutput;
+    public function genaiCreateScheduledIndexing(ApiCreateScheduledIndexingInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetScheduledIndexingOutput|Error>
      */
-    public function genaiGetScheduledIndexing(string $knowledgeBaseUuid): ApiGetScheduledIndexingOutput;
+    public function genaiGetScheduledIndexing(string $knowledgeBaseUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteScheduledIndexingOutput|Error>
      */
-    public function genaiDeleteScheduledIndexing(string $uuid): ApiDeleteScheduledIndexingOutput;
+    public function genaiDeleteScheduledIndexing(string $uuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListWorkspacesOutput|Error>
      */
-    public function genaiListWorkspaces(): ApiListWorkspacesOutput;
+    public function genaiListWorkspaces(): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:create`.
+     * @return Envelope<ApiCreateWorkspaceOutput|Error>
      */
-    public function genaiCreateWorkspace(ApiCreateWorkspaceInputPublic $body): ApiCreateWorkspaceOutput;
+    public function genaiCreateWorkspace(ApiCreateWorkspaceInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiGetWorkspaceOutput|Error>
      */
-    public function genaiGetWorkspace(string $workspaceUuid): ApiGetWorkspaceOutput;
+    public function genaiGetWorkspace(string $workspaceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiUpdateWorkspaceOutput|Error>
      */
-    public function genaiUpdateWorkspace(
-        string $workspaceUuid,
-        ApiUpdateWorkspaceInputPublic $body,
-    ): ApiUpdateWorkspaceOutput;
+    public function genaiUpdateWorkspace(string $workspaceUuid, ApiUpdateWorkspaceInputPublic $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:delete`.
+     * @return Envelope<ApiDeleteWorkspaceOutput|Error>
      */
-    public function genaiDeleteWorkspace(string $workspaceUuid): ApiDeleteWorkspaceOutput;
+    public function genaiDeleteWorkspace(string $workspaceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListAgentsByWorkspaceOutput|Error>
      */
     public function genaiListAgentsByWorkspace(
         string $workspaceUuid,
         ?bool $onlyDeployed = null,
         ?int $page = null,
         ?int $perPage = null,
-    ): ApiListAgentsByWorkspaceOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:update`.
+     * @return Envelope<ApiMoveAgentsToWorkspaceOutput|Error>
      */
     public function genaiUpdateAgentsWorkspace(
         string $workspaceUuid,
         ApiMoveAgentsToWorkspaceInputPublic $body,
-    ): ApiMoveAgentsToWorkspaceOutput;
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `genai:read`.
+     * @return Envelope<ApiListEvaluationTestCasesByWorkspaceOutput|Error>
      */
-    public function genaiListEvaluationTestCasesByWorkspace(
-        string $workspaceUuid,
-    ): ApiListEvaluationTestCasesByWorkspaceOutput;
+    public function genaiListEvaluationTestCasesByWorkspace(string $workspaceUuid): Envelope;
 }

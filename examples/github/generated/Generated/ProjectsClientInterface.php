@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch1;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch2;
 use Acme\GitHub\Generated\Model\ProjectsAddFieldForOrgBranch3;
@@ -31,6 +32,8 @@ use Acme\GitHub\Generated\Model\ProjectsV2Field;
 use Acme\GitHub\Generated\Model\ProjectsV2ItemSimple;
 use Acme\GitHub\Generated\Model\ProjectsV2ItemWithContent;
 use Acme\GitHub\Generated\Model\ProjectsV2View;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `projects` endpoints.
@@ -42,7 +45,7 @@ use Acme\GitHub\Generated\Model\ProjectsV2View;
 interface ProjectsClientInterface
 {
     /**
-     * @return list<ProjectsV2>
+     * @return Envelope<list<ProjectsV2>|null|BasicError>
      */
     public function projectsListForOrg(
         string $org,
@@ -50,18 +53,24 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
-    public function projectsGetForOrg(int $projectNumber, string $org): ProjectsV2;
+    /**
+     * @return Envelope<ProjectsV2|null|BasicError>
+     */
+    public function projectsGetForOrg(int $projectNumber, string $org): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsCreateDraftItemForOrg(
         string $org,
         int $projectNumber,
         ProjectsCreateDraftItemForOrgRequestContent $body,
-    ): ProjectsV2ItemSimple;
+    ): Envelope;
 
     /**
-     * @return list<ProjectsV2Field>
+     * @return Envelope<list<ProjectsV2Field>|null|BasicError>
      */
     public function projectsListFieldsForOrg(
         int $projectNumber,
@@ -69,19 +78,25 @@ interface ProjectsClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError|ValidationError>
+     */
     public function projectsAddFieldForOrg(
         int $projectNumber,
         string $org,
         ProjectsAddFieldForOrgBranch1|ProjectsAddFieldForOrgBranch2|ProjectsAddFieldForOrgBranch3|ProjectsAddFieldForOrgBranch4 $body,
-    ): ProjectsV2Field;
+    ): Envelope;
 
-    public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): ProjectsV2Field;
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError>
+     */
+    public function projectsGetFieldForOrg(int $projectNumber, int $fieldId, string $org): Envelope;
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListItemsForOrg(
         int $projectNumber,
@@ -91,42 +106,55 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsAddItemForOrg(
         string $org,
         int $projectNumber,
         ProjectsAddItemForOrgRequestContent $body,
-    ): ProjectsV2ItemSimple;
+    ): Envelope;
 
     /**
      * @param string|list<string> $fields
+     * @return Envelope<ProjectsV2ItemWithContent|null|BasicError>
      */
     public function projectsGetOrgItem(
         int $projectNumber,
         string $org,
         int $itemId,
         string|array|null $fields = null,
-    ): ProjectsV2ItemWithContent;
+    ): Envelope;
 
-    public function projectsDeleteItemForOrg(int $projectNumber, string $org, int $itemId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function projectsDeleteItemForOrg(int $projectNumber, string $org, int $itemId): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError>
+     */
     public function projectsUpdateItemForOrg(
         int $projectNumber,
         string $org,
         int $itemId,
         ProjectsUpdateItemForOrgRequestContent $body,
-    ): ProjectsV2ItemWithContent;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2View|null|BasicError|ValidationError>
+     */
     public function projectsCreateViewForOrg(
         string $org,
         int $projectNumber,
         ProjectsCreateViewForOrgRequestContent $body,
-    ): ProjectsV2View;
+    ): Envelope;
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListViewItemsForOrg(
         int $projectNumber,
@@ -136,22 +164,28 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsCreateDraftItemForAuthenticatedUser(
         string $userId,
         int $projectNumber,
         ProjectsCreateDraftItemForAuthenticatedUserRequestContent $body,
-    ): ProjectsV2ItemSimple;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2View|null|BasicError|ValidationError>
+     */
     public function projectsCreateViewForUser(
         string $userId,
         int $projectNumber,
         ProjectsCreateViewForUserRequestContent $body,
-    ): ProjectsV2View;
+    ): Envelope;
 
     /**
-     * @return list<ProjectsV2>
+     * @return Envelope<list<ProjectsV2>|null|BasicError>
      */
     public function projectsListForUser(
         string $username,
@@ -159,12 +193,15 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
-
-    public function projectsGetForUser(int $projectNumber, string $username): ProjectsV2;
+    ): Envelope;
 
     /**
-     * @return list<ProjectsV2Field>
+     * @return Envelope<ProjectsV2|null|BasicError>
+     */
+    public function projectsGetForUser(int $projectNumber, string $username): Envelope;
+
+    /**
+     * @return Envelope<list<ProjectsV2Field>|null|BasicError>
      */
     public function projectsListFieldsForUser(
         int $projectNumber,
@@ -172,19 +209,25 @@ interface ProjectsClientInterface
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError|ValidationError>
+     */
     public function projectsAddFieldForUser(
         string $username,
         int $projectNumber,
         ProjectsAddFieldForUserBranch1|ProjectsAddFieldForUserBranch2|ProjectsAddFieldForUserBranch3 $body,
-    ): ProjectsV2Field;
+    ): Envelope;
 
-    public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): ProjectsV2Field;
+    /**
+     * @return Envelope<ProjectsV2Field|null|BasicError>
+     */
+    public function projectsGetFieldForUser(int $projectNumber, int $fieldId, string $username): Envelope;
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListItemsForUser(
         int $projectNumber,
@@ -194,36 +237,46 @@ interface ProjectsClientInterface
         ?int $perPage = null,
         ?string $q = null,
         string|array|null $fields = null,
-    ): array;
+    ): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemSimple|null|BasicError>
+     */
     public function projectsAddItemForUser(
         string $username,
         int $projectNumber,
         ProjectsAddItemForUserRequestContent $body,
-    ): ProjectsV2ItemSimple;
+    ): Envelope;
 
     /**
      * @param string|list<string> $fields
+     * @return Envelope<ProjectsV2ItemWithContent|null|BasicError>
      */
     public function projectsGetUserItem(
         int $projectNumber,
         string $username,
         int $itemId,
         string|array|null $fields = null,
-    ): ProjectsV2ItemWithContent;
+    ): Envelope;
 
-    public function projectsDeleteItemForUser(int $projectNumber, string $username, int $itemId): void;
+    /**
+     * @return Envelope<null|BasicError>
+     */
+    public function projectsDeleteItemForUser(int $projectNumber, string $username, int $itemId): Envelope;
 
+    /**
+     * @return Envelope<ProjectsV2ItemWithContent|BasicError|ValidationError>
+     */
     public function projectsUpdateItemForUser(
         int $projectNumber,
         string $username,
         int $itemId,
         ProjectsUpdateItemForUserRequestContent $body,
-    ): ProjectsV2ItemWithContent;
+    ): Envelope;
 
     /**
      * @param string|list<string> $fields
-     * @return list<ProjectsV2ItemWithContent>
+     * @return Envelope<list<ProjectsV2ItemWithContent>|null|BasicError>
      */
     public function projectsListViewItemsForUser(
         int $projectNumber,
@@ -233,5 +286,5 @@ interface ProjectsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?int $perPage = null,
-    ): array;
+    ): Envelope;
 }

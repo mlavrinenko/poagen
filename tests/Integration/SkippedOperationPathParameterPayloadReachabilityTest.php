@@ -49,7 +49,7 @@ final class SkippedOperationPathParameterPayloadReachabilityTest extends TestCas
     {
         $client = self::plannedSource($this->plan()->writes, 'ApiClient');
 
-        self::assertStringContainsString('public function keepsShared(SharedPayload $body): void', $client);
+        self::assertStringContainsString('public function keepsShared(SharedPayload $body): Envelope', $client);
     }
 
     public function testTheSkippedOperationsMethodStillDoesNotEmit(): void

@@ -16,6 +16,7 @@ use Acme\GitHub\Generated\Model\HostedComputeListNetworkConfigurationsForOrg200C
 use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgRequestContent;
 use Acme\GitHub\Generated\Model\NetworkConfiguration;
 use Acme\GitHub\Generated\Model\NetworkSettings;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `hosted-compute` endpoints.
@@ -26,29 +27,47 @@ use Acme\GitHub\Generated\Model\NetworkSettings;
  */
 interface HostedComputeClientInterface
 {
+    /**
+     * @return Envelope<HostedComputeListNetworkConfigurationsForOrg200Content>
+     */
     public function hostedComputeListNetworkConfigurationsForOrg(
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): HostedComputeListNetworkConfigurationsForOrg200Content;
+    ): Envelope;
 
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
     public function hostedComputeCreateNetworkConfigurationForOrg(
         string $org,
         HostedComputeCreateNetworkConfigurationForOrgRequestContent $body,
-    ): NetworkConfiguration;
+    ): Envelope;
 
-    public function hostedComputeGetNetworkConfigurationForOrg(
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
+    public function hostedComputeGetNetworkConfigurationForOrg(string $org, string $networkConfigurationId): Envelope;
+
+    /**
+     * @return Envelope<null>
+     */
+    public function hostedComputeDeleteNetworkConfigurationFromOrg(
         string $org,
         string $networkConfigurationId,
-    ): NetworkConfiguration;
+    ): Envelope;
 
-    public function hostedComputeDeleteNetworkConfigurationFromOrg(string $org, string $networkConfigurationId): void;
-
+    /**
+     * @return Envelope<NetworkConfiguration>
+     */
     public function hostedComputeUpdateNetworkConfigurationForOrg(
         string $org,
         string $networkConfigurationId,
         HostedComputeUpdateNetworkConfigurationForOrgRequestContent $body,
-    ): NetworkConfiguration;
+    ): Envelope;
 
-    public function hostedComputeGetNetworkSettingsForOrg(string $org, string $networkSettingsId): NetworkSettings;
+    /**
+     * @return Envelope<NetworkSettings>
+     */
+    public function hostedComputeGetNetworkSettingsForOrg(string $org, string $networkSettingsId): Envelope;
 }

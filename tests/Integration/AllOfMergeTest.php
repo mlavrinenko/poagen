@@ -51,7 +51,7 @@ final class AllOfMergeTest extends TestCase
             'mergeMissingRequired' => 'fixture-only refusal',
         ]));
 
-        self::assertStringContainsString('public function mergeRecursive(MergeRecursiveRequestContent $body): void', $client);
+        self::assertStringContainsString('public function mergeRecursive(MergeRecursiveRequestContent $body): Envelope', $client);
     }
 
     public function testARecursiveMergeModelCarriesBothLevelsProperties(): void
@@ -83,7 +83,7 @@ final class AllOfMergeTest extends TestCase
             'mergeMissingRequired' => 'fixture-only refusal',
         ]));
 
-        self::assertStringContainsString('public function mergeWidened(MergeWidenedRequestContent $body): void', $client);
+        self::assertStringContainsString('public function mergeWidened(MergeWidenedRequestContent $body): Envelope', $client);
         self::assertStringNotContainsString('mergeWidened(array $body)', $client);
     }
 
@@ -103,7 +103,7 @@ final class AllOfMergeTest extends TestCase
         $client = $this->clientSource($plan);
 
         self::assertStringContainsString(
-            'public function mergeUnion(MergeUnionByWeight|MergeUnionByVolume $body): void',
+            'public function mergeUnion(MergeUnionByWeight|MergeUnionByVolume $body): Envelope',
             $client,
         );
 

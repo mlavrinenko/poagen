@@ -12,11 +12,15 @@ declare(strict_types=1);
 namespace Acme\Kilbil\Generated;
 
 use Acme\Kilbil\Generated\Model\GeneratePromocode200Content;
+use Acme\Kilbil\Generated\Model\GeneratePromocode403Content;
 use Acme\Kilbil\Generated\Model\GeneratePromocodeRequestContent;
 use Acme\Kilbil\Generated\Model\ReservedPromocode200Content;
+use Acme\Kilbil\Generated\Model\ReservedPromocode403Content;
 use Acme\Kilbil\Generated\Model\ReservedPromocodeRequestContent;
 use Acme\Kilbil\Generated\Model\SearchPromocode200Content;
+use Acme\Kilbil\Generated\Model\SearchPromocode403Content;
 use Acme\Kilbil\Generated\Model\SearchPromocodeRequestContent;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Промокоды` endpoints.
@@ -27,9 +31,18 @@ use Acme\Kilbil\Generated\Model\SearchPromocodeRequestContent;
  */
 interface PromocodesClientInterface
 {
-    public function generatePromocode(GeneratePromocodeRequestContent $body): GeneratePromocode200Content;
+    /**
+     * @return Envelope<GeneratePromocode200Content|GeneratePromocode403Content>
+     */
+    public function generatePromocode(GeneratePromocodeRequestContent $body): Envelope;
 
-    public function reservedPromocode(ReservedPromocodeRequestContent $body): ReservedPromocode200Content;
+    /**
+     * @return Envelope<ReservedPromocode200Content|ReservedPromocode403Content>
+     */
+    public function reservedPromocode(ReservedPromocodeRequestContent $body): Envelope;
 
-    public function searchPromocode(SearchPromocodeRequestContent $body): SearchPromocode200Content;
+    /**
+     * @return Envelope<SearchPromocode200Content|SearchPromocode403Content>
+     */
+    public function searchPromocode(SearchPromocodeRequestContent $body): Envelope;
 }

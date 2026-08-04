@@ -22,14 +22,19 @@ use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesDirecti
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesSort;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoriesListRepositoryAdvisoriesState;
 use Acme\GitHub\Generated\Enum\SecurityAdvisoryEcosystems;
+use Acme\GitHub\Generated\Model\BasicError;
 use Acme\GitHub\Generated\Model\FullRepository;
 use Acme\GitHub\Generated\Model\GlobalAdvisory;
 use Acme\GitHub\Generated\Model\PrivateVulnerabilityReportCreate;
 use Acme\GitHub\Generated\Model\RepositoryAdvisory;
 use Acme\GitHub\Generated\Model\RepositoryAdvisoryCreate;
 use Acme\GitHub\Generated\Model\RepositoryAdvisoryUpdate;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Acme\GitHub\Generated\Model\ValidationErrorSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClientInterface
@@ -42,7 +47,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
     /**
      * @param string|list<string> $cwes
      * @param string|list<string> $affects
-     * @return list<GlobalAdvisory>
+     * @return Envelope<list<GlobalAdvisory>|BasicError|ValidationErrorSimple>
      */
     public function securityAdvisoriesListGlobalAdvisories(
         ?string $ghsaId = null,
@@ -63,8 +68,9 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
         ?SecurityAdvisoriesListGlobalAdvisoriesDirection $direction = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListGlobalAdvisoriesSort $sort = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<GlobalAdvisory>|BasicError|ValidationErrorSimple> $result */
+        $result = $this->transport->send(
             Endpoint::get('/advisories')
                 ->query('ghsa_id', $ghsaId)
                 ->query('type', $type)
@@ -84,20 +90,28 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('sort', $sort),
-            ResponseType::listOf(GlobalAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GlobalAdvisory::class)], ['429', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
         );
-    }
 
-    public function securityAdvisoriesGetGlobalAdvisory(string $ghsaId): GlobalAdvisory
-    {
-        return $this->transport->send(
-            Endpoint::get('/advisories/{ghsa_id}')->path('ghsa_id', $ghsaId),
-            ResponseType::object(GlobalAdvisory::class),
-        );
+        return $result;
     }
 
     /**
-     * @return list<RepositoryAdvisory>
+     * @return Envelope<GlobalAdvisory|BasicError>
+     */
+    public function securityAdvisoriesGetGlobalAdvisory(string $ghsaId): Envelope
+    {
+        /** @var Envelope<GlobalAdvisory|BasicError> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/advisories/{ghsa_id}')->path('ghsa_id', $ghsaId),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GlobalAdvisory::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @return Envelope<list<RepositoryAdvisory>|BasicError>
      */
     public function securityAdvisoriesListOrgRepositoryAdvisories(
         string $org,
@@ -107,8 +121,9 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
         ?string $after = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListOrgRepositoryAdvisoriesState $state = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RepositoryAdvisory>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/security-advisories')
                 ->path('org', $org)
                 ->query('direction', $direction)
@@ -117,12 +132,14 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('after', $after)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::listOf(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
     /**
-     * @return list<RepositoryAdvisory>
+     * @return Envelope<list<RepositoryAdvisory>|BasicError>
      */
     public function securityAdvisoriesListRepositoryAdvisories(
         string $owner,
@@ -133,8 +150,9 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
         ?string $after = null,
         ?int $perPage = null,
         ?SecurityAdvisoriesListRepositoryAdvisoriesState $state = null,
-    ): array {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<list<RepositoryAdvisory>|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/security-advisories')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
@@ -144,90 +162,125 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('after', $after)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::listOf(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreateRepositoryAdvisory(
         string $owner,
         string $repo,
         RepositoryAdvisoryCreate $body,
-    ): RepositoryAdvisory {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryAdvisory|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/security-advisories')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreatePrivateVulnerabilityReport(
         string $owner,
         string $repo,
         PrivateVulnerabilityReportCreate $body,
-    ): RepositoryAdvisory {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryAdvisory|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/security-advisories/reports')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function securityAdvisoriesGetRepositoryAdvisory(
-        string $owner,
-        string $repo,
-        string $ghsaId,
-    ): RepositoryAdvisory {
-        return $this->transport->send(
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError>
+     */
+    public function securityAdvisoriesGetRepositoryAdvisory(string $owner, string $repo, string $ghsaId): Envelope
+    {
+        /** @var Envelope<RepositoryAdvisory|BasicError> $result */
+        $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/security-advisories/{ghsa_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::object(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<RepositoryAdvisory|BasicError|ValidationError>
+     */
     public function securityAdvisoriesUpdateRepositoryAdvisory(
         string $owner,
         string $repo,
         string $ghsaId,
         RepositoryAdvisoryUpdate $body,
-    ): RepositoryAdvisory {
-        return $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<RepositoryAdvisory|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/security-advisories/{ghsa_id}')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId)
                 ->json($body),
-            ResponseType::object(RepositoryAdvisory::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
+    /**
+     * @return Envelope<array<string, mixed>|BasicError|ValidationError>
+     */
     public function securityAdvisoriesCreateRepositoryAdvisoryCveRequest(
         string $owner,
         string $repo,
         string $ghsaId,
-    ): void {
-        $this->transport->send(
+    ): Envelope {
+        /** @var Envelope<array<string, mixed>|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/security-advisories/{ghsa_id}/cve')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 
-    public function securityAdvisoriesCreateFork(string $owner, string $repo, string $ghsaId): FullRepository
+    /**
+     * @return Envelope<FullRepository|BasicError|ValidationError>
+     */
+    public function securityAdvisoriesCreateFork(string $owner, string $repo, string $ghsaId): Envelope
     {
-        return $this->transport->send(
+        /** @var Envelope<FullRepository|BasicError|ValidationError> $result */
+        $result = $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/security-advisories/{ghsa_id}/forks')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::object(FullRepository::class),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
         );
+
+        return $result;
     }
 }

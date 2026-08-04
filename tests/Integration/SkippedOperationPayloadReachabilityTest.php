@@ -47,7 +47,7 @@ final class SkippedOperationPayloadReachabilityTest extends TestCase
     {
         $client = $this->clientSource($this->plan());
 
-        self::assertStringContainsString('public function keepsShared(SharedPayload $body): void', $client);
+        self::assertStringContainsString('public function keepsShared(SharedPayload $body): Envelope', $client);
     }
 
     public function testTheSkippedOperationsMethodStillDoesNotEmit(): void

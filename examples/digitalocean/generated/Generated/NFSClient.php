@@ -11,9 +11,17 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
+use Acme\DigitalOcean\Generated\Model\Error;
+use Acme\DigitalOcean\Generated\Model\NfsCreateResponse;
+use Acme\DigitalOcean\Generated\Model\NfsGetResponse;
+use Acme\DigitalOcean\Generated\Model\NfsListResponse;
 use Acme\DigitalOcean\Generated\Model\NfsRequest;
+use Acme\DigitalOcean\Generated\Model\NfsSnapshotGetResponse;
+use Acme\DigitalOcean\Generated\Model\NfsSnapshotListResponse;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 
 final readonly class NFSClient implements NFSClientInterface
@@ -26,97 +34,125 @@ final readonly class NFSClient implements NFSClientInterface
 
     /**
      * Requires `bearer_auth` scopes: `nfs:list`.
+     * @return Envelope<NfsListResponse|Error>
      */
-    public function nfsList(?string $region = null): void
+    public function nfsList(?string $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NfsListResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/nfs')
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NfsListResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:create`.
+     * @return Envelope<NfsCreateResponse|Error>
      */
-    public function nfsCreate(NfsRequest $body): void
+    public function nfsCreate(NfsRequest $body): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NfsCreateResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::post('/v2/nfs')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(NfsCreateResponse::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:list`.
+     * @return Envelope<NfsSnapshotListResponse|Error>
      */
-    public function nfsListSnapshot(?string $region = null, ?string $shareId = null): void
+    public function nfsListSnapshot(?string $region = null, ?string $shareId = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NfsSnapshotListResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/nfs/snapshots')
                 ->query('region', $region)
                 ->query('share_id', $shareId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NfsSnapshotListResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:read`.
+     * @return Envelope<NfsSnapshotGetResponse|Error>
      */
-    public function nfsGetSnapshot(string $nfsSnapshotId, ?string $region = null): void
+    public function nfsGetSnapshot(string $nfsSnapshotId, ?string $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NfsSnapshotGetResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/nfs/snapshots/{nfs_snapshot_id}')
                 ->path('nfs_snapshot_id', $nfsSnapshotId)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NfsSnapshotGetResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:delete`.
+     * @return Envelope<null|Error>
      */
-    public function nfsDeleteSnapshot(string $nfsSnapshotId, ?string $region = null): void
+    public function nfsDeleteSnapshot(string $nfsSnapshotId, ?string $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/nfs/snapshots/{nfs_snapshot_id}')
                 ->path('nfs_snapshot_id', $nfsSnapshotId)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:read`.
+     * @return Envelope<NfsGetResponse|Error>
      */
-    public function nfsGet(string $nfsId, ?string $region = null): void
+    public function nfsGet(string $nfsId, ?string $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<NfsGetResponse|Error> $result */
+        $result = $this->transport->send(
             Endpoint::get('/v2/nfs/{nfs_id}')
                 ->path('nfs_id', $nfsId)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NfsGetResponse::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 
     /**
      * Requires `bearer_auth` scopes: `nfs:delete`.
+     * @return Envelope<null|Error>
      */
-    public function nfsDelete(string $nfsId, ?string $region = null): void
+    public function nfsDelete(string $nfsId, ?string $region = null): Envelope
     {
-        $this->transport->send(
+        /** @var Envelope<null|Error> $result */
+        $result = $this->transport->send(
             Endpoint::delete('/v2/nfs/{nfs_id}')
                 ->path('nfs_id', $nfsId)
                 ->query('region', $region)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::nothing(),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
         );
+
+        return $result;
     }
 }

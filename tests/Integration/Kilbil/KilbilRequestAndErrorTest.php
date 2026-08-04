@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
-use Acme\Kilbil\Generated\ApiException;
 use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
+use Acme\Kilbil\Generated\Model\SearchClient403Content;
 use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
@@ -14,9 +14,14 @@ use function urlencode;
 
 /**
  * kilbil-recorded-response-proof: the request side (the `h` query-string
- * credential reaching an actually-built request) and the 403 failure path
- * (`ApiException` carrying the original request and response), both against
- * the real `HttpTransport` — see `KilbilHttpHarness`.
+ * credential reaching an actually-built request) and the 403 path, both
+ * against the real `HttpTransport` — see `KilbilHttpHarness`.
+ *
+ * The 403 half changed shape under `typed-error-responses`: kilbil declares
+ * a body for 403 on every operation, so it is a return value now — a
+ * `SearchClient403Content` hydrated onto the envelope — not an `ApiException`.
+ * `error-response-policy` threw on any non-2xx; the owner ruling that
+ * superseded it says the status does not change the shape of the return.
  */
 final class KilbilRequestAndErrorTest extends TestCase
 {
@@ -44,7 +49,7 @@ final class KilbilRequestAndErrorTest extends TestCase
         self::assertStringNotContainsString('h', $http->lastRequest->getHeaderLine('Authorization'));
     }
 
-    public function testA403ResponseProducesApiExceptionCarryingTheOriginalRequestAndResponse(): void
+    public function testA403ResponseHydratesIntoTheDeclaredErrorBodyRatherThanThrowing(): void
     {
         // Body from the vendor's own 403 example (schemas/loyalty_v1.yaml
         // ~985-992): result_code example 1, result_text example
@@ -52,21 +57,16 @@ final class KilbilRequestAndErrorTest extends TestCase
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(403, KilbilFixture::raw('error-403')));
         $client = KilbilHttpHarness::client($http, 'super-secret-h-value');
 
-        try {
-            $client->customers()->searchClient(new SearchClientRequestContent(
-                search_mode: SearchClientRequestContentSearchMode::_1,
-                search_value: '79129999999',
-            ));
-            self::fail('expected an ApiException on a 403 response');
-        } catch (ApiException $e) {
-            self::assertSame(403, $e->getStatusCode());
-            self::assertNotNull($http->lastRequest);
-            self::assertSame($http->lastRequest, $e->getRequest());
-            self::assertSame(403, $e->getResponse()->getStatusCode());
-            self::assertSame(
-                ['result_code' => 1, 'result_text' => 'Доступ запрещен'],
-                $e->getDecodedBody(),
-            );
-        }
+        $result = $client->customers()->searchClient(new SearchClientRequestContent(
+            search_mode: SearchClientRequestContentSearchMode::_1,
+            search_value: '79129999999',
+        ));
+
+        self::assertSame(403, $result->status);
+        self::assertInstanceOf(SearchClient403Content::class, $result->body);
+        self::assertSame(1, $result->body->result_code);
+        self::assertSame('Доступ запрещен', $result->body->result_text);
+        self::assertNotNull($http->lastRequest);
+        self::assertSame(403, $result->response->getStatusCode());
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Tests\Generated;
 
+use InvalidArgumentException;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
 
@@ -22,39 +24,65 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientIn
  */
 final class CachingStoreClient implements StoreClientInterface
 {
-    /** @var array<int,Order> */
+    /** @var array<int, Envelope<Order|null>> */
     private array $orders = [];
 
     public function __construct(
         private readonly StoreClientInterface $inner,
     ) {}
 
-    public function getOrderById(int $orderId): Order
+    /**
+     * The convenience the generator will not write, mirrored from the
+     * committed proof so this twin is the whole shape rather than only the
+     * interface's own methods.
+     *
+     * @return Envelope<Order|null>
+     */
+    public function refresh(Order $order): Envelope
+    {
+        $id = $order->id ?? throw new InvalidArgumentException('cannot refresh an Order with no id');
+        unset($this->orders[$id]);
+
+        return $this->getOrderById($id);
+    }
+
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function getOrderById(int $orderId): Envelope
     {
         return $this->orders[$orderId] ??= $this->inner->getOrderById($orderId);
     }
 
-    public function deleteOrder(int $orderId): void
+    /**
+     * @return Envelope<null>
+     */
+    public function deleteOrder(int $orderId): Envelope
     {
-        $this->inner->deleteOrder($orderId);
+        $result = $this->inner->deleteOrder($orderId);
         unset($this->orders[$orderId]);
+
+        return $result;
     }
 
-    public function placeOrder(Order $body): Order
+    /**
+     * @return Envelope<Order|null>
+     */
+    public function placeOrder(Order $body): Envelope
     {
         $placed = $this->inner->placeOrder($body);
 
-        if ($placed->id !== null) {
-            $this->orders[$placed->id] = $placed;
+        if ($placed->body instanceof Order && $placed->body->id !== null) {
+            $this->orders[$placed->body->id] = $placed;
         }
 
         return $placed;
     }
 
     /**
-     * @return array<string, int>
+     * @return Envelope<array<string, int>|null>
      */
-    public function getInventory(): array
+    public function getInventory(): Envelope
     {
         return $this->inner->getInventory();
     }

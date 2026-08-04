@@ -12,6 +12,14 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\AutoscalePoolCreate;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsCreate202Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsGet200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsList200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsListHistory200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsListMembers200Content;
+use Acme\DigitalOcean\Generated\Model\AutoscalepoolsUpdate200Content;
+use Acme\DigitalOcean\Generated\Model\Error;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `Droplet Autoscale Pools` endpoints.
@@ -24,41 +32,57 @@ interface DropletAutoscalePoolsClientInterface
 {
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsList200Content|Error>
      */
-    public function autoscalepoolsList(?int $perPage = null, ?int $page = null, ?string $name = null): void;
+    public function autoscalepoolsList(?int $perPage = null, ?int $page = null, ?string $name = null): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<AutoscalepoolsCreate202Content|Error>
      */
-    public function autoscalepoolsCreate(AutoscalePoolCreate $body): void;
+    public function autoscalepoolsCreate(AutoscalePoolCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsGet200Content|Error>
      */
-    public function autoscalepoolsGet(string $autoscalePoolId): void;
+    public function autoscalepoolsGet(string $autoscalePoolId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:create`.
+     * @return Envelope<AutoscalepoolsUpdate200Content|Error>
      */
-    public function autoscalepoolsUpdate(string $autoscalePoolId, AutoscalePoolCreate $body): void;
+    public function autoscalepoolsUpdate(string $autoscalePoolId, AutoscalePoolCreate $body): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function autoscalepoolsDelete(string $autoscalePoolId): void;
+    public function autoscalepoolsDelete(string $autoscalePoolId): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:delete`.
+     * @return Envelope<null|Error>
      */
-    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): void;
+    public function autoscalepoolsDeleteDangerous(string $autoscalePoolId, bool $xDangerous): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsListHistory200Content|Error>
      */
-    public function autoscalepoolsListHistory(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void;
+    public function autoscalepoolsListHistory(
+        string $autoscalePoolId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `droplet:read`.
+     * @return Envelope<AutoscalepoolsListMembers200Content|Error>
      */
-    public function autoscalepoolsListMembers(string $autoscalePoolId, ?int $perPage = null, ?int $page = null): void;
+    public function autoscalepoolsListMembers(
+        string $autoscalePoolId,
+        ?int $perPage = null,
+        ?int $page = null,
+    ): Envelope;
 }

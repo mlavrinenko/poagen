@@ -16,6 +16,8 @@ use Acme\GitHub\Generated\Model\InteractionLimitResponse;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForOrgResponseBranch2;
 use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForRepoResponseBranch2;
+use Acme\GitHub\Generated\Model\ValidationError;
+use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 
 /**
  * The contract for the `interactions` endpoints.
@@ -26,31 +28,48 @@ use Acme\GitHub\Generated\Model\InteractionsGetRestrictionsForRepoResponseBranch
  */
 interface InteractionsClientInterface
 {
-    public function interactionsGetRestrictionsForOrg(
-        string $org,
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2;
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2>
+     */
+    public function interactionsGetRestrictionsForOrg(string $org): Envelope;
 
-    public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): InteractionLimitResponse;
+    /**
+     * @return Envelope<InteractionLimitResponse|ValidationError>
+     */
+    public function interactionsSetRestrictionsForOrg(string $org, InteractionLimit $body): Envelope;
 
-    public function interactionsRemoveRestrictionsForOrg(string $org): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForOrg(string $org): Envelope;
 
-    public function interactionsGetRestrictionsForRepo(
-        string $owner,
-        string $repo,
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2;
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForRepoResponseBranch2>
+     */
+    public function interactionsGetRestrictionsForRepo(string $owner, string $repo): Envelope;
 
-    public function interactionsSetRestrictionsForRepo(
-        string $owner,
-        string $repo,
-        InteractionLimit $body,
-    ): InteractionLimitResponse;
+    /**
+     * @return Envelope<InteractionLimitResponse|null>
+     */
+    public function interactionsSetRestrictionsForRepo(string $owner, string $repo, InteractionLimit $body): Envelope;
 
-    public function interactionsRemoveRestrictionsForRepo(string $owner, string $repo): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForRepo(string $owner, string $repo): Envelope;
 
-    public function interactionsGetRestrictionsForAuthenticatedUser(
-    ): InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2;
+    /**
+     * @return Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2|null>
+     */
+    public function interactionsGetRestrictionsForAuthenticatedUser(): Envelope;
 
-    public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): InteractionLimitResponse;
+    /**
+     * @return Envelope<InteractionLimitResponse|ValidationError>
+     */
+    public function interactionsSetRestrictionsForAuthenticatedUser(InteractionLimit $body): Envelope;
 
-    public function interactionsRemoveRestrictionsForAuthenticatedUser(): void;
+    /**
+     * @return Envelope<null>
+     */
+    public function interactionsRemoveRestrictionsForAuthenticatedUser(): Envelope;
 }
