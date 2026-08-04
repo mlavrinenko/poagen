@@ -119,7 +119,7 @@ either path, wiring `Schema` means building one from nothing, same as
 - `analysis-runs-at-maximum-strictness`'s `structural:` slot drops from
   five entries to two: only the `tests/generated/*Steps.php` pair remains,
   which is genuine tool blindness in speconaut-emitted output, not debt
-  against a paogen decision.
+  against a poagen decision.
 - Re-opening the vocabulary at any point needs a new decision that names,
   up front, the runtime consumer the new attribute will terminate in — not
   just the schema construct it would describe.

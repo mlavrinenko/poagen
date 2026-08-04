@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
-use Mlavrinenko\Paogen\Generator\Emit\EnvelopeResponsePlanner;
-use Mlavrinenko\Paogen\Generator\Emit\ResponseAnalyzer;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaWalk;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Unit\SchemaWalkTest;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\EnvelopeResponsePlanner;
+use Poagen\Generator\Generator\Emit\ResponseAnalyzer;
+use Poagen\Generator\Generator\Emit\SchemaWalk;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Unit\SchemaWalkTest;
 
 /**
  * response-analyzer-picks-a-2xx-without-resolving-a-ref.
@@ -53,7 +53,7 @@ final class ResponseRefReturnTypeParityTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/response-ref-return-type-parity-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseRefReturnTypeParity';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ResponseRefReturnTypeParity';
 
     public static function tearDownAfterClass(): void
     {
@@ -104,7 +104,7 @@ final class ResponseRefReturnTypeParityTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-response-ref-return-type-parity-'),
+            output: self::makeSandboxDir('poagen-response-ref-return-type-parity-'),
             namespace: self::NAMESPACE,
         ));
     }

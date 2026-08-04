@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
-use Mlavrinenko\Paogen\Exception\InvalidProfileException;
+use Poagen\Generator\Exception\InvalidProfileException;
 
 use function strlen;
 
@@ -41,7 +41,7 @@ final class ProfileLoader
      * Name the profile the way a reader would type it.
      *
      * This ends up in the header of every emitted file, so it must never be an
-     * absolute path: `/home/someone/work/api/paogen.php` would put one
+     * absolute path: `/home/someone/work/api/poagen.php` would put one
      * machine's directory layout into a committed tree, and the next
      * contributor's regeneration would rewrite every file with theirs. A path
      * relative to the working directory is both stable across checkouts and

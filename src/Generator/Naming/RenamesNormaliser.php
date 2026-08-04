@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
-
-use Mlavrinenko\Paogen\Exception\InvalidProfileException;
+namespace Poagen\Generator\Generator\Naming;
 
 use function sprintf;
 
@@ -26,7 +24,7 @@ final readonly class RenamesNormaliser implements NameNormaliser
 
     /**
      * @param array<string,string> $map   raw name → desired PHP identifier
-     * @param SymbolKind|null      $kind  the only kind this map applies to; null applies it to all
+     * @param SymbolKind|null $kind the only kind this map applies to; null applies it to all
      * @param string               $label how to name this map in an error, e.g. `renames`
      */
     public function __construct(
@@ -37,7 +35,7 @@ final readonly class RenamesNormaliser implements NameNormaliser
     ) {
         foreach ($map as $raw => $php) {
             if (preg_match(self::IDENTIFIER, $php) !== 1) {
-                throw new InvalidProfileException(sprintf(
+                throw new \Poagen\Generator\Exception\InvalidProfileException(sprintf(
                     "Profile %s map: '%s' is not a valid PHP identifier (mapped from '%s').",
                     $label,
                     $php,

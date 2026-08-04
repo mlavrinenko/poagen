@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\ValueObject;
 
-use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Generator\Generator\Attribute\BindsFormat;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * A kilbil calendar date.
  *
- * `data` (1 use) is `date` mistyped. paogen already handles the correct spelling
+ * `data` (1 use) is `date` mistyped. poagen already handles the correct spelling
  * with a built-in, so this covers only the typo — which is also why binding it
  * here does not disturb the eight fields that spell it properly and keep arriving
  * as `DateTimeImmutable` from the built-in path.

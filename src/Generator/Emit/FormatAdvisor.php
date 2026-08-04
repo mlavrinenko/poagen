@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\ScalarFormat;
 
 use function is_string;
 use function spl_object_id;
@@ -30,7 +30,7 @@ use function sprintf;
  * run that could be more pleasant, and this is the second kind.
  *
  * The kilbil loyalty document is what makes the case: nine distinct format
- * values across 292 uses, of which paogen knows one. `date time` is `date-time`
+ * values across 292 uses, of which poagen knows one. `date time` is `date-time`
  * misspelled with a space, and `data`/`data time` are further typos of it — 15
  * timestamps that would reach a consumer as strings with nothing said.
  *
@@ -82,9 +82,9 @@ final readonly class FormatAdvisor
 
         foreach ($formats as $format) {
             $notices[] = sprintf(
-                "format '%s' is not one paogen recognises — %d use(s), first at %s. The property keeps its base "
+                "format '%s' is not one poagen recognises — %d use(s), first at %s. The property keeps its base "
                     . "type. To give it a type of your own, put #[BindsFormat('%s')] on a value object in a "
-                    . 'namespace listed in Profile::$discoverIn; implement Runtime\\ScalarBinding on it and paogen '
+                    . 'namespace listed in Profile::$discoverIn; implement Runtime\\ScalarBinding on it and poagen '
                     . 'round-trips it as the underlying scalar at the wire boundary.',
                 $format,
                 $counts[$format],
@@ -141,7 +141,7 @@ final readonly class FormatAdvisor
     }
 
     /**
-     * Recognised means paogen already resolves it to a real type: one of its own
+     * Recognised means poagen already resolves it to a real type: one of its own
      * built-ins, or a format the consumer bound to a value object of theirs —
      * or, when `$schema` is itself a request/response body's content schema,
      * a format {@see BodyMediaType} reads to choose the body's whole shape

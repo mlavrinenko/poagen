@@ -2,11 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
-
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+namespace Poagen\Generator\Generator\Emit;
 
 /**
  * Single point where every emitter resolves an OpenAPI ref target
@@ -23,7 +19,7 @@ final readonly class ComponentName
         return $last === false ? '' : $last;
     }
 
-    public static function phpFromRef(string $ref, NameRegistry $registry): string
+    public static function phpFromRef(string $ref, \Poagen\Generator\Generator\Naming\NameRegistry $registry): string
     {
         return self::phpFromRaw(self::rawFromRef($ref), $registry);
     }
@@ -35,17 +31,17 @@ final readonly class ComponentName
      * through a synthesised `$ref` just to get back here would be a second
      * spelling of the pointer format to keep in step.
      */
-    public static function phpFromRaw(string $raw, NameRegistry $registry): string
+    public static function phpFromRaw(string $raw, \Poagen\Generator\Generator\Naming\NameRegistry $registry): string
     {
-        return $registry->resolve($raw, new NormalisationContext(SymbolKind::SchemaComponent));
+        return $registry->resolve($raw, new \Poagen\Generator\Generator\Naming\NormalisationContext(\Poagen\Generator\Generator\Naming\SymbolKind::SchemaComponent));
     }
 
-    public static function fqcnFromRef(string $ref, string $modelNamespace, NameRegistry $registry): string
+    public static function fqcnFromRef(string $ref, string $modelNamespace, \Poagen\Generator\Generator\Naming\NameRegistry $registry): string
     {
         return self::fqcnFromRaw(self::rawFromRef($ref), $modelNamespace, $registry);
     }
 
-    public static function fqcnFromRaw(string $raw, string $modelNamespace, NameRegistry $registry): string
+    public static function fqcnFromRaw(string $raw, string $modelNamespace, \Poagen\Generator\Generator\Naming\NameRegistry $registry): string
     {
         return '\\' . trim($modelNamespace, '\\') . '\\' . self::phpFromRaw($raw, $registry);
     }

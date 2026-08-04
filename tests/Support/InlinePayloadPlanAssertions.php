@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
-
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
+namespace Poagen\Generator\Tests\Support;
 
 use function array_keys;
 use function basename;
@@ -29,7 +27,7 @@ trait InlinePayloadPlanAssertions
     /**
      * @return list<string>
      */
-    private static function emittedNames(GenerationPlan $plan, string $subdirectory): array
+    private static function emittedNames(\Poagen\Generator\Generator\GenerationPlan $plan, string $subdirectory): array
     {
         $needle = DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR;
         $out = [];

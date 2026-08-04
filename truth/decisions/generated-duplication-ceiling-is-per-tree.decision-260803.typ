@@ -7,7 +7,7 @@
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
   standards: (link("../standards/analysis-runs-at-maximum-strictness.standard-260729.typ"),),
-  process-only: "governs paogen's own duplication-gate configuration for the generated tier — what `just lint-jscpd-generated` measures and `scripts/jscpd-generated-baselines` records — not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own duplication-gate configuration for the generated tier — what `just lint-jscpd-generated` measures and `scripts/jscpd-generated-baselines` records — not what the generator produces or what a reimplementation must do",
 )
 
 == Context
@@ -78,7 +78,7 @@ again.
 
 Only `examples/*/generated` trees get their own row in
 `scripts/jscpd-generated-baselines`. `tests/fixtures/generated/*` stays
-under one uniform ceiling inside the same recipe — those are paogen's own
+under one uniform ceiling inside the same recipe — those are poagen's own
 fixtures, small and hand-made, not emitted from a real vendor document
 whose scale sets its own floor. A new fixture tree there adds no row and
 needs none.

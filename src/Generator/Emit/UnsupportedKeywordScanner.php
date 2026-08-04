@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
@@ -39,22 +39,22 @@ use function sprintf;
 final readonly class UnsupportedKeywordScanner
 {
     /**
-     * Keyword → what paogen would have to invent to emit it, and the way out
-     * that does not need paogen to change.
+     * Keyword → what poagen would have to invent to emit it, and the way out
+     * that does not need poagen to change.
      *
      * @var array<string,string>
      */
     private const array KEYWORDS = [
-        'const' => 'pins the value, not the type, and no emitter carries a value constraint — paogen would emit '
+        'const' => 'pins the value, not the type, and no emitter carries a value constraint — poagen would emit '
             . 'the declared type and accept everything the vendor rejects. Write it as a single-member `enum`, '
-            . 'which paogen emits as a backed enum with one case',
+            . 'which poagen emits as a backed enum with one case',
         'prefixItems' => 'types an array position by position, and PHP has no tuple type — an emitted `array` '
             . 'would say nothing about which position holds what. Give the array one `items` type, or model the '
             . 'positions as named properties of an object',
         'unevaluatedProperties' => 'constrains whatever no subschema evaluated, which is a fact about the whole '
-            . 'composition rather than about this node — paogen resolves composition itself and would drop the '
+            . 'composition rather than about this node — poagen resolves composition itself and would drop the '
             . 'constraint on the floor. Use `additionalProperties` on the schema that owns the properties',
-        'contentMediaType' => 'says this string carries a document of another media type inside it, and paogen '
+        'contentMediaType' => 'says this string carries a document of another media type inside it, and poagen '
             . 'would emit a plain `string` and leave the payload unparsed. Model the embedded document as a '
             . 'schema of its own and reference it',
     ];
@@ -71,7 +71,7 @@ final readonly class UnsupportedKeywordScanner
             }
 
             return sprintf(
-                'schema at %s uses the JSON Schema 2020-12 keyword `%s`, which paogen does not implement: it %s. '
+                'schema at %s uses the JSON Schema 2020-12 keyword `%s`, which poagen does not implement: it %s. '
                     . 'Or name this operation or component in Profile::$skip to generate without it',
                 SynthesisedModel::originOf($schema),
                 $keyword,
@@ -84,14 +84,14 @@ final readonly class UnsupportedKeywordScanner
 
     /**
      * `webhooks` is refused whole rather than through {@see SkippedOperation},
-     * because it is not an operation paogen could have emitted and left out.
+     * because it is not an operation poagen could have emitted and left out.
      * It sits beside `paths` at the top of a 3.1 document and describes calls
      * the vendor makes to the consumer — the opposite direction from every
-     * client paogen emits. The default stays a refusal even once a consumer
+     * client poagen emits. The default stays a refusal even once a consumer
      * can opt out: `webhooks-refuse-with-no-opt-out` widened
      * `Profile::$skip`'s key space ({@see WebhookSkipKey}) rather than making
      * a webhook disappear unasked, because the omission the vendor's document
-     * asked about is not one paogen would take silently — see
+     * asked about is not one poagen would take silently — see
      * `skip-is-the-only-opt-out`.
      *
      * Generating the `paths` half alone and saying nothing is the outcome
@@ -115,9 +115,9 @@ final readonly class UnsupportedKeywordScanner
 
             $out[] = sprintf(
                 '`webhooks` at #/webhooks/%s (%s) — an OpenAPI 3.1 webhook describes a call the vendor makes to '
-                    . 'the consumer, and paogen emits a client that calls the vendor. No emitter models one, and '
+                    . 'the consumer, and poagen emits a client that calls the vendor. No emitter models one, and '
                     . 'generating the paths alone would drop it silently. Remove the webhook from the document '
-                    . 'paogen generates from, ask for webhook support, or name it in Profile::$skip as \'%s\' to '
+                    . 'poagen generates from, ask for webhook support, or name it in Profile::$skip as \'%s\' to '
                     . 'generate the paths alone.',
                 (string) $name,
                 self::describeWebhook($webhook),

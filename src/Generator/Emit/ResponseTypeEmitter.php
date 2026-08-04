@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
-use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
-use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Http\ResponseDecoder;
-use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchPicker;
 use Nette\PhpGenerator\Dumper;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Generator\Generator\ScalarFormat;
+use Poagen\Runtime\Attribute\BranchSelector;
+use Poagen\Runtime\Attribute\Discriminator;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Http\ResponseDecoder;
+use Poagen\Runtime\Marshal\UnionBranchPicker;
 use Psr\Http\Message\StreamInterface;
 
 use function array_map;
@@ -145,7 +145,7 @@ final readonly class ResponseTypeEmitter
      * {@see UnionBranchPicker} needs —
      * a `Discriminator` for a tag-in-value resolution, a `BranchSelector`
      * for a structural one, never both. A pin never reaches here: {@see
-     * \Mlavrinenko\Paogen\Generator\Emit\ResponseUnionPlanner} types a
+     * \Poagen\Generator\Generator\Emit\ResponseUnionPlanner} types a
      * pinned response as its single branch directly, `KIND_MODEL`, the same
      * way a pinned property carries no union at all.
      */

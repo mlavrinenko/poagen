@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 use function count;
 use function in_array;
@@ -138,7 +138,7 @@ final readonly class RequestBodyAnalyzer
 
         // The media type node exists but carries no `schema` key at all —
         // the document says nothing about the body's shape, which is not
-        // the same claim as a schema paogen cannot type. The same
+        // the same claim as a schema poagen cannot type. The same
         // KIND_JSON_MAP surface a genuinely shapeless *object* schema
         // already reaches, arrived at by this different route: an inline
         // `type: object` schema with no properties (SchemalessBodyAdvisor

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # verify-runtime-standalone — prove runtime-package-split's central claim: a
-# generated client installs and runs with mlavrinenko/paogen-runtime alone,
-# with the generator (mlavrinenko/paogen, devizzent/cebe-php-openapi, nette/php-
+# generated client installs and runs with poagen/client-runtime alone,
+# with the generator (poagen/client-generator, devizzent/cebe-php-openapi, nette/php-
 # generator, sebastian/diff) nowhere in vendor/.
 #
 # Builds a scratch composer project under build/ (git-ignored) that requires
-# only paogen-runtime and a PSR-7 implementation, drops in a copy of the
+# only poagen-runtime and a PSR-7 implementation, drops in a copy of the
 # committed petstore example's generated tree, and drives one real operation
 # through a stub transport. Not part of `just check`: composer resolves
 # nyholm/psr7 from the network/cache, which the offline gate does not assume.
@@ -25,7 +25,7 @@ cat > "$scratch/composer.json" <<JSON
     "license": "proprietary",
     "require": {
         "php": "^8.4",
-        "mlavrinenko/paogen-runtime": "@dev",
+        "poagen/client-runtime": "@dev",
         "nyholm/psr7": "^1.8"
     },
     "repositories": [
@@ -60,19 +60,19 @@ require __DIR__ . '/vendor/autoload.php';
 use Acme\Petstore\Generated\ApiClient;
 use Acme\Petstore\Generated\Model\Pet;
 use Composer\InstalledVersions;
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\TransportInterface;
 
-foreach (['mlavrinenko/paogen', 'devizzent/cebe-php-openapi', 'nette/php-generator', 'sebastian/diff'] as $generatorOnly) {
+foreach (['poagen/client-generator', 'devizzent/cebe-php-openapi', 'nette/php-generator', 'sebastian/diff'] as $generatorOnly) {
     if (InstalledVersions::isInstalled($generatorOnly)) {
         fwrite(STDERR, "FAIL: {$generatorOnly} is installed — the generator is not absent\n");
         exit(1);
     }
 }
 
-if (!InstalledVersions::isInstalled('mlavrinenko/paogen-runtime')) {
-    fwrite(STDERR, "FAIL: mlavrinenko/paogen-runtime is not installed\n");
+if (!InstalledVersions::isInstalled('poagen/client-runtime')) {
+    fwrite(STDERR, "FAIL: poagen/client-runtime is not installed\n");
     exit(1);
 }
 
@@ -95,7 +95,7 @@ if ($pet->name !== 'Rex') {
     exit(1);
 }
 
-echo "OK: generated client ran on mlavrinenko/paogen-runtime alone (generator absent)\n";
+echo "OK: generated client ran on poagen/client-runtime alone (generator absent)\n";
 PHP
 
 cd "$scratch"

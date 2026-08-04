@@ -6,7 +6,7 @@
   status: accepted(2026, 8, 2),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
-  process-only: "governs paogen's own traceability-gate policy — what the untraced-source finding blocks a commit on — not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own traceability-gate policy — what the untraced-source finding blocks a commit on — not what the generator produces or what a reimplementation must do",
 )
 
 == Context
@@ -17,7 +17,7 @@ many files under `.speconaut/config.toml`'s `[check].source-roots =
 scenarios. The measurement needed a local, uncommitted workaround for an
 upstream blocker (`audit-traces-ignores-the-configured-namespace`, filed in
 speconaut's own tracker — `AuditTracesHandler` hardcodes the PHPUnit filter
-namespace and never reads paogen's configured one, so every scenario fails
+namespace and never reads poagen's configured one, so every scenario fails
 identically with "phpunit exited with code 1" until that lands) and is
 reverted; the numbers below are real but were measured, not locked.
 
@@ -27,7 +27,7 @@ Of 114 files across the three source roots, 29 are untraced:
   `tests/Unit/Runtime/*` and `tests/Integration/RuntimeSubstitutionTest.php`
   exercise this code directly. `speconaut audit-traces` only instruments
   `tests/generated/*Test.php` (the manifest-listed, spec-derived suite), so
-  it structurally cannot see coverage from paogen's own hand-written
+  it structurally cannot see coverage from poagen's own hand-written
   PHPUnit tests. `truth/specs/`'s four features describe the *generator's*
   behaviour, not the separately-installable runtime library's
   (`runtime-ships-as-a-separate-package`) — this is a scope boundary, not a

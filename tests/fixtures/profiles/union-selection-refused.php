@@ -11,13 +11,12 @@
  */
 
 declare(strict_types=1);
-
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 require_once __DIR__ . '/scratch-output.php';
 
 return new Profile(
     schema: __DIR__ . '/../schemas/union-selection-3.0.yaml',
-    output: paogen_fixture_scratch_output('union-selection-refused'),
-    namespace: 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\UnionSelectionRefused',
+    output: poagen_fixture_scratch_output('union-selection-refused'),
+    namespace: 'Poagen\\Generator\\Tests\\Fixtures\\Generated\\UnionSelectionRefused',
 );

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
+use Poagen\Generator\Generator\GenerationPlan;
 
 /**
  * A top-level `webhooks:` entry the generator omitted because

@@ -1,4 +1,4 @@
-# Agent guide for paogen
+# Agent guide for poagen
 
 This file is the entry point — read it before your first task. Deep,
 reactive-lookup material split out to keep both files under linecop's
@@ -25,14 +25,14 @@ the config. Check the binary. A stale sentence reads exactly like a current one.
 Found a false claim? Fix it in the same change that discovered it and say so in
 your report. Routing around it silently is how this list got to four.
 
-## What paogen is trying to be
+## What poagen is trying to be
 
 Read `truth/vision.typ` before your first task. It describes what consuming an
-HTTP API from a project that uses paogen should feel like, and it links the
+HTTP API from a project that uses poagen should feel like, and it links the
 seven goals that judge whether we got there. Every goal carries an acid test
 that can be run rather than argued about.
 
-Short version: a consumer points paogen at the schema their vendor published,
+Short version: a consumer points poagen at the schema their vendor published,
 gets a typed client they never edit, and extends it from their own code rather
 than by patching ours. Everything below serves that.
 
@@ -65,7 +65,7 @@ Both are on the system PATH. `speconaut` is a nix shim at
 when you pass none, then execs `~/projects/home/speconaut/target/debug/
 speconaut`, `cargo build`-ing it first if absent. The system install and the
 in-tree debug build are the same binary — there is no "newer" one to prefer,
-and rebuilding speconaut in its own repo changes what paogen sees immediately.
+and rebuilding speconaut in its own repo changes what poagen sees immediately.
 
 `speconaut check` and every `mt` command need nothing else. `generate-tests`,
 `status`, `lock` and `diff` spawn the PHP adapter (`speconaut-php-phpunit`) and
@@ -200,7 +200,7 @@ This project runs MindTape's `gated` preset, which means:
 `mt` on `PATH` rebuilds the mindtape checkout from source on every
 invocation. When that checkout fails to compile — an uncommitted dependency
 edit was enough on 2026-08-03 — every subcommand exits 101, `mt ls` and
-`mt check` included, and nothing about paogen is at fault. Edit task
+`mt check` included, and nothing about poagen is at fault. Edit task
 artifacts by hand instead — the format is plain Typst — and validate with
 `speconaut check truth/`; run `scripts/gate-fresh is-fresh` directly for the
 freshness check `mt`'s own `[[on.flip]]` predicate would otherwise run.
@@ -224,22 +224,22 @@ no marked insertion point, no inheritance hook — see the
 `generated-types-are-total` standard. If output is wrong, fix the emitter.
 
 `Generated/` imports only from `runtime/`, this repo's second composer
-package (`mlavrinenko/paogen-runtime`) — see
+package (`poagen/client-runtime`) — see
 `runtime-ships-as-a-separate-package`. Consumers install it as a normal
 dependency and the generator itself only as `require-dev`; anything the
 generator needs (the parser, the code printer, the differ) belongs in `src/`,
 never in `runtime/src/`.
 
 Every emitted file says so itself, in a header naming the profile it came from
-and the `paogen generate <profile>` that reproduces it, so the rule travels with
+and the `poagen generate <profile>` that reproduces it, so the rule travels with
 the artifact instead of living only here. Nothing is made read-only: git keeps
 no write bit through a clone, so the barrier would exist on one machine only —
 see `a-header-not-a-chmod`. The header is the whole mechanism, which is why an
 edit under `Generated/` is caught by a reader rather than by the filesystem.
 
-All consumer customisation lives in the `paogen.php` `Profile` or in attributes
-on the consumer's own value objects. Guidance is data paogen reads, never code
-paogen runs — see `guidance-is-data-not-code`. Delete every bit of guidance and
+All consumer customisation lives in the `poagen.php` `Profile` or in attributes
+on the consumer's own value objects. Guidance is data poagen reads, never code
+poagen runs — see `guidance-is-data-not-code`. Delete every bit of guidance and
 generation still succeeds, producing a client that is less pleasant and no less
 correct.
 
@@ -271,18 +271,18 @@ wrong.
 
 ## When a dependency is broken, fix the dependency first
 
-paogen depends on speconaut (core plus the `php-phpunit` adapter) and on
+poagen depends on speconaut (core plus the `php-phpunit` adapter) and on
 MindTape. If a dependency-side bug blocks routine work, do not route around it
-inside paogen. Stop before any hand-edit or workaround, then file a focused task
+inside poagen. Stop before any hand-edit or workaround, then file a focused task
 in the owning repo with the reproducible example from the session that surfaced
 it, fix it there under that repo's own workflow, land green, and return. A
-paogen change built on a hacked-around dependency is a landmine for the next
+poagen change built on a hacked-around dependency is a landmine for the next
 session.
 
 ## Task placement
 
 File a task in the tracker of the project it fixes, not the project the
-symptom surfaced in. `speconaut-mindtape-skew-guard` sat here naming no paogen
+symptom surfaced in. `speconaut-mindtape-skew-guard` sat here naming no poagen
 file at all; it was retired and refiled as speconaut's
 `keep-the-embedded-mindtape-in-step-with-the-installed-mt`, with
 `speconaut-mindtape-config-skew` left behind pointing at where it went. A task
@@ -291,7 +291,7 @@ whoever cannot.
 
 One issue per task. Two problems surfaced by one symptom are two tasks.
 
-- paogen behaviour and specs: `~/projects/home/paogen/truth/tasks/`
+- poagen behaviour and specs: `~/projects/home/paogen/truth/tasks/`
 - speconaut core **and its adapters**: `~/projects/home/speconaut/truth/tasks/`
   — one flat root. `adapters/speconaut-php-phpunit/` and
   `adapters/speconaut-rust/` carry no task tree of their own.

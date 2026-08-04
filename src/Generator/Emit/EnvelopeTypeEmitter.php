@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\StatusResponseMap;
 
 use function array_unique;
 use function array_values;

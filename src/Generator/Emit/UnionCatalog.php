@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use const SORT_STRING;
 
@@ -32,9 +32,9 @@ use const SORT_STRING;
 final readonly class UnionCatalog
 {
     /**
-     * @param array<string,UnionResolution> $byPointer document position => how that union picks a branch
-     * @param array<string,UnionResolution> $byKey     '<Component>.<property>' => the same objects
-     * @param list<SkippedComponent>        $failures  unions no layer could resolve, keyed by the component
+     * @param array<string, UnionResolution> $byPointer document position => how that union picks a branch
+     * @param array<string, UnionResolution> $byKey '<Component>.<property>' => the same objects
+     * @param list<SkippedComponent> $failures unions no layer could resolve, keyed by the component
      *                                                 that carries them — the granularity `Profile::$skip`
      *                                                 already uses, so an unresolvable union stays acceptable
      *                                                 by naming its component the way every other refusal is

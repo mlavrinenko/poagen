@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Runtime\Contract\Endpoint;
 
 use function sprintf;
 use function var_export;
@@ -56,7 +56,7 @@ final readonly class EndpointChainEmitter
      * @param list<ResolvedParameter> $pathParams
      * @param list<ResolvedParameter> $queryParams
      * @param list<ResolvedParameter> $headerParams
-     * @param list<SecurityScheme>    $activeSchemes
+     * @param list<SecurityScheme> $activeSchemes
      *
      * @return list<string>
      */

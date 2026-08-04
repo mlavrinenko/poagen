@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function basename;
 
@@ -36,7 +36,7 @@ final class JsonSchema2020ConstructsTest extends TestCase
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/json-schema-2020-12-3.1.yaml';
     private const string WEBHOOKS = __DIR__ . '/../fixtures/schemas/webhooks-3.1.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\JsonSchema2020';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\JsonSchema2020';
 
     /** Every unsupported construct in the fixture, accepted by name. */
     private const array SKIP_ALL = [
@@ -111,7 +111,7 @@ final class JsonSchema2020ConstructsTest extends TestCase
      */
     public function testNothingIsWrittenWhenAKeywordIsRefused(): void
     {
-        $output = self::makeSandboxDir('paogen-2020-12-abort-');
+        $output = self::makeSandboxDir('poagen-2020-12-abort-');
 
         try {
             self::generator()->generate(new Profile(
@@ -126,7 +126,7 @@ final class JsonSchema2020ConstructsTest extends TestCase
     }
 
     /**
-     * The 3.1 constructs paogen *does* read are unaffected by the refusals
+     * The 3.1 constructs poagen *does* read are unaffected by the refusals
      * sitting beside them: one document carries both, and accepting the
      * refusals by name leaves the readable operation generating its declared
      * types (`type: [T, "null"]` nullable, a scalar union as a PHP union).
@@ -174,7 +174,7 @@ final class JsonSchema2020ConstructsTest extends TestCase
     {
         $plan = self::generator()->plan(new Profile(
             schema: $schema,
-            output: self::makeSandboxDir('paogen-2020-12-'),
+            output: self::makeSandboxDir('poagen-2020-12-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

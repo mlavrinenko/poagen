@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
-use Mlavrinenko\Paogen\Generator\Emit\WebhookSkipKey;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\WebhookSkipKey;
 
 /**
  * Unit coverage for {@see WebhookSkipKey} — the `Profile::$skip` key

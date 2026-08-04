@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures;
+namespace Poagen\Generator\Tests\Unit\Runtime\Fixtures;
 
-use Mlavrinenko\Paogen\Runtime\AdditionalPropertyBag;
-use Mlavrinenko\Paogen\Runtime\Attribute\AdditionalProperties;
+use Poagen\Runtime\AdditionalPropertyBag;
+use Poagen\Runtime\Attribute\AdditionalProperties;
 
 /**
  * The shape `AdditionalPropertyEmitter` emits for `additionalProperties: true`

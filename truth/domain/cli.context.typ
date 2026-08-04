@@ -9,4 +9,4 @@
 // Why this is one of four bounded contexts rather than one: see
 // "bounded-contexts.md".
 
-#let PaogenCli = entity("paogen CLI", props: ())
+#let PoagenCli = entity("poagen CLI", props: ())

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\SymbolKind;
 
 use function is_array;
 use function sprintf;
@@ -22,7 +22,7 @@ use function sprintf;
  * `anyOf` components (T-026).
  *
  * Built once at the start of a generation run, consumed by {@see
- * \Mlavrinenko\Paogen\Generator\ModelPlanner} to pick the right emitter per
+ * \Poagen\Generator\Generator\ModelPlanner} to pick the right emitter per
  * component and to tag object Models with the interfaces they implement.
  */
 final class ComponentCatalog
@@ -151,7 +151,7 @@ final class ComponentCatalog
 
         return sprintf(
             'component `%s`%s has an unrecognised schema shape (type: %s, no oneOf/anyOf/allOf, no object '
-                . 'properties) — paogen supports object, array, scalar (string/integer/number/boolean), '
+                . 'properties) — poagen supports object, array, scalar (string/integer/number/boolean), '
                 . 'allOf/oneOf/anyOf union, and enum component shapes; restructure the schema to match one of these',
             $rawName,
             $location,

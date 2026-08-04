@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\InlinePayloadPlanAssertions;
 
 /**
  * name-inline-schemas-by-operation-and-status: every response status earns a
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * bare return type.
  *
  * The `4XX` key is also the only place in this repo's fixtures a range key
- * is declared at all: every real vendor document paogen ships (Petstore,
+ * is declared at all: every real vendor document poagen ships (Petstore,
  * DigitalOcean, GitHub) sticks to exact statuses and `default`, so OpenAPI's
  * exact-then-range-then-default precedence — {@see EnvelopeResponsePlanner}
  * sorts a status into `exact`, `ranges` or `default` once, by key shape, and
@@ -35,7 +35,7 @@ final class InlineMultiStatusResponseTest extends TestCase
     use InlinePayloadPlanAssertions;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payload-multi-status-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlineMultiStatus';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\InlineMultiStatus';
 
     public static function tearDownAfterClass(): void
     {
@@ -88,7 +88,7 @@ final class InlineMultiStatusResponseTest extends TestCase
      */
     private function plan(array $inlineModels = []): GenerationPlan
     {
-        $output = self::makeSandboxDir('paogen-inline-multi-status-');
+        $output = self::makeSandboxDir('poagen-inline-multi-status-');
 
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,

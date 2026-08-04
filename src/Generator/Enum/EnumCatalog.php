@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Enum;
+namespace Poagen\Generator\Generator\Enum;
 
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaType;
+use Poagen\Generator\Generator\Emit\SchemaType;
 use RuntimeException;
 
 use function count;
@@ -118,7 +118,7 @@ final class EnumCatalog
 
         // Reads `type: [string, "null"]` the same as `type: string` — a
         // nullable enum still backs onto its declared member, and the
-        // null-carrying case list below is what decides whether paogen can
+        // null-carrying case list below is what decides whether poagen can
         // represent it.
         $backing = match (SchemaType::of($schema)->name) {
             'string' => EnumSpec::BACKING_STRING,

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Exception;
+namespace Poagen\Generator\Exception;
 
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
 use RuntimeException;
 
 use function sprintf;
@@ -18,7 +17,7 @@ final class NameNormalisationException extends RuntimeException
 {
     public static function unhandled(
         string $raw,
-        NormalisationContext $context,
+        \Poagen\Generator\Generator\Naming\NormalisationContext $context,
         int $strategyCount,
     ): self {
         return new self(sprintf(

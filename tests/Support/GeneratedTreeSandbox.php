@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
+namespace Poagen\Generator\Tests\Support;
 
 use Composer\Autoload\ClassLoader;
-use Mlavrinenko\Paogen\GenerateCommand;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\Assert;
+use Poagen\Generator\GenerateCommand;
+use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Generator\Profile;
 use ReflectionClass;
 
 use function assert;
@@ -56,7 +56,7 @@ trait GeneratedTreeSandbox
     }
 
     /**
-     * Runs `paogen generate` against a profile file already on disk and
+     * Runs `poagen generate` against a profile file already on disk and
      * captures its exit code, stdout and stderr in memory rather than the
      * process's real streams. The profile path and any CLI flags — the
      * part that varies between a `--dry-run`, a `--diff` and a plain run —

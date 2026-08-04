@@ -15,7 +15,7 @@
 #     .githooks/check-task-trailers --range <rev-range>
 #     .githooks/check-task-trailers --range origin/main..HEAD
 #
-# Escape hatch: PAOGEN_SKIP_TASK_CHECK=1 skips the commit-msg hook for one
+# Escape hatch: POAGEN_SKIP_TASK_CHECK=1 skips the commit-msg hook for one
 # local commit (emergency WIP only — .githooks/commit-msg prints a warning
 # naming the bypass so it is never silent). It has no effect here: --range
 # always checks every commit in the range, so history review sees the truth

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen;
+namespace Poagen\Generator;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
@@ -23,19 +23,19 @@ use const STDOUT;
  */
 final class Cli
 {
-    private const string PACKAGE = 'mlavrinenko/paogen';
+    private const string PACKAGE = 'poagen/client-generator';
 
     private const string USAGE = <<<HELP
-        paogen — OpenAPI-driven PHP client generator
+        poagen — OpenAPI-driven PHP client generator
 
         USAGE
-            paogen <command> [options]
+            poagen <command> [options]
 
         COMMANDS
             generate <profile>  Generate code from a profile (PHP file returning a Profile)
             validate <schema>   Parse and validate an OpenAPI document (YAML or JSON)
             help                Print this message
-            version             Print the paogen version
+            version             Print the poagen version
 
         GENERATE OPTIONS
             --output=<dir>      Write the generated tree under <dir> (resolved relative to CWD),
@@ -47,10 +47,10 @@ final class Cli
 
         GLOBAL OPTIONS
             -h, --help          Print help for a command
-            -V, --version       Print the paogen version
+            -V, --version       Print the poagen version
 
         NOTES
-            The printed version reflects the installed paogen package, not the
+            The printed version reflects the installed poagen package, not the
             working copy. In-repo runs report `dev-<branch>`; installs via
             Packagist report the tagged release. When Composer metadata is not
             available the fallback sentinel `dev` is used instead.
@@ -76,7 +76,7 @@ final class Cli
         }
 
         if (in_array($args[0], ['-V', '--version', 'version'], true)) {
-            fwrite($stdout, 'paogen ' . self::version() . "\n");
+            fwrite($stdout, 'poagen ' . self::version() . "\n");
             return 0;
         }
 
@@ -84,7 +84,7 @@ final class Cli
             $loader = self::composerLoader();
 
             if (!$loader instanceof ClassLoader) {
-                fwrite($stderr, "paogen generate: could not locate Composer ClassLoader (needed to scan for #[BindsFormat]).\n");
+                fwrite($stderr, "poagen generate: could not locate Composer ClassLoader (needed to scan for #[BindsFormat]).\n");
                 return 1;
             }
 
@@ -96,8 +96,8 @@ final class Cli
         }
 
         $command = $args[0];
-        fwrite($stderr, "paogen: command '{$command}' is not implemented yet.\n");
-        fwrite($stderr, "See `paogen help`.\n");
+        fwrite($stderr, "poagen: command '{$command}' is not implemented yet.\n");
+        fwrite($stderr, "See `poagen help`.\n");
         return 2;
     }
 
@@ -109,15 +109,15 @@ final class Cli
     private static function validate(array $args, $stdout, $stderr): int
     {
         if ($args === []) {
-            fwrite($stderr, "paogen validate: missing schema path.\n");
-            fwrite($stderr, "See `paogen help`.\n");
+            fwrite($stderr, "poagen validate: missing schema path.\n");
+            fwrite($stderr, "See `poagen help`.\n");
             return 2;
         }
 
         $schemaPath = $args[0];
 
         if (!is_file($schemaPath)) {
-            fwrite($stderr, "paogen validate: schema file not found: {$schemaPath}\n");
+            fwrite($stderr, "poagen validate: schema file not found: {$schemaPath}\n");
             return 1;
         }
 
@@ -126,7 +126,7 @@ final class Cli
         $absolutePath = realpath($schemaPath);
 
         if ($absolutePath === false) {
-            fwrite($stderr, "paogen validate: cannot resolve schema path: {$schemaPath}\n");
+            fwrite($stderr, "poagen validate: cannot resolve schema path: {$schemaPath}\n");
             return 1;
         }
 
@@ -135,19 +135,19 @@ final class Cli
                 ? Reader::readFromJsonFile($absolutePath, OpenApi::class, false)
                 : Reader::readFromYamlFile($absolutePath, OpenApi::class, false);
         } catch (Throwable $e) {
-            fwrite($stderr, "paogen validate: parse error: {$e->getMessage()}\n");
+            fwrite($stderr, "poagen validate: parse error: {$e->getMessage()}\n");
             return 1;
         }
 
         if (!$openApi->validate()) {
-            fwrite($stderr, "paogen validate: {$schemaPath} has validation errors:\n");
+            fwrite($stderr, "poagen validate: {$schemaPath} has validation errors:\n");
             foreach ($openApi->getErrors() as $error) {
                 fwrite($stderr, "  - {$error}\n");
             }
             return 1;
         }
 
-        fwrite($stdout, "paogen: {$schemaPath} is a valid OpenAPI document\n");
+        fwrite($stdout, "poagen: {$schemaPath} is a valid OpenAPI document\n");
         return 0;
     }
 

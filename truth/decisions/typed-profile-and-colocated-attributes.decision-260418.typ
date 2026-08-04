@@ -86,7 +86,7 @@ component names that are not valid PHP identifiers. A single
 hard-coded sanitiser would be opinionated in ways different teams
 disagree about. `Profile` gains an optional `nameNormaliser` field
 that holds a `NameNormaliser` (interface under
-`Mlavrinenko\Paogen\Generator\Naming`). The pipeline is:
+`Poagen\Generator\Generator\Naming`). The pipeline is:
 
 ```
 normalise(raw) → CompositeNormaliser([
@@ -116,15 +116,15 @@ Users disambiguate via `renames`.
 == Consequences
 
 - Adding #a(ValueObject) is a one-file change for the user (the VO
-  itself, with the binding attribute on it). No edit to `paogen.php` is
+  itself, with the binding attribute on it). No edit to `poagen.php` is
   required.
-- The profile file stays small and stable. Most projects' `paogen.php`
+- The profile file stays small and stable. Most projects' `poagen.php`
   will fit on one screen.
 - Adding a new attribute (`#[BindsSchema]`, etc.) is a code change in
-  paogen — it is not extensible by users without a paogen release. This
+  poagen — it is not extensible by users without a poagen release. This
   is the explicit cost of keeping the surface declarative.
 - The `nameNormaliser` field is the user's extension point for
   anything renaming-adjacent that escapes `renames`'s static-map
   form (pattern-based conventions, external lookup tables, etc.) —
-  without it, name normalisation would have to grow into paogen-core
+  without it, name normalisation would have to grow into poagen-core
   on every new convention.

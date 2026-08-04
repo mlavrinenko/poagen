@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Exception;
+namespace Poagen\Generator\Exception;
 
 use RuntimeException;
 

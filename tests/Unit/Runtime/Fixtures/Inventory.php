@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures;
+namespace Poagen\Generator\Tests\Unit\Runtime\Fixtures;
 
-use Mlavrinenko\Paogen\Runtime\Attribute\AdditionalProperties;
+use Poagen\Runtime\Attribute\AdditionalProperties;
 
 /**
  * The same shape with the extra values typed by a `$ref`, so the map's values

@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\EndpointBody;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Status;
 use PHPUnit\Framework\TestCase;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\EndpointBody;
 
 use function substr_count;
 
@@ -96,7 +94,7 @@ final class EndpointTest extends TestCase
     public function testABackedEnumTravelsAsItsValueAndABoolAsPhpSpellsIt(): void
     {
         $uri = Endpoint::get('/pet/findByStatus')
-            ->query('status', Status::Placed)
+            ->query('status', Fixtures\Status::Placed)
             ->query('archived', false)
             ->query('starred', true)
             ->uri();
@@ -128,7 +126,7 @@ final class EndpointTest extends TestCase
 
     public function testEachBodyKindNamesItsContentTypeAndKeepsThePayloadAsGiven(): void
     {
-        $contact = new Contact('Grace');
+        $contact = new Fixtures\Contact('Grace');
 
         $kinds = [
             [Endpoint::post('/x')->json($contact), EndpointBody::KIND_JSON, 'application/json'],
@@ -152,7 +150,7 @@ final class EndpointTest extends TestCase
 
     public function testTheXmlElementNamesTheDocumentSuppliedTravelWithTheBody(): void
     {
-        $body = Endpoint::post('/x')->xmlList([new Contact('Grace')], 'goods', 'good')->body();
+        $body = Endpoint::post('/x')->xmlList([new Fixtures\Contact('Grace')], 'goods', 'good')->body();
 
         self::assertInstanceOf(EndpointBody::class, $body);
         self::assertSame('goods', $body->rootElement);
@@ -169,7 +167,7 @@ final class EndpointTest extends TestCase
      */
     public function testANestedContainerBindingTravelsWithTheBody(): void
     {
-        $body = Endpoint::post('/x')->xmlList([new Contact('Grace')], 'goods', 'good', ['inside' => 'good'])->body();
+        $body = Endpoint::post('/x')->xmlList([new Fixtures\Contact('Grace')], 'goods', 'good', ['inside' => 'good'])->body();
 
         self::assertInstanceOf(EndpointBody::class, $body);
         self::assertSame(['inside' => 'good'], $body->nestedContainers);

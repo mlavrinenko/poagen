@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
+use Poagen\Runtime\Contract\StatusResponseMap;
 
 /**
  * One operation's whole response surface, resolved: every declared status
@@ -29,7 +29,7 @@ use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 final readonly class EnvelopeSpec
 {
     /**
-     * @param list<array{0: string, 1: ReturnSpec}> $exact  exact status text, as the document spells it
+     * @param list<array{0: string, 1: ReturnSpec}> $exact exact status text, as the document spells it
      * @param list<array{0: string, 1: ReturnSpec}> $ranges range key text, as the document spells it — `'4XX'`
      */
     public function __construct(

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
- * default-deny-on-degradation: `paogen generate`'s plain success line
- * ("paogen: generated into ...") claims every operation and component made
+ * default-deny-on-degradation: `poagen generate`'s plain success line
+ * ("poagen: generated into ...") claims every operation and component made
  * it into the client. That claim is false the moment anything was skipped —
  * even a skip the profile explicitly accepted is still an omission — so a
  * run that skipped or degraded anything must not open by announcing success.
@@ -48,7 +48,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
      */
     private function invokeGenerate(): array
     {
-        $outputDir = self::makeSandboxDir('paogen-success-line-');
+        $outputDir = self::makeSandboxDir('poagen-success-line-');
         $profilePath = $this->writeProfile($outputDir);
 
         return self::runGenerateCommand([$profilePath]);
@@ -56,7 +56,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
 
     private function writeProfile(string $outputDir): string
     {
-        $dir = self::makeSandboxDir('paogen-success-line-profile-');
+        $dir = self::makeSandboxDir('poagen-success-line-profile-');
         $path = $dir . '/profile.php';
 
         $schema = var_export(self::SCHEMA, true);
@@ -65,11 +65,11 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
         file_put_contents($path, <<<PHP
             <?php
             declare(strict_types=1);
-            use Mlavrinenko\\Paogen\\Generator\\Profile;
+            use Poagen\\Generator\\Generator\\Profile;
             return new Profile(
                 schema: {$schema},
                 output: {$output},
-                namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\SuccessLineSuppressed',
+                namespace: 'Poagen\\\\Generator\\\\Tests\\\\Tmp\\\\SuccessLineSuppressed',
                 skip: [
                     'getXmlLabel' => 'application/xml not decoded',
                     'getBrokenRef' => 'broken \$ref, fix the schema',

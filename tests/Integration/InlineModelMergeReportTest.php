@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function array_filter;
 use function array_values;
@@ -29,7 +29,7 @@ final class InlineModelMergeReportTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-model-merge-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlineModelMergeReport';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\InlineModelMergeReport';
 
     public static function tearDownAfterClass(): void
     {
@@ -109,7 +109,7 @@ final class InlineModelMergeReportTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-inline-merge-report-'),
+            output: self::makeSandboxDir('poagen-inline-merge-report-'),
             namespace: self::NAMESPACE,
         ));
     }

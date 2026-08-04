@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function basename;
 
@@ -33,7 +33,7 @@ final class NullableIdiomEquivalenceTest extends TestCase
 
     // One namespace for both runs: the emitted namespace is part of the bytes
     // being compared, so varying it would make the comparison vacuous.
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\NullableIdiom';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\NullableIdiom';
 
     public static function tearDownAfterClass(): void
     {
@@ -105,7 +105,7 @@ final class NullableIdiomEquivalenceTest extends TestCase
     {
         $plan = self::generator()->plan(new Profile(
             schema: $schema,
-            output: self::makeSandboxDir('paogen-nullable-idiom-'),
+            output: self::makeSandboxDir('poagen-nullable-idiom-'),
             namespace: self::NAMESPACE,
         ));
 

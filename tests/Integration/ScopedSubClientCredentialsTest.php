@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\StubErrorFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\StubErrorFactory;
+use Poagen\Runtime\Http\HttpTransport;
 use ReflectionClass;
 use ReflectionParameter;
 
@@ -37,7 +37,7 @@ final class ScopedSubClientCredentialsTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/scoped-security-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ScopedSecurity';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ScopedSecurity';
     private const string BASE_URI = 'https://scoped-security.example/v2';
 
     /** @var array<string,string> emitted source, keyed by the class it declares */
@@ -47,7 +47,7 @@ final class ScopedSubClientCredentialsTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$output = self::makeSandboxDir('paogen-scoped-');
+        self::$output = self::makeSandboxDir('poagen-scoped-');
 
         $plan = self::generator()->generate(new Profile(
             schema: self::SCHEMA,

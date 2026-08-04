@@ -12,13 +12,13 @@ use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode403Content;
 use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\Envelope;
 
 /**
  * The wrapper architecture on the acceptance target.
  *
  * This is hand-written consumer code. It implements
- * `ConfirmationCodesClientInterface` — the contract paogen emitted for the
+ * `ConfirmationCodesClientInterface` — the contract poagen emitted for the
  * vendor's `Код подтверждения` tag — delegates both calls to the generated
  * implementation, and adds a method the generator has no way to write: one that
  * takes a phone number and a code and returns whether the code was accepted,
@@ -41,8 +41,8 @@ use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
  *
  * And the vendor's awkwardness stays outside the emitted tree. `PhoneNumber` is
  * this project's own value object, bound to the vendor's invented `format: phone`
- * from `paogen.php`; the generated models carry it because the profile said to,
- * not because paogen knows anything about Russian phone numbers.
+ * from `poagen.php`; the generated models carry it because the profile said to,
+ * not because poagen knows anything about Russian phone numbers.
  */
 final class PhoneConfirmation implements ConfirmationCodesClientInterface
 {
@@ -74,7 +74,7 @@ final class PhoneConfirmation implements ConfirmationCodesClientInterface
         // The vendor signals success in a `result_code` — declared `type: string`,
         // so `'0'` and not `0` — rather than in the HTTP status. That is exactly
         // the kind of local knowledge that belongs here and not in generated code:
-        // paogen emitted the field faithfully and has no idea what its values mean.
+        // poagen emitted the field faithfully and has no idea what its values mean.
         return $response->body->result_code === '0';
     }
 

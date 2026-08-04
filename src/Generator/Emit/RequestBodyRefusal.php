@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
@@ -27,7 +27,7 @@ use function sprintf;
  */
 final readonly class RequestBodyRefusal
 {
-    private const string SUPPORTED = 'paogen emits application/json ($ref or list<$ref>), '
+    private const string SUPPORTED = 'poagen emits application/json ($ref or list<$ref>), '
         . 'application/x-www-form-urlencoded, application/xml (inline object/array, elements named in '
         . 'Profile::$xmlElements), a text content type over a `type: string` schema, and '
         . 'application/octet-stream as a PSR-7 stream';
@@ -40,7 +40,7 @@ final readonly class RequestBodyRefusal
 
         if (isset($body->content[BodyMediaType::MULTIPART])) {
             return 'multipart/form-data request body' . $location
-                . ' — every part carries its own content type and encoding, which paogen does not model; '
+                . ' — every part carries its own content type and encoding, which poagen does not model; '
                 . self::SUPPORTED;
         }
 
@@ -51,7 +51,7 @@ final readonly class RequestBodyRefusal
         // never printed for a document that declared nothing here.
         if (isset($body->content[BodyMediaType::JSON])) {
             return 'application/json request body with an inline (non-$ref) schema' . $location
-                . ' — paogen only emits a typed body for a $ref to a component schema, or list<$ref>; '
+                . ' — poagen only emits a typed body for a $ref to a component schema, or list<$ref>; '
                 . 'move the schema into components.schemas and reference it';
         }
 
@@ -63,7 +63,7 @@ final readonly class RequestBodyRefusal
 
         if (isset($body->content[BodyMediaType::XML])) {
             return 'application/xml request body' . $location
-                . ' — paogen serialises an inline object (or an array of inline objects) schema declared '
+                . ' — poagen serialises an inline object (or an array of inline objects) schema declared '
                 . 'application/xml, naming the document root (and, for a list, the repeated item element) in '
                 . 'Profile::$xmlElements; add the missing entry, or — if the schema is a $ref, a scalar, or an '
                 . 'inline object with no declared properties — it cannot be named there and stays unrepresentable';
@@ -83,17 +83,17 @@ final readonly class RequestBodyRefusal
             $others = implode(', ', array_values(array_diff($types, ['application/x-www-form-urlencoded'])));
 
             return "application/x-www-form-urlencoded request body paired with other content type(s) ({$others}){$location}"
-                . ' — paogen only honours it when it is the sole content type';
+                . ' — poagen only honours it when it is the sole content type';
         }
 
         $schema = $form->schema;
 
         if (!$schema instanceof Schema || !SchemaType::of($schema)->is('object')) {
             return "application/x-www-form-urlencoded request body{$location} whose schema is not an inline `type: object`"
-                . ' — paogen flattens declared properties into method parameters and needs an inline object schema';
+                . ' — poagen flattens declared properties into method parameters and needs an inline object schema';
         }
 
         return "application/x-www-form-urlencoded request body{$location} declares no properties"
-            . ' — paogen needs at least one property to generate method parameters from';
+            . ' — poagen needs at least one property to generate method parameters from';
     }
 }

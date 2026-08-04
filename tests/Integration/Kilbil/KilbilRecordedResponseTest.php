@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
+namespace Poagen\Generator\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\Enum\SearchClient200ContentActivateClientType;
 use Acme\Kilbil\Generated\Enum\SearchClient200ContentInterfacesItemInterfaceType;
@@ -14,8 +14,8 @@ use Acme\Kilbil\Generated\Model\SearchClient200ContentInterfacesItem;
 use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Acme\Kilbil\ValueObject\PhoneNumber;
 use DateTimeImmutable;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Generated\RecordingClient;
 
 /**
  * kilbil-recorded-response-proof: hydrates the generated `searchClient()`
@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
  *    example sets this to `null`, but the property is declared plain
  *    `type: string` (not nullable) and required. Copying that verbatim
  *    would fail hydration on a defect in the vendor's *example*, not in
- *    paogen. The fixture instead reuses the value the vendor documents
+ *    poagen. The fixture instead reuses the value the vendor documents
  *    for the same field name on the sibling `getclientcards` operation
  *    (schemas/loyalty_v1.yaml:~1332), which is internally consistent.
  *  - `outer_systems_interface_type` (top-level) carries no `example:` at

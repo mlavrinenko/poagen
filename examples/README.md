@@ -1,10 +1,10 @@
-# paogen examples
+# poagen examples
 
 Each sub-directory here is scaffolded like a standalone consumer
-project — its own `composer.json`, `README.md`, `paogen.php`,
+project — its own `composer.json`, `README.md`, `poagen.php`,
 vendored schema, `Justfile`, `phpstan.neon`, and (when generation
 succeeds) committed `generated/` output. Everything a user would have
-after dropping paogen into their own repo, minus `vendor/`. Each
+after dropping poagen into their own repo, minus `vendor/`. Each
 example's own `Justfile` runs its own `check` at the consumer-view
 absolute; the root `Justfile` doesn't assemble a shared path list, it
 fans out into every example's `check` (see `lint-phpstan-generated`).
@@ -12,7 +12,7 @@ fans out into every example's `check` (see `lint-phpstan-generated`).
 ```
 examples/
 ├── petstore/          ✅ passes — small textbook schema
-├── kilbil/            ✅ passes — the real vendor schema paogen is proven against
+├── kilbil/            ✅ passes — the real vendor schema poagen is proven against
 ├── digitalocean/      ⚠️  expected-failure (T-030) — no generated/ tree
 └── github/            ⚠️  expected-failure (T-030) — no generated/ tree
 ```
@@ -27,10 +27,10 @@ composer install
 composer generate
 ```
 
-`composer install` picks paogen up via a `path` composer repository
+`composer install` picks poagen up via a `path` composer repository
 pointing at `../..`, so you always get the current working copy — no
 Packagist round-trip. `composer generate` is a one-line alias for
-`paogen generate paogen.php`.
+`poagen generate poagen.php`.
 
 ## The examples
 
@@ -39,7 +39,7 @@ Packagist round-trip. `composer generate` is a one-line alias for
   synthesised class, a small `ApiClient`, a `jsonSerialize` round-trip.
 - **`kilbil/`** — the real vendor schema (kilbil's loyalty API,
   committed exactly as published), not one more sample schema.
-  paogen's claim to work is measured against this document rather
+  poagen's claim to work is measured against this document rather
   than against Petstore: it is what surfaced the transport collapse,
   the sub-client split, and the XML request-body work. See
   `kilbil/README.md` for the day-to-day list of what makes it hard.
@@ -62,7 +62,7 @@ Run from the repo root:
 just check-examples
 ```
 
-The recipe walks every `examples/*/paogen.php`, invokes the
+The recipe walks every `examples/*/poagen.php`, invokes the
 generator, and summarises:
 
 - Directory without `.expected-failure` → generation must succeed
@@ -82,7 +82,7 @@ blocked on them.
 ## Adding a new example
 
 1. Create `examples/<vendor>/` with: `composer.json`, `README.md`,
-   `paogen.php`, `schemas/<vendor>-<version>.yaml`, `Justfile`, and
+   `poagen.php`, `schemas/<vendor>-<version>.yaml`, `Justfile`, and
    `phpstan.neon` (copy an existing example's `Justfile` and
    `phpstan.neon` verbatim — every example is held to the identical
    consumer-view absolute; see `examples-check-themselves`). Add
@@ -91,7 +91,7 @@ blocked on them.
 2. Run `composer install` once to prove the `path` repo resolves,
    then add the sub-directory's `composer.lock` / `vendor/` to the
    sub-directory's `.gitignore`.
-3. Run `paogen generate paogen.php`. If it succeeds, commit the
+3. Run `poagen generate poagen.php`. If it succeeds, commit the
    `generated/` tree. If it fails with a spec-level gap, add a
    `.expected-failure` file explaining which task tracks the fix.
 4. Confirm `just check-examples` and `just lint-phpstan-generated`

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
+namespace Poagen\Generator\Tests\Support;
 
 use FilesystemIterator;
 use PHPUnit\Framework\Assert;

@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
-use Mlavrinenko\Paogen\Generator\Emit\WebhookSkipKey;
-use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
+use Poagen\Generator\Generator\Emit\WebhookSkipKey;
 
 /**
  * User-supplied generation guidance. See `profile-driven-generation` /
@@ -22,9 +21,9 @@ final readonly class Profile
      * @param list<string>          $discoverIn     Namespace prefixes to scan for #[Binds*] attributes.
      * @param array<string,string>  $renames        Map of schema-component name → desired PHP class name.
      *                                              Always honoured before the auto-sanitiser.
-     * @param NameNormaliser|null   $nameNormaliser Custom normalisation pipeline. When null, paogen
+     * @param Naming\NameNormaliser|null $nameNormaliser Custom normalisation pipeline. When null, poagen
      *                                              composes RenamesNormaliser($renames) + PascalCaseSanitiser.
-     *                                              When set, paogen uses it verbatim — `$renames` is *not*
+     *                                              When set, poagen uses it verbatim — `$renames` is *not*
      *                                              merged in automatically. See
      *                                              `typed-profile-and-colocated-attributes` (T-023).
      * @param array<string,string>  $discriminators Override map for undiscriminated property-level
@@ -36,13 +35,13 @@ final readonly class Profile
      *                                              emitted client. This is the documented answer to an operation
      *                                              id with no word boundaries: `searchclient` has no algorithmic
      *                                              path to `searchClient`, and guessing would produce a different
-     *                                              wrong answer per schema, so paogen keeps the vendor's spelling
+     *                                              wrong answer per schema, so poagen keeps the vendor's spelling
      *                                              and the consumer supplies the readable one. Also feeds the
      *                                              names of any models synthesised for that operation's inline
      *                                              payloads. An entry naming an operation id absent from the
      *                                              document fails the run.
      * @param array<string,string>  $tagRenames     Map of raw OpenAPI tag → desired PHP name for the sub-client
-     *                                              emitted from it. Without one, paogen transliterates a
+     *                                              emitted from it. Without one, poagen transliterates a
      *                                              non-ASCII tag deterministically, which is legible but
      *                                              rarely what a consumer wants: `Клиенты` becomes `Klienty`
      *                                              where they meant `Customers`. An entry naming a tag no
@@ -76,7 +75,7 @@ final readonly class Profile
      *                                              same role `'<operationId>.item'` plays for the outer list. It
      *                                              is validated the same way as the other two forms — a property
      *                                              absent from that operation's XML item schema fails the run
-     *                                              naming it — and, unlike them, paogen does wire it into the
+     *                                              naming it — and, unlike them, poagen does wire it into the
      *                                              generated call: `Endpoint::xmlList()` takes this entry as its
      *                                              own argument, and the runtime builds the `XmlWriter` its
      *                                              constructor takes from it at request time. A consumer writes
@@ -85,7 +84,7 @@ final readonly class Profile
      *                                              renders exactly as it always has
      *                                              (thread-the-validated-nested-container-map-into-the-generated-client).
      * @param array<string, string|list<string>> $inlineModels Names — and optionally merges — the class(es)
-     *                                              paogen synthesises for an operation's inline payloads. Keys are
+     *                                              poagen synthesises for an operation's inline payloads. Keys are
      *                                              the PHP class name; values are one site or several, each
      *                                              `'<operationId>.request'` or `'<operationId>.<status>'` using
      *                                              the raw operation id and the response status exactly as the
@@ -133,7 +132,7 @@ final readonly class Profile
      *                                              'name' => 'api_key']`. The vendored petstore document is the
      *                                              case: it requires `api_key` on two operations and declares only
      *                                              `petstore_auth`, so without an entry here those two operations
-     *                                              authenticate with nothing. paogen will not guess the header name
+     *                                              authenticate with nothing. poagen will not guess the header name
      *                                              — a wrong guess is a 401 the consumer debugs at runtime — so an
      *                                              undeclared requirement aborts the run naming this key. An entry
      *                                              for a scheme the document does declare, or one no requirement
@@ -150,7 +149,7 @@ final readonly class Profile
      *                                              inside the value could ever select it. Every part is checked
      *                                              against the document — the component, the property, the union,
      *                                              the field, each branch, and each tag value against the field's
-     *                                              `enum` where it declares one. A tag refines what paogen would
+     *                                              `enum` where it declares one. A tag refines what poagen would
      *                                              otherwise compute rather than suppressing anything, so unlike
      *                                              $skip and $unionPins it is not stale-checked: an entry that
      *                                              stays true of the document stays valid even once the branches
@@ -189,7 +188,7 @@ final readonly class Profile
      *                                              because an absolute path would make one machine's output differ
      *                                              from another's and turn a re-run into a diff. A profile built in
      *                                              code rather than loaded from disk keeps the default, which names
-     *                                              the file paogen's own examples and docs use.
+     *                                              the file poagen's own examples and docs use.
      */
     public function __construct(
         public string $schema,
@@ -197,7 +196,7 @@ final readonly class Profile
         public string $namespace,
         public array $discoverIn = [],
         public array $renames = [],
-        public ?NameNormaliser $nameNormaliser = null,
+        public ?Naming\NameNormaliser $nameNormaliser = null,
         public array $discriminators = [],
         public array $unionTags = [],
         public array $unionPins = [],
@@ -210,7 +209,7 @@ final readonly class Profile
         public array $inlineModels = [],
         public array $propertyRenames = [],
         public array $securitySchemes = [],
-        public string $source = 'paogen.php',
+        public string $source = 'poagen.php',
     ) {}
 
     /**

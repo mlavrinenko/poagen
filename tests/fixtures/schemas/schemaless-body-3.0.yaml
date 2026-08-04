@@ -8,11 +8,11 @@ info:
     exact shape — and generates a raw `array<string, mixed>` parameter
     rather than refusing the operation.
 
-    `postUnrepresentable`'s media type declares a `schema`, just one paogen
+    `postUnrepresentable`'s media type declares a `schema`, just one poagen
     cannot type: a bare `type: string` body, which is neither a `$ref`, an
     inline object, nor an array of either. The distinction the task turns
     on is "the document said nothing" versus "the document said something
-    paogen cannot type", and only the first passes — this operation proves
+    poagen cannot type", and only the first passes — this operation proves
     the second still refuses, unchanged.
 paths:
   /raw:

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Runtime\Http\PsrRequestBuilder;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
+use Poagen\Runtime\Http\PsrRequestBuilder;
+use Poagen\Runtime\Marshal\Marshaller;
 
 use function sprintf;
 use function var_export;

@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
-use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Generator\Generator\Emit\DiscriminatorEnforcer;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * What the emitters must look up per node and cannot read off the schema,
@@ -27,11 +26,11 @@ final readonly class Bindings
 {
     /**
      * @param array<string,class-string> $formats Map of OpenAPI format → user value-object FQCN.
-     * @param UnionCatalog               $unions  How each property-level union picks a branch.
+     * @param Emit\UnionCatalog $unions How each property-level union picks a branch.
      */
     public function __construct(
         public array $formats,
-        public UnionCatalog $unions = new UnionCatalog(),
+        public Emit\UnionCatalog $unions = new Emit\UnionCatalog(),
     ) {}
 
     /**
@@ -40,7 +39,7 @@ final readonly class Bindings
      * read the whole document — the scan that produces the format bindings runs
      * before the document is even parsed, so the two cannot be built together.
      */
-    public function withUnions(UnionCatalog $unions): self
+    public function withUnions(Emit\UnionCatalog $unions): self
     {
         return new self($this->formats, $unions);
     }
@@ -75,7 +74,7 @@ final readonly class Bindings
 
     /**
      * Resolve a `format` to a scalar-boundary binding: a user VO implementing
-     * {@see ScalarBinding} if one is registered, otherwise a paogen built-in
+     * {@see ScalarBinding} if one is registered, otherwise a poagen built-in
      * (currently `date-time` and `date` → `\DateTimeImmutable`). User bindings
      * always win so consumers can swap in Carbon, Chronos, etc.
      */

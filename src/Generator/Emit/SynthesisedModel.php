@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\Schema;
@@ -11,7 +11,7 @@ use cebe\openapi\spec\Schema;
  * An inline schema node promoted to a named generated class.
  *
  * Three producers queue these, and the FIFO in
- * {@see \Mlavrinenko\Paogen\Generator\ModelPlanner} drains them all the same
+ * {@see \Poagen\Generator\Generator\ModelPlanner} drains them all the same
  * way, re-running the emitter against each entry so it may queue grandchildren:
  *
  *   - {@see ModelEmitter} for a property whose schema is an inline object with
@@ -43,7 +43,7 @@ final readonly class SynthesisedModel
 
     /**
      * Derive the origin from the node's own document position, so a collision
-     * diagnostic points at the schema rather than at the class name paogen
+     * diagnostic points at the schema rather than at the class name poagen
      * chose for it.
      *
      * @param list<string> $implements

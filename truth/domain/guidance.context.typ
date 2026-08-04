@@ -3,7 +3,7 @@
 #let guidance-context = bounded-context("guidance", layer: "functional")
 
 // What the consumer writes to steer generation. Every term names something the
-// user authors and paogen reads as data — never a template paogen expands, and
+// user authors and poagen reads as data — never a template poagen expands, and
 // never code that reaches the people who consume the generated client.
 //
 // Why this is one of four bounded contexts rather than one: see

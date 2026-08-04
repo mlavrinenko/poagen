@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\ApiErrorInterface;
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreHttpTransport;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\PetstoreHttpTransport;
+use Poagen\Runtime\Contract\ApiErrorInterface;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\StatusResponseMap;
 
 /**
  * `KIND_ENVELOPE`, split out of {@see TransportResponseKindsTest} to keep
@@ -110,7 +110,7 @@ final class EnvelopeTransportTest extends TestCase
             $this->transport(null, $http)->send(Endpoint::get('/pet/1'), $expected);
             self::fail('expected an API error');
         } catch (ApiErrorInterface $e) {
-            // One handler covers every paogen client in a project, without
+            // One handler covers every poagen client in a project, without
             // naming any one profile's generated class.
             self::assertSame(429, $e->getStatusCode());
             self::assertStringContainsString('no exact, range or default response declared for status 429', $e->getReason());

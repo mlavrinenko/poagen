@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
 
 use function count;
 use function explode;
@@ -62,7 +61,7 @@ final readonly class InlineXmlRequestPlanner
         }
 
         if (InlinePayloadPlanner::isSynthesisableObject($schema)) {
-            return BodySpec::xml(InlineModelClaim::named($pin, InlinePayloadName::request($base), $schema, $ledger, $roots), $root);
+            return BodySpec::xml(InlineModelClaim::named($pin, \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base), $schema, $ledger, $roots), $root);
         }
 
         $items = InlinePayloadPlanner::inlineObjectItemsOf($schema);
@@ -70,7 +69,7 @@ final readonly class InlineXmlRequestPlanner
 
         if ($items instanceof Schema && is_string($item) && $item !== '') {
             return BodySpec::xmlList(
-                InlineModelClaim::named($pin, InlinePayloadName::request($base, item: true), $items, $ledger, $roots),
+                InlineModelClaim::named($pin, \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base, item: true), $items, $ledger, $roots),
                 $root,
                 $item,
                 self::nestedContainersFor($rawId, $xmlElements),

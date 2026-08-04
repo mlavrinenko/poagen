@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 use Psr\Http\Message\StreamInterface;
@@ -28,13 +25,13 @@ final readonly class RequestBodyParameterEmitter
 {
     public function __construct(
         private string $modelNamespace,
-        private ?EnumCatalog $enums = null,
-        private ?NameRegistry $registry = null,
+        private ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums = null,
+        private ?\Poagen\Generator\Generator\Naming\NameRegistry $registry = null,
     ) {
-        assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
+        assert($registry instanceof \Poagen\Generator\Generator\Naming\NameRegistry, 'NameRegistry is required (T-023).');
     }
 
-    public function addBodyParams(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
+    public function addBodyParams(Method $method, PhpNamespace $namespace, BodySpec $body, \Poagen\Generator\Generator\Bindings $bindings): void
     {
         switch ($body->kind) {
             case BodySpec::KIND_JSON:
@@ -130,9 +127,9 @@ final readonly class RequestBodyParameterEmitter
      * still types the values when the document supplied it, so the phpdoc comes
      * from the same resolver that types such a schema on a model property.
      */
-    private function addJsonMapBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
+    private function addJsonMapBodyParam(Method $method, PhpNamespace $namespace, BodySpec $body, \Poagen\Generator\Generator\Bindings $bindings): void
     {
-        assert($this->registry instanceof NameRegistry);
+        assert($this->registry instanceof \Poagen\Generator\Generator\Naming\NameRegistry);
         $schema = $body->schema ?? new Schema(['type' => 'object']);
         $resolved = InlineObjectResolver::resolve($schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
         $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc ?? 'array<string, mixed>');
@@ -141,7 +138,7 @@ final readonly class RequestBodyParameterEmitter
         $method->addComment('@param ' . $docType . ' $body');
     }
 
-    private function addFormFieldParams(Method $method, PhpNamespace $namespace, BodySpec $body, Bindings $bindings): void
+    private function addFormFieldParams(Method $method, PhpNamespace $namespace, BodySpec $body, \Poagen\Generator\Generator\Bindings $bindings): void
     {
         // Required fields first, then optionals (mirrors query-param order).
         $required = [];
@@ -167,10 +164,10 @@ final readonly class RequestBodyParameterEmitter
         Method $method,
         PhpNamespace $namespace,
         FormField $field,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         bool $required,
     ): void {
-        assert($this->registry instanceof NameRegistry);
+        assert($this->registry instanceof \Poagen\Generator\Generator\Naming\NameRegistry);
         $resolved = TypeResolver::resolve($field->schema, $bindings, $this->modelNamespace, $this->registry, $this->enums);
         $type = $resolved->phpType;
 

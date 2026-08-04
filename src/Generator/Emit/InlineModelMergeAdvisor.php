@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
 
 use function array_filter;
 use function array_map;
@@ -48,7 +44,7 @@ final readonly class InlineModelMergeAdvisor
      * @param array<string,string> $preScannedSkips raw operationId → reason, {@see InlineModelSiteWalk}
      * @return list<string>        one line per group of 2+ structurally identical inline schemas
      */
-    public static function notices(OpenApi $openApi, NameRegistry $operationIdRegistry, array $preScannedSkips = []): array
+    public static function notices(OpenApi $openApi, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry, array $preScannedSkips = []): array
     {
         $groups = array_values(array_filter(
             self::group(InlineModelSiteWalk::sites($openApi, $preScannedSkips)),
@@ -68,7 +64,7 @@ final readonly class InlineModelMergeAdvisor
     }
 
     /**
-     * @param  list<InlineModelSiteSchema> $sites
+     * @param list<InlineModelSiteSchema> $sites
      * @return list<list<InlineModelSiteSchema>>
      */
     private static function group(array $sites): array
@@ -98,7 +94,7 @@ final readonly class InlineModelMergeAdvisor
     /**
      * @param list<InlineModelSiteSchema> $group
      */
-    private static function describe(array $group, NameRegistry $operationIdRegistry): string
+    private static function describe(array $group, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry): string
     {
         $suggested = self::suggestedName($group[0], $operationIdRegistry);
         $lines = [sprintf(
@@ -116,12 +112,12 @@ final readonly class InlineModelMergeAdvisor
         return implode("\n", $lines);
     }
 
-    private static function suggestedName(InlineModelSiteSchema $member, NameRegistry $operationIdRegistry): string
+    private static function suggestedName(InlineModelSiteSchema $member, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry): string
     {
-        $base = ucfirst($operationIdRegistry->resolve($member->site->operationId, new NormalisationContext(SymbolKind::OperationId)));
+        $base = ucfirst($operationIdRegistry->resolve($member->site->operationId, new \Poagen\Generator\Generator\Naming\NormalisationContext(\Poagen\Generator\Generator\Naming\SymbolKind::OperationId)));
 
         return $member->site->isRequest()
-            ? InlinePayloadName::request($base, $member->item)
-            : InlinePayloadName::response($base, $member->site->position, $member->item);
+            ? \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base, $member->item)
+            : \Poagen\Generator\Generator\Naming\InlinePayloadName::response($base, $member->site->position, $member->item);
     }
 }

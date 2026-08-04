@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\ResponseUnionSelectionTest;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Unit\Runtime\ResponseUnionSelectionTest;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -25,7 +25,7 @@ final class ResponseUnionTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/union-response-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseUnion';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ResponseUnion';
 
     private const array WORKING_PIN = [
         'getUndecidableCreature.response' => ['branch' => 'Celsius', 'reason' => 'this client reads metric sensors'],
@@ -117,7 +117,7 @@ final class ResponseUnionTest extends TestCase
             self::assertStringContainsString('200 response', $e->getMessage());
             self::assertStringContainsString('Celsius', $e->getMessage());
             self::assertStringContainsString('Fahrenheit', $e->getMessage());
-            self::assertStringContainsString('paogen will not guess', $e->getMessage());
+            self::assertStringContainsString('poagen will not guess', $e->getMessage());
         }
     }
 
@@ -128,7 +128,7 @@ final class ResponseUnionTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-response-union-'),
+            output: self::makeSandboxDir('poagen-response-union-'),
             namespace: self::NAMESPACE,
             unionPins: $pins,
         ));

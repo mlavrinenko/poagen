@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\StubErrorFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\StubErrorFactory;
+use Poagen\Runtime\Http\HttpTransport;
 
 /**
  * report-unsupported-security-schemes: every scheme kind that reduces to
@@ -28,12 +28,12 @@ final class WiredSecuritySchemesTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/security-kinds-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\SecurityKinds';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\SecurityKinds';
     private const string BASE_URI = 'https://security-kinds.example/api/v1';
 
     public static function setUpBeforeClass(): void
     {
-        self::generateRootClientOnce(self::SCHEMA, self::NAMESPACE, 'paogen-securitykinds-');
+        self::generateRootClientOnce(self::SCHEMA, self::NAMESPACE, 'poagen-securitykinds-');
     }
 
     public static function tearDownAfterClass(): void
@@ -93,7 +93,7 @@ final class WiredSecuritySchemesTest extends TestCase
 
     public function testAVendorHttpSchemeTokenIsSentVerbatimBeforeTheCredential(): void
     {
-        // `scheme: Token` is not a token paogen knows, and RFC 7235 says a
+        // `scheme: Token` is not a token poagen knows, and RFC 7235 says a
         // credential follows the scheme token whatever the token is. The
         // document's own spelling survives — `Token`, not `token`.
         $body = self::methodSlice(self::$rootClientSource, 'tokenScheme');
@@ -109,7 +109,7 @@ final class WiredSecuritySchemesTest extends TestCase
     public function testAnOAuth2AccessTokenIsSentAsABearerCredential(): void
     {
         // RFC 6750 says that is what an OAuth2 access token looks like on
-        // the wire, for every one of the four flows. paogen sends the token
+        // the wire, for every one of the four flows. poagen sends the token
         // it was given and never obtains one.
         $body = self::methodSlice(self::$rootClientSource, 'oauthScheme');
         self::assertStringContainsString("->header('Authorization', 'Bearer ' . \$this->oauthAuth)", $body);

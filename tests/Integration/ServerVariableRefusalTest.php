@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -25,7 +25,7 @@ final class ServerVariableRefusalTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/server-variables-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ServerVariable';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ServerVariable';
 
     public static function tearDownAfterClass(): void
     {
@@ -37,7 +37,7 @@ final class ServerVariableRefusalTest extends TestCase
         try {
             self::generator()->plan(new Profile(
                 schema: self::SCHEMA,
-                output: self::makeSandboxDir('paogen-server-variable-'),
+                output: self::makeSandboxDir('poagen-server-variable-'),
                 namespace: self::NAMESPACE,
             ));
             self::fail('expected UnrepresentableConstructsException');
@@ -57,7 +57,7 @@ final class ServerVariableRefusalTest extends TestCase
 
     public function testNothingIsWrittenWhenAServerVariableIsDeclared(): void
     {
-        $outputDir = self::makeSandboxDir('paogen-server-variable-');
+        $outputDir = self::makeSandboxDir('poagen-server-variable-');
 
         try {
             self::generator()->generate(new Profile(

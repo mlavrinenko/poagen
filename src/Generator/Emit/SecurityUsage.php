@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
@@ -19,7 +19,7 @@ use function sprintf;
  * published and did not use — so refusing the run over an unused
  * `http digest` block, or printing a notice about an unused `mutualTLS`
  * one, would be noise about a fact with no consequence. Every diagnostic
- * paogen raises about a scheme is raised because some operation needs that
+ * poagen raises about a scheme is raised because some operation needs that
  * scheme and will not get it.
  *
  * It is also where an abort gets the list it names. A refused scheme

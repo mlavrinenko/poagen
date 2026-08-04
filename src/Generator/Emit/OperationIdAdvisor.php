@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
@@ -14,7 +14,7 @@ use function strlen;
 use const SORT_STRING;
 
 /**
- * Names the operation ids the document gave paogen no way to make readable, and
+ * Names the operation ids the document gave poagen no way to make readable, and
  * says what would fix them.
  *
  * An identifier with no word boundary — `searchclient`, `getclientfullbalance`,
@@ -25,7 +25,7 @@ use const SORT_STRING;
  * when unrelated parts of the schema changed. That breaks the "no incidental
  * renames" half of `cheap-regeneration` while pretending to help.
  *
- * So paogen keeps the vendor's spelling, which is at least stable and
+ * So poagen keeps the vendor's spelling, which is at least stable and
  * predictable, and says so — `real-world-schemas` asks the generator to request
  * guidance and state exactly what it needs where a document is ambiguous rather
  * than merely awkward. This is that request.
@@ -40,7 +40,7 @@ final readonly class OperationIdAdvisor
 {
     /**
      * Anything with a separator, an uppercase letter, or a digit boundary has
-     * word boundaries paogen can already act on.
+     * word boundaries poagen can already act on.
      */
     private const string UNSEPARATED = '/^[a-z]+$/';
 
@@ -71,7 +71,7 @@ final readonly class OperationIdAdvisor
 
         return [sprintf(
             "%d operation id(s) carry no word boundary, so the emitted method keeps the vendor's spelling: %s. "
-                . 'paogen does not guess a split — a dictionary would give a different answer per schema and move '
+                . 'poagen does not guess a split — a dictionary would give a different answer per schema and move '
                 . "names between runs. Where the vendor's spelling reads badly, name the method you want in "
                 . "Profile::\$methodRenames, keyed on the operation id (e.g. 'getclientfullbalance' => "
                 . "'getClientFullBalance'). A single word needs no answer.",

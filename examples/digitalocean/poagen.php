@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 return new Profile(
     schema: __DIR__ . '/schemas/DigitalOcean-public.v2.yaml',
@@ -15,7 +15,7 @@ return new Profile(
      * no guidance at all — `autoscale_pool.config` and
      * `autoscale_pool_create.config` pick between their static and dynamic
      * branches on `target_number_instances` against `min_instances`, which
-     * paogen computes from the branches themselves.
+     * poagen computes from the branches themselves.
      *
      * The two below are the only unions in either large vendor document that
      * no rule can decide, and the pins are the layer-three answer. A pin is
@@ -66,7 +66,7 @@ return new Profile(
     /*
      * Twenty operations this document could already not represent before any
      * of the union work (an inline (non-$ref) JSON request body with no
-     * `allOf` to merge, or a query/header parameter shape outside paogen's
+     * `allOf` to merge, or a query/header parameter shape outside poagen's
      * supported set). These were silently dropped by the pre-`abort-on-
      * unrepresentable-constructs` generator (`examples/digitalocean/README.md`'s
      * "Known limitations" already named this gap under T-025/T-026); since
@@ -74,7 +74,7 @@ return new Profile(
      * unrepresentable construct into the same generator-time abort this
      * profile refuses to weaken, they now block the run too and need the
      * same skip-list treatment `uploadFile` already gets in the petstore
-     * example. Regenerated from `bin/paogen generate --dry-run`'s own
+     * example. Regenerated from `bin/poagen generate --dry-run`'s own
      * diagnostic.
      *
      * `merge-allof-members-into-one-model` removed eighteen entries this list
@@ -109,17 +109,17 @@ return new Profile(
      * skipped past silently, treating the operation as if it had no 2xx at
      * all and emitting `void`. Resolving every `$ref`'d response properly
      * surfaced the vendor's real content type instead: a PDF stream and a
-     * YAML document, neither of which paogen decoded at the time.
+     * YAML document, neither of which poagen decoded at the time.
      *
      * `return-a-binary-2xx-as-the-stream-a-done-task-already-promised`
      * removed the PDF one: `invoice_pdf`'s `format: binary` body now returns
      * a PSR-7 `StreamInterface` instead of refusing, the same way the
      * request side already has, so `invoices_get_pdfByUUID` generates
-     * cleanly and only the YAML one below still blocks the run — paogen has
+     * cleanly and only the YAML one below still blocks the run — poagen has
      * no YAML decoder.
      */
     skip: [
-        // The vendor's own defect, not paogen's: `check_updatable` (this
+        // The vendor's own defect, not poagen's: `check_updatable` (this
         // operation's sole allOf member) declares `name`, `type`, `target`,
         // `regions`, `enabled` — never `method` — yet the request body's own
         // `required` list demands it. No member anywhere in the merge
@@ -128,9 +128,9 @@ return new Profile(
         'uptime_create_check' => 'allOf requires \'method\' but no member declares it as a property — members '
             . 'searched: #/components/schemas/check_updatable',
         // typed-error-responses: 200 is `#/components/responses/kubeconfig`,
-        // `application/yaml` — paogen decodes JSON responses and text over a
+        // `application/yaml` — poagen decodes JSON responses and text over a
         // `type: string` schema, not YAML.
         'kubernetes_get_kubeconfig' => "200 response (components/responses/kubeconfig) content type "
-            . "'application/yaml' is not one paogen decodes",
+            . "'application/yaml' is not one poagen decodes",
     ],
 );

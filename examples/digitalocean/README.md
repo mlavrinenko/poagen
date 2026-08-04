@@ -1,4 +1,4 @@
-# paogen example — DigitalOcean API
+# poagen example — DigitalOcean API
 
 The [DigitalOcean public API](https://docs.digitalocean.com/reference/api/)
 OpenAPI 3.0 document — 722 schema components, hundreds of endpoints.
@@ -16,7 +16,7 @@ OpenAPI 3.0 document — 722 schema components, hundreds of endpoints.
 
 ## What this demonstrates
 
-- paogen on a mid-sized production schema (2.7 MB bundled YAML, 722
+- poagen on a mid-sized production schema (2.7 MB bundled YAML, 722
   schema components).
 - The default `nameNormaliser` pipeline (T-023) handling kebab-case
   and snake_case component names out of the box: `app_alert`
@@ -29,7 +29,7 @@ OpenAPI 3.0 document — 722 schema components, hundreds of endpoints.
 ```
 digitalocean/
 ├── composer.json              — consumer-style project manifest
-├── paogen.php                 — the Profile object paogen reads
+├── poagen.php                 — the Profile object poagen reads
 └── schemas/
     └── DigitalOcean-public.v2.yaml   — vendored bundled schema
 ```
@@ -79,7 +79,7 @@ What blocks this example today, found by `clear-example-expected-failures`:
 - Skipping those four components instead cascades into 8 dangling
   `class.notFound` PHPStan errors — the operations that still declare
   the skipped component as a parameter type cannot be skip-listed
-  themselves without paogen calling the entry stale.
+  themselves without poagen calling the entry stale.
 - Independently of the above, this schema declares two named `http
   bearer` security schemes (`bearer_auth`, `inference_bearer_auth`)
   that collapse onto the same fixed constructor argument name; every
@@ -89,7 +89,7 @@ What blocks this example today, found by `clear-example-expected-failures`:
   `anyOf: [integer, string]`, which resolves to `mixed` instead of
   tripping the "unsupported parameter shapes" abort, then fails
   PHPStan against `Endpoint::path()`'s stricter signature.
-- `Profile::$skip` in `paogen.php` fully catalogues the twenty-one
+- `Profile::$skip` in `poagen.php` fully catalogues the twenty-one
   unrelated operation-level gaps this document already had (inline
   JSON request bodies with no `allOf` to merge, unsupported
   query/header parameter shapes, and the one `allOf` `required` name

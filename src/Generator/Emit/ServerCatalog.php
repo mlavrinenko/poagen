@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Server;
@@ -24,7 +24,7 @@ use function trim;
  * Resolves the document's `servers:` list — read by nothing before this —
  * into the constants {@see ServerConstantEmitter} puts on the root client,
  * and the failures that abort a run declaring a server variable, which
- * paogen does not substitute (emit-declared-servers-so-the-base-address-
+ * poagen does not substitute (emit-declared-servers-so-the-base-address-
  * comes-from-the-document).
  *
  * OpenAPI 3.0.3 §4.7.9.1 defaults an absent or empty `servers:` to a single
@@ -85,7 +85,7 @@ final readonly class ServerCatalog
             $names = array_map(static fn(int|string $name): string => "'" . $name . "'", array_keys($server->variables));
 
             $out[] = sprintf(
-                "server #/servers/%d ('%s') declares variable(s) %s — paogen does not substitute server-variable "
+                "server #/servers/%d ('%s') declares variable(s) %s — poagen does not substitute server-variable "
                     . 'templates, and emitting the URL unresolved would produce a constant that looks like a usable '
                     . 'address and is not one. Replace the template in the server URL with a literal value in the '
                     . 'document, or drop the variable. Profile::$skip cannot accept it, because a skip entry names '

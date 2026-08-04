@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Cat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Celsius;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Dog;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Enclosure;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Habitat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Reading;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Sighting;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Vacant;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Cat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Celsius;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Dog;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Enclosure;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Habitat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Reading;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Sighting;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Vacant;
+use Poagen\Runtime\Marshal\Hydrator;
+use Poagen\Runtime\Marshal\UnionBranchException;
 
 /**
  * declare-an-undiscriminated-union-as-raw-data, both halves at once.

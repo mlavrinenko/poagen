@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
-use Mlavrinenko\Paogen\Runtime\Marshal\MethodDocScanner;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\DocScanTargets;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Unit\Runtime\Fixtures\DocScanTargets;
+use Poagen\Generator\Tests\Unit\Runtime\Fixtures\Pet;
+use Poagen\Runtime\Marshal\MethodDocScanner;
 use ReflectionMethod;
 
 use function dirname;
@@ -96,16 +96,16 @@ final class DescriptorParserFallbackTest extends TestCase
             <?php
             require {$this->phpString($autoload)};
 
-            \$reflection = new ReflectionMethod(\\Mlavrinenko\\Paogen\\Tests\\Unit\\Runtime\\Fixtures\\Pet::class, '__construct');
+            \$reflection = new ReflectionMethod(\\Poagen\\Generator\\Tests\\Unit\\Runtime\\Fixtures\\Pet::class, '__construct');
             \$stripped = \$reflection->getDocComment() === false;
 
-            \$pet = (new \\Mlavrinenko\\Paogen\\Runtime\\Marshal\\Hydrator())->hydrate(
-                \\Mlavrinenko\\Paogen\\Tests\\Unit\\Runtime\\Fixtures\\Pet::class,
+            \$pet = (new \\Poagen\\Runtime\\Marshal\\Hydrator())->hydrate(
+                \\Poagen\\Generator\\Tests\\Unit\\Runtime\\Fixtures\\Pet::class,
                 ['id' => 1, 'tags' => [['id' => 10, 'name' => 'friendly']]],
             );
 
             echo (\$stripped ? 'stripped' : 'keeps-comments'), ':',
-                (\$pet->tags[0] instanceof \\Mlavrinenko\\Paogen\\Tests\\Unit\\Runtime\\Fixtures\\Tag ? 'tag' : 'array');
+                (\$pet->tags[0] instanceof \\Poagen\\Generator\\Tests\\Unit\\Runtime\\Fixtures\\Tag ? 'tag' : 'array');
             PHP;
         $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
+namespace Poagen\Generator\Generator\Naming;
 
 /**
  * Side-channel data threaded into {@see NameNormaliser::normalise()}.

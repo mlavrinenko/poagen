@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\AdditionalPropertyBag;
 use PHPUnit\Framework\TestCase;
 
 use function count;
@@ -27,7 +26,7 @@ final class AdditionalPropertyBagTest extends TestCase
     {
         // The emitted property defaults to this, which is why a consumer never
         // has to guard before asking a question.
-        $bag = new AdditionalPropertyBag();
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag();
 
         self::assertTrue($bag->isEmpty());
         self::assertCount(0, $bag);
@@ -40,7 +39,7 @@ final class AdditionalPropertyBagTest extends TestCase
     {
         // A key present with a null value and an absent key both read back as
         // null through `get()`, so presence needs its own question.
-        $bag = new AdditionalPropertyBag(['nil' => null]);
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag(['nil' => null]);
 
         self::assertTrue($bag->has('nil'));
         self::assertNull($bag->get('nil'));
@@ -50,7 +49,7 @@ final class AdditionalPropertyBagTest extends TestCase
 
     public function testItReturnsAValueByKeyAndFallsBackToTheGivenDefault(): void
     {
-        $bag = new AdditionalPropertyBag(['colour' => 'red', 'depth' => 3]);
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag(['colour' => 'red', 'depth' => 3]);
 
         self::assertSame('red', $bag->get('colour'));
         self::assertSame(3, $bag->get('depth'));
@@ -62,7 +61,7 @@ final class AdditionalPropertyBagTest extends TestCase
         // Order is the payload's, not the bag's. Keeping it is what makes a
         // hydrate/marshal round trip stable rather than merely lossless.
         $values = ['b' => 2, 'a' => 1, 'c' => 3];
-        $bag = new AdditionalPropertyBag($values);
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag($values);
 
         self::assertSame(['b', 'a', 'c'], $bag->keys());
         self::assertSame(3, $bag->count());
@@ -76,7 +75,7 @@ final class AdditionalPropertyBagTest extends TestCase
         // Nothing validates an extra value against anything: the document
         // declined to constrain it, so the bag declines to interpret it.
         $nested = ['deep' => ['deeper' => true]];
-        $bag = new AdditionalPropertyBag(['raw' => $nested, 'zero' => 0, 'blank' => '']);
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag(['raw' => $nested, 'zero' => 0, 'blank' => '']);
 
         self::assertSame($nested, $bag->get('raw'));
         self::assertSame(0, $bag->get('zero'));
@@ -90,7 +89,7 @@ final class AdditionalPropertyBagTest extends TestCase
         // Immutable like every other emitted value. The array is copied in by
         // value, so mutating the caller's copy afterwards cannot reach inside.
         $values = ['colour' => 'red'];
-        $bag = new AdditionalPropertyBag($values);
+        $bag = new \Poagen\Runtime\AdditionalPropertyBag($values);
 
         $values['colour'] = 'blue';
         $values['added'] = true;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 use function is_string;
 use function sprintf;
@@ -29,7 +29,7 @@ use function sprintf;
  * Outgoing, this needs no branch *selection* at all
  * (`a-union-request-body-takes-a-union-parameter`): the caller already holds
  * a concrete instance of one branch, so the emitted parameter is simply the
- * native PHP union across every branch paogen can name as a class, and the
+ * native PHP union across every branch poagen can name as a class, and the
  * marshaller serialises whichever one it was handed.
  *
  * A schema with its own non-empty `properties` alongside a `oneOf`/`anyOf` is
@@ -76,7 +76,7 @@ final readonly class RequestUnionPlanner
         if ($unnameable !== null) {
             [$index, $branch] = $unnameable;
             $refusal = sprintf(
-                'request body branch %d at %s is %s — paogen can only union branches it can express as a PHP '
+                'request body branch %d at %s is %s — poagen can only union branches it can express as a PHP '
                     . 'class (a $ref to a component, or an inline object with declared properties); reduce this '
                     . 'branch to one of those, or skip the operation',
                 $index,
@@ -128,7 +128,7 @@ final readonly class RequestUnionPlanner
     }
 
     /**
-     * A branch paogen cannot express as a PHP class: a bare `array`, a
+     * A branch poagen cannot express as a PHP class: a bare `array`, a
      * scalar, or an inline object with no declared properties to synthesise
      * a class from.
      */

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
- * webhooks-refuse-with-no-opt-out, CLI surface: `paogen generate` reports an
+ * webhooks-refuse-with-no-opt-out, CLI surface: `poagen generate` reports an
  * accepted webhook skip the same way it reports a skipped operation or
  * component — a written reason, a printed count, and a suppressed plain
  * success line, because an accepted skip is still an omission
@@ -29,7 +29,7 @@ final class WebhookSkipCliTest extends TestCase
 
     public function testSuccessLineIsSuppressedAndTheSkippedWebhooksAreReported(): void
     {
-        $outputDir = self::makeSandboxDir('paogen-webhook-skip-cli-');
+        $outputDir = self::makeSandboxDir('poagen-webhook-skip-cli-');
         $profilePath = $this->writeProfile($outputDir, [
             'memberCreated.webhook' => 'inbound payload, not a client concern',
             'orderClosed.webhook' => 'inbound payload, not a client concern',
@@ -47,7 +47,7 @@ final class WebhookSkipCliTest extends TestCase
 
     public function testAPlainGenerateRefusesWhenNoWebhookIsSkipped(): void
     {
-        $outputDir = self::makeSandboxDir('paogen-webhook-skip-cli-');
+        $outputDir = self::makeSandboxDir('poagen-webhook-skip-cli-');
         $profilePath = $this->writeProfile($outputDir, []);
 
         [$exit, $stdout, $stderr] = self::runGenerateCommand([$profilePath]);
@@ -63,7 +63,7 @@ final class WebhookSkipCliTest extends TestCase
      */
     private function writeProfile(string $outputDir, array $skip): string
     {
-        $dir = self::makeSandboxDir('paogen-webhook-skip-cli-profile-');
+        $dir = self::makeSandboxDir('poagen-webhook-skip-cli-profile-');
         $path = $dir . '/profile.php';
 
         $schema = var_export(self::SCHEMA, true);
@@ -73,11 +73,11 @@ final class WebhookSkipCliTest extends TestCase
         file_put_contents($path, <<<PHP
             <?php
             declare(strict_types=1);
-            use Mlavrinenko\\Paogen\\Generator\\Profile;
+            use Poagen\\Generator\\Generator\\Profile;
             return new Profile(
                 schema: {$schema},
                 output: {$output},
-                namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\WebhookSkipCli',
+                namespace: 'Poagen\\\\Generator\\\\Tests\\\\Tmp\\\\WebhookSkipCli',
                 skip: {$skipExport},
             );
             PHP);

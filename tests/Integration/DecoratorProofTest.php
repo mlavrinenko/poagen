@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
-use Mlavrinenko\Paogen\Tests\Generated\CachingStoreClient;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Poagen\Generator\Tests\Generated\CachingStoreClient;
+use Poagen\Runtime\Contract\Envelope;
 
 /**
  * The wrapper architecture, exercised rather than asserted about.

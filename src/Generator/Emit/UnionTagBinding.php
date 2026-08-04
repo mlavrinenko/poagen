@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use function count;
 use function implode;

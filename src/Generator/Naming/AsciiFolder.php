@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
+namespace Poagen\Generator\Generator\Naming;
 
 /**
  * Folds a raw schema name's non-ASCII letters to ASCII before the sanitisers
@@ -23,7 +23,7 @@ namespace Mlavrinenko\Paogen\Generator\Naming;
  * European vendor documents reach for it constantly. A script outside the table
  * folds to nothing, and that is deliberate too — the caller then finds no legal
  * identifier and fails, naming the tag and asking for a rename, rather than
- * inventing `Tag7`. Guessing a readable name for a script paogen cannot read is
+ * inventing `Tag7`. Guessing a readable name for a script poagen cannot read is
  * exactly what `real-world-schemas` says not to do.
  *
  * @internal

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\ProfileLoader;
-use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\ProfileLoader;
+use Poagen\Generator\Tests\Fixtures\ValueObject\Email;
 use Throwable;
 
 use function dirname;
@@ -53,7 +53,7 @@ final class ProfileSteps
 
     public function givenItsNamespaceIsListedInProfilesDiscoverIn(): void
     {
-        $this->discoverIn = ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'];
+        $this->discoverIn = ['Poagen\\Generator\\Tests\\Fixtures\\ValueObject'];
     }
 
     public function givenItsNamespaceIsNotListedInProfilesDiscoverIn(): void
@@ -126,7 +126,7 @@ final class ProfileSteps
 
     public function givenPhpFileThatReturnsTheIntegerValueInsteadOfProfile(int $value): void
     {
-        $tmp = tempnam(sys_get_temp_dir(), 'paogen-bad-profile-') . '.php';
+        $tmp = tempnam(sys_get_temp_dir(), 'poagen-bad-profile-') . '.php';
         file_put_contents($tmp, "<?php\nreturn {$value};\n");
         $this->tempFile = $tmp;
         $this->loaderPath = $tmp;
@@ -146,7 +146,7 @@ final class ProfileSteps
     {
         TestCase::assertNotNull($this->loaderError, 'expected loader error, got none');
         TestCase::assertSame(
-            'Mlavrinenko\\Paogen\\Exception\\' . $error,
+            'Poagen\\Generator\\Exception\\' . $error,
             $this->loaderError::class,
         );
 

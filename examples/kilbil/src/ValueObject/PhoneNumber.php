@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\ValueObject;
 
-use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Generator\Generator\Attribute\BindsFormat;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * A kilbil phone number.
@@ -13,7 +13,7 @@ use Mlavrinenko\Paogen\Runtime\ScalarBinding;
  * `phone` (4 uses) is not an OpenAPI format at all — the vendor invented it, and
  * their description says what it means: eleven digits beginning with a 7. That
  * constraint lives here rather than in the generated tree, which is the division
- * `guidance-is-data-not-code` draws: paogen reads that the format is bound and
+ * `guidance-is-data-not-code` draws: poagen reads that the format is bound and
  * emits this type, and never runs a line of it.
  */
 #[BindsFormat('phone')]

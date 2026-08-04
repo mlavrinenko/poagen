@@ -37,7 +37,7 @@ exist on the emitted client. It never means *emit something that
 degrades* — a method whose body throws, whose return type is a lossy
 `void`, or whose shape drops part of what the schema declared.
 
-A consumer who wants a construct represented has one path: ask paogen to
+A consumer who wants a construct represented has one path: ask poagen to
 support it (a task, upstream). A consumer who does not need it has one path:
 name it in `$skip` and it disappears from the client. Until 2026-08-03 there
 was no third: no button that produces a method compiling clean at max
@@ -76,7 +76,7 @@ generator refuses.
 `webhooks-refuse-with-no-opt-out` widened `$skip` itself rather than
 opening a third surface. An OpenAPI 3.1 `webhooks:` entry is refused whole
 by default — it describes a call the vendor makes to the consumer, the
-opposite direction from every client paogen emits, and no emitter
+opposite direction from every client poagen emits, and no emitter
 represents one — but `$skip` previously had nowhere to name it: keyed by
 operation id or raw component name, and a webhook is neither. That was the
 key space being too narrow, not a reason webhooks needed a map of their
@@ -117,7 +117,7 @@ is the same failure `$skip` exists to replace, one layer up.
   similar) — every entry names one operation id or component. A category
   skip would hide the next unrelated construct that happens to share the
   category, which is exactly the blanket-allow shape this decision forbids.
-- Nothing here changes what paogen can represent. It only removes the
+- Nothing here changes what poagen can represent. It only removes the
   silent middle ground between "represented" and "refused."
 - A second opt-out surface, `Profile::$unionPins`, was admitted on
   2026-08-03 by `union-pin-is-a-second-opt-out`. Nothing above about

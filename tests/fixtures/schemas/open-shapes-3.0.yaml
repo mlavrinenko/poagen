@@ -68,7 +68,7 @@ components:
     Silent:
       description: >
         the vendor wrote nothing. JSON Schema would default this to `true`;
-        paogen does not read a default as a declaration, so this emits exactly
+        poagen does not read a default as a declaration, so this emits exactly
         what it emitted before extras were carried at all.
       type: object
       properties:

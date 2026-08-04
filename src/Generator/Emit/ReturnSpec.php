@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\ScalarFormat;
+use Poagen\Runtime\Contract\ResponseType;
 
 /**
  * Resolved return-type of an operation.
@@ -27,7 +27,7 @@ use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
  * three operations — had no way to be said at all. It carries its item as
  * another spec rather than as a type name, for the same reason a map does:
  * an item can be a plain scalar or a scalar the document gave a `format`
- * paogen binds to a type, and a flat string could not tell those apart.
+ * poagen binds to a type, and a flat string could not tell those apart.
  *
  * A map carries the shape of its *values* as another spec rather than as a
  * type name, which is what lets `additionalProperties: {$ref: Pet}` answer
@@ -84,8 +84,8 @@ final readonly class ReturnSpec
     public const string KIND_UNION = 'union';
 
     /**
-     * @param ScalarFormat|null    $scalarFormat set on a KIND_SCALAR the document gave a `format`
-     *                                           paogen binds to a type — the binding a model
+     * @param ScalarFormat|null $scalarFormat set on a KIND_SCALAR the document gave a `format`
+     *                                           poagen binds to a type — the binding a model
      *                                           property with the same `format` already honours
      * @param self|null            $listItem     the item shape, set for KIND_SCALAR_LIST — a bare
      *                                           scalar, or (as of this task) a KIND_UNION
@@ -124,7 +124,7 @@ final readonly class ReturnSpec
     }
 
     /**
-     * A scalar the document annotated with a `format` paogen binds — `date`
+     * A scalar the document annotated with a `format` poagen binds — `date`
      * and `date-time` to `\DateTimeImmutable` by default, or to whatever
      * value object the consumer registered for that format. The binding is
      * resolved once, by the same {@see Bindings} a model property consults,

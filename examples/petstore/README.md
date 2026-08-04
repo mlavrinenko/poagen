@@ -1,4 +1,4 @@
-# paogen example — Petstore
+# poagen example — Petstore
 
 The canonical [Swagger Petstore](https://petstore3.swagger.io/) schema,
 generated into a typed PHP client.
@@ -17,11 +17,11 @@ generated into a typed PHP client.
 ```
 petstore/
 ├── composer.json              — consumer-style project manifest
-├── paogen.php                 — the Profile object paogen reads
+├── poagen.php                 — the Profile object poagen reads
 ├── schemas/
 │   └── petstore-3.0.yaml      — the vendored OpenAPI document
 └── generated/
-    └── Generated/             — paogen's output (committed)
+    └── Generated/             — poagen's output (committed)
         ├── ApiClient.php
         ├── ApiException.php
         ├── Enum/
@@ -45,7 +45,7 @@ composer install
 composer generate
 ```
 
-`composer generate` is a thin alias for `paogen generate paogen.php`.
+`composer generate` is a thin alias for `poagen generate poagen.php`.
 The output writes to `./generated/` and is idempotent — regenerating
 against an unchanged schema produces byte-identical files
 (`profile-driven-generation`).
@@ -56,9 +56,9 @@ against an unchanged schema produces byte-identical files
 use Acme\Petstore\Generated\ApiClient;
 use Acme\Petstore\Generated\ApiException;
 use Acme\Petstore\Generated\Enum\FindPetsByStatusStatus;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
+use Poagen\Runtime\Http\HttpTransport;
 
-// The base address is a constant paogen read off the document's own
+// The base address is a constant poagen read off the document's own
 // `servers:` entry — ApiClient::SERVER_1 — rather than a value you retype
 // from the schema. It is still a plain constructor argument to the
 // transport: swap in a test server or a staging host by passing a
@@ -94,10 +94,10 @@ generated client with it. Nothing under `generated/` changes either way.
 
 ## How the Profile is wired
 
-See `paogen.php`. The minimum a profile needs is:
+See `poagen.php`. The minimum a profile needs is:
 
 - `schema` — absolute path to the OpenAPI document.
-- `output` — directory to write under (paogen creates a `Generated/`
+- `output` — directory to write under (poagen creates a `Generated/`
   subtree, never touches anything outside it).
 - `namespace` — root namespace prefix for every emitted class.
 

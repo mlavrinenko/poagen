@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\ModelNameCollisionException;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\InlinePayloadPlanAssertions;
 
 use function basename;
 
@@ -33,7 +33,7 @@ final class InlinePayloadSynthesisTest extends TestCase
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payloads-3.0.yaml';
     private const string COLLISION_SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payload-collision-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlinePayloads';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\InlinePayloads';
 
     public static function tearDownAfterClass(): void
     {
@@ -189,7 +189,7 @@ final class InlinePayloadSynthesisTest extends TestCase
      */
     private function planFor(string $schema, array $inlineModels = []): GenerationPlan
     {
-        $output = self::makeSandboxDir('paogen-inline-');
+        $output = self::makeSandboxDir('poagen-inline-');
 
         return self::generator()->plan(new Profile(
             schema: $schema,

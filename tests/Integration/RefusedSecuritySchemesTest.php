@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\PetstoreFixture;
 
 /**
  * report-unsupported-security-schemes, the two buckets that stop the run.
  *
  * `http digest` and `http negotiate` need a challenge and a second request
- * before any credential exists, and paogen will not run a protocol. A
+ * before any credential exists, and poagen will not run a protocol. A
  * scheme type the specification does not define lands in the same bucket:
  * unknown means refused, never ignored. And a requirement naming a scheme
  * the document never declared is refused with instructions, because the
@@ -31,7 +31,7 @@ final class RefusedSecuritySchemesTest extends TestCase
 
     private const string REFUSED = __DIR__ . '/../fixtures/schemas/refused-security-3.0.yaml';
     private const string PETSTORE = __DIR__ . '/../fixtures/schemas/petstore-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\RefusedSecurity';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\RefusedSecurity';
 
     public static function tearDownAfterClass(): void
     {
@@ -171,7 +171,7 @@ final class RefusedSecuritySchemesTest extends TestCase
     {
         return new Profile(
             schema: $schema,
-            output: self::makeSandboxDir('paogen-refused-'),
+            output: self::makeSandboxDir('poagen-refused-'),
             namespace: self::NAMESPACE,
             skip: $skip,
             securitySchemes: $securitySchemes,

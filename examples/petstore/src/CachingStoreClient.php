@@ -6,12 +6,12 @@ namespace Acme\Petstore;
 
 use Acme\Petstore\Generated\Model\Order;
 use Acme\Petstore\Generated\StoreClientInterface;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\Envelope;
 
 /**
  * The wrapper architecture, demonstrated.
  *
- * This is hand-written consumer code. It implements the interface paogen emitted
+ * This is hand-written consumer code. It implements the interface poagen emitted
  * for the `store` tag, delegates every call to the generated implementation, and
  * adds two things the generator has no business knowing about: a per-instance
  * cache of orders already fetched, and a convenience method that takes a domain

@@ -23,7 +23,7 @@ undiscriminated-union-as-raw-data` shipped one on 2026-08-03.
 `Profile::$unionPins` names a property whose union no rule can decide and
 picks a branch for it, keyed the same way `$skip` is, carrying the same
 written reason a `$skip` entry carries. Two entries exist today, both in
-`examples/digitalocean/paogen.php`:
+`examples/digitalocean/poagen.php`:
 
 - `database_config.config` pinned to `postgres_advanced_config` — the
   document's seven engine-specific advanced-config branches declare no
@@ -126,7 +126,7 @@ shape, accepting a key it should always have accepted. `$skip` and
   shape — omit, never emit-degraded, checked for staleness, keyed to one
   operation or component at a time — is unchanged and still holds.
 - The two live pins, `database_config.config` and `logsink_update.config`,
-  are correct for the client `examples/digitalocean/paogen.php` describes
+  are correct for the client `examples/digitalocean/poagen.php` describes
   and stay as they are; this records why they are acceptable, it does not
   reopen either.
 - Any future construct that degrades knowingly rather than refusing or

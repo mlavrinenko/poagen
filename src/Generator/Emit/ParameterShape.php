@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\Parameter;
@@ -13,7 +13,7 @@ use function is_array;
 use function sprintf;
 
 /**
- * Whether one parameter's schema is a shape paogen emits, and — when it is
+ * Whether one parameter's schema is a shape poagen emits, and — when it is
  * not — the refusal that says so.
  *
  * So all three positions ask their question here. Each keeps its own subset —
@@ -54,7 +54,7 @@ use function sprintf;
 final readonly class ParameterShape
 {
     /**
-     * True when paogen can emit this parameter. False is a refusal, and
+     * True when poagen can emit this parameter. False is a refusal, and
      * {@see describe()} says which one.
      */
     public static function supports(Parameter $param): bool
@@ -78,7 +78,7 @@ final readonly class ParameterShape
         $schema = $param->schema;
 
         return sprintf(
-            "parameter '%s' (in: %s, type: %s)%s is outside paogen's supported parameter shapes — %s",
+            "parameter '%s' (in: %s, type: %s)%s is outside poagen's supported parameter shapes — %s",
             $param->name,
             $param->in,
             $schema instanceof Schema ? SchemaType::of($schema)->describe() : 'unspecified',
@@ -281,7 +281,7 @@ final readonly class ParameterShape
                 . 'whose items are scalars (directly or through a $ref), or a oneOf/anyOf of a scalar and a list '
                 . 'of one',
             'header' => 'a header parameter\'s schema must name a scalar, or a $ref to a scalar component',
-            default => 'paogen emits path, query and header parameters — no other `in` value',
+            default => 'poagen emits path, query and header parameters — no other `in` value',
         };
     }
 }

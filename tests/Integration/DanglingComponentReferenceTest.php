@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * a-skipped-component-leaves-dangling-references-behind-it: skipping a
@@ -34,7 +34,7 @@ final class DanglingComponentReferenceTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/dangling-component-reference-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\DanglingComponentReference';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\DanglingComponentReference';
 
     /** Accepts every problem the fixture raises — the "everything named" case. */
     private const array FULLY_ACCEPTED_SKIP = [
@@ -111,7 +111,7 @@ final class DanglingComponentReferenceTest extends TestCase
         // `Wrapper` deliberately left unaccepted: it still fails (below),
         // but `getWrapper` — accepted only because it reaches `Wrapper` —
         // must not be reported stale for want of `Wrapper`'s own entry.
-        // paogen used to judge an operation representable on its own and
+        // poagen used to judge an operation representable on its own and
         // call this exact entry stale; this is the acceptance criterion for
         // that fix.
         try {
@@ -156,7 +156,7 @@ final class DanglingComponentReferenceTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-dangling-component-'),
+            output: self::makeSandboxDir('poagen-dangling-component-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

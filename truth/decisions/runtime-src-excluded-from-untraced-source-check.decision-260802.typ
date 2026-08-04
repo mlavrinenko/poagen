@@ -6,7 +6,7 @@
   status: accepted(2026, 8, 2),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
-  process-only: "governs paogen's own traceability-gate configuration — what `[check].source-roots` walks — not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own traceability-gate configuration — what `[check].source-roots` walks — not what the generator produces or what a reimplementation must do",
 )
 
 == Context
@@ -23,9 +23,9 @@ scope boundary rather than a real gap and deferred the actual
 The 26-of-26 figure is not partial. `speconaut audit-traces` instruments
 only the manifest-listed `tests/generated/*Test.php` suite, and
 `truth/specs/`'s four features (Model Generator, Operation Generator,
-paogen CLI, Profile) describe #the(Generator)'s own behaviour — what PHP
+poagen CLI, Profile) describe #the(Generator)'s own behaviour — what PHP
 it emits — never the behaviour of the separately-packaged runtime library
-(`runtime-ships-as-a-separate-package`). No scenario paogen could write
+(`runtime-ships-as-a-separate-package`). No scenario poagen could write
 inside its own spec scope changes that: a scenario exercises the
 generator producing #a(GeneratedFile), never a consumer's own code
 calling into the runtime that file imports. `runtime/src/` is fully

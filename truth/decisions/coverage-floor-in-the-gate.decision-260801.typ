@@ -6,14 +6,14 @@
   status: accepted(2026, 8, 1),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
-  process-only: "governs paogen's own test-gate configuration (what the project's CI enforces about its own coverage), not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own test-gate configuration (what the project's CI enforces about its own coverage), not what the generator produces or what a reimplementation must do",
 )
 
 == Context
 
 `quality-gates-at-maximum-strictness` dropped a coverage threshold
 deliberately: a hosted service was wired with no bar to clear, which
-implied a number nobody enforced, and much of paogen's logic was
+implied a number nobody enforced, and much of poagen's logic was
 exercised through committed golden-output fixtures rather than assertions
 a line-coverage figure would credit. It named its own condition for
 revisiting that: "when the code surface stabilises, a new decision may
@@ -46,7 +46,7 @@ instrumentation root, not a fact about that package's tests. Measured on
 the same commit both ways: as configured, `src/` 87.46%, `runtime/src/`
 0.00% (fake), combined 73.35%; with `pcov.directory` set to the repo root
 instead, `src/` 87.50%, `runtime/src/` 88.39%, combined 87.64%. Any prior
-reading of paogen's coverage that relied on the old recipe's output
+reading of poagen's coverage that relied on the old recipe's output
 inherited that artifact and should be discarded — none is known to have
 been recorded anywhere, which is consistent with the recipe having gone
 unread.

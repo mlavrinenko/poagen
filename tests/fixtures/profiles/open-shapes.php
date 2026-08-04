@@ -14,7 +14,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 // See scratch-output.php: a test run never writes into the committed
 // golden tree — that only happens via `just regenerate-fixture open-shapes`.
@@ -22,6 +22,6 @@ require_once __DIR__ . '/scratch-output.php';
 
 return new Profile(
     schema: __DIR__ . '/../schemas/open-shapes-3.0.yaml',
-    output: paogen_fixture_scratch_output('open-shapes'),
-    namespace: 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\OpenShapes',
+    output: poagen_fixture_scratch_output('open-shapes'),
+    namespace: 'Poagen\\Generator\\Tests\\Fixtures\\Generated\\OpenShapes',
 );

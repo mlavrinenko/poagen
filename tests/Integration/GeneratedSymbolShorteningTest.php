@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\PetstoreFixture;
 
 /**
  * import-generated-type-references (T-260730): an emitted PHPDoc type used
@@ -27,13 +27,13 @@ final class GeneratedSymbolShorteningTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/petstore-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\SymbolShortening';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\SymbolShortening';
 
     private static GenerationPlan $plan;
 
     public static function setUpBeforeClass(): void
     {
-        $output = self::makeSandboxDir('paogen-symbol-shortening-');
+        $output = self::makeSandboxDir('poagen-symbol-shortening-');
 
         self::$plan = self::generator()->generate(new Profile(
             schema: self::SCHEMA,
@@ -68,7 +68,7 @@ final class GeneratedSymbolShorteningTest extends TestCase
         // The emitter used to spell a global function `\array_map(...)`
         // inline; it imports the symbol once with `use function array_map;`
         // and calls it unqualified, mirroring what
-        // `import-global-functions-in-source` already does for paogen's own
+        // `import-global-functions-in-source` already does for poagen's own
         // sources. `ApiException` no longer calls one at all — a declared
         // body is hydrated by the runtime now, never decoded by hand
         // (typed-error-responses) — so the emitted file this pins is a
@@ -76,7 +76,7 @@ final class GeneratedSymbolShorteningTest extends TestCase
         // each item needs its own `toScalar()`, called through `array_map`.
         $plan = self::generator()->generate(new Profile(
             schema: __DIR__ . '/../fixtures/schemas/parameter-shape-references-3.0.yaml',
-            output: self::makeSandboxDir('paogen-symbol-shortening-array-map-'),
+            output: self::makeSandboxDir('poagen-symbol-shortening-array-map-'),
             namespace: self::NAMESPACE . 'ArrayMap',
         ));
         $client = '';
@@ -106,7 +106,7 @@ final class GeneratedSymbolShorteningTest extends TestCase
 
         self::assertStringNotContainsString('use function', $client);
         self::assertStringNotContainsString('use const', $client);
-        self::assertStringContainsString('use Mlavrinenko\\Paogen\\Runtime\\Contract\\Endpoint;', $client);
+        self::assertStringContainsString('use Poagen\\Runtime\\Contract\\Endpoint;', $client);
     }
 
     private function sourceEndingWith(string $suffix): string

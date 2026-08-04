@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use LogicException;
-use Mlavrinenko\Paogen\Generator\ModelPlanner;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\PropertyRenameValidator;
+use Poagen\Generator\Generator\ModelPlanner;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\PropertyRenameValidator;
 
 use function in_array;
 use function is_array;

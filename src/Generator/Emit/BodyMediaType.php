@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
@@ -97,7 +97,7 @@ final readonly class BodyMediaType
      * Declaration order is the whole content-negotiation policy for a body
      * that names several text types, and it is why GitHub's
      * `text/plain, text/x-markdown` pair emits one method rather than two:
-     * `text/plain` is declared first, so `text/plain` is what paogen sends.
+     * `text/plain` is declared first, so `text/plain` is what poagen sends.
      * The alternative — a method per content type, or a content-type
      * argument — asks the caller to answer a question the document already
      * answered.

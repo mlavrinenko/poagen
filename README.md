@@ -1,4 +1,4 @@
-<h1 align="center">paogen</h1>
+<h1 align="center">poagen</h1>
 
 <p align="center">
     <strong>OpenAPI-driven PHP client generator producing typed, extensible clients.</strong>
@@ -10,7 +10,7 @@
 
 ## About
 
-paogen reads an OpenAPI 3.0 or 3.1 schema and emits a PHP 8.4 HTTP client:
+poagen reads an OpenAPI 3.0 or 3.1 schema and emits a PHP 8.4 HTTP client:
 
 * **Typed** — exhaustive PHPStan annotations (`@var non-empty-string`, etc.)
 * **Extensible** — your customisations live in a typed `Profile` and in
@@ -87,7 +87,7 @@ JSON Schema 2020-12 keywords have no emitter yet and stop the run by name
 rather than being silently dropped or misread: `const`, `prefixItems`,
 `unevaluatedProperties`, `contentMediaType`. A 3.1 `webhooks` entry is
 refused the same way — it describes a call the vendor makes to the consumer,
-the opposite direction from every client paogen emits — unless named in
+the opposite direction from every client poagen emits — unless named in
 `Profile::$skip`, which generates the `paths` half of the document alone.
 
 ## Installation
@@ -95,29 +95,29 @@ the opposite direction from every client paogen emits — unless named in
 Not on Packagist yet. Clone and install locally:
 
 ```bash
-git clone https://github.com/mlavrinenko/paogen.git
-cd paogen
+git clone https://github.com/mlavrinenko/poagen.git
+cd poagen
 composer install
 ```
 
 ## Usage
 
 ```bash
-paogen generate path/to/paogen.php
-paogen generate path/to/paogen.php --dry-run   # preview writes / deletes
-paogen generate path/to/paogen.php --diff      # unified diff vs disk
-paogen generate path/to/paogen.php --output=/tmp/out
-paogen validate path/to/schema.yaml            # parse + validate only
+poagen generate path/to/poagen.php
+poagen generate path/to/poagen.php --dry-run   # preview writes / deletes
+poagen generate path/to/poagen.php --diff      # unified diff vs disk
+poagen generate path/to/poagen.php --output=/tmp/out
+poagen validate path/to/schema.yaml            # parse + validate only
 ```
 
-Where `paogen.php` returns a typed `Profile` describing the schema, output
+Where `poagen.php` returns a typed `Profile` describing the schema, output
 dir, namespace, and any user value objects to wire in.
 
 See [`examples/`](examples/) for end-to-end demonstrations on real
 schemas (Petstore passes; DigitalOcean and GitHub are scaffolded as
 tracked follow-ups — see [ROADMAP.md](ROADMAP.md)). The example
 profiles and committed `generated/` trees are the shortest path to
-"what does paogen's output look like on *my* kind of schema?".
+"what does poagen's output look like on *my* kind of schema?".
 
 A minimal sample profile also lives at
 [`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).

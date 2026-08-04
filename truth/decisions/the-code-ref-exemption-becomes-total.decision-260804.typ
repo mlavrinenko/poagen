@@ -5,12 +5,12 @@
   status: accepted(2026, 8, 4),
   goals: (link("../goals/typed-injectable-surface.goal.typ"),),
   supersedes: (link("code-references-permitted-in-generator-specs.decision-260729.typ"),),
-  process-only: "governs how paogen's own truth-tree artifacts may reference paogen's tree, not what the generator produces",
+  process-only: "governs how poagen's own truth-tree artifacts may reference poagen's tree, not what the generator produces",
 )
 
 == Context
 
-`narrow-the-code-ref-exemption` rewrote 32 references to paogen's own tree
+`narrow-the-code-ref-exemption` rewrote 32 references to poagen's own tree
 behaviourally and dropped the `src/`, `bin/`, and `tests/` entries from
 `[check.code-refs] allowlist`, so specs, decisions, standards, and domain
 artifacts stopped being able to name a path the way task artifacts always
@@ -33,7 +33,7 @@ them was not.
 
 Owner ruling, 2026-08-02: neither branch of the open question. Portability
 of `truth/` across a reimplementation is a low-value property this project
-does not pay for, and paogen stops paying for it. The check is not widened
+does not pay for, and poagen stops paying for it. The check is not widened
 to catch a bare basename, and it is not kept in its narrow path-shaped form
 either — the exemption becomes total. An artifact may name a file.
 
@@ -49,14 +49,14 @@ check under the pre-widening allowlist and passed once the three entries
 below were restored, so the pass is the allowlist doing the work, not the
 whole-file exemption `process-only:` already carried before this decision.
 
-#link("code-references-permitted-in-generator-specs.decision-260729.typ")[Code references are permitted in paogen's own specs] framed the
+#link("code-references-permitted-in-generator-specs.decision-260729.typ")[Code references are permitted in poagen's own specs] framed the
 `src/`, `bin/`, and `tests/` entries as debt: 32 references paid down by
 rewriting them behaviourally, with the allowlist narrowed to output
 vocabulary once the rewrite landed. That framing — the legitimate half is
 output vocabulary, the rest was debt — is what this decision reverses. The
 three entries return to `[check.code-refs] allowlist` in
 `.speconaut/config.toml`, not as a stopgap awaiting a further rewrite, but
-because naming paogen's own tree is now permitted outright, in every
+because naming poagen's own tree is now permitted outright, in every
 artifact kind, the same freedom task artifacts had by design from the
 start.
 

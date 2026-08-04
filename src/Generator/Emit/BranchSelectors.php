@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
@@ -71,7 +71,7 @@ final readonly class BranchSelectors
         // A component name that reads as a number becomes an int key in PHP, so
         // every key read back out is cast rather than assumed — the same trap
         // ModelEmitter already guards when it orders a schema's properties.
-        /** @var array<array-key,EffectiveShape|null> $shapes */
+        /** @var array<array-key, EffectiveShape|null> $shapes */
         $shapes = [];
 
         foreach ($branches as $branch) {
@@ -94,7 +94,7 @@ final readonly class BranchSelectors
      * round-tripping through a `Reference` that does not exist for an
      * inline branch.
      *
-     * @param array<array-key,EffectiveShape|null> $shapes
+     * @param array<array-key, EffectiveShape|null> $shapes
      */
     public static function computeFromShapes(array $shapes): self
     {
@@ -156,7 +156,7 @@ final readonly class BranchSelectors
      * one union would both accept `{}`, so neither is decided by it and both
      * fall through to the undecidable list instead.
      *
-     * @param array<array-key,EffectiveShape|null> $shapes
+     * @param array<array-key, EffectiveShape|null> $shapes
      */
     private static function soleClosedBranch(array $shapes): ?string
     {
@@ -172,7 +172,7 @@ final readonly class BranchSelectors
     }
 
     /**
-     * @param array<array-key,EffectiveShape|null> $shapes
+     * @param array<array-key, EffectiveShape|null> $shapes
      */
     private static function decidingField(string $branch, EffectiveShape $shape, array $shapes): ?string
     {
@@ -194,7 +194,7 @@ final readonly class BranchSelectors
     }
 
     /**
-     * @param array<array-key,EffectiveShape|null> $shapes
+     * @param array<array-key, EffectiveShape|null> $shapes
      */
     private static function isExclusive(string $field, string $branch, array $shapes): bool
     {

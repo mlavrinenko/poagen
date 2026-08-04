@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Generator\Generator;
+use Poagen\Generator\Generator\Generator;
 
 /**
  * What {@see InlinePayloadPlanner} decided about the operations whose payloads
@@ -34,11 +34,11 @@ use Mlavrinenko\Paogen\Generator\Generator;
 final readonly class InlinePayloadCatalog
 {
     /**
-     * @param array<string,BodySpec>     $bodies           keyed by raw operationId
-     * @param array<string,EnvelopeSpec> $envelopes        keyed by raw operationId — every declared status,
+     * @param array<string, BodySpec> $bodies keyed by raw operationId
+     * @param array<string, EnvelopeSpec> $envelopes keyed by raw operationId — every declared status,
      *                                                      resolved (typed-error-responses); absent exactly when
      *                                                      the operation is refused, never partially populated
-     * @param list<SynthesisedModel>     $roots            payload classes to emit, in document order
+     * @param list<SynthesisedModel> $roots payload classes to emit, in document order
      * @param array<string,string>       $requestRefusals  keyed by raw operationId — the specific reason
      *                                                      an `allOf`/`anyOf` merge in the request body could
      *                                                      not resolve, preferred over
@@ -47,7 +47,7 @@ final readonly class InlinePayloadCatalog
      * @param array<string,string>       $responseRefusals keyed by raw operationId, mirrors $requestRefusals
      *                                                      for the response side — names the status that could
      *                                                      not be represented
-     * @param UnionCatalog                $responseUnions   how every response-position union resolved —
+     * @param UnionCatalog $responseUnions how every response-position union resolved —
      *                                                      {@see Generator}
      *                                                      merges this into the property-position catalog
      *                                                      {@see DiscriminatorEnforcer}

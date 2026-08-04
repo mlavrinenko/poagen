@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
@@ -69,7 +69,7 @@ final readonly class ResponseRefusal
 
             if (BodyMediaType::isXml($mediaType)) {
                 return sprintf(
-                    '%s is declared %s — paogen refuses an XML response at generation time rather than decoding '
+                    '%s is declared %s — poagen refuses an XML response at generation time rather than decoding '
                         . 'it or handing back the raw body (xml-responses-refused-at-generation-time); %s',
                     $prefix,
                     $mediaType,
@@ -79,7 +79,7 @@ final readonly class ResponseRefusal
         }
 
         return sprintf(
-            "%s content type(s) '%s' — paogen decodes application/json responses (\$ref/list<\$ref>, a scalar, "
+            "%s content type(s) '%s' — poagen decodes application/json responses (\$ref/list<\$ref>, a scalar, "
                 . 'or an additionalProperties map), returns a text content type over a `type: string` schema as a '
                 . 'string, and returns a `format: binary` body as a PSR-7 stream; %s',
             $prefix,
@@ -101,7 +101,7 @@ final readonly class ResponseRefusal
         }
 
         if (!$schema instanceof Schema) {
-            return sprintf('%s declares application/json with no schema — paogen needs one to know what to decode', $prefix);
+            return sprintf('%s declares application/json with no schema — poagen needs one to know what to decode', $prefix);
         }
 
         $type = SchemaType::of($schema);
@@ -111,7 +111,7 @@ final readonly class ResponseRefusal
         }
 
         return sprintf(
-            "%s has an application/json schema of type '%s', which paogen cannot represent as a method return type",
+            "%s has an application/json schema of type '%s', which poagen cannot represent as a method return type",
             $prefix,
             $type->describe(),
         );
@@ -130,7 +130,7 @@ final readonly class ResponseRefusal
         }
 
         return sprintf(
-            '%s is a JSON array whose items declare neither a $ref nor a scalar `type` — paogen emits a typed '
+            '%s is a JSON array whose items declare neither a $ref nor a scalar `type` — poagen emits a typed '
                 . 'list for items that are a $ref to a component schema, and a list of scalars for items that '
                 . 'declare one; give the items a `type`, or move the item schema into components.schemas',
             $prefix,

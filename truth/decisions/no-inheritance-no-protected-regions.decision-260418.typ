@@ -18,7 +18,7 @@ commonly proposed; we reject all of them.
 
 == Choice
 
-paogen's #a(Client) is `final readonly`. #The(Generator) never re-reads
+poagen's #a(Client) is `final readonly`. #The(Generator) never re-reads
 its own output. No mechanism that stores user code inside #a(GeneratedFile)
 is supported.
 

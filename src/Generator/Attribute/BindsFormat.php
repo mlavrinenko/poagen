@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Attribute;
+namespace Poagen\Generator\Generator\Attribute;
 
 use Attribute;
 

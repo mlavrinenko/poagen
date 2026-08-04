@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
-
-use Mlavrinenko\Paogen\Exception\NameNormalisationException;
+namespace Poagen\Generator\Generator\Naming;
 
 use function count;
 
@@ -31,6 +29,6 @@ final readonly class CompositeNormaliser implements NameNormaliser
             }
         }
 
-        throw NameNormalisationException::unhandled($raw, $context, count($this->strategies));
+        throw \Poagen\Generator\Exception\NameNormalisationException::unhandled($raw, $context, count($this->strategies));
     }
 }

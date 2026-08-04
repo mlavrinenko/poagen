@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * Resolves an OpenAPI `format` to a PHP type that is transparent at the wire
@@ -13,7 +13,7 @@ use Mlavrinenko\Paogen\Runtime\ScalarBinding;
  *   - user `#[BindsFormat]` value objects that implement {@see ScalarBinding}
  *     — treated as `scalar` bindings whose `fromScalar()` / `toScalar()`
  *     bracket the wire value on the way in / out;
- *   - paogen-shipped built-ins like `date-time` / `date` → `\DateTimeImmutable`
+ *   - poagen-shipped built-ins like `date-time` / `date` → `\DateTimeImmutable`
  *     — the generator hard-codes the marshal/unmarshal expressions.
  *
  * A built-in is overridden by a user binding on the same format, so library

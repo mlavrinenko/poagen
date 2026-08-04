@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\Emit\ParameterShape;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\Emit\ParameterShape;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * path-parameters-run-through-no-shape-gate-at-all: the path position was
@@ -38,7 +38,7 @@ final class ParameterShapeGateTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/parameter-shape-gate-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ParameterShapeGate';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ParameterShapeGate';
 
     /** Every operation the fixture declares that the gate refuses. */
     private const array REFUSED = [
@@ -64,7 +64,7 @@ final class ParameterShapeGateTest extends TestCase
         self::assertStringContainsString(
             "parameter 'selector' (in: path, type: object) "
                 . 'at /paths/~1widgets~1{selector}/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
+                . "is outside poagen's supported parameter shapes — a path parameter is interpolated into the URI, "
                 . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
                 . 'or one or more $refs to scalar component schemas',
             $message,
@@ -113,7 +113,7 @@ final class ParameterShapeGateTest extends TestCase
         self::assertStringContainsString(
             "parameter 'filter' (in: query, type: object) "
                 . 'at /paths/~1widgets~1search/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes — a query parameter's schema must name a scalar, "
+                . "is outside poagen's supported parameter shapes — a query parameter's schema must name a scalar, "
                 . 'a $ref to a scalar component, an array whose items are scalars (directly or through a $ref), '
                 . 'or a oneOf/anyOf of a scalar and a list of one',
             $message,
@@ -121,7 +121,7 @@ final class ParameterShapeGateTest extends TestCase
         self::assertStringContainsString(
             "parameter 'session' (in: cookie, type: string) "
                 . 'at /paths/~1widgets~1track/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes — paogen emits path, query and header parameters "
+                . "is outside poagen's supported parameter shapes — poagen emits path, query and header parameters "
                 . '— no other `in` value',
             $message,
         );
@@ -187,7 +187,7 @@ final class ParameterShapeGateTest extends TestCase
         self::assertStringContainsString(
             "parameter 'widget_ref' (in: path, type: unspecified) "
                 . 'at /paths/~1widgets~1by-ref~1{widget_ref}/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes — a path parameter is interpolated into the URI, "
+                . "is outside poagen's supported parameter shapes — a path parameter is interpolated into the URI, "
                 . 'so its schema must name a scalar (string, integer, number or boolean), a union of scalars, '
                 . 'or one or more $refs to scalar component schemas',
             $message,
@@ -209,7 +209,7 @@ final class ParameterShapeGateTest extends TestCase
         self::assertStringContainsString(
             "parameter 'tags' (in: query, type: array) "
                 . 'at /paths/~1widgets~1comma/get/parameters/0 '
-                . "is outside paogen's supported parameter shapes",
+                . "is outside poagen's supported parameter shapes",
             $message,
         );
         self::assertStringContainsString('GET /widgets/comma (getWidgetsCommaSeparated)', $message);
@@ -233,7 +233,7 @@ final class ParameterShapeGateTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-parameter-shape-gate-'),
+            output: self::makeSandboxDir('poagen-parameter-shape-gate-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

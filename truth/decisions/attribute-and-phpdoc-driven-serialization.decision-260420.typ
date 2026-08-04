@@ -174,15 +174,15 @@ final readonly class Pet
   `JsonSerializable` implementation. Golden trees (petstore,
   digitalocean, github) regenerate.
 - A new runtime package area is introduced:
-  `Mlavrinenko\\Paogen\\Runtime\\Marshal\\{Marshaller,Hydrator}` plus
+  `Poagen\\Runtime\\Marshal\\{Marshaller,Hydrator}` plus
   the attribute classes under
-  `Mlavrinenko\\Paogen\\Runtime\\Attribute\\*`. The `ScalarBinding`
+  `Poagen\\Runtime\\Attribute\\*`. The `ScalarBinding`
   interface stays where it is.
 - `ClientEmitter::hydrate()` is retired. `ApiClient` gains a
   constructor-injected `Hydrator` and `Marshaller`, both optional with
   sensible defaults (`new Hydrator()` / `new Marshaller()`).
 - `composer.json` gains `phpstan/phpdoc-parser: ^1.33` as a runtime
-  dependency. This flows to every paogen consumer — documented in
+  dependency. This flows to every poagen consumer — documented in
   README.
 - #link("hydration-and-serialization-contract.decision-260418.typ")[Hydration and serialization contract between the Client, Models, and bound VOs]'s `PROPERTY_MAP` representation choice is
   superseded. The contract it states (marshal/unmarshal is explicit,
@@ -199,7 +199,7 @@ final readonly class Pet
   descriptor per class in a `static` map on the `Hydrator` /
   `Marshaller`. The cache is per-process and per-class; warm-up cost
   is a single parse. Consumers who need sub-microsecond hydration are
-  not paogen's target audience in v0.1; if this becomes painful, a
+  not poagen's target audience in v0.1; if this becomes painful, a
   follow-up decision revisits representation.
 
 === Alternatives rejected

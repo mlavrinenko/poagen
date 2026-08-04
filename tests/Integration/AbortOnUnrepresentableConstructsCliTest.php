@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -48,7 +48,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 
     public function testPlainGenerateFailsWithNonZeroExitAndWritesNothing(): void
     {
-        $outputDir = self::makeSandboxDir('paogen-unrepresentable-cli-');
+        $outputDir = self::makeSandboxDir('poagen-unrepresentable-cli-');
         [$exit, $stdout, $stderr] = $this->invokeGenerate([], $outputDir);
 
         self::assertSame(1, $exit);
@@ -63,7 +63,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
      */
     private function invokeGenerate(array $extraArgs, ?string $outputDir = null): array
     {
-        $outputDir ??= self::makeSandboxDir('paogen-unrepresentable-cli-');
+        $outputDir ??= self::makeSandboxDir('poagen-unrepresentable-cli-');
         $profilePath = $this->writeProfile($outputDir);
 
         return self::runGenerateCommand([$profilePath, ...$extraArgs]);
@@ -71,7 +71,7 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
 
     private function writeProfile(string $outputDir): string
     {
-        $dir = self::makeSandboxDir('paogen-unrepresentable-profile-');
+        $dir = self::makeSandboxDir('poagen-unrepresentable-profile-');
         $path = $dir . '/profile.php';
 
         $schema = var_export(self::SCHEMA, true);
@@ -80,11 +80,11 @@ final class AbortOnUnrepresentableConstructsCliTest extends TestCase
         file_put_contents($path, <<<PHP
             <?php
             declare(strict_types=1);
-            use Mlavrinenko\\Paogen\\Generator\\Profile;
+            use Poagen\\Generator\\Generator\\Profile;
             return new Profile(
                 schema: {$schema},
                 output: {$output},
-                namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\UnrepresentableCli',
+                namespace: 'Poagen\\\\Generator\\\\Tests\\\\Tmp\\\\UnrepresentableCli',
             );
             PHP);
 

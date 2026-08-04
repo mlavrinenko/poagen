@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
 
 /**
  * `a-media-type-with-no-schema-takes-a-raw-body`: a media type carrying no
  * `schema` key at all declares nothing about its body, which is not the
- * same claim as a schema paogen cannot type — only the first passes.
+ * same claim as a schema poagen cannot type — only the first passes.
  *
  * `postRaw` mirrors `repos/get-content`'s exact shape: `examples` and no
  * `schema`. `postUnrepresentable` proves the distinction holds the other
- * way — a `schema` paogen genuinely cannot represent still refuses,
+ * way — a `schema` poagen genuinely cannot represent still refuses,
  * unchanged, and mixing the two in one document is the fixture bullet 5
  * asks for.
  */
@@ -28,7 +28,7 @@ final class SchemalessBodyTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/schemaless-body-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\SchemalessBody';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\SchemalessBody';
 
     public static function tearDownAfterClass(): void
     {
@@ -64,7 +64,7 @@ final class SchemalessBodyTest extends TestCase
     }
 
     /**
-     * Bullet 3: a media type declaring a schema paogen cannot represent —
+     * Bullet 3: a media type declaring a schema poagen cannot represent —
      * here a bare `type: string` JSON body, neither a `$ref`, an inline
      * object, nor an array of either — still refuses, unchanged.
      */
@@ -95,7 +95,7 @@ final class SchemalessBodyTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-schemaless-body-'),
+            output: self::makeSandboxDir('poagen-schemaless-body-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

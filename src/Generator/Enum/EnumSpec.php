@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Enum;
+namespace Poagen\Generator\Generator\Enum;
 
 /**
  * Describes one backed enum that the generator intends to emit.

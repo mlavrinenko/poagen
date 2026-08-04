@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
 
@@ -64,7 +64,7 @@ final readonly class BodySpec
     public const string KIND_BINARY = 'binary';
 
     /**
-     * @param list<FormField>      $formFields       non-empty when kind is KIND_FORM
+     * @param list<FormField> $formFields non-empty when kind is KIND_FORM
      * @param Schema|null          $schema           the inline node, set when kind is KIND_JSON_MAP so the
      *                                               parameter emitter can type the map's values
      * @param string               $rootElement      the XML root element, set for the XML kinds — the
@@ -72,7 +72,7 @@ final readonly class BodySpec
      * @param string               $itemElement      the repeated XML element, set for KIND_XML_LIST
      * @param string               $contentType      the content type to send, set for KIND_TEXT and
      *                                               KIND_BINARY — the document declares it and, where it
-     *                                               declared several, this is the one paogen picked
+     *                                               declared several, this is the one poagen picked
      * @param list<string>         $models           the branch class names, set when kind is KIND_JSON_UNION —
      *                                               the parameter type is their `|`-join
      * @param array<string,string> $nestedContainers item-schema property wire name → repeated child element

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
@@ -10,11 +10,11 @@ use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaWalk;
-use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\FormatAdvisor;
+use Poagen\Generator\Generator\Emit\SchemaScan;
+use Poagen\Generator\Generator\Emit\SchemaWalk;
+use Poagen\Generator\Generator\Emit\UnconstrainedFieldAdvisor;
 
 use function array_map;
 use function spl_object_id;

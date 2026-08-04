@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use PHPUnit\Framework\TestCase;
 
@@ -297,17 +297,17 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An operation whose body shape is unsupported is reported as a skip rather than dropped silently
      * @source truth/specs/operation-generator.feature-260418.typ:179
      *
-     * Given Schema declares Operation operationId: createWidget whose request body content type is multipart/form-data, which paogen does not emit
+     * Given Schema declares Operation operationId: createWidget whose request body content type is multipart/form-data, which poagen does not emit
      * When Generator runs against Profile
      * Then the resulting GenerationPlan carries a skippedOperations entry naming Operation's HTTP method, path, operationId and the reason for the skip
-     *   And paogen CLI's generate command prints the same list to stderr so the user knows which ops did not make it into the client
+     *   And poagen CLI's generate command prints the same list to stderr so the user knows which ops did not make it into the client
      */
     public function testAnOperationWhoseBodyShapeIsUnsupportedIsReportedAsASkipRatherThanDroppedSilently(): void
     {
-        $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPaogenDoesNotEmit('operationId: createWidget');
+        $this->steps->givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPoagenDoesNotEmit('operationId: createWidget');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenResultingGenerationPlanCarriesASkippedOperationsEntryNamingOperationsHTTPMethodPathOperationIdAndTheReasonForTheSkip();
-        $this->steps->thenPaogenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();
+        $this->steps->thenPoagenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient();
     }
 
 

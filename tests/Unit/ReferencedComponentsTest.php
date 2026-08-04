@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\DanglingReferenceScanner;
-use Mlavrinenko\Paogen\Generator\Emit\ReferencedComponents;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\DanglingReferenceScanner;
+use Poagen\Generator\Generator\Emit\ReferencedComponents;
 
 /**
  * Unit coverage for {@see ReferencedComponents} —

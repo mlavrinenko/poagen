@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
-use Mlavrinenko\Paogen\GenerateCommand;
-use Mlavrinenko\Paogen\Generator\Profile;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\GenerateCommand;
+use Poagen\Generator\Generator\Profile;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionProperty;
@@ -14,7 +14,7 @@ use ReflectionProperty;
 use function count;
 
 /**
- * `paogen generate --output=<dir>` must change the output directory and nothing
+ * `poagen generate --output=<dir>` must change the output directory and nothing
  * else.
  *
  * This guard exists because the hand-enumerated copy behind
@@ -48,7 +48,7 @@ final class OutputOverrideCarriesEveryProfileFieldTest extends TestCase
             tagChoice: ['someOp' => 'Customers'],
             xmlElements: ['someOp' => 'root'],
             inlineModels: ['someOp.request' => 'SomeRequest'],
-            source: 'config/acme-paogen.php',
+            source: 'config/acme-poagen.php',
         );
 
         $overridden = $this->withOutput($original, '/elsewhere');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Operation;
 use Nette\PhpGenerator\ClassType;
@@ -16,10 +16,10 @@ use function sprintf;
  * one scheme that has nothing to send.
  *
  * A consumer reaching for `league/oauth2-client` needs a token endpoint and
- * a scope list. Both are in the document they already handed paogen, and
+ * a scope list. Both are in the document they already handed poagen, and
  * without this they would go back to the vendor's YAML to read them beside
  * the typed client they were given instead of it. That is the "help the
- * consumer wire their own transport" half of the ruling: paogen does not
+ * consumer wire their own transport" half of the ruling: poagen does not
  * acquire the token — `operations-delegate-to-an-injected-transport` puts
  * that in the transport, and sending a token and obtaining one are
  * different jobs — but it does hand over everything the document says
@@ -40,7 +40,7 @@ final readonly class SecurityDocs
      * consumer reads in their editor, and nothing reflows a generated
      * comment for them.
      */
-    private const string CLOSING = "paogen never acquires, refreshes, stores or validates a credential. It\n"
+    private const string CLOSING = "poagen never acquires, refreshes, stores or validates a credential. It\n"
         . "puts the value you pass to the constructor on the request; obtaining\n"
         . "one is your transport's job.";
 

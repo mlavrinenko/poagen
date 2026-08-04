@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\ScalarFormat;
 
 use function is_string;
 
@@ -18,7 +18,7 @@ use function is_string;
  * Resolves one declared status's response into a {@see ReturnSpec} — the
  * shape a status's body has, independent of which status it is.
  *
- * `null` means this response sits outside paogen's supported shapes and the
+ * `null` means this response sits outside poagen's supported shapes and the
  * caller must refuse the whole operation rather than fall back to `void` —
  * a response that declares a body and gets one dropped is exactly the
  * silent shrink `silence-means-success` forbids

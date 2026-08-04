@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
+namespace Poagen\Generator\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\Model\GoodsListXmlRequestContentItem;
 use Acme\Kilbil\Generated\Model\GoodsListXmlRequestContentItemInsideItem;
@@ -15,8 +15,8 @@ use cebe\openapi\spec\RequestBody;
 use DOMDocument;
 use DOMElement;
 use DOMText;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Generated\RecordingClient;
 
 use function assert;
 use function is_string;

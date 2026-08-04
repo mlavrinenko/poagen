@@ -12,7 +12,7 @@
 
 == Context
 
-paogen takes an OpenAPI 3.0 schema and emits a typed PHP client. Users need
+poagen takes an OpenAPI 3.0 schema and emits a typed PHP client. Users need
 to influence what #the(Generator) emits (rename a poorly-named schema
 component, swap a generic string for their own value object, exclude
 internal endpoints) without hand-editing generated files. Established

@@ -6,7 +6,7 @@
 
 [features."Model Generator"]
 spec = "truth/specs/model-generator.feature-260418.typ"
-spec-hash = "sha256:f205c79f580c134aeff282b465cb65452f2eda4cb5a48b9f37d7f75c9aeed34b"
+spec-hash = "sha256:99685ca6f7c9d7b6eb161e22a3115791280ce4fe40aee73dad641206a245a607"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding"]
 as-is-hash = "sha256:8be88086af99a2fa6020e333f7de5ed768fedd11639f2cb8d13ee2cb522b8bab"
@@ -154,8 +154,8 @@ as-is = "KLUv/QBYPQkAJhY9IFBN0wZ/XrZssrEqZm1S14TCyCJ2L5XOwkDRNGbCpjkBMwAzADQAh3Y
 stage = "unstable"
 
 [features."Model Generator".scenarios."An emitted file opens with a header naming the profile and the command that reproduces it"]
-as-is-hash = "sha256:b6c5144d74e28bdcb3aaa37c5b8132979217f4e20c31fb7063f7bff6c2b688c2"
-as-is = "KLUv/QBYBQgA5pEwHGBn2waDaHK5Sd4vNUwy0WwtDDaGDHuElIIOgjgnACoAKABPr6WkEIOmcvloffCSofPGjmxGewkrfik/uYPNdy/dSPBAXRoeMQSGGvpUtuAOhq5+nVQebG5MJVZLCBiPuIJdPDlsFRUPfmwNdrFnPaIYlSsKwe9eJvzkAmy+5BE3Hg3YxSqeHbOikk61lscXjEcEdrHQAniq1f0KA128XGrWJ0OCXRg05OWw+Z65f3gVelVJ+KNseTnOng/eYurFpxQVAPx4wDQCOCPubXLg27uYmEG2leGxp1e84MQ+5zfiutYdsmtxG1k/fZ9evPIbLhMJTr9gntkGK0FBAQ=="
+as-is-hash = "sha256:10a4183ad484fee5355548dd460624fbb20e4a5db4853ff9ef62236bcd0ab392"
+as-is = "KLUv/QBYBQgA5pEwHGBn2waDaHK5Sd4vNUwy0WwtDDaGDHuElIIOgjgnACoAKABPr6WkEIOmcvloffCSofPGjmxGewkrfik/uYPNdy/dSPBAXRoeMQSGGvpUtuAOhq5+nVQebG5MJVZLCBiPuIJdPDlsFRUPfmwNdrFnPaIYlSsKwe9eJvzkAmy+5BE3Hg3YxSqeHbOikk61lscXjEcEdrHQAniq1f0KA128XGrWJ0OCXRg05OWw+Z65f3gVelVJ+GNqeTnOng/eYurFpxQVAPx4wDQCOCPubXLg27uYmEG2leGxp1e84MQ+5zfiutYdsmtxG1k/fZ9evPIbLhMJTr9gntkGK0FBAQ=="
 stage = "unstable"
 
 [features."Model Generator".scenarios."An explicit `renames` entry takes precedence over the auto-sanitiser"]
@@ -240,7 +240,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:14c21dc89ce124908535951040255279a45010bc31413f784b2a0ad85cee81a9"
+spec-hash = "sha256:e5dad153edf1d8f1746a27417bde082698768f09576d7d0a74539597124f82c5"
 
 [features."Operation Generator".scenarios."A GET operation with a path parameter becomes a typed client method"]
 as-is-hash = "sha256:43736afd1a469a314aab2ae3e0a79b4ba998ee523815566879e89754a4b5cf33"
@@ -373,8 +373,8 @@ as-is = "KLUv/QBY5QoABhhEI0CN0wGvMyFyEtvKHlC2oewHrZVbW9jp4MFruSC17mR4MAYENwA8ADs
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation whose body shape is unsupported is reported as a skip rather than dropped silently"]
-as-is-hash = "sha256:1230a416d664e0a001e2951e39b413f48be0a5b0ed86108889501aca59d98f8b"
-as-is = "KLUv/QBYDQsARhtIIFBt0gaM6NVGkrKb2DSdaC64rdnhOAaGM+A1nVA1WD0EPABAAD8AjRdXah12IrLsfTH1eUqYx1donUdb6WQQdVnraTWfb2JKjV5jNT8VUkcONviKKMKHtpVP6CPwAi3rnjgCXjzr8fiuYCWjxFCEFbV1AphEB4HNSrZLw0TWe9/DZPXNw3OvHFP41jPx4jASrM9akh8Xc5Q4fIcwAzvxpaFWLwfRnnHj8TiwAihnTJ0juXfrebplVuKrpXFoytkujT59tL6jhzlgNrx6VkpZr0knbuXvBr4jBTvBMHBswWvMA3u3Jdkzr/mQYo4da0KNwIM4rw2qM39WjetVW3ymdM8y+VwxDCa+YgVgIBScI7ATySCa6OBDrXPlw1CgrWRFFgBRxyPtNUwrUZ+NuYpXxYa5G0Iyl+OYS1naDANtRf8y5CyiXKXQq12E6Fh7ZqOzbBgky0uxApLCFMPPyh4="
+as-is-hash = "sha256:b2f6e1161836207b77ee70910e1c151110a7c97b5b1e24378efe06add1b61190"
+as-is = "KLUv/QBYDQsARhtIIFBt0gaM6NVGkrKb2DSdaC64rdnhOAaGM+A1nVA1WD0EPABAAD8AjRdXah12IrLsfTH1eUqYx1donUdb6WQQdVnraTWfb2JKjV5jNT8VUkcONviKKMKHtpVP6CPwAi3rnjgCXjzr8fiuFCajxFCEFbV1AphEB4HNSrZLw0TWe9/DZPXNw3OvHFP41jPx4jASrM9akh8Xc5Q4fIcwAzvxpaFWLwfRnnHj8TiwAihnTJ0juXfrebplVuKrpXFoytkujT59tL6jhzlgNrx6VkpZr0knbuXvBr4jBTvBMHBswWvMA3u3Jdkzr/mQYo4da0KNwIM4rw2qM39WjetVW3ymdM8y+VwxDCa+YgVgIBScI7ATySCa6OBDrXPlw1CgrWRFFgBRxyPtNUwrUZ+NuYpXxYa5G0Iyl+OYS1naDANtRf8y5CyiXKXQq12E6Fh7ZqOzbBgky0uxApLCFMPPyh4="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operation-level `$ref` to a component parameter is resolved to a typed method argument"]
@@ -451,86 +451,86 @@ as-is-hash = "sha256:736264498169563001e88616318419a64d031600cc92861ac9b4a3e54bd
 as-is = "KLUv/QBYxQcANlE0KZA1SQf///9/+acy/rYlGdqWC78kpKW9CS1XU5VFrw3GPUzIZov16lwCJwAoACoAy9M/BtE3hkbPR9TRQzbjea1JVaAIj8DMnoNVLR3ndXnhhLo0/GEEAehrqxDNenveoCD4K9mC8ZEzsJMnxVZxOfHFlmEnCx7CUx42a371AruUy92F8QyDneCBIp7uoTLBeEZfvWQ93TPChZ04FLlrDTsGEOmsOUKgEY501lzRWGPWAB4C2Ipni+oYYo0XvE1Lnz6zxjMKdpKPKCuuNNph+AEMAC07CLvJY2ZCpRvChJU8VCsNZQw/aF0Fi3hgONkOuTxwUFE="
 stage = "unstable"
 
-[features."paogen CLI"]
+[features."poagen CLI"]
 spec = "truth/specs/cli.feature-260417.typ"
-spec-hash = "sha256:2fa493795b3cf1d02d9eb035d343baf4a85493d95705b15777244bc0072c0c76"
+spec-hash = "sha256:aa3162a06ca35693dfcd5dfc64225d8812c524abe1b41bc59a662bc2816b58bf"
 
-[features."paogen CLI".scenarios."--diff against a corrupted golden tree prints unified diff and exits 1"]
-as-is-hash = "sha256:940dda6ab093f6b9810362d4066eb39bd3f0bc5101f31dc9fcb76f13e2882aaf"
-as-is = "KLUv/QBYrQgAttM4IVBp1AY4kEiStBJHYt1SiLOEhUZyAU8fY3RCHDTHTHJCCCwALwAxAL34EcNZqyOPe0x1dNtZry71zNXfxIifY7Zqa3H6vdnqPXfHUUySH1jXbaZFmw+f+mLniaWYKEYj3peREhyzb+Wm4g7/oTj9sW6xYmT/vtlQxY9klHDNtv2QzwXdOEmegPpUkpE6vBTiz1lvMtqzDlOBG6tnugkh/EijQH2KSduc5/Kh1oUHnPsFBgMPjUFJ5MTc8EROrY7EFfiRZlmUjDBzmS/LV6+X0zFqDLF3Y2x2BnDwI43CnnVMNxUQAFMzSGoGKjWuaIz83BohZ8lii40zlmcSQ3+C8yWqSHHHEEM6ZdyPMgwD3EFFAQ=="
+[features."poagen CLI".scenarios."--diff against a corrupted golden tree prints unified diff and exits 1"]
+as-is-hash = "sha256:120a6c9ce86a0751a8ad9bf03241e8eabbd75802186c61cf3c4321df3ea852b9"
+as-is = "KLUv/QBYrQgAttM4IVBp1AY4kEiStBJHYt1SiLOEhUZyAU8fY3RCHDTHTHJCCCwALwAxAL34EcNZqyOPe0x1dNtZry71zNXfxIifY7Zqa3H6vdnqPXfHUUySH1jXbaZFm8+x+mLniaWYKEYj3peREhyzb+Wm4g7/oTj9sW6xYmT/vtlQxY9klHDNtv2QzwXdOEmegPpUkpE6vBTiz1lvMtqzDlOBG6tnugkh/EijQH2KSduc5/Kh1oUHnPsFBgMPjUFJ5MTc8EROrY7EFfiRZlmUjDBzmS/LV6+X0zFqDLF3Y2x2BnDwI43CnnVMNxUQAFMzSGoGKjWuaIz83BohZ8lii40zlmcSQ3+C8yWqSHHHEEM6ZdyPMgwD3EFFAQ=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--diff against a matching golden tree exits 0 with no output"]
-as-is-hash = "sha256:2bf8bccf89b78a8f054afeef28d925da434badeac5065b29a33dde986b14068d"
-as-is = "KLUv/QBYvQcA5hAyIFBp2wYzSNJJK39Guk36ftM0ZjEfIPUIi0hvVpKZsMEQJwAoACkArB+f96tV4cdd60I+s/U3U8PqanUtjc7x7VZR4RlGE0I3sDbcXBQBTh/emI0OPGVjy80Ew38YL38aNmZO9vGbC038RjYI2G7fDamwFb/RL40y3Njh6q43nacapkzgxeqdbq6D31CQ1ciSc5+gQOCbipG9MXNE04RYyoFk4iX58Uy8pObxcmkDfuNp5uSdvh+ndncABr+hIE41TBA6YjUylAEPAD4bULdXoWfc0Bj5uTXCx5LdYltYGwFged7M0K3iXGpRRtlxyhhKd1swAw=="
+[features."poagen CLI".scenarios."--diff against a matching golden tree exits 0 with no output"]
+as-is-hash = "sha256:df1c2bb7043f951f228cd267563edc48c21bd6bc8a2a864bbc60b98ffd998d30"
+as-is = "KLUv/QBYvQcA5hAyIFBp2wYzSNJJK39Guk36ftM0ZjEfIPUIi0hvVpKZsMEQJwAoACkArB+f96tV4cdd60I+s/U3U8PqanUtjc7x7VZR4RlGE0I3sDbcXBQBTh/emI0OPGVjy80Ew38YL38aNmZO9vGbC038RjYI2G7fDamwFb/RL40y3Njh6q43nacapkzgxeqdbq6D31CQ1ciSc5+gQOCbCpm9MXNE04RYyoFk4iX58Uy8pObxcmkDfuNp5uSdvh+ndncABr+hIE41TBA6YjUylAEPAD4bULdXoWfc0Bj5uTXCx5LdYltYGwFged7M0K3iXGpRRtlxyhhKd1swAw=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--dry-run combined with --diff is a usage error"]
-as-is-hash = "sha256:9b2145b29f2b98d53fd2728a30c5be554bb8bbd9f6e85b145de644048a698dba"
-as-is = "KLUv/QBYHQYAAg4pH2BpmwM4SETOrtjB0ruTiKZLrjHtgmrCyEEB7SDXlhWJ4XhiCLHBTwy5XDzpgG0kx1f6FfEV2d5Ci3thLXzuMdZEpww5rceW5t0n19wADmwjOZpaRAQWh835SoVtE+A73OuVm9MzTy0mMIWmW7rAgMB6xbCxfkGwja8EuqbPhyt0CNtYtntfYXtGt7SiZDrHi0sFp2smGIasb8/CpnN8YLmoR4gJAGEbJEUGwIYz5ONBxJN1qaX2cCAJi28+bzAD"
+[features."poagen CLI".scenarios."--dry-run combined with --diff is a usage error"]
+as-is-hash = "sha256:df62d6fcc5c05a213a89c082d4fbc021db930aa5ba782fda30af71f244e356d4"
+as-is = "KLUv/QBYHQYAAg4pH2BpmwM4SETOrtjB0ruTiKZLrjHtgmrCyEEB7SDXlhWJ4XhiCLHBTwy5XDzpgG0kx1f6FfEV2d5Ci3thLXzuMdZEpww5rceW5t0n19wADmwjOZpaRAQWh835SoVtE+A73OuVm9MzTy0mMIWmW7rAgMB6hayxfkGwja8EuqbPhyt0CNtYtntfYXtGt7SiZDrHi0sFp2smGIasb8/CpnN8YLmoR4gJAGEbJEUGwIYz5ONBxJN1qaX2cCAJi28+bzAD"
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--dry-run prints a tree summary and writes nothing"]
-as-is-hash = "sha256:136116ff76515d78837a221f6f8d3ef06a3b0c20657e5a4d20ec5567c99235f0"
-as-is = "KLUv/QBY1QgAhlI1IFBp2waDSGKvSVBnu1H4fnsKvcfJaWOcKJjcBmMmckwIKgAtACsAzdqOwHSt+JGkqXrpGTvXcaT3xx6D0fiI279zay67tj2PReccsXJPkVEE98QmOozRj13N4Ca6YtzF70gDfmRJVB9TnlB97DCA9x2bXKw1uGIjB34Em4QLyjnYt6iYzq3IaGnvqtNxhAqroXnOKyqEH1ka016/G+u2zgaCAoErpnXsHMshQbQY5YcjWkznAjI2ufjSc4INQlTljmte62KOmrYUv9tCzWfDwY8sCae9GAA/OwhjBFwhg5+l2IULS1uhYyGoDcLPeuAmXh8VYMw1QE9+8XpgZeNuAS0aGF7MoGeV4agkmAt6DeEacconj5Uz"
+[features."poagen CLI".scenarios."--dry-run prints a tree summary and writes nothing"]
+as-is-hash = "sha256:361be08a05a6adbecfd928bd979864211786f59184fa7db055256329b89e6dde"
+as-is = "KLUv/QBY1QgAhlI1IFBp2waDSGKvSVBnu1H4fnsKvcfJaWOcKJjcBmMmckwIKgAtACsAzdqOwHSt+JGkqXrpGTvXcaT3xx6D0fiI279zay67tj2PReccsXJPkVEE98QmOozRj13N4Ca6YtzF70gDfmRJVB9TnlB97DCA9x2bXKw1uGIjB34Em4QLyjnYt6iYzq3IaGnvqtNxhAqroXnOKyqEH1ka016/G+u2zgaCAoErplvsHMshQbQY5YcjWkznAjI2ufjSc4INQlTljmte62KOmrYUv9tCzWfDwY8sCae9GAA/OwhjBFwhg5+l2IULS1uhYyGoDcLPeuAmXh8VYMw1QE9+8XpgZeNuAS0aGF7MoGeV4agkmAt6DeEacconj5Uz"
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--help prints usage and exits 0"]
-as-is-hash = "sha256:02fb48a35e01ed908b2587ae947db63e246cd36fb058e224586565e1050fee56"
-as-is = "KLUv/QBY3QQAkkohH1BL2wYzJPpMmzG7RdgcCJiHWojEbPDMWsn9UDWMDgOII8G06PDjmBZ1JjCp8p9CYEBZDoprXuuiJ6bt4nfb1HwGMPgPIlHsDq240BS7r86GJ1RYBs1znqAg4Ipqr7niQvgPMgnXrO0IquvlP8e5M4FPekd13M6tyZo3DC7DOLLJThEtAQYAdBi0NAOeg3tCSM0GVhMkwhk="
+[features."poagen CLI".scenarios."--help prints usage and exits 0"]
+as-is-hash = "sha256:caf31c5789539db73b1dc9473739d81d13388a6a38886aa3fcc370a268c746db"
+as-is = "KLUv/QBY3QQAkkohH1BL2wYzJPpMmzG7RdgcCJiHWojEbPDMWsn9UDWMDgOII8G06PDjmBZ1JjCp8p9CYEBZDoprXuuiJ6bt4nfb1HwGMPgPIlHsDq240BS7r86GJ1RYBs1znqAg4IrqtrniQvgPMgnXrO0IquvlP8e5M4FPekd13M6tyZo3DC7DOLLJThEtAQYAdBi0NAOeg3tCSM0GVhMkwhk="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--output redirects the generated tree to the supplied directory"]
-as-is-hash = "sha256:21422d4705acb9aada5790f4266cd62b42467345503333275d8bbd77aa970d08"
-as-is = "KLUv/QBYHQgAVlAwIGBpmwODiKTc7r6hQhalNK1pqrV8KEv17T1oIkQSvBqsJAAnACkAChtpUGV8Pms1pta/rvF7+nTHR2u2zTXx6m1rm0oSI1TqpTeKiUmimKXxek9z9JlCDyfQ3kqW4j3/SYbSA6c7ksBG/ijcstSMuHMbC3P0VmOVhW16ozl6RpsP4xeUI6VZusBgwOmOuuV0lGAjjAMWtLcWTmjMYTmqZuGDj6rZZLjxaQoxTAI2wjAAhjLel6W0HlNz+m7qwywRAhgAdxu83XDDSgBjMxCzEx/tQ9WAt2olgDgQhFShZlhWjiUCZQi0bYqiilocDB9YJsD3hhCEl9teRnFqpOQ19w=="
+[features."poagen CLI".scenarios."--output redirects the generated tree to the supplied directory"]
+as-is-hash = "sha256:266f0b6b5fe6fd5b11934aede2319c8e195f52d8ccb6ffc01a75a69de745fa24"
+as-is = "KLUv/QBYHQgAVlAwIGBpmwODiKTc7r6hQhalNK1pqrV8KEv17T1oIkQSvBqsJAAnACkAChtpUGV8Pms1pta/rvF7+nTHR2u2zTXx6m1rm0oSI1TqpTeKiUmimKXxek9z9JlCDyfQ3kqW4j3/SYbSA6c7ksBG/ijcstSMuHMbC3P0VmOVhW16ozl6RpsP4xeUI6VZusBgwOnOqeV0lGAjjAMWtLcWTmjMYTmqZuGDj6rZZLjxaQoxTAI2wjAAhjLel6W0HlNz+m7qwywRAhgAdxu83XDDSgBjMxCzEx/tQ9WAt2olgDgQhFShZlhWjiUCZQi0bYqiilocDB9YJsD3hhCEl9teRnFqpOQ19w=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."--version prints the paogen version and exits 0"]
-as-is-hash = "sha256:da2ab1e7c518792f0645828aa18b6a9c325592f63b1df9cd90435903638707a6"
-as-is = "KLUv/QBYHQUAgkogHmBH3AaDJGovq9rbPUKojUbU4RjHFwiKAOKS4EmgBEpxYNoleXFMu+SDSQs/Uo4nCZA1yZtd8xPTdvG7bWo+EwJ+pByKXdKKBk2x++o8eMKCdTTP+QOAQXEJ/AiZgWvWdgPVNfKj4tz54JPeFdVec1x9bk3WXDeZoUMQNzbZKS5ICwBe5fmagYbhZiaf6DMwxdCQILWM1sDYOF5FnpuYTw=="
+[features."poagen CLI".scenarios."--version prints the poagen version and exits 0"]
+as-is-hash = "sha256:e65f75794e16d23a65ad0f8e11ae4cef2b095b9d6cf6691e36116db7a9a9823a"
+as-is = "KLUv/QBYHQUAgkogHmBH3AaDJGovq9rbPUKojUbU4RjHFwiKAOKS4EmgBEpxYNoleXFMu+SDSQs/Uo4nCZA1yZtd8xPTdvG7bWo+EwJ+pByKXdKKBk2x++o8eMKCdTTP+QOAQXEJ/AiZgWvWdgPVNfKj4tz54JPeFdVtc1x9bk3WXDeZoUMQNzbZKS5ICwBe5fmagYbhZiaf6DMwxdCQILWM1sDYOF5FnpuYTw=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."No arguments prints usage and exits 0"]
-as-is-hash = "sha256:a068ac139ff79ee0a33497eb4db8174798b6415bd563e4e8450bf3aebefea9d6"
-as-is = "KLUv/QBYlQQAIoofH2BV0wZjSJiZ3GFUpiBJGioYJVhIPXJbImBbBzlGKQGOZIBrVePJca3qjHDp8iekYFiYBXLNa1315bRt+N12NZ8Fij/pm86BLwRYAc1z/oAgXJHtPVdsGH9C53HN2q4gu2b+lJw7I/zSO7Ljdm5N6Dm3YkBj0H0TVzahU1RMBQBkGLQ0Ax4D96RKKrs4mAE="
+[features."poagen CLI".scenarios."No arguments prints usage and exits 0"]
+as-is-hash = "sha256:fe9ef63a563ff6d1fbf30e3627d12eb69d6e57274e4dcad3f742bce516316fbd"
+as-is = "KLUv/QBYlQQAIoofH2BV0wZjSJiZ3GFUpiBJGioYJVhIPXJbImBbBzlGKQGOZIBrVePJca3qjHDp8iekYFiYBXLNa1315bRt+N12NZ8Fij/pm86BLwRYAc1z/oAgXJHdPldsGH9C53HN2q4gu2b+lJw7I/zSO7Ljdm5N6Dm3YkBj0H0TVzahU1RMBQBkGLQ0Ax4D96RKKrs4mAE="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."Unknown command reports on stderr and exits 2"]
-as-is-hash = "sha256:052e09c40f25dbf4109edf1abf1765e7ae51ff759d820890522b5a2e5128812d"
-as-is = "KLUv/QBYnQUAgo0mHmBJ1Aad2k42uSRGNE1CXnWlMaZdqHwVqAl2kCMFB4lx3DIhNnzLtPfcMMAukuOM/Yh4v2D74tWZRp030XrGQ4uZbIyTiypAgV0kh7IQ4tV7bthEgz7Ni1eOspCXPQXbE5mAZz0PEAgYryRqjF8O7OIMAlpFx4craBF2YVj3ntsQea3bqjGtu7L5siFSKpNRITGBBj7kLYRPiAcAMxukRQZkhjMWqsrCiCYF+SVOnmg="
+[features."poagen CLI".scenarios."Unknown command reports on stderr and exits 2"]
+as-is-hash = "sha256:6376ef3240fe67ee51449162f5f2469ab9d42ba9970a95b8d31c6cd7d0fe0f60"
+as-is = "KLUv/QBYnQUAgo0mHmBJ1Aad2k42uSRGNE1CXnWlMaZdqHwVqAl2kCMFB4lx3DIhNnzLtPfcMMAukuOM/Yh4v2D74tWZRp030XrGQ4uZbIyTiypAgV0kh7IQ4tV7bthEgz7Ni1eOspCXPQXbE5mAZz0PEAgYr6BsjF8O7OIMAlpFx4craBF2YVj3ntsQea3bqjGtu7L5siFSKpNRITGBBj7kLYRPiAcAMxukRQZkhjMWqsrCiCYF+SVOnmg="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."Version falls back to a non-empty sentinel when Composer metadata is missing"]
-as-is-hash = "sha256:e3cc917d8288fb4439e2ffd894886474d991b5cccee8ba3388649e1184544eb9"
-as-is = "KLUv/QBYTQYA0o4pH2BL0wYz3VIUvdLsbpKRpOspq+j8rJV1UAAkEMCpbgV6VlzMJrlPa3wysA0FgQQjvLSJAavn8GMTD30e26xvVOqXE4JtHFmC2OLzW2cYbF654LMS+WqOc6VsFc+JVksKQFCQMB6lLcY3N2AbVwtbRcaII1uFbSA81VOsZ1s7tle8rrkomTA+NVgdb/Hqh12UH5hoc64TxBZWpWzBmKfrB0bkLcMjigsAQbtxgKHBhSKBug2Vx6psXkcogkj54jway0J/JCEK"
+[features."poagen CLI".scenarios."Version falls back to a non-empty sentinel when Composer metadata is missing"]
+as-is-hash = "sha256:c07e4397d3c7e96c34b525868a94435dd995acdb9eee25cab5156d9ed16c08d2"
+as-is = "KLUv/QBYTQYA0o4pH2BL0wYz3VIUvdLsbpKRpOspq+j8rJV1UAAkEMCpbgV6VlzMJrlPa3wysA0FgQQjvLSJAavn8GMTD30e26xvVOqXE4JtHFmC2OLzW2cYbF654LMS+WqOc6VsFc+JVksKQFCQMB5ZLsY3N2AbVwtbRcaII1uFbSA81VOsZ1s7tle8rrkomTA+NVgdb/Hqh12UH5hoc64TxBZWpWzBmKfrB0bkLcMjigsAQbtxgKHBhSKBug2Vx6psXkcogkj54jway0J/JCEK"
 stage = "unstable"
 
-[features."paogen CLI".scenarios."generate emits no PHP deprecation notices on 8.4"]
-as-is-hash = "sha256:202f5cca6fc37a49121b6f1b97481309d5f5a0010b6d0dbb4cc3de24e77b6c93"
-as-is = "KLUv/QBY/QYABpAvIFBN0wYzLdG1lOMlWJ0gXss1isdAgUNhr5oXXSpUDbfXJAAoACYAtg4bGRAgMKb16DbRmLeGvpwnNxYaTrTuPe6vreMZM/KW4ZEjCMYzaY7x6sFGlkStOYoN1JoT4BR4zW8uIlfD+IlTsJE3ELaKjxlnAivR+2RatQKsq72j8crBRpZEmWWKdfGPh1lmtUfhdImcwLOeGRoCyyJ5SqR44adEexV3ap5U6oQHNrIkb9KPihnpCVY8W0zktZ5WHQoAPhtJCsbcmLQAZcfFxgpaGxISVGXgEqd88Vg5Aw=="
+[features."poagen CLI".scenarios."generate emits no PHP deprecation notices on 8.4"]
+as-is-hash = "sha256:123a2869fb5c4e3792ba7ce7ff645d20ad4ca014cb20a8abee619b5c41111470"
+as-is = "KLUv/QBY/QYABpAvIFBN0wYzLdG1lOMlWJ0gXss1isdAgUNhr5oXXSpUDbfXJAAoACYAtg4bGRAgMKb16DbRmLeGvpwnNxYaTrTuPe6vreMZM/KW4ZEjCMYzlo7x6sFGlkStOYoN1JoT4BR4zW8uIlfD+IlTsJE3ELaKjxlnAivR+2RatQKsq72j8crBRpZEmWWKdfGPh1lmtUfhdImcwLOeGRoCyyJ5SqR44adEexV3ap5U6oQHNrIkb9KPihnpCVY8W0zktZ5WHQoAPhtJCsbcmLQAZcfFxgpaGxISVGXgEqd88Vg5Aw=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."help subcommand prints usage and exits 0"]
-as-is-hash = "sha256:ab748fce85c519d416cd8376c1162fbdaaea23e6eed2adabab5bf783398a301f"
-as-is = "KLUv/QBYBQUAYgsjH2Bp2gYzJFkzuXZC+mS7htocYXRMGJ2PA9hFCOAEVwKLA4G3R/HjeHs6G3ia+I1BYCCBHBiuaa17fmpt4vfaaz4DGPxmoShMCLSYohWThRZ76lz4YcIqaJ7zBAUBV0RryhUTwm9QMaxZ1w+IrJHfHOfOBv7Ujsh4nVtzUX5qSbKHsfiKwvTD5mKKBwkFAHAYtDQDfgP3eJX6plgwAw=="
+[features."poagen CLI".scenarios."help subcommand prints usage and exits 0"]
+as-is-hash = "sha256:f49014f1820d38dfde9b38294959698d8093e346fe0587c8d6e758cbb3fb44af"
+as-is = "KLUv/QBYBQUAYgsjH2Bp2gYzJFkzuXZC+mS7htocYXRMGJ2PA9hFCOAEVwKLA4G3R/HjeHs6G3ia+I1BYCCBHBiuaa17fmpt4vfaaz4DGPxmoShMCLSYohWThRZ76lz4YcIqaJ7zBAUBV0S2yhUTwm9QMaxZ1w+IrJHfHOfOBv7Ujsh4nVtzUX5qSbKHsfiKwvTD5mKKBwkFAHAYtDQDfgP3eJX6plgwAw=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."validate on a malformed document reports on stderr and exits 1"]
-as-is-hash = "sha256:3955b8f8bfca08734db78063e379c90a35668d0b33cf80df5c505178d13135f3"
-as-is = "KLUv/QBYFQcAZhAwIGBp0wY43WLNZNtcIUOblMFQrcDuUIZ74zAqg+gg15YVJAAmACoA95T23UvNTz33anP7zmMcpOnpmFXHMub21F9bwmXPEYpreUgJmmd8m+rfQseNOYWUhrXVhrm+Pe9Bgh+5pWDN6Rxxi7XyI8m58RFHGgle1hgXUG3NoU11AC9rV40MT7egT+IZX7AYeN6i1jxPIfzIwkCR8A6NJHFJEePJLylqfFxKxY8sywX5q7t3OF5rbk+0TkVPy1HFDHDwCgAfMwhrBuIxXrRGNDDIjw+1wYdiHxOlwoZwNSNEAQ=="
+[features."poagen CLI".scenarios."validate on a malformed document reports on stderr and exits 1"]
+as-is-hash = "sha256:240afdd34e6b7028bffa5c373dc5c55b34962fc7be15ebd6ccbc5d185ac4ec87"
+as-is = "KLUv/QBYFQcAZhAwIGBp0wY43WLNZNtcIUOblMFQrcDuUIZ74zAqg+gg15YVJAAmACoA95T23UvNTz33anP7zmMcpOnpmFXHMub21F9bwmXPEYpreUgJmmd8m+rfQseNOYWUhrXVhrm+Pe9Bgh+5pWDN6Rxxi7XyI8m58RFHGgle1hgXUG3NoU11AC9rV40MT7egT+IZX7AYeN5i2jxPIfzIwkCR8A6NJHFJEePJLylqfFxKxY8sywX5q7t3OF5rbk+0TkVPy1HFDHDwCgAfMwhrBuIxXrRGNDDIjw+1wYdiHxOlwoZwNSNEAQ=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."validate on a syntactically valid OpenAPI document exits 0"]
-as-is-hash = "sha256:d22fddb5349bedf4ff48a8df94841f5d7c58ab857dcd4412241fc7848f1488a2"
-as-is = "KLUv/QBYlQUAYksjH1BL2wYzZvu/pSCLdEqba0OhWuiBrKh6jTNyGjNRCTCKgWBalLhxTIsSY3Yxwn8UhNVyrJb76mR4woVtNM95RMHAFdVeu+JK+I+CrL6WeMDqawcGeN8pcKEEmyT4DzKFa1bmB6rr5D/GubMB34oKBm064kBAsRl8wdihbHStC/5d99iXkl3zY3M5RZQEDABlDFjbVcjQaaCKbtEDanvPMe0D7t9cveBWhMEA9rH5BA=="
+[features."poagen CLI".scenarios."validate on a syntactically valid OpenAPI document exits 0"]
+as-is-hash = "sha256:37309f7d06b853bcad89199a94454bd13ae8c8115bdf4c336ae3a20bba9c2ae4"
+as-is = "KLUv/QBYlQUAYksjH1BL2wYzZvu/pSCLdEqba0OhWuiBrKh6jTNyGjNRCTCKgWBalLhxTIsSY3Yxwn8UhNVyrJb76mR4woVtNM95RMHAFdVtu+JK+I+CrL6WeMDqawcGeN8pcKEEmyT4DzKFa1bmB6rr5D/GubMB34oKBm064kBAsRl8wdihbHStC/5d99iXkl3zY3M5RZQEDABlDFjbVcjQaaCKbtEDanvPMe0D7t9cveBWhMEA9rH5BA=="
 stage = "unstable"
 
-[features."paogen CLI".scenarios."validate with no argument reports on stderr and exits 2"]
-as-is-hash = "sha256:8ca1cbc8dc3e363ae51cd715473a516831825a954aded91aedf7c0ca917c79da"
-as-is = "KLUv/QBYXQUAEswiHGBJ1AZDk8km2xo2uYmU2bFlhvy4wjsYwQ5ypOBJcRzlQVz4KM/e4QgDbCI5rqAfEas1xrZcHXXCU73FeLaYx0hpUqkCFNhEcqRlCDpCGvCs5wECAeNTGmO8MrCJKwe2io2NJ9uCTRTWvcON0LzW0aoxrbuS+fLilyYtc6LVXoK/hk4xg428ZfhTCAoAIRtERQZAhjP7SeVHohlYvpj3OGrzsAQcDtgM"
+[features."poagen CLI".scenarios."validate with no argument reports on stderr and exits 2"]
+as-is-hash = "sha256:60e7fa232d77eba295b7b58a557a07ece11aa764f5e09b86c9651b0e0e2b8a00"
+as-is = "KLUv/QBYXQUAEswiHGBJ1AZDk8km2xo2uYmU2bFlhvy4wjsYwQ5ypOBJcRzlQVz4KM/e4QgDbCI5rqAfEas1xrZcHXXCU73FeLaYx0hpUqkCFNhEcqRlCDpCGvCs5wECAeOTJWO8MrCJKwe2io2NJ9uCTRTWvcON0LzW0aoxrbuS+fLilyYtc6LVXoK/hk4xg428ZfhTCAoAIRtERQZAhjP7SeVHohlYvpj3OGrzsAQcDtgM"
 stage = "unstable"
 
-[features."paogen CLI".scenarios."version subcommand prints the paogen version and exits 0"]
-as-is-hash = "sha256:67ae7274b44b287284150e285c5a391b6ebcbe084c7087ec7f6743c73a9a90cd"
-as-is = "KLUv/QBYRQUAAkshHWBJ2waDJNpM9k9LW2W3xjpmY9qFygcZlkAAJ7gSSGHg7TleHG9PLnga8BvEWPIAlXK8lTX/EGsTv9de8xmg4DeIgZQdrZgspOypM+GHCJvQPOcHCAQUk8FvEHGwZl0vILI2/KY4dy74U1NEa8ox9bk1lfJTS5I9h8XXTVaYeGFTmeIxBAsAXuX5moGE4WYmn+cz8MTQiJDaYE5DBe14FXlGhSoD"
+[features."poagen CLI".scenarios."version subcommand prints the poagen version and exits 0"]
+as-is-hash = "sha256:4787d8314a7787d35aac1aef90852bca39cdde7408950879fb015095abf29f88"
+as-is = "KLUv/QBYRQUAAkshHWBJ2waDJNpM9k9LW2W3xjpmY9qFygcZlkAAJ7gSSGHg7TleHG9PLnga8BvEWPIAlXK8lTX/EGsTv9de8xmg4DeIgZQdrZgspOypM+GHCJvQPOcHCAQUk8FvEHGwZl0vILI2/KY4dy74U1NEtsox9bk1lfJTS5I9h8XXTVaYeGFTmeIxBAsAXuX5moGE4WYmn+cz8MTQiJDaYE5DBe14FXlGhSoD"
 stage = "unstable"

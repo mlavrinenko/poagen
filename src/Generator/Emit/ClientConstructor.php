@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -61,10 +60,10 @@ final readonly class ClientConstructor
      */
     private static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
     {
-        $namespace->addUse(TransportInterface::class);
+        $namespace->addUse(\Poagen\Runtime\Contract\TransportInterface::class);
 
         $ctor = $class->addMethod('__construct');
-        $ctor->addPromotedParameter('transport')->setType(TransportInterface::class)->setPrivate();
+        $ctor->addPromotedParameter('transport')->setType(\Poagen\Runtime\Contract\TransportInterface::class)->setPrivate();
 
         // Security-scheme args sit AFTER the transport so a schema that gains
         // a scheme does not reorder the existing signature. A scheme claims
@@ -82,7 +81,7 @@ final readonly class ClientConstructor
      * The argument list one client passes to another when the root hands out a
      * sub-client, in the same order {@see addTo} declares.
      *
-     * @param  list<SecurityScheme> $schemes
+     * @param list<SecurityScheme> $schemes
      * @return list<string>
      */
     public static function forwardedArgs(array $schemes): array

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Runtime\AdditionalPropertyBag;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
+use Poagen\Runtime\AdditionalPropertyBag;
+use Poagen\Runtime\Marshal\Hydrator;
+use Poagen\Runtime\Marshal\Marshaller;
 use ReflectionClass;
 
 use function substr_count;
@@ -27,7 +27,7 @@ use const DIRECTORY_SEPARATOR;
  * keyword to `true` and the parser substitutes that default, so an omitted
  * keyword reads back through `Schema::$additionalProperties` exactly as an
  * explicit one does. Reading it that way would put a bag on every object
- * paogen has ever emitted, for a permission nobody granted — so the three
+ * poagen has ever emitted, for a permission nobody granted — so the three
  * states are generated from one document here, and the assertions are as much
  * about the two classes that must NOT change as about the one that does.
  *
@@ -51,12 +51,12 @@ final class OpenShapesTest extends TestCase
     {
         // `generate`, not `plan`: one test below loads the emitted classes and
         // runs a real payload through them, which needs them on disk.
-        self::$output = self::makeSandboxDir('paogen-open-');
+        self::$output = self::makeSandboxDir('poagen-open-');
 
         $plan = self::generator()->generate(new Profile(
             schema: self::SCHEMA,
             output: self::$output,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\OpenShapes',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\OpenShapes',
         ));
 
         $needle = DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR;

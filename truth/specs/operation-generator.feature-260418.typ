@@ -2,7 +2,7 @@
 #import "../domain/schema.context.typ": schema-context, Schema, Operation
 #import "../domain/guidance.context.typ": guidance-context, Profile
 #import "../domain/generation.context.typ": generation-context, Generator, Client, Model, GeneratedFile, Envelope
-#import "../domain/cli.context.typ": cli-context, PaogenCli
+#import "../domain/cli.context.typ": cli-context, PoagenCli
 
 #feature(
   "Operation Generator",
@@ -180,10 +180,10 @@
       "An operation whose body shape is unsupported is reported as a skip rather than dropped silently",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: createWidget")) whose request body content type is `multipart/form-data`, which paogen does not emit]
+      #given[#the(Schema) declares #a(Operation) #p((id: "operationId: createWidget")) whose request body content type is `multipart/form-data`, which poagen does not emit]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the resulting `GenerationPlan` carries a `skippedOperations` entry naming #the(Operation)'s HTTP method, path, operationId and the reason for the skip]
-      #and_[#the(PaogenCli)'s `generate` command prints the same list to stderr so the user knows which ops did not make it into the client]
+      #and_[#the(PoagenCli)'s `generate` command prints the same list to stderr so the user knows which ops did not make it into the client]
     ]
   ]
 

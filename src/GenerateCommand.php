@@ -2,22 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen;
+namespace Poagen\Generator;
 
 use Composer\Autoload\ClassLoader;
-use Mlavrinenko\Paogen\Exception\InvalidProfileException;
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\PlanReporter;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\ProfileLoader;
+use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Generator\PlanReporter;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\ProfileLoader;
 
 use function count;
 
 /**
- * `paogen generate` command handler.
+ * `poagen generate` command handler.
  *
  * Split out of {@see Cli} so the dispatch helper in `Cli.php` stays tiny
  * (`plain-getopt-for-the-cli` — hand-rolled CLI). Flag parsing is a manual
@@ -51,31 +49,31 @@ final class GenerateCommand
                 continue;
             }
             if (str_starts_with($arg, '--')) {
-                fwrite($stderr, "paogen generate: unknown option '{$arg}'.\n");
+                fwrite($stderr, "poagen generate: unknown option '{$arg}'.\n");
                 return 2;
             }
             $positional[] = $arg;
         }
 
         if ($dryRun && $diff) {
-            fwrite($stderr, "paogen generate: --dry-run and --diff are mutually exclusive.\n");
+            fwrite($stderr, "poagen generate: --dry-run and --diff are mutually exclusive.\n");
             return 2;
         }
 
         if ($positional === []) {
-            fwrite($stderr, "paogen generate: missing profile path.\n");
+            fwrite($stderr, "poagen generate: missing profile path.\n");
             return 2;
         }
 
         if ($output !== null && $output === '') {
-            fwrite($stderr, "paogen generate: --output requires a non-empty value.\n");
+            fwrite($stderr, "poagen generate: --output requires a non-empty value.\n");
             return 2;
         }
 
         try {
             $profile = new ProfileLoader()->load($positional[0]);
-        } catch (InvalidProfileException $e) {
-            fwrite($stderr, "paogen generate: {$e->getMessage()}\n");
+        } catch (Exception\InvalidProfileException $e) {
+            fwrite($stderr, "poagen generate: {$e->getMessage()}\n");
             return 2;
         }
 
@@ -116,12 +114,12 @@ final class GenerateCommand
             // disclosing) it is exactly the "opens by announcing success"
             // shape default-deny-on-degradation forbids.
             if ($plan->skippedOperations === [] && $plan->skippedComponents === [] && $plan->skippedWebhooks === []) {
-                fwrite($stdout, "paogen: generated into {$profile->output}\n");
+                fwrite($stdout, "poagen: generated into {$profile->output}\n");
             }
 
             return 0;
-        } catch (UnrepresentableConstructsException $e) {
-            fwrite($stderr, "paogen generate: {$e->getMessage()}\n");
+        } catch (Exception\UnrepresentableConstructsException $e) {
+            fwrite($stderr, "poagen generate: {$e->getMessage()}\n");
             return 1;
         }
     }
@@ -135,7 +133,7 @@ final class GenerateCommand
 
         if ($skippedOps !== []) {
             $count = count($skippedOps);
-            fwrite($stderr, "paogen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
+            fwrite($stderr, "poagen: {$count} operation(s) skipped — not emitted onto ApiClient:\n");
 
             foreach ($skippedOps as $entry) {
                 fwrite($stderr, $entry->format() . "\n");
@@ -146,7 +144,7 @@ final class GenerateCommand
 
         if ($skippedComponents !== []) {
             $count = count($skippedComponents);
-            fwrite($stderr, "paogen: {$count} component(s) skipped — no Generated/Model file emitted:\n");
+            fwrite($stderr, "poagen: {$count} component(s) skipped — no Generated/Model file emitted:\n");
 
             foreach ($skippedComponents as $entry) {
                 fwrite($stderr, "  - {$entry->rawName} [{$entry->reason}]\n");
@@ -157,7 +155,7 @@ final class GenerateCommand
 
         if ($skippedWebhooks !== []) {
             $count = count($skippedWebhooks);
-            fwrite($stderr, "paogen: {$count} webhook(s) skipped — paogen does not generate webhook handlers:\n");
+            fwrite($stderr, "poagen: {$count} webhook(s) skipped — poagen does not generate webhook handlers:\n");
 
             foreach ($skippedWebhooks as $entry) {
                 fwrite($stderr, "  - {$entry->name} [{$entry->reason}]\n");
@@ -169,7 +167,7 @@ final class GenerateCommand
         // more pleasant, which `user-code-guides-generation` is explicit must
         // never be an error.
         foreach ($plan->notices as $notice) {
-            fwrite($stderr, "paogen: {$notice}\n");
+            fwrite($stderr, "poagen: {$notice}\n");
         }
     }
 

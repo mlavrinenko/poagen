@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
 use DateTimeImmutable;
-use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector;
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
-use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreHttpTransport;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
+use Poagen\Generator\Tests\Fixtures\ValueObject\Email;
+use Poagen\Generator\Tests\Support\PetstoreHttpTransport;
+use Poagen\Generator\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
+use Poagen\Runtime\Attribute\BranchSelector;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\ResponseType;
 
 /**
  * The six shapes a schema produces, decoded by the runtime rather than by

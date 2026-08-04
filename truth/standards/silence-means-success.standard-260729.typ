@@ -13,7 +13,7 @@
     "explicit-skip-omits-without-stub",
   ),
   rule: [
-    When #the(PaogenCli) exits successfully, every #an(Operation) and every
+    When #the(PoagenCli) exits successfully, every #an(Operation) and every
     payload shape in #the(Schema) is present in the emitted tree. There is no
     third outcome between success and failure — no partial client, no method
     that compiles and throws when called, no omission reported on the error

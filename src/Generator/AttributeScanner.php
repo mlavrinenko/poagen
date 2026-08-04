@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use Composer\Autoload\ClassLoader;
 use FilesystemIterator;
-use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionClass;
@@ -31,8 +30,8 @@ final readonly class AttributeScanner
         foreach ($this->classesIn($profile->discoverIn) as $fqcn) {
             $reflection = new ReflectionClass($fqcn);
 
-            foreach ($reflection->getAttributes(BindsFormat::class) as $attribute) {
-                /** @var BindsFormat $instance */
+            foreach ($reflection->getAttributes(Attribute\BindsFormat::class) as $attribute) {
+                /** @var Attribute\BindsFormat $instance */
                 $instance = $attribute->newInstance();
                 $formats[$instance->format] = $fqcn;
             }

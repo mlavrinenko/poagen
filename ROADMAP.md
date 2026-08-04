@@ -1,4 +1,4 @@
-# Roadmap — paogen v0.1
+# Roadmap — poagen v0.1
 
 > **This is a release checklist, not the work queue.** The queue is
 > MindTape: run `mt ls`. Where the two disagree, `mt` wins. This file
@@ -55,7 +55,7 @@ All P1-high, all independent, each closes a `mixed`-fallback branch in
 
 - [x] **T-016** — Silence `cebe/php-openapi` PHP 8.4 deprecation noise (composer-patch or upstream pin). *Decoupled from 3.1 by `openapi-31-strategy`.*
 - [x] **T-022** — Byte-stability integration test against Petstore (runs generator twice; asserts identical output and match against the golden tree).
-- [x] **T-019** — `paogen generate` grows `--output`, `--dry-run`, `--diff` flags.
+- [x] **T-019** — `poagen generate` grows `--output`, `--dry-run`, `--diff` flags.
 - [x] **T-020** — Dropped codecov entirely (no meaningful threshold on a codegen project whose logic is exercised through generated fixtures). `quality-gates-at-maximum-strictness` updated.
 
 ## Phase 5 — Real-world schema shakedown (emerged 2026-04-19)
@@ -171,7 +171,7 @@ v0.1's critical path.
 
 ## How to follow this roadmap
 
-When picking up work in paogen:
+When picking up work in poagen:
 
 1. **Read this file first.** It is the ordered queue. Do not start
    Phase 3 work while Phase 1 items are open unless you have an

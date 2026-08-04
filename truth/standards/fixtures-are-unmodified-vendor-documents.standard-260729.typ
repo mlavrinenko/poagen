@@ -7,12 +7,12 @@
   status: accepted(2026, 7, 29),
   contexts: (schema-context,),
   rule: [
-    #A(Schema) used to demonstrate that paogen works is committed byte-for-byte
+    #A(Schema) used to demonstrate that poagen works is committed byte-for-byte
     as its vendor published it. It is not reformatted, not trimmed to the parts
     that generate cleanly, not repaired where it is sloppy, and not bundled
     through a tool that normalises it first.
 
-    A hand-adjusted fixture proves only that paogen handles schemas paogen
+    A hand-adjusted fixture proves only that poagen handles schemas poagen
     already likes, which is the one claim nobody needs. Real documents carry
     inline payloads, absent operation identifiers, tags applied unevenly, and
     constructs their authors never validated — and handling those is the whole

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
-use Mlavrinenko\Paogen\Tests\Integration\Kilbil\KilbilXmlNestedContainerTest;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Integration\Kilbil\KilbilXmlNestedContainerTest;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Runtime\Marshal\XmlWriter;
 
 use function preg_replace;
 use function substr_count;
@@ -32,7 +32,7 @@ final class XmlNestedContainerTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../../examples/kilbil/schemas/loyalty_v1.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\KilbilXmlNested';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\KilbilXmlNested';
 
     /** @var array<string,string> */
     private const array ELEMENTS = [
@@ -150,7 +150,7 @@ final class XmlNestedContainerTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-xml-nested-'),
+            output: self::makeSandboxDir('poagen-xml-nested-'),
             namespace: self::NAMESPACE,
             xmlElements: $xmlElements,
         ));

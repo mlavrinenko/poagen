@@ -1,5 +1,5 @@
 {
-    "name": "mlavrinenko/paogen",
+    "name": "poagen/client-generator",
     "description": "OpenAPI-driven PHP client generator producing typed, extensible clients.",
     "license": "MIT",
     "type": "library",
@@ -21,7 +21,7 @@
     "require": {
         "php": "^8.4",
         "devizzent/cebe-php-openapi": "^1.1",
-        "mlavrinenko/paogen-runtime": "*@dev",
+        "poagen/client-runtime": "*@dev",
         "nette/php-generator": "^4.2",
         "psr/http-message": "^2.0",
         "sebastian/diff": "^6.0 || ^7.0"
@@ -48,25 +48,25 @@
     ],
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["bin/paogen"],
+    "bin": ["bin/poagen"],
     "autoload": {
         "psr-4": {
-            "Mlavrinenko\\Paogen\\": "src/"
+            "Poagen\\Generator\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Mlavrinenko\\Paogen\\Tests\\": "tests/",
-            "Mlavrinenko\\Paogen\\Tests\\Generated\\": "tests/generated/",
-            "Mlavrinenko\\Paogen\\Tests\\Integration\\": "tests/Integration/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject\\": "tests/fixtures/profiles/value-objects/",
+            "Poagen\\Generator\\Tests\\": "tests/",
+            "Poagen\\Generator\\Tests\\Generated\\": "tests/generated/",
+            "Poagen\\Generator\\Tests\\Integration\\": "tests/Integration/",
+            "Poagen\\Generator\\Tests\\Fixtures\\ValueObject\\": "tests/fixtures/profiles/value-objects/",
             "Acme\\Kilbil\\ValueObject\\": "examples/kilbil/src/ValueObject/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\": "tests/fixtures/generated/composition/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Parameters\\": "tests/fixtures/generated/parameters/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\UnionSelection\\": "tests/fixtures/generated/union-selection/",
-            "Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\UnionResponse\\": "tests/fixtures/generated/union-response/"
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Composition\\": "tests/fixtures/generated/composition/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Parameters\\": "tests/fixtures/generated/parameters/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\UnionSelection\\": "tests/fixtures/generated/union-selection/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\UnionResponse\\": "tests/fixtures/generated/union-response/"
         }
     },
     "config": {

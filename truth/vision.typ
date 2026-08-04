@@ -1,7 +1,7 @@
 #import "@local/speconaut:0.1.0": *
 
 #show: vision.with(
-  title: "paogen",
+  title: "poagen",
   goals: (
     link("goals/never-edit-generated.goal.typ"),
     link("goals/user-code-guides-generation.goal.typ"),
@@ -15,17 +15,17 @@
   ),
 )
 
-What it feels like to consume an HTTP API from a project that uses paogen.
+What it feels like to consume an HTTP API from a project that uses poagen.
 
 == The promise
 
-You point paogen at the schema your vendor publishes. You get a typed
+You point poagen at the schema your vendor publishes. You get a typed
 client you never edit, that passes your strictest checks, and that you
 extend from your own code rather than by patching theirs.
 
 == Setup
 
-Your vendor publishes a schema. You add paogen as a development
+Your vendor publishes a schema. You add poagen as a development
 dependency and write one small file of guidance describing where the
 schema lives, where the output goes, and what namespace it takes. You run
 one command. A generated tree appears, and it compiles.
@@ -41,7 +41,7 @@ fields. So you start guiding.
 
 You rename the shapes whose published names read badly. You declare that
 the field the vendor calls a string of digits is really your own
-identifier type, and paogen threads that type through every operation
+identifier type, and poagen threads that type through every operation
 that touches it. You tell it which field discriminates a union the vendor
 left ambiguous. Each of these is a few lines of your own declarative
 code, sitting beside the schema path, and each one changes the generated
@@ -70,7 +70,7 @@ The vendor republishes. You run the same command. You read the diff.
 
 The diff shows what changed upstream and nothing else: no reordering, no
 formatting churn, no files left behind for operations that no longer
-exist. If something upstream is now beyond what paogen can represent, the
+exist. If something upstream is now beyond what poagen can represent, the
 run stops and names it, rather than quietly emitting a smaller client and
 reporting success.
 
@@ -84,10 +84,10 @@ imply, and nothing else. Not a convention you remember. Not a protected
 region you must not disturb. Not a note in a README asking the next
 person to be careful.
 
-Every mechanism in paogen exists to make that trust cheap: total
+Every mechanism in poagen exists to make that trust cheap: total
 regeneration so nothing hand-written can survive in the output,
 determinism so the diff means something, refusal so silence always means
-success, and strict-clean output so your own checks — not paogen's
+success, and strict-clean output so your own checks — not poagen's
 promises — are what tell you the client is sound.
 
 == What is deliberately absent

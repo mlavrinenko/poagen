@@ -1,4 +1,4 @@
-// paogen — unified knowledge entry point.
+// poagen — unified knowledge entry point.
 //
 // Every artifact except tasks must be #include-d here, wherever it lives under
 // truth/. Files are classified by sub-extension (`.goal`, `.context`,
@@ -10,12 +10,12 @@
 
 #import "@local/speconaut:0.1.0": *
 
-#set document(title: "paogen — Source of Truth")
+#set document(title: "poagen — Source of Truth")
 #set text(size: 10pt)
 #set page(margin: 2cm, numbering: "1")
 
 #align(center)[
-  #text(size: 22pt, weight: "bold")[paogen]
+  #text(size: 22pt, weight: "bold")[poagen]
   #v(0.3em)
   #text(size: 11pt, fill: rgb("#6B7280"))[
     OpenAPI-driven PHP client generator.

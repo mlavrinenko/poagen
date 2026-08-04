@@ -2,44 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\Emit\ApiExceptionEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\ClientEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\DanglingReferenceScanner;
-use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\GeneratedFileHeader;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelGroups;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelMergeAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
-use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
-use Mlavrinenko\Paogen\Generator\Emit\OperationAnalyzer;
-use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\QuerySerializationAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\SchemalessBodyAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
-use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
-use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
-use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
-use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner;
-use Mlavrinenko\Paogen\Generator\Enum\ComponentEnumCollector;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormaliserFactory;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\Emit\DanglingReferenceScanner;
+use Poagen\Generator\Generator\Emit\OperationAnalyzer;
+use Poagen\Generator\Generator\Emit\UnionCatalog;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -52,9 +23,9 @@ final readonly class Generator
 
     public function __construct(
         private AttributeScanner $scanner,
-        ModelEmitter $modelEmitter = new ModelEmitter(),
-        private EnumEmitter $enumEmitter = new EnumEmitter(),
-        private ApiExceptionEmitter $apiExceptionEmitter = new ApiExceptionEmitter(),
+        Emit\ModelEmitter $modelEmitter = new Emit\ModelEmitter(),
+        private Emit\EnumEmitter $enumEmitter = new Emit\EnumEmitter(),
+        private Emit\ApiExceptionEmitter $apiExceptionEmitter = new Emit\ApiExceptionEmitter(),
         private PlanApplier $applier = new PlanApplier(),
         private SkipListValidator $skipListValidator = new SkipListValidator(),
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
@@ -99,10 +70,10 @@ final readonly class Generator
         // A `security` requirement naming a scheme the document never
         // declared is a gap only the consumer can fill, so their declaration
         // is merged in before anything reads the document. The audit then
-        // judges what is still undeclared, what paogen refuses to wire, and
+        // judges what is still undeclared, what poagen refuses to wire, and
         // what it can only report.
         $profileSecurityFailures = ProfileSecuritySchemes::apply($openApi, $profile->securitySchemes);
-        $security = SecurityAudit::of($openApi);
+        $security = Emit\SecurityAudit::of($openApi);
 
         // declare-an-undiscriminated-union-as-raw-data: resolve every
         // property-level `oneOf`/`anyOf` through the four layers — a tag in the
@@ -112,15 +83,15 @@ final readonly class Generator
         // (abort-on-unrepresentable-constructs). Mutates the document, so it
         // runs before anything reads a property's branch list, and rides to the
         // emitters on $bindings.
-        $unions = new DiscriminatorEnforcer($profile->discriminators, $profile)->enforce($openApi);
+        $unions = new Emit\DiscriminatorEnforcer($profile->discriminators, $profile)->enforce($openApi);
         $bindings = $bindings->withUnions($unions);
 
         // Same discipline, one walk further out: a `type` list naming several types PHP cannot
         // express as one (nullable-type-arrays), and a JSON Schema 2020-12 keyword no emitter
         // implements (swap-openapi-parser-for-31-support). One walk, two probes, one reason each.
-        $schemaSkips = SchemaScan::run($openApi, [
-            TypeListScanner::probe(...),
-            UnsupportedKeywordScanner::probe(...),
+        $schemaSkips = Emit\SchemaScan::run($openApi, [
+            Emit\TypeListScanner::probe(...),
+            Emit\UnsupportedKeywordScanner::probe(...),
         ]);
 
         $rootNamespace = rtrim($profile->namespace, '\\') . '\\Generated';
@@ -130,25 +101,25 @@ final readonly class Generator
         $modelDir = $rootDir . DIRECTORY_SEPARATOR . 'Model';
         $enumDir = $rootDir . DIRECTORY_SEPARATOR . 'Enum';
 
-        $normaliser = NormaliserFactory::fromProfile($profile);
-        $enums = new EnumCatalog($enumNamespace);
-        $enumRegistry = new NameRegistry($normaliser);
-        new ComponentEnumCollector()->collect($openApi, $enums, $enumRegistry);
+        $normaliser = Naming\NormaliserFactory::fromProfile($profile);
+        $enums = new Enum\EnumCatalog($enumNamespace);
+        $enumRegistry = new Naming\NameRegistry($normaliser);
+        new Enum\ComponentEnumCollector()->collect($openApi, $enums, $enumRegistry);
 
         // Lazy-populated: every ref-resolution site routes through here
         // so each raw name is normalised exactly once and collisions are
         // caught the moment a second raw key tries to claim the same PHP
         // class.
-        $registry = new NameRegistry($normaliser);
+        $registry = new Naming\NameRegistry($normaliser);
         // Sibling registry scoped to the ApiClient — operationIds form
         // their own collision space (PHP method names on one class)
         // separate from schema-component class names.
-        $operationIdRegistry = new NameRegistry($normaliser);
+        $operationIdRegistry = new Naming\NameRegistry($normaliser);
 
         /** @var array<string,string> $writes */
         $writes = [];
 
-        $components = ComponentCatalog::build($openApi, $registry, $enums);
+        $components = Emit\ComponentCatalog::build($openApi, $registry, $enums);
         // Both refusal sources a skip entry must cover — see OperationAnalyzer::preScanSkips().
         $preScannedSkips = OperationAnalyzer::preScanSkips($openApi, $schemaSkips['operations']);
 
@@ -160,8 +131,8 @@ final readonly class Generator
 
         // Payload classes are named before anything is emitted: the model planner emits them, and
         // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
-        $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, InlineModelGroups::pins($profile->inlineModels), $ledger, $bindings, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
+        $ledger = new Emit\ModelNameLedger();
+        $inlinePayloads = Emit\InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, Emit\InlineModelGroups::pins($profile->inlineModels), $ledger, $bindings, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
 
         // See UnionCatalog::merge() for why the response-position half waits for this walk.
         $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());
@@ -180,20 +151,20 @@ final readonly class Generator
             $ledger,
             $profile->propertyRenames,
         );
-        $tagRegistry = new NameRegistry($normaliser);
+        $tagRegistry = new Naming\NameRegistry($normaliser);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
         $this->apiExceptionEmitter->emitInto($rootNamespace, $rootDir, $writes);
         $this->enumEmitter->emitAllInto($enums, $enumDir, $writes);
 
         $prunes = $this->prunePlanner->plan($rootDir, $writes);
         $notices = [
-            ...OperationIdAdvisor::notices($openApi, $profile->methodRenames),
-            ...FormatAdvisor::notices($openApi, $bindings),
+            ...Emit\OperationIdAdvisor::notices($openApi, $profile->methodRenames),
+            ...Emit\FormatAdvisor::notices($openApi, $bindings),
             // Where a `mixed` survives, the vendor declared nothing there and
             // the run says so — `declared-shapes-become-types` tolerates that
             // one `mixed` only while it is visible.
-            ...UnconstrainedFieldAdvisor::notices($openApi),
-            ...SchemalessBodyAdvisor::notices($openApi),
+            ...Emit\UnconstrainedFieldAdvisor::notices($openApi),
+            ...Emit\SchemalessBodyAdvisor::notices($openApi),
             // One line per union naming what it will discriminate on, so the
             // rule is visible before anything runs rather than discovered in
             // production — and so a pin's narrowing is reprinted on every run,
@@ -204,16 +175,16 @@ final readonly class Generator
             // correct whether the document spelled out `style`/`explode` or
             // left the OpenAPI default to apply — but silently is not the
             // same as visibly, `support-the-parameter-shapes-real-documents-use`.
-            ...QuerySerializationAdvisor::notices($openApi),
-            ...InlineModelMergeAdvisor::notices($openApi, $operationIdRegistry, $preScannedSkips),
+            ...Emit\QuerySerializationAdvisor::notices($openApi),
+            ...Emit\InlineModelMergeAdvisor::notices($openApi, $operationIdRegistry, $preScannedSkips),
         ];
         $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components'], ...$dangling['components']];
 
         $failures = [
             ...$profileSecurityFailures,
             ...$security->failures,
-            ...UnsupportedKeywordScanner::webhookFailures($openApi, $profile->skip),
-            ...ServerCatalog::variableProblems($openApi),
+            ...Emit\UnsupportedKeywordScanner::webhookFailures($openApi, $profile->skip),
+            ...Emit\ServerCatalog::variableProblems($openApi),
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
@@ -225,43 +196,43 @@ final readonly class Generator
         }
 
         // Stamped once over the finished write set rather than inside each of
-        // the emitters: every file paogen emits carries the header, and a
+        // the emitters: every file poagen emits carries the header, and a
         // per-emitter copy would be a rule the next emitter could forget.
         // Stamping inside the plan rather than in {@see PlanApplier} is what
         // makes `--diff` and `--dry-run` show the same bytes a real run writes.
-        $header = new GeneratedFileHeader($profile->source);
+        $header = new Emit\GeneratedFileHeader($profile->source);
         $writes = array_map($header->stamp(...), $writes);
 
-        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, UnsupportedKeywordScanner::skippedWebhooks($openApi, $profile->skip), $notices);
+        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, Emit\UnsupportedKeywordScanner::skippedWebhooks($openApi, $profile->skip), $notices);
     }
 
     /**
      * @param  array<string,string>                                $preScannedSkips raw operationId → reason
      * @param  array<string,string>                                $writes
-     * @return list<SkippedOperation>
+     * @return list<Emit\SkippedOperation>
      */
     private function emitClient(
         OpenApi $openApi,
         string $rootNamespace,
         string $rootDir,
         string $modelNamespace,
-        NameRegistry $registry,
-        NameRegistry $operationIdRegistry,
-        NameNormaliser $normaliser,
+        Naming\NameRegistry $registry,
+        Naming\NameRegistry $operationIdRegistry,
+        Naming\NameNormaliser $normaliser,
         Bindings $bindings,
-        EnumCatalog $enums,
-        ComponentCatalog $components,
-        InlinePayloadCatalog $inlinePayloads,
+        Enum\EnumCatalog $enums,
+        Emit\ComponentCatalog $components,
+        Emit\InlinePayloadCatalog $inlinePayloads,
         array $preScannedSkips,
         Profile $profile,
-        NameRegistry $tagRegistry,
+        Naming\NameRegistry $tagRegistry,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
             return [];
         }
 
-        $emitter = new ClientEmitter(new OperationEmitter(
+        $emitter = new Emit\ClientEmitter(new Emit\OperationEmitter(
             $modelNamespace,
             $enums,
             $registry,

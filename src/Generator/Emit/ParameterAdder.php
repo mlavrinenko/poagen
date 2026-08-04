@@ -2,14 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Enum\EnumSpec;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -28,14 +24,14 @@ final readonly class ParameterAdder
 {
     public function __construct(
         private string $modelNamespace,
-        private ?EnumCatalog $enums,
-        private NameRegistry $registry,
+        private ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
+        private \Poagen\Generator\Generator\Naming\NameRegistry $registry,
     ) {}
 
     /**
      * @param list<ResolvedParameter> $params
      */
-    public function addPath(Method $method, PhpNamespace $namespace, array $params, Bindings $bindings, string $operationId): void
+    public function addPath(Method $method, PhpNamespace $namespace, array $params, \Poagen\Generator\Generator\Bindings $bindings, string $operationId): void
     {
         foreach ($params as $resolvedParam) {
             $resolved = $this->resolveParamType($resolvedParam->param, $bindings, $operationId);
@@ -55,7 +51,7 @@ final readonly class ParameterAdder
         Method $method,
         PhpNamespace $namespace,
         array $params,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         bool $required,
         string $operationId,
     ): void {
@@ -90,7 +86,7 @@ final readonly class ParameterAdder
         Method $method,
         PhpNamespace $namespace,
         array $params,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         string $operationId,
         bool $required = false,
     ): void {
@@ -113,7 +109,7 @@ final readonly class ParameterAdder
      * Resolve the PHP type for one parameter. Inline enum schemas
      * synthesise a backed enum named after the operation + parameter.
      */
-    private function resolveParamType(Parameter $param, Bindings $bindings, string $operationId): TypeResolver
+    private function resolveParamType(Parameter $param, \Poagen\Generator\Generator\Bindings $bindings, string $operationId): TypeResolver
     {
         $schema = $param->schema instanceof Schema ? $param->schema : null;
         $synthFqcn = $this->synthesizeParamEnum($schema, $operationId, $param->name);
@@ -127,14 +123,14 @@ final readonly class ParameterAdder
 
     private function synthesizeParamEnum(?Schema $schema, string $operationId, string $paramName): ?string
     {
-        if (!$schema instanceof Schema || !$this->enums instanceof EnumCatalog) {
+        if (!$schema instanceof Schema || !$this->enums instanceof \Poagen\Generator\Generator\Enum\EnumCatalog) {
             return null;
         }
 
-        $synthName = EnumCatalog::pascalize($operationId) . EnumCatalog::pascalize($paramName);
-        $spec = EnumCatalog::specFromSchema($synthName, $schema);
+        $synthName = \Poagen\Generator\Generator\Enum\EnumCatalog::pascalize($operationId) . \Poagen\Generator\Generator\Enum\EnumCatalog::pascalize($paramName);
+        $spec = \Poagen\Generator\Generator\Enum\EnumCatalog::specFromSchema($synthName, $schema);
 
-        if (!$spec instanceof EnumSpec) {
+        if (!$spec instanceof \Poagen\Generator\Generator\Enum\EnumSpec) {
             return null;
         }
 

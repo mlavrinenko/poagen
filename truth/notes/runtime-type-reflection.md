@@ -6,7 +6,7 @@
 
 ## Purpose
 
-`attribute-and-phpdoc-driven-serialization` decides that paogen's runtime
+`attribute-and-phpdoc-driven-serialization` decides that poagen's runtime
 will parse PHPStan-style phpdoc annotations to drive hydration and
 marshalling, instead of the per-class `PROPERTY_MAP` constant introduced by
 `hydration-and-serialization-contract`. This note
@@ -20,10 +20,10 @@ investigation:
 
 The headline result: *we use `phpstan/phpdoc-parser` directly.*
 Typhoon is elegant but currently mid-rewrite upstream and imposes a
-large dependency footprint on every paogen consumer. Hand-rolling a
+large dependency footprint on every poagen consumer. Hand-rolling a
 parser reinvents a wheel the community already maintains well.
 
-## What paogen actually needs at runtime
+## What poagen actually needs at runtime
 
 Enumerated across every phpdoc type the generator emits today in the
 petstore and GitHub golden trees, the full surface is:
@@ -84,7 +84,7 @@ type to whatever descriptor the caller wants.
   `typhoon/typed-map`, `typhoon/change-detector`,
   `phpstan/phpdoc-parser`, `psr/simple-cache`, and the reflection
   package itself.
-- Every paogen consumer would inherit that footprint in `vendor/`.
+- Every poagen consumer would inherit that footprint in `vendor/`.
 
 If typhoon's upstream settles and ships a reflection companion on the
 0.8.x (or later) line with an active release cadence, re-evaluate.
@@ -97,11 +97,11 @@ is actively maintained, ubiquitous in the PHPStan ecosystem, and
 MIT-licensed. Most PHP projects of any size already ship it
 transitively.
 
-Adding it to paogen's runtime is a **+1 package** increment. It ships
+Adding it to poagen's runtime is a **+1 package** increment. It ships
 an AST (`PhpDocNode`, `PhpDocTagNode`, `TypeNode` and subtypes like
 `IdentifierTypeNode`, `GenericTypeNode`, `UnionTypeNode`,
 `NullableTypeNode`). A small visitor (~50 LOC) pattern-matches these
-into paogen's internal descriptor shape.
+into poagen's internal descriptor shape.
 
 **Recommended integration sketch (for the Hydrator / Marshaller):**
 
@@ -208,6 +208,6 @@ map:   {"kind":"map","key":"string","value":{"kind":"object","class":"stdClass"}
 when:  {"kind":"object","class":"DateTimeImmutable","nullable":true}
 ```
 
-This is the shape the paogen Hydrator / Marshaller wants. With
+This is the shape the poagen Hydrator / Marshaller wants. With
 `phpstan/phpdoc-parser` we synthesise the same descriptor directly
 without going through typhoon's intermediate representation.

@@ -2,7 +2,7 @@
 
 #let generation-context = bounded-context("generation", layer: "technical")
 
-// What paogen does and what it leaves on disk. Every term names something the
+// What poagen does and what it leaves on disk. Every term names something the
 // generator owns end to end, which is why `never-edit-generated` can hold:
 // nothing here has a hand-written counterpart.
 //

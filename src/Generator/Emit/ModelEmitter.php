@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\ModelPlanner;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\PropertyRenameValidator;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\ModelPlanner;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\PropertyRenameValidator;
 
 use function array_slice;
 use function assert;
@@ -224,7 +224,7 @@ final readonly class ModelEmitter
     }
 
     /**
-     * The property name paogen would emit for a raw wire name with no
+     * The property name poagen would emit for a raw wire name with no
      * `Profile::$propertyRenames` entry — a valid PHP identifier verbatim,
      * or a `camelCase` derivation for one that is not. Public and static so
      * {@see PropertyRenameValidator} can

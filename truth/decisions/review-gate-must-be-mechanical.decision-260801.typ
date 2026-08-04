@@ -4,12 +4,12 @@
   title: "The check that closes a task is a machine's, not a human's",
   status: accepted(2026, 8, 1),
   goals: (link("../goals/fail-loud-never-silent.goal.typ"),),
-  process-only: "governs how paogen's own work is tracked and closed, not what the generator produces",
+  process-only: "governs how poagen's own work is tracked and closed, not what the generator produces",
 )
 
 == Context
 
-paogen's MindTape config shipped with a human review gate: `done` was
+poagen's MindTape config shipped with a human review gate: `done` was
 reachable only from `needs-review`, so no run of work could close itself.
 The reasoning was sound and is documented in the config — agents report
 success they have not achieved and rarely catch it themselves.

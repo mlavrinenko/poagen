@@ -2,16 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentName;
-use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\ResponseUnionGuidanceIndex;
-use Mlavrinenko\Paogen\Generator\Emit\UnionCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\UnionResolution;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Emit\ComponentName;
+use Poagen\Generator\Generator\Emit\ResponseUnionGuidanceIndex;
 
 use function implode;
 use function in_array;
@@ -35,7 +31,7 @@ use function sprintf;
  * pin suppresses — it discards declared branches, and it is the only guidance
  * key whose absence changes the exit status — so it inherits `$skip`'s rule
  * that guidance outliving its cause is itself a failure. A tag refines: it
- * names a fact about the document that stays true whether or not paogen could
+ * names a fact about the document that stays true whether or not poagen could
  * also have computed a branch selector, so there is nothing to expire. The
  * same line already separates `$skip` from `$methodRenames`, which is never
  * checked for having become derivable.
@@ -48,7 +44,7 @@ final readonly class UnionGuidanceValidator
     /**
      * @return list<string> failure lines; empty means the run may proceed
      */
-    public function validate(OpenApi $openApi, Profile $profile, UnionCatalog $unions, NameRegistry $operationIdRegistry): array
+    public function validate(OpenApi $openApi, Profile $profile, Emit\UnionCatalog $unions, Naming\NameRegistry $operationIdRegistry): array
     {
         $index = $this->index($openApi, $operationIdRegistry);
 
@@ -94,7 +90,7 @@ final readonly class UnionGuidanceValidator
      *
      * @return list<string>
      */
-    private function validatePins(Profile $profile, array $index, UnionCatalog $unions): array
+    private function validatePins(Profile $profile, array $index, Emit\UnionCatalog $unions): array
     {
         $failures = [];
 
@@ -133,7 +129,7 @@ final readonly class UnionGuidanceValidator
 
             $kind = $unions->kindFor((string) $key);
 
-            if ($kind !== null && $kind !== UnionResolution::KIND_PIN) {
+            if ($kind !== null && $kind !== Emit\UnionResolution::KIND_PIN) {
                 $failures[] = sprintf(
                     "Profile::\$unionPins['%s'] is stale — that union now selects a branch on its own (%s), so the "
                         . 'pin discards branches for no reason; delete this entry.',
@@ -156,7 +152,7 @@ final readonly class UnionGuidanceValidator
      *
      * @return array<string,array{0:?Schema,1:Schema,2:list<string>}>
      */
-    private function index(OpenApi $openApi, NameRegistry $operationIdRegistry): array
+    private function index(OpenApi $openApi, Naming\NameRegistry $operationIdRegistry): array
     {
         return [...$this->indexProperties($openApi), ...ResponseUnionGuidanceIndex::build($openApi, $operationIdRegistry)];
     }
@@ -168,10 +164,10 @@ final readonly class UnionGuidanceValidator
     {
         $out = [];
 
-        foreach (DiscriminatorEnforcer::unionProperties($openApi) as [$component, $property, $parent, $schema]) {
+        foreach (Emit\DiscriminatorEnforcer::unionProperties($openApi) as [$component, $property, $parent, $schema]) {
             $branches = [];
 
-            foreach (DiscriminatorEnforcer::branchRefs($schema) ?? [] as $ref) {
+            foreach (Emit\DiscriminatorEnforcer::branchRefs($schema) ?? [] as $ref) {
                 $branches[] = ComponentName::rawFromRef($ref->getReference());
             }
 

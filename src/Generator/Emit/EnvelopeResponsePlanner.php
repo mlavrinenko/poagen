@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Naming\InlinePayloadName;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 use function is_array;
 use function sprintf;
@@ -40,7 +40,7 @@ final readonly class EnvelopeResponsePlanner
      *
      * @param array<string,string>                             $pins
      * @param array<string,array{branch:string,reason:string}> $unionPins
-     * @param list<SynthesisedModel>                            $roots
+     * @param list<SynthesisedModel> $roots
      */
     public static function plan(
         Operation $operation,
@@ -60,7 +60,7 @@ final readonly class EnvelopeResponsePlanner
 
         if ($responses === []) {
             $refusal = sprintf(
-                '`%s` declares no responses at all — paogen cannot build an envelope with no status to attach a '
+                '`%s` declares no responses at all — poagen cannot build an envelope with no status to attach a '
                     . 'body to; add at least one response, or accept this operation by name in Profile::$skip',
                 $rawId,
             );
@@ -121,7 +121,7 @@ final readonly class EnvelopeResponsePlanner
      *
      * @param array<string,string>                             $pins       forwarded from {@see plan()} unchanged
      * @param array<string,array{branch:string,reason:string}> $unionPins  forwarded from {@see plan()} unchanged
-     * @param list<SynthesisedModel>                            $roots     forwarded from {@see plan()} unchanged
+     * @param list<SynthesisedModel> $roots forwarded from {@see plan()} unchanged
      */
     private static function planOneStatus(
         Response $response,

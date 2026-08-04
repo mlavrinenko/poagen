@@ -6,16 +6,16 @@
   status: accepted(2026, 4, 17),
   contexts: (cli-context,),
   goals: (link("../goals/cheap-regeneration.goal.typ"),),
-  process-only: "governs paogen's own tooling choice, not what the generator produces",
+  process-only: "governs poagen's own tooling choice, not what the generator produces",
 )
 
 == Context
 
-#The(PaogenCli) exposes a small surface:
+#The(PoagenCli) exposes a small surface:
 
-- `paogen generate <profile> [--output=<dir>]`
-- `paogen validate <schema>`
-- `paogen --help`, `paogen --version`
+- `poagen generate <profile> [--output=<dir>]`
+- `poagen validate <schema>`
+- `poagen --help`, `poagen --version`
 
 Realistic options for the CLI layer:
 
@@ -41,9 +41,9 @@ Realistic options for the CLI layer:
 
 == Choice
 
-Use plain PHP with `getopt()`. #The(PaogenCli) surface is tiny (≤5
+Use plain PHP with `getopt()`. #The(PoagenCli) surface is tiny (≤5
 commands) and will not grow beyond that — the generator does the work;
-#the(PaogenCli) is a thin entry point. Dependencies are a liability here:
+#the(PoagenCli) is a thin entry point. Dependencies are a liability here:
 any bug or CVE in the CLI lib forces a point release in a tool that is
 meant to be boring and reliable.
 
@@ -53,7 +53,7 @@ migrate to `minicli/minicli` first (near-zero cost) before considering
 
 == Consequences
 
-- #the(PaogenCli)'s entry point `bin/paogen` is hand-rolled; `src/Cli.php`
+- #the(PoagenCli)'s entry point `bin/poagen` is hand-rolled; `src/Cli.php`
   contains the dispatch.
 - Help text is a single `const` string. Keep it short.
 - No autocompletion scripts out-of-the-box. Fine for a generator.

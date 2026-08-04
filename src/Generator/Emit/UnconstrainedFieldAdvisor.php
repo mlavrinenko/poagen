@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
@@ -69,7 +69,7 @@ final readonly class UnconstrainedFieldAdvisor
         foreach ($positions as $position) {
             [$missing, $emitted] = self::REASONS[$found[$position]];
             $notices[] = sprintf(
-                'unconstrained value at %s — the document %s, so paogen emits `%s`. Declaring a shape there gives '
+                'unconstrained value at %s — the document %s, so poagen emits `%s`. Declaring a shape there gives '
                     . 'the consumer a type; leaving it unconstrained is a choice this line makes visible.',
                 $position,
                 $missing,

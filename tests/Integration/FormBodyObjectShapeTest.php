@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\Emit\ObjectShape;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\Emit\ObjectShape;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function str_ends_with;
 
@@ -30,7 +30,7 @@ final class FormBodyObjectShapeTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/form-object-shape-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\FormObjectShape';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\FormObjectShape';
 
     public static function tearDownAfterClass(): void
     {
@@ -99,7 +99,7 @@ final class FormBodyObjectShapeTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-form-object-shape-'),
+            output: self::makeSandboxDir('poagen-form-object-shape-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * `guidance-cannot-mislead` applied to a response-position key: bullet 4 of
@@ -29,7 +29,7 @@ final class ResponseUnionGuidanceTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/union-response-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseUnionGuidance';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ResponseUnionGuidance';
 
     private const array WORKING_PIN = [
         'getUndecidableCreature.response' => ['branch' => 'Celsius', 'reason' => 'this client reads metric sensors'],
@@ -125,7 +125,7 @@ final class ResponseUnionGuidanceTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-response-union-guidance-'),
+            output: self::makeSandboxDir('poagen-response-union-guidance-'),
             namespace: self::NAMESPACE,
             unionTags: $tags,
             unionPins: $pins,

@@ -38,7 +38,7 @@ declare(strict_types=1);
  * (never a bare `require`: this file declares a global symbol, and a second
  * `require` of it within the same process is a fatal redeclaration).
  */
-function paogen_fixture_scratch_output(string $name): string
+function poagen_fixture_scratch_output(string $name): string
 {
-    return sys_get_temp_dir() . '/paogen-fixtures-generated/' . $name;
+    return sys_get_temp_dir() . '/poagen-fixtures-generated/' . $name;
 }

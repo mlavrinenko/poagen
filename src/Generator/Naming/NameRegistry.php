@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
-
-use Mlavrinenko\Paogen\Exception\NameNormalisationException;
+namespace Poagen\Generator\Generator\Naming;
 
 /**
  * Single source of truth for "raw OpenAPI symbol → PHP identifier"
@@ -38,11 +36,11 @@ final class NameRegistry
         if ($php === null) {
             // Composite throws on this path; a non-composite returning
             // null is a programming error, but we surface it cleanly.
-            throw NameNormalisationException::unhandled($raw, $context, 1);
+            throw \Poagen\Generator\Exception\NameNormalisationException::unhandled($raw, $context, 1);
         }
 
         if (isset($this->phpToRaw[$php]) && $this->phpToRaw[$php] !== $raw) {
-            throw NameNormalisationException::collision($php, $this->phpToRaw[$php], $raw);
+            throw \Poagen\Generator\Exception\NameNormalisationException::collision($php, $this->phpToRaw[$php], $raw);
         }
 
         $this->rawToPhp[$raw] = $php;

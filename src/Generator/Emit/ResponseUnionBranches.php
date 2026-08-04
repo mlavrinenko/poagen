@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use function array_map;
 use function is_string;
@@ -39,7 +39,7 @@ final readonly class ResponseUnionBranches
 {
     /**
      * @param  list<Schema|Reference>                     $branches
-     * @param  list<SynthesisedModel>                      $roots
+     * @param list<SynthesisedModel> $roots
      * @return array{0:array<int,string>,1:array<string,string>}|null identities parallel to `$branches`,
      *              and identity => PHP model name; null when a branch cannot be named, with `$refusal` set
      */
@@ -70,7 +70,7 @@ final readonly class ResponseUnionBranches
 
             if (!ObjectShape::is($branch)) {
                 $refusal = sprintf(
-                    '%s response of `%s` branch %d at %s is %s — paogen can only union branches it can express as '
+                    '%s response of `%s` branch %d at %s is %s — poagen can only union branches it can express as '
                         . 'a PHP class (a $ref to a component, or an inline object); reduce this branch to one of '
                         . 'those, or skip the operation',
                     $status,
@@ -94,7 +94,7 @@ final readonly class ResponseUnionBranches
     /**
      * @param  list<Schema|Reference> $branches
      * @param  array<int,string>      $identities parallel to `$branches`
-     * @return array<string,EffectiveShape|null>
+     * @return array<string, EffectiveShape|null>
      */
     public static function shapesOf(array $branches, array $identities, OpenApi $openApi): array
     {
@@ -156,7 +156,7 @@ final readonly class ResponseUnionBranches
         return self::identities($branches, $base);
     }
 
-    /** A branch paogen cannot express as a PHP class: a bare `array`, or a scalar. */
+    /** A branch poagen cannot express as a PHP class: a bare `array`, or a scalar. */
     private static function describeUnnameable(Schema $branch): string
     {
         if (SchemaType::of($branch)->is('array')) {
