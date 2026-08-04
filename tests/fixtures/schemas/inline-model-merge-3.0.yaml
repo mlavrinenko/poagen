@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Inline Model Merge Fixture
+  version: "1.0.0"
+  description: >
+    name-inline-schemas-by-operation-and-status fixture. getA, getB and getC
+    each declare a 200 response with the identical inline shape — the group a
+    Profile::$inlineModels merge entry can legitimately collapse into one
+    class. getD's 200 response looks similar but its `code` property is a
+    different type, so merging it with the others must fail naming the two
+    sites and the property. postE and postF declare identical inline request
+    bodies, so the same merge works on the request side too.
+paths:
+  /a:
+    get:
+      operationId: getA
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message]
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+  /b:
+    get:
+      operationId: getB
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message]
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+  /c:
+    get:
+      operationId: getC
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message]
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+  /d:
+    get:
+      operationId: getD
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message]
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+  /e:
+    post:
+      operationId: postE
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '204':
+          description: ok
+  /f:
+    post:
+      operationId: postF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '204':
+          description: ok

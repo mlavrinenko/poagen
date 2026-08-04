@@ -154,9 +154,7 @@ final readonly class InlinePayloadPlanner
         }
 
         [$status, $schema] = $picked;
-        // Still the fixed `.response` role, not the status — the per-status
-        // pin key lands with Profile::$inlineModels' site→class direction.
-        $pin = $pins[$rawId . '.' . self::ROLE_RESPONSE] ?? null;
+        $pin = $pins[$rawId . '.' . $status] ?? null;
 
         if (is_array($schema->allOf) && $schema->allOf !== []) {
             $refusal = null;
@@ -185,7 +183,7 @@ final readonly class InlinePayloadPlanner
         }
 
         if (self::isSynthesisableObject($schema)) {
-            $name = self::claim($pin ?? InlinePayloadName::response($base, $status), $schema, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::response($base, $status), $schema, $ledger, $roots);
 
             return ReturnSpec::model($name);
         }
@@ -193,7 +191,7 @@ final readonly class InlinePayloadPlanner
         $items = self::inlineObjectItemsOf($schema);
 
         if ($items instanceof Schema) {
-            $name = self::claim($pin ?? InlinePayloadName::response($base, $status, item: true), $items, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::response($base, $status, item: true), $items, $ledger, $roots);
 
             return ReturnSpec::listOf($name);
         }

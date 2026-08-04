@@ -434,19 +434,19 @@
       "The profile pins the class name for a synthesised payload",
       stage: "unstable",
     )[
-      #given[#the(Profile) whose `inlineModels` map carries #p((pin: "'placeOrder.response' => 'PlacedOrder'"))]
+      #given[#the(Profile) whose `inlineModels` map carries #p((pin: "'PlacedOrder' => 'placeOrder.200'"))]
       #when[#the(Generator) runs against #the(Profile)]
       #then[#a(GeneratedFile) `Generated/Model/PlacedOrder.php` is written and no `PlaceOrder200Content.php` is]
       #and_[the pin renames the root alone, so #a(Model) nested under it is emitted as `PlacedOrderShipping`]
     ]
 
     #scenario(
-      "A pin naming an operation absent from the document fails the run",
+      "A pin naming a site absent from the document fails the run",
       stage: "unstable",
     )[
-      #given[#the(Profile) whose `inlineModels` map carries a key `'noSuchOperation.response'`]
+      #given[#the(Profile) whose `inlineModels` map carries a value `'noSuchOperation.request'`]
       #when[#the(Generator) runs against #the(Profile)]
-      #then[the run fails naming the key and saying the operation id is absent from #the(Schema)]
+      #then[the run fails naming the site and saying it is absent from #the(Schema)]
       #and_[no #a(GeneratedFile) is written, so guidance that has outlived #the(Operation) it named cannot pass unnoticed]
     ]
 

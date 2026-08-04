@@ -32,9 +32,10 @@ final class ModelNameCollisionException extends RuntimeException
             "Model name collision: `%s` is claimed by two different schema nodes:\n"
                 . "  - %s\n"
                 . "  - %s\n"
-                . 'Pin one of them to a different class name from the profile — `Profile::$inlineModels` keys a '
-                . "synthesised payload on '<operationId>.request' or '<operationId>.response', and "
-                . '`Profile::$renames` keys a named component on its schema name.',
+                . 'Pin one of them to a different class name from the profile — `Profile::$inlineModels` names a '
+                . "synthesised payload's class and the sites ('<operationId>.request' or "
+                . "'<operationId>.<status>') that feed it, and `Profile::\$renames` keys a named component on its "
+                . 'schema name.',
             $phpName,
             $firstOrigin,
             $secondOrigin,

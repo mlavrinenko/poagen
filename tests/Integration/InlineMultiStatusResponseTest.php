@@ -7,10 +7,8 @@ namespace Mlavrinenko\Paogen\Tests\Integration;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
-
-use const DIRECTORY_SEPARATOR;
-use const SORT_STRING;
 
 /**
  * name-inline-schemas-by-operation-and-status: every response status earns a
@@ -23,6 +21,7 @@ use const SORT_STRING;
 final class InlineMultiStatusResponseTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use InlinePayloadPlanAssertions;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payload-multi-status-3.0.yaml';
     private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlineMultiStatus';
@@ -34,14 +33,14 @@ final class InlineMultiStatusResponseTest extends TestCase
 
     public function testThePickedStatusStillDrivesTheReturnType(): void
     {
-        $client = $this->clientSource($this->plan());
+        $client = self::plannedSource($this->plan()->writes, 'ApiClient');
 
         self::assertStringContainsString('public function getWidget(string $id): GetWidget200Content', $client);
     }
 
     public function testEveryOtherStatusStillEarnsItsOwnClass(): void
     {
-        $models = $this->modelNames($this->plan());
+        $models = self::emittedNames($this->plan(), 'Model');
 
         self::assertContains('GetWidget200Content', $models);
         self::assertContains('GetWidget403Content', $models);
@@ -54,14 +53,14 @@ final class InlineMultiStatusResponseTest extends TestCase
         // method signature or into ApiException — this task only names the
         // class. Not asserting the model is unreferenced would silently stop
         // covering the split the moment someone wires it in early.
-        $client = $this->clientSource($this->plan());
+        $client = self::plannedSource($this->plan()->writes, 'ApiClient');
 
         self::assertStringNotContainsString('GetWidget403Content', $client);
         self::assertStringNotContainsString('GetWidgetdefaultContent', $client);
     }
 
     /**
-     * @param array<string,string> $inlineModels
+     * @param array<string, string|list<string>> $inlineModels
      */
     private function plan(array $inlineModels = []): GenerationPlan
     {
@@ -73,35 +72,5 @@ final class InlineMultiStatusResponseTest extends TestCase
             namespace: self::NAMESPACE,
             inlineModels: $inlineModels,
         ));
-    }
-
-    private function clientSource(GenerationPlan $plan): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
-            }
-        }
-
-        self::fail('the plan wrote no ApiClient.php');
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function modelNames(GenerationPlan $plan): array
-    {
-        $needle = DIRECTORY_SEPARATOR . 'Model' . DIRECTORY_SEPARATOR;
-        $out = [];
-
-        foreach (array_keys($plan->writes) as $path) {
-            if (str_contains($path, $needle)) {
-                $out[] = basename($path, '.php');
-            }
-        }
-
-        sort($out, SORT_STRING);
-
-        return $out;
     }
 }

@@ -260,7 +260,7 @@ final class ModelGeneratorSteps
      * A profile over one of the inline-payload fixtures, writing to a scratch
      * tree so the run cannot disturb a committed fixture.
      *
-     * @param array<string,string> $inlineModels
+     * @param array<string, string|list<string>> $inlineModels
      */
     private function inlinePayloadProfile(string $schema, array $inlineModels = []): Profile
     {
@@ -1494,11 +1494,11 @@ final class ModelGeneratorSteps
 
     public function givenProfileWhoseInlineModelsMapCarriesPin(string $pin): void
     {
-        TestCase::assertSame("'placeOrder.response' => 'PlacedOrder'", $pin);
+        TestCase::assertSame("'PlacedOrder' => 'placeOrder.200'", $pin);
 
         $this->profile = $this->inlinePayloadProfile(
             'inline-payloads-3.0.yaml',
-            ['placeOrder.response' => 'PlacedOrder'],
+            ['PlacedOrder' => 'placeOrder.200'],
         );
     }
 
@@ -1523,26 +1523,26 @@ final class ModelGeneratorSteps
     }
 
 
-    public function givenProfileWhoseInlineModelsMapCarriesAKeyNoSuchOperationResponse(): void
+    public function givenProfileWhoseInlineModelsMapCarriesAValueNoSuchOperationRequest(): void
     {
         $this->expectGeneratorAbort = true;
 
         $this->profile = $this->inlinePayloadProfile(
             'inline-payloads-3.0.yaml',
-            ['noSuchOperation.response' => 'Whatever'],
+            ['Whatever' => 'noSuchOperation.request'],
         );
     }
 
 
-    public function thenRunFailsNamingTheKeyAndSayingTheOperationIdIsAbsentFromSchema(): void
+    public function thenRunFailsNamingTheSiteAndSayingItIsAbsentFromSchema(): void
     {
         TestCase::assertInstanceOf(UnrepresentableConstructsException::class, $this->caught);
 
         $message = $this->caught->getMessage();
 
-        // Naming the key is what makes the message actionable: the reader has
-        // to know which entry to remove.
-        TestCase::assertStringContainsString('noSuchOperation.response', $message);
+        // Naming the site is what makes the message actionable: the reader
+        // has to know which entry to remove.
+        TestCase::assertStringContainsString('noSuchOperation.request', $message);
         TestCase::assertStringContainsString('absent from the schema', $message);
     }
 
@@ -2173,6 +2173,5 @@ final class ModelGeneratorSteps
         TestCase::assertInstanceOf(UnionBranchException::class, $unmapped);
         TestCase::assertStringContainsString('no branch is mapped to', $unmapped->getMessage());
     }
-
 
 }

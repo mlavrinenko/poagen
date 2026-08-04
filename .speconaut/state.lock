@@ -6,7 +6,7 @@
 
 [features."Model Generator"]
 spec = "truth/specs/model-generator.feature-260418.typ"
-spec-hash = "sha256:2659dfe8511a852b8d5fc8a1bffde1b3261e42fd259e99c799071f3ad9d89a55"
+spec-hash = "sha256:f205c79f580c134aeff282b465cb65452f2eda4cb5a48b9f37d7f75c9aeed34b"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding"]
 as-is-hash = "sha256:8be88086af99a2fa6020e333f7de5ed768fedd11639f2cb8d13ee2cb522b8bab"
@@ -93,9 +93,9 @@ as-is-hash = "sha256:084cc2feedb3091e8ff57e9dce6a7b4a83f3ebfa948915fb6e01d550df0
 as-is = "KLUv/QBY5QsARhpJKpAnSQf///8/92PFRWprRIr8REpCDclNWtqbwDVUbpCq/ylQKTLu2FJRAjwAPwA8AEbANp4ctXqMFY7UHmzjh0bOEscWX6V1Pm2l9WqVNuBinWiDPp2rPIz5BkbO0tlSjAqTphYvWAEt634OAUZfZlHwWEHinic/BEgAwGXkrMmsY8OWAAcIDjD60qyfzNbzuNn8grkYPY1h8HRZn5WcIyNnmxA7ODlCA74rAgdsY4FXnHhOZB32s94y61wxLcqrZ4WU9Zh04laipoCv2B6T1oS9WyLA94TANhQlN8Se4QI15ISntYKJCEeUWvWJUryVFlbzVlpDeBDBq2mIRK2bw9c61isS1Kfzip/XjK7S4nFPC9Sk0C3YBtLmCXSFnCl1NhxaCiAgIEJiCMR81SRLhYC959Z41lKIpzdb2XRQoTE9ncEPONQC7kAxkNWesEIos4HP2+AG/IYA7wjZBiEFuBuPwg2ocKPf2uj61VubCgW+Njpojd/nYmg="
 stage = "unstable"
 
-[features."Model Generator".scenarios."A pin naming an operation absent from the document fails the run"]
-as-is-hash = "sha256:085c5f3e7cecb095804c7a00f24f57e3dbb825c6b90a10ff359c31a2f796f9db"
-as-is = "KLUv/QBYtQcA5lIzHnA3bQOASKKNlWlKuw2X2oZTiQ0aAmOBNOcD0KPYBCoALQAqAF82XGKL2MeX0oSmLJPHh9ZKKoX3pwnzE9fULembk6Ni93HxwYZEZT+DBPpc9BTAADILyRPcuAOb9VApM15MsaY7KXDHdPRpIoYvoSIVgX8LRNjHpYStBpcwwOfyPj/YhymHDKLogw1Tn9uh/aEC+1g9WmLWL2WVa+p+CP+QgX0QLucMbv7LqrZ48zfjc4rdi/a5BaZdaTXkNbQ+czu4Eqe68NtFxbCiAw0AUrUCBYyodTv/NtvakEHxzvYzoCwDjRGDNEiZBIaizSNZ7YQC"
+[features."Model Generator".scenarios."A pin naming a site absent from the document fails the run"]
+as-is-hash = "sha256:f7ab6da20453519dbb4480cadbd3dafa812b11713d2289ce93d3dd45e80476a6"
+as-is = "KLUv/QBYhQcARtMzHmBn2waARiuttvuH0Mck0oBL/tn5LiKc0UUQwAEUBysALAArAMZTwlZx2XDE9rANXErTWbJMHh+tk1QKL14T5u+pzQheYmg8xQcb8pThzRFfCFcBmLemrhAgs47Egr+SLTbrTykzViyxpp8cOF7C8zXRwk+nSFVg/HIIOwI+T/TBg21YcmQOPe8ZwUsw9cGjxSMD21jFM8SsuJRVrqnjEcajA9sorAbn5jYRl1VN8SaiGZ8nht6zz5dLu9JqyGtofYN2biFONQB+99TCen66CgBytALRQdRpOxVr2a2WLWU5bIwYghpI2jwy1U4o"
 stage = "unstable"
 
 [features."Model Generator".scenarios."A pinned branch types the property as that single class"]
@@ -224,8 +224,8 @@ as-is = "KLUv/QBY3QYAtpAtHHC3aQMQm8SOyWJG6MdElMfr5HBvWJAbgqn++4UkACQAJwCJWsMu9FL
 stage = "unstable"
 
 [features."Model Generator".scenarios."The profile pins the class name for a synthesised payload"]
-as-is-hash = "sha256:79c5f4da1be3d9729d66513efa7667101e928c1897172950502735e6ef762290"
-as-is = "KLUv/QBYLQgA9hI1IGCJ0gZAfCqZRPZdIpvYWSwtqm/MvlwlEsOfpmiI4+IVKwAsACwAikNsNWzlWKYGUz7f26OFDWuz5sOPGHrXUuOj5cVTfrpHqvKRw4o8NXzTCIsFFl6+mGqvB/3RgzeW1OL9qVpjZRFv+kmD4yU8fxNNGOMZjmErTwu2FiUOZvxapxPvWSF1QCDOn67A5w5bWYtnEPOiRK25TI9nGI8QbEVhgacSvJw3lpgQPKUONbzmE/k66w9KfL72aOca4JjJvDL1ajx1cMBWFn5hEiQSAYwTfTARAA5jGgQGscBxK2zNgoBR60KnuYOxMhJmAmbuwIqYpIbMMYT71JvvufBNGT4D"
+as-is-hash = "sha256:77be2a523e9527b7875288b7f7726cc57b81b3d2dde03e2f11058cea0367badc"
+as-is = "KLUv/QBYLQgAphI1IFCppA0ACyqfJG0WLUpsnj19G6kBbPeLhllV4TETdqEGKgAtAC0Aj9hy2MuxTBVTPt/bo4WVtVkT4ksMvWup8dHy4ik/HSRV+ehhRZ4avnEEhjeWFOOAhRn9UYPzxlKD8f5UrbEyiTf9ZMHxEp6/iSgN4xeOYS9PCrYWJ1YEB834tU4p3rNCynA4nD8dgc8f9rIWzyLmxYlac5kezzAeHdhLwgJPIZhBIBIBETylDjm85iP5OusPTny+9mjnGuCYybwy9Wo8dVDAXhZ+YQ4gEImGEx0RAA5jGgQGscBx62rNgoBH60KnuZOyMuIwYTJ3YEVMUkOWGMIpNbzNCPimDJ8B"
 stage = "unstable"
 
 [features."Model Generator".scenarios."Two raw component names that normalise to the same PHP class abort the run"]

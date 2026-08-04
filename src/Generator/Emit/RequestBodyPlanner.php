@@ -84,7 +84,7 @@ final readonly class RequestBodyPlanner
         }
 
         if (InlinePayloadPlanner::isSynthesisableObject($schema)) {
-            $name = InlinePayloadPlanner::claim($pin ?? InlinePayloadName::request($base), $schema, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::request($base), $schema, $ledger, $roots);
 
             return BodySpec::json($name);
         }
@@ -92,7 +92,7 @@ final readonly class RequestBodyPlanner
         $items = InlinePayloadPlanner::inlineObjectItemsOf($schema);
 
         if ($items instanceof Schema) {
-            $name = InlinePayloadPlanner::claim($pin ?? InlinePayloadName::request($base, item: true), $items, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::request($base, item: true), $items, $ledger, $roots);
 
             return BodySpec::jsonList($name);
         }

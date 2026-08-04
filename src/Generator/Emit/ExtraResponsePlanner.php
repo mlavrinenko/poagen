@@ -106,7 +106,7 @@ final readonly class ExtraResponsePlanner
         $pin = $pins[$rawId . '.' . $status] ?? null;
 
         if (InlinePayloadPlanner::isSynthesisableObject($schema)) {
-            InlinePayloadPlanner::claim($pin ?? InlinePayloadName::response($base, $status), $schema, $ledger, $roots);
+            InlineModelClaim::named($pin, InlinePayloadName::response($base, $status), $schema, $ledger, $roots);
 
             return;
         }
@@ -114,7 +114,7 @@ final readonly class ExtraResponsePlanner
         $items = InlinePayloadPlanner::inlineObjectItemsOf($schema);
 
         if ($items instanceof Schema) {
-            InlinePayloadPlanner::claim($pin ?? InlinePayloadName::response($base, $status, item: true), $items, $ledger, $roots);
+            InlineModelClaim::named($pin, InlinePayloadName::response($base, $status, item: true), $items, $ledger, $roots);
         }
     }
 }

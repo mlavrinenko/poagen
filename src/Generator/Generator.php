@@ -15,6 +15,7 @@ use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
 use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\GeneratedFileHeader;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelGroups;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
@@ -156,14 +157,13 @@ final readonly class Generator
             ),
             true,
         );
-        // Both refusal sources a skip entry has to cover before payload
-        // naming ever sees the operation — see OperationAnalyzer::preScanSkips().
+        // Both refusal sources a skip entry must cover — see OperationAnalyzer::preScanSkips().
         $preScannedSkips = OperationAnalyzer::preScanSkips($openApi, $schemaSkips['operations']);
 
         // Payload classes are named before anything is emitted: the model planner emits them, and
         // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).
         $ledger = new ModelNameLedger();
-        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, $profile->inlineModels, $ledger, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
+        $inlinePayloads = InlinePayloadPlanner::build($openApi, $operationIdRegistry, $registry, InlineModelGroups::pins($profile->inlineModels), $ledger, $profile->xmlElements, $preScannedSkips, $profile->unionPins);
 
         // See UnionCatalog::merge() for why the response-position half waits for this walk.
         $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());

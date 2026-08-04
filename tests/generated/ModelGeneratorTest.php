@@ -767,14 +767,14 @@ final class ModelGeneratorTest extends TestCase
      * Scenario: The profile pins the class name for a synthesised payload
      * @source truth/specs/model-generator.feature-260418.typ:433
      *
-     * Given Profile whose inlineModels map carries 'placeOrder.response' => 'PlacedOrder'
+     * Given Profile whose inlineModels map carries 'PlacedOrder' => 'placeOrder.200'
      * When Generator runs against Profile
      * Then Generated File Generated/Model/PlacedOrder.php is written and no PlaceOrder200Content.php is
      *   And the pin renames the root alone, so Model nested under it is emitted as PlacedOrderShipping
      */
     public function testTheProfilePinsTheClassNameForASynthesisedPayload(): void
     {
-        $this->steps->givenProfileWhoseInlineModelsMapCarriesPin('\'placeOrder.response\' => \'PlacedOrder\'');
+        $this->steps->givenProfileWhoseInlineModelsMapCarriesPin('\'PlacedOrder\' => \'placeOrder.200\'');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenGeneratedFileGeneratedModelPlacedOrderPhpIsWrittenAndNoPlaceOrder200ContentPhpIs();
         $this->steps->thenPinRenamesTheRootAloneSoModelNestedUnderItIsEmittedAsPlacedOrderShipping();
@@ -782,19 +782,19 @@ final class ModelGeneratorTest extends TestCase
 
 
     /**
-     * Scenario: A pin naming an operation absent from the document fails the run
+     * Scenario: A pin naming a site absent from the document fails the run
      * @source truth/specs/model-generator.feature-260418.typ:443
      *
-     * Given Profile whose inlineModels map carries a key 'noSuchOperation.response'
+     * Given Profile whose inlineModels map carries a value 'noSuchOperation.request'
      * When Generator runs against Profile
-     * Then the run fails naming the key and saying the operation id is absent from Schema
+     * Then the run fails naming the site and saying it is absent from Schema
      *   And no Generated File is written, so guidance that has outlived Operation it named cannot pass unnoticed
      */
-    public function testAPinNamingAnOperationAbsentFromTheDocumentFailsTheRun(): void
+    public function testAPinNamingASiteAbsentFromTheDocumentFailsTheRun(): void
     {
-        $this->steps->givenProfileWhoseInlineModelsMapCarriesAKeyNoSuchOperationResponse();
+        $this->steps->givenProfileWhoseInlineModelsMapCarriesAValueNoSuchOperationRequest();
         $this->steps->whenGeneratorRunsAgainstProfile();
-        $this->steps->thenRunFailsNamingTheKeyAndSayingTheOperationIdIsAbsentFromSchema();
+        $this->steps->thenRunFailsNamingTheSiteAndSayingItIsAbsentFromSchema();
         $this->steps->thenNoGeneratedFileIsWrittenSoGuidanceThatHasOutlivedOperationItNamedCannotPassUnnoticed();
     }
 

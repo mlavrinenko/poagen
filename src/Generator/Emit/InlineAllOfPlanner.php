@@ -68,8 +68,9 @@ final readonly class InlineAllOfPlanner
             return BodySpec::jsonUnion($models);
         }
 
-        $name = InlinePayloadPlanner::claim(
-            $pin ?? InlinePayloadName::request($base),
+        $name = InlineModelClaim::named(
+            $pin,
+            InlinePayloadName::request($base),
             $merge->schema ?? throw new LogicException('allOf merge missing schema'),
             $ledger,
             $roots,
@@ -112,8 +113,9 @@ final readonly class InlineAllOfPlanner
             return null;
         }
 
-        $name = InlinePayloadPlanner::claim(
-            $pin ?? InlinePayloadName::response($base, $status),
+        $name = InlineModelClaim::named(
+            $pin,
+            InlinePayloadName::response($base, $status),
             $merge->schema ?? throw new LogicException('allOf merge missing schema'),
             $ledger,
             $roots,

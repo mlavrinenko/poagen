@@ -9,10 +9,10 @@ use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
 use Mlavrinenko\Paogen\Generator\GenerationPlan;
 use Mlavrinenko\Paogen\Generator\Profile;
 use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
+use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
 
-use const DIRECTORY_SEPARATOR;
-use const SORT_STRING;
+use function basename;
 
 /**
  * inline-body-and-response-schemas: a document that names no components still
@@ -29,6 +29,7 @@ use const SORT_STRING;
 final class InlinePayloadSynthesisTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use InlinePayloadPlanAssertions;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payloads-3.0.yaml';
     private const string COLLISION_SCHEMA = __DIR__ . '/../fixtures/schemas/inline-payload-collision-3.0.yaml';
@@ -84,7 +85,7 @@ final class InlinePayloadSynthesisTest extends TestCase
 
     public function testAnInlineEnumInAPayloadBecomesABackedEnum(): void
     {
-        $enums = $this->emittedNames($this->plan(), 'Enum');
+        $enums = self::emittedNames($this->plan(), 'Enum');
 
         // On a property, and on an array's items.
         self::assertContains('PlaceOrderRequestContentChannel', $enums);
@@ -110,11 +111,11 @@ final class InlinePayloadSynthesisTest extends TestCase
 
     public function testAProfilePinRenamesASynthesisedPayloadClass(): void
     {
-        $plan = $this->plan(['placeOrder.response' => 'PlacedOrder']);
+        $plan = $this->plan(['PlacedOrder' => 'placeOrder.200']);
         $models = $this->modelNames($plan);
 
         self::assertContains('PlacedOrder', $models);
-        self::assertNotContains('PlaceOrderResponse', $models);
+        self::assertNotContains('PlaceOrder200Content', $models);
         self::assertStringContainsString(': PlacedOrder', $this->clientSource($plan));
 
         // The pin renames the root only; children still hang off it, so a
@@ -123,42 +124,43 @@ final class InlinePayloadSynthesisTest extends TestCase
     }
 
     /**
-     * synthesise-a-model-for-inline-array-item-responses: the `.response` pin
+     * synthesise-a-model-for-inline-array-item-responses: a single-site pin
      * works the same way when the response is an array of inline objects, not
      * only when it is a single inline object — {@see
      * testAProfilePinRenamesASynthesisedPayloadClass} covers the latter. Both
-     * go through {@see InlinePayloadPlanner::planResponse()}'s same `claim()`
-     * call, so one pin key covers both shapes; this pins that down for the
-     * list case specifically, since nothing else did.
+     * go through the same `InlineModelClaim::named()` call, so one pin covers
+     * both shapes; this pins that down for the list case specifically, since
+     * nothing else did.
      */
     public function testAProfilePinRenamesAnArrayItemResponseModel(): void
     {
-        $plan = $this->plan(['placeOrdersBulk.response' => 'BulkOrderConfirmation']);
+        $plan = $this->plan(['BulkOrderConfirmation' => 'placeOrdersBulk.200']);
         $models = $this->modelNames($plan);
 
         self::assertContains('BulkOrderConfirmation', $models);
-        self::assertNotContains('PlaceOrdersBulkResponseItem', $models);
+        self::assertNotContains('PlaceOrdersBulk200ContentItem', $models);
         self::assertStringContainsString('@return list<BulkOrderConfirmation>', $this->clientSource($plan));
     }
 
     public function testAPinNamingAnAbsentOperationIdFailsTheRun(): void
     {
         try {
-            $this->plan(['noSuchOperation.response' => 'Whatever']);
+            $this->plan(['Whatever' => 'noSuchOperation.request']);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
-            self::assertStringContainsString('noSuchOperation.response', $e->getMessage());
+            self::assertStringContainsString('noSuchOperation.request', $e->getMessage());
             self::assertStringContainsString('absent from the schema', $e->getMessage());
         }
     }
 
-    public function testAPinNamingAnUnknownRoleFailsTheRun(): void
+    public function testAPinNamingAPositionTheOperationDoesNotDeclareFailsTheRun(): void
     {
         try {
-            $this->plan(['placeOrder.payload' => 'Whatever']);
+            $this->plan(['Whatever' => 'placeOrder.payload']);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
-            self::assertStringContainsString('does not name a payload role', $e->getMessage());
+            self::assertStringContainsString('placeOrder.payload', $e->getMessage());
+            self::assertStringContainsString('absent from the schema', $e->getMessage());
         }
     }
 
@@ -175,7 +177,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     }
 
     /**
-     * @param array<string,string> $inlineModels
+     * @param array<string, string|list<string>> $inlineModels
      */
     private function plan(array $inlineModels = []): GenerationPlan
     {
@@ -183,7 +185,7 @@ final class InlinePayloadSynthesisTest extends TestCase
     }
 
     /**
-     * @param array<string,string> $inlineModels
+     * @param array<string, string|list<string>> $inlineModels
      */
     private function planFor(string $schema, array $inlineModels = []): GenerationPlan
     {
@@ -199,13 +201,7 @@ final class InlinePayloadSynthesisTest extends TestCase
 
     private function clientSource(GenerationPlan $plan): string
     {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
-            }
-        }
-
-        self::fail('the plan wrote no ApiClient.php');
+        return self::plannedSource($plan->writes, 'ApiClient');
     }
 
     /**
@@ -229,25 +225,6 @@ final class InlinePayloadSynthesisTest extends TestCase
      */
     private function modelNames(GenerationPlan $plan): array
     {
-        return $this->emittedNames($plan, 'Model');
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function emittedNames(GenerationPlan $plan, string $subdirectory): array
-    {
-        $needle = DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR;
-        $out = [];
-
-        foreach (array_keys($plan->writes) as $path) {
-            if (str_contains($path, $needle)) {
-                $out[] = basename($path, '.php');
-            }
-        }
-
-        sort($out, SORT_STRING);
-
-        return $out;
+        return self::emittedNames($plan, 'Model');
     }
 }

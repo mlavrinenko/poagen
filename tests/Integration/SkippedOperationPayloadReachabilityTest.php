@@ -65,8 +65,7 @@ final class SkippedOperationPayloadReachabilityTest extends TestCase
             namespace: self::NAMESPACE,
             skip: ['dropsShared' => 'a `type: [object, string]` response — narrowing it needs the vendor'],
             inlineModels: [
-                'keepsShared.request' => 'SharedPayload',
-                'dropsShared.request' => 'SharedPayload',
+                'SharedPayload' => ['keepsShared.request', 'dropsShared.request'],
             ],
         ));
     }
