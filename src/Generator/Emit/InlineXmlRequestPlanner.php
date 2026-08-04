@@ -11,6 +11,8 @@ use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
 
+use function count;
+use function explode;
 use function is_string;
 
 /**
@@ -71,10 +73,38 @@ final readonly class InlineXmlRequestPlanner
                 InlineModelClaim::named($pin, InlinePayloadName::request($base, item: true), $items, $ledger, $roots),
                 $root,
                 $item,
+                self::nestedContainersFor($rawId, $xmlElements),
             );
         }
 
         return null;
+    }
+
+    /**
+     * Every `'<rawId>.item.<property>'` entry of `Profile::$xmlElements`,
+     * reduced to the shape {@see BodySpec::xmlList()} carries onward — the
+     * property alone, since the item element itself is already `$item`. This
+     * is the one place a validated binding turns into something the emitted
+     * client actually sends; {@see XmlNestedContainerValidator} already
+     * proved every key here names a real property, so nothing further is
+     * checked.
+     *
+     * @param  array<string,string> $xmlElements
+     * @return array<string,string>
+     */
+    private static function nestedContainersFor(string $rawId, array $xmlElements): array
+    {
+        $containers = [];
+
+        foreach ($xmlElements as $key => $child) {
+            $parts = explode('.', $key, 3);
+
+            if (count($parts) === 3 && $parts[0] === $rawId && $parts[1] === 'item') {
+                $containers[$parts[2]] = $child;
+            }
+        }
+
+        return $containers;
     }
 
     /**

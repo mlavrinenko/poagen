@@ -26,10 +26,12 @@ use function sprintf;
  * Same discipline as every other profile-guidance validator here
  * (abort-on-unrepresentable-constructs): a binding naming an operation id, or
  * a property of that operation's XML item schema, absent from the document
- * fails the run instead of silently doing nothing — the runtime never reads
- * `Profile::$xmlElements` itself (a consumer transcribes it into their own
- * `XmlWriter` construction), so a stale entry here would otherwise look like
- * working guidance right up until the emitted XML stayed wrong.
+ * fails the run instead of silently doing nothing. {@see InlineXmlRequestPlanner}
+ * wires a validated entry straight onto the generated `Endpoint::xmlList()`
+ * call (thread-the-validated-nested-container-map-into-the-generated-client),
+ * so this check runs before that happens — a stale entry would otherwise
+ * reach the wire as a wrong nesting rather than merely looking like working
+ * guidance.
  *
  * @internal
  */

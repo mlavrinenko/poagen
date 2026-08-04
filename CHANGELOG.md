@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the JSON pointer to the node that used it, and the operation or component
   carrying that node. An OpenAPI 3.1 `webhooks` entry does the same. None of
   them is emitted as something else and none produces a smaller client.
+- `Endpoint::xmlList()` takes a validated `Profile::$xmlElements`
+  nested-container binding as its own argument, and the generated client now
+  passes it: a consumer gets the vendor's wrapped XML shape straight from the
+  profile, with no second map built by hand against their own `HttpTransport`.
 
 ### Changed
 

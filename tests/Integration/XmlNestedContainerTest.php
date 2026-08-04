@@ -53,10 +53,10 @@ final class XmlNestedContainerTest extends TestCase
     {
         $plan = $this->plan(self::ELEMENTS);
 
-        // Nothing about the nested-container entries changes what gets
-        // emitted — Endpoint::xmlList() still only takes root and item — so
-        // the same 36 operations that generate without them still do with
-        // them.
+        // The nested-container entries change what the two XML operations'
+        // emitted ->xmlList() call carries (KilbilXmlNestedContainerTest
+        // proves that), not whether any operation generates at all — the
+        // same 36 operations that generate without them still do with them.
         self::assertSame([], $plan->skippedOperations);
         self::assertNotSame([], $plan->writes);
     }

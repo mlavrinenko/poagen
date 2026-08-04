@@ -76,16 +76,14 @@ final readonly class Profile
      *                                              same role `'<operationId>.item'` plays for the outer list. It
      *                                              is validated the same way as the other two forms — a property
      *                                              absent from that operation's XML item schema fails the run
-     *                                              naming it — but, unlike them, paogen does not read it back: the
-     *                                              runtime's `XmlWriter` takes this map through its own
-     *                                              constructor, keyed by element name rather than operation id, so
-     *                                              a consumer who needs nesting builds that map from these entries
-     *                                              and passes it when they construct their own `HttpTransport`
-     *                                              (`Endpoint::xmlList()` already takes exactly the root and item
-     *                                              names the specification leaves open, and neither it nor
-     *                                              anything between it and the wire changes for this). This entry
-     *                                              existing and staying valid is what keeps that hand-built map
-     *                                              honest between runs.
+     *                                              naming it — and, unlike them, paogen does wire it into the
+     *                                              generated call: `Endpoint::xmlList()` takes this entry as its
+     *                                              own argument, and the runtime builds the `XmlWriter` its
+     *                                              constructor takes from it at request time. A consumer writes
+     *                                              nothing beyond this entry — no second map, no manual
+     *                                              `HttpTransport` wiring — and an XML body with no entry here
+     *                                              renders exactly as it always has
+     *                                              (thread-the-validated-nested-container-map-into-the-generated-client).
      * @param array<string, string|list<string>> $inlineModels Names — and optionally merges — the class(es)
      *                                              paogen synthesises for an operation's inline payloads. Keys are
      *                                              the PHP class name; values are one site or several, each
