@@ -5,7 +5,7 @@
   tags: ("generator", "dx", "guidance"),
   priority: 7,
   difficulty: 5,
-  status: accepted(2026, 8, 2),
+  status: wip(2026, 8, 4)[wave 2 agent dispatched],
 )
 
 == Summary
