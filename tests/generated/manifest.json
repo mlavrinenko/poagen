@@ -587,9 +587,9 @@
             "stage": "unstable"
         },
         {
-            "test_id": "OperationGeneratorTest::testAnApplicationXmlResponseAbortsTheRunTheSameWayAnyOtherNonJSONResponseDoes",
+            "test_id": "OperationGeneratorTest::testAnApplicationXmlResponseAbortsTheRunBecauseXMLIsRefusedAtGenerationTimeNotBecauseItIsNonJSON",
             "feature": "Operation Generator",
-            "scenario": "An application/xml response aborts the run the same way any other non-JSON response does",
+            "scenario": "An application/xml response aborts the run because XML is refused at generation time, not because it is non-JSON",
             "spec_file": "truth/specs/operation-generator.feature-260418.typ",
             "spec_line": 99,
             "stage": "unstable"
