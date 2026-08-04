@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: Response Ref Parity Fixture
+  version: "1.0.0"
+  description: >
+    a-referenced-response-component-is-invisible-to-the-schema-walk:
+    SchemaWalk::bodyContentSchemas() used to skip any response that was a
+    `$ref` to a `#/components/responses/*` entry rather than an inline
+    Response, so nothing that walks schemas ever saw its content —
+    DigitalOcean's `invoice_pdf` is exactly this shape (a named response
+    component over `application/pdf` with `format: binary`), mirrored here.
+
+    Both operations below declare byte-identical response content, one
+    inline and one through a component $ref, so the walk must yield the same
+    schema nodes for both.
+paths:
+  /inline:
+    get:
+      operationId: inlineResponse
+      responses:
+        '200':
+          description: the PDF, declared inline
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+  /referenced:
+    get:
+      operationId: referencedResponse
+      responses:
+        '200':
+          $ref: '#/components/responses/Pdf'
+components:
+  responses:
+    Pdf:
+      description: the PDF, declared as a named component
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary

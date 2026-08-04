@@ -95,10 +95,24 @@ final readonly class SchemaWalk
      * schema) pair {@see BodyMediaType} classifies. Parameters are not
      * included: nothing there is ever read as a body payload.
      *
-     * References are not followed here either, same as everywhere else in
-     * this class — a `$ref` request/response body never reaches {@see
-     * BodyMediaType} as a Schema (its callers all guard `instanceof
-     * Schema`), so it is right that this does not manufacture one.
+     * A `$ref` naming the request/response body's own container — a
+     * `#/components/requestBodies/*` or `#/components/responses/*` entry —
+     * is resolved down to that container, the same way {@see
+     * RequestBodyAnalyzer::resolveBody()} already did for request bodies and
+     * {@see resolveResponse()} now does for responses too, so a consumer of
+     * this walk sees identical nodes whether the document wrote the body
+     * inline or through a component. Until this method resolved responses
+     * the same way, a `$ref` response was invisible to every caller of
+     * {@see roots()}, {@see operationRoots()} and {@see bodySchemas()} —
+     * `a-referenced-response-component-is-invisible-to-the-schema-walk`,
+     * found through DigitalOcean's `invoice_pdf`, a named response
+     * component nothing that reads this class ever reached.
+     *
+     * A `$ref` *schema* under a content-type key is a different case and
+     * stays unresolved, same as everywhere else in this class — it never
+     * reaches {@see BodyMediaType} as a `Schema` (its callers all guard
+     * `instanceof Schema`), so it is right that this does not manufacture
+     * one.
      *
      * @return list<array{string, Schema}>
      */
@@ -116,6 +130,8 @@ final readonly class SchemaWalk
         $responses = $operation->responses;
 
         foreach ($responses === null ? [] : $responses->getResponses() as $response) {
+            $response = self::resolveResponse($response);
+
             if (!$response instanceof Response) {
                 continue;
             }
@@ -128,6 +144,26 @@ final readonly class SchemaWalk
         }
 
         return $out;
+    }
+
+    /**
+     * Resolves a `$ref` response — one naming a `#/components/responses/*`
+     * entry — to its concrete node, the same shape {@see
+     * RequestBodyAnalyzer::resolveBody()} already gives request bodies. An
+     * inline response passes through unchanged; a reference this document's
+     * context cannot resolve answers `null`, same as an unresolvable request
+     * body does, rather than fabricating a `Response` the document never
+     * wrote.
+     */
+    private static function resolveResponse(Response|Reference|null $response): ?Response
+    {
+        if ($response instanceof Reference) {
+            $resolved = $response->resolve();
+
+            return $resolved instanceof Response ? $resolved : null;
+        }
+
+        return $response;
     }
 
     /**
