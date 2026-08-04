@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Enum\EnumSpec;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Enum\EnumSpec;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 /**
  * Decides the PHP type of one model property, promoting an inline schema to a
@@ -18,7 +18,7 @@ use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
  *
  * A property whose schema is inline gets one of four readings, in order:
  *
- *   1. an inline enum paogen can back → a synthesised enum on the surrounding
+ *   1. an inline enum poagen can back → a synthesised enum on the surrounding
  *      class plus property (`SearchClientRequestSearchMode`);
  *   2. an inline object with declared properties → a synthesised model class
  *      (`SearchClientResponseSettings`). {@see ObjectShape} decides what
@@ -144,7 +144,7 @@ final readonly class PropertySynthesiser
 
     /**
      * Register an inline enum under the derived name and return its FQCN, or
-     * null when the schema is not one paogen can back — a mixed-type or
+     * null when the schema is not one poagen can back — a mixed-type or
      * null-carrying `enum` list stays on its base type rather than becoming a
      * partial enum that silently drops cases.
      */

@@ -2,17 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
-
-use Mlavrinenko\Paogen\Runtime\Contract\DescriptorParserInterface;
-use Mlavrinenko\Paogen\Runtime\Contract\HydratorInterface;
-use Mlavrinenko\Paogen\Runtime\Contract\MarshallerInterface;
-use Mlavrinenko\Paogen\Runtime\Contract\PropertyDescriptor;
-use Mlavrinenko\Paogen\Runtime\Contract\XmlWriterInterface;
-use Mlavrinenko\Paogen\Runtime\Marshal\DescriptorParser;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
+namespace Poagen\Generator\Tests\Support;
 
 /**
  * A consumer's own runtime: one object satisfying every marshalling contract
@@ -27,33 +17,33 @@ use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
  * the real implementations produce, so a test asserting on the wire is still
  * asserting on real behaviour.
  */
-final class RecordingRuntime implements DescriptorParserInterface, HydratorInterface, MarshallerInterface, XmlWriterInterface
+final class RecordingRuntime implements \Poagen\Runtime\Contract\DescriptorParserInterface, \Poagen\Runtime\Contract\HydratorInterface, \Poagen\Runtime\Contract\MarshallerInterface, \Poagen\Runtime\Contract\XmlWriterInterface
 {
     /** @var list<string> */
     public array $calls = [];
 
-    private readonly Hydrator $hydrator;
+    private readonly \Poagen\Runtime\Marshal\Hydrator $hydrator;
 
-    private readonly Marshaller $marshaller;
+    private readonly \Poagen\Runtime\Marshal\Marshaller $marshaller;
 
-    private readonly XmlWriter $xmlWriter;
+    private readonly \Poagen\Runtime\Marshal\XmlWriter $xmlWriter;
 
-    private readonly DescriptorParser $descriptors;
+    private readonly \Poagen\Runtime\Marshal\DescriptorParser $descriptors;
 
     public function __construct()
     {
-        $this->descriptors = new DescriptorParser();
+        $this->descriptors = new \Poagen\Runtime\Marshal\DescriptorParser();
         // The delegates read metadata through this object, so a descriptor
         // lookup made on the client's behalf is recorded too.
-        $this->hydrator = new Hydrator($this);
-        $this->marshaller = new Marshaller($this);
-        $this->xmlWriter = new XmlWriter();
+        $this->hydrator = new \Poagen\Runtime\Marshal\Hydrator($this);
+        $this->marshaller = new \Poagen\Runtime\Marshal\Marshaller($this);
+        $this->xmlWriter = new \Poagen\Runtime\Marshal\XmlWriter();
     }
 
     /**
      * @param class-string $class
      *
-     * @return list<PropertyDescriptor>
+     * @return list<\Poagen\Runtime\Contract\PropertyDescriptor>
      */
     public function descriptorsFor(string $class): array
     {

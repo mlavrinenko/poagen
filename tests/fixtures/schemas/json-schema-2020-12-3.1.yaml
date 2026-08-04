@@ -6,7 +6,7 @@ info:
     swap-openapi-parser-for-31-support fixture. A document that genuinely uses
     JSON Schema 2020-12, so the parser swap has something to be measured
     against. One operation is representable — `type: [T, "null"]` and a scalar
-    union, which paogen reads — and the rest each carry exactly one construct
+    union, which poagen reads — and the rest each carry exactly one construct
     the emitters do not implement, so each can be named on its own in the
     refusal and accepted on its own from Profile::$skip.
 
@@ -16,7 +16,7 @@ info:
     `prefixItems`, `unevaluatedProperties` and `contentMediaType` all read back
     through its magic accessor, because an unrecognised key lands in the same
     property bag a recognised one does. Its `validate()` refused the document
-    ("Unsupported openapi version: 3.1.0"), which paogen never called and so
+    ("Unsupported openapi version: 3.1.0"), which poagen never called and so
     never saw. So the old parser did not hide these; nothing asked it for them.
     Each property carrying one was emitted as its bare declared type, the
     constraint dropped and nothing said. That silent third outcome — read,

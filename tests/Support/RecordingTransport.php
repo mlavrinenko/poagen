@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
+namespace Poagen\Generator\Tests\Support;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\TransportInterface;
 
 /**
  * A transport that speaks no HTTP at all: it records what the generated

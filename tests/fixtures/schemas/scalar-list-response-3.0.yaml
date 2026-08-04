@@ -15,7 +15,7 @@ info:
     binds to on a model property, not as a raw string.
 
     `listEmails` pins the other half of that rule: a consumer's own
-    `#[BindsFormat]` value object wins over paogen's built-in, in a response
+    `#[BindsFormat]` value object wins over poagen's built-in, in a response
     list exactly as it does on a property. `listPets` is the pre-existing
     array-of-$ref shape, here to prove it still hydrates. `listAnything`
     declares no item type at all and must stay refused rather than widen to

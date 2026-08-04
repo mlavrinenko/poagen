@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
-use Mlavrinenko\Paogen\Generator\Emit\ServerCatalog;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\ServerCatalog;
 
 /**
  * Unit coverage for {@see ServerCatalog}, one level below the integration

@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
-use Mlavrinenko\Paogen\Generator\Emit\WebhookSkipKey;
+use Poagen\Generator\Generator\Emit\WebhookSkipKey;
 
 use function array_keys;
 use function sprintf;
@@ -28,7 +25,7 @@ use function sprintf;
  * A webhook entry (`webhooks-refuse-with-no-opt-out`, keyed through
  * {@see WebhookSkipKey}) gets the identical staleness treatment, folded into
  * the same pass rather than a second check: every webhook the document still
- * declares is, unconditionally, "a problem" — nothing paogen does can ever
+ * declares is, unconditionally, "a problem" — nothing poagen does can ever
  * make one generate cleanly — so a webhook skip entry is stale in exactly
  * one way, naming a webhook the document no longer declares. That is the
  * same "absent from the schema" failure a stale operation/component entry
@@ -40,13 +37,13 @@ final readonly class SkipListValidator
 {
     /**
      * @param  array<string,string>   $skip               Profile::$skip
-     * @param  list<SkippedOperation> $skippedOperations
-     * @param  list<SkippedComponent> $skippedComponents
+     * @param list<Emit\SkippedOperation> $skippedOperations
+     * @param list<Emit\SkippedComponent> $skippedComponents
      * @return list<string>           failure lines; empty means the run may proceed
      */
     public function validate(
         OpenApi $openApi,
-        ComponentCatalog $components,
+        Emit\ComponentCatalog $components,
         array $skip,
         array $skippedOperations,
         array $skippedComponents,
@@ -120,7 +117,7 @@ final readonly class SkipListValidator
 
     /**
      * @return list<string> every non-empty operationId declared anywhere in
-     *                      the document, regardless of whether paogen can
+     *                      the document, regardless of whether poagen can
      *                      represent it
      */
     private function operationIds(OpenApi $openApi): array

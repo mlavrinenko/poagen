@@ -1,15 +1,15 @@
 {
-    "name": "acme/paogen-petstore-example",
-    "description": "Example consumer project that generates a typed Petstore client via paogen.",
+    "name": "acme/poagen-petstore-example",
+    "description": "Example consumer project that generates a typed Petstore client via poagen.",
     "type": "project",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "mlavrinenko/paogen-runtime": "@dev",
+        "poagen/client-runtime": "@dev",
         "nyholm/psr7": "^1.8"
     },
     "require-dev": {
-        "mlavrinenko/paogen": "@dev"
+        "poagen/client-generator": "@dev"
     },
     "repositories": [
         {
@@ -41,6 +41,6 @@
         }
     },
     "scripts": {
-        "generate": "paogen generate paogen.php"
+        "generate": "poagen generate poagen.php"
     }
 }

@@ -6,7 +6,7 @@
   status: accepted(2026, 8, 2),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
-  process-only: "governs paogen's own audit-traces plumbing configuration — how three specific zero-statement files are classified by the untraced-source check — not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own audit-traces plumbing configuration — how three specific zero-statement files are classified by the untraced-source check — not what the generator produces or what a reimplementation must do",
 )
 
 == Context
@@ -58,7 +58,7 @@ problem, and the precedent settles it. speconaut's own
 entries today — `src/main.rs`, `src/cli_resolve.rs`,
 `src/extraction/mod.rs`, and five more — each pinning a file no scenario
 tests directly because every scenario that reaches it merely transits it:
-dispatch, thin wrappers, barrel re-exports. paogen's three zero-statement
+dispatch, thin wrappers, barrel re-exports. poagen's three zero-statement
 files are the same phenomenon from the opposite direction — reached and
 exercised, but with no line of their own for the collector to mark —
 and the pin mechanism does not care which direction produced the

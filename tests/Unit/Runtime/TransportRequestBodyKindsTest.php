@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Http\HttpTransport;
 use Psr\Http\Message\RequestInterface;
 
 use function preg_replace;
@@ -42,7 +38,7 @@ final class TransportRequestBodyKindsTest extends TestCase
 
     public function testAJsonBodyIsMarshalledThenEncoded(): void
     {
-        $request = $this->send(Endpoint::post('/contact')->json(new Contact('Grace')));
+        $request = $this->send(Endpoint::post('/contact')->json(new Fixtures\Contact('Grace')));
 
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         // `display-name`, not `displayName`: the marshaller decided the wire
@@ -53,7 +49,7 @@ final class TransportRequestBodyKindsTest extends TestCase
     public function testAJsonListMarshallsEveryItem(): void
     {
         $request = $this->send(
-            Endpoint::post('/contacts')->jsonList([new Contact('Grace'), new Contact('Ada')]),
+            Endpoint::post('/contacts')->jsonList([new Fixtures\Contact('Grace'), new Fixtures\Contact('Ada')]),
         );
 
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
@@ -73,7 +69,7 @@ final class TransportRequestBodyKindsTest extends TestCase
 
     public function testAnXmlBodyIsMarshalledThenRenderedUnderTheNamedRoot(): void
     {
-        $request = $this->send(Endpoint::post('/contact')->xml(new Contact('Grace'), 'contact'));
+        $request = $this->send(Endpoint::post('/contact')->xml(new Fixtures\Contact('Grace'), 'contact'));
 
         self::assertSame('application/xml', $request->getHeaderLine('Content-Type'));
         self::assertStringContainsString('<contact>', (string) $request->getBody());
@@ -83,7 +79,7 @@ final class TransportRequestBodyKindsTest extends TestCase
     public function testAnXmlListRepeatsTheNamedItemElement(): void
     {
         $request = $this->send(
-            Endpoint::post('/contacts')->xmlList([new Contact('Grace'), new Contact('Ada')], 'contacts', 'contact'),
+            Endpoint::post('/contacts')->xmlList([new Fixtures\Contact('Grace'), new Fixtures\Contact('Ada')], 'contacts', 'contact'),
         );
         $body = (string) $request->getBody();
 
@@ -101,7 +97,7 @@ final class TransportRequestBodyKindsTest extends TestCase
      */
     public function testANestedContainerBindingWrapsThePropertyOnThePlainDefaultTransport(): void
     {
-        $pet = new Pet(name: 'Rex', tags: [new Tag(id: 1, name: 'a'), new Tag(id: 2, name: 'b')]);
+        $pet = new Fixtures\Pet(name: 'Rex', tags: [new Fixtures\Tag(id: 1, name: 'a'), new Fixtures\Tag(id: 2, name: 'b')]);
         $request = $this->send(
             Endpoint::post('/pets')->xmlList([$pet], 'pets', 'pet', ['tags' => 'tag']),
         );
@@ -123,7 +119,7 @@ final class TransportRequestBodyKindsTest extends TestCase
      */
     public function testWithNoNestedContainerBindingTheSamePropertyStaysUnwrapped(): void
     {
-        $pet = new Pet(name: 'Rex', tags: [new Tag(id: 1, name: 'a'), new Tag(id: 2, name: 'b')]);
+        $pet = new Fixtures\Pet(name: 'Rex', tags: [new Fixtures\Tag(id: 1, name: 'a'), new Fixtures\Tag(id: 2, name: 'b')]);
         $request = $this->send(Endpoint::post('/pets')->xmlList([$pet], 'pets', 'pet'));
         $body = $this->collapsed((string) $request->getBody());
 
@@ -157,7 +153,7 @@ final class TransportRequestBodyKindsTest extends TestCase
 
     public function testABinaryBodyReachesTheRequestAsTheSameStreamNeverReadWhole(): void
     {
-        $stream = new NoWholeReadStream(new Psr17Factory()->createStream('bytes'));
+        $stream = new Fixtures\NoWholeReadStream(new Psr17Factory()->createStream('bytes'));
         $request = $this->send(Endpoint::post('/assets')->binary($stream, 'application/octet-stream'));
 
         self::assertSame('application/octet-stream', $request->getHeaderLine('Content-Type'));

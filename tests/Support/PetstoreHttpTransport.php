@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Support;
+namespace Poagen\Generator\Tests\Support;
 
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\EnvelopeTransportTest;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\TransportResponseKindsTest;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Unit\Runtime\EnvelopeTransportTest;
+use Poagen\Generator\Tests\Unit\Runtime\TransportResponseKindsTest;
+use Poagen\Runtime\Http\HttpTransport;
 
 /**
  * The one {@see HttpTransport} every petstore-fixture transport test builds:

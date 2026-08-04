@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use PHPUnit\Framework\TestCase;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\StatusResponseMap;
 
 /**
  * typed-error-responses: OpenAPI's own status precedence, proved directly

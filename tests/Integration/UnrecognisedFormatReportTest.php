@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * report-unrecognised-formats: an unknown `format` falls back to the base type
  * and says so.
  *
  * Exercised against the kilbil loyalty document, where the problem is real: nine
- * distinct format values across 292 uses, of which paogen knows one. `date time`
+ * distinct format values across 292 uses, of which poagen knows one. `date time`
  * is `date-time` misspelled with a space and `data`/`data time` are further typos
  * of it, so silence would cost 15 timestamps.
  *
@@ -28,7 +28,7 @@ final class UnrecognisedFormatReportTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../../examples/kilbil/schemas/loyalty_v1.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\KilbilFormats';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\KilbilFormats';
     private const string VALUE_OBJECTS = 'Acme\\Kilbil\\ValueObject';
 
     /** @var array<string,string> */
@@ -65,7 +65,7 @@ final class UnrecognisedFormatReportTest extends TestCase
 
     public function testABuiltInFormatIsNotReported(): void
     {
-        // `date` is paogen's own; only the vendor's `data` typo is an opportunity.
+        // `date` is poagen's own; only the vendor's `data` typo is an opportunity.
         self::assertNull($this->noticeFor($this->formatNotices($this->plan()), 'date'));
     }
 
@@ -102,7 +102,7 @@ final class UnrecognisedFormatReportTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-formats-'),
+            output: self::makeSandboxDir('poagen-formats-'),
             namespace: self::NAMESPACE,
             discoverIn: $discoverIn,
             skip: self::XML_SKIP,

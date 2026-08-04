@@ -7,7 +7,7 @@ info:
     which is how JSON Schema and OpenAPI 3.1 say "nullable". Between them the
     operations cover the three readings: one member plus "null", several scalar
     members, and a list mixing a non-scalar with something else — which is the
-    one paogen refuses.
+    one poagen refuses.
 paths:
   /nullable:
     post:

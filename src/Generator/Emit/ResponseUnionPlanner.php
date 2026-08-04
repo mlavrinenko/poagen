@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use function array_values;
 use function count;
@@ -50,7 +50,7 @@ final readonly class ResponseUnionPlanner
     /**
      * @param  array<string,array{branch:string,reason:string}> $pins Profile::$unionPins, keyed
      *                                                                 '<rawOperationId>.response'
-     * @param  list<SynthesisedModel>                            $roots
+     * @param list<SynthesisedModel> $roots
      * @return ReturnSpec|null null either because this is not a response union at all, or because
      *                         it is one and no rule resolves it — the two are told apart by whether
      *                         `$refusal` is set on return
@@ -86,7 +86,7 @@ final readonly class ResponseUnionPlanner
     /**
      * @param  list<Schema|Reference>                           $branches
      * @param  array<string,array{branch:string,reason:string}> $pins
-     * @param  list<SynthesisedModel>                            $roots
+     * @param list<SynthesisedModel> $roots
      */
     private static function planObjectUnion(
         array $branches,
@@ -144,7 +144,7 @@ final readonly class ResponseUnionPlanner
 
         $refusal = sprintf(
             '%s response of `%s` (%s): branches %s share every discriminating field — each requires nothing the '
-                . 'others do not also declare, so no payload could select between them and paogen will not guess. '
+                . 'others do not also declare, so no payload could select between them and poagen will not guess. '
                 . "Resolve it by adding a `discriminator` to the document, or by a Profile::\$unionPins['%s'] "
                 . 'entry pinning one branch with a written reason.',
             $status,
@@ -221,7 +221,7 @@ final readonly class ResponseUnionPlanner
      *
      * @param  array<string,array{branch:string,reason:string}> $pins
      * @param  array<string,string>                             $models identity => PHP model name
-     * @return array{0:string,1:UnionResolution}|null
+     * @return array{0: string, 1: UnionResolution}|null
      */
     private static function pin(string $key, string $position, array $pins, array $models, int $branchCount): ?array
     {
@@ -237,7 +237,7 @@ final readonly class ResponseUnionPlanner
 
         if ($model === null) {
             // A pin naming a branch outside the union — {@see
-            // \Mlavrinenko\Paogen\Generator\UnionGuidanceValidator} fails
+            // \Poagen\Generator\Generator\UnionGuidanceValidator} fails
             // the run naming the entry; resolving here would report the
             // union as the cause when the guidance is (guidance-cannot-mislead).
             return null;

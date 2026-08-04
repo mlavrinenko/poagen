@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
-use Mlavrinenko\Paogen\Generator\Emit\SecurityScheme;
-use Mlavrinenko\Paogen\Generator\Emit\SecuritySchemeClassifier;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\SecurityScheme;
+use Poagen\Generator\Generator\Emit\SecuritySchemeClassifier;
 
 /**
  * report-unsupported-security-schemes: the classification rules, exercised
@@ -33,7 +33,7 @@ final class SecuritySchemeClassifierTest extends TestCase
             'apiKey in a place no credential can go' => [
                 ['type' => 'apiKey', 'in' => 'body', 'name' => 'k'],
                 "apiKey in: 'body'",
-                'nothing else is a place paogen can put it',
+                'nothing else is a place poagen can put it',
             ],
             'apiKey with no key to send under' => [
                 ['type' => 'apiKey', 'in' => 'header'],

@@ -6,7 +6,7 @@
   status: accepted(2026, 8, 2),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
-  process-only: "governs paogen's own test-gate configuration (whether and how infection runs against this project's own suite), not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own test-gate configuration (whether and how infection runs against this project's own suite), not what the generator produces or what a reimplementation must do",
 )
 
 == Context

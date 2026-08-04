@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\RecordingRuntime;
-use Mlavrinenko\Paogen\Tests\Support\RecordingTransport;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\RecordingRuntime;
+use Poagen\Generator\Tests\Support\RecordingTransport;
+use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\TransportInterface;
+use Poagen\Runtime\Http\HttpTransport;
 use ReflectionClass;
 
 use function in_array;

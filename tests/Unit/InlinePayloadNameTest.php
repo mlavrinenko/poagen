@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Naming\InlinePayloadName;
 
 /**
  * Unit coverage for {@see InlinePayloadName} — the one derivation rule

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -31,7 +31,7 @@ final class OperationIdNamingTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../../examples/kilbil/schemas/loyalty_v1.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Kilbil';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\Kilbil';
 
     /**
      * The two XML bodies are a separate task (xml-content-type-policy); naming
@@ -89,7 +89,7 @@ final class OperationIdNamingTest extends TestCase
         // One entry, two improvements: the synthesised payload classes are
         // derived from the normalised method name, not the raw id. This
         // operation's 2xx response is an array of inline objects, so the class
-        // paogen names for it is the item.
+        // poagen names for it is the item.
         $models = $this->emittedNames($plan);
         self::assertContains('GetClientFullBalanceRequestContent', $models);
         self::assertContains('GetClientFullBalance200ContentItem', $models);
@@ -140,7 +140,7 @@ final class OperationIdNamingTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-opid-'),
+            output: self::makeSandboxDir('poagen-opid-'),
             namespace: self::NAMESPACE,
             skip: self::XML_SKIP,
             methodRenames: $methodRenames,

@@ -6,7 +6,7 @@ reformatted, trimmed, or bundled through a normaliser — see the
 `fixtures-are-unmodified-vendor-documents` standard.
 
 This example exists because it is hard in the specific ways real documents are
-hard, and paogen's claim to work is measured against it rather than against
+hard, and poagen's claim to work is measured against it rather than against
 Petstore.
 
 ## What makes it a real test
@@ -29,7 +29,7 @@ Two earlier versions of this file got this wrong in opposite directions, and
 both wrong versions informed the backlog, so it is worth being precise about
 which part of the original claim held.
 
-The part that held: paogen has no version gate. It never inspects
+The part that held: poagen has no version gate. It never inspects
 `$openApi->openapi` and never calls `validate()`, so the document parses
 cleanly and reaches the emitters. The parser swap was never what blocked this
 client.
@@ -40,18 +40,18 @@ in as many words, and structurally called it a 3.0 document. It is not one.
 `Schema::$type` as `string`, so every `is_string($schema->type)` guard in the
 generator missed it and 87 properties the vendor had typed fell through to
 `mixed` — with 11 inline enums lost on the same guard. Reading the list needed
-no parser swap, only for paogen to read what the parser already handed over;
+no parser swap, only for poagen to read what the parser already handed over;
 `nullable-type-arrays` is that work, and it landed before the swap did.
 
 The swap has since landed anyway (`swap-openapi-parser-for-31-support`):
-paogen parses through `devizzent/cebe-php-openapi`, which declares
+poagen parses through `devizzent/cebe-php-openapi`, which declares
 `Schema::$type` as `string|string[]` — the shape this document was always
 using. Every type above is emitted byte-identically before and after,
 which is how the swap was checked.
 
 **No named components at all.** `components/schemas` is empty. Every payload is
 declared inline at its use site: 29 inline JSON request bodies and 71 inline
-JSON response schemas across the 36 operations. paogen's model planner works by
+JSON response schemas across the 36 operations. poagen's model planner works by
 walking the component catalogue, so against this document it has nothing to walk
 and emits no models whatsoever. Roughly a hundred model names have to be
 synthesised, which is what makes the naming rule load-bearing rather than
@@ -85,20 +85,20 @@ Neither the schema nor `xml:` metadata name a root or item element for either
 body — this document carries no `xml:` metadata at all — but both request
 bodies carry a literal `example: |` block with a full XML sample, in
 `schemas/loyalty_v1.yaml` around line 4305 (`/load/goodsxml`) and line 4570
-(`/load/goodslistxml`). paogen never makes a live call to settle this kind of
+(`/load/goodslistxml`). poagen never makes a live call to settle this kind of
 question, but the vendor document already answers it: `goodsxml` roots at
 `<goods>` with repeated item `<good>`, and `goodslistxml` roots at
-`<goodslist>` with repeated item `<goodlist>`. `examples/kilbil/paogen.php`'s
+`<goodslist>` with repeated item `<goodlist>`. `examples/kilbil/poagen.php`'s
 `xmlElements` carried `goodslistxml.item => good` until this was checked
 against the sample — wrong, fixed to `goodlist`.
 
 Both samples nest one level further, an `<inside>` wrapper inside an item
 holding more items of the same element name. `xmlElements` names that too:
 `'goodsxml.item.inside' => 'good'` and `'goodslistxml.item.inside' =>
-'goodlist'` tell paogen that `inside` is a container wrapping repeated
+'goodlist'` tell poagen that `inside` is a container wrapping repeated
 `good`/`goodlist` children, rather than OpenAPI's unwrapped default of
 repeating `inside` itself as a sibling once per entry
-(kilbil-xml-nesting-is-unrepresentable). paogen validates these entries
+(kilbil-xml-nesting-is-unrepresentable). poagen validates these entries
 against the schema — a property absent from the item schema fails the run —
 and wires them onto the generated call itself: `goodsXml()`/`goodsListXml()`
 emit `->xmlList($body, 'goods', 'good', ['inside' => 'good'])` (and the
@@ -113,7 +113,7 @@ emitted XML against both vendor samples, structurally rather than by eye.
 **Formats that are mostly not OpenAPI formats.** Nine distinct values across 292
 uses: `int` (166), `double` (94), `date time` (15), `date` (9), `phone` (4),
 `data time` (3), `time` (2), `email` (2), `data` (1). Only `date` matches a
-paogen built-in. `date time` is a misspelling of `date-time` with a space, and
+poagen built-in. `date time` is a misspelling of `date-time` with a space, and
 `data`/`data time` look like further typos of it. A generator that silently
 ignores an unrecognised format loses 15 timestamps quietly; one that aborts on
 each loses the whole client. This is what `report-unrecognised-formats` is for,
@@ -134,7 +134,7 @@ or cookie parameters at all.
 Generating. All 36 operations, nothing skipped, `generated/` committed:
 
 ```
-php bin/paogen generate examples/kilbil/paogen.php   # exits 0
+php bin/poagen generate examples/kilbil/poagen.php   # exits 0
 just check-examples                                  # ✅ kilbil: no drift
 ```
 
@@ -146,14 +146,14 @@ output.
 
 ## Using the generated client
 
-The document declares one server, `https://bonus.kilbil.ru`, and paogen reads
+The document declares one server, `https://bonus.kilbil.ru`, and poagen reads
 it onto the client as a constant instead of leaving it for a consumer to copy
 out of the schema by hand:
 
 ```php
 use Acme\Kilbil\Generated\ApiClient;
 use Acme\Kilbil\Generated\ApiException;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
+use Poagen\Runtime\Http\HttpTransport;
 
 $client = new ApiClient(
     new HttpTransport(ApiClient::SERVER_1, ApiException::class),
@@ -168,7 +168,7 @@ host is still a different string away. See "Authentication" below for what
 
 ## What the profile has to say, and what it does not
 
-`paogen.php` is the demonstration that guidance shapes output. Delete everything
+`poagen.php` is the demonstration that guidance shapes output. Delete everything
 below `namespace:` and generation still succeeds; the client is only less pleasant
 to call. What is there, and why:
 
@@ -198,7 +198,7 @@ is the same shape with less at stake, so it is decided the same way.
 limitation, not a shrug: it reaches the consumer as a plain PHP `float`, and money
 in a `float` is a defect, not a style choice. There is no per-property fix while
 `double` still means several other things in this document. A consumer who needs
-`price` money-safe today has to do it after paogen: bind their own value object to
+`price` money-safe today has to do it after poagen: bind their own value object to
 `double` only if their own document spends that format on money alone, or narrow
 `price` to a `Money` type by hand right after hydration, leaving the rest of the
 document's doubles as floats.
@@ -217,7 +217,7 @@ interface and the gate would say so. That is what makes the seam a contract rath
 than a convention.
 
 What `isCodeValid` reads is a `result_code` the vendor puts inside a 200 body, and
-paogen deliberately does nothing with it. The document never marks that property as
+poagen deliberately does nothing with it. The document never marks that property as
 a failure signal — a generator acting on it would be acting on vendor knowledge it
 was never given, and a wrong guess turns a call that succeeded into a thrown
 exception. So the payload envelope stays the consumer's business, and this wrapper
@@ -231,6 +231,6 @@ globally, and it threads through: every client takes an `$h` constructor argumen
 and every request appends `h=<urlencoded key>` to its query string, joining the
 operation's own parameters rather than producing a second `?`.
 
-This was a silent-failure bug until `query-apikey-security-scheme` landed — paogen
+This was a silent-failure bug until `query-apikey-security-scheme` landed — poagen
 recognised `apiKey` only with `in: header`, so the emitted client took no
 credential, sent no credential, and exited 0. Every call would have come back 403.

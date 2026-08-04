@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use function array_values;
 use function count;
@@ -107,7 +107,7 @@ final readonly class ResponseArrayUnionPlanner
 
         $refusal = sprintf(
             '%s response of `%s` (%s): each branch is a list of a different item shape (%s), and those items share '
-                . 'every discriminating field — no element could be told apart, and paogen will not guess which '
+                . 'every discriminating field — no element could be told apart, and poagen will not guess which '
                 . "list the vendor sent. Resolve it by a Profile::\$unionPins['%s'] entry pinning one item shape "
                 . 'with a written reason.',
             $status,

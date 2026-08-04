@@ -34,7 +34,7 @@ the general problem it closes.
 
 The corpus settles what is actually at stake: kilbil and petstore carry zero
 XML responses between them. This is not a document with real content
-paogen needs to decode; it is a hole nobody has hit yet.
+poagen needs to decode; it is a hole nobody has hit yet.
 
 == Choice
 
@@ -47,7 +47,7 @@ either.
 This decision supersedes the "XML responses stay unimplemented" criterion
 from `xml-content-type-policy`. Refusal *is* the implementation: it is a
 documented, tested outcome the consumer can act on (accept the operation by
-name in `Profile::$skip`, or ask paogen to support it), not the silent void
+name in `Profile::$skip`, or ask poagen to support it), not the silent void
 that criterion's plain reading produced in practice. It satisfies the other,
 contradicting criterion — "reaches a documented, tested outcome rather than
 a silent drop" — instead of retiring it.
@@ -57,7 +57,7 @@ a silent drop" — instead of retiring it.
 Two other outcomes were on the table and both cost more than the corpus
 currently justifies:
 
-- *Decode to a typed model.* Needs an XML parser dependency paogen does not
+- *Decode to a typed model.* Needs an XML parser dependency poagen does not
   currently have, and a real decision about attributes versus elements that
   `xml-request-bodies-are-serialised-not-refused` explicitly declined to
   make for the response direction — "parsing XML back into a model has

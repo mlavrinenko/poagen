@@ -31,9 +31,9 @@ silently credential-less client is neither.
 
 The question this decision was filed to answer was which side `oauth2` falls
 on — wired, or refused as the transport's business. That framing was rejected.
-paogen never implements transport, and it never drops anything silently, so
+poagen never implements transport, and it never drops anything silently, so
 the question is not "wire or refuse" but "what does the document say that helps
-a consumer wire their own transport, and how does paogen hand it over".
+a consumer wire their own transport, and how does poagen hand it over".
 
 Almost every scheme in OpenAPI reduces to one credential attached to one
 request. That is the observation the framing missed, and it makes the wired
@@ -48,7 +48,7 @@ complicated the protocol around it is.
 `http` with any other scheme token, sent verbatim as
 `Authorization: <SchemeToken> <credential>` per RFC 7235; `oauth2` in every
 flow and `openIdConnect`, each taking one access token sent as
-`Authorization: Bearer <token>` per RFC 6750. For the last two paogen also
+`Authorization: Bearer <token>` per RFC 6750. For the last two poagen also
 emits the flow metadata the document carries — flow names, `authorizationUrl`,
 `tokenUrl`, `refreshUrl`, scope names and descriptions — as constants and
 docblock, and puts an operation's required scopes on that operation's
@@ -61,8 +61,8 @@ notice naming the scheme and where the certificate is configured. It never
 aborts and never stays silent.
 
 *Refused by name.* `http digest` and `http negotiate` need a challenge and a
-second request before a credential exists; paogen will not run a protocol.
-Anything a later specification revision adds that paogen does not recognise
+second request before a credential exists; poagen will not run a protocol.
+Anything a later specification revision adds that poagen does not recognise
 lands here too — unknown means refused, never ignored.
 
 *Refused, and says what to configure.* A requirement naming a scheme the
@@ -85,7 +85,7 @@ transport boundary — it would force the consumer to reach past the generated
 surface to add a header the document already specified, which is precisely
 what `typed-injectable-surface` exists to prevent.
 
-The metadata half follows from the same split. paogen emits the endpoints and
+The metadata half follows from the same split. poagen emits the endpoints and
 scope vocabulary *because* it does not acquire the token: a consumer reaching
 for their own OAuth library gets what it needs from the client they already
 have, instead of reopening the vendor's YAML.

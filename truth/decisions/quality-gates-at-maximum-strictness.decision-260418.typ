@@ -11,7 +11,7 @@
 
 == Context
 
-paogen has two distinct PHP audiences: #the(Generator) itself (its library
+poagen has two distinct PHP audiences: #the(Generator) itself (its library
 code) and #a(GeneratedFile) it produces. They have different
 pathologies. Library code can grow into a big-ball-of-mud; generated code
 doesn't, but it must withstand the user's own static analyser.
@@ -38,7 +38,7 @@ doesn't, but it must withstand the user's own static analyser.
 
 === Why bleeding-edge
 
-paogen is pre-alpha; we want to find PHPStan tightenings as they ship, not
+poagen is pre-alpha; we want to find PHPStan tightenings as they ship, not
 bulk-fix them at v1. Cost: occasional breakage on a PHPStan minor — that's
 acceptable for an early-stage project.
 
@@ -59,7 +59,7 @@ the world. Tunable by editing `.linecop.yaml`.
 - Test coverage is not a v0.1 gate. codecov was wired with no threshold,
   which is worse than no coverage report at all: it implied a bar that did
   not exist. The `codecov.yml` config and the `code-coverage` CI job were
-  removed. Much of paogen's logic is exercised via the committed
+  removed. Much of poagen's logic is exercised via the committed
   golden-output fixtures, so a line-coverage number on the library code
   alone would be both noisy and misleading. When the code surface
   stabilises, a new decision may re-introduce a coverage threshold

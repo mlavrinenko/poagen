@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 use function is_string;
 

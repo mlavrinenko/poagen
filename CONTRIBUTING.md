@@ -7,7 +7,7 @@ in this project and its community, you are expected to uphold this code.
 
 ## Communication Channels
 
-* GitHub Issues: <https://github.com/mlavrinenko/paogen/issues>
+* GitHub Issues: <https://github.com/mlavrinenko/poagen/issues>
 
 ## Developing
 
@@ -19,7 +19,7 @@ automatically when you `cd` into the repo.
 
 `composer.lock` is committed, so `composer install` — never `composer update`
 — reproduces the exact phpstan / rector / php-cs-fixer versions the gate was
-last green under. paogen is an application, not a library: nothing else pins
+last green under. poagen is an application, not a library: nothing else pins
 its QA tooling, so an uncommitted lock means every checkout resolves its own
 versions and `just check` can pass on one machine and fail on another for no
 real reason.
@@ -124,7 +124,7 @@ still supported, just explicit:
 just regenerate-fixture parameters
 ```
 
-which runs `paogen generate` against that profile with `--output` pointed at
+which runs `poagen generate` against that profile with `--output` pointed at
 the real `tests/fixtures/generated/parameters` tree, overriding the
 profile's scratch default for that one invocation. Review the diff before
 committing; `git diff tests/fixtures/generated/parameters` is the whole
@@ -202,7 +202,7 @@ on its own) sets `core.hooksPath` to `.githooks`, and its `commit-msg` hook
 rejects a commit that has neither an exempt type nor a `Refs:` trailer whose
 slug resolves to a real `truth/tasks/<slug>.task-*.typ` — a trailer naming a
 task that does not exist fails the same way a missing trailer does. For
-emergency local WIP, `PAOGEN_SKIP_TASK_CHECK=1 git commit ...` bypasses the
+emergency local WIP, `POAGEN_SKIP_TASK_CHECK=1 git commit ...` bypasses the
 check for that one commit; the hook still runs and prints a warning, so the
 bypass is visible rather than silent, and the trailer is expected before the
 commit leaves your machine.
@@ -210,7 +210,7 @@ commit leaves your machine.
 To audit a range of existing history — in CI or by hand — run
 `just check-commit-trailers <rev-range>`, e.g.
 `just check-commit-trailers origin/main..HEAD`. It applies the identical rule
-commit by commit and is unaffected by `PAOGEN_SKIP_TASK_CHECK`.
+commit by commit and is unaffected by `POAGEN_SKIP_TASK_CHECK`.
 
 ### Pull Requests
 
@@ -226,7 +226,7 @@ Use the [issue tracker][issues]. Include:
 * What you expected to happen
 * What actually happened (including stack traces / CLI output)
 * Minimal reproduction (schema snippet + command line)
-* PHP / paogen version (`paogen --version`)
+* PHP / poagen version (`poagen --version`)
 
 ⚠️ Do not include secrets or proprietary schemas. Redact before posting.
 
@@ -235,6 +235,6 @@ Use the [issue tracker][issues]. Include:
 For security issues, see [SECURITY.md](SECURITY.md). Please do **not** file
 public GitHub issues for vulnerabilities.
 
-[github]: https://github.com/mlavrinenko/paogen
-[issues]: https://github.com/mlavrinenko/paogen/issues
+[github]: https://github.com/mlavrinenko/poagen
+[issues]: https://github.com/mlavrinenko/poagen/issues
 [cc]: https://www.conventionalcommits.org/

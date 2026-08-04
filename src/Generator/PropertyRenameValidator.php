@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentShape;
-use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
-use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
+use Poagen\Generator\Generator\Emit\CompositionResolver;
+use Poagen\Generator\Generator\Emit\ModelEmitter;
 
 use function array_keys;
 use function in_array;
@@ -46,7 +44,7 @@ final readonly class PropertyRenameValidator
      * @param  array<string,string> $propertyRenames Profile::$propertyRenames
      * @return list<string>         failure lines; empty means the run may proceed
      */
-    public function validate(OpenApi $openApi, ComponentCatalog $components, array $propertyRenames): array
+    public function validate(OpenApi $openApi, Emit\ComponentCatalog $components, array $propertyRenames): array
     {
         $failures = [];
         /** @var array<string, array<string,string>> $byComponent wire property name → desired PHP name */
@@ -147,17 +145,17 @@ final readonly class PropertyRenameValidator
      *
      * @return list<string>|null
      */
-    private function propertiesOf(OpenApi $openApi, ComponentCatalog $components, string $rawName): ?array
+    private function propertiesOf(OpenApi $openApi, Emit\ComponentCatalog $components, string $rawName): ?array
     {
         $shape = $components->shapeOf($rawName);
 
-        if (!$shape instanceof ComponentShape) {
+        if (!$shape instanceof Emit\ComponentShape) {
             return null;
         }
 
         $schema = match ($shape->kind) {
-            ComponentShape::KIND_OBJECT => $shape->schema,
-            ComponentShape::KIND_ALLOF_OBJECT => $shape->schema instanceof Schema
+            Emit\ComponentShape::KIND_OBJECT => $shape->schema,
+            Emit\ComponentShape::KIND_ALLOF_OBJECT => $shape->schema instanceof Schema
                 ? CompositionResolver::materialiseAllOf($shape->schema, $openApi)
                 : null,
             default => null,

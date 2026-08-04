@@ -1,6 +1,6 @@
-# paogen engineering hazards
+# poagen engineering hazards
 
-Traps measured the expensive way while writing or debugging paogen's own code
+Traps measured the expensive way while writing or debugging poagen's own code
 and its gates. `AGENT.md` is the entry point and covers process; this file is
 the reactive reference — read it before touching `src/`, `runtime/src/` or
 `tests/`, or when a gate goes red in a way `AGENT.md` doesn't explain.
@@ -16,7 +16,7 @@ recognisable if you meet it outside `just`: an opaque `ProcessPool.php line 30:
 Process "<random>" not found`, which means a stale cache, not a broken change.
 
 **Build any `$PWD`-based PATH *after* you `cd`, never before.** There are
-usually several paogen worktrees live at once, each with its own `vendor/`. A
+usually several poagen worktrees live at once, each with its own `vendor/`. A
 PATH fragment expanded in the wrong directory silently runs another worktree's
 phpstan against this one's source and reports a clean result. Check `pwd` first
 and pin absolute paths.
@@ -54,7 +54,7 @@ own keys, read through `getSerializableData()`.
 Schema defaults the keyword to `true` and the parser substitutes that default
 (`spec/Schema.php`'s `attributeDefaults()`), so a document that wrote nothing
 reads back identically to one that wrote `true`. Believing the accessor puts an
-extras bag on every object paogen emits — 107 models in kilbil alone.
+extras bag on every object poagen emits — 107 models in kilbil alone.
 `getSerializableData()` again reflects only what the document set;
 `ObjectShape::declaresOpenExtras()` holds that reading. `false` is a third
 state, and still the signal that closes a shape.

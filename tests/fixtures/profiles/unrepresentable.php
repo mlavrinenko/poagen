@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 // See scratch-output.php: no golden tree of its own, so it writes to scratch
 // like every other fixture profile here.
@@ -25,8 +25,8 @@ require_once __DIR__ . '/scratch-output.php';
 
 return new Profile(
     schema: __DIR__ . '/../schemas/unrepresentable-3.0.yaml',
-    output: paogen_fixture_scratch_output('unrepresentable'),
-    namespace: 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Unrepresentable',
+    output: poagen_fixture_scratch_output('unrepresentable'),
+    namespace: 'Poagen\\Generator\\Tests\\Fixtures\\Generated\\Unrepresentable',
     skip: [
         'createWidget' => 'multipart/form-data request body — every part carries its own content type',
         'Gadget' => 'oneOf without a discriminator, and no field is common to every branch',

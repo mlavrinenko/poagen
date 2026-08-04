@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Operation;
-use Mlavrinenko\Paogen\Generator\Bindings;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\PhpFile;
@@ -44,12 +43,12 @@ final readonly class SubClientEmitter
     /**
      * A tag's sub-client, or null when nothing in the group could be emitted.
      *
-     * @return array{source:string, interface:string, skipped:list<SkippedOperation>, operations:list<Operation>}
+     * @return array{source: string, interface: string, skipped: list<SkippedOperation>, operations: list<Operation>}
      */
     public function emit(
         string $clientNamespace,
         TagGroup $group,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
         [$file, $namespace, $class] = $this->openSubClass($clientNamespace, $group->phpName, $group->interfaceName());
@@ -137,13 +136,13 @@ final readonly class SubClientEmitter
     }
 
     /**
-     * @return array{emitted:int, skipped:list<SkippedOperation>, operations:list<Operation>}
+     * @return array{emitted: int, skipped: list<SkippedOperation>, operations: list<Operation>}
      */
     public function addOperations(
         ClassType $class,
         PhpNamespace $namespace,
         TagGroup $group,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
         $skipped = [];

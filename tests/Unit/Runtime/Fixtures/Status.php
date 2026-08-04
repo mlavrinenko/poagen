@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures;
+namespace Poagen\Generator\Tests\Unit\Runtime\Fixtures;
 
 enum Status: string
 {

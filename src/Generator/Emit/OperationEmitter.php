@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameNormaliser;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\SymbolKind;
+use Poagen\Runtime\Contract\Envelope;
 
 use function assert;
 use function is_string;

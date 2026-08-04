@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Parameter;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\SymbolKind;
 
 /**
  * One OpenAPI parameter paired with the PHP identifier the emitter
@@ -17,7 +17,7 @@ use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
  * needs — the path template token, the header key, the query key.
  * The PHP name (`contentType`, `xTraceId`) is what `Method::addParameter`
  * accepts and what `$path = \str_replace('{Content-Type}', ...)` would
- * never produce. T-025 routes both through the registry so paogen no
+ * never produce. T-025 routes both through the registry so poagen no
  * longer skips an op just because its raw parameter is `Content-Type`.
  *
  * @internal

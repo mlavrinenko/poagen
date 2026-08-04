@@ -2,13 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 
 /**
  * Resolution strategy for an inline object schema (T-013).
@@ -45,10 +42,10 @@ final class InlineObjectResolver
      */
     public static function resolve(
         Schema $node,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         string $modelNamespace,
-        NameRegistry $registry,
-        ?EnumCatalog $enums,
+        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
+        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
     ): TypeResolver {
         // 3.0 `nullable: true` or 3.1 `type: [T, "null"]` — read once, shared
         // with TypeResolver and PropertySynthesiser via SchemaType.
@@ -76,10 +73,10 @@ final class InlineObjectResolver
      */
     public static function valueMapDoc(
         Schema $node,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         string $modelNamespace,
-        NameRegistry $registry,
-        ?EnumCatalog $enums,
+        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
+        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
     ): string {
         $additional = $node->additionalProperties;
 

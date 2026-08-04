@@ -3,128 +3,128 @@
     "adapter": "phpunit",
     "entries": [
         {
-            "test_id": "PaogenCLITest::testNoArgumentsPrintsUsageAndExits0",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testNoArgumentsPrintsUsageAndExits0",
+            "feature": "poagen CLI",
             "scenario": "No arguments prints usage and exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 14,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testHelpPrintsUsageAndExits0",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testHelpPrintsUsageAndExits0",
+            "feature": "poagen CLI",
             "scenario": "--help prints usage and exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 20,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testHelpSubcommandPrintsUsageAndExits0",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testHelpSubcommandPrintsUsageAndExits0",
+            "feature": "poagen CLI",
             "scenario": "help subcommand prints usage and exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 26,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testVersionPrintsThePaogenVersionAndExits0",
-            "feature": "paogen CLI",
-            "scenario": "--version prints the paogen version and exits 0",
+            "test_id": "PoagenCLITest::testVersionPrintsThePoagenVersionAndExits0",
+            "feature": "poagen CLI",
+            "scenario": "--version prints the poagen version and exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 34,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testVersionSubcommandPrintsThePaogenVersionAndExits0",
-            "feature": "paogen CLI",
-            "scenario": "version subcommand prints the paogen version and exits 0",
+            "test_id": "PoagenCLITest::testVersionSubcommandPrintsThePoagenVersionAndExits0",
+            "feature": "poagen CLI",
+            "scenario": "version subcommand prints the poagen version and exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 40,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testVersionFallsBackToANonEmptySentinelWhenComposerMetadataIsMissing",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testVersionFallsBackToANonEmptySentinelWhenComposerMetadataIsMissing",
+            "feature": "poagen CLI",
             "scenario": "Version falls back to a non-empty sentinel when Composer metadata is missing",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 46,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testUnknownCommandReportsOnStderrAndExits2",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testUnknownCommandReportsOnStderrAndExits2",
+            "feature": "poagen CLI",
             "scenario": "Unknown command reports on stderr and exits 2",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 57,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testValidateOnASyntacticallyValidOpenAPIDocumentExits0",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testValidateOnASyntacticallyValidOpenAPIDocumentExits0",
+            "feature": "poagen CLI",
             "scenario": "validate on a syntactically valid OpenAPI document exits 0",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 65,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testValidateOnAMalformedDocumentReportsOnStderrAndExits1",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testValidateOnAMalformedDocumentReportsOnStderrAndExits1",
+            "feature": "poagen CLI",
             "scenario": "validate on a malformed document reports on stderr and exits 1",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 71,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testValidateWithNoArgumentReportsOnStderrAndExits2",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testValidateWithNoArgumentReportsOnStderrAndExits2",
+            "feature": "poagen CLI",
             "scenario": "validate with no argument reports on stderr and exits 2",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 78,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testOutputRedirectsTheGeneratedTreeToTheSuppliedDirectory",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testOutputRedirectsTheGeneratedTreeToTheSuppliedDirectory",
+            "feature": "poagen CLI",
             "scenario": "--output redirects the generated tree to the supplied directory",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 86,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testDryRunPrintsATreeSummaryAndWritesNothing",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testDryRunPrintsATreeSummaryAndWritesNothing",
+            "feature": "poagen CLI",
             "scenario": "--dry-run prints a tree summary and writes nothing",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 96,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testDiffAgainstAMatchingGoldenTreeExits0WithNoOutput",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testDiffAgainstAMatchingGoldenTreeExits0WithNoOutput",
+            "feature": "poagen CLI",
             "scenario": "--diff against a matching golden tree exits 0 with no output",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 108,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testDiffAgainstACorruptedGoldenTreePrintsUnifiedDiffAndExits1",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testDiffAgainstACorruptedGoldenTreePrintsUnifiedDiffAndExits1",
+            "feature": "poagen CLI",
             "scenario": "--diff against a corrupted golden tree prints unified diff and exits 1",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 118,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testDryRunCombinedWithDiffIsAUsageError",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testDryRunCombinedWithDiffIsAUsageError",
+            "feature": "poagen CLI",
             "scenario": "--dry-run combined with --diff is a usage error",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 128,
             "stage": "unstable"
         },
         {
-            "test_id": "PaogenCLITest::testGenerateEmitsNoPHPDeprecationNoticesOn84",
-            "feature": "paogen CLI",
+            "test_id": "PoagenCLITest::testGenerateEmitsNoPHPDeprecationNoticesOn84",
+            "feature": "poagen CLI",
             "scenario": "generate emits no PHP deprecation notices on 8.4",
             "spec_file": "truth/specs/cli.feature-260417.typ",
             "spec_line": 139,

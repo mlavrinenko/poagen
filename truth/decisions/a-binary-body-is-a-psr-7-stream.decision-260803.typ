@@ -95,7 +95,7 @@ different things, and only the first was ruled out.
   GitHub's `application/octocat-stream` — whose schema says `type: string` —
   is correctly a string despite its name.
 - Several text types on one body do not multiply the emitted method. Where a
-  document declares more than one, paogen picks by declaration order and says
+  document declares more than one, poagen picks by declaration order and says
   so; it does not negotiate at call time.
 - `multipart/form-data` stays refused, now with a reason naming its own shape
   rather than a content-type list. It carries per-part content types and

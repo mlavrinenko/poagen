@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
 use LogicException;
-use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
+use Poagen\Generator\Generator\Naming\InlinePayloadName;
 
 /**
  * Turns an {@see AllOfMerge} into what {@see InlinePayloadPlanner} needs for
@@ -100,7 +100,7 @@ final readonly class InlineAllOfPlanner
         }
 
         if ($merge->isUnion()) {
-            $refusal = 'allOf response has a oneOf/anyOf member — paogen does not synthesise a response branch '
+            $refusal = 'allOf response has a oneOf/anyOf member — poagen does not synthesise a response branch '
                 . 'union (hydrating an incoming body into the right branch needs a discriminator or a union pin '
                 . 'this class does not have); merge the branches in the document, or skip the operation';
 

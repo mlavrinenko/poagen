@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\UnionGuidanceValidator;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\UnionGuidanceValidator;
 
 use function count;
 use function implode;
@@ -237,7 +237,7 @@ final readonly class DiscriminatorEnforcer
 
         return sprintf(
             'Undiscriminated union at %s (%s): branches %s share every discriminating field — each requires nothing '
-                . 'the others do not also declare, so no payload could select between them and paogen will not '
+                . 'the others do not also declare, so no payload could select between them and poagen will not '
                 . "guess. Resolve it by adding a `discriminator` to the document, by a Profile::\$unionTags['%s'] "
                 . "entry naming a tag property on the enclosing object, or by a Profile::\$unionPins['%s'] entry "
                 . 'pinning one branch with a written reason.',

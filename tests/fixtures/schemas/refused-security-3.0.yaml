@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Security schemes paogen refuses by name
+  title: Security schemes poagen refuses by name
   version: 1.0.0
   description: >
     `http digest` and `http negotiate` need a challenge and a second

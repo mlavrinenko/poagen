@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 return new Profile(
     schema: __DIR__ . '/schemas/petstore-3.0.yaml',
@@ -16,7 +16,7 @@ return new Profile(
     securitySchemes: [
         // The document requires `api_key` on getPetById and getInventory but
         // declares only `petstore_auth` under components.securitySchemes, so
-        // the requirement names a credential nothing describes. paogen
+        // the requirement names a credential nothing describes. poagen
         // refuses to guess a header name — a wrong guess is a 401 you debug
         // at runtime — and aborts naming this key. Swagger's own petstore
         // sends the key as the `api_key` request header, so that is what

@@ -2,25 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use LogicException;
-use Mlavrinenko\Paogen\Generator\Emit\ArrayWrapperEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
-use Mlavrinenko\Paogen\Generator\Emit\ComponentShape;
-use Mlavrinenko\Paogen\Generator\Emit\CompositionResolver;
-use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
-use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
-use Mlavrinenko\Paogen\Generator\Emit\ScalarVoEmitter;
-use Mlavrinenko\Paogen\Generator\Emit\SynthesisedModel;
-use Mlavrinenko\Paogen\Generator\Emit\UnionInterfaceEmitter;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Emit\ComponentCatalog;
+use Poagen\Generator\Generator\Emit\DiscriminatorEnforcer;
+use Poagen\Generator\Generator\Emit\InlinePayloadPlanner;
 
 use function in_array;
 use function is_string;
@@ -37,10 +27,10 @@ use const SORT_STRING;
 final readonly class ModelPlanner
 {
     public function __construct(
-        private ModelEmitter $emitter,
-        private ScalarVoEmitter $scalarEmitter = new ScalarVoEmitter(),
-        private ArrayWrapperEmitter $arrayEmitter = new ArrayWrapperEmitter(),
-        private UnionInterfaceEmitter $unionEmitter = new UnionInterfaceEmitter(),
+        private Emit\ModelEmitter $emitter,
+        private Emit\ScalarVoEmitter $scalarEmitter = new Emit\ScalarVoEmitter(),
+        private Emit\ArrayWrapperEmitter $arrayEmitter = new Emit\ArrayWrapperEmitter(),
+        private Emit\UnionInterfaceEmitter $unionEmitter = new Emit\UnionInterfaceEmitter(),
     ) {}
 
     /**
@@ -48,7 +38,7 @@ final readonly class ModelPlanner
      * @param array<string,true>     $excludedComponents Raw component names to omit entirely — e.g. ones flagged
      *                                                    by {@see DiscriminatorEnforcer}
      *                                                    and accepted via `Profile::$skip` (abort-on-unrepresentable-constructs).
-     * @param list<SynthesisedModel> $extraRoots         Classes named outside the component catalogue — the operation
+     * @param list<Emit\SynthesisedModel> $extraRoots Classes named outside the component catalogue — the operation
      *                                                    payloads {@see InlinePayloadPlanner}
      *                                                    found. They join the same queue as inline children, so nesting
      *                                                    below them is reached by the machinery that was already there.
@@ -58,21 +48,21 @@ final readonly class ModelPlanner
         OpenApi $openApi,
         string $modelNamespace,
         string $modelDir,
-        NameRegistry $registry,
+        Naming\NameRegistry $registry,
         Bindings $bindings,
-        EnumCatalog $enums,
+        Enum\EnumCatalog $enums,
         array &$writes,
         ComponentCatalog $components,
         array $excludedComponents = [],
         array $extraRoots = [],
-        ?ModelNameLedger $ledger = null,
+        ?Emit\ModelNameLedger $ledger = null,
         array $propertyRenames = [],
     ): void {
-        $ledger ??= new ModelNameLedger();
+        $ledger ??= new Emit\ModelNameLedger();
         $rawNames = array_keys($components->all());
         sort($rawNames, SORT_STRING);
 
-        /** @var list<SynthesisedModel> $pending */
+        /** @var list<Emit\SynthesisedModel> $pending */
         $pending = $extraRoots;
 
         foreach ($rawNames as $rawName) {
@@ -82,13 +72,13 @@ final readonly class ModelPlanner
 
             $shape = $components->shapeOf($rawName);
 
-            if (!$shape instanceof ComponentShape) {
+            if (!$shape instanceof Emit\ComponentShape) {
                 continue;
             }
 
             // Enum components land in the enum namespace and unsupported ones
             // land nowhere, so neither competes for a model class name.
-            if (!in_array($shape->kind, [ComponentShape::KIND_ENUM, ComponentShape::KIND_UNSUPPORTED], true)) {
+            if (!in_array($shape->kind, [Emit\ComponentShape::KIND_ENUM, Emit\ComponentShape::KIND_UNSUPPORTED], true)) {
                 $ledger->claim($shape->phpName, 'components.schemas/' . $rawName);
             }
 
@@ -100,18 +90,18 @@ final readonly class ModelPlanner
 
     /**
      * @param array<string,string>   $writes
-     * @param list<SynthesisedModel> $pending
+     * @param list<Emit\SynthesisedModel> $pending
      * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
      */
     private function emitShape(
         string $rawName,
-        ComponentShape $shape,
+        Emit\ComponentShape $shape,
         OpenApi $openApi,
         string $modelNamespace,
         string $modelDir,
-        NameRegistry $registry,
+        Naming\NameRegistry $registry,
         Bindings $bindings,
-        EnumCatalog $enums,
+        Enum\EnumCatalog $enums,
         ComponentCatalog $components,
         array &$writes,
         array &$pending,
@@ -120,18 +110,18 @@ final readonly class ModelPlanner
         $path = $modelDir . DIRECTORY_SEPARATOR . $shape->phpName . '.php';
 
         switch ($shape->kind) {
-            case ComponentShape::KIND_ENUM:
-            case ComponentShape::KIND_UNSUPPORTED:
+            case Emit\ComponentShape::KIND_ENUM:
+            case Emit\ComponentShape::KIND_UNSUPPORTED:
                 return;
 
-            case ComponentShape::KIND_OBJECT:
+            case Emit\ComponentShape::KIND_OBJECT:
                 $effective = $shape->schema ?? throw new LogicException('object shape missing schema');
                 $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames);
 
                 return;
 
-            case ComponentShape::KIND_ALLOF_OBJECT:
-                $effective = CompositionResolver::materialiseAllOf($shape->schema ?? throw new LogicException('allOf shape missing schema'), $openApi);
+            case Emit\ComponentShape::KIND_ALLOF_OBJECT:
+                $effective = Emit\CompositionResolver::materialiseAllOf($shape->schema ?? throw new LogicException('allOf shape missing schema'), $openApi);
 
                 if (!$effective instanceof Schema) {
                     return;
@@ -141,17 +131,17 @@ final readonly class ModelPlanner
 
                 return;
 
-            case ComponentShape::KIND_SCALAR:
+            case Emit\ComponentShape::KIND_SCALAR:
                 $writes[$path] = $this->scalarEmitter->emit($modelNamespace, $shape);
 
                 return;
 
-            case ComponentShape::KIND_ARRAY:
+            case Emit\ComponentShape::KIND_ARRAY:
                 $writes[$path] = $this->arrayEmitter->emit($modelNamespace, $shape, $bindings, $registry, $enums);
 
                 return;
 
-            case ComponentShape::KIND_UNION:
+            case Emit\ComponentShape::KIND_UNION:
                 $writes[$path] = $this->unionEmitter->emit($modelNamespace, $shape);
                 $this->queueInlineUnionBranches($shape, $pending);
 
@@ -161,16 +151,16 @@ final readonly class ModelPlanner
 
     /**
      * @param array<string,string>   $writes
-     * @param list<SynthesisedModel> $pending
+     * @param list<Emit\SynthesisedModel> $pending
      * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
      */
     private function emitObject(
         Schema $effective,
-        ComponentShape $shape,
+        Emit\ComponentShape $shape,
         string $modelNamespace,
-        NameRegistry $registry,
+        Naming\NameRegistry $registry,
         Bindings $bindings,
-        EnumCatalog $enums,
+        Enum\EnumCatalog $enums,
         ComponentCatalog $components,
         string $rawName,
         string $path,
@@ -204,9 +194,9 @@ final readonly class ModelPlanner
      * {@see ComponentCatalog::interfacesFor} when the target object Model
      * is emitted.
      *
-     * @param list<SynthesisedModel> $pending
+     * @param list<Emit\SynthesisedModel> $pending
      */
-    private function queueInlineUnionBranches(ComponentShape $shape, array &$pending): void
+    private function queueInlineUnionBranches(Emit\ComponentShape $shape, array &$pending): void
     {
         $parent = $shape->phpName;
         $index = 0;
@@ -219,7 +209,7 @@ final readonly class ModelPlanner
             }
 
             $childName = $parent . $this->branchLabel($branch, $index);
-            $pending[] = SynthesisedModel::forNode($childName, $branch, [$parent]);
+            $pending[] = Emit\SynthesisedModel::forNode($childName, $branch, [$parent]);
         }
     }
 
@@ -228,7 +218,7 @@ final readonly class ModelPlanner
         $title = $branch->title;
 
         if (is_string($title) && $title !== '') {
-            $pascal = EnumCatalog::pascalize($title);
+            $pascal = Enum\EnumCatalog::pascalize($title);
 
             if ($pascal !== '') {
                 return $pascal;
@@ -244,23 +234,23 @@ final readonly class ModelPlanner
      * queue is empty. Sorting by name at each batch keeps byte-stability
      * across runs regardless of the order children were discovered.
      *
-     * @param list<SynthesisedModel> $pending
+     * @param list<Emit\SynthesisedModel> $pending
      * @param array<string,string>   $writes
      */
     private function drain(
         array $pending,
         string $modelNamespace,
         string $modelDir,
-        NameRegistry $registry,
+        Naming\NameRegistry $registry,
         Bindings $bindings,
-        EnumCatalog $enums,
+        Enum\EnumCatalog $enums,
         array &$writes,
-        ModelNameLedger $ledger,
+        Emit\ModelNameLedger $ledger,
     ): void {
         while ($pending !== []) {
             usort(
                 $pending,
-                static fn(SynthesisedModel $a, SynthesisedModel $b): int => strcmp($a->name, $b->name),
+                static fn(Emit\SynthesisedModel $a, Emit\SynthesisedModel $b): int => strcmp($a->name, $b->name),
             );
 
             $batch = $pending;

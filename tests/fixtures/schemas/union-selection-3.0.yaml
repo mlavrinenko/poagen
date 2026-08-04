@@ -8,7 +8,7 @@ info:
     them against each other.
 
     `Sighting.creature` is layer three read the other way round: `Dog` and
-    `Cat` declare disjoint required fields, so paogen computes a
+    `Cat` declare disjoint required fields, so poagen computes a
     discriminating field and needs no guidance. `Enclosure.occupant` adds the
     closed-shape predicate — `Vacant` declares no properties and closes itself,
     so it is selected by an empty payload where `Dog` is selected by `bark`.

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Fixtures\ValueObject;
+namespace Poagen\Generator\Tests\Fixtures\ValueObject;
 
 use InvalidArgumentException;
-use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Generator\Generator\Attribute\BindsFormat;
+use Poagen\Runtime\ScalarBinding;
 
 use function is_string;
 

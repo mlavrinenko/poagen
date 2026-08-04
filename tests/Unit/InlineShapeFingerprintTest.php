@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\InlineShapeFingerprint;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\InlineShapeFingerprint;
 
 /**
  * Unit coverage for {@see InlineShapeFingerprint} — the structural-identity

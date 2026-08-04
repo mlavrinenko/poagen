@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
 
 use function is_array;
 use function is_string;
@@ -45,7 +45,7 @@ final readonly class AllOfBranchBuilder
     {
         if (!$branch instanceof Schema) {
             throw new AllOfRefusal(sprintf(
-                'allOf member %s branch %d is a $ref, not an inline object shape — paogen only merges inline '
+                'allOf member %s branch %d is a $ref, not an inline object shape — poagen only merges inline '
                     . 'property/required branches',
                 $acc->unionSite,
                 $index,
@@ -54,7 +54,7 @@ final readonly class AllOfBranchBuilder
 
         if (AllOfMerger::rawBranches($branch) !== [] || (is_array($branch->allOf) && $branch->allOf !== [])) {
             throw new AllOfRefusal(sprintf(
-                'allOf member %s branch %d nests further composition — paogen does not model that depth',
+                'allOf member %s branch %d nests further composition — poagen does not model that depth',
                 $acc->unionSite,
                 $index,
             ));

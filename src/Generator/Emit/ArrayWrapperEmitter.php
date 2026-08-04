@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Enum\EnumCatalog;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
 
@@ -34,9 +31,9 @@ final readonly class ArrayWrapperEmitter
     public function emit(
         string $modelNamespace,
         ComponentShape $shape,
-        Bindings $bindings,
-        NameRegistry $registry,
-        EnumCatalog $enums,
+        \Poagen\Generator\Generator\Bindings $bindings,
+        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
+        \Poagen\Generator\Generator\Enum\EnumCatalog $enums,
     ): string {
         assert($shape->kind === ComponentShape::KIND_ARRAY);
 
@@ -59,10 +56,10 @@ final readonly class ArrayWrapperEmitter
 
     private function itemPhpDoc(
         ?Schema $items,
-        Bindings $bindings,
+        \Poagen\Generator\Generator\Bindings $bindings,
         string $modelNamespace,
-        NameRegistry $registry,
-        EnumCatalog $enums,
+        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
+        \Poagen\Generator\Generator\Enum\EnumCatalog $enums,
     ): string {
         if (!$items instanceof Schema) {
             return 'mixed';

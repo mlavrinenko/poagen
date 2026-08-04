@@ -1,4 +1,4 @@
-# mlavrinenko/paogen Changelog
+# poagen/client-generator Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Every emitted file opens with a comment naming itself as generated, naming
-  the profile it came from, and printing the `paogen generate <profile>` that
+  the profile it came from, and printing the `poagen generate <profile>` that
   reproduces it. The header carries no timestamp, no version and no absolute
   path, so a re-run over unchanged inputs is still an empty diff. Emitted files
   are deliberately *not* made read-only — see
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for.
 - `Profile::$source` names the profile in that header. `ProfileLoader` fills it
   with the path the run was given, relative to the working directory; a profile
-  built in code keeps the conventional `paogen.php` unless it says otherwise.
+  built in code keeps the conventional `poagen.php` unless it says otherwise.
 - A JSON Schema 2020-12 keyword no emitter implements — `const`, `prefixItems`,
   `unevaluatedProperties`, `contentMediaType` — stops the run and names itself,
   the JSON pointer to the node that used it, and the operation or component
@@ -39,6 +39,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking.** Both packages publish under a new vendor, and the PHP
+  namespaces are renamed to match: `mlavrinenko/paogen` (namespace
+  `Mlavrinenko\Paogen\`) is now `poagen/client-generator` (namespace
+  `Poagen\Generator\`), and `mlavrinenko/paogen-runtime` (namespace
+  `Mlavrinenko\Paogen\Runtime\`) is now `poagen/client-runtime` (namespace
+  `Poagen\Runtime\` — a sibling of the generator's namespace now, not a child
+  of it, since the two are separately published packages). The binary is
+  `poagen`, not `paogen`. A consumer holding the old package names or
+  importing the old namespaces needs to update both `composer.json` requires
+  and every `use` statement; there is no compatibility shim. See
+  [the task](truth/tasks/rename-the-vendor-packages-and-namespaces-before-publishing.task-260803.typ)
+  for the reasoning.
 - **Breaking.** `XmlWriterInterface::renderList()` takes a fourth argument,
   `$nestedContainers`, so a validated nested-container binding reaches
   whichever writer the transport holds — default or a consumer's own
@@ -80,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of `cebe/php-openapi`. The fork is maintained, declares
   `replace: cebe/php-openapi`, keeps the identical `cebe\openapi\` PSR-4
   namespace, and models OpenAPI 3.1 — including `type` as a list, which the
-  document paogen is built against uses 87 times. See
+  document poagen is built against uses 87 times. See
   [the decision](truth/decisions/openapi-31-through-a-maintained-parser.decision-260729.typ).
 - The 3.0 `nullable: true` idiom and the 3.1 `type: [T, "null"]` idiom emit the
   same PHP type, proven by a fixture pair that differs in nothing else and
@@ -201,7 +213,7 @@ explicit post-v0.1 follow-ups (see
 
 #### DX
 
-- `paogen generate <profile>` grows three DX flags (T-019):
+- `poagen generate <profile>` grows three DX flags (T-019):
   - `--output=<dir>` redirects the generated tree to an alternative
     directory without editing the profile.
   - `--dry-run` prints a tree-shaped summary of would-be-written and
@@ -209,7 +221,7 @@ explicit post-v0.1 follow-ups (see
   - `--diff` prints a unified diff (via `sebastian/diff`) for every
     would-be-written file against the copy on disk; exits 1 when any
     diff is non-empty.
-- `paogen validate <schema>` subcommand: parses a YAML or JSON OpenAPI
+- `poagen validate <schema>` subcommand: parses a YAML or JSON OpenAPI
   document, runs `OpenApi::validate()`, and reports parse / validation
   / usage errors on stderr (T-018, `plain-getopt-for-the-cli`).
 - Generator prunes stale `.php` files under `Generated/` at the end of

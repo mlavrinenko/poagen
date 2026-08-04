@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
+namespace Poagen\Generator\Generator\Naming;
 
-use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
+use Poagen\Generator\Generator\Emit\InlinePayloadPlanner;
 
 /**
  * One derivation rule for every class {@see InlinePayloadPlanner}

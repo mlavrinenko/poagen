@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\OpenApi;
@@ -113,7 +113,7 @@ final readonly class AllOfMerger
     {
         if ($acc->unionMember instanceof Schema) {
             throw new AllOfRefusal(sprintf(
-                'allOf declares more than one oneOf/anyOf member (%s and %s) — paogen merges at most one union '
+                'allOf declares more than one oneOf/anyOf member (%s and %s) — poagen merges at most one union '
                     . 'member per allOf',
                 $acc->unionSite,
                 $site,
@@ -122,7 +122,7 @@ final readonly class AllOfMerger
 
         if (is_array($target->allOf) && $target->allOf !== []) {
             throw new AllOfRefusal(sprintf(
-                'allOf member %s combines oneOf/anyOf with its own allOf — paogen does not model that combination',
+                'allOf member %s combines oneOf/anyOf with its own allOf — poagen does not model that combination',
                 $site,
             ));
         }

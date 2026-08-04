@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\EffectiveShape;
 
 use function implode;
 use function in_array;
@@ -113,7 +112,7 @@ final readonly class UnionTagGuidanceChecks
         /** @var array<string,Schema|Reference> $properties */
         $properties = $parent->properties ?? [];
         $node = $properties[$field] ?? null;
-        $schema = $node === null ? null : EffectiveShape::resolve($node, $openApi);
+        $schema = $node === null ? null : Emit\EffectiveShape::resolve($node, $openApi);
 
         if (!$schema instanceof Schema || !is_array($schema->enum) || $schema->enum === []) {
             return [];

@@ -62,7 +62,7 @@ Split the findings list in two, so a reader can stop after the first part:
 
 - **Needs the owner** — the choice trades off something only the owner
   can weigh: scope, a public contract, a threshold with no objective
-  floor, anything that changes what paogen promises a consumer.
+  floor, anything that changes what poagen promises a consumer.
 - **An implementer may accept** — the choice is sound and narrow enough
   that reversing it later, if it turns out wrong, costs about what
   making it cost. State it anyway; do not silently ratify it by omission.

@@ -14,7 +14,7 @@
 == Context
 
 #link("openapi-31-strategy.decision-260419.typ")[Strategy for OpenAPI 3.1 support] deferred 3.1 support and named an external pre-processor as the
-interim. That interim is over: #the(Schema) documents paogen wants to
+interim. That interim is over: #the(Schema) documents poagen wants to
 generate against have moved to 3.1.
 
 Two things this decision originally asserted were false, and are corrected

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use function sprintf;
 
@@ -16,7 +16,7 @@ use function sprintf;
  */
 final readonly class SkippedOperation
 {
-    public const string REASON_MISSING_OPERATION_ID = 'operation has no operationId — paogen needs one to name '
+    public const string REASON_MISSING_OPERATION_ID = 'operation has no operationId — poagen needs one to name '
         . 'a method and to reference the operation from Profile::$skip; add operationId to this operation in the schema';
 
     public function __construct(

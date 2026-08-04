@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelSite;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\InlineModelSite;
 
 /**
  * Unit coverage for {@see InlineModelSite} — splitting a

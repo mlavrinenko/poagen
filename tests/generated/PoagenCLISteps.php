@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use FilesystemIterator;
-use Mlavrinenko\Paogen\Cli;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Cli;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -22,10 +22,10 @@ use const PHP_BINARY;
 use const SORT_STRING;
 
 /**
- * Step implementations for PaogenCLI.
+ * Step implementations for PoagenCLI.
  * This file is yours — speconaut only appends new step stubs.
  */
-final class PaogenCLISteps
+final class PoagenCLISteps
 {
     private readonly TestCase $test;
 
@@ -59,19 +59,19 @@ final class PaogenCLISteps
         fclose($errStream);
     }
 
-    public function whenPaogenCLIIsInvokedWithNoArguments(): void
+    public function whenPoagenCLIIsInvokedWithNoArguments(): void
     {
-        $this->invokeCli(['paogen']);
+        $this->invokeCli(['poagen']);
     }
 
-    public function thenPaogenCLIShouldExitWithCodeCode(int $code): void
+    public function thenPoagenCLIShouldExitWithCodeCode(int $code): void
     {
         TestCase::assertSame($code, $this->exitCode);
     }
 
-    public function whenPaogenCLIIsInvokedWithArgumentArg(string $arg): void
+    public function whenPoagenCLIIsInvokedWithArgumentArg(string $arg): void
     {
-        $this->invokeCli(['paogen', $arg]);
+        $this->invokeCli(['poagen', $arg]);
     }
 
     private string $brokenYamlPath = '';
@@ -97,7 +97,7 @@ final class PaogenCLISteps
         return dirname(__DIR__, 2) . '/' . self::SCHEMA_FIXTURE;
     }
 
-    public function whenPaogenCLIIsInvokedWithArgumentsArgs(string $args): void
+    public function whenPoagenCLIIsInvokedWithArgumentsArgs(string $args): void
     {
         // The spec uses `<that-path>` / `<tmp-dir>` / `<profile-path>` as
         // placeholders for the scratch paths created in the matching
@@ -123,7 +123,7 @@ final class PaogenCLISteps
             return;
         }
 
-        $this->invokeCli(array_merge(['paogen'], $parts));
+        $this->invokeCli(array_merge(['poagen'], $parts));
     }
 
 
@@ -134,7 +134,7 @@ final class PaogenCLISteps
         // exit code. For scenarios that assert on the *process-level*
         // stderr (PHP deprecation notices, which go to the engine's real
         // stderr, not any in-process captured stream), switch the step
-        // to spawn `bin/paogen` as a subprocess.
+        // to spawn `bin/poagen` as a subprocess.
         TestCase::assertSame('<profile-path>', $path);
         TestCase::assertFileExists($this->profileFixturePath());
         $this->spawnBinary = true;
@@ -147,7 +147,7 @@ final class PaogenCLISteps
     private function invokeBinary(array $args): void
     {
         $root = dirname(__DIR__, 2);
-        $bin = $root . '/bin/paogen';
+        $bin = $root . '/bin/poagen';
         TestCase::assertFileExists($bin);
 
         $descriptors = [
@@ -230,13 +230,13 @@ final class PaogenCLISteps
     }
 
 
-    public function thenPaogenCLIsStdoutShouldContainUSAGE(): void
+    public function thenPoagenCLIsStdoutShouldContainUSAGE(): void
     {
         TestCase::assertStringContainsString('USAGE', $this->stdout);
     }
 
 
-    public function thenPaogenCLIsStdoutShouldStartWithPrefix(string $prefix): void
+    public function thenPoagenCLIsStdoutShouldStartWithPrefix(string $prefix): void
     {
         if ($prefix === '') {
             TestCase::fail('prefix must be non-empty');
@@ -245,7 +245,7 @@ final class PaogenCLISteps
     }
 
 
-    public function givenPaogenCLIsComposerMetadataHasNoInstalledVersionRecordForAQueriedPackage(): void
+    public function givenPoagenCLIsComposerMetadataHasNoInstalledVersionRecordForAQueriedPackage(): void
     {
         // Precondition marker: the `when` step passes a deliberately unknown
         // package name, so Composer's InstalledVersions cannot resolve it.
@@ -253,19 +253,19 @@ final class PaogenCLISteps
     }
 
 
-    public function whenPaogenCLIResolvesAVersionForAPackagePackage(string $package): void
+    public function whenPoagenCLIResolvesAVersionForAPackagePackage(string $package): void
     {
         $this->resolvedVersion = Cli::version($package);
     }
 
 
-    public function thenVersionTokenPaogenCLIReturnsIsNonEmpty(): void
+    public function thenVersionTokenPoagenCLIReturnsIsNonEmpty(): void
     {
         TestCase::assertNotSame('', $this->resolvedVersion);
     }
 
 
-    public function thenPaogenCLIsStderrShouldContainNeedle(string $needle): void
+    public function thenPoagenCLIsStderrShouldContainNeedle(string $needle): void
     {
         TestCase::assertStringContainsString($needle, $this->stderr);
     }
@@ -283,7 +283,7 @@ final class PaogenCLISteps
 
     public function givenTemporaryMalformedSchemaFileThatIsNotValidYAML(): void
     {
-        $path = (string) tempnam(sys_get_temp_dir(), 'paogen-validate-');
+        $path = (string) tempnam(sys_get_temp_dir(), 'poagen-validate-');
         // Deliberately malformed YAML — unterminated flow sequence with
         // colons in an unquoted scalar is guaranteed to trip the parser.
         file_put_contents($path, "not: valid: yaml: [\n");
@@ -292,9 +292,9 @@ final class PaogenCLISteps
     }
 
 
-    public function thenPaogenCLIsStderrShouldContainAParseErrorSignal(): void
+    public function thenPoagenCLIsStderrShouldContainAParseErrorSignal(): void
     {
-        TestCase::assertStringContainsString('paogen validate: parse error:', $this->stderr);
+        TestCase::assertStringContainsString('poagen validate: parse error:', $this->stderr);
 
         if ($this->brokenYamlPath !== '' && is_file($this->brokenYamlPath)) {
             unlink($this->brokenYamlPath);
@@ -313,7 +313,7 @@ final class PaogenCLISteps
         TestCase::assertSame('<profile-path>', $path);
         TestCase::assertSame('<declared-output-dir>', $declaredOutput);
         TestCase::assertFileExists($this->profileFixturePath());
-        $this->tmpDir = $this->makeScratchDir('paogen-output-');
+        $this->tmpDir = $this->makeScratchDir('poagen-output-');
     }
 
 
@@ -327,45 +327,45 @@ final class PaogenCLISteps
     }
 
 
-    public function givenFreshDirectoryAtPathAsPaogenCLIsOutputTarget(string $path): void
+    public function givenFreshDirectoryAtPathAsPoagenCLIsOutputTarget(string $path): void
     {
-        $this->tmpDir = $this->makeScratchDir('paogen-dryrun-');
+        $this->tmpDir = $this->makeScratchDir('poagen-dryrun-');
     }
 
 
-    public function thenPaogenCLIsStdoutShouldContainNeedle(string $needle): void
+    public function thenPoagenCLIsStdoutShouldContainNeedle(string $needle): void
     {
         TestCase::assertStringContainsString($needle, $this->stdout);
     }
 
 
-    public function thenPaogenCLIsOutputDirectoryAtPathContainsNoFiles(string $path): void
+    public function thenPoagenCLIsOutputDirectoryAtPathContainsNoFiles(string $path): void
     {
         TestCase::assertNotSame('', $this->tmpDir);
         TestCase::assertSame([], $this->listFilesRecursive($this->tmpDir));
     }
 
 
-    public function givenTemporaryCopyOfMatchingGeneratedFileTreeAtPathForPaogenCLIToDiffAgainst(string $path): void
+    public function givenTemporaryCopyOfMatchingGeneratedFileTreeAtPathForPoagenCLIToDiffAgainst(string $path): void
     {
         // Spec names the tree only as "matching": the fixture the profile
         // under test regenerates byte-for-byte. `$path` is the `<tmp-dir>`
         // placeholder, so the real directory is made here.
-        $this->tmpDir = $this->makeScratchDir('paogen-diff-match-');
+        $this->tmpDir = $this->makeScratchDir('poagen-diff-match-');
         $this->copyTree(dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore', $this->tmpDir);
     }
 
 
-    public function thenPaogenCLIsStdoutIsEmpty(): void
+    public function thenPoagenCLIsStdoutIsEmpty(): void
     {
         TestCase::assertSame('', $this->stdout);
     }
 
 
-    public function givenTemporaryCopyOfGeneratedFileTreeAtPathForPaogenCLIToDiffAgainstWithOneFileTruncated(
+    public function givenTemporaryCopyOfGeneratedFileTreeAtPathForPoagenCLIToDiffAgainstWithOneFileTruncated(
         string $path,
     ): void {
-        $this->tmpDir = $this->makeScratchDir('paogen-diff-corrupt-');
+        $this->tmpDir = $this->makeScratchDir('poagen-diff-corrupt-');
         $this->copyTree(dirname(__DIR__, 2) . '/tests/fixtures/generated/petstore', $this->tmpDir);
 
         $files = $this->listFilesRecursive($this->tmpDir);
@@ -377,7 +377,7 @@ final class PaogenCLISteps
     }
 
 
-    public function thenNeitherPaogenCLIsStdoutNorStderrContainsNeedle(string $needle): void
+    public function thenNeitherPoagenCLIsStdoutNorStderrContainsNeedle(string $needle): void
     {
         TestCase::assertStringNotContainsString($needle, $this->stdout);
         TestCase::assertStringNotContainsString($needle, $this->stderr);

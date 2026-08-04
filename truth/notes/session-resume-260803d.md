@@ -142,7 +142,7 @@ split made room for.
 The `mt` on `PATH` rebuilds `~/projects/home/mindtape` on every call, and that
 checkout has uncommitted `Cargo.toml` / `Cargo.lock` edits that do not compile
 — two versions of `typst_world`, one via `typst_harvest`. Every subcommand
-exits 101. Nothing about paogen is wrong when this happens.
+exits 101. Nothing about poagen is wrong when this happens.
 
 Worked around all session: edit task artifacts by hand, validate with
 `speconaut check truth/` (about one second, parses every artifact), and call

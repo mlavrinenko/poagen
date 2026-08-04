@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 
@@ -101,7 +101,7 @@ final readonly class SecurityAudit
     private static function undeclared(string $name, SecurityUsage $usage): string
     {
         return sprintf(
-            "security requirement '%s' names a scheme components.securitySchemes does not declare, so paogen cannot "
+            "security requirement '%s' names a scheme components.securitySchemes does not declare, so poagen cannot "
                 . "tell what to send or where. %s Declare it under %s keyed '%s' — e.g. ['type' => 'apiKey', "
                 . "'in' => 'header', 'name' => '%s'] — or skip those operations via Profile::\$skip.",
             $name,

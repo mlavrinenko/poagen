@@ -33,13 +33,13 @@ subagent will not read fourteen task files.
    on it — that can be added later without breaking anything. 2xx is not
    special. A response the document did not describe raises.
 4. Every security scheme that reduces to a credential gets wired, oauth2
-   included. paogen sends tokens; it never acquires them. Flow metadata and
+   included. poagen sends tokens; it never acquires them. Flow metadata and
    scopes are emitted so a consumer can wire their own library.
 5. An undiscriminated union emits a real PHP union and selects its branch from
    the payload. Refuse when two branches are genuinely indistinguishable.
 6. Inline schemas are named `{OperationId}{StatusCode}Content`. Structural
    identity never merges anything on its own; only a profile entry does, and
-   paogen verifies the shapes really match.
+   poagen verifies the shapes really match.
 7. `additionalProperties: true` carries the extras in a runtime bag object. An
    omitted keyword is not `true` and changes nothing.
 8. Nested XML containers get implemented. XML responses and multipart stay
@@ -48,13 +48,13 @@ subagent will not read fourteen task files.
    name files.
 
 Publishing: the runtime goes to Packagist, then the kilbil client is extracted
-to its own public repository. paogen itself is not published until its
+to its own public repository. poagen itself is not published until its
 capability is proven.
 
 ## Scope: what "the backlog is closed" means
 
 All four examples generate with no expected-failure marker, no skip entry that
-names a construct paogen could support, and committed generated trees for all
+names a construct poagen could support, and committed generated trees for all
 four. The hundred skip entries on the two large examples are covered by filed
 tasks — they are not acceptable debt.
 
@@ -100,7 +100,7 @@ Files that more than one task touches, so the waves have to respect them:
   in `with()` every time, and resolve it orchestrator-side.
 - `runtime/src/Contract/TransportInterface.php` and `ResponseType.php` — the
   envelope owns these. Nothing else may touch them in the same wave.
-- The four `examples/*/paogen.php` profiles and their generated trees —
+- The four `examples/*/poagen.php` profiles and their generated trees —
   every gap task removes skip entries from them. One task per example per wave.
 
 ## Session 1 — the parser, and type honesty
@@ -193,6 +193,6 @@ Packagist, extract the kilbil client.
   false`.
 - kilbil emits 511 model properties with zero native `mixed`; three `mixed`
   phpdocs, all honest. petstore the same. Zero suppressions in either tree.
-- GitHub declares 240 response-header blocks, almost all `Link`. paogen reads
+- GitHub declares 240 response-header blocks, almost all `Link`. poagen reads
   none of them.
 - No vendored document uses multipart. Two use `application/octet-stream`.

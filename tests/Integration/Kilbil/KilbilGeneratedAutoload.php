@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
+namespace Poagen\Generator\Tests\Integration\Kilbil;
 
 use function dirname;
 use function is_file;

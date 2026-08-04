@@ -18,10 +18,10 @@ foreach ($autoloaders as $candidate) {
 }
 
 if ($autoloader === null) {
-    fwrite(STDERR, "paogen: could not locate composer autoloader. Did you run `composer install`?\n");
+    fwrite(STDERR, "poagen: could not locate composer autoloader. Did you run `composer install`?\n");
     exit(1);
 }
 
 require $autoloader;
 
-exit(Mlavrinenko\Paogen\Cli::run($argv));
+exit(Poagen\Generator\Cli::run($argv));

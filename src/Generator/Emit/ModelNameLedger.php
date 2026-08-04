@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
-use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Exception\ModelNameCollisionException;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 /**
  * Records which schema node owns each emitted model class name, for the one

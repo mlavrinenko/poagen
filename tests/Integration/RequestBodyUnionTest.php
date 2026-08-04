@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\GadgetByVolume;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\GadgetByWeight;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Unit\Runtime\Fixtures\GadgetByVolume;
+use Poagen\Generator\Tests\Unit\Runtime\Fixtures\GadgetByWeight;
+use Poagen\Runtime\Marshal\Marshaller;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -34,7 +34,7 @@ final class RequestBodyUnionTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/union-request-body-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\RequestBodyUnion';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\RequestBodyUnion';
 
     public static function tearDownAfterClass(): void
     {
@@ -114,7 +114,7 @@ final class RequestBodyUnionTest extends TestCase
 
     /**
      * `issues/set-labels`'s known candidate: a branch set that mixes a
-     * synthesisable object with a bare `array` — paogen cannot name a PHP
+     * synthesisable object with a bare `array` — poagen cannot name a PHP
      * class across the two, so it refuses rather than silently dropping the
      * `array` branch or widening the whole parameter to `mixed`.
      */
@@ -131,7 +131,7 @@ final class RequestBodyUnionTest extends TestCase
 
     /**
      * Both resolving operations generate with no skip entry at all — only
-     * `unionMixed`, the branch set paogen genuinely cannot name, needs one.
+     * `unionMixed`, the branch set poagen genuinely cannot name, needs one.
      */
     public function testOnlyTheMixedBranchSetIsSkipped(): void
     {
@@ -146,7 +146,7 @@ final class RequestBodyUnionTest extends TestCase
      */
     private function plan(array $skip): GenerationPlan
     {
-        $output = self::makeSandboxDir('paogen-union-body-');
+        $output = self::makeSandboxDir('poagen-union-body-');
 
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,

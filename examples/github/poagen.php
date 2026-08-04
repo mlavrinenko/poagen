@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 return new Profile(
     schema: __DIR__ . '/schemas/api.github.com.yaml',
@@ -18,7 +18,7 @@ return new Profile(
      * declare-an-undiscriminated-union-as-raw-data: eleven property-level
      * unions across ten components used to block this document entirely, and
      * the `.expected-failure` marker that recorded them is gone. Eight of the
-     * eleven now resolve with no guidance at all — paogen computes a
+     * eleven now resolve with no guidance at all — poagen computes a
      * discriminating field from the branches themselves. That covers
      * `integration.owner`, `installation.account`,
      * `integration-installation-request.account`,
@@ -126,7 +126,7 @@ return new Profile(
      * unified every one of these into the same generator-time abort this
      * profile refuses to weaken, so they need the same skip-list treatment
      * `uploadFile` already gets in the petstore example. Regenerated from
-     * `bin/paogen generate --dry-run`'s own diagnostic.
+     * `bin/poagen generate --dry-run`'s own diagnostic.
      *
      * `merge-allof-members-into-one-model` took the fortieth:
      * `apps/create-from-manifest`'s 201 response is `allOf: [$ref integration,
@@ -143,7 +143,7 @@ return new Profile(
      * `*-team-access-restrictions` operations, `issues/set-labels`,
      * `issues/add-labels`, and the two `users/*-email-for-authenticated-user`
      * ones all mix an object branch with a bare `array` or scalar branch
-     * paogen cannot name a PHP class for, so they stay skipped — but for that
+     * poagen cannot name a PHP class for, so they stay skipped — but for that
      * reason now, not the generic "inline schema" one every unresolved body
      * used to carry. Two operations this list never named —
      * `orgs/delete-attestations-bulk` and `users/delete-attestations-bulk` —
@@ -180,7 +180,7 @@ return new Profile(
      *
      * `a-media-type-with-no-schema-takes-a-raw-body` took the last one:
      * `repos/get-content`'s request body carries `examples` and no
-     * `schema` key at all, which is not a schema paogen failed to
+     * `schema` key at all, which is not a schema poagen failed to
      * understand — the document declares nothing about the body's shape,
      * so it passes through untyped as `array<string, mixed>` rather than
      * refusing the operation.
@@ -208,14 +208,14 @@ return new Profile(
             . 'share every discriminating field — add a discriminator, or pin one with Profile::$unionPins',
         // issues/set-labels and issues/add-labels: request body is a `oneOf`
         // whose branches mix an object with a bare `array` — `body` is
-        // `array<string>` (a list of label names), which paogen cannot union
+        // `array<string>` (a list of label names), which poagen cannot union
         // with a synthesised class. Branch 2 is named because it is the
         // first unnameable one found; issues/set-labels' 4th and 5th
         // branches (another array, then a scalar `string`) share the defect.
-        'issues/set-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — paogen '
+        'issues/set-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — poagen '
             . 'can only union branches it can express as a PHP class (a $ref to a component, or an inline object '
             . 'with declared properties); reduce this branch to one of those, or skip the operation',
-        'issues/add-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — paogen '
+        'issues/add-labels' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named class — poagen '
             . 'can only union branches it can express as a PHP class (a $ref to a component, or an inline object '
             . 'with declared properties); reduce this branch to one of those, or skip the operation',
         // The six repos/*-status-check-contexts and *-team-access-restrictions
@@ -224,22 +224,22 @@ return new Profile(
         // name) — the same object-beside-a-bare-array defect as issues/*
         // above.
         'repos/set-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
-            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'class — poagen can only union branches it can express as a PHP class (a $ref to a component, or an '
             . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/add-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
-            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'class — poagen can only union branches it can express as a PHP class (a $ref to a component, or an '
             . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/remove-status-check-contexts' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
-            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'class — poagen can only union branches it can express as a PHP class (a $ref to a component, or an '
             . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/set-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
-            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'class — poagen can only union branches it can express as a PHP class (a $ref to a component, or an '
             . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/add-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a named '
-            . 'class — paogen can only union branches it can express as a PHP class (a $ref to a component, or an '
+            . 'class — poagen can only union branches it can express as a PHP class (a $ref to a component, or an '
             . 'inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'repos/remove-team-access-restrictions' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
-            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'named class — poagen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         // users/add-email-for-authenticated-user and
         // users/delete-email-for-authenticated-user: request body is
@@ -247,10 +247,10 @@ return new Profile(
         // string}]` — three branches, and the first unnameable one is again
         // the bare array (the third, a bare `string`, has the same defect).
         'users/add-email-for-authenticated-user' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
-            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'named class — poagen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
         'users/delete-email-for-authenticated-user' => 'request body branch 2 (oneOf/1) is a bare `array`, not a '
-            . 'named class — paogen can only union branches it can express as a PHP class (a $ref to a component, '
+            . 'named class — poagen can only union branches it can express as a PHP class (a $ref to a component, '
             . 'or an inline object with declared properties); reduce this branch to one of those, or skip the operation',
     ],
 );

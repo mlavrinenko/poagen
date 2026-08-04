@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Discriminator;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Bindings;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\ScalarFormat;
-use Mlavrinenko\Paogen\Runtime\Attribute\BranchSelector as BranchSelectorAttr;
-use Mlavrinenko\Paogen\Runtime\Attribute\Discriminator as DiscriminatorAttr;
-use Mlavrinenko\Paogen\Runtime\Attribute\Format;
-use Mlavrinenko\Paogen\Runtime\Attribute\WireName;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PromotedParameter;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\ScalarFormat;
+use Poagen\Runtime\Attribute\BranchSelector;
+use Poagen\Runtime\Attribute\Format;
+use Poagen\Runtime\Attribute\WireName;
 
 use function is_string;
 
@@ -126,8 +125,8 @@ final readonly class ModelAttributeApplier
             $map[$short] = $this->classLiteral($namespace, $fqcn);
         }
 
-        $namespace->addUse(DiscriminatorAttr::class);
-        $param->addAttribute(DiscriminatorAttr::class, [
+        $namespace->addUse(\Poagen\Runtime\Attribute\Discriminator::class);
+        $param->addAttribute(\Poagen\Runtime\Attribute\Discriminator::class, [
             'field' => $discriminator->propertyName,
             'map' => $map,
         ]);
@@ -147,8 +146,8 @@ final readonly class ModelAttributeApplier
             $map[$tag] = $this->classLiteral($namespace, ComponentName::fqcnFromRaw($branch, $modelNamespace, $registry));
         }
 
-        $namespace->addUse(DiscriminatorAttr::class);
-        $param->addAttribute(DiscriminatorAttr::class, [
+        $namespace->addUse(\Poagen\Runtime\Attribute\Discriminator::class);
+        $param->addAttribute(\Poagen\Runtime\Attribute\Discriminator::class, [
             'field' => (string) $resolution->field,
             'map' => $map,
             'onParent' => $onParent,
@@ -183,8 +182,8 @@ final readonly class ModelAttributeApplier
             );
         }
 
-        $namespace->addUse(BranchSelectorAttr::class);
-        $param->addAttribute(BranchSelectorAttr::class, $arguments);
+        $namespace->addUse(BranchSelector::class);
+        $param->addAttribute(BranchSelector::class, $arguments);
     }
 
     private function classLiteral(PhpNamespace $namespace, string $fqcn): Literal

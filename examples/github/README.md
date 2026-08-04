@@ -1,4 +1,4 @@
-# paogen example — GitHub REST API
+# poagen example — GitHub REST API
 
 The full [GitHub REST API](https://docs.github.com/en/rest) OpenAPI
 3.0.3 document — ~1000 endpoints, ~918 schema components, 8.8 MB of
@@ -17,7 +17,7 @@ YAML. This is the industry's "real client generator" torture test.
 
 ## What this demonstrates
 
-- paogen on a large production schema (8.8 MB, ~918 components,
+- poagen on a large production schema (8.8 MB, ~918 components,
   ~1000 endpoints).
 - The default `nameNormaliser` pipeline (T-023) handling 818
   kebab-case component names automatically — no `renames` entries
@@ -30,7 +30,7 @@ YAML. This is the industry's "real client generator" torture test.
 ```
 github/
 ├── composer.json              — consumer-style project manifest
-├── paogen.php                 — the Profile object paogen reads
+├── poagen.php                 — the Profile object poagen reads
 └── schemas/
     └── api.github.com.yaml    — vendored bundled schema
 ```
@@ -46,7 +46,7 @@ From this directory:
 composer install
 
 # Needs a raised memory limit to parse the 8.8 MB schema:
-php -d memory_limit=4G vendor/bin/paogen generate paogen.php
+php -d memory_limit=4G vendor/bin/poagen generate poagen.php
 ```
 
 This currently exits non-zero — see `.expected-failure`. Once the ten
@@ -59,7 +59,7 @@ commits the tree alongside deleting the marker.
 
 Downloaded from the canonical
 [`github/rest-api-description`](https://github.com/github/rest-api-description)
-repository — the OpenAPI 3.0 variant, which is the one paogen
+repository — the OpenAPI 3.0 variant, which is the one poagen
 currently supports:
 
 ```
@@ -90,7 +90,7 @@ What blocks this example today, found by `clear-example-expected-failures`:
   parameter resolves to `mixed` instead of tripping the
   "unsupported parameter shapes" abort, then fails PHPStan against
   `Endpoint::path()`'s stricter signature.
-- `Profile::$skip` in `paogen.php` fully catalogues the thirty-nine
+- `Profile::$skip` in `poagen.php` fully catalogues the thirty-nine
   unrelated operation-level gaps this document already had (inline
   JSON request bodies with no `allOf` to merge, unsupported
   query-parameter shapes, non-JSON response content types) and is

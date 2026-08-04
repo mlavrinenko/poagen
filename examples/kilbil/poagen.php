@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Mlavrinenko\Paogen\Generator\Profile;
+use Poagen\Generator\Generator\Profile;
 
 /**
  * Guidance for the kilbil loyalty API.
@@ -17,8 +17,8 @@ return new Profile(
     namespace: 'Acme\\Kilbil',
 
     /*
-     * Where paogen looks for this project's own `#[BindsFormat]` value objects.
-     * The vendor writes nine format values across 292 uses and paogen knows one
+     * Where poagen looks for this project's own `#[BindsFormat]` value objects.
+     * The vendor writes nine format values across 292 uses and poagen knows one
      * of them, so it reports the other eight and `src/ValueObject/` answers the
      * four that carry meaning: `date time` and `data time` (both `date-time`
      * misspelled), `data` (`date` misspelled), and the invented `phone`.
@@ -35,7 +35,7 @@ return new Profile(
 
     /*
      * All eleven tags are Russian words, and a tag names a sub-client class.
-     * Without an answer here paogen transliterates deterministically —
+     * Without an answer here poagen transliterates deterministically —
      * `Клиенты` becomes `KlientyClient` — which is legible and grep-able but
      * not what anyone means. These are the names this project wants.
      *
@@ -47,10 +47,10 @@ return new Profile(
      * whose schemas are arrays of inline objects. OpenAPI names the elements for
      * the properties — a property becomes an element of the same name — but names
      * nothing for the document root or for the repeated element of a bare array,
-     * and this document carries no `xml:` metadata at all. paogen refuses to
+     * and this document carries no `xml:` metadata at all. poagen refuses to
      * invent either, because a wrong root element is a 400 from the vendor.
      *
-     * paogen could not confirm these with a live call — the example still makes
+     * poagen could not confirm these with a live call — the example still makes
      * none — but the vendor document already had the answer. Both operations'
      * `application/xml` request body in schemas/loyalty_v1.yaml carries a
      * literal `example: |` block with a full XML sample: around line 4305, the
@@ -67,7 +67,7 @@ return new Profile(
      * naming a property absent from the item schema fails the run, the same as
      * a stale root or item entry would (kilbil-xml-nesting-is-unrepresentable).
      *
-     * paogen validates these entries against the schema and wires them onto
+     * poagen validates these entries against the schema and wires them onto
      * the generated call: `goodsXml()` and `goodsListXml()` emit
      * `->xmlList($body, root, item, ['inside' => child])`, so a caller who
      * passes a populated `inside` gets the vendor's nested shape with no
@@ -105,7 +105,7 @@ return new Profile(
      * `getclientfullbalance` has no algorithmic path to `getClientFullBalance`
      * — a split needs a dictionary, and a dictionary gives a different answer
      * per schema and moves names between runs, which is exactly the incidental
-     * rename `cheap-regeneration` forbids. So paogen keeps the vendor's
+     * rename `cheap-regeneration` forbids. So poagen keeps the vendor's
      * spelling, says so on stderr, and the readable name comes from here.
      *
      * These also name the models synthesised for each operation's inline
@@ -113,10 +113,10 @@ return new Profile(
      * `GetClientFullBalanceResponse` rather than `GetclientfullbalanceResponse`.
      *
      * Three of the thirty-six are absent on purpose. `generate_promocode` and
-     * `legal_info` carry real separators, so paogen already reads them as
+     * `legal_info` carry real separators, so poagen already reads them as
      * `generatePromocode` and `legalInfo` — listing them here would hide the
      * fact that separator handling works. `goods` is a single word with nothing
-     * to split, so paogen reports it and there is nothing to answer with.
+     * to split, so poagen reports it and there is nothing to answer with.
      */
     methodRenames: [
         'addclient' => 'addClient',

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
+namespace Poagen\Generator\Generator\Naming;
 
 use function in_array;
 

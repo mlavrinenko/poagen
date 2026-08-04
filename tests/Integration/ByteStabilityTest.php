@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
 use FilesystemIterator;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\PetstoreFixture;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -37,7 +37,7 @@ final class ByteStabilityTest extends TestCase
 {
     use GeneratedTreeSandbox;
 
-    private const string PETSTORE_NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore';
+    private const string PETSTORE_NAMESPACE = 'Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore';
 
     /**
      * The golden tree is produced by running the CLI against this profile from
@@ -66,8 +66,8 @@ final class ByteStabilityTest extends TestCase
         self::assertFileExists($schema, 'petstore schema must exist for this integration test');
         self::assertDirectoryExists($goldenDir, 'petstore golden tree must exist for this integration test');
 
-        $firstOutputDir = self::makeSandboxDir('paogen-bytestab-a-');
-        $secondOutputDir = self::makeSandboxDir('paogen-bytestab-b-');
+        $firstOutputDir = self::makeSandboxDir('poagen-bytestab-a-');
+        $secondOutputDir = self::makeSandboxDir('poagen-bytestab-b-');
 
         $generator = self::generator();
 
@@ -77,7 +77,7 @@ final class ByteStabilityTest extends TestCase
             schema: $schema,
             output: $firstOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
-            discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
+            discoverIn: ['Poagen\\Generator\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,
@@ -88,7 +88,7 @@ final class ByteStabilityTest extends TestCase
             schema: $schema,
             output: $secondOutputDir,
             namespace: self::PETSTORE_NAMESPACE,
-            discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
+            discoverIn: ['Poagen\\Generator\\Tests\\Fixtures\\ValueObject'],
             skip: self::PETSTORE_SKIP,
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,

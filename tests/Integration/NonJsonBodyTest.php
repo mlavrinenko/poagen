@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function array_values;
 use function implode;
@@ -28,7 +28,7 @@ final class NonJsonBodyTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/non-json-bodies-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\NonJsonBodies';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\NonJsonBodies';
 
     public static function tearDownAfterClass(): void
     {
@@ -42,7 +42,7 @@ final class NonJsonBodyTest extends TestCase
         // GitHub declares text/plain and text/x-markdown over the same
         // `type: string` schema. A method per content type would ask the
         // caller to answer a question the document already answered; the
-        // first declared type is what paogen sends.
+        // first declared type is what poagen sends.
         //
         // Twice, not once: the emitted client declares it and the emitted
         // interface mirrors it. A method per content type would read four.
@@ -93,7 +93,7 @@ final class NonJsonBodyTest extends TestCase
         try {
             self::generator()->plan(new Profile(
                 schema: self::SCHEMA,
-                output: self::makeSandboxDir('paogen-non-json-'),
+                output: self::makeSandboxDir('poagen-non-json-'),
                 namespace: self::NAMESPACE,
             ));
             self::fail('expected UnrepresentableConstructsException');
@@ -182,7 +182,7 @@ final class NonJsonBodyTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-non-json-'),
+            output: self::makeSandboxDir('poagen-non-json-'),
             namespace: self::NAMESPACE,
             skip: ['uploadForm' => 'multipart/form-data is out of scope'],
         ));

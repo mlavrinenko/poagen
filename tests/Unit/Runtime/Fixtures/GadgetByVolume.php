@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures;
+namespace Poagen\Generator\Tests\Unit\Runtime\Fixtures;
 
-use Mlavrinenko\Paogen\Tests\Integration\XmlRequestBodyTest;
+use Poagen\Generator\Tests\Integration\XmlRequestBodyTest;
 
 /**
  * Mirrors `gadget_by_volume` in `union-request-body-3.0.yaml` — the other

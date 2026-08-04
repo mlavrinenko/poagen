@@ -109,12 +109,12 @@ Not the same and deliberately not filed:
 ## Two rulings, proposed then reversed by the owner the same day
 
 Both were drafted here as ignore-with-a-notice or normalise-it-away, and the
-owner rejected both on one principle: paogen fails when it cannot generate
+owner rejected both on one principle: poagen fails when it cannot generate
 something, and the consumer decides whether to skip. Recorded because the
 reasoning that lost is the reasoning a future session will re-derive.
 
 - **An `anyOf` member of an `allOf` becomes a union of branch models.** The
-  draft dropped the constraint with a notice, arguing that paogen ignores
+  draft dropped the constraint with a notice, arguing that poagen ignores
   `minLength` and `pattern` too. It is not a choice between ignoring and
   refusing: `anyOf` is a union and a union is expressible. `firewalls_create`
   emits `FirewallsCreateInboundRules|FirewallsCreateOutboundRules`, both
@@ -132,7 +132,7 @@ reasoning that lost is the reasoning a future session will re-derive.
 Also recorded, so it is not re-derived: **`allOf` is not an intersection
 type.** An `allOf` payload is one flat JSON object carrying the union of its
 members' properties, not a value that is two things at once. `X&Y` would need
-paogen to emit a property-declaring interface per component, since an
+poagen to emit a property-declaring interface per component, since an
 intersection of two classes is uninhabitable — the only model interfaces it
 emits today are the empty union markers `UnionInterfaceEmitter` writes, which
 constrain no shape. Non-goal, with the reasoning, in the allOf task.
@@ -163,7 +163,7 @@ in someone's lockfile is not recoverable. Get the one-word answer first.
 
 A task that fixes or enhances another project is filed in that project's
 tracker, not in the one that suffers from it. `speconaut-mindtape-skew-guard`
-named no paogen file at all; it is now speconaut's
+named no poagen file at all; it is now speconaut's
 `keep-the-embedded-mindtape-in-step-with-the-installed-mt` and retired here.
 `speconaut-mindtape-config-skew` records where it went. This belongs in
 `AGENT.md` once `agent-guide-is-nine-lines-from-its-own-cap` makes room.

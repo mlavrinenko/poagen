@@ -79,7 +79,7 @@ first exists.
 
 == Consequences
 
-- Every inline payload class name paogen has ever emitted moves. This is a
+- Every inline payload class name poagen has ever emitted moves. This is a
   breaking, byte-stable rename: `just check-examples` reports no drift
   because all four examples were regenerated in the same change
   (`AddClientResponse` → `AddClient200Content`, `AddClientRequest` →

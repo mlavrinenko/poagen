@@ -1,4 +1,4 @@
-# paogen — Decisions Audit (2026-08-01 closed set)
+# poagen — Decisions Audit (2026-08-01 closed set)
 
 Procedure: `truth/notes/decisions-audit-procedure.md`. Input:
 `scripts/audit-decisions`, run over every task whose `status.date` is
@@ -69,7 +69,7 @@ no Result section, no commit, no follow-up task. Verified directly:
 `.speconaut/config.toml`'s `[check.code-refs] allowlist` is still `("(",
 "::")`, unchanged, and still only matches path-prefixed patterns.
 
-**Alternatives:** widen the checker — paogen-side, or an upstream speconaut
+**Alternatives:** widen the checker — poagen-side, or an upstream speconaut
 ask on the model `process-only-decisions-may-name-a-file` used for its own
 dependency; or accept the gap explicitly and correct
 `narrow-the-code-ref-exemption`'s now-overstated criterion; or leave it as

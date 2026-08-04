@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * `guidance-cannot-mislead` applied to the two union keys: every part of a
@@ -28,7 +28,7 @@ final class UnionGuidanceTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/union-selection-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\UnionGuidance';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\UnionGuidance';
 
     private const array WORKING_TAG = [
         'Habitat.resident' => ['field' => 'species', 'map' => ['cat' => 'Cat', 'dog' => 'Dog']],
@@ -170,7 +170,7 @@ final class UnionGuidanceTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: sys_get_temp_dir() . '/paogen-union-guidance',
+            output: sys_get_temp_dir() . '/poagen-union-guidance',
             namespace: self::NAMESPACE,
             unionTags: $tags,
             unionPins: $pins,

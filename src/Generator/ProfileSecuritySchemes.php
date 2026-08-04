@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\Components;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
-use Mlavrinenko\Paogen\Generator\Emit\SecurityAudit;
-use Mlavrinenko\Paogen\Generator\Emit\SecurityUsage;
 
 use function sprintf;
 
@@ -49,7 +47,7 @@ final readonly class ProfileSecuritySchemes
             return [];
         }
 
-        $usage = SecurityUsage::scan($openApi);
+        $usage = Emit\SecurityUsage::scan($openApi);
         $components = $openApi->components ?? new Components([]);
         /** @var array<string, CebeSecurityScheme|Reference> $existing */
         $existing = $components->securitySchemes ?? [];
@@ -79,13 +77,13 @@ final readonly class ProfileSecuritySchemes
     /**
      * @param array<string, CebeSecurityScheme|Reference> $existing
      */
-    private static function reject(string $name, array $existing, SecurityUsage $usage): ?string
+    private static function reject(string $name, array $existing, Emit\SecurityUsage $usage): ?string
     {
         if (isset($existing[$name])) {
             return sprintf(
                 "%s['%s'] names a scheme the document already declares under components.securitySchemes — remove "
-                    . 'this entry; paogen will not override what the vendor published.',
-                SecurityAudit::PROFILE_KEY,
+                    . 'this entry; poagen will not override what the vendor published.',
+                Emit\SecurityAudit::PROFILE_KEY,
                 $name,
             );
         }
@@ -94,7 +92,7 @@ final readonly class ProfileSecuritySchemes
             return sprintf(
                 "%s['%s'] names a scheme no security requirement asks for — remove this entry, or point it at the "
                     . 'requirement name the document actually uses.',
-                SecurityAudit::PROFILE_KEY,
+                Emit\SecurityAudit::PROFILE_KEY,
                 $name,
             );
         }

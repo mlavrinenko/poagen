@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
+use Poagen\Runtime\Marshal\XmlWriter;
 
 use function array_keys;
 use function count;
@@ -118,7 +118,7 @@ final readonly class XmlNestedContainerValidator
         $names = [];
 
         // YAML parses a purely numeric key as an int; coerce to string the
-        // same way {@see \Mlavrinenko\Paogen\Generator\PropertyRenameValidator} does.
+        // same way {@see \Poagen\Generator\Generator\PropertyRenameValidator} does.
         foreach (array_keys($schema->properties ?? []) as $name) {
             $names[] = is_int($name) ? (string) $name : $name;
         }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
@@ -48,7 +48,7 @@ use const SORT_STRING;
 final readonly class DanglingReferenceScanner
 {
     /**
-     * @param  list<SkippedComponent> $unrepresentable every component the generator already
+     * @param list<SkippedComponent> $unrepresentable every component the generator already
      *                                                  refuses to emit this run — {@see
      *                                                  ComponentCatalog::skipped()}, a {@see
      *                                                  DiscriminatorEnforcer} union failure, and a
@@ -56,11 +56,7 @@ final readonly class DanglingReferenceScanner
      * @param  array<string,string>   $alreadySkipped   operationId => reason, for operations a
      *                                                  different pass already refused — not
      *                                                  re-reported here under a second reason
-     * @return array{
-     *     excluded: array<string,true>,
-     *     components: list<SkippedComponent>,
-     *     operations: array<string,string>,
-     * }
+     * @return array{excluded: array<string, true>, components: list<SkippedComponent>, operations: array<string, string>}
      */
     public static function scan(OpenApi $openApi, array $unrepresentable, array $alreadySkipped): array
     {

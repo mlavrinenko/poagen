@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
@@ -10,9 +10,9 @@ use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\RequestBodyAnalyzer;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaWalk;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\RequestBodyAnalyzer;
+use Poagen\Generator\Generator\Emit\SchemaWalk;
 
 /**
  * a-referenced-response-component-is-invisible-to-the-schema-walk:

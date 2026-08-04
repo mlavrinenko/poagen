@@ -28,7 +28,7 @@ info:
                         support-the-parameter-shapes-real-documents-use:
                         emitted as a required method argument, no longer
                         refused on requiredness.
-      - trackWidget     `in: cookie`, a position paogen emits nothing for.
+      - trackWidget     `in: cookie`, a position poagen emits nothing for.
                         Refused, and says which position it is.
       - listWidgets     scalar path parameter, scalar query parameter,
                         optional scalar header parameter. Emitted, so the

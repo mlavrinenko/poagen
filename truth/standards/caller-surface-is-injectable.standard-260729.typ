@@ -11,7 +11,7 @@
     "sub-client-injects-transport-not-root",
   ),
   rule: [
-    Every #a(Client) paogen emits is declared by an interface it implements, and
+    Every #a(Client) poagen emits is declared by an interface it implements, and
     acquires its transport — and whatever credential #the(Schema) declares —
     through its constructor, type-hinted against `TransportInterface` rather
     than a concrete class. The message factories, the base address, and the

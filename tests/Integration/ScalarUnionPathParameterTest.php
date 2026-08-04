@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * scalar-union-path-parameter-degrades-to-mixed: a path parameter typed
@@ -31,7 +31,7 @@ final class ScalarUnionPathParameterTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/scalar-union-path-parameter-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ScalarUnionPathParameter';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ScalarUnionPathParameter';
 
     public static function tearDownAfterClass(): void
     {
@@ -42,7 +42,7 @@ final class ScalarUnionPathParameterTest extends TestCase
     {
         $plan = self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-scalar-union-path-'),
+            output: self::makeSandboxDir('poagen-scalar-union-path-'),
             namespace: self::NAMESPACE,
         ));
 

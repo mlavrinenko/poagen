@@ -1,15 +1,15 @@
 # Namespace generated PHPUnit test stubs (tests/generated/) declare. Matches
-# the namespace the committed tree already uses — `Mlavrinenko\Paogen\Tests\
+# the namespace the committed tree already uses — `Poagen\Generator\Tests\
 # Generated`, the same vendor prefix as src/'s own PSR-4 root
-# (`Mlavrinenko\Paogen\`) — so this states what the files already say rather
+# (`Poagen\Generator\`) — so this states what the files already say rather
 # than introducing a new convention. `generate-tests` no longer takes
 # `--namespace` as a CLI flag; the adapter reads it from here instead.
 # Single-quoted TOML literal string on purpose: a PHP namespace is
 # backslash-separated, and a double-quoted TOML string treats backslash as
 # an escape, which would silently mangle it.
-namespace = 'Mlavrinenko\Paogen\Tests\Generated'
+namespace = 'Poagen\Generator\Tests\Generated'
 
-# paogen declined the speconaut session workflow: no `speconaut session
+# poagen declined the speconaut session workflow: no `speconaut session
 # start`/`close`, no installed pre-commit hook driving it, tasks go
 # proposed -> wip -> done by hand through mindtape instead. `enabled = false`
 # says that was a choice, not neglect, so `check`/`status` stop treating
@@ -24,7 +24,7 @@ namespace = 'Mlavrinenko\Paogen\Tests\Generated'
 # still applies — the staged set is a baseline it can judge without a session.
 # Fixed upstream 2026-07-31 as `session-opt-out-does-not-reach-lock`; an
 # earlier version of this comment said the opposite and was right when
-# written. Revisit if paogen ever
+# written. Revisit if poagen ever
 # wants the workflow-runtime session protocol's other benefits (in-process
 # spec-first gate on `lock`, orientation dumps via `session start`) enough
 # to also install the hook and start opening/closing sessions per task —
@@ -34,7 +34,7 @@ enabled = false
 
 # `lock`/`status`/`diff` spawn an adapter to resolve traces; unset, the
 # adapter name falls through to speconaut's baked-in default, `rust`, which
-# paogen — a PHP project — never satisfies:
+# poagen — a PHP project — never satisfies:
 #
 #   error: failed to resolve traces via TraceProvider: failed to load
 #   manifest for rpc audit-traces against .../speconaut-rust: read manifest
@@ -59,7 +59,7 @@ enabled = false
 # identically with "phpunit exited with code 1" (verified by reproducing the
 # collector's own PHPUnit invocation by hand: `--filter
 # '/^Speconaut\\Generated\\...'` against a class actually declaring
-# `Mlavrinenko\Paogen\Tests\Generated` reports "No tests executed!" and exits
+# `Poagen\Generator\Tests\Generated` reports "No tests executed!" and exits
 # 1; the same invocation with the real namespace passes). Filed upstream as
 # `audit-traces-ignores-the-configured-namespace` in speconaut's own
 # `truth/tasks/` — this repo cannot work around it, since the namespace used
@@ -164,21 +164,21 @@ spec-roots = ["truth/specs"]
 
 # The code-ref sweep forbids file paths, member chains, and call shapes in
 # specs, decisions, standards, and domain artifacts, so those layers stay
-# portable across reimplementations. paogen decided portability of truth/
+# portable across reimplementations. poagen decided portability of truth/
 # across a reimplementation is not a value this project pays for
 # (`the-code-ref-exemption-becomes-total`, 2026-08-04, superseding
 # `code-references-permitted-in-generator-specs`), so the exemption below is
-# total rather than scoped: every artifact kind may name a path into paogen's
+# total rather than scoped: every artifact kind may name a path into poagen's
 # own tree, the same freedom task artifacts always had by design.
 #
 # The call shapes and attribute forms were always legitimate on their own
-# terms, ruling aside. paogen's product IS emitted PHP, so `addPet(Pet
+# terms, ruling aside. poagen's product IS emitted PHP, so `addPet(Pet
 # $body): Pet` and `#[BindsFormat('date-time')]` are the observable
 # behaviour a scenario asserts, not an implementation leak. Rephrasing them
 # behaviourally would describe the generator by describing nothing.
 #
 # `src/`, `bin/`, and `tests/` paths are exempted here too, not as debt
-# awaiting a further rewrite but because naming paogen's own tree is now
+# awaiting a further rewrite but because naming poagen's own tree is now
 # permitted outright. `narrow-the-code-ref-exemption` had removed these same
 # three entries after rewriting 32 references behaviourally; the ruling this
 # time reverses that direction rather than repeating its sweep, so nothing
@@ -194,7 +194,7 @@ allowlist = [
   # Output vocabulary: emitted signatures, attributes, member references.
   "(",
   "::",
-  # paogen's own tree, every artifact kind, total rather than scoped — see
+  # poagen's own tree, every artifact kind, total rather than scoped — see
   # `the-code-ref-exemption-becomes-total`.
   "src/",
   "bin/",
@@ -206,7 +206,7 @@ allowlist = [
 # a decision needs Context / Choice / Consequences in that order, a standard
 # is slot-only DSL and takes no L2 headers. Writing the baked-in default out
 # explicitly means a future speconaut release changing that default cannot
-# silently loosen or tighten what paogen's own decisions and standards owe a
+# silently loosen or tighten what poagen's own decisions and standards owe a
 # reader; the shape is a content contract this project chose, not an
 # accident of whatever speconaut ships. Confirmed a no-op against the current
 # tree: 27 decisions, 27 `== Context`/`== Choice`/`== Consequences`, in order
@@ -229,10 +229,10 @@ required = true
 name = "Consequences"
 required = true
 
-# Stale `stage: review` scenarios. paogen writes none yet, so this is inert
+# Stale `stage: review` scenarios. poagen writes none yet, so this is inert
 # on data today regardless of the window — but the window is worth setting
 # now rather than inheriting speconaut's default un-examined. The default
-# (50 commits) is calibrated to nothing paogen-specific; this repo ships in
+# (50 commits) is calibrated to nothing poagen-specific; this repo ships in
 # short task branches (observed ~4-8 commits each, `git log --oneline
 # --merges`) and lands 20-40 commits a day while a session is active, so 50
 # commits is closer to a day and a half of unrelated churn before a
@@ -243,7 +243,7 @@ required = true
 window-commits = 30
 
 # `[check.context-deps]` is declined this round, not because it doesn't fit
-# paogen — it fits exactly: four real bounded contexts (schema, generation,
+# poagen — it fits exactly: four real bounded contexts (schema, generation,
 # guidance, cli) with a real dependency shape worth enforcing. It is declined
 # because turning it on today produces 12 findings, and 9 of them sit in
 # truth/standards/, which another agent is actively editing under this same
@@ -285,7 +285,7 @@ window-commits = 30
 # `may-be-stale` only when the task's own `contexts:` (an `x-speconaut`
 # extras slot, separate from decisions'/standards' `contexts:`) intersects an
 # accepted decision or terminal task that landed after the task's staleness
-# floor. Checked: 0 of paogen's 77 task files carry `x-speconaut.contexts`.
+# floor. Checked: 0 of poagen's 77 task files carry `x-speconaut.contexts`.
 # With no task tagged, every task is exempt and the heuristic can never fire
 # — any `days` value here would be undetectable policy, not a real decision.
 # It costs nothing to leave unset: the moment a task starts tagging
@@ -295,11 +295,11 @@ window-commits = 30
 # (truth/tasks/*.typ content belongs elsewhere).
 #
 # `[tasks]` (max-estimate-hours / over-budget-is-error) is declined, and not
-# provisionally — paogen's own .mindtape/config.toml already rejects
+# provisionally — poagen's own .mindtape/config.toml already rejects
 # hour-based sizing as a matter of policy: "Priority stays a plain optional
 # integer... Requiring a score would buy a number the agent invented to
 # satisfy the field... Difficulty is the exception, because it is the
-# routing question... Score JUDGMENT REQUIRED, not size." paogen sizes tasks
+# routing question... Score JUDGMENT REQUIRED, not size." poagen sizes tasks
 # by `difficulty` (a 0-9 judgment rubric), not by an `estimate: (hours:
 # ...)` slot. Checked: 0 of 77 task files set `estimate:` at all. Adding a
 # `max-estimate-hours` budget would regulate a field this project has
@@ -310,7 +310,7 @@ window-commits = 30
 
 # How many task-referencing commits `speconaut context` / `speconaut next
 # --full` surface under "recent activity". The default (5) is a generic
-# number; paogen's task branches run ~4-8 commits end to end (feature commit,
+# number; poagen's task branches run ~4-8 commits end to end (feature commit,
 # tests, docs, a status-flip commit, sometimes a merge — see `git log
 # --oneline --merges`), so 5 can truncate a single branch's own history
 # mid-task. 8 covers a typical branch in full without ballooning the dump.

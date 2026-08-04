@@ -1,10 +1,10 @@
-# paogen — Pre-Release Review (2026-04-18)
+# poagen — Pre-Release Review (2026-04-18)
 
 Author: review pass on `main` @ `8a91cca` (PoC, 18/19 Petstore ops covered).
 
 ## TL;DR
 
-paogen is an unusually disciplined pre-alpha: the **spec → ADR → code → golden-fixture**
+poagen is an unusually disciplined pre-alpha: the **spec → ADR → code → golden-fixture**
 chain is tight, PHPStan max + bleeding-edge is green, and `just check` passes end-to-end
 (24 tests, 124 assertions, 0 errors). The PoC covers ~18 of 19 Petstore operations and
 produces readable, PHPStan-clean output.
@@ -86,7 +86,7 @@ Not tested, not spec'd. Every non-trivial real API uses composition. Today these
 annotation.
 
 ### 8. No enums
-Petstore's `findPetsByStatus` has `enum: [available, pending, sold]`; paogen emits
+Petstore's `findPetsByStatus` has `enum: [available, pending, sold]`; poagen emits
 `string $status`. With PHP 8.1+ backed enums, this is low-hanging fruit and a big DX win.
 
 ### 9. No datetime / format handling beyond `BindsFormat`
@@ -144,12 +144,12 @@ version field. Needs either a build step that stamps a constant from the tag or 
 read from `Composer\InstalledVersions`.
 
 ### 18. Generator CLI is missing promised commands
-`plain-getopt-for-the-cli` lists `paogen validate <schema>` as part of the tiny CLI surface; only `generate`,
+`plain-getopt-for-the-cli` lists `poagen validate <schema>` as part of the tiny CLI surface; only `generate`,
 `help`, `version` exist. Either ship `validate` or retire the promise in the ADR.
 
 ### 19. CLI lacks `--output`, `--dry-run`, `--diff`
-All customisation has to go via `paogen.php`. A one-shot
-`paogen generate ./profile.php --output=./tmp` for CI introspection is sorely missing, as is
+All customisation has to go via `poagen.php`. A one-shot
+`poagen generate ./profile.php --output=./tmp` for CI introspection is sorely missing, as is
 a `--dry-run` that prints what would change. `--diff` (show textual diff vs existing output)
 would be a cheap review aid.
 
@@ -185,7 +185,7 @@ boot in `phpunit.xml.dist` with a comment explaining why.
   has 3 tags; for large APIs a single flat `ApiClient` with 1000 methods is unergonomic.
 - **Idempotent mkdir + dry-run prune** (see P0 #6) → also supports `--check` mode for CI.
 - **PSR-3 logging hook** (constructor-injected). Optional.
-- **`paogen.php` schema validator** (verify the `Profile` values point at real paths,
+- **`poagen.php` schema validator** (verify the `Profile` values point at real paths,
   `discoverIn` namespaces exist in Composer autoload, `renames` target real components) —
   currently only `schema` path is verified.
 - **Docs** — `README.md` usage section is "planned"; migrate to "current" once CLI is

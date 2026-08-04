@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\SecurityScheme as CebeSecurityScheme;
 
@@ -14,12 +14,12 @@ use function sprintf;
  * Split out of the value it produces because the rules are the interesting
  * part and they are read far more often than the fields: which `in` values
  * an `apiKey` may take, which `http` scheme tokens can be sent without a
- * handshake, and where the line falls between "paogen does not know this"
- * and "paogen refuses this".
+ * handshake, and where the line falls between "poagen does not know this"
+ * and "poagen refuses this".
  *
  * The `http` fallback is the deliberate default the owner ruling calls the
  * "sane default that works in almost every case": RFC 7235 puts a
- * credential after the scheme token, so a vendor word paogen has never
+ * credential after the scheme token, so a vendor word poagen has never
  * seen still reaches the wire correctly as
  * `Authorization: <SchemeToken> <credential>`. Only the two schemes that
  * genuinely cannot work that way — `digest` and `negotiate`, which need a
@@ -57,7 +57,7 @@ final readonly class SecuritySchemeClassifier
             default => self::refuse(
                 $name,
                 $type === '' ? '(no type)' : $type,
-                'paogen does not recognise this scheme type; unknown means refused, never ignored',
+                'poagen does not recognise this scheme type; unknown means refused, never ignored',
             ),
         };
     }
@@ -77,7 +77,7 @@ final readonly class SecuritySchemeClassifier
             return self::refuse(
                 $name,
                 sprintf("apiKey in: '%s'", $in),
-                'an apiKey scheme is sent in a header, a query parameter or a cookie; nothing else is a place paogen can put it',
+                'an apiKey scheme is sent in a header, a query parameter or a cookie; nothing else is a place poagen can put it',
             );
         }
 
@@ -134,7 +134,7 @@ final readonly class SecuritySchemeClassifier
             return self::refuse(
                 $name,
                 'http ' . $lower,
-                'the credential only exists after the server\'s challenge and a second request, and paogen will not '
+                'the credential only exists after the server\'s challenge and a second request, and poagen will not '
                     . 'run a protocol',
             );
         }

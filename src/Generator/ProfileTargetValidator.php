@@ -2,17 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelGroups;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelMergeValidator;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelSite;
-use Mlavrinenko\Paogen\Generator\Emit\InlineModelSiteResolver;
-use Mlavrinenko\Paogen\Generator\Emit\TagCatalogue;
-use Mlavrinenko\Paogen\Generator\Emit\XmlNestedContainerValidator;
+use Poagen\Generator\Generator\Emit\InlineModelMergeValidator;
+use Poagen\Generator\Generator\Emit\XmlNestedContainerValidator;
 
 use function in_array;
 use function sprintf;
@@ -70,7 +66,7 @@ final readonly class ProfileTargetValidator
      */
     private function validateTags(OpenApi $openApi, Profile $profile, array $known): array
     {
-        $carried = TagCatalogue::tagsCarriedByOperations($openApi, $profile);
+        $carried = Emit\TagCatalogue::tagsCarriedByOperations($openApi, $profile);
         $failures = [];
 
         foreach (array_keys($profile->tagRenames) as $tag) {
@@ -93,7 +89,7 @@ final readonly class ProfileTargetValidator
                 continue;
             }
 
-            if (!in_array($tag, TagCatalogue::declaredTagsOf($openApi, $operationId), true)) {
+            if (!in_array($tag, Emit\TagCatalogue::declaredTagsOf($openApi, $operationId), true)) {
                 $failures[] = sprintf(
                     "Profile::\$tagChoice['%s'] picks the tag '%s', which that operation does not carry — a choice "
                         . 'can only narrow the tags the document declared, not add one. Use '
@@ -146,7 +142,7 @@ final readonly class ProfileTargetValidator
     {
         $failures = [];
 
-        foreach (InlineModelGroups::normalise($inlineModels) as $className => $sites) {
+        foreach (Emit\InlineModelGroups::normalise($inlineModels) as $className => $sites) {
             if (preg_match(self::IDENTIFIER, $className) !== 1) {
                 $failures[] = sprintf("Profile::\$inlineModels['%s'] is not a valid PHP class name.", $className);
 
@@ -169,7 +165,7 @@ final readonly class ProfileTargetValidator
         $schemas = [];
 
         foreach ($sites as $site) {
-            $schema = InlineModelSiteResolver::schema($openApi, InlineModelSite::parse($site));
+            $schema = Emit\InlineModelSiteResolver::schema($openApi, Emit\InlineModelSite::parse($site));
 
             if (!$schema instanceof Schema) {
                 $failures[] = sprintf(

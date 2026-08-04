@@ -6,8 +6,8 @@
   status: accepted(2026, 8, 2),
   contexts: (generation-context,),
   goals: (link("../goals/fail-loud-never-silent.goal.typ"),),
-  process-only: "governs how paogen's own `analysis-runs-at-maximum-strictness`
-    standard may be amended — a policy about editing paogen's truth tree, not
+  process-only: "governs how poagen's own `analysis-runs-at-maximum-strictness`
+    standard may be amended — a policy about editing poagen's truth tree, not
     what the generator produces or what a reimplementation must do",
 )
 

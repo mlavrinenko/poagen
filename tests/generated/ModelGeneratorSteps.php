@@ -2,42 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use Composer\Autoload\ClassLoader;
 use DateTimeImmutable;
 use FilesystemIterator;
-use Mlavrinenko\Paogen\Exception\ModelNameCollisionException;
-use Mlavrinenko\Paogen\Exception\NameNormalisationException;
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\Naming\CompositeNormaliser;
-use Mlavrinenko\Paogen\Generator\Naming\NameNormaliser;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
-use Mlavrinenko\Paogen\Generator\Naming\NormalisationContext;
-use Mlavrinenko\Paogen\Generator\Naming\PascalCaseSanitiser;
-use Mlavrinenko\Paogen\Generator\Naming\RenamesNormaliser;
-use Mlavrinenko\Paogen\Generator\Naming\SymbolKind;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\ProfileLoader;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchException;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Cat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Contact\Generated\Model\Contact;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Cat as UnionSelectionCat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Habitat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Sighting;
-use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\ModelNameCollisionException;
+use Poagen\Generator\Exception\NameNormalisationException;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\Emit\SkippedOperation;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Generator\Naming\CompositeNormaliser;
+use Poagen\Generator\Generator\Naming\NameNormaliser;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\PascalCaseSanitiser;
+use Poagen\Generator\Generator\Naming\RenamesNormaliser;
+use Poagen\Generator\Generator\Naming\SymbolKind;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\ProfileLoader;
+use Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Cat;
+use Poagen\Generator\Tests\Fixtures\Generated\Contact\Generated\Model\Contact;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Cat as UnionSelectionCat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Habitat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionSelection\Generated\Model\Sighting;
+use Poagen\Generator\Tests\Fixtures\ValueObject\Email;
+use Poagen\Generator\Tests\Support\PetstoreFixture;
+use Poagen\Runtime\Marshal\Hydrator;
+use Poagen\Runtime\Marshal\Marshaller;
+use Poagen\Runtime\Marshal\UnionBranchException;
+use Poagen\Runtime\ScalarBinding;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -264,13 +264,13 @@ final class ModelGeneratorSteps
      */
     private function inlinePayloadProfile(string $schema, array $inlineModels = []): Profile
     {
-        $this->inlineOutputDir = $this->makeScratchOutputDir('paogen-inline-');
+        $this->inlineOutputDir = $this->makeScratchOutputDir('poagen-inline-');
         $this->outputDir = $this->inlineOutputDir;
 
         return new Profile(
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/' . $schema,
             output: $this->inlineOutputDir,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlineSteps',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\InlineSteps',
             inlineModels: $inlineModels,
         );
     }
@@ -359,14 +359,14 @@ final class ModelGeneratorSteps
 
     public function givenGeneratorHasProducedGeneratedModelPetPhpFromAPriorSchemaThatDeclaredAPetComponent(): void
     {
-        $tempBase = (string) tempnam(sys_get_temp_dir(), 'paogen-prune-');
+        $tempBase = (string) tempnam(sys_get_temp_dir(), 'poagen-prune-');
         unlink($tempBase);
         assert(mkdir($tempBase, 0o755, true));
 
         $profile = new Profile(
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $tempBase,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Prune\\Petstore',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\Prune\\Petstore',
             // No skip list: petstore's octet-stream upload became
             // representable in represent-non-json-request-and-response-bodies,
             // and an entry accepting it would now fail the run as stale.
@@ -380,7 +380,7 @@ final class ModelGeneratorSteps
 
         // Leave a sentinel *outside* Generated/ to prove the prune stays scoped.
         $sentinel = $tempBase . '/user-kept.txt';
-        file_put_contents($sentinel, 'not generated by paogen');
+        file_put_contents($sentinel, 'not generated by poagen');
 
         $this->pruneTempOutput = $tempBase;
         $this->pruneSentinel = $sentinel;
@@ -413,7 +413,7 @@ final class ModelGeneratorSteps
         $profile = new Profile(
             schema: $strippedSchema,
             output: $this->pruneTempOutput,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Prune\\Petstore',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\Prune\\Petstore',
         );
 
         $this->runGenerator($profile);
@@ -676,7 +676,7 @@ final class ModelGeneratorSteps
         $this->runGenerator($this->profile);
     }
 
-    private ?\Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet $hydratedDiscriminatedPet = null;
+    private ?\Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet $hydratedDiscriminatedPet = null;
 
     public function givenModelPetDeclaresARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType(
     ): void {
@@ -759,7 +759,7 @@ final class ModelGeneratorSteps
     {
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
         TestCase::assertStringContainsString('final readonly class Pet', $source);
-        TestCase::assertStringContainsString('namespace Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model;', $source);
+        TestCase::assertStringContainsString('namespace Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model;', $source);
     }
 
 
@@ -870,7 +870,7 @@ final class ModelGeneratorSteps
 
     public function thenModelsPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog(): void
     {
-        assert($this->hydratedCompositionPet instanceof \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
+        assert($this->hydratedCompositionPet instanceof \Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet);
         TestCase::assertInstanceOf(
             Cat::class,
             $this->hydratedCompositionPet->kind,
@@ -1011,15 +1011,15 @@ final class ModelGeneratorSteps
     {
         $projectRoot = dirname(__DIR__, 2);
         $autoload = $projectRoot . '/vendor/autoload.php';
-        $petClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
-        $tagClass = '\\Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
+        $petClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
+        $tagClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
         // The scenario requires `getDocComment()` to actually return `false`
         // under opcache. Since the petstore fixture is regenerated in the
         // given-step, we pass `file_update_protection=0` — without it, opcache
         // refuses to cache a file younger than 2 seconds (opcache default),
         // the file is read from disk, and the fallback never fires.
         $script = sprintf(
-            '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Mlavrinenko\\Paogen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
+            '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Poagen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
             var_export($autoload, true),
             $petClass,
             $petClass,
@@ -1059,7 +1059,7 @@ final class ModelGeneratorSteps
     public function thenModelsPropertyTypeInTheGeneratedConstructorIsAppValueObjectEmailNotString(): void
     {
         $source = (string) file_get_contents($this->outputDir . '/Generated/Model/Contact.php');
-        TestCase::assertStringContainsString('use Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject\\Email;', $source);
+        TestCase::assertStringContainsString('use Poagen\\Generator\\Tests\\Fixtures\\ValueObject\\Email;', $source);
         TestCase::assertStringContainsString('public Email $email', $source);
         TestCase::assertStringNotContainsString('public string $email', $source);
     }
@@ -1242,7 +1242,7 @@ final class ModelGeneratorSteps
         $resource = (string) file_get_contents($this->outputDir . '/Generated/Model/Resource.php');
         TestCase::assertStringContainsString('public Urn $urn,', $resource);
 
-        $namespace = 'Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model';
+        $namespace = 'Poagen\\Generator\\Tests\\Fixtures\\Generated\\Composition\\Generated\\Model';
         /** @var class-string $urnClass */
         $urnClass = $namespace . '\\Urn';
         /** @var class-string $resourceClass */
@@ -1446,12 +1446,12 @@ final class ModelGeneratorSteps
         // The inline-payloads fixture declares no components at all, so this
         // half is asserted against petstore, whose `Order.status` is exactly
         // that shape.
-        $base = $this->makeScratchOutputDir('paogen-component-enum-');
+        $base = $this->makeScratchOutputDir('poagen-component-enum-');
 
         $this->runGenerator(new Profile(
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
             output: $base,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ComponentEnum',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\ComponentEnum',
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
         ));
 
@@ -1604,7 +1604,7 @@ final class ModelGeneratorSteps
     public function thenFilesPlacedAlongsideGeneratedUnderProfilesOutputDirectoryRemainUntouched(): void
     {
         TestCase::assertFileExists($this->pruneSentinel);
-        TestCase::assertSame('not generated by paogen', (string) file_get_contents($this->pruneSentinel));
+        TestCase::assertSame('not generated by poagen', (string) file_get_contents($this->pruneSentinel));
     }
 
 
@@ -1621,25 +1621,9 @@ final class ModelGeneratorSteps
 
     public function givenProfileWasLoadedFromTestsFixturesProfilesPetstorePhp(): void
     {
-        $this->headerOutputDir = $this->makeScratchOutputDir('paogen-header-');
+        $this->headerOutputDir = $this->makeScratchOutputDir('poagen-header-');
         $this->profile = $this->loadProfile('petstore')->with(output: $this->headerOutputDir);
         $this->outputDir = $this->headerOutputDir;
-    }
-
-    public function thenEveryGeneratedFileWrittenOpensWithACommentSayingItWasGeneratedByPaogenAndMustNotBeEditedByHand(
-    ): void {
-        foreach ($this->emittedHeaders() as $relative => $header) {
-            TestCase::assertStringContainsString(
-                'Generated by paogen',
-                $header,
-                "{$relative} does not say it is generated",
-            );
-            TestCase::assertStringContainsString(
-                'Do not edit by hand',
-                $header,
-                "{$relative} does not refuse hand edits",
-            );
-        }
     }
 
     public function thenThatCommentNamesProfileAsTestsFixturesProfilesPetstorePhp(): void
@@ -1653,16 +1637,6 @@ final class ModelGeneratorSteps
         }
     }
 
-    public function thenThatCommentPrintsTheCommandThatReproducesGeneratedFilePaogenGenerateTestsFixturesProfilesPetstorePhp(
-    ): void {
-        foreach ($this->emittedHeaders() as $relative => $header) {
-            TestCase::assertStringContainsString(
-                'Regenerate: paogen generate tests/fixtures/profiles/petstore.php',
-                $header,
-                "{$relative} does not print the command that reproduces it",
-            );
-        }
-    }
 
     public function whenGeneratorRunsAgainOverSameSchemaAndSameProfile(): void
     {
@@ -1735,7 +1709,7 @@ final class ModelGeneratorSteps
 
     // ---- regenerating over a tree that is already there ----------------
 
-    private const string HAND_EDIT_SENTINEL = 'TYPED-BY-A-HUMAN-NOT-BY-PAOGEN';
+    private const string HAND_EDIT_SENTINEL = 'TYPED-BY-A-HUMAN-NOT-BY-POAGEN';
 
     private string $rerunOutputDir = '';
     /** @var array<string,string> */
@@ -1745,7 +1719,7 @@ final class ModelGeneratorSteps
 
     public function givenGeneratorHasAlreadyWrittenGeneratedFileTreeIntoProfilesOutput(): void
     {
-        $this->rerunOutputDir = $this->makeScratchOutputDir('paogen-rerun-');
+        $this->rerunOutputDir = $this->makeScratchOutputDir('poagen-rerun-');
         $this->profile = $this->loadProfile('petstore')->with(output: $this->rerunOutputDir);
         $this->outputDir = $this->rerunOutputDir;
 
@@ -1803,7 +1777,7 @@ final class ModelGeneratorSteps
         // and `meow` (Cat's required field) — petType='Cat' must break the tie
         // and select Cat regardless of the structural overlap.
         $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            \Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
             ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
         );
     }
@@ -1894,7 +1868,7 @@ final class ModelGeneratorSteps
             $contactProfile->output . '/Generated/Model/Contact.php',
         );
         TestCase::assertStringContainsString(
-            'use Mlavrinenko\\Paogen\\Runtime\\Attribute\\WireName;',
+            'use Poagen\\Runtime\\Attribute\\WireName;',
             $contactSource,
         );
         TestCase::assertStringContainsString("#[WireName('display-name')]", $contactSource);
@@ -1907,7 +1881,7 @@ final class ModelGeneratorSteps
         $tag = trim($wire, "'\"");
         $this->source = (string) file_get_contents($this->outputDir . '/Generated/Model/Pet.php');
         $this->hydratedDiscriminatedPet = new Hydrator()->hydrate(
-            \Mlavrinenko\Paogen\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            \Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
             ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
         );
     }
@@ -2173,6 +2147,35 @@ final class ModelGeneratorSteps
         );
         TestCase::assertInstanceOf(UnionBranchException::class, $unmapped);
         TestCase::assertStringContainsString('no branch is mapped to', $unmapped->getMessage());
+    }
+
+
+    public function thenEveryGeneratedFileWrittenOpensWithACommentSayingItWasGeneratedByPoagenAndMustNotBeEditedByHand(
+    ): void {
+        foreach ($this->emittedHeaders() as $relative => $header) {
+            TestCase::assertStringContainsString(
+                'Generated by poagen',
+                $header,
+                "{$relative} does not say it is generated",
+            );
+            TestCase::assertStringContainsString(
+                'Do not edit by hand',
+                $header,
+                "{$relative} does not refuse hand edits",
+            );
+        }
+    }
+
+
+    public function thenThatCommentPrintsTheCommandThatReproducesGeneratedFilePoagenGenerateTestsFixturesProfilesPetstorePhp(
+    ): void {
+        foreach ($this->emittedHeaders() as $relative => $header) {
+            TestCase::assertStringContainsString(
+                'Regenerate: poagen generate tests/fixtures/profiles/petstore.php',
+                $header,
+                "{$relative} does not print the command that reproduces it",
+            );
+        }
     }
 
 }

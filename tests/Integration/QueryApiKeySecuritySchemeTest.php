@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\StubErrorFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\StubErrorFactory;
+use Poagen\Runtime\Http\HttpTransport;
 use ReflectionClass;
 
 /**
@@ -31,7 +31,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/query-apikey-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\QueryApiKey';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\QueryApiKey';
     private const string BASE_URI = 'https://query-apikey.example/api/v1';
 
     private static string $clientSource = '';
@@ -44,7 +44,7 @@ final class QueryApiKeySecuritySchemeTest extends TestCase
         // Real files on disk, not just in-memory plan text, so the generated class
         // can be required and executed — proving the credential reaches the wire
         // rather than only the constructor argument list.
-        $result = self::generateRootClient(self::SCHEMA, self::NAMESPACE, 'paogen-queryapikey-');
+        $result = self::generateRootClient(self::SCHEMA, self::NAMESPACE, 'poagen-queryapikey-');
         self::$clientSource = $result['source'];
         self::$clientReflection = $result['reflection'];
     }

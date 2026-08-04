@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\ApiClient;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Celsius;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\GetRestrictionsResponseBranch2;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\ApiClient;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\ApiException;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Cat;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Celsius;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
+use Poagen\Generator\Tests\Fixtures\Generated\UnionResponse\Generated\Model\GetRestrictionsResponseBranch2;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Http\HttpTransport;
+use Poagen\Runtime\Marshal\UnionBranchException;
 
 /**
  * `a-union-response-selects-its-branch`, driven through the *emitted*

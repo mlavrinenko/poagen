@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\Emit\ModelEmitter;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Runtime\Marshal\Hydrator;
+use Poagen\Runtime\Marshal\Marshaller;
 use ReflectionClass;
 
 /**
@@ -33,7 +33,7 @@ final class PropertyRenameTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/contact-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\PropertyRename';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\PropertyRename';
 
     public static function tearDownAfterClass(): void
     {
@@ -42,7 +42,7 @@ final class PropertyRenameTest extends TestCase
 
     public function testARenamedPropertyRoundTripsHydrationMarshallingAndThePhpSurface(): void
     {
-        $output = self::makeSandboxDir('paogen-property-rename-');
+        $output = self::makeSandboxDir('poagen-property-rename-');
         self::generator()->generate(new Profile(
             schema: self::SCHEMA,
             output: $output,
@@ -139,7 +139,7 @@ final class PropertyRenameTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-property-rename-'),
+            output: self::makeSandboxDir('poagen-property-rename-'),
             namespace: self::NAMESPACE,
             propertyRenames: $propertyRenames,
         ));

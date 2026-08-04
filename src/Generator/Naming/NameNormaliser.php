@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Naming;
+namespace Poagen\Generator\Generator\Naming;
 
 /**
  * Strategy that maps an OpenAPI symbol's raw name to a PHP identifier.

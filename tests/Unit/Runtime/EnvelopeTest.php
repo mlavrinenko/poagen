@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
-use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -22,7 +19,7 @@ final class EnvelopeTest extends TestCase
         $body = ['id' => 7];
         $response = new Response(200);
 
-        $envelope = new Envelope(200, $body, $response);
+        $envelope = new \Poagen\Runtime\Contract\Envelope(200, $body, $response);
 
         self::assertSame(200, $envelope->status);
         self::assertSame($body, $envelope->body);
@@ -31,7 +28,7 @@ final class EnvelopeTest extends TestCase
 
     public function testANullBodyIsAWellFormedEnvelopeNotAMissingOne(): void
     {
-        $envelope = new Envelope(204, null, new Response(204));
+        $envelope = new \Poagen\Runtime\Contract\Envelope(204, null, new Response(204));
 
         self::assertSame(204, $envelope->status);
         self::assertNull($envelope->body);
@@ -39,11 +36,11 @@ final class EnvelopeTest extends TestCase
 
     public function testResponseTypeEnvelopeCarriesTheStatusResponseMapItWasBuiltFrom(): void
     {
-        $statuses = new StatusResponseMap(exact: [['200', ResponseType::string()]]);
+        $statuses = new \Poagen\Runtime\Contract\StatusResponseMap(exact: [['200', \Poagen\Runtime\Contract\ResponseType::string()]]);
 
-        $type = ResponseType::envelope($statuses);
+        $type = \Poagen\Runtime\Contract\ResponseType::envelope($statuses);
 
-        self::assertSame(ResponseType::KIND_ENVELOPE, $type->kind);
+        self::assertSame(\Poagen\Runtime\Contract\ResponseType::KIND_ENVELOPE, $type->kind);
         self::assertSame($statuses, $type->statuses);
     }
 }

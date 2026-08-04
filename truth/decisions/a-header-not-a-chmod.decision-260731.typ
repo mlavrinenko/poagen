@@ -3,7 +3,7 @@
 #import "../domain/guidance.context.typ": *
 
 #show: decision.with(
-  title: "Emitted files declare themselves in a header; paogen does not make them read-only",
+  title: "Emitted files declare themselves in a header; poagen does not make them read-only",
   status: accepted(2026, 7, 31),
   contexts: (generation-context,),
   goals: (
@@ -51,7 +51,7 @@ than by omission:
   documented. Trading a regeneration that always works for a barrier that
   only sometimes exists is the wrong side of `cheap-regeneration`.
 + *It protects the wrong tree.* The edit that prompted this landed in
-  another generator's output. A permission bit paogen sets on its own
+  another generator's output. A permission bit poagen sets on its own
   files would not have been anywhere near it.
 
 The header is honest about what it can do: it states the rule where the
@@ -65,11 +65,11 @@ nothing available can.
   regeneration diff stays readable.
 - #The(Profile) is named by the path the run was given, relative to the
   directory it was invoked from. A profile built in code rather than
-  loaded from a file names itself by paogen's conventional file name, and
+  loaded from a file names itself by poagen's conventional file name, and
   can say otherwise when it stands in for a real one.
-- Reproducing a committed tree means invoking paogen the way its header
+- Reproducing a committed tree means invoking poagen the way its header
   prints, from the root the header's path is relative to. Generating the
   same tree from a different directory is a diff in the header — visible
   and self-explaining, which is the point.
 - Anyone who wants the permission bit can set it themselves after a run.
-  paogen does not, and will not restore it either.
+  poagen does not, and will not restore it either.

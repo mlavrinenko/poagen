@@ -99,7 +99,7 @@ Also: 52 distinct branch schemas, not "roughly forty-five". The
 `repository-ruleset.conditions` maps a parent `source_type` that is **not
 required** and whose enum carries three values against two branches. `Enterprise`
 maps to nothing and raises at runtime. That is deliberate — the document permits
-a shape paogen cannot type — and the generation-time report names it on every
+a shape poagen cannot type — and the generation-time report names it on every
 run.
 
 A pinned `database_config.config` hydrates a Postgres payload into

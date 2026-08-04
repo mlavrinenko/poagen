@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\Emit\SecurityScheme;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\StubErrorFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\SecurityScheme;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\StubErrorFactory;
+use Poagen\Runtime\Http\HttpTransport;
 use ReflectionClass;
 
 /**
@@ -33,7 +33,7 @@ final class CollidingBearerSecuritySchemeTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/colliding-bearer-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\CollidingBearer';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\CollidingBearer';
     private const string BASE_URI = 'https://colliding-bearer.example/api/v1';
 
     private static string $clientSource = '';
@@ -43,7 +43,7 @@ final class CollidingBearerSecuritySchemeTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        $result = self::generateRootClient(self::SCHEMA, self::NAMESPACE, 'paogen-collidingbearer-');
+        $result = self::generateRootClient(self::SCHEMA, self::NAMESPACE, 'poagen-collidingbearer-');
         self::$clientSource = $result['source'];
         self::$clientReflection = $result['reflection'];
     }

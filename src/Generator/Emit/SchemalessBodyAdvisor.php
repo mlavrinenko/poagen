@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\spec\MediaType;
@@ -21,7 +21,7 @@ use const SORT_STRING;
  *
  * `RequestBodyAnalyzer` now passes such a body through untyped rather than
  * refusing the operation, on the reading that a document declaring nothing
- * is not the same claim as a schema paogen cannot type. Doing that silently
+ * is not the same claim as a schema poagen cannot type. Doing that silently
  * would be exactly the widening `merge-allof-members-into-one-model` exists
  * to remove: a `KIND_JSON_MAP` `array` parameter looks identical whether the
  * document left the shape open on purpose or the media type is simply
@@ -67,7 +67,7 @@ final readonly class SchemalessBodyAdvisor
         foreach ($sites as $site) {
             $notices[] = sprintf(
                 '%s declares an application/json request body with no `schema` — the document says nothing '
-                    . 'about its shape, so paogen passes it through untyped as `array<string, mixed>` rather '
+                    . 'about its shape, so poagen passes it through untyped as `array<string, mixed>` rather '
                     . 'than refusing the operation.',
                 $site,
             );

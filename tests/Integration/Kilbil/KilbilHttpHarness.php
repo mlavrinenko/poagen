@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
+namespace Poagen\Generator\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\ApiClient;
 use Acme\Kilbil\Generated\ApiException;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
+use Poagen\Generator\Tests\Generated\RecordingClient;
+use Poagen\Runtime\Http\HttpTransport;
 
 /**
  * Wires the real, committed kilbil `ApiClient` over the real `HttpTransport`

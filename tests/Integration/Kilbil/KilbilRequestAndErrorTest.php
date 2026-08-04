@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
+namespace Poagen\Generator\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
 use Acme\Kilbil\Generated\Model\SearchClient403Content;
 use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
-use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Generated\RecordingClient;
 
 use function urlencode;
 

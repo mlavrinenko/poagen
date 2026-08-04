@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
-use Mlavrinenko\Paogen\Generator\Emit\DanglingReferenceScanner;
-use Mlavrinenko\Paogen\Generator\Emit\DiscriminatorEnforcer;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Tests\Integration\DanglingComponentReferenceTest;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\DanglingReferenceScanner;
+use Poagen\Generator\Generator\Emit\DiscriminatorEnforcer;
+use Poagen\Generator\Generator\Emit\SkippedComponent;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Tests\Integration\DanglingComponentReferenceTest;
 
 /**
  * Unit coverage for {@see DanglingReferenceScanner} directly, isolated from

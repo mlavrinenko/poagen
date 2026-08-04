@@ -8,7 +8,7 @@
   goals: (link("../goals/strict-clean-output.goal.typ"),),
   standards: (link("../standards/analysis-runs-at-maximum-strictness.standard-260729.typ"),),
   relates-to: (link("generated-duplication-ceiling-is-per-tree.decision-260803.typ"),),
-  process-only: "governs paogen's own duplication-gate configuration for the generated tier — what `just lint-jscpd-generated` measures and `scripts/jscpd-generated-baselines` records — not what the generator produces or what a reimplementation must do",
+  process-only: "governs poagen's own duplication-gate configuration for the generated tier — what `just lint-jscpd-generated` measures and `scripts/jscpd-generated-baselines` records — not what the generator produces or what a reimplementation must do",
 )
 
 == Context

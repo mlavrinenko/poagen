@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit;
+namespace Poagen\Generator\Tests\Unit;
 
 use cebe\openapi\json\JsonPointer;
 use cebe\openapi\Reader;
@@ -11,13 +11,13 @@ use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
-use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaScan;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaType;
-use Mlavrinenko\Paogen\Generator\Emit\SchemaWalk;
-use Mlavrinenko\Paogen\Generator\Emit\TypeListScanner;
-use Mlavrinenko\Paogen\Generator\Emit\UnconstrainedFieldAdvisor;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\Emit\FormatAdvisor;
+use Poagen\Generator\Generator\Emit\SchemaScan;
+use Poagen\Generator\Generator\Emit\SchemaType;
+use Poagen\Generator\Generator\Emit\SchemaWalk;
+use Poagen\Generator\Generator\Emit\TypeListScanner;
+use Poagen\Generator\Generator\Emit\UnconstrainedFieldAdvisor;
 
 /**
  * pathitem-level-parameters-are-invisible-to-the-document-wide-scan:
@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
  * {@see SchemaWalk::roots()} (what {@see FormatAdvisor}
  * and {@see UnconstrainedFieldAdvisor}
  * walk) and {@see SchemaScan} (what {@see TypeListScanner} and {@see
- * \Mlavrinenko\Paogen\Generator\Emit\UnsupportedKeywordScanner} probe).
+ * \Poagen\Generator\Generator\Emit\UnsupportedKeywordScanner} probe).
  *
  * Fixture: tests/fixtures/schemas/pathitem-shared-parameter-3.1.yaml.
  * `/shared` declares one query parameter on the PathItem, `type: [object,

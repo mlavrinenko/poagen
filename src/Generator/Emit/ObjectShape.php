@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
@@ -90,7 +90,7 @@ final readonly class ObjectShape
      * lists `'additionalProperties' => true` among its defaults.
      *
      * Reading it through the accessor would therefore put an extras bag on
-     * every object paogen has ever emitted — 107 models in the kilbil example
+     * every object poagen has ever emitted — 107 models in the kilbil example
      * alone — for a permission nobody granted. `getSerializableData()` reflects
      * only what the document set, before the substitution, and is how
      * {@see ServerCatalog} tells the same two states apart for `servers:`.

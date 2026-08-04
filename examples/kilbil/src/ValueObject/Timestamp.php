@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\ValueObject;
 
-use Mlavrinenko\Paogen\Generator\Attribute\BindsFormat;
-use Mlavrinenko\Paogen\Runtime\ScalarBinding;
+use Poagen\Generator\Generator\Attribute\BindsFormat;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * A kilbil timestamp.
  *
  * The vendor writes this format three ways and gets it wrong all three times:
  * `date time` (11 uses) is `date-time` with a space where the hyphen belongs,
- * and `data time` (3 uses) is that typo plus another. paogen reports each one
+ * and `data time` (3 uses) is that typo plus another. poagen reports each one
  * rather than quietly leaving 14 timestamps as strings, and this class is the
  * answer — one type for every spelling, which is why `#[BindsFormat]` is
  * repeatable.

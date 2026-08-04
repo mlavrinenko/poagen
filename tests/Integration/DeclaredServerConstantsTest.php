@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 /**
  * emit-declared-servers-so-the-base-address-comes-from-the-document: the
@@ -103,8 +103,8 @@ final class DeclaredServerConstantsTest extends TestCase
     {
         $result = self::generateRootClient(
             $schema,
-            'Mlavrinenko\\Paogen\\Tests\\Tmp\\' . $suffix,
-            'paogen-servers-' . $suffix . '-',
+            'Poagen\\Generator\\Tests\\Tmp\\' . $suffix,
+            'poagen-servers-' . $suffix . '-',
         );
 
         return $result['source'];

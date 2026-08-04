@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator;
+namespace Poagen\Generator\Generator;
 
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
@@ -14,7 +14,7 @@ use const SORT_STRING;
  *
  * Two modes:
  *  - {@see summary} — tree-shaped list of would-be writes and prunes for
- *    `paogen generate --dry-run`.
+ *    `poagen generate --dry-run`.
  *  - {@see diff} — unified diff between each planned write (and each
  *    planned prune) and the file currently on disk, for `--diff`.
  */
@@ -43,7 +43,7 @@ final class PlanReporter
         }
 
         if ($lines === []) {
-            return "paogen: nothing to do\n";
+            return "poagen: nothing to do\n";
         }
 
         return implode("\n", $lines) . "\n";

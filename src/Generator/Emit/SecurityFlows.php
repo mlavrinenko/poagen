@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OAuthFlow;
 use cebe\openapi\spec\OAuthFlows;
@@ -15,12 +15,12 @@ use function is_string;
  * credential: which flows the vendor supports, the three URLs each flow
  * names, and the scopes it declares with the vendor's own descriptions.
  *
- * paogen sends an access token and nothing more — obtaining one is the
+ * poagen sends an access token and nothing more — obtaining one is the
  * consumer's transport's job, per `operations-delegate-to-an-injected-transport`.
  * But the consumer still has to point `league/oauth2-client` (or whatever
  * they reach for) at a token endpoint and ask for the right scopes, and
  * today that means re-reading the vendor's YAML beside the typed client
- * paogen already gave them. Carrying the metadata across is the cheap half
+ * poagen already gave them. Carrying the metadata across is the cheap half
  * of "emit everything the document says that helps a consumer wire their
  * own transport".
  *

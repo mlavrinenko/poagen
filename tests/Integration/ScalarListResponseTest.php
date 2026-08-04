@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function array_values;
 use function implode;
@@ -27,7 +27,7 @@ final class ScalarListResponseTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/scalar-list-response-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ScalarList';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ScalarList';
 
     public static function tearDownAfterClass(): void
     {
@@ -125,9 +125,9 @@ final class ScalarListResponseTest extends TestCase
     {
         return new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-scalar-list-'),
+            output: self::makeSandboxDir('poagen-scalar-list-'),
             namespace: self::NAMESPACE,
-            discoverIn: ['Mlavrinenko\\Paogen\\Tests\\Fixtures\\ValueObject'],
+            discoverIn: ['Poagen\\Generator\\Tests\\Fixtures\\ValueObject'],
             skip: $skip,
         );
     }

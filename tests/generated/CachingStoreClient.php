@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use InvalidArgumentException;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Poagen\Runtime\Contract\Envelope;
 
 /**
  * A consumer's own class implementing an emitted sub-client interface and

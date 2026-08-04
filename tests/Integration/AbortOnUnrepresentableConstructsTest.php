@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -30,7 +30,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/unrepresentable-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\Unrepresentable';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\Unrepresentable';
 
     public static function tearDownAfterClass(): void
     {
@@ -63,7 +63,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
             self::assertStringContainsString('createWidget', $message);
             self::assertStringContainsString('/paths/~1widgets/post/requestBody', $message);
             // Remedy.
-            self::assertStringContainsString('paogen emits application/json', $message);
+            self::assertStringContainsString('poagen emits application/json', $message);
         }
     }
 
@@ -109,7 +109,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
 
     public function testNothingIsWrittenToTheOutputDirectoryOnAbort(): void
     {
-        $outputDir = self::makeSandboxDir('paogen-unrepresentable-');
+        $outputDir = self::makeSandboxDir('poagen-unrepresentable-');
 
         try {
             self::generator()->generate(new Profile(
@@ -130,7 +130,7 @@ final class AbortOnUnrepresentableConstructsTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-unrepresentable-'),
+            output: self::makeSandboxDir('poagen-unrepresentable-'),
             namespace: self::NAMESPACE,
             skip: $skip,
         ));

@@ -18,7 +18,7 @@ return RectorConfig::configure()
         // regenerated; the *Steps.php files are append-only but keep a
         // $test property that's part of the adapter contract.
         __DIR__ . '/tests/generated',
-        // Golden trees produced by paogen itself — rector must never
+        // Golden trees produced by poagen itself — rector must never
         // mutate them. Shape decisions (unused params on throwing stubs,
         // explicit nullable casts, deliberate dead-code branches) are
         // owned by the generator, not by the refactorer. The consumer-

@@ -38,7 +38,7 @@ than feared, and still strictly more than `mixed`.
 
 Under `error-response-policy`, that 403 reached a consumer as
 `getDecodedBody(): mixed` on an exception — a status code and an untyped
-array, with the schema paogen already parsed thrown away. `typed-error-
+array, with the schema poagen already parsed thrown away. `typed-error-
 responses` filed the question this decision answers: given a real schema
 whose error body is worth reading, does the generator keep discarding it.
 

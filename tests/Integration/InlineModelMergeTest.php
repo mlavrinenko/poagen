@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Support\InlinePayloadPlanAssertions;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\InlinePayloadPlanAssertions;
 
 use function substr_count;
 
@@ -27,7 +27,7 @@ final class InlineModelMergeTest extends TestCase
     use InlinePayloadPlanAssertions;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/inline-model-merge-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\InlineModelMerge';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\InlineModelMerge';
 
     public static function tearDownAfterClass(): void
     {
@@ -119,7 +119,7 @@ final class InlineModelMergeTest extends TestCase
      */
     private function plan(array $inlineModels = []): GenerationPlan
     {
-        $output = self::makeSandboxDir('paogen-inline-merge-');
+        $output = self::makeSandboxDir('poagen-inline-merge-');
 
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,

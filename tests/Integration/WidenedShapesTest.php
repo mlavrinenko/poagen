@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
 
 use const DIRECTORY_SEPARATOR;
 use const SORT_STRING;
@@ -37,7 +37,7 @@ final class WidenedShapesTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/widened-shapes-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\WidenedShapes';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\WidenedShapes';
 
     public static function tearDownAfterClass(): void
     {
@@ -138,12 +138,12 @@ final class WidenedShapesTest extends TestCase
         self::assertCount(2, $notices);
         self::assertStringContainsString(
             'unconstrained value at /components/schemas/Widget/properties/notes — the document declares no type, '
-                . 'properties or items here, so paogen emits `mixed`.',
+                . 'properties or items here, so poagen emits `mixed`.',
             $notices[0],
         );
         self::assertStringContainsString(
             'unconstrained value at /paths/~1opaque/get/responses/200/content/application~1json/schema — the '
-                . "document declares no properties and no schema for this object's values, so paogen emits "
+                . "document declares no properties and no schema for this object's values, so poagen emits "
                 . '`array<string, mixed>`.',
             $notices[1],
         );
@@ -164,7 +164,7 @@ final class WidenedShapesTest extends TestCase
     {
         return self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-widened-'),
+            output: self::makeSandboxDir('poagen-widened-'),
             namespace: self::NAMESPACE,
         ));
     }

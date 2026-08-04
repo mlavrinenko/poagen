@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;

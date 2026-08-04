@@ -14,7 +14,7 @@ info:
     `components.requestBodies` entry and are pinned (Profile::$inlineModels)
     to the same class name, so the shared node is claimed from two places.
     `dropsShared` also declares an inline-object path parameter — the shape
-    `parameter-shape-gate-3.0.yaml`'s `getWidget` already proves paogen
+    `parameter-shape-gate-3.0.yaml`'s `getWidget` already proves poagen
     refuses — which gets it refused and skip-covered independent of the body
     it shares with `keepsShared`. Accepting that skip must drop
     `dropsShared`'s method without dropping the shared request model

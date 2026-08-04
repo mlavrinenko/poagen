@@ -2,16 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Unit\Runtime;
+namespace Poagen\Generator\Tests\Unit\Runtime;
 
-use Mlavrinenko\Paogen\Runtime\AdditionalPropertyBag;
-use Mlavrinenko\Paogen\Runtime\Marshal\Hydrator;
-use Mlavrinenko\Paogen\Runtime\Marshal\Marshaller;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Inventory;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Labels;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\OpenLabels;
-use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag;
 use PHPUnit\Framework\TestCase;
+use Poagen\Runtime\AdditionalPropertyBag;
+use Poagen\Runtime\Marshal\Hydrator;
+use Poagen\Runtime\Marshal\Marshaller;
 
 /**
  * declared-shapes-become-types: a schema declaring both `properties` and
@@ -33,7 +29,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
     {
         $payload = ['primary' => 'front', 'left' => 'port', 'right' => 'starboard'];
 
-        $labels = new Hydrator()->hydrate(Labels::class, $payload);
+        $labels = new Hydrator()->hydrate(Fixtures\Labels::class, $payload);
 
         self::assertSame('front', $labels->primary);
         self::assertSame(['left' => 'port', 'right' => 'starboard'], $labels->additionalProperties);
@@ -45,7 +41,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
 
     public function testADeclaredPropertyKeepsItsOwnKey(): void
     {
-        $labels = new Hydrator()->hydrate(Labels::class, ['primary' => 'front']);
+        $labels = new Hydrator()->hydrate(Fixtures\Labels::class, ['primary' => 'front']);
 
         self::assertSame('front', $labels->primary);
         self::assertSame([], $labels->additionalProperties);
@@ -53,7 +49,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
 
     public function testAnAbsentDeclaredPropertyDoesNotPutItsKeyInTheMap(): void
     {
-        $labels = new Hydrator()->hydrate(Labels::class, ['left' => 'port']);
+        $labels = new Hydrator()->hydrate(Fixtures\Labels::class, ['left' => 'port']);
 
         self::assertNull($labels->primary);
         self::assertSame(['left' => 'port'], $labels->additionalProperties);
@@ -61,7 +57,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
 
     public function testExtraValuesAreTypedByTheSchemaThatDeclaredThem(): void
     {
-        $inventory = new Hydrator()->hydrate(Inventory::class, [
+        $inventory = new Hydrator()->hydrate(Fixtures\Inventory::class, [
             'warehouse' => 'north',
             'spare' => ['id' => 7, 'name' => 'bolt'],
         ]);
@@ -69,14 +65,14 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         $spare = $inventory->additionalProperties['spare'] ?? null;
 
         self::assertSame('north', $inventory->warehouse);
-        self::assertInstanceOf(Tag::class, $spare);
+        self::assertInstanceOf(Fixtures\Tag::class, $spare);
         self::assertSame(7, $spare->id);
         self::assertSame('bolt', $spare->name);
     }
 
     public function testTypedExtraValuesMarshalBackToTheirWireForm(): void
     {
-        $inventory = new Inventory('north', ['spare' => new Tag(7, 'bolt')]);
+        $inventory = new Fixtures\Inventory('north', ['spare' => new Fixtures\Tag(7, 'bolt')]);
 
         self::assertSame(
             ['warehouse' => 'north', 'spare' => ['id' => 7, 'name' => 'bolt']],
@@ -90,7 +86,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         // puts a declared key in the map. The declared property still wins,
         // because a model that could be marshalled into a payload it cannot be
         // hydrated back from would not round-trip at all.
-        $labels = new Labels('front', ['primary' => 'smuggled', 'left' => 'port']);
+        $labels = new Fixtures\Labels('front', ['primary' => 'smuggled', 'left' => 'port']);
 
         self::assertSame(['primary' => 'front', 'left' => 'port'], new Marshaller()->marshal($labels));
     }
@@ -102,7 +98,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         // build a typed map out of.
         $payload = ['primary' => 'front', 'left' => 'port', 'count' => 2, 'nested' => ['deep' => true]];
 
-        $labels = new Hydrator()->hydrate(OpenLabels::class, $payload);
+        $labels = new Hydrator()->hydrate(Fixtures\OpenLabels::class, $payload);
 
         self::assertSame('front', $labels->primary);
         self::assertSame(['left', 'count', 'nested'], $labels->additionalProperties->keys());
@@ -118,7 +114,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         // `primary` is declared, so its key goes to that property and nowhere
         // else — never to the property and the bag both, which would marshal
         // one wire key out of two sources.
-        $labels = new Hydrator()->hydrate(OpenLabels::class, ['primary' => 'front', 'left' => 'port']);
+        $labels = new Hydrator()->hydrate(Fixtures\OpenLabels::class, ['primary' => 'front', 'left' => 'port']);
 
         self::assertSame('front', $labels->primary);
         self::assertFalse($labels->additionalProperties->has('primary'));
@@ -130,7 +126,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         // The key is claimed by its descriptor whether or not the payload
         // carried it, so an absent declared property does not leave its name
         // free for the bag to pick up from some other payload shape.
-        $labels = new Hydrator()->hydrate(OpenLabels::class, ['left' => 'port']);
+        $labels = new Hydrator()->hydrate(Fixtures\OpenLabels::class, ['left' => 'port']);
 
         self::assertNull($labels->primary);
         self::assertSame(['left'], $labels->additionalProperties->keys());
@@ -139,7 +135,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
 
     public function testAPayloadWithNoExtrasLeavesAnEmptyBagRatherThanNothing(): void
     {
-        $labels = new Hydrator()->hydrate(OpenLabels::class, ['primary' => 'front']);
+        $labels = new Hydrator()->hydrate(Fixtures\OpenLabels::class, ['primary' => 'front']);
 
         self::assertTrue($labels->additionalProperties->isEmpty());
         self::assertSame(['primary' => 'front'], new Marshaller()->marshal($labels));
@@ -150,7 +146,7 @@ final class AdditionalPropertiesRoundTripTest extends TestCase
         // The hand-constructed counterpart of the shadowing test above: even
         // when a bag is built with a declared wire name in it, the declared
         // property owns that key on the way out.
-        $labels = new OpenLabels('front', new AdditionalPropertyBag(['primary' => 'smuggled', 'left' => 'port']));
+        $labels = new Fixtures\OpenLabels('front', new AdditionalPropertyBag(['primary' => 'smuggled', 'left' => 'port']));
 
         self::assertSame(['primary' => 'front', 'left' => 'port'], new Marshaller()->marshal($labels));
     }

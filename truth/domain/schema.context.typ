@@ -2,7 +2,7 @@
 
 #let schema-context = bounded-context("schema", layer: "functional")
 
-// What the vendor publishes and paogen only ever reads. Nothing here is ours
+// What the vendor publishes and poagen only ever reads. Nothing here is ours
 // to change — the point of `real-world-schemas` is that the document arrives
 // exactly as published.
 //

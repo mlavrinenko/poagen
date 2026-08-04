@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Integration;
+namespace Poagen\Generator\Tests\Integration;
 
-use Mlavrinenko\Paogen\Generator\GenerationPlan;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Tests\Support\GeneratedTreeSandbox;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use function basename;
 
 /**
  * report-unsupported-security-schemes, the half that is not a credential:
  * the flow metadata an `oauth2` or `openIdConnect` declaration carries, and
- * the one scheme paogen can only report.
+ * the one scheme poagen can only report.
  *
  * A consumer wiring `league/oauth2-client` needs a token endpoint and a
- * scope list. Both are in the document they already handed paogen, so they
+ * scope list. Both are in the document they already handed poagen, so they
  * come back out on the client rather than sending the consumer to the
  * vendor's YAML beside the typed client they were given instead of it.
  */
@@ -26,7 +26,7 @@ final class SecurityMetadataEmissionTest extends TestCase
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/security-kinds-3.0.yaml';
-    private const string NAMESPACE = 'Mlavrinenko\\Paogen\\Tests\\Tmp\\SecurityMetadata';
+    private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\SecurityMetadata';
 
     /**
      * The exact line the run prints on stderr for a `mutualTLS` scheme.
@@ -45,7 +45,7 @@ final class SecurityMetadataEmissionTest extends TestCase
     {
         self::$plan = self::generator()->plan(new Profile(
             schema: self::SCHEMA,
-            output: self::makeSandboxDir('paogen-securitymeta-'),
+            output: self::makeSandboxDir('poagen-securitymeta-'),
             namespace: self::NAMESPACE,
         ));
 
@@ -105,7 +105,7 @@ final class SecurityMetadataEmissionTest extends TestCase
         // And the boundary this whole task sits on, said in the output
         // rather than only in a decision.
         self::assertStringContainsString(
-            'paogen never acquires, refreshes, stores or validates a credential.',
+            'poagen never acquires, refreshes, stores or validates a credential.',
             self::$rootSource,
         );
     }

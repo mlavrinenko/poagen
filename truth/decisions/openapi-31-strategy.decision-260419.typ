@@ -11,7 +11,7 @@
 
 == Context
 
-paogen currently consumes OpenAPI 3.0 via `cebe/php-openapi`. The
+poagen currently consumes OpenAPI 3.0 via `cebe/php-openapi`. The
 pre-release review (P1 #14) and `truth/notes/openapi-3.1-gap.md` both
 flag that most modern real-world #a(Schema) documents (GitHub, Stripe,
 Kubernetes) have moved to 3.1. The 2026-04-18 review also calls out (P2
@@ -92,7 +92,7 @@ Rationale:
 
 - *Wait for upstream 3.1 support.* There has been no public movement
   since 2023; indefinite blocking on upstream is not a strategy.
-- *Drop paogen's 3.0 support and call 3.1 the baseline.* Inverts the
+- *Drop poagen's 3.0 support and call 3.1 the baseline.* Inverts the
   same problem and invalidates every schema we ship fixtures for
   today.
 - *Silently pick (a), (b), or (c) without the prototype evidence the
@@ -104,6 +104,6 @@ Rationale:
 This decision was superseded on 2026-07-29 by
 #link("openapi-31-through-a-maintained-parser.decision-260729.typ")[OpenAPI 3.1 through a maintained parser fork], which picks option (a)
 above — swap to `devizzent/cebe-php-openapi` — now that every schema
-paogen wants to generate against, including the kilbil loyalty document,
+poagen wants to generate against, including the kilbil loyalty document,
 is 3.1-only. The analysis above is a record of what was believed at the
 time and is left unchanged.

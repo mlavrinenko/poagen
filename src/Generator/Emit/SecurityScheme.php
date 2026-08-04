@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use function in_array;
 
 /**
  * One classified OpenAPI `securityScheme`, sorted into the three reactions
- * paogen has to a scheme: wire it, report it, or refuse it by name.
+ * poagen has to a scheme: wire it, report it, or refuse it by name.
  *
  * Almost everything is wired, because almost every scheme in OpenAPI
  * reduces to one credential attached to one place on one request — an
  * `apiKey` in a header, a query key or a cookie, an `Authorization` header
  * carrying a scheme token and a credential after it, an OAuth2 access
  * token, which RFC 6750 says is a bearer credential for all four flows.
- * paogen never acquires, refreshes, stores or validates any of them: it
+ * poagen never acquires, refreshes, stores or validates any of them: it
  * emits the constructor argument and puts the value on the request, and
  * everything before that is the consumer's transport
  * (`operations-delegate-to-an-injected-transport`).
@@ -26,7 +26,7 @@ use function in_array;
  *
  * `http digest`, `http negotiate` and anything unrecognised are refused,
  * because a credential only exists after a challenge and a second request,
- * and paogen will not run a protocol. Unknown means refused, never ignored
+ * and poagen will not run a protocol. Unknown means refused, never ignored
  * (`fail-loud-never-silent`).
  *
  * {@see SecuritySchemeClassifier} builds these; this file is the value.
@@ -85,13 +85,13 @@ final readonly class SecurityScheme
         public ?SecurityFlows $flows = null,
     ) {}
 
-    /** A credential paogen emits an argument for and puts on the request. */
+    /** A credential poagen emits an argument for and puts on the request. */
     public function isWired(): bool
     {
         return in_array($this->kind, self::WIRED, true);
     }
 
-    /** Declared, understood, and carrying nothing paogen can put on a request. */
+    /** Declared, understood, and carrying nothing poagen can put on a request. */
     public function isReported(): bool
     {
         return $this->kind === self::KIND_MUTUAL_TLS;

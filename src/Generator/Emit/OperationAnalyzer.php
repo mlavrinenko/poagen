@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Generator\Emit;
+namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
@@ -10,7 +10,7 @@ use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\RequestBody;
-use Mlavrinenko\Paogen\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 /**
  * Summary of an operation used by the emitter, with `null` meaning the
@@ -77,7 +77,7 @@ final readonly class OperationAnalyzer
             }
         }
 
-        return "this operation has a parameter outside paogen's supported shapes";
+        return "this operation has a parameter outside poagen's supported shapes";
     }
 
     /**
@@ -123,7 +123,7 @@ final readonly class OperationAnalyzer
      * read this same result. A schema-scan reason wins a name collision — it
      * was authoritative before this pass existed.
      *
-     * @param  list<SkippedOperation> $schemaSkips
+     * @param list<SkippedOperation> $schemaSkips
      * @return array<string,string>   raw operationId → reason
      */
     public static function preScanSkips(OpenApi $openApi, array $schemaSkips): array

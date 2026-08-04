@@ -2,38 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Mlavrinenko\Paogen\Tests\Generated;
+namespace Poagen\Generator\Tests\Generated;
 
 use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
 use Composer\Autoload\ClassLoader;
-use Mlavrinenko\Paogen\Exception\UnrepresentableConstructsException;
-use Mlavrinenko\Paogen\GenerateCommand;
-use Mlavrinenko\Paogen\Generator\AttributeScanner;
-use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
-use Mlavrinenko\Paogen\Generator\Generator;
-use Mlavrinenko\Paogen\Generator\Profile;
-use Mlavrinenko\Paogen\Generator\ProfileLoader;
-use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
-use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiClient as ParametersClient;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\ApiException as ParametersApiException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\Order as ParametersOrder;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Enum\OrderStatus;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClient;
-use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
-use Mlavrinenko\Paogen\Tests\Support\PetstoreFixture;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Generator\Exception\UnrepresentableConstructsException;
+use Poagen\Generator\GenerateCommand;
+use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\Emit\SkippedOperation;
+use Poagen\Generator\Generator\Generator;
+use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Generator\ProfileLoader;
+use Poagen\Generator\Tests\Fixtures\Generated\Parameters\Generated\ApiClient as ParametersClient;
+use Poagen\Generator\Tests\Fixtures\Generated\Parameters\Generated\ApiException as ParametersApiException;
+use Poagen\Generator\Tests\Fixtures\Generated\Parameters\Generated\Model\Order as ParametersOrder;
+use Poagen\Generator\Tests\Fixtures\Generated\Parameters\Generated\Model\SshKeyId;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Enum\FindPetsByStatusStatus;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Enum\OrderStatus;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Order;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\StoreClient;
+use Poagen\Generator\Tests\Fixtures\Generated\Petstore\Generated\StoreClientInterface;
+use Poagen\Generator\Tests\Support\PetstoreFixture;
+use Poagen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\TransportInterface;
+use Poagen\Runtime\Http\HttpTransport;
 use ReflectionClass;
 use ReflectionParameter;
 
@@ -269,13 +269,13 @@ final class OperationGeneratorSteps
         array $tagChoice = [],
         array $securitySchemes = [],
     ): Profile {
-        $this->tagOutputDir = $this->makeScratchOutputDir('paogen-tagged-');
+        $this->tagOutputDir = $this->makeScratchOutputDir('poagen-tagged-');
         $this->outputDir = $this->tagOutputDir;
 
         return new Profile(
             schema: str_starts_with($schema, '/') ? $schema : dirname(__DIR__, 2) . '/' . $schema,
             output: $this->tagOutputDir,
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\TaggedSteps',
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\TaggedSteps',
             skip: $skip,
             tagRenames: $tagRenames,
             tagChoice: $tagChoice,
@@ -346,7 +346,7 @@ final class OperationGeneratorSteps
      */
     private function writeMultiTagSchema(): string
     {
-        $dir = $this->makeScratchOutputDir('paogen-multitag-');
+        $dir = $this->makeScratchOutputDir('poagen-multitag-');
         $path = $dir . '/multi-tag-3.0.yaml';
 
         file_put_contents($path, <<<'YAML'
@@ -402,7 +402,7 @@ final class OperationGeneratorSteps
      *
      * `application/yaml` with no `schema` key mirrors DigitalOcean's real
      * `kubeconfig` response component exactly (an `example:` under the
-     * content type, nothing else) — paogen has no YAML decoder, and
+     * content type, nothing else) — poagen has no YAML decoder, and
      * `return-a-binary-2xx-as-the-stream-a-done-task-already-promised` is
      * why this scenario no longer uses `application/octet-stream`: that
      * content type is a binary stream now, representable rather than
@@ -410,7 +410,7 @@ final class OperationGeneratorSteps
      */
     private function writeResponseContentTypeSchema(): string
     {
-        $dir = $this->makeScratchOutputDir('paogen-response-content-type-');
+        $dir = $this->makeScratchOutputDir('poagen-response-content-type-');
         $path = $dir . '/response-content-type-3.0.yaml';
 
         file_put_contents($path, <<<'YAML'
@@ -697,7 +697,7 @@ final class OperationGeneratorSteps
         // A pristine output directory, so "wrote nothing" is observable. The
         // shared fixture tree is populated by sibling scenarios and would make
         // the assertion vacuous.
-        $this->abortOutputDir = sys_get_temp_dir() . '/paogen-abort-' . bin2hex(random_bytes(6));
+        $this->abortOutputDir = sys_get_temp_dir() . '/poagen-abort-' . bin2hex(random_bytes(6));
 
         // Same fixture profile with the skip entries removed, so the multipart
         // body is left unaccepted and has to stop the run.
@@ -738,14 +738,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPaogenDoesNotEmit(
-        string $id,
-    ): void {
-        TestCase::assertSame('operationId: createWidget', $id);
-        $this->profile = $this->loadProfile('unrepresentable');
-    }
-
-
     public function givenSchemaDeclaresComponentsSchemasSshKeyIdAsSchema(string $schema): void
     {
         TestCase::assertSame('type: integer', $schema);
@@ -774,7 +766,7 @@ final class OperationGeneratorSteps
     {
         TestCase::assertStringContainsString('final readonly class ApiClient', $this->source);
         TestCase::assertStringContainsString(
-            'namespace Mlavrinenko\\Paogen\\Tests\\Fixtures\\Generated\\Petstore\\Generated;',
+            'namespace Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated;',
             $this->source,
         );
     }
@@ -880,7 +872,7 @@ final class OperationGeneratorSteps
         TestCase::assertInstanceOf(Order::class, $order);
         TestCase::assertSame(42, $order->id);
         // `Order.status` declares an inline enum, so it hydrates into the
-        // backed enum paogen synthesised for it rather than into the raw
+        // backed enum poagen synthesised for it rather than into the raw
         // string (inline-body-and-response-schemas).
         TestCase::assertSame(OrderStatus::Placed, $order->status);
         TestCase::assertSame('placed', $order->status->value);
@@ -1085,32 +1077,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenPaogenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient(
-    ): void {
-        // Drive the real CLI binary so the round-trip exercises
-        // GenerateCommand::reportSkipped() exactly as the user sees it.
-        $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/unrepresentable.php';
-
-        $stdout = tmpfile();
-        $stderr = tmpfile();
-        TestCase::assertNotFalse($stdout);
-        TestCase::assertNotFalse($stderr);
-
-        $exit = GenerateCommand::run(
-            [$profilePath, '--dry-run'],
-            $this->composerLoader(),
-            $stdout,
-            $stderr,
-        );
-
-        TestCase::assertSame(0, $exit);
-
-        rewind($stderr);
-        $stderrContents = (string) stream_get_contents($stderr);
-        TestCase::assertStringContainsString('createWidget', $stderrContents);
-        TestCase::assertStringContainsString('/widgets', $stderrContents);
-        TestCase::assertStringContainsString('skipped', $stderrContents);
-    }
 
 
     public function thenEmittedClientHasAMethodListOrdersIntLimitNullEnvelope(): void
@@ -1947,8 +1913,8 @@ final class OperationGeneratorSteps
         $schema = $this->writeResponseContentTypeSchema();
         $this->profile = new Profile(
             schema: $schema,
-            output: $this->makeScratchOutputDir('paogen-response-content-type-out-'),
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseContentType',
+            output: $this->makeScratchOutputDir('poagen-response-content-type-out-'),
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\ResponseContentType',
         );
         $this->expectedSkipOperationId = 'getLabel';
         $this->expectedSkipContentType = 'application/yaml';
@@ -1960,7 +1926,7 @@ final class OperationGeneratorSteps
         TestCase::assertNotNull($this->profile);
 
         // A pristine output directory, so "wrote nothing" is observable.
-        $this->abortOutputDir = sys_get_temp_dir() . '/paogen-abort-' . bin2hex(random_bytes(6));
+        $this->abortOutputDir = sys_get_temp_dir() . '/poagen-abort-' . bin2hex(random_bytes(6));
         $unaccepted = $this->profile->with(output: $this->abortOutputDir);
 
         $this->abortMessage = null;
@@ -1987,8 +1953,8 @@ final class OperationGeneratorSteps
         // response.
         $this->profile = new Profile(
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/response-degradation-3.0.yaml',
-            output: $this->makeScratchOutputDir('paogen-xml-response-out-'),
-            namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\XmlResponse',
+            output: $this->makeScratchOutputDir('poagen-xml-response-out-'),
+            namespace: 'Poagen\\Generator\\Tests\\Tmp\\XmlResponse',
         );
         $this->expectedSkipOperationId = 'getXmlLabel';
         $this->expectedSkipContentType = 'application/xml';
@@ -2093,6 +2059,42 @@ final class OperationGeneratorSteps
         } catch (ParametersApiException $e) {
             $this->altCaught = $e;
         }
+    }
+
+
+    public function givenSchemaDeclaresOperationIdWhoseRequestBodyContentTypeIsMultipartFormDataWhichPoagenDoesNotEmit(
+        string $id,
+    ): void {
+        TestCase::assertSame('operationId: createWidget', $id);
+        $this->profile = $this->loadProfile('unrepresentable');
+    }
+
+
+    public function thenPoagenCLIsGenerateCommandPrintsTheSameListToStderrSoTheUserKnowsWhichOpsDidNotMakeItIntoTheClient(
+    ): void {
+        // Drive the real CLI binary so the round-trip exercises
+        // GenerateCommand::reportSkipped() exactly as the user sees it.
+        $profilePath = dirname(__DIR__, 2) . '/tests/fixtures/profiles/unrepresentable.php';
+
+        $stdout = tmpfile();
+        $stderr = tmpfile();
+        TestCase::assertNotFalse($stdout);
+        TestCase::assertNotFalse($stderr);
+
+        $exit = GenerateCommand::run(
+            [$profilePath, '--dry-run'],
+            $this->composerLoader(),
+            $stdout,
+            $stderr,
+        );
+
+        TestCase::assertSame(0, $exit);
+
+        rewind($stderr);
+        $stderrContents = (string) stream_get_contents($stderr);
+        TestCase::assertStringContainsString('createWidget', $stderrContents);
+        TestCase::assertStringContainsString('/widgets', $stderrContents);
+        TestCase::assertStringContainsString('skipped', $stderrContents);
     }
 
 }
