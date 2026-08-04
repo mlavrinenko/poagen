@@ -5,7 +5,11 @@
   tags: ("generator", "strictness", "skip"),
   priority: 7,
   difficulty: 5,
-  status: wip(2026, 8, 4)[Dispatched to a worktree agent off 9ee43502.],
+  status: done(
+    2026,
+    8,
+    4,
+  )[Refuse, do not cascade, per the 2026-08-02 ruling. A skip whose type another component or operation still references stops the run, names every referencer, and prints the Profile::\$skip entries that would resolve it ready to paste. Measured rather than assumed: the defect is latent, not live - neither large example names a component in \$skip today, because declare-an-undiscriminated-union-as-raw-data resolved DigitalOcean's four and GitHub's ten through \$unionPins instead. Proved on a constructed fixture covering single and cascaded referencers in both operation and component position, plus staleness in both directions. Gated on the merged HEAD: 555 tests, both floors held.],
 )
 
 == Summary
