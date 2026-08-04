@@ -92,7 +92,7 @@
       case: "unsupported-content-type-aborts-run",
       standards: (link("../standards/silence-means-success.standard-260729.typ"),),
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "GET /labels/{id}")) with #p((id: "operationId: getLabel")) whose 200 response content type is `application/octet-stream`]
+      #given[#the(Schema) declares #a(Operation) #p((op: "GET /labels/{id}")) with #p((id: "operationId: getLabel")) whose 200 response content type is `application/yaml`]
       #when[#the(Generator) runs against #the([unaccepted], Profile)]
       #then[#the(Generator)'s run fails and emits no #a(GeneratedFile)]
       #and_[#the(Generator)'s report names the operationId, the unsupported content type, and the remedy]

@@ -13,11 +13,13 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Ca
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\UnionResponse\Generated\Model\Dog;
 use Mlavrinenko\Paogen\Tests\Fixtures\ValueObject\Email;
 use Mlavrinenko\Paogen\Tests\Support\PetstoreHttpTransport;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The five shapes a schema produces, decoded by the runtime rather than by
+ * The six shapes a schema produces, decoded by the runtime rather than by
  * thirty-six copies of the same emitted branch. `KIND_ENVELOPE` is
  * {@see EnvelopeTransportTest}'s own file, split out to keep both under the
  * linecop limit (`quality-gates-at-maximum-strictness`) — the two share
@@ -84,6 +86,27 @@ final class TransportResponseKindsTest extends TestCase
             $this->transport(new Response(200, [], '1'))
                 ->send(Endpoint::get('/flag'), ResponseType::bool()),
         );
+    }
+
+    /**
+     * `a-binary-body-is-a-psr-7-stream`, response side: the stream is the
+     * value, handed back exactly as the transport produced it — not the
+     * request side's `NoWholeReadStream` fixture reused verbatim, because
+     * both directions make the identical promise (`__toString()` and
+     * `getContents()` both throw; everything a chunked reader needs
+     * delegates normally). Identity, not equality, is what proves it: a
+     * `(string) $response->getBody()` anywhere on this path would have
+     * thrown getting here, rather than silently reading the body whole.
+     */
+    public function testABinaryResponseHandsBackTheStreamWithoutReadingIt(): void
+    {
+        $stream = new NoWholeReadStream(new Psr17Factory()->createStream('%PDF-1.4 bytes'));
+        $transport = $this->transport(new Response(200, ['Content-Type' => 'application/pdf'], '')->withBody($stream));
+
+        $result = $transport->send(Endpoint::get('/invoices/1/pdf'), ResponseType::stream());
+
+        self::assertSame($stream, $result);
+        self::assertSame(0, $result->tell());
     }
 
     public function testAMapIsDecodedAndHandedBackWithoutHydration(): void

@@ -19,6 +19,7 @@ use Acme\DigitalOcean\Generated\Model\InvoiceSummary;
 use Acme\DigitalOcean\Generated\Model\InvoicesGetByUuid200Content;
 use Acme\DigitalOcean\Generated\Model\InvoicesList200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * The contract for the `Billing` endpoints.
@@ -70,6 +71,12 @@ interface BillingClientInterface
      * @return Envelope<string|Error>
      */
     public function invoicesGetCsvByUuid(string $invoiceUuid): Envelope;
+
+    /**
+     * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<StreamInterface|Error>
+     */
+    public function invoicesGetPdfByUuid(string $invoiceUuid): Envelope;
 
     /**
      * Requires `bearer_auth` scopes: `billing:read`.

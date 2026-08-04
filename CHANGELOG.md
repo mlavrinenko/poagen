@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the JSON pointer to the node that used it, and the operation or component
   carrying that node. An OpenAPI 3.1 `webhooks` entry does the same. None of
   them is emitted as something else and none produces a smaller client.
+- A 2xx response whose schema declares `format: binary` returns a PSR-7
+  `StreamInterface` instead of aborting generation, mirroring the request
+  side's binary body. The stream is never read to produce it.
 
 ### Changed
 

@@ -20,6 +20,7 @@ use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
  *   - `scalar_list` → `array` of scalars, decoded but never hydrated
  *   - `map`         → `additionalProperties`, returned as the decoded array
  *   - `mixed`       → the document declared nothing here, so neither does the type
+ *   - `stream`      → `format: binary`, the PSR-7 body handed back unread
  *
  * `scalar_list` exists because every other list shape resolves a class name
  * and hydrates it, so `items: {type: string}` — which GitHub declares on
@@ -50,6 +51,17 @@ final readonly class ReturnSpec
     public const string KIND_SCALAR_LIST = 'scalar_list';
     public const string KIND_MAP = 'map';
     public const string KIND_MIXED = 'mixed';
+
+    /**
+     * A body the document declared binary — `format: binary`, under any
+     * content type — carried back as the PSR-7 `StreamInterface` the
+     * transport produced, never read. Mirrors `BodySpec::KIND_BINARY` on the
+     * request side: the same shape, the same reason (PHP has no `resource`
+     * type declaration, and `declared-shapes-become-types` forbids a
+     * declared shape becoming `mixed`), just the other direction
+     * (`a-binary-body-is-a-psr-7-stream`).
+     */
+    public const string KIND_STREAM = 'stream';
 
     /**
      * A response whose whole schema is a `oneOf`/`anyOf` — the incoming
@@ -147,6 +159,15 @@ final readonly class ReturnSpec
     public static function mixed(): self
     {
         return new self(self::KIND_MIXED);
+    }
+
+    /**
+     * A binary body — a PSR-7 stream, handed back exactly as the transport
+     * produced it.
+     */
+    public static function stream(): self
+    {
+        return new self(self::KIND_STREAM);
     }
 
     /**

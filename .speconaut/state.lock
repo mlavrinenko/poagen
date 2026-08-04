@@ -240,7 +240,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:faa52473c78f1644174a0995e464bb1a76f33b504b4ecc10cb4ec654f405a2b0"
+spec-hash = "sha256:14c21dc89ce124908535951040255279a45010bc31413f784b2a0ad85cee81a9"
 
 [features."Operation Generator".scenarios."A GET operation with a path parameter becomes a typed client method"]
 as-is-hash = "sha256:43736afd1a469a314aab2ae3e0a79b4ba998ee523815566879e89754a4b5cf33"
@@ -308,8 +308,8 @@ as-is = "KLUv/QBYpQsAdhlIIzCP0wEDKISkXW1l/ynbUI6QUyVDZvGhmXWFZnhzdwsHrSwwPABBAD4
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A response declaring an unsupported content type aborts the run"]
-as-is-hash = "sha256:9b52fbb7ef6d12dc7e87088c5fbe5b8a0d948ed02e0efd8e386a4640540f8778"
-as-is = "KLUv/QBYbQgAZlI1IUCL0wY7B5vcQCs4p7afiBKyySRk6qD7LEcMVRLYDA/GgCgALgAtAIh70mfWuomK+athvfc9RE7fxLUevcdnXk6lNejJ18OlTzvMQJV2R5BfzEgFaGbVxA9JOSi0uWKNwpGBhw/VWn4dWG/OGQTxnUE9bMQbxVbvMeOLLcQOi1nvSSeu5e8P35kEG7HQSMqJxkIFO/ZcDdgvQgVSzVpmVYuFgK/ITNxcMYMNDenOE4k7dt7E9XQOAqfjWVc5dzqzNsokvietABElwURw+q4jZPd49ZQFEwCTK9DGdZULIm7FncwEsDVwqwFwksF1kK5ADKonwG0XdOPT3sDgxSUSO8vKbMGhhKhZFqI="
+as-is-hash = "sha256:4930c3ce0a5e7d49aae2edc264fdc444a4a22ba49ebedc5fb428604cf1913091"
+as-is = "KLUv/QBYTQgA5lE0IWCJmgNjxUjE2iZyYLLtc5M8VhQ1dhFEP4yE96SDAA44HCgALAAsAI35zFqXKeX8NVlvflMdoy9TazXN5jwviezSOfI11dIzN7xQyC5/HgGIQJlZlLgBIUNC05VLCUMEHE6Fe+zLwPprzpyH8wvosA9Pyq1m8+LL7cM+ZHjLWbMxM7XHnnc4zyDYBwUGQiMYSyU4NTdJHExrnRUVigBfFSNxunIF+8WLE/TmCMSbSy9T6ygbA0ZXaV1sbpRnTXgRZ2NWAAhGFDsw+q6fc9m8mgETAIsr0MZ1jQsibcWdzASsNXCrAXCSwXWQrkAMqifAbBc049NnIPLiOokdYGV241DyapYFMw=="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A scalar JSON response is decoded onto the Envelope without hydration"]

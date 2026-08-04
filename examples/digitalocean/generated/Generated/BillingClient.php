@@ -23,6 +23,7 @@ use Mlavrinenko\Paogen\Runtime\Contract\Envelope;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\StatusResponseMap;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
+use Psr\Http\Message\StreamInterface;
 
 final readonly class BillingClient implements BillingClientInterface
 {
@@ -139,6 +140,23 @@ final readonly class BillingClient implements BillingClientInterface
                 ->path('invoice_uuid', $invoiceUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
             ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
+        );
+
+        return $result;
+    }
+
+    /**
+     * Requires `bearer_auth` scopes: `billing:read`.
+     * @return Envelope<StreamInterface|Error>
+     */
+    public function invoicesGetPdfByUuid(string $invoiceUuid): Envelope
+    {
+        /** @var Envelope<StreamInterface|Error> $result */
+        $result = $this->transport->send(
+            Endpoint::get('/v2/customers/my/invoices/{invoice_uuid}/pdf')
+                ->path('invoice_uuid', $invoiceUuid)
+                ->header('Authorization', 'Bearer ' . $this->bearerAuth),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::stream()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

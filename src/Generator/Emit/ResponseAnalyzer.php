@@ -26,10 +26,13 @@ use function is_string;
  * itself declares no body for the status: an entry whose `content` is
  * empty.
  *
- * Two shapes reach a return type: an `application/json` body, resolved by
- * its schema, and a body the document declared as text over a `type: string`
- * schema, which is the `string` it says it is. A binary body is neither and
- * stays refused.
+ * Three shapes reach a return type: an `application/json` body, resolved by
+ * its schema; a body the document declared as text over a `type: string`
+ * schema, which is the `string` it says it is; and a body it declared
+ * binary (`format: binary`, under any content type), which is the PSR-7
+ * `StreamInterface` it says it is (`return-a-binary-2xx-as-the-stream-a-
+ * done-task-already-promised`) — handed back exactly as the transport
+ * produced it, never read here.
  *
  * Extracted from {@see OperationAnalyzer} to keep that file under the
  * linecop limit (`quality-gates-at-maximum-strictness`), mirroring
@@ -69,7 +72,7 @@ final readonly class ResponseAnalyzer
         $json = $content['application/json'] ?? null;
 
         if (!$json instanceof MediaType) {
-            return self::textResponse($content);
+            return self::textOrBinaryResponse($content);
         }
 
         $schema = $json->schema;
@@ -101,25 +104,32 @@ final readonly class ResponseAnalyzer
     }
 
     /**
-     * A response the document declared as characters rather than as JSON.
+     * A response the document declared as characters or as bytes, rather
+     * than as JSON.
      *
-     * It reaches the caller as the `string` the schema said it was, read
+     * Text reaches the caller as the `string` the schema said it was, read
      * straight off the body — {@see ReturnSpec::scalar()} already means
      * "no JSON decode", which is exactly right for `text/html` and for
      * GitHub's `application/octocat-stream`. No Model, no ambiguity, and
      * nothing about it needs a return kind of its own.
      *
-     * A binary response is deliberately not accepted here: a
-     * `format: binary` body is a stream, not a string, and casting one to
-     * the other is the silent widening `declared-shapes-become-types`
-     * refuses. It stays a refusal until the return contract can name a
-     * stream.
+     * Binary reaches the caller as the PSR-7 `StreamInterface` the schema
+     * said it was — {@see ReturnSpec::stream()} — mirroring the request
+     * side's `BodySpec::binary()`: the stream is handed back exactly as the
+     * transport produced it, never read, never cast. Text wins when a
+     * document somehow declares both under different content types on the
+     * same response, the same precedence `RequestBodyAnalyzer::opaqueBody()`
+     * already gives the request side.
      *
      * @param array<array-key, MediaType> $content
      */
-    private static function textResponse(array $content): ?ReturnSpec
+    private static function textOrBinaryResponse(array $content): ?ReturnSpec
     {
-        return BodyMediaType::firstText($content) === null ? null : ReturnSpec::scalar('string');
+        if (BodyMediaType::firstText($content) !== null) {
+            return ReturnSpec::scalar('string');
+        }
+
+        return BodyMediaType::firstBinary($content) === null ? null : ReturnSpec::stream();
     }
 
     /**
