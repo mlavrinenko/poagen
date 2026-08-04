@@ -213,7 +213,7 @@ final readonly class Generator
         $failures = [
             ...$profileSecurityFailures,
             ...$security->failures,
-            ...UnsupportedKeywordScanner::webhookFailures($openApi),
+            ...UnsupportedKeywordScanner::webhookFailures($openApi, $profile->skip),
             ...ServerCatalog::variableProblems($openApi),
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
@@ -233,7 +233,7 @@ final readonly class Generator
         $header = new GeneratedFileHeader($profile->source);
         $writes = array_map($header->stamp(...), $writes);
 
-        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, $notices);
+        return new GenerationPlan($writes, $prunes, $skipped, $skippedComponents, UnsupportedKeywordScanner::skippedWebhooks($openApi, $profile->skip), $notices);
     }
 
     /**

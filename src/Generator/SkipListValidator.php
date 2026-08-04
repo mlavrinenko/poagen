@@ -9,7 +9,9 @@ use cebe\openapi\spec\PathItem;
 use Mlavrinenko\Paogen\Generator\Emit\ComponentCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedComponent;
 use Mlavrinenko\Paogen\Generator\Emit\SkippedOperation;
+use Mlavrinenko\Paogen\Generator\Emit\WebhookSkipKey;
 
+use function array_keys;
 use function sprintf;
 
 /**
@@ -22,6 +24,15 @@ use function sprintf;
  * operation id / component absent from the schema entirely, is itself a
  * failure — a skip list that outlives its cause is the silent-success bug
  * this feature replaces, wearing a different hat.
+ *
+ * A webhook entry (`webhooks-refuse-with-no-opt-out`, keyed through
+ * {@see WebhookSkipKey}) gets the identical staleness treatment, folded into
+ * the same pass rather than a second check: every webhook the document still
+ * declares is, unconditionally, "a problem" — nothing paogen does can ever
+ * make one generate cleanly — so a webhook skip entry is stale in exactly
+ * one way, naming a webhook the document no longer declares. That is the
+ * same "absent from the schema" failure a stale operation/component entry
+ * already gets, not a new message.
  *
  * See abort-on-unrepresentable-constructs.
  */
@@ -40,13 +51,14 @@ final readonly class SkipListValidator
         array $skippedOperations,
         array $skippedComponents,
     ): array {
+        $webhookTargets = $this->webhookTargets($openApi);
         $validTargets = array_fill_keys(
-            [...$this->operationIds($openApi), ...array_keys($components->all())],
+            [...$this->operationIds($openApi), ...array_keys($components->all()), ...$webhookTargets],
             true,
         );
 
         /** @var array<string,true> $problemTargets */
-        $problemTargets = [];
+        $problemTargets = array_fill_keys($webhookTargets, true);
         $failures = [];
 
         foreach ($skippedOperations as $operation) {
@@ -72,7 +84,8 @@ final readonly class SkipListValidator
         foreach (array_keys($skip) as $target) {
             if (!isset($validTargets[$target])) {
                 $failures[] = sprintf(
-                    "Profile::\$skip['%s'] names an operation id or component absent from the schema — remove this entry.",
+                    "Profile::\$skip['%s'] names an operation id, component or webhook absent from the schema — "
+                        . 'remove this entry.',
                     $target,
                 );
 
@@ -88,6 +101,21 @@ final readonly class SkipListValidator
         }
 
         return $failures;
+    }
+
+    /**
+     * @return list<string> every webhook the document declares, as the
+     *                      `Profile::$skip` key {@see WebhookSkipKey} names it
+     */
+    private function webhookTargets(OpenApi $openApi): array
+    {
+        $targets = [];
+
+        foreach (array_keys($openApi->webhooks ?? []) as $name) {
+            $targets[] = WebhookSkipKey::forName((string) $name);
+        }
+
+        return $targets;
     }
 
     /**

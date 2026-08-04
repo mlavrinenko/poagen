@@ -8,6 +8,7 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\PathItem;
 use cebe\openapi\spec\Schema;
 
+use function array_keys;
 use function sprintf;
 
 /**
@@ -86,30 +87,68 @@ final readonly class UnsupportedKeywordScanner
      * because it is not an operation paogen could have emitted and left out.
      * It sits beside `paths` at the top of a 3.1 document and describes calls
      * the vendor makes to the consumer — the opposite direction from every
-     * client paogen emits. `Profile::$skip` names operations under `paths`
-     * and components under `components`, so there is nothing there for a
-     * consumer to name; the entry would be rejected as absent from the schema.
+     * client paogen emits. The default stays a refusal even once a consumer
+     * can opt out: `webhooks-refuse-with-no-opt-out` widened
+     * `Profile::$skip`'s key space ({@see WebhookSkipKey}) rather than making
+     * a webhook disappear unasked, because the omission the vendor's document
+     * asked about is not one paogen would take silently — see
+     * `skip-is-the-only-opt-out`.
      *
      * Generating the `paths` half alone and saying nothing is the outcome
      * `fail-loud-never-silent` exists to prevent: the client would look
-     * complete and describe half the document.
+     * complete and describe half the document. A webhook named in `$skip`
+     * is therefore left out of this list entirely — it fails nothing and
+     * prints nothing here, and {@see skippedWebhooks} reports it as an
+     * accepted omission instead.
      *
-     * @return list<string> failure lines, one per webhook entry
+     * @param  array<string,string> $skip Profile::$skip
+     * @return list<string>         failure lines, one per unskipped webhook entry
      */
-    public static function webhookFailures(OpenApi $openApi): array
+    public static function webhookFailures(OpenApi $openApi, array $skip): array
     {
         $out = [];
 
         foreach ($openApi->webhooks ?? [] as $name => $webhook) {
+            if (isset($skip[WebhookSkipKey::forName((string) $name)])) {
+                continue;
+            }
+
             $out[] = sprintf(
                 '`webhooks` at #/webhooks/%s (%s) — an OpenAPI 3.1 webhook describes a call the vendor makes to '
                     . 'the consumer, and paogen emits a client that calls the vendor. No emitter models one, and '
                     . 'generating the paths alone would drop it silently. Remove the webhook from the document '
-                    . 'paogen generates from, or ask for webhook support; Profile::$skip cannot accept it, '
-                    . 'because a skip entry names an operation under `paths` or a component.',
+                    . 'paogen generates from, ask for webhook support, or name it in Profile::$skip as \'%s\' to '
+                    . 'generate the paths alone.',
                 (string) $name,
                 self::describeWebhook($webhook),
+                WebhookSkipKey::forName((string) $name),
             );
+        }
+
+        return $out;
+    }
+
+    /**
+     * The webhooks `$skip` accepted this run — the mirror image of
+     * {@see webhookFailures}: every entry here is one the consumer asked to
+     * omit, so nothing about it fails or feeds a diagnostic. Reported to the
+     * consumer the same way an accepted operation or component skip is, so
+     * an omission the consumer wrote stays visible rather than vanishing
+     * quietly into a smaller client (`silence-means-success`).
+     *
+     * @param  array<string,string>  $skip Profile::$skip
+     * @return list<SkippedWebhook>
+     */
+    public static function skippedWebhooks(OpenApi $openApi, array $skip): array
+    {
+        $out = [];
+
+        foreach (array_keys($openApi->webhooks ?? []) as $name) {
+            $key = WebhookSkipKey::forName((string) $name);
+
+            if (isset($skip[$key])) {
+                $out[] = new SkippedWebhook((string) $name, $skip[$key]);
+            }
         }
 
         return $out;
