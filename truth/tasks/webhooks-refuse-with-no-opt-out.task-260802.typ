@@ -5,11 +5,7 @@
   tags: ("generator", "openapi-31", "strictness"),
   priority: 4,
   difficulty: 4,
-  status: accepted(
-    2026,
-    8,
-    3,
-  )[Ruled by the owner on 2026-08-03: a webhook is skippable. The recommended ruling below is the one they took, so the shape it describes is now the work.],
+  status: wip(2026, 8, 4)[agent dispatched],
 )
 
 == Summary

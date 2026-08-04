@@ -5,12 +5,10 @@
   tags: ("errors", "dx", "generator"),
   priority: 8,
   difficulty: 8,
-  links: (depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),),
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Unblocked, and the answer is neither branch this task offered. The owner reversed \`error-response-policy\`'s rejected option (c): an operation returns an envelope carrying the status code and the body the document declared for that status, typed. 2xx stops being a special case. The exception survives only for a response the document did not describe. See the ruling below.],
+  links: (
+    depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),
+  ),
+  status: wip(2026, 8, 4)[envelope agent dispatched],
 )
 
 == Summary
