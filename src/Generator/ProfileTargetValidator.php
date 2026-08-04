@@ -12,13 +12,17 @@ use Mlavrinenko\Paogen\Generator\Emit\InlineModelMergeValidator;
 use Mlavrinenko\Paogen\Generator\Emit\InlineModelSite;
 use Mlavrinenko\Paogen\Generator\Emit\InlineModelSiteResolver;
 use Mlavrinenko\Paogen\Generator\Emit\TagCatalogue;
+use Mlavrinenko\Paogen\Generator\Emit\XmlNestedContainerValidator;
 
 use function in_array;
 use function sprintf;
 
 /**
  * Cross-checks the profile's operation-keyed guidance against the document —
- * `Profile::$inlineModels` and `Profile::$methodRenames`.
+ * `Profile::$inlineModels` and `Profile::$methodRenames`. The
+ * `'<operationId>.item.<property>'` form of `Profile::$xmlElements` gets the
+ * same treatment, delegated to {@see XmlNestedContainerValidator} to keep
+ * this file under the linecop limit (`quality-gates-at-maximum-strictness`).
  *
  * Guidance that matches nothing is the failure mode this guards. It looks like
  * working guidance, it costs nothing to write, and it silently stops applying
@@ -54,6 +58,9 @@ final readonly class ProfileTargetValidator
             ...$this->validateInlineModels($openApi, $inlineModels),
             ...$this->validateMethodRenames($methodRenames, $known),
             ...($profile instanceof Profile ? $this->validateTags($openApi, $profile, $known) : []),
+            ...($profile instanceof Profile
+                ? XmlNestedContainerValidator::validate($openApi, $profile->xmlElements, $known)
+                : []),
         ];
     }
 

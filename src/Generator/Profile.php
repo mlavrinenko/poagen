@@ -64,6 +64,27 @@ final readonly class Profile
      *                                              XML body with no entry here fails the run rather than guessing.
      *                                              A wrong root element is a 400 from the vendor, and asking at
      *                                              generation time is cheaper than finding out at runtime.
+     *
+     *                                              A third form, `'<operationId>.item.<propertyName>'`, names a
+     *                                              *nested* container: a property of the item schema whose own
+     *                                              value is an array the vendor wants wrapped in one element
+     *                                              (named after the property, the same default every other
+     *                                              property gets) holding several repeated children, instead of
+     *                                              OpenAPI's unwrapped default — the property's own name repeated
+     *                                              as sibling elements. The value names that repeated child, the
+     *                                              same role `'<operationId>.item'` plays for the outer list. It
+     *                                              is validated the same way as the other two forms — a property
+     *                                              absent from that operation's XML item schema fails the run
+     *                                              naming it — but, unlike them, paogen does not read it back: the
+     *                                              runtime's `XmlWriter` takes this map through its own
+     *                                              constructor, keyed by element name rather than operation id, so
+     *                                              a consumer who needs nesting builds that map from these entries
+     *                                              and passes it when they construct their own `HttpTransport`
+     *                                              (`Endpoint::xmlList()` already takes exactly the root and item
+     *                                              names the specification leaves open, and neither it nor
+     *                                              anything between it and the wire changes for this). This entry
+     *                                              existing and staying valid is what keeps that hand-built map
+     *                                              honest between runs.
      * @param array<string, string|list<string>> $inlineModels Names — and optionally merges — the class(es)
      *                                              paogen synthesises for an operation's inline payloads. Keys are
      *                                              the PHP class name; values are one site or several, each
