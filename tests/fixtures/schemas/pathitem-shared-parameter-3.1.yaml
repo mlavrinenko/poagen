@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: PathItem Shared Parameter Fixture
+  version: "1.0.0"
+  description: >
+    pathitem-level-parameters-are-invisible-to-the-document-wide-scan
+    fixture. /shared declares a multi-member-type query parameter once on
+    the PathItem and lets both of its operations inherit it unmodified —
+    SchemaWalk::roots() must see that one declaration once, not once per
+    operation, and SchemaScan's TypeListScanner probe must refuse both
+    operations for it. /overridden declares the identical PathItem-level
+    parameter but its one operation redeclares the same (name, in) pair
+    with a plain scalar, which OpenAPI 3.1 4.8.9 says wins — that operation
+    must NOT be refused for the shadowed shape.
+paths:
+  /shared:
+    parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type:
+            - object
+            - string
+    get:
+      operationId: listShared
+      responses:
+        '204':
+          description: ok
+    post:
+      operationId: createShared
+      responses:
+        '204':
+          description: ok
+  /overridden:
+    parameters:
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type:
+            - object
+            - string
+    get:
+      operationId: getOverridden
+      parameters:
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
