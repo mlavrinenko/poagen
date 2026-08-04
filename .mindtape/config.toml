@@ -242,7 +242,7 @@ description = "Recently closed — read for decisions worth revisiting"
 when = 'into("wip")'
 actions = [{ list = "@wip", title = "Already in flight — finish these first:" }]
 
-# On the way into `done`, two external checks — both gates, both stop the
+# On the way into `done`, three external checks — all gates, all stop the
 # flip on a non-zero exit.
 #
 # The first is the preset's original floor: it refuses a task whose body
@@ -266,6 +266,16 @@ actions = [{ list = "@wip", title = "Already in flight — finish these first:" 
 # status is stamped and could never pass again. Whatever replaces
 # `gate-fresh` here must keep that exclusion.
 #
+# The third is `gate-fresh is-valid`, and it exists because that exclusion
+# has a hole: `truth/tasks` never invalidates the freshness hash, so a task
+# artifact can go malformed — break `speconaut check truth/` — without ever
+# making a recorded pass read stale. `is-valid` is a second, separate,
+# stateless predicate: it re-runs `speconaut check truth/` (~1s) directly,
+# every time, rather than teaching the hash to see truth/tasks (that would
+# reopen the exact problem the exclusion above fixes — see
+# scripts/gate-fresh.inputs). Freshness and validity stay two questions,
+# both required, neither standing in for the other.
+#
 # It receives $MINDTAPE_TASK_FILE, $MINDTAPE_TASK_STEM and
 # $MINDTAPE_TASK_STATUS, so a script can inspect the artifact being closed —
 # the TODO check uses $MINDTAPE_TASK_FILE below.
@@ -285,6 +295,7 @@ when = 'into("done")'
 actions = [
   { run = '! grep -qE "^- TODO: " "$MINDTAPE_TASK_FILE"', gate = true, message = "this task still carries the template's TODO placeholders — fill them in, or point this gate at the check that really proves the work" },
   { run = 'scripts/gate-fresh is-fresh', gate = true, message = "the project gate has not passed against this worktree since your last change — run `scripts/gated-check` (wraps `just check`) and flip again" },
+  { run = 'scripts/gate-fresh is-valid', gate = true, message = "truth/ does not parse (`speconaut check truth/` failed) — a task artifact or another truth file is malformed; fix it and flip again" },
 ]
 
 [ls.columns.file]
