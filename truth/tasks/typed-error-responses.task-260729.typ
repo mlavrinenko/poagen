@@ -9,11 +9,11 @@
     depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),
     related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
   ),
-  status: blocked(
+  status: done(
     2026,
     8,
     4,
-  )[Built and gated. Resolution pending a final gate on the merged HEAD.],
+  )[Every operation returns an Envelope carrying the HTTP status and the body hydrated into the type the document declared for that status. Declared statuses are return values, not throws; an undeclared status or a body that fails to hydrate raises. OpenAPI precedence (exact, then range, then default) decides which model to hydrate and never whether to throw, and a synthetic 4XX fixture proves the range rule no real document in the repo exercised. Gated on the merged HEAD: 528 tests, both coverage floors held, PHPStan max clean on both tiers, all four examples byte-stable. Generated-tier duplication floors were re-measured under the owner's 2026-08-04 ruling; retighten-the-generated-duplication-ceilings owns bringing them back down.],
 )
 
 == Summary
