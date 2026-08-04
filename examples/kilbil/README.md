@@ -93,14 +93,39 @@ question, but the vendor document already answers it: `goodsxml` roots at
 against the sample — wrong, fixed to `goodlist`.
 
 Both samples nest one level further, an `<inside>` wrapper inside an item
-holding more items of the same element name. `xmlElements` cannot express
-that: it names one root and one item element per operation, and the
-generated client's `XmlWriter` unwraps a nested array property by repeating
-the property's own name, not by wrapping same-named children in a container.
-A request that populates `inside` would not serialise into the vendor's
-shape. This is a real limitation of the flat root/item mapping, not
-something this change fixes — see the profile comment above `xmlElements`
-in `paogen.php`.
+holding more items of the same element name. `xmlElements` names that too:
+`'goodsxml.item.inside' => 'good'` and `'goodslistxml.item.inside' =>
+'goodlist'` tell paogen that `inside` is a container wrapping repeated
+`good`/`goodlist` children, rather than OpenAPI's unwrapped default of
+repeating `inside` itself as a sibling once per entry
+(kilbil-xml-nesting-is-unrepresentable). paogen validates these entries
+against the schema — a property absent from the item schema fails the run —
+but does not wire them into the generated client itself: `Endpoint::xmlList()`
+already takes exactly the root and item names the specification leaves open,
+and nothing between it and the wire changes for a nested property. A
+consumer who calls `goodsXml()`/`goodsListXml()` with a populated `inside`
+and wants the vendor's nested shape builds the runtime's own map — keyed by
+element name (`good`, `goodlist`), not operation id — and passes it when
+constructing their own transport:
+
+```php
+use Acme\Kilbil\Generated\ApiException;
+use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
+use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
+
+$xmlWriter = new XmlWriter([
+    'good' => ['inside' => 'good'],
+    'goodlist' => ['inside' => 'goodlist'],
+]);
+$transport = new HttpTransport(
+    'https://kilbil.example/api',
+    ApiException::class,
+    xmlWriter: $xmlWriter,
+);
+```
+
+`tests/Integration/Kilbil/KilbilXmlNestedContainerTest.php` proves the
+emitted XML against both vendor samples, structurally rather than by eye.
 
 **Formats that are mostly not OpenAPI formats.** Nine distinct values across 292
 uses: `int` (166), `double` (94), `date time` (15), `date` (9), `phone` (4),
@@ -169,7 +194,7 @@ to call. What is there, and why:
 | `discoverIn` + `src/ValueObject/` | Four of the nine format values: `date time`, `data time`, `data`, `phone`. 23 properties gain a real type. |
 | `methodRenames` (33 entries) | Operation ids with no word boundary. `getclientfullbalance` becomes `getClientFullBalance` — and so do its models. |
 | `tagRenames` (10 entries) | Russian tag names. `Клиенты` becomes `CustomersClient` rather than `KlientyClient`. |
-| `xmlElements` (4 entries) | The XML root and item elements OpenAPI supplies no default for, confirmed against the vendor's own embedded XML samples (see "Two XML request bodies" above). |
+| `xmlElements` (6 entries) | The XML root, item, and nested-container elements OpenAPI supplies no default for, confirmed against the vendor's own embedded XML samples (see "Two XML request bodies" above). |
 
 Three operation ids are deliberately absent from `methodRenames`, and one tag from
 `tagRenames`. `generate_promocode` and `legal_info` carry real separators, `goods`
