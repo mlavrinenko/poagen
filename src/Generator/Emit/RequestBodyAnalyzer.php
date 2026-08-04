@@ -30,10 +30,11 @@ use function is_string;
  *   1. `application/json` with a `$ref`-to-Model or `list<$ref>` schema
  *      — produces a typed body parameter (JSON / JSON_LIST kinds).
  *   2. `application/x-www-form-urlencoded` when it is the *sole* content
- *      type, and the schema is an inline `type: object` with declared
- *      properties — one typed method parameter per property (FORM kind;
- *      T-011). A `$ref`-to-Model form body is intentionally skipped to
- *      avoid flattening a whole Model into dozens of parameters; petstore's
+ *      type, and the schema is an inline object — per {@see ObjectShape},
+ *      not the literal `type: object` keyword — with declared properties:
+ *      one typed method parameter per property (FORM kind; T-011). A
+ *      `$ref`-to-Model form body is intentionally skipped to avoid
+ *      flattening a whole Model into dozens of parameters; petstore's
  *      JSON+form pairings are already covered by the JSON branch.
  *   3. A text content type over a `type: string` schema — one `string`
  *      parameter, sent under the first such content type the document
@@ -190,7 +191,7 @@ final readonly class RequestBodyAnalyzer
 
         $schema = $media->schema;
 
-        if (!$schema instanceof Schema || !SchemaType::of($schema)->is('object')) {
+        if (!$schema instanceof Schema || !ObjectShape::is($schema)) {
             return null;
         }
 
