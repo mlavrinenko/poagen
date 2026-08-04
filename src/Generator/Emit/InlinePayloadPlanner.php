@@ -37,7 +37,9 @@ use function is_array;
  * renames an operation: point the pin at the new identifier and the class name
  * they publish stays put.
  *
- * An operation the document-wide schema scan already refused (skip-is-the-only-opt-out)
+ * An operation already refused before this planner runs — by the document-wide
+ * schema scan, or by {@see OperationAnalyzer::scanUnresolvablePathParameters()}
+ * finding a path parameter that does not resolve (skip-is-the-only-opt-out) —
  * claims nothing here — {@see build()}'s `$preScannedSkips` — so a skip entry
  * naming that operation drops its payload model along with its method rather
  * than leaving the model behind as a dangling write. A second operation that
@@ -56,7 +58,7 @@ final readonly class InlinePayloadPlanner
     /**
      * @param array<string,string> $pins            `'<operationId>.request'|'<operationId>.response'` → PHP class name
      * @param array<string,string> $xmlElements     Profile::$xmlElements
-     * @param array<string,string> $preScannedSkips raw operationId → reason, from the document-wide scan that
+     * @param array<string,string> $preScannedSkips raw operationId → reason, from the document-wide scans that
      *                                               ran before this planner — an operation named here is refused
      *                                               regardless of `Profile::$skip`, so it claims no payload model
      * @param array<string,array{branch:string,reason:string}> $unionPins Profile::$unionPins — read only for a
