@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: Dangling Component Reference Fixture
+  version: "1.0.0"
+  description: >
+    a-skipped-component-leaves-dangling-references-behind-it. `Gadget.owner`
+    is an undiscriminated union (Person vs Company share every field), so
+    DiscriminatorEnforcer excludes the whole `Gadget` component the same way
+    the existing unrepresentable-3.0.yaml fixture does. `Wrapper` is a
+    fully representable object whose only property is a `$ref` to `Gadget` —
+    a component referencing a skipped one. `getGadget` returns `Gadget`
+    directly; `getWrapper` returns `Wrapper`, which only becomes a problem
+    once `Wrapper` itself is excluded by the cascade, proving the closure
+    reaches a second level. `ping` is fully representable and touches none
+    of this, so a `Profile::$skip` entry naming it should still be reported
+    stale.
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        '204':
+          description: ok
+  /gadgets/{id}:
+    get:
+      operationId: getGadget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gadget'
+  /wrappers/{id}:
+    get:
+      operationId: getWrapper
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wrapper'
+components:
+  schemas:
+    Gadget:
+      type: object
+      required:
+        - id
+        - owner
+      properties:
+        id:
+          type: integer
+        owner:
+          oneOf:
+            - $ref: '#/components/schemas/Person'
+            - $ref: '#/components/schemas/Company'
+    Person:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    Company:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    Wrapper:
+      type: object
+      required:
+        - gadget
+      properties:
+        gadget:
+          $ref: '#/components/schemas/Gadget'
