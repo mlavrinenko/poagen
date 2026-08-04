@@ -10,7 +10,7 @@
 
 ## About
 
-paogen reads an OpenAPI 3.0.x schema and emits a PHP 8.4 HTTP client:
+paogen reads an OpenAPI 3.0 or 3.1 schema and emits a PHP 8.4 HTTP client:
 
 * **Typed** — exhaustive PHPStan annotations (`@var non-empty-string`, etc.)
 * **Extensible** — your customisations live in a typed `Profile` and in
