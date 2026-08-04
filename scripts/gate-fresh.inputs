@@ -20,6 +20,20 @@
 # single task would change the hash out from under itself and no second
 # flip could ever be fresh again. Every other input here is something only a
 # real change to the gate's own behaviour touches.
+#
+# What this hash answers, and what it deliberately does not: this file
+# drives FRESHNESS — "has anything the gate reads changed since the last
+# recorded pass" — never VALIDITY — "does the tree the gate reads still
+# parse". Those are different questions, and truth/tasks is exactly where
+# they come apart: a malformed task artifact does not change this hash (see
+# above), so freshness alone would let it record as, or read as, a fresh
+# pass while `speconaut check truth/` — which `just check` runs via
+# `check-specs` — fails on it. `scripts/gate-fresh is-valid` is the second,
+# stateless predicate that answers the validity question instead, by
+# re-running `speconaut check truth/` (~1s) directly rather than teaching
+# this hash to see truth/tasks. Both predicates gate `mt flip ... done`; see
+# the `[[on.flip]]` block in .mindtape/config.toml. Do not try to collapse
+# them into one hash — that is the mistake this comment exists to head off.
 
 bin
 devbox.d

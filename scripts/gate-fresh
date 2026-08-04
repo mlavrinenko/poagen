@@ -21,6 +21,15 @@
 # excluded — see the comment at the top of gate-fresh.inputs. Getting this
 # wrong makes the gate pass once and never again, because `mt flip` rewrites
 # the very file it is gating.
+#
+# `is-valid` is a second, separate predicate, not a patch to the hash above.
+# Freshness (`is-fresh`) answers "has anything the gate reads changed since
+# the last recorded pass"; it cannot see `truth/tasks` edits by design, so a
+# task file can go malformed without ever making a recorded pass stale. That
+# is a different question — "does the tree the gate reads still parse" —
+# answered by re-running the cheap part of the gate (`speconaut check
+# truth/`, ~1s) rather than by asking a content hash to carry it. See
+# gate-fresh.inputs for why folding this into the hash does not work.
 set -eo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -138,7 +147,7 @@ recorded_hash() {
 }
 
 usage() {
-    echo "usage: gate-fresh {record|is-fresh|invalidate|hash}" >&2
+    echo "usage: gate-fresh {record|is-fresh|invalidate|hash|is-valid}" >&2
     exit 2
 }
 
@@ -170,6 +179,27 @@ is-fresh)
     ;;
 hash)
     hash_inputs
+    ;;
+is-valid)
+    # Stateless on purpose: unlike is-fresh this never reads or writes
+    # $state, so it always reflects the tree on disk right now, including
+    # truth/tasks — the one directory the hash above is forbidden to see.
+    if ! command -v speconaut >/dev/null 2>&1; then
+        echo "gate-fresh: speconaut not found on PATH — cannot assert truth/ validity" >&2
+        exit 1
+    fi
+    # `if output=$(...)` (not a bare assignment) on purpose: under `set -e` a
+    # plain `output="$(cmd)"; status=$?` exits the whole script the instant
+    # cmd fails, on the assignment line, before status=$? or the error
+    # message below ever run — the `if` form is what keeps a failing
+    # `speconaut check` from being swallowed silently.
+    if output="$(cd "$root" && speconaut check truth/ 2>&1)"; then
+        echo "gate-fresh: valid"
+        exit 0
+    fi
+    echo "gate-fresh: truth/ does not parse — \`speconaut check truth/\` failed:" >&2
+    echo "$output" >&2
+    exit 1
     ;;
 *)
     usage
