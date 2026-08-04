@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Unit\Runtime\Fixtures;
 
+use Poagen\Runtime\ScalarBinding;
+
 use function assert;
 use function is_string;
 
-final readonly class Email implements \Poagen\Runtime\ScalarBinding
+final readonly class Email implements ScalarBinding
 {
     public function __construct(public string $value) {}
 

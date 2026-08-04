@@ -6,6 +6,10 @@ namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\ScalarFormat;
 
 use function assert;
 use function is_string;
@@ -24,15 +28,15 @@ final readonly class TypeResolver
 
     public static function resolve(
         Schema|Reference $node,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         string $modelNamespace,
-        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
-        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums = null,
+        NameRegistry $registry,
+        ?EnumCatalog $enums = null,
     ): self {
         if ($node instanceof Reference) {
             $component = ComponentName::rawFromRef($node->getReference());
 
-            if ($enums instanceof \Poagen\Generator\Generator\Enum\EnumCatalog && $enums->isEnumComponent($component)) {
+            if ($enums instanceof EnumCatalog && $enums->isEnumComponent($component)) {
                 $fqcn = $enums->componentFqcn($component);
                 assert(is_string($fqcn));
 
@@ -53,7 +57,7 @@ final readonly class TypeResolver
         if (is_string($format) && $format !== '') {
             $scalarFormat = $bindings->scalarFormat($format);
 
-            if ($scalarFormat instanceof \Poagen\Generator\Generator\ScalarFormat) {
+            if ($scalarFormat instanceof ScalarFormat) {
                 return new self($scalarFormat->phpType, null, null, $nullable);
             }
 
@@ -122,10 +126,10 @@ final readonly class TypeResolver
 
     private static function resolveArray(
         Schema $node,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         string $modelNamespace,
-        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
-        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
+        NameRegistry $registry,
+        ?EnumCatalog $enums,
         bool $nullable,
     ): self {
         /** @var Schema|Reference|null $items */

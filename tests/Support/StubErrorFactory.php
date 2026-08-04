@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Support;
 
+use Poagen\Runtime\Contract\ErrorFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -21,7 +22,7 @@ use function sprintf;
  * and keeps the emitted exception's own coverage where the class is a real
  * one — the committed petstore fixture.
  */
-final class StubErrorFactory implements \Poagen\Runtime\Contract\ErrorFactoryInterface
+final class StubErrorFactory implements ErrorFactoryInterface
 {
     public function errorFor(int $status, RequestInterface $request, ResponseInterface $response, string $reason): Throwable
     {

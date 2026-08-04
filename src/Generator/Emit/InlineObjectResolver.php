@@ -6,6 +6,9 @@ namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Enum\EnumCatalog;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 /**
  * Resolution strategy for an inline object schema (T-013).
@@ -42,10 +45,10 @@ final class InlineObjectResolver
      */
     public static function resolve(
         Schema $node,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         string $modelNamespace,
-        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
-        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
+        NameRegistry $registry,
+        ?EnumCatalog $enums,
     ): TypeResolver {
         // 3.0 `nullable: true` or 3.1 `type: [T, "null"]` — read once, shared
         // with TypeResolver and PropertySynthesiser via SchemaType.
@@ -73,10 +76,10 @@ final class InlineObjectResolver
      */
     public static function valueMapDoc(
         Schema $node,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         string $modelNamespace,
-        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
-        ?\Poagen\Generator\Generator\Enum\EnumCatalog $enums,
+        NameRegistry $registry,
+        ?EnumCatalog $enums,
     ): string {
         $additional = $node->additionalProperties;
 

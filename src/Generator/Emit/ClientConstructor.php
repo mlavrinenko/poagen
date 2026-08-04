@@ -6,6 +6,7 @@ namespace Poagen\Generator\Generator\Emit;
 
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Runtime\Contract\TransportInterface;
 
 /**
  * The constructor every emitted client shares — root and sub-client alike.
@@ -60,10 +61,10 @@ final readonly class ClientConstructor
      */
     private static function addTo(ClassType $class, PhpNamespace $namespace, array $schemes): void
     {
-        $namespace->addUse(\Poagen\Runtime\Contract\TransportInterface::class);
+        $namespace->addUse(TransportInterface::class);
 
         $ctor = $class->addMethod('__construct');
-        $ctor->addPromotedParameter('transport')->setType(\Poagen\Runtime\Contract\TransportInterface::class)->setPrivate();
+        $ctor->addPromotedParameter('transport')->setType(TransportInterface::class)->setPrivate();
 
         // Security-scheme args sit AFTER the transport so a schema that gains
         // a scheme does not reorder the existing signature. A scheme claims

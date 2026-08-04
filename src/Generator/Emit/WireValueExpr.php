@@ -7,6 +7,8 @@ namespace Poagen\Generator\Generator\Emit;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
 use Nette\PhpGenerator\PhpNamespace;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\ScalarFormat;
 
 use function is_array;
 use function is_string;
@@ -40,7 +42,7 @@ final readonly class WireValueExpr
     public function build(
         string $varName,
         Schema|Reference|null $node,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         PhpNamespace $namespace,
         bool $required,
     ): string {
@@ -62,7 +64,7 @@ final readonly class WireValueExpr
      * items pass straight through can be handed to `Endpoint` as-is instead
      * of being mapped item by item.
      */
-    public function isTransparent(Schema|Reference|null $node, \Poagen\Generator\Generator\Bindings $bindings, PhpNamespace $namespace): bool
+    public function isTransparent(Schema|Reference|null $node, Bindings $bindings, PhpNamespace $namespace): bool
     {
         if ($this->refsScalarVo($node)) {
             return false;
@@ -85,7 +87,7 @@ final readonly class WireValueExpr
      * a style nit, since `quality-gates-at-maximum-strictness` runs the
      * generated tier at max with no suppression.
      */
-    public function itemExpr(string $varName, Schema|Reference|null $node, \Poagen\Generator\Generator\Bindings $bindings, PhpNamespace $namespace): string
+    public function itemExpr(string $varName, Schema|Reference|null $node, Bindings $bindings, PhpNamespace $namespace): string
     {
         $var = '$' . $varName;
         $types = $this->scalarBranchTypes($node);
@@ -112,7 +114,7 @@ final readonly class WireValueExpr
      * The `format(...)` or `toScalar()` call a bound format needs, or null
      * when the value goes to the wire untouched.
      */
-    private function formatCall(?Schema $schema, \Poagen\Generator\Generator\Bindings $bindings, PhpNamespace $namespace): ?string
+    private function formatCall(?Schema $schema, Bindings $bindings, PhpNamespace $namespace): ?string
     {
         if (!$schema instanceof Schema || !is_string($schema->format)) {
             return null;
@@ -120,18 +122,18 @@ final readonly class WireValueExpr
 
         $scalarFormat = $bindings->scalarFormat($schema->format);
 
-        if (!$scalarFormat instanceof \Poagen\Generator\Generator\ScalarFormat) {
+        if (!$scalarFormat instanceof ScalarFormat) {
             return null;
         }
 
-        if ($scalarFormat->kind === \Poagen\Generator\Generator\ScalarFormat::KIND_DATETIME) {
+        if ($scalarFormat->kind === ScalarFormat::KIND_DATETIME) {
             $namespace->addUse('DateTimeInterface');
         }
 
         return match ($scalarFormat->kind) {
-            \Poagen\Generator\Generator\ScalarFormat::KIND_DATETIME => 'format(' . $namespace->simplifyName('DateTimeInterface') . '::RFC3339)',
-            \Poagen\Generator\Generator\ScalarFormat::KIND_DATE => "format('Y-m-d')",
-            \Poagen\Generator\Generator\ScalarFormat::KIND_SCALAR => 'toScalar()',
+            ScalarFormat::KIND_DATETIME => 'format(' . $namespace->simplifyName('DateTimeInterface') . '::RFC3339)',
+            ScalarFormat::KIND_DATE => "format('Y-m-d')",
+            ScalarFormat::KIND_SCALAR => 'toScalar()',
             default => null,
         };
     }

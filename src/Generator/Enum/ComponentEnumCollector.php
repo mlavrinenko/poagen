@@ -7,6 +7,9 @@ namespace Poagen\Generator\Generator\Enum;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Reference;
 use cebe\openapi\spec\Schema;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\SymbolKind;
 
 /**
  * Registers every named `components.schemas` entry that is a backed enum, so a
@@ -20,7 +23,7 @@ use cebe\openapi\spec\Schema;
  */
 final readonly class ComponentEnumCollector
 {
-    public function collect(OpenApi $openApi, EnumCatalog $enums, \Poagen\Generator\Generator\Naming\NameRegistry $registry): void
+    public function collect(OpenApi $openApi, EnumCatalog $enums, NameRegistry $registry): void
     {
         $components = $openApi->components;
 
@@ -30,7 +33,7 @@ final readonly class ComponentEnumCollector
 
         /** @var array<string,Schema|Reference> $schemas */
         $schemas = $components->schemas ?? [];
-        $context = new \Poagen\Generator\Generator\Naming\NormalisationContext(\Poagen\Generator\Generator\Naming\SymbolKind::SchemaComponent);
+        $context = new NormalisationContext(SymbolKind::SchemaComponent);
 
         foreach ($schemas as $name => $schema) {
             if (!$schema instanceof Schema) {

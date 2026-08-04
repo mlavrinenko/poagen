@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Generator\Naming;
 
+use Poagen\Generator\Exception\InvalidProfileException;
+
 use function sprintf;
 
 /**
@@ -35,7 +37,7 @@ final readonly class RenamesNormaliser implements NameNormaliser
     ) {
         foreach ($map as $raw => $php) {
             if (preg_match(self::IDENTIFIER, $php) !== 1) {
-                throw new \Poagen\Generator\Exception\InvalidProfileException(sprintf(
+                throw new InvalidProfileException(sprintf(
                     "Profile %s map: '%s' is not a valid PHP identifier (mapped from '%s').",
                     $label,
                     $php,

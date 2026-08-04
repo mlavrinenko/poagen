@@ -8,6 +8,8 @@ use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
+use Poagen\Generator\Generator\Naming\InlinePayloadName;
+use Poagen\Generator\Generator\Naming\NameRegistry;
 
 use function is_array;
 
@@ -33,7 +35,7 @@ final readonly class RequestBodyPlanner
         string $rawId,
         string $base,
         array $pins,
-        \Poagen\Generator\Generator\Naming\NameRegistry $registry,
+        NameRegistry $registry,
         ModelNameLedger $ledger,
         array &$roots,
         OpenApi $openApi,
@@ -82,7 +84,7 @@ final readonly class RequestBodyPlanner
         }
 
         if (InlinePayloadPlanner::isSynthesisableObject($schema)) {
-            $name = InlineModelClaim::named($pin, \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base), $schema, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::request($base), $schema, $ledger, $roots);
 
             return BodySpec::json($name);
         }
@@ -90,7 +92,7 @@ final readonly class RequestBodyPlanner
         $items = InlinePayloadPlanner::inlineObjectItemsOf($schema);
 
         if ($items instanceof Schema) {
-            $name = InlineModelClaim::named($pin, \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base, item: true), $items, $ledger, $roots);
+            $name = InlineModelClaim::named($pin, InlinePayloadName::request($base, item: true), $items, $ledger, $roots);
 
             return BodySpec::jsonList($name);
         }

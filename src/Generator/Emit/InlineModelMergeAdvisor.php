@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator\Emit;
 
 use cebe\openapi\spec\OpenApi;
+use Poagen\Generator\Generator\Naming\InlinePayloadName;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Naming\NormalisationContext;
+use Poagen\Generator\Generator\Naming\SymbolKind;
 
 use function array_filter;
 use function array_map;
@@ -44,7 +48,7 @@ final readonly class InlineModelMergeAdvisor
      * @param array<string,string> $preScannedSkips raw operationId → reason, {@see InlineModelSiteWalk}
      * @return list<string>        one line per group of 2+ structurally identical inline schemas
      */
-    public static function notices(OpenApi $openApi, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry, array $preScannedSkips = []): array
+    public static function notices(OpenApi $openApi, NameRegistry $operationIdRegistry, array $preScannedSkips = []): array
     {
         $groups = array_values(array_filter(
             self::group(InlineModelSiteWalk::sites($openApi, $preScannedSkips)),
@@ -94,7 +98,7 @@ final readonly class InlineModelMergeAdvisor
     /**
      * @param list<InlineModelSiteSchema> $group
      */
-    private static function describe(array $group, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry): string
+    private static function describe(array $group, NameRegistry $operationIdRegistry): string
     {
         $suggested = self::suggestedName($group[0], $operationIdRegistry);
         $lines = [sprintf(
@@ -112,12 +116,12 @@ final readonly class InlineModelMergeAdvisor
         return implode("\n", $lines);
     }
 
-    private static function suggestedName(InlineModelSiteSchema $member, \Poagen\Generator\Generator\Naming\NameRegistry $operationIdRegistry): string
+    private static function suggestedName(InlineModelSiteSchema $member, NameRegistry $operationIdRegistry): string
     {
-        $base = ucfirst($operationIdRegistry->resolve($member->site->operationId, new \Poagen\Generator\Generator\Naming\NormalisationContext(\Poagen\Generator\Generator\Naming\SymbolKind::OperationId)));
+        $base = ucfirst($operationIdRegistry->resolve($member->site->operationId, new NormalisationContext(SymbolKind::OperationId)));
 
         return $member->site->isRequest()
-            ? \Poagen\Generator\Generator\Naming\InlinePayloadName::request($base, $member->item)
-            : \Poagen\Generator\Generator\Naming\InlinePayloadName::response($base, $member->site->position, $member->item);
+            ? InlinePayloadName::request($base, $member->item)
+            : InlinePayloadName::response($base, $member->site->position, $member->item);
     }
 }

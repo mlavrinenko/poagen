@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Support;
 
+use Poagen\Generator\Generator\GenerationPlan;
+
 use function array_keys;
 use function basename;
 use function sort;
@@ -27,7 +29,7 @@ trait InlinePayloadPlanAssertions
     /**
      * @return list<string>
      */
-    private static function emittedNames(\Poagen\Generator\Generator\GenerationPlan $plan, string $subdirectory): array
+    private static function emittedNames(GenerationPlan $plan, string $subdirectory): array
     {
         $needle = DIRECTORY_SEPARATOR . $subdirectory . DIRECTORY_SEPARATOR;
         $out = [];

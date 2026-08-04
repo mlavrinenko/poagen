@@ -6,6 +6,7 @@ namespace Poagen\Generator\Generator\Emit;
 
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
+use Poagen\Runtime\Contract\ApiErrorInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
@@ -57,7 +58,7 @@ final readonly class ApiExceptionEmitter
         $file->setStrictTypes();
 
         $namespace = $file->addNamespace($clientNamespace);
-        $namespace->addUse(\Poagen\Runtime\Contract\ApiErrorInterface::class);
+        $namespace->addUse(ApiErrorInterface::class);
         $namespace->addUse(RequestInterface::class);
         $namespace->addUse(ResponseInterface::class);
         $namespace->addUse(RuntimeException::class);
@@ -65,7 +66,7 @@ final readonly class ApiExceptionEmitter
         $class = $namespace->addClass('ApiException')
             ->setFinal()
             ->setExtends(RuntimeException::class)
-            ->addImplement(\Poagen\Runtime\Contract\ApiErrorInterface::class);
+            ->addImplement(ApiErrorInterface::class);
 
         $class->addComment('Thrown for the one case an envelope cannot honestly represent: a');
         $class->addComment('status the document declared no exact, range or `default` response for,');

@@ -7,6 +7,9 @@ namespace Poagen\Generator\Generator\Emit;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use Nette\PhpGenerator\PsrPrinter;
+use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\Naming\NameRegistry;
+use Poagen\Generator\Generator\Profile;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -46,9 +49,9 @@ final class ClientEmitter
         string $clientNamespace,
         string $rootDir,
         OpenApi $openApi,
-        \Poagen\Generator\Generator\Bindings $bindings,
-        \Poagen\Generator\Generator\Profile $profile,
-        \Poagen\Generator\Generator\Naming\NameRegistry $tagRegistry,
+        Bindings $bindings,
+        Profile $profile,
+        NameRegistry $tagRegistry,
         array &$writes,
     ): int {
         $groups = SubClientPlanner::plan($openApi, $profile, $tagRegistry);
@@ -119,7 +122,7 @@ final class ClientEmitter
         string $rootDir,
         ?TagGroup $rootGroup,
         array $live,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
         array $servers,
         array &$writes,

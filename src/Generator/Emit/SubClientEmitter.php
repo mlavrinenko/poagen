@@ -10,6 +10,7 @@ use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\PsrPrinter;
+use Poagen\Generator\Generator\Bindings;
 
 use function sprintf;
 
@@ -48,7 +49,7 @@ final readonly class SubClientEmitter
     public function emit(
         string $clientNamespace,
         TagGroup $group,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
         [$file, $namespace, $class] = $this->openSubClass($clientNamespace, $group->phpName, $group->interfaceName());
@@ -142,7 +143,7 @@ final readonly class SubClientEmitter
         ClassType $class,
         PhpNamespace $namespace,
         TagGroup $group,
-        \Poagen\Generator\Generator\Bindings $bindings,
+        Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
     ): array {
         $skipped = [];

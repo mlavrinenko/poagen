@@ -6,6 +6,9 @@ namespace Poagen\Generator\Tests\Unit\Runtime;
 
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Poagen\Runtime\Contract\Envelope;
+use Poagen\Runtime\Contract\ResponseType;
+use Poagen\Runtime\Contract\StatusResponseMap;
 
 /**
  * typed-error-responses: what every generated operation returns now — the
@@ -19,7 +22,7 @@ final class EnvelopeTest extends TestCase
         $body = ['id' => 7];
         $response = new Response(200);
 
-        $envelope = new \Poagen\Runtime\Contract\Envelope(200, $body, $response);
+        $envelope = new Envelope(200, $body, $response);
 
         self::assertSame(200, $envelope->status);
         self::assertSame($body, $envelope->body);
@@ -28,7 +31,7 @@ final class EnvelopeTest extends TestCase
 
     public function testANullBodyIsAWellFormedEnvelopeNotAMissingOne(): void
     {
-        $envelope = new \Poagen\Runtime\Contract\Envelope(204, null, new Response(204));
+        $envelope = new Envelope(204, null, new Response(204));
 
         self::assertSame(204, $envelope->status);
         self::assertNull($envelope->body);
@@ -36,11 +39,11 @@ final class EnvelopeTest extends TestCase
 
     public function testResponseTypeEnvelopeCarriesTheStatusResponseMapItWasBuiltFrom(): void
     {
-        $statuses = new \Poagen\Runtime\Contract\StatusResponseMap(exact: [['200', \Poagen\Runtime\Contract\ResponseType::string()]]);
+        $statuses = new StatusResponseMap(exact: [['200', ResponseType::string()]]);
 
-        $type = \Poagen\Runtime\Contract\ResponseType::envelope($statuses);
+        $type = ResponseType::envelope($statuses);
 
-        self::assertSame(\Poagen\Runtime\Contract\ResponseType::KIND_ENVELOPE, $type->kind);
+        self::assertSame(ResponseType::KIND_ENVELOPE, $type->kind);
         self::assertSame($statuses, $type->statuses);
     }
 }
