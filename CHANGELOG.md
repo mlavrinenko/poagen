@@ -32,6 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking.** `XmlWriterInterface::renderList()` takes a fourth argument,
+  `$nestedContainers`, so a validated nested-container binding reaches
+  whichever writer the transport holds — default or a consumer's own
+  substitute — rather than a stock writer being swapped in only for the
+  calls that carry one. A custom implementation must add the parameter
+  (defaulting it to `[]` costs nothing for a body with no binding).
 - **Breaking.** Every generated operation's return type changes: a method
   now returns [`Envelope`](runtime/src/Contract/Envelope.php) instead of a
   bare model. `->status` carries the HTTP status the wire sent, `->body` is
