@@ -8,7 +8,11 @@
   links: (
     depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),
   ),
-  status: wip(2026, 8, 4)[envelope agent dispatched],
+  status: blocked(
+    2026,
+    8,
+    4,
+  )[Stopped mid-flight by a session limit, not by anything in the code. Step one, the additive runtime layer, is merged and gated on main. Step two, the generator switch and the regeneration of all four examples, is preserved uncommitted-no-longer on branch envelope at 600beed7 and must not be merged as it stands. Resume by reading that commit.],
 )
 
 == Summary
