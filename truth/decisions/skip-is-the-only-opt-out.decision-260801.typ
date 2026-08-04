@@ -71,6 +71,24 @@ mechanism the request-body path already used, rather than inventing a
 "lenient" response mode: one mechanism, one meaning, for every construct the
 generator refuses.
 
+=== The key space widens for a webhook, added 2026-08-04
+
+`webhooks-refuse-with-no-opt-out` widened `$skip` itself rather than
+opening a third surface. An OpenAPI 3.1 `webhooks:` entry is refused whole
+by default — it describes a call the vendor makes to the consumer, the
+opposite direction from every client paogen emits, and no emitter
+represents one — but `$skip` previously had nowhere to name it: keyed by
+operation id or raw component name, and a webhook is neither. That was the
+key space being too narrow, not a reason webhooks needed a map of their
+own. A webhook is now named `'<webhookName>.webhook'`, suffixed so it
+cannot collide with the operation id or component name #a(Profile)'s
+`$skip` already accepts bare, and it passes the identical opt-out test
+this decision already applies: the entry's *absence* is what keeps the
+refusal in force. A document whose webhooks are only partly named this way
+still refuses, naming the ones left — the default stays a refusal, only an
+explicit entry turns it off. `$skip` and `$unionPins` remain the only two
+opt-out surfaces; a wider key space on one of them is not a third.
+
 === Staleness is part of the same guarantee
 
 `silence-means-success` requires that "when a named omission would now
