@@ -5,7 +5,11 @@
   tags: ("generator", "runtime"),
   priority: 5,
   difficulty: 5,
-  status: wip(2026, 8, 4)[Dispatched to a worktree agent off c68c5ce2.],
+  status: done(
+    2026,
+    8,
+    4,
+  )[A binary 2xx returns a PSR-7 StreamInterface. ReturnSpec, ResponseType, ResponseTypeEmitter and ResponseDecoder all name the stream kind, so the generated return type and the runtime agree with no cast. The stream is not read on the way out, pinned by a decorator that throws on getContents and \_\_toString, matching how the request side was already pinned. DigitalOcean's invoices\_get\_pdfByUuid loses its skip entry and generates as Envelope\<StreamInterface|Error>. Gated on the merged HEAD: 531 tests, both floors held.],
 )
 
 == Summary

@@ -5,7 +5,11 @@
   tags: ("generator",),
   priority: 5,
   difficulty: 3,
-  status: wip(2026, 8, 4)[Dispatched to a worktree agent off c68c5ce2.],
+  status: done(
+    2026,
+    8,
+    4,
+  )[Already fixed by the envelope, verified against the tree rather than assumed: EnvelopeResponsePlanner::plan resolves a Reference response for every status before ResponseAnalyzer sees it. The regression test the task asked for landed anyway - a fixture pair, inline against ref with identical content, proving both earn the same envelope expression. Reverting the resolution fails it.],
 )
 
 == Summary
