@@ -13,12 +13,12 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\Import;
 use Acme\GitHub\Generated\Model\Migration;
-use Acme\GitHub\Generated\Model\MigrationsMapCommitAuthorRequest;
-use Acme\GitHub\Generated\Model\MigrationsSetLfsPreferenceRequest;
-use Acme\GitHub\Generated\Model\MigrationsStartForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\MigrationsStartForOrgRequest;
-use Acme\GitHub\Generated\Model\MigrationsStartImportRequest;
-use Acme\GitHub\Generated\Model\MigrationsUpdateImportRequest;
+use Acme\GitHub\Generated\Model\MigrationsMapCommitAuthorRequestContent;
+use Acme\GitHub\Generated\Model\MigrationsSetLfsPreferenceRequestContent;
+use Acme\GitHub\Generated\Model\MigrationsStartForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\MigrationsStartForOrgRequestContent;
+use Acme\GitHub\Generated\Model\MigrationsStartImportRequestContent;
+use Acme\GitHub\Generated\Model\MigrationsUpdateImportRequestContent;
 use Acme\GitHub\Generated\Model\MinimalRepository;
 use Acme\GitHub\Generated\Model\PorterAuthor;
 use Acme\GitHub\Generated\Model\PorterLargeFile;
@@ -43,7 +43,7 @@ interface MigrationsClientInterface
         ?array $exclude = null,
     ): array;
 
-    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequest $body): Migration;
+    public function migrationsStartForOrg(string $org, MigrationsStartForOrgRequestContent $body): Migration;
 
     /**
      * @param list<string> $exclude
@@ -68,11 +68,19 @@ interface MigrationsClientInterface
 
     public function migrationsGetImportStatus(string $owner, string $repo): Import;
 
-    public function migrationsStartImport(string $owner, string $repo, MigrationsStartImportRequest $body): Import;
+    public function migrationsStartImport(
+        string $owner,
+        string $repo,
+        MigrationsStartImportRequestContent $body,
+    ): Import;
 
     public function migrationsCancelImport(string $owner, string $repo): void;
 
-    public function migrationsUpdateImport(string $owner, string $repo, MigrationsUpdateImportRequest $body): Import;
+    public function migrationsUpdateImport(
+        string $owner,
+        string $repo,
+        MigrationsUpdateImportRequestContent $body,
+    ): Import;
 
     /**
      * @return list<PorterAuthor>
@@ -83,7 +91,7 @@ interface MigrationsClientInterface
         string $owner,
         string $repo,
         int $authorId,
-        MigrationsMapCommitAuthorRequest $body,
+        MigrationsMapCommitAuthorRequestContent $body,
     ): PorterAuthor;
 
     /**
@@ -94,7 +102,7 @@ interface MigrationsClientInterface
     public function migrationsSetLfsPreference(
         string $owner,
         string $repo,
-        MigrationsSetLfsPreferenceRequest $body,
+        MigrationsSetLfsPreferenceRequestContent $body,
     ): Import;
 
     /**
@@ -102,7 +110,9 @@ interface MigrationsClientInterface
      */
     public function migrationsListForAuthenticatedUser(?int $perPage = null, ?int $page = null): array;
 
-    public function migrationsStartForAuthenticatedUser(MigrationsStartForAuthenticatedUserRequest $body): Migration;
+    public function migrationsStartForAuthenticatedUser(
+        MigrationsStartForAuthenticatedUserRequestContent $body,
+    ): Migration;
 
     /**
      * @param list<string> $exclude

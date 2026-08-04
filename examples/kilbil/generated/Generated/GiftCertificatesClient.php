@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GenerateGiftCardRequest;
-use Acme\Kilbil\Generated\Model\GenerateGiftCardResponse;
-use Acme\Kilbil\Generated\Model\GetProgramGiftCardResponse;
-use Acme\Kilbil\Generated\Model\SearchGiftCardRequest;
-use Acme\Kilbil\Generated\Model\SearchGiftCardResponse;
+use Acme\Kilbil\Generated\Model\GenerateGiftCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateGiftCardRequestContent;
+use Acme\Kilbil\Generated\Model\GetProgramGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCard200Content;
+use Acme\Kilbil\Generated\Model\SearchGiftCardRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -28,27 +28,27 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
     ) {
     }
 
-    public function generateGiftCard(GenerateGiftCardRequest $body): GenerateGiftCardResponse
+    public function generateGiftCard(GenerateGiftCardRequestContent $body): GenerateGiftCard200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/generategiftcard')->query('h', $this->h)->json($body),
-            ResponseType::object(GenerateGiftCardResponse::class),
+            ResponseType::object(GenerateGiftCard200Content::class),
         );
     }
 
-    public function getProgramGiftCard(): GetProgramGiftCardResponse
+    public function getProgramGiftCard(): GetProgramGiftCard200Content
     {
         return $this->transport->send(
             Endpoint::get('/load/getprogramgiftcard')->query('h', $this->h),
-            ResponseType::object(GetProgramGiftCardResponse::class),
+            ResponseType::object(GetProgramGiftCard200Content::class),
         );
     }
 
-    public function searchGiftCard(SearchGiftCardRequest $body): SearchGiftCardResponse
+    public function searchGiftCard(SearchGiftCardRequestContent $body): SearchGiftCard200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/searchgiftcard')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchGiftCardResponse::class),
+            ResponseType::object(SearchGiftCard200Content::class),
         );
     }
 }

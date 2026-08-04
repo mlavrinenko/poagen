@@ -15,8 +15,8 @@ use Acme\GitHub\Generated\Enum\CampaignState;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsDirection;
 use Acme\GitHub\Generated\Enum\CampaignsListOrgCampaignsSort;
 use Acme\GitHub\Generated\Model\CampaignSummary;
-use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequest;
-use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequest;
+use Acme\GitHub\Generated\Model\CampaignsCreateCampaignRequestContent;
+use Acme\GitHub\Generated\Model\CampaignsUpdateCampaignRequestContent;
 
 /**
  * The contract for the `campaigns` endpoints.
@@ -39,7 +39,7 @@ interface CampaignsClientInterface
         ?CampaignsListOrgCampaignsSort $sort = null,
     ): array;
 
-    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequest $body): CampaignSummary;
+    public function campaignsCreateCampaign(string $org, CampaignsCreateCampaignRequestContent $body): CampaignSummary;
 
     public function campaignsGetCampaignSummary(string $org, int $campaignNumber): CampaignSummary;
 
@@ -48,6 +48,6 @@ interface CampaignsClientInterface
     public function campaignsUpdateCampaign(
         string $org,
         int $campaignNumber,
-        CampaignsUpdateCampaignRequest $body,
+        CampaignsUpdateCampaignRequestContent $body,
     ): CampaignSummary;
 }

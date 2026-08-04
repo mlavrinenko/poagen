@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsPatchRequest;
-use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\VpcsCreatePeeringsRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchPeeringsRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsPatchRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcsUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -45,7 +45,7 @@ final readonly class VPCsClient implements VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:create`.
      */
-    public function vpcsCreate(VpcsCreateRequest $body): void
+    public function vpcsCreate(VpcsCreateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/vpcs')
@@ -71,7 +71,7 @@ final readonly class VPCsClient implements VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
      */
-    public function vpcsUpdate(string $vpcId, VpcsUpdateRequest $body): void
+    public function vpcsUpdate(string $vpcId, VpcsUpdateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/vpcs/{vpc_id}')
@@ -98,7 +98,7 @@ final readonly class VPCsClient implements VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc:update`.
      */
-    public function vpcsPatch(string $vpcId, VpcsPatchRequest $body): void
+    public function vpcsPatch(string $vpcId, VpcsPatchRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::patch('/v2/vpcs/{vpc_id}')
@@ -147,7 +147,7 @@ final readonly class VPCsClient implements VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
      */
-    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequest $body): void
+    public function vpcsCreatePeerings(string $vpcId, VpcsCreatePeeringsRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/vpcs/{vpc_id}/peerings')
@@ -161,8 +161,11 @@ final readonly class VPCsClient implements VPCsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
      */
-    public function vpcsPatchPeerings(string $vpcId, string $vpcPeeringId, VpcsPatchPeeringsRequest $body): void
-    {
+    public function vpcsPatchPeerings(
+        string $vpcId,
+        string $vpcPeeringId,
+        VpcsPatchPeeringsRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::patch('/v2/vpcs/{vpc_id}/peerings/{vpc_peering_id}')
                 ->path('vpc_id', $vpcId)

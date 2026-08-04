@@ -19,13 +19,13 @@ use Acme\GitHub\Generated\Model\CheckAnnotation;
 use Acme\GitHub\Generated\Model\CheckRun;
 use Acme\GitHub\Generated\Model\CheckSuite;
 use Acme\GitHub\Generated\Model\CheckSuitePreference;
-use Acme\GitHub\Generated\Model\ChecksCreateRequest;
-use Acme\GitHub\Generated\Model\ChecksCreateSuiteRequest;
-use Acme\GitHub\Generated\Model\ChecksListForRefResponse;
-use Acme\GitHub\Generated\Model\ChecksListForSuiteResponse;
-use Acme\GitHub\Generated\Model\ChecksListSuitesForRefResponse;
-use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequest;
-use Acme\GitHub\Generated\Model\ChecksUpdateRequest;
+use Acme\GitHub\Generated\Model\ChecksCreateRequestContent;
+use Acme\GitHub\Generated\Model\ChecksCreateSuiteRequestContent;
+use Acme\GitHub\Generated\Model\ChecksListForRef200Content;
+use Acme\GitHub\Generated\Model\ChecksListForSuite200Content;
+use Acme\GitHub\Generated\Model\ChecksListSuitesForRef200Content;
+use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequestContent;
+use Acme\GitHub\Generated\Model\ChecksUpdateRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 
 /**
@@ -37,11 +37,16 @@ use Acme\GitHub\Generated\Model\EmptyObject;
  */
 interface ChecksClientInterface
 {
-    public function checksCreate(string $owner, string $repo, ChecksCreateRequest $body): CheckRun;
+    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): CheckRun;
 
     public function checksGet(string $owner, string $repo, int $checkRunId): CheckRun;
 
-    public function checksUpdate(string $owner, string $repo, int $checkRunId, ChecksUpdateRequest $body): CheckRun;
+    public function checksUpdate(
+        string $owner,
+        string $repo,
+        int $checkRunId,
+        ChecksUpdateRequestContent $body,
+    ): CheckRun;
 
     /**
      * @return list<CheckAnnotation>
@@ -56,12 +61,12 @@ interface ChecksClientInterface
 
     public function checksRerequestRun(string $owner, string $repo, int $checkRunId): EmptyObject;
 
-    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequest $body): CheckSuite;
+    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): CheckSuite;
 
     public function checksSetSuitesPreferences(
         string $owner,
         string $repo,
-        ChecksSetSuitesPreferencesRequest $body,
+        ChecksSetSuitesPreferencesRequestContent $body,
     ): CheckSuitePreference;
 
     public function checksGetSuite(string $owner, string $repo, int $checkSuiteId): CheckSuite;
@@ -75,7 +80,7 @@ interface ChecksClientInterface
         ?ChecksListForSuiteFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListForSuiteResponse;
+    ): ChecksListForSuite200Content;
 
     public function checksRerequestSuite(string $owner, string $repo, int $checkSuiteId): EmptyObject;
 
@@ -89,7 +94,7 @@ interface ChecksClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?int $appId = null,
-    ): ChecksListForRefResponse;
+    ): ChecksListForRef200Content;
 
     public function checksListSuitesForRef(
         string $owner,
@@ -99,5 +104,5 @@ interface ChecksClientInterface
         ?string $checkName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListSuitesForRefResponse;
+    ): ChecksListSuitesForRef200Content;
 }

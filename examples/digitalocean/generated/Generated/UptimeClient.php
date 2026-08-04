@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequest;
-use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequest;
-use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequest;
+use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -56,7 +56,7 @@ final readonly class UptimeClient implements UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
      */
-    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequest $body): void
+    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}')
@@ -98,7 +98,7 @@ final readonly class UptimeClient implements UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:create`, `uptime:update`.
      */
-    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequest $body): void
+    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/uptime/checks/{check_id}/alerts')
@@ -126,7 +126,7 @@ final readonly class UptimeClient implements UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
      */
-    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequest $body): void
+    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/uptime/checks/{check_id}/alerts/{alert_id}')

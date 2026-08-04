@@ -56,40 +56,40 @@ use Acme\GitHub\Generated\Model\OrganizationRole;
 use Acme\GitHub\Generated\Model\OrganizationSimple;
 use Acme\GitHub\Generated\Model\OrganizationUpdateIssueField;
 use Acme\GitHub\Generated\Model\OrganizationUpdateIssueType;
-use Acme\GitHub\Generated\Model\OrgsConvertMemberToOutsideCollaboratorRequest;
-use Acme\GitHub\Generated\Model\OrgsCreateArtifactDeploymentRecordRequest;
-use Acme\GitHub\Generated\Model\OrgsCreateArtifactDeploymentRecordResponse;
-use Acme\GitHub\Generated\Model\OrgsCreateArtifactStorageRecordRequest;
-use Acme\GitHub\Generated\Model\OrgsCreateArtifactStorageRecordResponse;
-use Acme\GitHub\Generated\Model\OrgsCreateInvitationRequest;
-use Acme\GitHub\Generated\Model\OrgsCreateWebhookRequest;
-use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequest;
-use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequest;
+use Acme\GitHub\Generated\Model\OrgsConvertMemberToOutsideCollaboratorRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCreateArtifactDeploymentRecord200Content;
+use Acme\GitHub\Generated\Model\OrgsCreateArtifactDeploymentRecordRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCreateArtifactStorageRecord200Content;
+use Acme\GitHub\Generated\Model\OrgsCreateArtifactStorageRecordRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCreateInvitationRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCreateWebhookRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequestContent;
+use Acme\GitHub\Generated\Model\OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequestContent;
 use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch1;
 use Acme\GitHub\Generated\Model\OrgsDeleteAttestationsBulkBranch2;
-use Acme\GitHub\Generated\Model\OrgsEnableOrDisableSecurityProductOnAllOrgReposRequest;
-use Acme\GitHub\Generated\Model\OrgsGetImmutableReleasesSettingsRepositoriesResponse;
-use Acme\GitHub\Generated\Model\OrgsListAppInstallationsResponse;
-use Acme\GitHub\Generated\Model\OrgsListArtifactDeploymentRecordsResponse;
-use Acme\GitHub\Generated\Model\OrgsListArtifactStorageRecordsResponse;
-use Acme\GitHub\Generated\Model\OrgsListAttestationRepositoriesResponseItem;
-use Acme\GitHub\Generated\Model\OrgsListAttestationsBulkRequest;
-use Acme\GitHub\Generated\Model\OrgsListAttestationsBulkResponse;
-use Acme\GitHub\Generated\Model\OrgsListAttestationsResponse;
-use Acme\GitHub\Generated\Model\OrgsListOrgRolesResponse;
-use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestRequest;
-use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestsInBulkRequest;
-use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecordsRequest;
-use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecordsResponse;
-use Acme\GitHub\Generated\Model\OrgsSetImmutableReleasesSettingsRepositoriesRequest;
-use Acme\GitHub\Generated\Model\OrgsSetImmutableReleasesSettingsRequest;
-use Acme\GitHub\Generated\Model\OrgsSetMembershipForUserRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdateMembershipForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessesRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdateRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdateWebhookConfigForOrgRequest;
-use Acme\GitHub\Generated\Model\OrgsUpdateWebhookRequest;
+use Acme\GitHub\Generated\Model\OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestContent;
+use Acme\GitHub\Generated\Model\OrgsGetImmutableReleasesSettingsRepositories200Content;
+use Acme\GitHub\Generated\Model\OrgsListAppInstallations200Content;
+use Acme\GitHub\Generated\Model\OrgsListArtifactDeploymentRecords200Content;
+use Acme\GitHub\Generated\Model\OrgsListArtifactStorageRecords200Content;
+use Acme\GitHub\Generated\Model\OrgsListAttestationRepositories200ContentItem;
+use Acme\GitHub\Generated\Model\OrgsListAttestations200Content;
+use Acme\GitHub\Generated\Model\OrgsListAttestationsBulk200Content;
+use Acme\GitHub\Generated\Model\OrgsListAttestationsBulkRequestContent;
+use Acme\GitHub\Generated\Model\OrgsListOrgRoles200Content;
+use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestRequestContent;
+use Acme\GitHub\Generated\Model\OrgsReviewPatGrantRequestsInBulkRequestContent;
+use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecords200Content;
+use Acme\GitHub\Generated\Model\OrgsSetClusterDeploymentRecordsRequestContent;
+use Acme\GitHub\Generated\Model\OrgsSetImmutableReleasesSettingsRepositoriesRequestContent;
+use Acme\GitHub\Generated\Model\OrgsSetImmutableReleasesSettingsRequestContent;
+use Acme\GitHub\Generated\Model\OrgsSetMembershipForUserRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdateMembershipForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdatePatAccessesRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdateRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdateWebhookConfigForOrgRequestContent;
+use Acme\GitHub\Generated\Model\OrgsUpdateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\RulesetVersion;
 use Acme\GitHub\Generated\Model\RulesetVersionWithState;
 use Acme\GitHub\Generated\Model\SimpleUser;
@@ -117,41 +117,41 @@ interface OrgsClientInterface
 
     public function orgsDelete(string $org): void;
 
-    public function orgsUpdate(string $org, OrgsUpdateRequest $body): OrganizationFull;
+    public function orgsUpdate(string $org, OrgsUpdateRequestContent $body): OrganizationFull;
 
     public function orgsCreateArtifactDeploymentRecord(
         string $org,
-        OrgsCreateArtifactDeploymentRecordRequest $body,
-    ): OrgsCreateArtifactDeploymentRecordResponse;
+        OrgsCreateArtifactDeploymentRecordRequestContent $body,
+    ): OrgsCreateArtifactDeploymentRecord200Content;
 
     public function orgsSetClusterDeploymentRecords(
         string $org,
         string $cluster,
-        OrgsSetClusterDeploymentRecordsRequest $body,
-    ): OrgsSetClusterDeploymentRecordsResponse;
+        OrgsSetClusterDeploymentRecordsRequestContent $body,
+    ): OrgsSetClusterDeploymentRecords200Content;
 
     public function orgsCreateArtifactStorageRecord(
         string $org,
-        OrgsCreateArtifactStorageRecordRequest $body,
-    ): OrgsCreateArtifactStorageRecordResponse;
+        OrgsCreateArtifactStorageRecordRequestContent $body,
+    ): OrgsCreateArtifactStorageRecord200Content;
 
     public function orgsListArtifactDeploymentRecords(
         string $org,
         string $subjectDigest,
-    ): OrgsListArtifactDeploymentRecordsResponse;
+    ): OrgsListArtifactDeploymentRecords200Content;
 
     public function orgsListArtifactStorageRecords(
         string $org,
         string $subjectDigest,
-    ): OrgsListArtifactStorageRecordsResponse;
+    ): OrgsListArtifactStorageRecords200Content;
 
     public function orgsListAttestationsBulk(
         string $org,
-        OrgsListAttestationsBulkRequest $body,
+        OrgsListAttestationsBulkRequestContent $body,
         ?int $perPage = null,
         ?string $before = null,
         ?string $after = null,
-    ): OrgsListAttestationsBulkResponse;
+    ): OrgsListAttestationsBulk200Content;
 
     public function orgsDeleteAttestationsBulk(
         string $org,
@@ -161,7 +161,7 @@ interface OrgsClientInterface
     public function orgsDeleteAttestationsBySubjectDigest(string $org, string $subjectDigest): void;
 
     /**
-     * @return list<OrgsListAttestationRepositoriesResponseItem>
+     * @return list<OrgsListAttestationRepositories200ContentItem>
      */
     public function orgsListAttestationRepositories(
         string $org,
@@ -180,7 +180,7 @@ interface OrgsClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): OrgsListAttestationsResponse;
+    ): OrgsListAttestations200Content;
 
     /**
      * @return list<SimpleUser>
@@ -203,20 +203,20 @@ interface OrgsClientInterface
      */
     public function orgsListWebhooks(string $org, ?int $perPage = null, ?int $page = null): array;
 
-    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequest $body): OrgHook;
+    public function orgsCreateWebhook(string $org, OrgsCreateWebhookRequestContent $body): OrgHook;
 
     public function orgsGetWebhook(string $org, int $hookId): OrgHook;
 
     public function orgsDeleteWebhook(string $org, int $hookId): void;
 
-    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequest $body): OrgHook;
+    public function orgsUpdateWebhook(string $org, int $hookId, OrgsUpdateWebhookRequestContent $body): OrgHook;
 
     public function orgsGetWebhookConfigForOrg(string $org, int $hookId): WebhookConfig;
 
     public function orgsUpdateWebhookConfigForOrg(
         string $org,
         int $hookId,
-        OrgsUpdateWebhookConfigForOrgRequest $body,
+        OrgsUpdateWebhookConfigForOrgRequestContent $body,
     ): WebhookConfig;
 
     /**
@@ -330,7 +330,7 @@ interface OrgsClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): OrgsListAppInstallationsResponse;
+    ): OrgsListAppInstallations200Content;
 
     /**
      * @return list<OrganizationInvitation>
@@ -343,7 +343,10 @@ interface OrgsClientInterface
         ?OrgsListPendingInvitationsInvitationSource $invitationSource = null,
     ): array;
 
-    public function orgsCreateInvitation(string $org, OrgsCreateInvitationRequest $body): OrganizationInvitation;
+    public function orgsCreateInvitation(
+        string $org,
+        OrgsCreateInvitationRequestContent $body,
+    ): OrganizationInvitation;
 
     public function orgsCancelInvitation(string $org, int $invitationId): void;
 
@@ -403,12 +406,12 @@ interface OrgsClientInterface
     public function orgsSetMembershipForUser(
         string $org,
         string $username,
-        OrgsSetMembershipForUserRequest $body,
+        OrgsSetMembershipForUserRequestContent $body,
     ): OrgMembership;
 
     public function orgsRemoveMembershipForUser(string $org, string $username): void;
 
-    public function orgsListOrgRoles(string $org): OrgsListOrgRolesResponse;
+    public function orgsListOrgRoles(string $org): OrgsListOrgRoles200Content;
 
     public function orgsRevokeAllOrgRolesTeam(string $org, string $teamSlug): void;
 
@@ -450,7 +453,7 @@ interface OrgsClientInterface
     public function orgsConvertMemberToOutsideCollaborator(
         string $org,
         string $username,
-        OrgsConvertMemberToOutsideCollaboratorRequest $body,
+        OrgsConvertMemberToOutsideCollaboratorRequestContent $body,
     ): array;
 
     public function orgsRemoveOutsideCollaborator(string $org, string $username): void;
@@ -474,12 +477,15 @@ interface OrgsClientInterface
         ?array $tokenId = null,
     ): array;
 
-    public function orgsReviewPatGrantRequestsInBulk(string $org, OrgsReviewPatGrantRequestsInBulkRequest $body): void;
+    public function orgsReviewPatGrantRequestsInBulk(
+        string $org,
+        OrgsReviewPatGrantRequestsInBulkRequestContent $body,
+    ): void;
 
     public function orgsReviewPatGrantRequest(
         string $org,
         int $patRequestId,
-        OrgsReviewPatGrantRequestRequest $body,
+        OrgsReviewPatGrantRequestRequestContent $body,
     ): void;
 
     /**
@@ -511,9 +517,9 @@ interface OrgsClientInterface
         ?array $tokenId = null,
     ): array;
 
-    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequest $body): void;
+    public function orgsUpdatePatAccesses(string $org, OrgsUpdatePatAccessesRequestContent $body): void;
 
-    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequest $body): void;
+    public function orgsUpdatePatAccess(string $org, int $patId, OrgsUpdatePatAccessRequestContent $body): void;
 
     /**
      * @return list<MinimalRepository>
@@ -535,7 +541,7 @@ interface OrgsClientInterface
      */
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitions(
         string $org,
-        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequest $body,
+        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequestContent $body,
     ): array;
 
     public function orgsCustomPropertiesForReposGetOrganizationDefinition(
@@ -566,7 +572,7 @@ interface OrgsClientInterface
 
     public function orgsCustomPropertiesForReposCreateOrUpdateOrganizationValues(
         string $org,
-        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequest $body,
+        OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequestContent $body,
     ): void;
 
     /**
@@ -603,17 +609,20 @@ interface OrgsClientInterface
 
     public function orgsGetImmutableReleasesSettings(string $org): ImmutableReleasesOrganizationSettings;
 
-    public function orgsSetImmutableReleasesSettings(string $org, OrgsSetImmutableReleasesSettingsRequest $body): void;
+    public function orgsSetImmutableReleasesSettings(
+        string $org,
+        OrgsSetImmutableReleasesSettingsRequestContent $body,
+    ): void;
 
     public function orgsGetImmutableReleasesSettingsRepositories(
         string $org,
         ?int $page = null,
         ?int $perPage = null,
-    ): OrgsGetImmutableReleasesSettingsRepositoriesResponse;
+    ): OrgsGetImmutableReleasesSettingsRepositories200Content;
 
     public function orgsSetImmutableReleasesSettingsRepositories(
         string $org,
-        OrgsSetImmutableReleasesSettingsRepositoriesRequest $body,
+        OrgsSetImmutableReleasesSettingsRepositoriesRequestContent $body,
     ): void;
 
     public function orgsEnableSelectedRepositoryImmutableReleasesOrganization(string $org, int $repositoryId): void;
@@ -624,7 +633,7 @@ interface OrgsClientInterface
         string $org,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct $securityProduct,
         OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement $enablement,
-        OrgsEnableOrDisableSecurityProductOnAllOrgReposRequest $body,
+        OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestContent $body,
     ): void;
 
     /**
@@ -640,7 +649,7 @@ interface OrgsClientInterface
 
     public function orgsUpdateMembershipForAuthenticatedUser(
         string $org,
-        OrgsUpdateMembershipForAuthenticatedUserRequest $body,
+        OrgsUpdateMembershipForAuthenticatedUserRequestContent $body,
     ): OrgMembership;
 
     /**

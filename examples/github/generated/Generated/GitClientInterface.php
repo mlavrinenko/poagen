@@ -13,15 +13,15 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\Blob;
 use Acme\GitHub\Generated\Model\GitCommit;
-use Acme\GitHub\Generated\Model\GitCreateBlobRequest;
-use Acme\GitHub\Generated\Model\GitCreateCommitRequest;
-use Acme\GitHub\Generated\Model\GitCreateRefRequest;
-use Acme\GitHub\Generated\Model\GitCreateTagRequest;
-use Acme\GitHub\Generated\Model\GitCreateTreeRequest;
+use Acme\GitHub\Generated\Model\GitCreateBlobRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateCommitRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateRefRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateTagRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateTreeRequestContent;
 use Acme\GitHub\Generated\Model\GitRef;
 use Acme\GitHub\Generated\Model\GitTag;
 use Acme\GitHub\Generated\Model\GitTree;
-use Acme\GitHub\Generated\Model\GitUpdateRefRequest;
+use Acme\GitHub\Generated\Model\GitUpdateRefRequestContent;
 use Acme\GitHub\Generated\Model\ShortBlob;
 
 /**
@@ -33,11 +33,11 @@ use Acme\GitHub\Generated\Model\ShortBlob;
  */
 interface GitClientInterface
 {
-    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequest $body): ShortBlob;
+    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequestContent $body): ShortBlob;
 
     public function gitGetBlob(string $owner, string $repo, string $fileSha): Blob;
 
-    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequest $body): GitCommit;
+    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): GitCommit;
 
     public function gitGetCommit(string $owner, string $repo, string $commitSha): GitCommit;
 
@@ -48,17 +48,17 @@ interface GitClientInterface
 
     public function gitGetRef(string $owner, string $repo, string $ref): GitRef;
 
-    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequest $body): GitRef;
+    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): GitRef;
 
     public function gitDeleteRef(string $owner, string $repo, string $ref): void;
 
-    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequest $body): GitRef;
+    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): GitRef;
 
-    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequest $body): GitTag;
+    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): GitTag;
 
     public function gitGetTag(string $owner, string $repo, string $tagSha): GitTag;
 
-    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequest $body): GitTree;
+    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): GitTree;
 
     public function gitGetTree(string $owner, string $repo, string $treeSha, ?string $recursive = null): GitTree;
 }

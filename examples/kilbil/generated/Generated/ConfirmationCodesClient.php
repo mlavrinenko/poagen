@@ -11,10 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequest;
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneResponse;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequest;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeResponse;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -27,19 +27,19 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
     ) {
     }
 
-    public function askConfirmPhone(AskConfirmPhoneRequest $body): AskConfirmPhoneResponse
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/askconfirmphone')->query('h', $this->h)->json($body),
-            ResponseType::object(AskConfirmPhoneResponse::class),
+            ResponseType::object(AskConfirmPhone200Content::class),
         );
     }
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequest $body): CheckConfirmPhoneCodeResponse
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/checkconfirmphonecode')->query('h', $this->h)->json($body),
-            ResponseType::object(CheckConfirmPhoneCodeResponse::class),
+            ResponseType::object(CheckConfirmPhoneCode200Content::class),
         );
     }
 }

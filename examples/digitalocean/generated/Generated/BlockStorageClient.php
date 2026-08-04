@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\RegionSlug;
-use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequest;
+use Acme\DigitalOcean\Generated\Model\VolumeSnapshotsCreateRequestContent;
 use Acme\DigitalOcean\Generated\Model\VolumesExt4;
 use Acme\DigitalOcean\Generated\Model\VolumesXfs;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
@@ -144,7 +144,7 @@ final readonly class BlockStorageClient implements BlockStorageClientInterface
     /**
      * Requires `bearer_auth` scopes: `block_storage_snapshot:create`.
      */
-    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequest $body): void
+    public function volumeSnapshotsCreate(string $volumeId, VolumeSnapshotsCreateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/volumes/{volume_id}/snapshots')

@@ -13,9 +13,9 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\SecurityGetLatestScanSeverity;
 use Acme\DigitalOcean\Generated\Enum\SecurityGetScanSeverity;
-use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequest;
-use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequest;
-use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequest;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateScanRuleRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityCreateSuppressionRequestContent;
+use Acme\DigitalOcean\Generated\Model\SecurityUpdateSettingsPlanRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -77,7 +77,7 @@ final readonly class SecurityClient implements SecurityClientInterface
     /**
      * Requires `bearer_auth` scopes: `security:create`.
      */
-    public function securityCreateScanRule(SecurityCreateScanRuleRequest $body): void
+    public function securityCreateScanRule(SecurityCreateScanRuleRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/security/scans/rules')
@@ -146,7 +146,7 @@ final readonly class SecurityClient implements SecurityClientInterface
     /**
      * Requires `bearer_auth` scopes: `security:update`.
      */
-    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequest $body): void
+    public function securityUpdateSettingsPlan(SecurityUpdateSettingsPlanRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/security/settings/plan')
@@ -159,7 +159,7 @@ final readonly class SecurityClient implements SecurityClientInterface
     /**
      * Requires `bearer_auth` scopes: `security:create`.
      */
-    public function securityCreateSuppression(SecurityCreateSuppressionRequest $body): void
+    public function securityCreateSuppression(SecurityCreateSuppressionRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/security/settings/suppressions')

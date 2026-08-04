@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\Project;
-use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequest;
-use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequestContent;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -44,7 +44,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:create`.
      */
-    public function projectsCreate(ProjectsCreateRequest $body): void
+    public function projectsCreate(ProjectsCreateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/projects')
@@ -69,7 +69,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:update`.
      */
-    public function projectsUpdateDefault(ProjectsUpdateDefaultRequest $body): void
+    public function projectsUpdateDefault(ProjectsUpdateDefaultRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/projects/default')
@@ -108,7 +108,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:update`.
      */
-    public function projectsUpdate(string $projectId, ProjectsUpdateRequest $body): void
+    public function projectsUpdate(string $projectId, ProjectsUpdateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::put('/v2/projects/{project_id}')

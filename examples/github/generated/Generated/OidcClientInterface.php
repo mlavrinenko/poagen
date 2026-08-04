@@ -15,7 +15,7 @@ use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusion;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusionInput;
 use Acme\GitHub\Generated\Model\OidcCustomSub;
-use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequest;
+use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequestContent;
 
 /**
  * The contract for the `oidc` endpoints.
@@ -57,6 +57,6 @@ interface OidcClientInterface
 
     public function oidcUpdateOidcCustomSubTemplateForOrg(
         string $org,
-        OidcUpdateOidcCustomSubTemplateForOrgRequest $body,
+        OidcUpdateOidcCustomSubTemplateForOrgRequestContent $body,
     ): EmptyObject;
 }

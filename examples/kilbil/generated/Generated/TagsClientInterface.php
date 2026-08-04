@@ -11,14 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\AddClientTagsRequest;
-use Acme\Kilbil\Generated\Model\AddClientTagsResponse;
-use Acme\Kilbil\Generated\Model\DeleteClientTagsRequest;
-use Acme\Kilbil\Generated\Model\DeleteClientTagsResponse;
-use Acme\Kilbil\Generated\Model\GetClientTagsRequest;
-use Acme\Kilbil\Generated\Model\GetClientTagsResponse;
-use Acme\Kilbil\Generated\Model\GetListTagsRequest;
-use Acme\Kilbil\Generated\Model\GetListTagsResponse;
+use Acme\Kilbil\Generated\Model\AddClientTags200Content;
+use Acme\Kilbil\Generated\Model\AddClientTagsRequestContent;
+use Acme\Kilbil\Generated\Model\DeleteClientTags200Content;
+use Acme\Kilbil\Generated\Model\DeleteClientTagsRequestContent;
+use Acme\Kilbil\Generated\Model\GetClientTags200Content;
+use Acme\Kilbil\Generated\Model\GetClientTagsRequestContent;
+use Acme\Kilbil\Generated\Model\GetListTags200Content;
+use Acme\Kilbil\Generated\Model\GetListTagsRequestContent;
 
 /**
  * The contract for the `Теги` endpoints.
@@ -29,11 +29,11 @@ use Acme\Kilbil\Generated\Model\GetListTagsResponse;
  */
 interface TagsClientInterface
 {
-    public function addClientTags(AddClientTagsRequest $body): AddClientTagsResponse;
+    public function addClientTags(AddClientTagsRequestContent $body): AddClientTags200Content;
 
-    public function deleteClientTags(DeleteClientTagsRequest $body): DeleteClientTagsResponse;
+    public function deleteClientTags(DeleteClientTagsRequestContent $body): DeleteClientTags200Content;
 
-    public function getClientTags(GetClientTagsRequest $body): GetClientTagsResponse;
+    public function getClientTags(GetClientTagsRequestContent $body): GetClientTags200Content;
 
-    public function getListTags(GetListTagsRequest $body): GetListTagsResponse;
+    public function getListTags(GetListTagsRequestContent $body): GetListTags200Content;
 }

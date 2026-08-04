@@ -11,10 +11,10 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequest;
-use Acme\Kilbil\Generated\Model\AskConfirmPhoneResponse;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequest;
-use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeResponse;
+use Acme\Kilbil\Generated\Model\AskConfirmPhone200Content;
+use Acme\Kilbil\Generated\Model\AskConfirmPhoneRequestContent;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCode200Content;
+use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeRequestContent;
 
 /**
  * The contract for the `Код подтверждения` endpoints.
@@ -25,7 +25,7 @@ use Acme\Kilbil\Generated\Model\CheckConfirmPhoneCodeResponse;
  */
 interface ConfirmationCodesClientInterface
 {
-    public function askConfirmPhone(AskConfirmPhoneRequest $body): AskConfirmPhoneResponse;
+    public function askConfirmPhone(AskConfirmPhoneRequestContent $body): AskConfirmPhone200Content;
 
-    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequest $body): CheckConfirmPhoneCodeResponse;
+    public function checkConfirmPhoneCode(CheckConfirmPhoneCodeRequestContent $body): CheckConfirmPhoneCode200Content;
 }

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\CredentialsRevokeRequest;
+use Acme\GitHub\Generated\Model\CredentialsRevokeRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -23,7 +23,7 @@ final readonly class CredentialsClient implements CredentialsClientInterface
     ) {
     }
 
-    public function credentialsRevoke(CredentialsRevokeRequest $body): void
+    public function credentialsRevoke(CredentialsRevokeRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/credentials/revoke')->json($body),

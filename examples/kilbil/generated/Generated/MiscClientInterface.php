@@ -11,13 +11,13 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\CloseSessionRequest;
-use Acme\Kilbil\Generated\Model\CloseSessionResponse;
-use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequest;
-use Acme\Kilbil\Generated\Model\ExchangePosSettingsResponse;
-use Acme\Kilbil\Generated\Model\GenerateCardRequest;
-use Acme\Kilbil\Generated\Model\GenerateCardResponse;
-use Acme\Kilbil\Generated\Model\LegalInfoResponse;
+use Acme\Kilbil\Generated\Model\CloseSession200Content;
+use Acme\Kilbil\Generated\Model\CloseSessionRequestContent;
+use Acme\Kilbil\Generated\Model\ExchangePosSettings200Content;
+use Acme\Kilbil\Generated\Model\ExchangePosSettingsRequestContent;
+use Acme\Kilbil\Generated\Model\GenerateCard200Content;
+use Acme\Kilbil\Generated\Model\GenerateCardRequestContent;
+use Acme\Kilbil\Generated\Model\LegalInfo200Content;
 
 /**
  * The contract for the `Другое` endpoints.
@@ -28,11 +28,11 @@ use Acme\Kilbil\Generated\Model\LegalInfoResponse;
  */
 interface MiscClientInterface
 {
-    public function closeSession(CloseSessionRequest $body): CloseSessionResponse;
+    public function closeSession(CloseSessionRequestContent $body): CloseSession200Content;
 
-    public function exchangePosSettings(ExchangePosSettingsRequest $body): ExchangePosSettingsResponse;
+    public function exchangePosSettings(ExchangePosSettingsRequestContent $body): ExchangePosSettings200Content;
 
-    public function generateCard(GenerateCardRequest $body): GenerateCardResponse;
+    public function generateCard(GenerateCardRequestContent $body): GenerateCard200Content;
 
-    public function legalInfo(): LegalInfoResponse;
+    public function legalInfo(): LegalInfo200Content;
 }

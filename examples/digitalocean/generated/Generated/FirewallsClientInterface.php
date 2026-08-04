@@ -13,14 +13,14 @@ namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsAddRulesOutboundRules;
-use Acme\DigitalOcean\Generated\Model\FirewallsAddTagsRequest;
-use Acme\DigitalOcean\Generated\Model\FirewallsAssignDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsAddTagsRequestContent;
+use Acme\DigitalOcean\Generated\Model\FirewallsAssignDropletsRequestContent;
 use Acme\DigitalOcean\Generated\Model\FirewallsCreateInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsCreateOutboundRules;
-use Acme\DigitalOcean\Generated\Model\FirewallsDeleteDropletsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteDropletsRequestContent;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsDeleteRulesOutboundRules;
-use Acme\DigitalOcean\Generated\Model\FirewallsDeleteTagsRequest;
+use Acme\DigitalOcean\Generated\Model\FirewallsDeleteTagsRequestContent;
 use Acme\DigitalOcean\Generated\Model\FirewallsUpdateInboundRules;
 use Acme\DigitalOcean\Generated\Model\FirewallsUpdateOutboundRules;
 
@@ -64,12 +64,12 @@ interface FirewallsClientInterface
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
      */
-    public function firewallsAssignDroplets(string $firewallId, FirewallsAssignDropletsRequest $body): void;
+    public function firewallsAssignDroplets(string $firewallId, FirewallsAssignDropletsRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
      */
-    public function firewallsDeleteDroplets(string $firewallId, FirewallsDeleteDropletsRequest $body): void;
+    public function firewallsDeleteDroplets(string $firewallId, FirewallsDeleteDropletsRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
@@ -90,10 +90,10 @@ interface FirewallsClientInterface
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
      */
-    public function firewallsAddTags(string $firewallId, FirewallsAddTagsRequest $body): void;
+    public function firewallsAddTags(string $firewallId, FirewallsAddTagsRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `firewall:update`.
      */
-    public function firewallsDeleteTags(string $firewallId, FirewallsDeleteTagsRequest $body): void;
+    public function firewallsDeleteTags(string $firewallId, FirewallsDeleteTagsRequestContent $body): void;
 }

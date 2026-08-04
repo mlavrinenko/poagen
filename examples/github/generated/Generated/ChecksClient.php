@@ -19,13 +19,13 @@ use Acme\GitHub\Generated\Model\CheckAnnotation;
 use Acme\GitHub\Generated\Model\CheckRun;
 use Acme\GitHub\Generated\Model\CheckSuite;
 use Acme\GitHub\Generated\Model\CheckSuitePreference;
-use Acme\GitHub\Generated\Model\ChecksCreateRequest;
-use Acme\GitHub\Generated\Model\ChecksCreateSuiteRequest;
-use Acme\GitHub\Generated\Model\ChecksListForRefResponse;
-use Acme\GitHub\Generated\Model\ChecksListForSuiteResponse;
-use Acme\GitHub\Generated\Model\ChecksListSuitesForRefResponse;
-use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequest;
-use Acme\GitHub\Generated\Model\ChecksUpdateRequest;
+use Acme\GitHub\Generated\Model\ChecksCreateRequestContent;
+use Acme\GitHub\Generated\Model\ChecksCreateSuiteRequestContent;
+use Acme\GitHub\Generated\Model\ChecksListForRef200Content;
+use Acme\GitHub\Generated\Model\ChecksListForSuite200Content;
+use Acme\GitHub\Generated\Model\ChecksListSuitesForRef200Content;
+use Acme\GitHub\Generated\Model\ChecksSetSuitesPreferencesRequestContent;
+use Acme\GitHub\Generated\Model\ChecksUpdateRequestContent;
 use Acme\GitHub\Generated\Model\EmptyObject;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -38,7 +38,7 @@ final readonly class ChecksClient implements ChecksClientInterface
     ) {
     }
 
-    public function checksCreate(string $owner, string $repo, ChecksCreateRequest $body): CheckRun
+    public function checksCreate(string $owner, string $repo, ChecksCreateRequestContent $body): CheckRun
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-runs')
@@ -60,8 +60,12 @@ final readonly class ChecksClient implements ChecksClientInterface
         );
     }
 
-    public function checksUpdate(string $owner, string $repo, int $checkRunId, ChecksUpdateRequest $body): CheckRun
-    {
+    public function checksUpdate(
+        string $owner,
+        string $repo,
+        int $checkRunId,
+        ChecksUpdateRequestContent $body,
+    ): CheckRun {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/check-runs/{check_run_id}')
                 ->path('owner', $owner)
@@ -104,7 +108,7 @@ final readonly class ChecksClient implements ChecksClientInterface
         );
     }
 
-    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequest $body): CheckSuite
+    public function checksCreateSuite(string $owner, string $repo, ChecksCreateSuiteRequestContent $body): CheckSuite
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/check-suites')
@@ -118,7 +122,7 @@ final readonly class ChecksClient implements ChecksClientInterface
     public function checksSetSuitesPreferences(
         string $owner,
         string $repo,
-        ChecksSetSuitesPreferencesRequest $body,
+        ChecksSetSuitesPreferencesRequestContent $body,
     ): CheckSuitePreference {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/check-suites/preferences')
@@ -149,7 +153,7 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?ChecksListForSuiteFilter $filter = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListForSuiteResponse {
+    ): ChecksListForSuite200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs')
                 ->path('owner', $owner)
@@ -160,7 +164,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ChecksListForSuiteResponse::class),
+            ResponseType::object(ChecksListForSuite200Content::class),
         );
     }
 
@@ -185,7 +189,7 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?int $perPage = null,
         ?int $page = null,
         ?int $appId = null,
-    ): ChecksListForRefResponse {
+    ): ChecksListForRef200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/check-runs')
                 ->path('owner', $owner)
@@ -197,7 +201,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('app_id', $appId),
-            ResponseType::object(ChecksListForRefResponse::class),
+            ResponseType::object(ChecksListForRef200Content::class),
         );
     }
 
@@ -209,7 +213,7 @@ final readonly class ChecksClient implements ChecksClientInterface
         ?string $checkName = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): ChecksListSuitesForRefResponse {
+    ): ChecksListSuitesForRef200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/commits/{ref}/check-suites')
                 ->path('owner', $owner)
@@ -219,7 +223,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('check_name', $checkName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ChecksListSuitesForRefResponse::class),
+            ResponseType::object(ChecksListSuitesForRef200Content::class),
         );
     }
 }

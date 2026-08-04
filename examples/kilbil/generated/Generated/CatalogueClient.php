@@ -11,14 +11,14 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GoodsListRequestItem;
-use Acme\Kilbil\Generated\Model\GoodsListResponse;
-use Acme\Kilbil\Generated\Model\GoodsListXmlRequestItem;
-use Acme\Kilbil\Generated\Model\GoodsListXmlResponse;
-use Acme\Kilbil\Generated\Model\GoodsRequestItem;
-use Acme\Kilbil\Generated\Model\GoodsResponse;
-use Acme\Kilbil\Generated\Model\GoodsXmlRequestItem;
-use Acme\Kilbil\Generated\Model\GoodsXmlResponse;
+use Acme\Kilbil\Generated\Model\Goods200Content;
+use Acme\Kilbil\Generated\Model\GoodsList200Content;
+use Acme\Kilbil\Generated\Model\GoodsListRequestContentItem;
+use Acme\Kilbil\Generated\Model\GoodsListXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsListXmlRequestContentItem;
+use Acme\Kilbil\Generated\Model\GoodsRequestContentItem;
+use Acme\Kilbil\Generated\Model\GoodsXml200Content;
+use Acme\Kilbil\Generated\Model\GoodsXmlRequestContentItem;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -32,9 +32,9 @@ final readonly class CatalogueClient implements CatalogueClientInterface
     }
 
     /**
-     * @param list<GoodsRequestItem> $body
+     * @param list<GoodsRequestContentItem> $body
      */
-    public function goods(array $body, ?int $partial = null, ?int $id = null): GoodsResponse
+    public function goods(array $body, ?int $partial = null, ?int $id = null): Goods200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/goods')
@@ -42,42 +42,42 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::object(GoodsResponse::class),
+            ResponseType::object(Goods200Content::class),
         );
     }
 
     /**
-     * @param list<GoodsListRequestItem> $body
+     * @param list<GoodsListRequestContentItem> $body
      */
-    public function goodsList(array $body, ?int $id = null): GoodsListResponse
+    public function goodsList(array $body, ?int $id = null): GoodsList200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/goodslist')
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::object(GoodsListResponse::class),
+            ResponseType::object(GoodsList200Content::class),
         );
     }
 
     /**
-     * @param list<GoodsListXmlRequestItem> $body
+     * @param list<GoodsListXmlRequestContentItem> $body
      */
-    public function goodsListXml(array $body, ?int $id = null): GoodsListXmlResponse
+    public function goodsListXml(array $body, ?int $id = null): GoodsListXml200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/goodslistxml')
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goodslist', 'goodlist'),
-            ResponseType::object(GoodsListXmlResponse::class),
+            ResponseType::object(GoodsListXml200Content::class),
         );
     }
 
     /**
-     * @param list<GoodsXmlRequestItem> $body
+     * @param list<GoodsXmlRequestContentItem> $body
      */
-    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXmlResponse
+    public function goodsXml(array $body, ?int $partial = null, ?int $id = null): GoodsXml200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/goodsxml')
@@ -85,7 +85,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goods', 'good'),
-            ResponseType::object(GoodsXmlResponse::class),
+            ResponseType::object(GoodsXml200Content::class),
         );
     }
 }

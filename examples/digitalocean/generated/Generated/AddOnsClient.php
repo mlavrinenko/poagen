@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\AddonsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequest;
-use Acme\DigitalOcean\Generated\Model\AddonsPatchRequest;
+use Acme\DigitalOcean\Generated\Model\AddonsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -60,7 +60,7 @@ final readonly class AddOnsClient implements AddOnsClientInterface
     /**
      * Requires `bearer_auth` scopes: `addon:create`.
      */
-    public function addonsCreate(AddonsCreateRequest $body): void
+    public function addonsCreate(AddonsCreateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/add-ons/saas')
@@ -99,7 +99,7 @@ final readonly class AddOnsClient implements AddOnsClientInterface
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
      */
-    public function addonsPatch(string $resourceUuid, AddonsPatchRequest $body): void
+    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::patch('/v2/add-ons/saas/{resource_uuid}')
@@ -113,7 +113,7 @@ final readonly class AddOnsClient implements AddOnsClientInterface
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
      */
-    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequest $body): void
+    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::patch('/v2/add-ons/saas/{resource_uuid}/plan')

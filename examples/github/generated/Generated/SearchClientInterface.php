@@ -24,13 +24,13 @@ use Acme\GitHub\Generated\Enum\SearchReposOrder;
 use Acme\GitHub\Generated\Enum\SearchReposSort;
 use Acme\GitHub\Generated\Enum\SearchUsersOrder;
 use Acme\GitHub\Generated\Enum\SearchUsersSort;
-use Acme\GitHub\Generated\Model\SearchCodeResponse;
-use Acme\GitHub\Generated\Model\SearchCommitsResponse;
-use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequestsResponse;
-use Acme\GitHub\Generated\Model\SearchLabelsResponse;
-use Acme\GitHub\Generated\Model\SearchReposResponse;
-use Acme\GitHub\Generated\Model\SearchTopicsResponse;
-use Acme\GitHub\Generated\Model\SearchUsersResponse;
+use Acme\GitHub\Generated\Model\SearchCode200Content;
+use Acme\GitHub\Generated\Model\SearchCommits200Content;
+use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests200Content;
+use Acme\GitHub\Generated\Model\SearchLabels200Content;
+use Acme\GitHub\Generated\Model\SearchRepos200Content;
+use Acme\GitHub\Generated\Model\SearchTopics200Content;
+use Acme\GitHub\Generated\Model\SearchUsers200Content;
 
 /**
  * The contract for the `search` endpoints.
@@ -47,7 +47,7 @@ interface SearchClientInterface
         ?SearchCodeOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCodeResponse;
+    ): SearchCode200Content;
 
     public function searchCommits(
         string $q,
@@ -55,7 +55,7 @@ interface SearchClientInterface
         ?SearchCommitsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCommitsResponse;
+    ): SearchCommits200Content;
 
     public function searchIssuesAndPullRequests(
         string $q,
@@ -65,7 +65,7 @@ interface SearchClientInterface
         ?int $page = null,
         ?string $advancedSearch = null,
         ?SearchIssuesAndPullRequestsSearchType $searchType = null,
-    ): SearchIssuesAndPullRequestsResponse;
+    ): SearchIssuesAndPullRequests200Content;
 
     public function searchLabels(
         int $repositoryId,
@@ -74,7 +74,7 @@ interface SearchClientInterface
         ?SearchLabelsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchLabelsResponse;
+    ): SearchLabels200Content;
 
     public function searchRepos(
         string $q,
@@ -82,9 +82,9 @@ interface SearchClientInterface
         ?SearchReposOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchReposResponse;
+    ): SearchRepos200Content;
 
-    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopicsResponse;
+    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopics200Content;
 
     public function searchUsers(
         string $q,
@@ -92,5 +92,5 @@ interface SearchClientInterface
         ?SearchUsersOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchUsersResponse;
+    ): SearchUsers200Content;
 }

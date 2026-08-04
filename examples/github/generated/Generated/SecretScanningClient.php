@@ -20,14 +20,14 @@ use Acme\GitHub\Generated\Enum\SecretScanningListAlertsForRepoState;
 use Acme\GitHub\Generated\Model\AlertNumber;
 use Acme\GitHub\Generated\Model\OrganizationSecretScanningAlert;
 use Acme\GitHub\Generated\Model\SecretScanningAlert;
-use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequest;
+use Acme\GitHub\Generated\Model\SecretScanningCreatePushProtectionBypassRequestContent;
 use Acme\GitHub\Generated\Model\SecretScanningLocation;
 use Acme\GitHub\Generated\Model\SecretScanningPatternConfiguration;
 use Acme\GitHub\Generated\Model\SecretScanningPushProtectionBypass;
 use Acme\GitHub\Generated\Model\SecretScanningScanHistory;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequest;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequest;
-use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsResponse;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateAlertRequestContent;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigs200Content;
+use Acme\GitHub\Generated\Model\SecretScanningUpdateOrgPatternConfigsRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -97,13 +97,13 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
 
     public function secretScanningUpdateOrgPatternConfigs(
         string $org,
-        SecretScanningUpdateOrgPatternConfigsRequest $body,
-    ): SecretScanningUpdateOrgPatternConfigsResponse {
+        SecretScanningUpdateOrgPatternConfigsRequestContent $body,
+    ): SecretScanningUpdateOrgPatternConfigs200Content {
         return $this->transport->send(
             Endpoint::patch('/orgs/{org}/secret-scanning/pattern-configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(SecretScanningUpdateOrgPatternConfigsResponse::class),
+            ResponseType::object(SecretScanningUpdateOrgPatternConfigs200Content::class),
         );
     }
 
@@ -176,7 +176,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
         string $owner,
         string $repo,
         AlertNumber $alertNumber,
-        SecretScanningUpdateAlertRequest $body,
+        SecretScanningUpdateAlertRequestContent $body,
     ): SecretScanningAlert {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}')
@@ -212,7 +212,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
     public function secretScanningCreatePushProtectionBypass(
         string $owner,
         string $repo,
-        SecretScanningCreatePushProtectionBypassRequest $body,
+        SecretScanningCreatePushProtectionBypassRequestContent $body,
     ): SecretScanningPushProtectionBypass {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/secret-scanning/push-protection-bypasses')

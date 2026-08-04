@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Tests\Integration\Kilbil;
 
 use Acme\Kilbil\Generated\ApiException;
-use Acme\Kilbil\Generated\Enum\SearchClientRequestSearchMode;
-use Acme\Kilbil\Generated\Model\SearchClientRequest;
+use Acme\Kilbil\Generated\Enum\SearchClientRequestContentSearchMode;
+use Acme\Kilbil\Generated\Model\SearchClientRequestContent;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
 
@@ -30,8 +30,8 @@ final class KilbilRequestAndErrorTest extends TestCase
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, KilbilFixture::raw('searchclient-found')));
         $client = KilbilHttpHarness::client($http, 'super-secret-h-value');
 
-        $client->customers()->searchClient(new SearchClientRequest(
-            search_mode: SearchClientRequestSearchMode::_1,
+        $client->customers()->searchClient(new SearchClientRequestContent(
+            search_mode: SearchClientRequestContentSearchMode::_1,
             search_value: '79129999999',
         ));
 
@@ -53,8 +53,8 @@ final class KilbilRequestAndErrorTest extends TestCase
         $client = KilbilHttpHarness::client($http, 'super-secret-h-value');
 
         try {
-            $client->customers()->searchClient(new SearchClientRequest(
-                search_mode: SearchClientRequestSearchMode::_1,
+            $client->customers()->searchClient(new SearchClientRequestContent(
+                search_mode: SearchClientRequestContentSearchMode::_1,
                 search_value: '79129999999',
             ));
             self::fail('expected an ApiException on a 403 response');

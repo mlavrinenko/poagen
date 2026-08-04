@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GetActionsListRequest;
-use Acme\Kilbil\Generated\Model\GetActionsListResponse;
-use Acme\Kilbil\Generated\Model\GetProgramsResponse;
+use Acme\Kilbil\Generated\Model\GetActionsList200Content;
+use Acme\Kilbil\Generated\Model\GetActionsListRequestContent;
+use Acme\Kilbil\Generated\Model\GetPrograms200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -26,22 +26,22 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
     ) {
     }
 
-    public function getActionsList(GetActionsListRequest $body): GetActionsListResponse
+    public function getActionsList(GetActionsListRequestContent $body): GetActionsList200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getactionslist')->query('h', $this->h)->json($body),
-            ResponseType::object(GetActionsListResponse::class),
+            ResponseType::object(GetActionsList200Content::class),
         );
     }
 
     /**
      * @param array<string, mixed> $body
      */
-    public function getPrograms(array $body): GetProgramsResponse
+    public function getPrograms(array $body): GetPrograms200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/getprograms')->query('h', $this->h)->jsonRaw($body),
-            ResponseType::object(GetProgramsResponse::class),
+            ResponseType::object(GetPrograms200Content::class),
         );
     }
 }

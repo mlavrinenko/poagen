@@ -26,20 +26,20 @@ use Acme\GitHub\Generated\Model\PullRequestReview;
 use Acme\GitHub\Generated\Model\PullRequestReviewComment;
 use Acme\GitHub\Generated\Model\PullRequestReviewRequest;
 use Acme\GitHub\Generated\Model\PullRequestSimple;
-use Acme\GitHub\Generated\Model\PullsCreateReplyForReviewCommentRequest;
-use Acme\GitHub\Generated\Model\PullsCreateRequest;
-use Acme\GitHub\Generated\Model\PullsCreateReviewCommentRequest;
-use Acme\GitHub\Generated\Model\PullsCreateReviewRequest;
-use Acme\GitHub\Generated\Model\PullsDismissReviewRequest;
-use Acme\GitHub\Generated\Model\PullsMergeRequest;
-use Acme\GitHub\Generated\Model\PullsRemoveRequestedReviewersRequest;
-use Acme\GitHub\Generated\Model\PullsRequestReviewersRequest;
-use Acme\GitHub\Generated\Model\PullsSubmitReviewRequest;
-use Acme\GitHub\Generated\Model\PullsUpdateBranchRequest;
-use Acme\GitHub\Generated\Model\PullsUpdateBranchResponse;
-use Acme\GitHub\Generated\Model\PullsUpdateRequest;
-use Acme\GitHub\Generated\Model\PullsUpdateReviewCommentRequest;
-use Acme\GitHub\Generated\Model\PullsUpdateReviewRequest;
+use Acme\GitHub\Generated\Model\PullsCreateReplyForReviewCommentRequestContent;
+use Acme\GitHub\Generated\Model\PullsCreateRequestContent;
+use Acme\GitHub\Generated\Model\PullsCreateReviewCommentRequestContent;
+use Acme\GitHub\Generated\Model\PullsCreateReviewRequestContent;
+use Acme\GitHub\Generated\Model\PullsDismissReviewRequestContent;
+use Acme\GitHub\Generated\Model\PullsMergeRequestContent;
+use Acme\GitHub\Generated\Model\PullsRemoveRequestedReviewersRequestContent;
+use Acme\GitHub\Generated\Model\PullsRequestReviewersRequestContent;
+use Acme\GitHub\Generated\Model\PullsSubmitReviewRequestContent;
+use Acme\GitHub\Generated\Model\PullsUpdateBranch202Content;
+use Acme\GitHub\Generated\Model\PullsUpdateBranchRequestContent;
+use Acme\GitHub\Generated\Model\PullsUpdateRequestContent;
+use Acme\GitHub\Generated\Model\PullsUpdateReviewCommentRequestContent;
+use Acme\GitHub\Generated\Model\PullsUpdateReviewRequestContent;
 use Acme\GitHub\Generated\Model\ReviewComment;
 
 /**
@@ -66,7 +66,7 @@ interface PullsClientInterface
         ?int $page = null,
     ): array;
 
-    public function pullsCreate(string $owner, string $repo, PullsCreateRequest $body): PullRequest;
+    public function pullsCreate(string $owner, string $repo, PullsCreateRequestContent $body): PullRequest;
 
     /**
      * @return list<PullRequestReviewComment>
@@ -89,12 +89,17 @@ interface PullsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        PullsUpdateReviewCommentRequest $body,
+        PullsUpdateReviewCommentRequestContent $body,
     ): PullRequestReviewComment;
 
     public function pullsGet(string $owner, string $repo, int $pullNumber): PullRequest;
 
-    public function pullsUpdate(string $owner, string $repo, int $pullNumber, PullsUpdateRequest $body): PullRequest;
+    public function pullsUpdate(
+        string $owner,
+        string $repo,
+        int $pullNumber,
+        PullsUpdateRequestContent $body,
+    ): PullRequest;
 
     /**
      * @return list<PullRequestReviewComment>
@@ -114,7 +119,7 @@ interface PullsClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsCreateReviewCommentRequest $body,
+        PullsCreateReviewCommentRequestContent $body,
     ): PullRequestReviewComment;
 
     public function pullsCreateReplyForReviewComment(
@@ -122,7 +127,7 @@ interface PullsClientInterface
         string $repo,
         int $pullNumber,
         int $commentId,
-        PullsCreateReplyForReviewCommentRequest $body,
+        PullsCreateReplyForReviewCommentRequestContent $body,
     ): PullRequestReviewComment;
 
     /**
@@ -153,7 +158,7 @@ interface PullsClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsMergeRequest $body,
+        PullsMergeRequestContent $body,
     ): PullRequestMergeResult;
 
     public function pullsListRequestedReviewers(
@@ -166,14 +171,14 @@ interface PullsClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsRequestReviewersRequest $body,
+        PullsRequestReviewersRequestContent $body,
     ): PullRequestSimple;
 
     public function pullsRemoveRequestedReviewers(
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsRemoveRequestedReviewersRequest $body,
+        PullsRemoveRequestedReviewersRequestContent $body,
     ): PullRequestSimple;
 
     /**
@@ -191,7 +196,7 @@ interface PullsClientInterface
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsCreateReviewRequest $body,
+        PullsCreateReviewRequestContent $body,
     ): PullRequestReview;
 
     public function pullsGetReview(string $owner, string $repo, int $pullNumber, int $reviewId): PullRequestReview;
@@ -201,7 +206,7 @@ interface PullsClientInterface
         string $repo,
         int $pullNumber,
         int $reviewId,
-        PullsUpdateReviewRequest $body,
+        PullsUpdateReviewRequestContent $body,
     ): PullRequestReview;
 
     public function pullsDeletePendingReview(
@@ -228,7 +233,7 @@ interface PullsClientInterface
         string $repo,
         int $pullNumber,
         int $reviewId,
-        PullsDismissReviewRequest $body,
+        PullsDismissReviewRequestContent $body,
     ): PullRequestReview;
 
     public function pullsSubmitReview(
@@ -236,13 +241,13 @@ interface PullsClientInterface
         string $repo,
         int $pullNumber,
         int $reviewId,
-        PullsSubmitReviewRequest $body,
+        PullsSubmitReviewRequestContent $body,
     ): PullRequestReview;
 
     public function pullsUpdateBranch(
         string $owner,
         string $repo,
         int $pullNumber,
-        PullsUpdateBranchRequest $body,
-    ): PullsUpdateBranchResponse;
+        PullsUpdateBranchRequestContent $body,
+    ): PullsUpdateBranch202Content;
 }

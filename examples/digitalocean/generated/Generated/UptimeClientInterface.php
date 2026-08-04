@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequest;
-use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequest;
-use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequest;
+use Acme\DigitalOcean\Generated\Model\UptimeCreateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateAlertRequestContent;
+use Acme\DigitalOcean\Generated\Model\UptimeUpdateCheckRequestContent;
 
 /**
  * The contract for the `Uptime` endpoints.
@@ -37,7 +37,7 @@ interface UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
      */
-    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequest $body): void;
+    public function uptimeUpdateCheck(string $checkId, UptimeUpdateCheckRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`.
@@ -52,7 +52,7 @@ interface UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:create`, `uptime:update`.
      */
-    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequest $body): void;
+    public function uptimeCreateAlert(string $checkId, UptimeCreateAlertRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:read`.
@@ -62,7 +62,7 @@ interface UptimeClientInterface
     /**
      * Requires `bearer_auth` scopes: `uptime:update`.
      */
-    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequest $body): void;
+    public function uptimeUpdateAlert(string $checkId, string $alertId, UptimeUpdateAlertRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `uptime:delete`, `uptime:update`.

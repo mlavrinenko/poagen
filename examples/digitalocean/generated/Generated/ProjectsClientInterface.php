@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\Project;
-use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequest;
-use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\ProjectsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateDefaultRequestContent;
+use Acme\DigitalOcean\Generated\Model\ProjectsUpdateRequestContent;
 
 /**
  * The contract for the `Projects` endpoints.
@@ -33,7 +33,7 @@ interface ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:create`.
      */
-    public function projectsCreate(ProjectsCreateRequest $body): void;
+    public function projectsCreate(ProjectsCreateRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `project:read`.
@@ -43,7 +43,7 @@ interface ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:update`.
      */
-    public function projectsUpdateDefault(ProjectsUpdateDefaultRequest $body): void;
+    public function projectsUpdateDefault(ProjectsUpdateDefaultRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `project:update`.
@@ -58,7 +58,7 @@ interface ProjectsClientInterface
     /**
      * Requires `bearer_auth` scopes: `project:update`.
      */
-    public function projectsUpdate(string $projectId, ProjectsUpdateRequest $body): void;
+    public function projectsUpdate(string $projectId, ProjectsUpdateRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `project:delete`.

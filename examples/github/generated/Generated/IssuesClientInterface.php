@@ -36,23 +36,23 @@ use Acme\GitHub\Generated\Model\IssueComment;
 use Acme\GitHub\Generated\Model\IssueEvent;
 use Acme\GitHub\Generated\Model\IssueEventForIssue;
 use Acme\GitHub\Generated\Model\IssueFieldValue;
-use Acme\GitHub\Generated\Model\IssuesAddAssigneesRequest;
-use Acme\GitHub\Generated\Model\IssuesAddBlockedByDependencyRequest;
-use Acme\GitHub\Generated\Model\IssuesAddIssueFieldValuesRequest;
-use Acme\GitHub\Generated\Model\IssuesAddSubIssueRequest;
-use Acme\GitHub\Generated\Model\IssuesCreateCommentRequest;
-use Acme\GitHub\Generated\Model\IssuesCreateLabelRequest;
-use Acme\GitHub\Generated\Model\IssuesCreateMilestoneRequest;
-use Acme\GitHub\Generated\Model\IssuesCreateRequest;
-use Acme\GitHub\Generated\Model\IssuesLockRequest;
-use Acme\GitHub\Generated\Model\IssuesRemoveAssigneesRequest;
-use Acme\GitHub\Generated\Model\IssuesRemoveSubIssueRequest;
-use Acme\GitHub\Generated\Model\IssuesReprioritizeSubIssueRequest;
-use Acme\GitHub\Generated\Model\IssuesSetIssueFieldValuesRequest;
-use Acme\GitHub\Generated\Model\IssuesUpdateCommentRequest;
-use Acme\GitHub\Generated\Model\IssuesUpdateLabelRequest;
-use Acme\GitHub\Generated\Model\IssuesUpdateMilestoneRequest;
-use Acme\GitHub\Generated\Model\IssuesUpdateRequest;
+use Acme\GitHub\Generated\Model\IssuesAddAssigneesRequestContent;
+use Acme\GitHub\Generated\Model\IssuesAddBlockedByDependencyRequestContent;
+use Acme\GitHub\Generated\Model\IssuesAddIssueFieldValuesRequestContent;
+use Acme\GitHub\Generated\Model\IssuesAddSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesCreateCommentRequestContent;
+use Acme\GitHub\Generated\Model\IssuesCreateLabelRequestContent;
+use Acme\GitHub\Generated\Model\IssuesCreateMilestoneRequestContent;
+use Acme\GitHub\Generated\Model\IssuesCreateRequestContent;
+use Acme\GitHub\Generated\Model\IssuesLockRequestContent;
+use Acme\GitHub\Generated\Model\IssuesRemoveAssigneesRequestContent;
+use Acme\GitHub\Generated\Model\IssuesRemoveSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesReprioritizeSubIssueRequestContent;
+use Acme\GitHub\Generated\Model\IssuesSetIssueFieldValuesRequestContent;
+use Acme\GitHub\Generated\Model\IssuesUpdateCommentRequestContent;
+use Acme\GitHub\Generated\Model\IssuesUpdateLabelRequestContent;
+use Acme\GitHub\Generated\Model\IssuesUpdateMilestoneRequestContent;
+use Acme\GitHub\Generated\Model\IssuesUpdateRequestContent;
 use Acme\GitHub\Generated\Model\Label;
 use Acme\GitHub\Generated\Model\Milestone;
 use Acme\GitHub\Generated\Model\SimpleUser;
@@ -128,7 +128,7 @@ interface IssuesClientInterface
         ?int $page = null,
     ): array;
 
-    public function issuesCreate(string $owner, string $repo, IssuesCreateRequest $body): Issue;
+    public function issuesCreate(string $owner, string $repo, IssuesCreateRequestContent $body): Issue;
 
     /**
      * @return list<IssueComment>
@@ -151,7 +151,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        IssuesUpdateCommentRequest $body,
+        IssuesUpdateCommentRequestContent $body,
     ): IssueComment;
 
     public function issuesPinComment(string $owner, string $repo, int $commentId): IssueComment;
@@ -172,20 +172,25 @@ interface IssuesClientInterface
 
     public function issuesGet(string $owner, string $repo, int $issueNumber): Issue;
 
-    public function issuesUpdate(string $owner, string $repo, int $issueNumber, IssuesUpdateRequest $body): Issue;
+    public function issuesUpdate(
+        string $owner,
+        string $repo,
+        int $issueNumber,
+        IssuesUpdateRequestContent $body,
+    ): Issue;
 
     public function issuesAddAssignees(
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesAddAssigneesRequest $body,
+        IssuesAddAssigneesRequestContent $body,
     ): Issue;
 
     public function issuesRemoveAssignees(
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesRemoveAssigneesRequest $body,
+        IssuesRemoveAssigneesRequestContent $body,
     ): Issue;
 
     public function issuesCheckUserCanBeAssignedToIssue(
@@ -211,7 +216,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesCreateCommentRequest $body,
+        IssuesCreateCommentRequestContent $body,
     ): IssueComment;
 
     /**
@@ -229,7 +234,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesAddBlockedByDependencyRequest $body,
+        IssuesAddBlockedByDependencyRequestContent $body,
     ): Issue;
 
     public function issuesRemoveDependencyBlockedBy(
@@ -290,7 +295,7 @@ interface IssuesClientInterface
      */
     public function issuesRemoveLabel(string $owner, string $repo, int $issueNumber, string $name): array;
 
-    public function issuesLock(string $owner, string $repo, int $issueNumber, IssuesLockRequest $body): void;
+    public function issuesLock(string $owner, string $repo, int $issueNumber, IssuesLockRequestContent $body): void;
 
     public function issuesUnlock(string $owner, string $repo, int $issueNumber): void;
 
@@ -300,7 +305,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesRemoveSubIssueRequest $body,
+        IssuesRemoveSubIssueRequestContent $body,
     ): Issue;
 
     /**
@@ -318,14 +323,14 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesAddSubIssueRequest $body,
+        IssuesAddSubIssueRequestContent $body,
     ): Issue;
 
     public function issuesReprioritizeSubIssue(
         string $owner,
         string $repo,
         int $issueNumber,
-        IssuesReprioritizeSubIssueRequest $body,
+        IssuesReprioritizeSubIssueRequestContent $body,
     ): Issue;
 
     /**
@@ -349,7 +354,7 @@ interface IssuesClientInterface
         ?int $page = null,
     ): array;
 
-    public function issuesCreateLabel(string $owner, string $repo, IssuesCreateLabelRequest $body): Label;
+    public function issuesCreateLabel(string $owner, string $repo, IssuesCreateLabelRequestContent $body): Label;
 
     public function issuesGetLabel(string $owner, string $repo, string $name): Label;
 
@@ -359,7 +364,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         string $name,
-        IssuesUpdateLabelRequest $body,
+        IssuesUpdateLabelRequestContent $body,
     ): Label;
 
     /**
@@ -375,7 +380,11 @@ interface IssuesClientInterface
         ?int $page = null,
     ): array;
 
-    public function issuesCreateMilestone(string $owner, string $repo, IssuesCreateMilestoneRequest $body): Milestone;
+    public function issuesCreateMilestone(
+        string $owner,
+        string $repo,
+        IssuesCreateMilestoneRequestContent $body,
+    ): Milestone;
 
     public function issuesGetMilestone(string $owner, string $repo, int $milestoneNumber): Milestone;
 
@@ -385,7 +394,7 @@ interface IssuesClientInterface
         string $owner,
         string $repo,
         int $milestoneNumber,
-        IssuesUpdateMilestoneRequest $body,
+        IssuesUpdateMilestoneRequestContent $body,
     ): Milestone;
 
     /**
@@ -405,7 +414,7 @@ interface IssuesClientInterface
     public function issuesSetIssueFieldValues(
         int $repositoryId,
         int $issueNumber,
-        IssuesSetIssueFieldValuesRequest $body,
+        IssuesSetIssueFieldValuesRequestContent $body,
     ): array;
 
     /**
@@ -414,7 +423,7 @@ interface IssuesClientInterface
     public function issuesAddIssueFieldValues(
         int $repositoryId,
         int $issueNumber,
-        IssuesAddIssueFieldValuesRequest $body,
+        IssuesAddIssueFieldValuesRequestContent $body,
     ): array;
 
     public function issuesDeleteIssueFieldValue(int $repositoryId, int $issueNumber, int $issueFieldId): void;

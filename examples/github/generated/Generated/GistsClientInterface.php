@@ -15,10 +15,10 @@ use Acme\GitHub\Generated\Model\BaseGist;
 use Acme\GitHub\Generated\Model\GistComment;
 use Acme\GitHub\Generated\Model\GistCommit;
 use Acme\GitHub\Generated\Model\GistSimple;
-use Acme\GitHub\Generated\Model\GistsCreateCommentRequest;
-use Acme\GitHub\Generated\Model\GistsCreateRequest;
-use Acme\GitHub\Generated\Model\GistsUpdateCommentRequest;
-use Acme\GitHub\Generated\Model\GistsUpdateRequest;
+use Acme\GitHub\Generated\Model\GistsCreateCommentRequestContent;
+use Acme\GitHub\Generated\Model\GistsCreateRequestContent;
+use Acme\GitHub\Generated\Model\GistsUpdateCommentRequestContent;
+use Acme\GitHub\Generated\Model\GistsUpdateRequestContent;
 
 /**
  * The contract for the `gists` endpoints.
@@ -34,7 +34,7 @@ interface GistsClientInterface
      */
     public function gistsList(?\DateTimeImmutable $since = null, ?int $perPage = null, ?int $page = null): array;
 
-    public function gistsCreate(GistsCreateRequest $body): GistSimple;
+    public function gistsCreate(GistsCreateRequestContent $body): GistSimple;
 
     /**
      * @return list<BaseGist>
@@ -54,20 +54,24 @@ interface GistsClientInterface
 
     public function gistsDelete(string $gistId): void;
 
-    public function gistsUpdate(string $gistId, GistsUpdateRequest $body): GistSimple;
+    public function gistsUpdate(string $gistId, GistsUpdateRequestContent $body): GistSimple;
 
     /**
      * @return list<GistComment>
      */
     public function gistsListComments(string $gistId, ?int $perPage = null, ?int $page = null): array;
 
-    public function gistsCreateComment(string $gistId, GistsCreateCommentRequest $body): GistComment;
+    public function gistsCreateComment(string $gistId, GistsCreateCommentRequestContent $body): GistComment;
 
     public function gistsGetComment(string $gistId, int $commentId): GistComment;
 
     public function gistsDeleteComment(string $gistId, int $commentId): void;
 
-    public function gistsUpdateComment(string $gistId, int $commentId, GistsUpdateCommentRequest $body): GistComment;
+    public function gistsUpdateComment(
+        string $gistId,
+        int $commentId,
+        GistsUpdateCommentRequestContent $body,
+    ): GistComment;
 
     /**
      * @return list<GistCommit>

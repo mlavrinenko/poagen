@@ -11,16 +11,16 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\ConfirmSaleRequest;
-use Acme\Kilbil\Generated\Model\ConfirmSaleResponse;
-use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequest;
-use Acme\Kilbil\Generated\Model\GetDetailingByMoveResponse;
-use Acme\Kilbil\Generated\Model\GetMovesByClientRequest;
-use Acme\Kilbil\Generated\Model\GetMovesByClientResponse;
-use Acme\Kilbil\Generated\Model\ManualAddRequest;
-use Acme\Kilbil\Generated\Model\ManualAddResponse;
-use Acme\Kilbil\Generated\Model\ProcessSaleRequest;
-use Acme\Kilbil\Generated\Model\ProcessSaleResponse;
+use Acme\Kilbil\Generated\Model\ConfirmSale200Content;
+use Acme\Kilbil\Generated\Model\ConfirmSaleRequestContent;
+use Acme\Kilbil\Generated\Model\GetDetailingByMove200Content;
+use Acme\Kilbil\Generated\Model\GetDetailingByMoveRequestContent;
+use Acme\Kilbil\Generated\Model\GetMovesByClient200Content;
+use Acme\Kilbil\Generated\Model\GetMovesByClientRequestContent;
+use Acme\Kilbil\Generated\Model\ManualAdd200Content;
+use Acme\Kilbil\Generated\Model\ManualAddRequestContent;
+use Acme\Kilbil\Generated\Model\ProcessSale200Content;
+use Acme\Kilbil\Generated\Model\ProcessSaleRequestContent;
 
 /**
  * The contract for the `Операции` endpoints.
@@ -31,13 +31,13 @@ use Acme\Kilbil\Generated\Model\ProcessSaleResponse;
  */
 interface TransactionsClientInterface
 {
-    public function confirmSale(ConfirmSaleRequest $body): ConfirmSaleResponse;
+    public function confirmSale(ConfirmSaleRequestContent $body): ConfirmSale200Content;
 
-    public function getDetailingByMove(GetDetailingByMoveRequest $body): GetDetailingByMoveResponse;
+    public function getDetailingByMove(GetDetailingByMoveRequestContent $body): GetDetailingByMove200Content;
 
-    public function getMovesByClient(GetMovesByClientRequest $body): GetMovesByClientResponse;
+    public function getMovesByClient(GetMovesByClientRequestContent $body): GetMovesByClient200Content;
 
-    public function manualAdd(ManualAddRequest $body): ManualAddResponse;
+    public function manualAdd(ManualAddRequestContent $body): ManualAdd200Content;
 
-    public function processSale(ProcessSaleRequest $body): ProcessSaleResponse;
+    public function processSale(ProcessSaleRequestContent $body): ProcessSale200Content;
 }

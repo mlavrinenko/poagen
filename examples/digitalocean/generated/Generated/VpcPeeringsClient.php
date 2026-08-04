@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Enum\RegionSlug;
-use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequest;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\VpcPeeringsPatchRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -44,7 +44,7 @@ final readonly class VpcPeeringsClient implements VpcPeeringsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:create`.
      */
-    public function vpcPeeringsCreate(VpcPeeringsCreateRequest $body): void
+    public function vpcPeeringsCreate(VpcPeeringsCreateRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/vpc_peerings')
@@ -83,7 +83,7 @@ final readonly class VpcPeeringsClient implements VpcPeeringsClientInterface
     /**
      * Requires `bearer_auth` scopes: `vpc_peering:update`.
      */
-    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequest $body): void
+    public function vpcPeeringsPatch(string $vpcPeeringId, VpcPeeringsPatchRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::patch('/v2/vpc_peerings/{vpc_peering_id}')

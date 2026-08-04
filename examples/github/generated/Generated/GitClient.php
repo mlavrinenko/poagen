@@ -13,15 +13,15 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\Blob;
 use Acme\GitHub\Generated\Model\GitCommit;
-use Acme\GitHub\Generated\Model\GitCreateBlobRequest;
-use Acme\GitHub\Generated\Model\GitCreateCommitRequest;
-use Acme\GitHub\Generated\Model\GitCreateRefRequest;
-use Acme\GitHub\Generated\Model\GitCreateTagRequest;
-use Acme\GitHub\Generated\Model\GitCreateTreeRequest;
+use Acme\GitHub\Generated\Model\GitCreateBlobRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateCommitRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateRefRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateTagRequestContent;
+use Acme\GitHub\Generated\Model\GitCreateTreeRequestContent;
 use Acme\GitHub\Generated\Model\GitRef;
 use Acme\GitHub\Generated\Model\GitTag;
 use Acme\GitHub\Generated\Model\GitTree;
-use Acme\GitHub\Generated\Model\GitUpdateRefRequest;
+use Acme\GitHub\Generated\Model\GitUpdateRefRequestContent;
 use Acme\GitHub\Generated\Model\ShortBlob;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -34,7 +34,7 @@ final readonly class GitClient implements GitClientInterface
     ) {
     }
 
-    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequest $body): ShortBlob
+    public function gitCreateBlob(string $owner, string $repo, GitCreateBlobRequestContent $body): ShortBlob
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/blobs')
@@ -56,7 +56,7 @@ final readonly class GitClient implements GitClientInterface
         );
     }
 
-    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequest $body): GitCommit
+    public function gitCreateCommit(string $owner, string $repo, GitCreateCommitRequestContent $body): GitCommit
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/commits')
@@ -103,7 +103,7 @@ final readonly class GitClient implements GitClientInterface
         );
     }
 
-    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequest $body): GitRef
+    public function gitCreateRef(string $owner, string $repo, GitCreateRefRequestContent $body): GitRef
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/refs')
@@ -125,7 +125,7 @@ final readonly class GitClient implements GitClientInterface
         );
     }
 
-    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequest $body): GitRef
+    public function gitUpdateRef(string $owner, string $repo, string $ref, GitUpdateRefRequestContent $body): GitRef
     {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/git/refs/{ref}')
@@ -137,7 +137,7 @@ final readonly class GitClient implements GitClientInterface
         );
     }
 
-    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequest $body): GitTag
+    public function gitCreateTag(string $owner, string $repo, GitCreateTagRequestContent $body): GitTag
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/tags')
@@ -159,7 +159,7 @@ final readonly class GitClient implements GitClientInterface
         );
     }
 
-    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequest $body): GitTree
+    public function gitCreateTree(string $owner, string $repo, GitCreateTreeRequestContent $body): GitTree
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/git/trees')

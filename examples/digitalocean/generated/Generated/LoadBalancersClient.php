@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated;
 
 use Acme\DigitalOcean\Generated\Model\LoadBalancerCreate;
-use Acme\DigitalOcean\Generated\Model\LoadBalancersAddDropletsRequest;
-use Acme\DigitalOcean\Generated\Model\LoadBalancersAddForwardingRulesRequest;
-use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveDropletsRequest;
-use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveForwardingRulesRequest;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersAddDropletsRequestContent;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersAddForwardingRulesRequestContent;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveDropletsRequestContent;
+use Acme\DigitalOcean\Generated\Model\LoadBalancersRemoveForwardingRulesRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -111,7 +111,7 @@ final readonly class LoadBalancersClient implements LoadBalancersClientInterface
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
      */
-    public function loadBalancersAddDroplets(string $lbId, LoadBalancersAddDropletsRequest $body): void
+    public function loadBalancersAddDroplets(string $lbId, LoadBalancersAddDropletsRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::post('/v2/load_balancers/{lb_id}/droplets')
@@ -125,7 +125,7 @@ final readonly class LoadBalancersClient implements LoadBalancersClientInterface
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
      */
-    public function loadBalancersRemoveDroplets(string $lbId, LoadBalancersRemoveDropletsRequest $body): void
+    public function loadBalancersRemoveDroplets(string $lbId, LoadBalancersRemoveDropletsRequestContent $body): void
     {
         $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}/droplets')
@@ -139,8 +139,10 @@ final readonly class LoadBalancersClient implements LoadBalancersClientInterface
     /**
      * Requires `bearer_auth` scopes: `load_balancer:update`.
      */
-    public function loadBalancersAddForwardingRules(string $lbId, LoadBalancersAddForwardingRulesRequest $body): void
-    {
+    public function loadBalancersAddForwardingRules(
+        string $lbId,
+        LoadBalancersAddForwardingRulesRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::post('/v2/load_balancers/{lb_id}/forwarding_rules')
                 ->path('lb_id', $lbId)
@@ -155,7 +157,7 @@ final readonly class LoadBalancersClient implements LoadBalancersClientInterface
      */
     public function loadBalancersRemoveForwardingRules(
         string $lbId,
-        LoadBalancersRemoveForwardingRulesRequest $body,
+        LoadBalancersRemoveForwardingRulesRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::delete('/v2/load_balancers/{lb_id}/forwarding_rules')

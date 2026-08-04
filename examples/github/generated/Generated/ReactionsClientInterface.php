@@ -17,11 +17,11 @@ use Acme\GitHub\Generated\Enum\ReactionsListForIssueContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForPullRequestReviewCommentContent;
 use Acme\GitHub\Generated\Enum\ReactionsListForReleaseContent;
 use Acme\GitHub\Generated\Model\Reaction;
-use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequest;
-use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequest;
+use Acme\GitHub\Generated\Model\ReactionsCreateForCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForIssueCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForIssueRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForPullRequestReviewCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReactionsCreateForReleaseRequestContent;
 
 /**
  * The contract for the `reactions` endpoints.
@@ -48,7 +48,7 @@ interface ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForCommitCommentRequest $body,
+        ReactionsCreateForCommitCommentRequestContent $body,
     ): Reaction;
 
     public function reactionsDeleteForCommitComment(
@@ -74,7 +74,7 @@ interface ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForIssueCommentRequest $body,
+        ReactionsCreateForIssueCommentRequestContent $body,
     ): Reaction;
 
     public function reactionsDeleteForIssueComment(string $owner, string $repo, int $commentId, int $reactionId): void;
@@ -95,7 +95,7 @@ interface ReactionsClientInterface
         string $owner,
         string $repo,
         int $issueNumber,
-        ReactionsCreateForIssueRequest $body,
+        ReactionsCreateForIssueRequestContent $body,
     ): Reaction;
 
     public function reactionsDeleteForIssue(string $owner, string $repo, int $issueNumber, int $reactionId): void;
@@ -116,7 +116,7 @@ interface ReactionsClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReactionsCreateForPullRequestReviewCommentRequest $body,
+        ReactionsCreateForPullRequestReviewCommentRequestContent $body,
     ): Reaction;
 
     public function reactionsDeleteForPullRequestComment(
@@ -142,7 +142,7 @@ interface ReactionsClientInterface
         string $owner,
         string $repo,
         int $releaseId,
-        ReactionsCreateForReleaseRequest $body,
+        ReactionsCreateForReleaseRequestContent $body,
     ): Reaction;
 
     public function reactionsDeleteForRelease(string $owner, string $repo, int $releaseId, int $reactionId): void;

@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\DigitalOcean\Generated;
 
-use Acme\DigitalOcean\Generated\Model\AddonsCreateRequest;
-use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequest;
-use Acme\DigitalOcean\Generated\Model\AddonsPatchRequest;
+use Acme\DigitalOcean\Generated\Model\AddonsCreateRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchPlanRequestContent;
+use Acme\DigitalOcean\Generated\Model\AddonsPatchRequestContent;
 
 /**
  * The contract for the `Add-Ons` endpoints.
@@ -36,7 +36,7 @@ interface AddOnsClientInterface
     /**
      * Requires `bearer_auth` scopes: `addon:create`.
      */
-    public function addonsCreate(AddonsCreateRequest $body): void;
+    public function addonsCreate(AddonsCreateRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `addon:read`.
@@ -51,10 +51,10 @@ interface AddOnsClientInterface
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
      */
-    public function addonsPatch(string $resourceUuid, AddonsPatchRequest $body): void;
+    public function addonsPatch(string $resourceUuid, AddonsPatchRequestContent $body): void;
 
     /**
      * Requires `bearer_auth` scopes: `addon:update`.
      */
-    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequest $body): void;
+    public function addonsPatchPlan(string $resourceUuid, AddonsPatchPlanRequestContent $body): void;
 }

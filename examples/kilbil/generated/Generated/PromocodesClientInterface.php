@@ -11,12 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GeneratePromocodeRequest;
-use Acme\Kilbil\Generated\Model\GeneratePromocodeResponse;
-use Acme\Kilbil\Generated\Model\ReservedPromocodeRequest;
-use Acme\Kilbil\Generated\Model\ReservedPromocodeResponse;
-use Acme\Kilbil\Generated\Model\SearchPromocodeRequest;
-use Acme\Kilbil\Generated\Model\SearchPromocodeResponse;
+use Acme\Kilbil\Generated\Model\GeneratePromocode200Content;
+use Acme\Kilbil\Generated\Model\GeneratePromocodeRequestContent;
+use Acme\Kilbil\Generated\Model\ReservedPromocode200Content;
+use Acme\Kilbil\Generated\Model\ReservedPromocodeRequestContent;
+use Acme\Kilbil\Generated\Model\SearchPromocode200Content;
+use Acme\Kilbil\Generated\Model\SearchPromocodeRequestContent;
 
 /**
  * The contract for the `Промокоды` endpoints.
@@ -27,9 +27,9 @@ use Acme\Kilbil\Generated\Model\SearchPromocodeResponse;
  */
 interface PromocodesClientInterface
 {
-    public function generatePromocode(GeneratePromocodeRequest $body): GeneratePromocodeResponse;
+    public function generatePromocode(GeneratePromocodeRequestContent $body): GeneratePromocode200Content;
 
-    public function reservedPromocode(ReservedPromocodeRequest $body): ReservedPromocodeResponse;
+    public function reservedPromocode(ReservedPromocodeRequestContent $body): ReservedPromocode200Content;
 
-    public function searchPromocode(SearchPromocodeRequest $body): SearchPromocodeResponse;
+    public function searchPromocode(SearchPromocodeRequestContent $body): SearchPromocode200Content;
 }

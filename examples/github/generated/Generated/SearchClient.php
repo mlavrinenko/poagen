@@ -24,13 +24,13 @@ use Acme\GitHub\Generated\Enum\SearchReposOrder;
 use Acme\GitHub\Generated\Enum\SearchReposSort;
 use Acme\GitHub\Generated\Enum\SearchUsersOrder;
 use Acme\GitHub\Generated\Enum\SearchUsersSort;
-use Acme\GitHub\Generated\Model\SearchCodeResponse;
-use Acme\GitHub\Generated\Model\SearchCommitsResponse;
-use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequestsResponse;
-use Acme\GitHub\Generated\Model\SearchLabelsResponse;
-use Acme\GitHub\Generated\Model\SearchReposResponse;
-use Acme\GitHub\Generated\Model\SearchTopicsResponse;
-use Acme\GitHub\Generated\Model\SearchUsersResponse;
+use Acme\GitHub\Generated\Model\SearchCode200Content;
+use Acme\GitHub\Generated\Model\SearchCommits200Content;
+use Acme\GitHub\Generated\Model\SearchIssuesAndPullRequests200Content;
+use Acme\GitHub\Generated\Model\SearchLabels200Content;
+use Acme\GitHub\Generated\Model\SearchRepos200Content;
+use Acme\GitHub\Generated\Model\SearchTopics200Content;
+use Acme\GitHub\Generated\Model\SearchUsers200Content;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -48,7 +48,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchCodeOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCodeResponse {
+    ): SearchCode200Content {
         return $this->transport->send(
             Endpoint::get('/search/code')
                 ->query('q', $q)
@@ -56,7 +56,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchCodeResponse::class),
+            ResponseType::object(SearchCode200Content::class),
         );
     }
 
@@ -66,7 +66,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchCommitsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchCommitsResponse {
+    ): SearchCommits200Content {
         return $this->transport->send(
             Endpoint::get('/search/commits')
                 ->query('q', $q)
@@ -74,7 +74,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchCommitsResponse::class),
+            ResponseType::object(SearchCommits200Content::class),
         );
     }
 
@@ -86,7 +86,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?int $page = null,
         ?string $advancedSearch = null,
         ?SearchIssuesAndPullRequestsSearchType $searchType = null,
-    ): SearchIssuesAndPullRequestsResponse {
+    ): SearchIssuesAndPullRequests200Content {
         return $this->transport->send(
             Endpoint::get('/search/issues')
                 ->query('q', $q)
@@ -96,7 +96,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('page', $page)
                 ->query('advanced_search', $advancedSearch)
                 ->query('search_type', $searchType),
-            ResponseType::object(SearchIssuesAndPullRequestsResponse::class),
+            ResponseType::object(SearchIssuesAndPullRequests200Content::class),
         );
     }
 
@@ -107,7 +107,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchLabelsOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchLabelsResponse {
+    ): SearchLabels200Content {
         return $this->transport->send(
             Endpoint::get('/search/labels')
                 ->query('repository_id', $repositoryId)
@@ -116,7 +116,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchLabelsResponse::class),
+            ResponseType::object(SearchLabels200Content::class),
         );
     }
 
@@ -126,7 +126,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchReposOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchReposResponse {
+    ): SearchRepos200Content {
         return $this->transport->send(
             Endpoint::get('/search/repositories')
                 ->query('q', $q)
@@ -134,18 +134,18 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchReposResponse::class),
+            ResponseType::object(SearchRepos200Content::class),
         );
     }
 
-    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopicsResponse
+    public function searchTopics(string $q, ?int $perPage = null, ?int $page = null): SearchTopics200Content
     {
         return $this->transport->send(
             Endpoint::get('/search/topics')
                 ->query('q', $q)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchTopicsResponse::class),
+            ResponseType::object(SearchTopics200Content::class),
         );
     }
 
@@ -155,7 +155,7 @@ final readonly class SearchClient implements SearchClientInterface
         ?SearchUsersOrder $order = null,
         ?int $perPage = null,
         ?int $page = null,
-    ): SearchUsersResponse {
+    ): SearchUsers200Content {
         return $this->transport->send(
             Endpoint::get('/search/users')
                 ->query('q', $q)
@@ -163,7 +163,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(SearchUsersResponse::class),
+            ResponseType::object(SearchUsers200Content::class),
         );
     }
 }

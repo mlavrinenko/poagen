@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequest;
-use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequest;
+use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkAddRequestContent;
+use Acme\GitHub\Generated\Model\EnterpriseTeamOrganizationsBulkRemoveRequestContent;
 use Acme\GitHub\Generated\Model\OrganizationSimple;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
@@ -50,7 +50,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
     public function enterpriseTeamOrganizationsBulkAdd(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamOrganizationsBulkAddRequest $body,
+        EnterpriseTeamOrganizationsBulkAddRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/add')
@@ -64,7 +64,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
     public function enterpriseTeamOrganizationsBulkRemove(
         string $enterprise,
         string $enterpriseTeam,
-        EnterpriseTeamOrganizationsBulkRemoveRequest $body,
+        EnterpriseTeamOrganizationsBulkRemoveRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/teams/{enterprise-team}/organizations/remove')

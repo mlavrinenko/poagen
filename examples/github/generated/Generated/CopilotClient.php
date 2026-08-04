@@ -11,26 +11,26 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequest;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsResponse;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersRequest;
-use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersResponse;
-use Acme\GitHub\Generated\Model\CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsResponse;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersRequest;
-use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersResponse;
-use Acme\GitHub\Generated\Model\CopilotGetCopilotCodingAgentPermissionsOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotListCopilotSeatsResponse;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeams201Content;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForTeamsRequestContent;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsers201Content;
+use Acme\GitHub\Generated\Model\CopilotAddCopilotSeatsForUsersRequestContent;
+use Acme\GitHub\Generated\Model\CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeams200Content;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForTeamsRequestContent;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsers200Content;
+use Acme\GitHub\Generated\Model\CopilotCancelCopilotSeatAssignmentForUsersRequestContent;
+use Acme\GitHub\Generated\Model\CopilotGetCopilotCodingAgentPermissionsOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotListCopilotSeats200Content;
 use Acme\GitHub\Generated\Model\CopilotOrganizationContentExclusionDetails;
 use Acme\GitHub\Generated\Model\CopilotOrganizationDetails;
-use Acme\GitHub\Generated\Model\CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequest;
+use Acme\GitHub\Generated\Model\CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent;
 use Acme\GitHub\Generated\Model\CopilotSeatDetails;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentPermissionsOrganizationRequest;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest;
-use Acme\GitHub\Generated\Model\CopilotSetCopilotContentExclusionForOrganizationResponse;
-use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequest;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent;
+use Acme\GitHub\Generated\Model\CopilotSetCopilotContentExclusionForOrganization200Content;
+use Acme\GitHub\Generated\Model\CopilotSetEnterpriseCodingAgentPolicyRequestContent;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics1DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetrics28DayReport;
 use Acme\GitHub\Generated\Model\CopilotUsageMetricsDay;
@@ -89,7 +89,7 @@ final readonly class CopilotClient implements CopilotClientInterface
 
     public function copilotSetEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotSetEnterpriseCodingAgentPolicyRequest $body,
+        CopilotSetEnterpriseCodingAgentPolicyRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/enterprises/{enterprise}/copilot/policies/coding_agent')
@@ -101,7 +101,7 @@ final readonly class CopilotClient implements CopilotClientInterface
 
     public function copilotAddOrganizationsToEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequest $body,
+        CopilotAddOrganizationsToEnterpriseCodingAgentPolicyRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::post('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
@@ -113,7 +113,7 @@ final readonly class CopilotClient implements CopilotClientInterface
 
     public function copilotRemoveOrganizationsFromEnterpriseCodingAgentPolicy(
         string $enterprise,
-        CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequest $body,
+        CopilotRemoveOrganizationsFromEnterpriseCodingAgentPolicyRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::delete('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
@@ -135,76 +135,76 @@ final readonly class CopilotClient implements CopilotClientInterface
         string $org,
         ?int $page = null,
         ?int $perPage = null,
-    ): CopilotListCopilotSeatsResponse {
+    ): CopilotListCopilotSeats200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/billing/seats')
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(CopilotListCopilotSeatsResponse::class),
+            ResponseType::object(CopilotListCopilotSeats200Content::class),
         );
     }
 
     public function copilotAddCopilotSeatsForTeams(
         string $org,
-        CopilotAddCopilotSeatsForTeamsRequest $body,
-    ): CopilotAddCopilotSeatsForTeamsResponse {
+        CopilotAddCopilotSeatsForTeamsRequestContent $body,
+    ): CopilotAddCopilotSeatsForTeams201Content {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotAddCopilotSeatsForTeamsResponse::class),
+            ResponseType::object(CopilotAddCopilotSeatsForTeams201Content::class),
         );
     }
 
     public function copilotCancelCopilotSeatAssignmentForTeams(
         string $org,
-        CopilotCancelCopilotSeatAssignmentForTeamsRequest $body,
-    ): CopilotCancelCopilotSeatAssignmentForTeamsResponse {
+        CopilotCancelCopilotSeatAssignmentForTeamsRequestContent $body,
+    ): CopilotCancelCopilotSeatAssignmentForTeams200Content {
         return $this->transport->send(
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeamsResponse::class),
+            ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeams200Content::class),
         );
     }
 
     public function copilotAddCopilotSeatsForUsers(
         string $org,
-        CopilotAddCopilotSeatsForUsersRequest $body,
-    ): CopilotAddCopilotSeatsForUsersResponse {
+        CopilotAddCopilotSeatsForUsersRequestContent $body,
+    ): CopilotAddCopilotSeatsForUsers201Content {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotAddCopilotSeatsForUsersResponse::class),
+            ResponseType::object(CopilotAddCopilotSeatsForUsers201Content::class),
         );
     }
 
     public function copilotCancelCopilotSeatAssignmentForUsers(
         string $org,
-        CopilotCancelCopilotSeatAssignmentForUsersRequest $body,
-    ): CopilotCancelCopilotSeatAssignmentForUsersResponse {
+        CopilotCancelCopilotSeatAssignmentForUsersRequestContent $body,
+    ): CopilotCancelCopilotSeatAssignmentForUsers200Content {
         return $this->transport->send(
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsersResponse::class),
+            ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsers200Content::class),
         );
     }
 
     public function copilotGetCopilotCodingAgentPermissionsOrganization(
         string $org,
-    ): CopilotGetCopilotCodingAgentPermissionsOrganizationResponse {
+    ): CopilotGetCopilotCodingAgentPermissionsOrganization200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/coding-agent/permissions')->path('org', $org),
-            ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganizationResponse::class),
+            ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganization200Content::class),
         );
     }
 
     public function copilotSetCopilotCodingAgentPermissionsOrganization(
         string $org,
-        CopilotSetCopilotCodingAgentPermissionsOrganizationRequest $body,
+        CopilotSetCopilotCodingAgentPermissionsOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions')
@@ -218,19 +218,19 @@ final readonly class CopilotClient implements CopilotClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse {
+    ): CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/coding-agent/permissions/repositories')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse::class),
+            ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content::class),
         );
     }
 
     public function copilotSetCopilotCodingAgentSelectedRepositoriesForOrganization(
         string $org,
-        CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest $body,
+        CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions/repositories')
@@ -275,12 +275,12 @@ final readonly class CopilotClient implements CopilotClientInterface
     public function copilotSetCopilotContentExclusionForOrganization(
         string $org,
         array $body,
-    ): CopilotSetCopilotContentExclusionForOrganizationResponse {
+    ): CopilotSetCopilotContentExclusionForOrganization200Content {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/copilot/content_exclusion')
                 ->path('org', $org)
                 ->jsonRaw($body),
-            ResponseType::object(CopilotSetCopilotContentExclusionForOrganizationResponse::class),
+            ResponseType::object(CopilotSetCopilotContentExclusionForOrganization200Content::class),
         );
     }
 

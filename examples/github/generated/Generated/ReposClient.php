@@ -92,62 +92,62 @@ use Acme\GitHub\Generated\Model\ReferrerTraffic;
 use Acme\GitHub\Generated\Model\Release;
 use Acme\GitHub\Generated\Model\ReleaseAsset;
 use Acme\GitHub\Generated\Model\ReleaseNotesContent;
-use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequest;
-use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReportingResponse;
-use Acme\GitHub\Generated\Model\ReposCreateAttestationRequest;
-use Acme\GitHub\Generated\Model\ReposCreateAttestationResponse;
-use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequest;
-use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequest;
-use Acme\GitHub\Generated\Model\ReposCreateDispatchEventRequest;
-use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequest;
-use Acme\GitHub\Generated\Model\ReposCreateForkRequest;
-use Acme\GitHub\Generated\Model\ReposCreateInOrgRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequest;
-use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequest;
-use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequest;
-use Acme\GitHub\Generated\Model\ReposCreateReleaseRequest;
-use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequest;
-use Acme\GitHub\Generated\Model\ReposCreateWebhookRequest;
-use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest;
-use Acme\GitHub\Generated\Model\ReposDeleteFileRequest;
-use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequest;
-use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRulesResponse;
-use Acme\GitHub\Generated\Model\ReposGetAllEnvironmentsResponse;
-use Acme\GitHub\Generated\Model\ReposListAttestationsResponse;
-use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrationsResponse;
-use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPoliciesResponse;
-use Acme\GitHub\Generated\Model\ReposMergeRequest;
-use Acme\GitHub\Generated\Model\ReposMergeUpstreamRequest;
-use Acme\GitHub\Generated\Model\ReposRemoveAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposRemoveUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposRenameBranchRequest;
-use Acme\GitHub\Generated\Model\ReposReplaceAllTopicsRequest;
-use Acme\GitHub\Generated\Model\ReposSetAppAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposSetUserAccessRestrictionsRequest;
-use Acme\GitHub\Generated\Model\ReposTransferRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateBranchProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateCommitCommentRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateInformationAboutPagesSiteRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateInvitationRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateOrgRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdatePullRequestReviewProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateReleaseAssetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateReleaseRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateRepoRulesetRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateStatusCheckProtectionRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateWebhookConfigForRepoRequest;
-use Acme\GitHub\Generated\Model\ReposUpdateWebhookRequest;
+use Acme\GitHub\Generated\Model\ReposAddAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposAddCollaboratorRequestContent;
+use Acme\GitHub\Generated\Model\ReposAddUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposCheckPrivateVulnerabilityReporting200Content;
+use Acme\GitHub\Generated\Model\ReposCreateAttestation201Content;
+use Acme\GitHub\Generated\Model\ReposCreateAttestationRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateAutolinkRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateCommitStatusRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeployKeyRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentProtectionRuleRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDeploymentStatusRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateDispatchEventRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateForAuthenticatedUserRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateForkRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateInOrgRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrUpdateEnvironmentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrUpdateFileContentsRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateOrgRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreatePagesDeploymentRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreatePagesSiteRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateRepoRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateUsingTemplateRequestContent;
+use Acme\GitHub\Generated\Model\ReposCreateWebhookRequestContent;
+use Acme\GitHub\Generated\Model\ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent;
+use Acme\GitHub\Generated\Model\ReposDeleteFileRequestContent;
+use Acme\GitHub\Generated\Model\ReposGenerateReleaseNotesRequestContent;
+use Acme\GitHub\Generated\Model\ReposGetAllDeploymentProtectionRules200Content;
+use Acme\GitHub\Generated\Model\ReposGetAllEnvironments200Content;
+use Acme\GitHub\Generated\Model\ReposListAttestations200Content;
+use Acme\GitHub\Generated\Model\ReposListCustomDeploymentRuleIntegrations200Content;
+use Acme\GitHub\Generated\Model\ReposListDeploymentBranchPolicies200Content;
+use Acme\GitHub\Generated\Model\ReposMergeRequestContent;
+use Acme\GitHub\Generated\Model\ReposMergeUpstreamRequestContent;
+use Acme\GitHub\Generated\Model\ReposRemoveAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposRemoveUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposRenameBranchRequestContent;
+use Acme\GitHub\Generated\Model\ReposReplaceAllTopicsRequestContent;
+use Acme\GitHub\Generated\Model\ReposSetAppAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposSetUserAccessRestrictionsRequestContent;
+use Acme\GitHub\Generated\Model\ReposTransferRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateBranchProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateCommitCommentRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateInformationAboutPagesSiteRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateInvitationRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateOrgRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdatePullRequestReviewProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateReleaseAssetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateReleaseRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateRepoRulesetRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateStatusCheckProtectionRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateWebhookConfigForRepoRequestContent;
+use Acme\GitHub\Generated\Model\ReposUpdateWebhookRequestContent;
 use Acme\GitHub\Generated\Model\Repository;
 use Acme\GitHub\Generated\Model\RepositoryCollaboratorPermission;
 use Acme\GitHub\Generated\Model\RepositoryInvitation;
@@ -203,7 +203,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateInOrg(string $org, ReposCreateInOrgRequest $body): FullRepository
+    public function reposCreateInOrg(string $org, ReposCreateInOrgRequestContent $body): FullRepository
     {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/repos')->path('org', $org)->json($body),
@@ -230,7 +230,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequest $body): RepositoryRuleset
+    public function reposCreateOrgRuleset(string $org, ReposCreateOrgRulesetRequestContent $body): RepositoryRuleset
     {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/rulesets')->path('org', $org)->json($body),
@@ -285,7 +285,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposUpdateOrgRuleset(
         string $org,
         int $rulesetId,
-        ReposUpdateOrgRulesetRequest $body,
+        ReposUpdateOrgRulesetRequestContent $body,
     ): RepositoryRuleset {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/rulesets/{ruleset_id}')
@@ -324,7 +324,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposUpdate(string $owner, string $repo, ReposUpdateRequest $body): FullRepository
+    public function reposUpdate(string $owner, string $repo, ReposUpdateRequestContent $body): FullRepository
     {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}')
@@ -369,14 +369,14 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCreateAttestation(
         string $owner,
         string $repo,
-        ReposCreateAttestationRequest $body,
-    ): ReposCreateAttestationResponse {
+        ReposCreateAttestationRequestContent $body,
+    ): ReposCreateAttestation201Content {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/attestations')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::object(ReposCreateAttestationResponse::class),
+            ResponseType::object(ReposCreateAttestation201Content::class),
         );
     }
 
@@ -388,7 +388,7 @@ final readonly class ReposClient implements ReposClientInterface
         ?string $before = null,
         ?string $after = null,
         ?string $predicateType = null,
-    ): ReposListAttestationsResponse {
+    ): ReposListAttestations200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/attestations/{subject_digest}')
                 ->path('owner', $owner)
@@ -398,7 +398,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::object(ReposListAttestationsResponse::class),
+            ResponseType::object(ReposListAttestations200Content::class),
         );
     }
 
@@ -415,8 +415,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateAutolink(string $owner, string $repo, ReposCreateAutolinkRequest $body): Autolink
-    {
+    public function reposCreateAutolink(
+        string $owner,
+        string $repo,
+        ReposCreateAutolinkRequestContent $body,
+    ): Autolink {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/autolinks')
                 ->path('owner', $owner)
@@ -525,7 +528,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdateBranchProtectionRequest $body,
+        ReposUpdateBranchProtectionRequestContent $body,
     ): ProtectedBranch {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection')
@@ -616,7 +619,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdatePullRequestReviewProtectionRequest $body,
+        ReposUpdatePullRequestReviewProtectionRequestContent $body,
     ): ProtectedBranchPullRequestReview {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/branches/{branch}/protection/required_pull_request_reviews')
@@ -693,7 +696,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposUpdateStatusCheckProtectionRequest $body,
+        ReposUpdateStatusCheckProtectionRequestContent $body,
     ): StatusCheckPolicy {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks')
@@ -762,7 +765,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposSetAppAccessRestrictionsRequest $body,
+        ReposSetAppAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
@@ -781,7 +784,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposAddAppAccessRestrictionsRequest $body,
+        ReposAddAppAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
@@ -800,7 +803,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposRemoveAppAccessRestrictionsRequest $body,
+        ReposRemoveAppAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/apps')
@@ -847,7 +850,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposSetUserAccessRestrictionsRequest $body,
+        ReposSetUserAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
@@ -866,7 +869,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposAddUserAccessRestrictionsRequest $body,
+        ReposAddUserAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
@@ -885,7 +888,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposRemoveUserAccessRestrictionsRequest $body,
+        ReposRemoveUserAccessRestrictionsRequestContent $body,
     ): array {
         return $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users')
@@ -901,7 +904,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $branch,
-        ReposRenameBranchRequest $body,
+        ReposRenameBranchRequestContent $body,
     ): BranchWithProtection {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/branches/{branch}/rename')
@@ -962,7 +965,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $username,
-        ReposAddCollaboratorRequest $body,
+        ReposAddCollaboratorRequestContent $body,
     ): RepositoryInvitation {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/collaborators/{username}')
@@ -1044,7 +1047,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $commentId,
-        ReposUpdateCommitCommentRequest $body,
+        ReposUpdateCommitCommentRequestContent $body,
     ): CommitComment {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/comments/{comment_id}')
@@ -1126,7 +1129,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $commitSha,
-        ReposCreateCommitCommentRequest $body,
+        ReposCreateCommitCommentRequestContent $body,
     ): CommitComment {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/commits/{commit_sha}/comments')
@@ -1277,7 +1280,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $path,
-        ReposCreateOrUpdateFileContentsRequest $body,
+        ReposCreateOrUpdateFileContentsRequestContent $body,
     ): FileCommit {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/contents/{path}')
@@ -1293,7 +1296,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $path,
-        ReposDeleteFileRequest $body,
+        ReposDeleteFileRequestContent $body,
     ): FileCommit {
         return $this->transport->send(
             Endpoint::delete('/repos/{owner}/{repo}/contents/{path}')
@@ -1353,8 +1356,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateDeployment(string $owner, string $repo, ReposCreateDeploymentRequest $body): Deployment
-    {
+    public function reposCreateDeployment(
+        string $owner,
+        string $repo,
+        ReposCreateDeploymentRequestContent $body,
+    ): Deployment {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/deployments')
                 ->path('owner', $owner)
@@ -1411,7 +1417,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $deploymentId,
-        ReposCreateDeploymentStatusRequest $body,
+        ReposCreateDeploymentStatusRequestContent $body,
     ): DeploymentStatus {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/deployments/{deployment_id}/statuses')
@@ -1439,8 +1445,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateDispatchEvent(string $owner, string $repo, ReposCreateDispatchEventRequest $body): void
-    {
+    public function reposCreateDispatchEvent(
+        string $owner,
+        string $repo,
+        ReposCreateDispatchEventRequestContent $body,
+    ): void {
         $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/dispatches')
                 ->path('owner', $owner)
@@ -1455,14 +1464,14 @@ final readonly class ReposClient implements ReposClientInterface
         string $repo,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposGetAllEnvironmentsResponse {
+    ): ReposGetAllEnvironments200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments')
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ReposGetAllEnvironmentsResponse::class),
+            ResponseType::object(ReposGetAllEnvironments200Content::class),
         );
     }
 
@@ -1481,7 +1490,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $environmentName,
-        ReposCreateOrUpdateEnvironmentRequest $body,
+        ReposCreateOrUpdateEnvironmentRequestContent $body,
     ): Environment {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/environments/{environment_name}')
@@ -1510,7 +1519,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $environmentName,
         ?int $perPage = null,
         ?int $page = null,
-    ): ReposListDeploymentBranchPoliciesResponse {
+    ): ReposListDeploymentBranchPolicies200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies')
                 ->path('owner', $owner)
@@ -1518,7 +1527,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(ReposListDeploymentBranchPoliciesResponse::class),
+            ResponseType::object(ReposListDeploymentBranchPolicies200Content::class),
         );
     }
 
@@ -1592,13 +1601,13 @@ final readonly class ReposClient implements ReposClientInterface
         string $environmentName,
         string $repo,
         string $owner,
-    ): ReposGetAllDeploymentProtectionRulesResponse {
+    ): ReposGetAllDeploymentProtectionRules200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules')
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner),
-            ResponseType::object(ReposGetAllDeploymentProtectionRulesResponse::class),
+            ResponseType::object(ReposGetAllDeploymentProtectionRules200Content::class),
         );
     }
 
@@ -1606,7 +1615,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $environmentName,
         string $repo,
         string $owner,
-        ReposCreateDeploymentProtectionRuleRequest $body,
+        ReposCreateDeploymentProtectionRuleRequestContent $body,
     ): DeploymentProtectionRule {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules')
@@ -1624,7 +1633,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         ?int $page = null,
         ?int $perPage = null,
-    ): ReposListCustomDeploymentRuleIntegrationsResponse {
+    ): ReposListCustomDeploymentRuleIntegrations200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/environments/{environment_name}/deployment_protection_rules/apps')
                 ->path('environment_name', $environmentName)
@@ -1632,7 +1641,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::object(ReposListCustomDeploymentRuleIntegrationsResponse::class),
+            ResponseType::object(ReposListCustomDeploymentRuleIntegrations200Content::class),
         );
     }
 
@@ -1689,7 +1698,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequest $body): FullRepository
+    public function reposCreateFork(string $owner, string $repo, ReposCreateForkRequestContent $body): FullRepository
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/forks')
@@ -1715,7 +1724,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequest $body): Hook
+    public function reposCreateWebhook(string $owner, string $repo, ReposCreateWebhookRequestContent $body): Hook
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/hooks')
@@ -1752,7 +1761,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $hookId,
-        ReposUpdateWebhookRequest $body,
+        ReposUpdateWebhookRequestContent $body,
     ): Hook {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/hooks/{hook_id}')
@@ -1779,7 +1788,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $hookId,
-        ReposUpdateWebhookConfigForRepoRequest $body,
+        ReposUpdateWebhookConfigForRepoRequestContent $body,
     ): WebhookConfig {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/hooks/{hook_id}/config')
@@ -1920,7 +1929,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $invitationId,
-        ReposUpdateInvitationRequest $body,
+        ReposUpdateInvitationRequestContent $body,
     ): RepositoryInvitation {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/invitations/{invitation_id}')
@@ -1947,8 +1956,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateDeployKey(string $owner, string $repo, ReposCreateDeployKeyRequest $body): DeployKey
-    {
+    public function reposCreateDeployKey(
+        string $owner,
+        string $repo,
+        ReposCreateDeployKeyRequestContent $body,
+    ): DeployKey {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/keys')
                 ->path('owner', $owner)
@@ -1990,8 +2002,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposMergeUpstream(string $owner, string $repo, ReposMergeUpstreamRequest $body): MergedUpstream
-    {
+    public function reposMergeUpstream(
+        string $owner,
+        string $repo,
+        ReposMergeUpstreamRequestContent $body,
+    ): MergedUpstream {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/merge-upstream')
                 ->path('owner', $owner)
@@ -2001,7 +2016,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposMerge(string $owner, string $repo, ReposMergeRequest $body): Commit
+    public function reposMerge(string $owner, string $repo, ReposMergeRequestContent $body): Commit
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/merges')
@@ -2025,7 +2040,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposUpdateInformationAboutPagesSite(
         string $owner,
         string $repo,
-        ReposUpdateInformationAboutPagesSiteRequest $body,
+        ReposUpdateInformationAboutPagesSiteRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/pages')
@@ -2036,7 +2051,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequest $body): Page
+    public function reposCreatePagesSite(string $owner, string $repo, ReposCreatePagesSiteRequestContent $body): Page
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages')
@@ -2106,7 +2121,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCreatePagesDeployment(
         string $owner,
         string $repo,
-        ReposCreatePagesDeploymentRequest $body,
+        ReposCreatePagesDeploymentRequestContent $body,
     ): PageDeployment {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/pages/deployments')
@@ -2155,12 +2170,12 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCheckPrivateVulnerabilityReporting(
         string $owner,
         string $repo,
-    ): ReposCheckPrivateVulnerabilityReportingResponse {
+    ): ReposCheckPrivateVulnerabilityReporting200Content {
         return $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}/private-vulnerability-reporting')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::object(ReposCheckPrivateVulnerabilityReportingResponse::class),
+            ResponseType::object(ReposCheckPrivateVulnerabilityReporting200Content::class),
         );
     }
 
@@ -2200,7 +2215,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCustomPropertiesForReposCreateOrUpdateRepositoryValues(
         string $owner,
         string $repo,
-        ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequest $body,
+        ReposCustomPropertiesForReposCreateOrUpdateRepositoryValuesRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/properties/values')
@@ -2253,7 +2268,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequest $body): Release
+    public function reposCreateRelease(string $owner, string $repo, ReposCreateReleaseRequestContent $body): Release
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases')
@@ -2290,7 +2305,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $assetId,
-        ReposUpdateReleaseAssetRequest $body,
+        ReposUpdateReleaseAssetRequestContent $body,
     ): ReleaseAsset {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/releases/assets/{asset_id}')
@@ -2305,7 +2320,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposGenerateReleaseNotes(
         string $owner,
         string $repo,
-        ReposGenerateReleaseNotesRequest $body,
+        ReposGenerateReleaseNotesRequestContent $body,
     ): ReleaseNotesContent {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/releases/generate-notes')
@@ -2363,7 +2378,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $releaseId,
-        ReposUpdateReleaseRequest $body,
+        ReposUpdateReleaseRequestContent $body,
     ): Release {
         return $this->transport->send(
             Endpoint::patch('/repos/{owner}/{repo}/releases/{release_id}')
@@ -2463,7 +2478,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCreateRepoRuleset(
         string $owner,
         string $repo,
-        ReposCreateRepoRulesetRequest $body,
+        ReposCreateRepoRulesetRequestContent $body,
     ): RepositoryRuleset {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/rulesets')
@@ -2529,7 +2544,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         int $rulesetId,
-        ReposUpdateRepoRulesetRequest $body,
+        ReposUpdateRepoRulesetRequestContent $body,
     ): RepositoryRuleset {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/rulesets/{ruleset_id}')
@@ -2655,7 +2670,7 @@ final readonly class ReposClient implements ReposClientInterface
         string $owner,
         string $repo,
         string $sha,
-        ReposCreateCommitStatusRequest $body,
+        ReposCreateCommitStatusRequestContent $body,
     ): Status {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/statuses/{sha}')
@@ -2720,8 +2735,11 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposReplaceAllTopics(string $owner, string $repo, ReposReplaceAllTopicsRequest $body): Topic
-    {
+    public function reposReplaceAllTopics(
+        string $owner,
+        string $repo,
+        ReposReplaceAllTopicsRequestContent $body,
+    ): Topic {
         return $this->transport->send(
             Endpoint::put('/repos/{owner}/{repo}/topics')
                 ->path('owner', $owner)
@@ -2779,7 +2797,7 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposTransfer(string $owner, string $repo, ReposTransferRequest $body): MinimalRepository
+    public function reposTransfer(string $owner, string $repo, ReposTransferRequestContent $body): MinimalRepository
     {
         return $this->transport->send(
             Endpoint::post('/repos/{owner}/{repo}/transfer')
@@ -2834,7 +2852,7 @@ final readonly class ReposClient implements ReposClientInterface
     public function reposCreateUsingTemplate(
         string $templateOwner,
         string $templateRepo,
-        ReposCreateUsingTemplateRequest $body,
+        ReposCreateUsingTemplateRequestContent $body,
     ): FullRepository {
         return $this->transport->send(
             Endpoint::post('/repos/{template_owner}/{template_repo}/generate')
@@ -2885,8 +2903,9 @@ final readonly class ReposClient implements ReposClientInterface
         );
     }
 
-    public function reposCreateForAuthenticatedUser(ReposCreateForAuthenticatedUserRequest $body): FullRepository
-    {
+    public function reposCreateForAuthenticatedUser(
+        ReposCreateForAuthenticatedUserRequestContent $body,
+    ): FullRepository {
         return $this->transport->send(
             Endpoint::post('/user/repos')->json($body),
             ResponseType::object(FullRepository::class),

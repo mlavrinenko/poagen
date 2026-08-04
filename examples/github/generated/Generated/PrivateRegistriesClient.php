@@ -13,10 +13,10 @@ namespace Acme\GitHub\Generated;
 
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfiguration;
 use Acme\GitHub\Generated\Model\OrgPrivateRegistryConfigurationWithSelectedRepositories;
-use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequest;
-use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKeyResponse;
-use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistriesResponse;
-use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequest;
+use Acme\GitHub\Generated\Model\PrivateRegistriesCreateOrgPrivateRegistryRequestContent;
+use Acme\GitHub\Generated\Model\PrivateRegistriesGetOrgPublicKey200Content;
+use Acme\GitHub\Generated\Model\PrivateRegistriesListOrgPrivateRegistries200Content;
+use Acme\GitHub\Generated\Model\PrivateRegistriesUpdateOrgPrivateRegistryRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -32,19 +32,19 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): PrivateRegistriesListOrgPrivateRegistriesResponse {
+    ): PrivateRegistriesListOrgPrivateRegistries200Content {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries')
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::object(PrivateRegistriesListOrgPrivateRegistriesResponse::class),
+            ResponseType::object(PrivateRegistriesListOrgPrivateRegistries200Content::class),
         );
     }
 
     public function privateRegistriesCreateOrgPrivateRegistry(
         string $org,
-        PrivateRegistriesCreateOrgPrivateRegistryRequest $body,
+        PrivateRegistriesCreateOrgPrivateRegistryRequestContent $body,
     ): OrgPrivateRegistryConfigurationWithSelectedRepositories {
         return $this->transport->send(
             Endpoint::post('/orgs/{org}/private-registries')->path('org', $org)->json($body),
@@ -52,11 +52,11 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
         );
     }
 
-    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKeyResponse
+    public function privateRegistriesGetOrgPublicKey(string $org): PrivateRegistriesGetOrgPublicKey200Content
     {
         return $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries/public-key')->path('org', $org),
-            ResponseType::object(PrivateRegistriesGetOrgPublicKeyResponse::class),
+            ResponseType::object(PrivateRegistriesGetOrgPublicKey200Content::class),
         );
     }
 
@@ -85,7 +85,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
     public function privateRegistriesUpdateOrgPrivateRegistry(
         string $org,
         string $secretName,
-        PrivateRegistriesUpdateOrgPrivateRegistryRequest $body,
+        PrivateRegistriesUpdateOrgPrivateRegistryRequestContent $body,
     ): void {
         $this->transport->send(
             Endpoint::patch('/orgs/{org}/private-registries/{secret_name}')

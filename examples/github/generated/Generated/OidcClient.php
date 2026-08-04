@@ -15,7 +15,7 @@ use Acme\GitHub\Generated\Model\EmptyObject;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusion;
 use Acme\GitHub\Generated\Model\OidcCustomPropertyInclusionInput;
 use Acme\GitHub\Generated\Model\OidcCustomSub;
-use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequest;
+use Acme\GitHub\Generated\Model\OidcUpdateOidcCustomSubTemplateForOrgRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -107,7 +107,7 @@ final readonly class OidcClient implements OidcClientInterface
 
     public function oidcUpdateOidcCustomSubTemplateForOrg(
         string $org,
-        OidcUpdateOidcCustomSubTemplateForOrgRequest $body,
+        OidcUpdateOidcCustomSubTemplateForOrgRequestContent $body,
     ): EmptyObject {
         return $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/oidc/customization/sub')

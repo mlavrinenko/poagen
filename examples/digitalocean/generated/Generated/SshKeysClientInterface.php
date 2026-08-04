@@ -14,7 +14,7 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\SshKeyFingerprint;
 use Acme\DigitalOcean\Generated\Model\SshKeyId;
 use Acme\DigitalOcean\Generated\Model\SshKeys;
-use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\SshKeysUpdateRequestContent;
 
 /**
  * The contract for the `SSH Keys` endpoints.
@@ -43,7 +43,10 @@ interface SshKeysClientInterface
     /**
      * Requires `bearer_auth` scopes: `ssh_key:update`.
      */
-    public function sshKeysUpdate(SshKeyId|SshKeyFingerprint $sshKeyIdentifier, SshKeysUpdateRequest $body): void;
+    public function sshKeysUpdate(
+        SshKeyId|SshKeyFingerprint $sshKeyIdentifier,
+        SshKeysUpdateRequestContent $body,
+    ): void;
 
     /**
      * Requires `bearer_auth` scopes: `ssh_key:delete`.

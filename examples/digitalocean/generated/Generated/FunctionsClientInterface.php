@@ -14,7 +14,7 @@ namespace Acme\DigitalOcean\Generated;
 use Acme\DigitalOcean\Generated\Model\AccessKeyCreateRequest;
 use Acme\DigitalOcean\Generated\Model\CreateNamespace;
 use Acme\DigitalOcean\Generated\Model\CreateTrigger;
-use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequest;
+use Acme\DigitalOcean\Generated\Model\FunctionsAccessKeyUpdateRequestContent;
 use Acme\DigitalOcean\Generated\Model\UpdateTrigger;
 
 /**
@@ -62,7 +62,7 @@ interface FunctionsClientInterface
     public function functionsAccessKeyUpdate(
         string $namespaceId,
         string $keyId,
-        FunctionsAccessKeyUpdateRequest $body,
+        FunctionsAccessKeyUpdateRequestContent $body,
     ): void;
 
     /**

@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Acme\GitHub\Generated;
 
-use Acme\GitHub\Generated\Model\HostedComputeCreateNetworkConfigurationForOrgRequest;
-use Acme\GitHub\Generated\Model\HostedComputeListNetworkConfigurationsForOrgResponse;
-use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgRequest;
+use Acme\GitHub\Generated\Model\HostedComputeCreateNetworkConfigurationForOrgRequestContent;
+use Acme\GitHub\Generated\Model\HostedComputeListNetworkConfigurationsForOrg200Content;
+use Acme\GitHub\Generated\Model\HostedComputeUpdateNetworkConfigurationForOrgRequestContent;
 use Acme\GitHub\Generated\Model\NetworkConfiguration;
 use Acme\GitHub\Generated\Model\NetworkSettings;
 
@@ -30,11 +30,11 @@ interface HostedComputeClientInterface
         string $org,
         ?int $perPage = null,
         ?int $page = null,
-    ): HostedComputeListNetworkConfigurationsForOrgResponse;
+    ): HostedComputeListNetworkConfigurationsForOrg200Content;
 
     public function hostedComputeCreateNetworkConfigurationForOrg(
         string $org,
-        HostedComputeCreateNetworkConfigurationForOrgRequest $body,
+        HostedComputeCreateNetworkConfigurationForOrgRequestContent $body,
     ): NetworkConfiguration;
 
     public function hostedComputeGetNetworkConfigurationForOrg(
@@ -47,7 +47,7 @@ interface HostedComputeClientInterface
     public function hostedComputeUpdateNetworkConfigurationForOrg(
         string $org,
         string $networkConfigurationId,
-        HostedComputeUpdateNetworkConfigurationForOrgRequest $body,
+        HostedComputeUpdateNetworkConfigurationForOrgRequestContent $body,
     ): NetworkConfiguration;
 
     public function hostedComputeGetNetworkSettingsForOrg(string $org, string $networkSettingsId): NetworkSettings;

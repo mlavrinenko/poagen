@@ -11,12 +11,12 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated;
 
-use Acme\Kilbil\Generated\Model\GeneratePromocodeRequest;
-use Acme\Kilbil\Generated\Model\GeneratePromocodeResponse;
-use Acme\Kilbil\Generated\Model\ReservedPromocodeRequest;
-use Acme\Kilbil\Generated\Model\ReservedPromocodeResponse;
-use Acme\Kilbil\Generated\Model\SearchPromocodeRequest;
-use Acme\Kilbil\Generated\Model\SearchPromocodeResponse;
+use Acme\Kilbil\Generated\Model\GeneratePromocode200Content;
+use Acme\Kilbil\Generated\Model\GeneratePromocodeRequestContent;
+use Acme\Kilbil\Generated\Model\ReservedPromocode200Content;
+use Acme\Kilbil\Generated\Model\ReservedPromocodeRequestContent;
+use Acme\Kilbil\Generated\Model\SearchPromocode200Content;
+use Acme\Kilbil\Generated\Model\SearchPromocodeRequestContent;
 use Mlavrinenko\Paogen\Runtime\Contract\Endpoint;
 use Mlavrinenko\Paogen\Runtime\Contract\ResponseType;
 use Mlavrinenko\Paogen\Runtime\Contract\TransportInterface;
@@ -29,27 +29,27 @@ final readonly class PromocodesClient implements PromocodesClientInterface
     ) {
     }
 
-    public function generatePromocode(GeneratePromocodeRequest $body): GeneratePromocodeResponse
+    public function generatePromocode(GeneratePromocodeRequestContent $body): GeneratePromocode200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/generate_promocode')->query('h', $this->h)->json($body),
-            ResponseType::object(GeneratePromocodeResponse::class),
+            ResponseType::object(GeneratePromocode200Content::class),
         );
     }
 
-    public function reservedPromocode(ReservedPromocodeRequest $body): ReservedPromocodeResponse
+    public function reservedPromocode(ReservedPromocodeRequestContent $body): ReservedPromocode200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/reservedpromocode')->query('h', $this->h)->json($body),
-            ResponseType::object(ReservedPromocodeResponse::class),
+            ResponseType::object(ReservedPromocode200Content::class),
         );
     }
 
-    public function searchPromocode(SearchPromocodeRequest $body): SearchPromocodeResponse
+    public function searchPromocode(SearchPromocodeRequestContent $body): SearchPromocode200Content
     {
         return $this->transport->send(
             Endpoint::post('/load/searchpromocode')->query('h', $this->h)->json($body),
-            ResponseType::object(SearchPromocodeResponse::class),
+            ResponseType::object(SearchPromocode200Content::class),
         );
     }
 }

@@ -21,13 +21,13 @@ use Acme\GitHub\Generated\Model\Team;
 use Acme\GitHub\Generated\Model\TeamFull;
 use Acme\GitHub\Generated\Model\TeamMembership;
 use Acme\GitHub\Generated\Model\TeamRepository;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserLegacyRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequest;
-use Acme\GitHub\Generated\Model\TeamsCreateRequest;
-use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequest;
-use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequest;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateMembershipForUserLegacyRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsAddOrUpdateRepoPermissionsLegacyRequestContent;
+use Acme\GitHub\Generated\Model\TeamsCreateRequestContent;
+use Acme\GitHub\Generated\Model\TeamsUpdateInOrgRequestContent;
+use Acme\GitHub\Generated\Model\TeamsUpdateLegacyRequestContent;
 
 /**
  * The contract for the `teams` endpoints.
@@ -48,13 +48,13 @@ interface TeamsClientInterface
         ?TeamsListTeamType $teamType = null,
     ): array;
 
-    public function teamsCreate(string $org, TeamsCreateRequest $body): TeamFull;
+    public function teamsCreate(string $org, TeamsCreateRequestContent $body): TeamFull;
 
     public function teamsGetByName(string $org, string $teamSlug): TeamFull;
 
     public function teamsDeleteInOrg(string $org, string $teamSlug): void;
 
-    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequest $body): TeamFull;
+    public function teamsUpdateInOrg(string $org, string $teamSlug, TeamsUpdateInOrgRequestContent $body): TeamFull;
 
     /**
      * @return list<OrganizationInvitation>
@@ -83,7 +83,7 @@ interface TeamsClientInterface
         string $org,
         string $teamSlug,
         string $username,
-        TeamsAddOrUpdateMembershipForUserInOrgRequest $body,
+        TeamsAddOrUpdateMembershipForUserInOrgRequestContent $body,
     ): TeamMembership;
 
     public function teamsRemoveMembershipForUserInOrg(string $org, string $teamSlug, string $username): void;
@@ -105,7 +105,7 @@ interface TeamsClientInterface
         string $teamSlug,
         string $owner,
         string $repo,
-        TeamsAddOrUpdateRepoPermissionsInOrgRequest $body,
+        TeamsAddOrUpdateRepoPermissionsInOrgRequestContent $body,
     ): void;
 
     public function teamsRemoveRepoInOrg(string $org, string $teamSlug, string $owner, string $repo): void;
@@ -119,7 +119,7 @@ interface TeamsClientInterface
 
     public function teamsDeleteLegacy(int $teamId): void;
 
-    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequest $body): TeamFull;
+    public function teamsUpdateLegacy(int $teamId, TeamsUpdateLegacyRequestContent $body): TeamFull;
 
     /**
      * @return list<OrganizationInvitation>
@@ -147,7 +147,7 @@ interface TeamsClientInterface
     public function teamsAddOrUpdateMembershipForUserLegacy(
         int $teamId,
         string $username,
-        TeamsAddOrUpdateMembershipForUserLegacyRequest $body,
+        TeamsAddOrUpdateMembershipForUserLegacyRequestContent $body,
     ): TeamMembership;
 
     public function teamsRemoveMembershipForUserLegacy(int $teamId, string $username): void;
@@ -163,7 +163,7 @@ interface TeamsClientInterface
         int $teamId,
         string $owner,
         string $repo,
-        TeamsAddOrUpdateRepoPermissionsLegacyRequest $body,
+        TeamsAddOrUpdateRepoPermissionsLegacyRequestContent $body,
     ): void;
 
     public function teamsRemoveRepoLegacy(int $teamId, string $owner, string $repo): void;
