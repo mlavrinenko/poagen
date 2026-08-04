@@ -5,7 +5,11 @@
   tags: ("generator",),
   priority: 5,
   difficulty: 4,
-  status: wip(2026, 8, 4)[Dispatched to a worktree agent off c68c5ce2.],
+  status: done(
+    2026,
+    8,
+    4,
+  )[The profile entry is now the only place a nested XML container name is written. XmlWriterInterface::renderList takes the binding as its own argument, so the writer the transport holds - default or consumer substitute alike - is always the one that renders; PsrRequestBuilder lost its special case entirely rather than gaining a failure path. kilbil's README drops its hand-built XmlWriter recipe. A no-binding XML body is byte-identical and the absent-property diagnostic still fires. Gated on the merged HEAD: 535 tests, both floors held.],
 )
 
 == Summary
