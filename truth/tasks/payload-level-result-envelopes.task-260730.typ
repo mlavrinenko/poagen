@@ -5,7 +5,7 @@
   tags: ("generator", "errors", "decision"),
   priority: 5,
   difficulty: 2,
-  status: wip(2026, 8, 4)[wave 3 agent dispatched],
+  status: done(2026, 8, 4),
 )
 
 == Summary
