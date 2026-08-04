@@ -145,6 +145,16 @@ supplies it); no misplaced modifier (`the same #a(Schema)` must be
 `#the([same], Schema)`). `speconaut fix truth/` rewrites the last two in place;
 the header-comment one is yours to remove.
 
+`speconaut check truth/` parses every artifact in about a second — run it
+directly after any `truth/` edit rather than waiting to hit the failure inside
+a `just check` that takes minutes. It also catches something linecop won't:
+Typst reads a bare `$` in prose as opening math mode, so an unbackticked PHP
+sigil in a task body fails with `eval error: unclosed delimiter`. Because
+`truth/tasks` is excluded from the freshness hash, that failure surfaces to
+whoever runs the gate next, not to whoever wrote it — backtick every sigil.
+The exclusion itself is filed as `a-malformed-task-artifact-records-as-fresh`;
+this entry is the workaround, not the fix.
+
 Long-form notes live in `truth/notes/*.md`, review archives in
 `truth/reviews/*.md`. Decisions do not belong in either.
 
@@ -179,6 +189,21 @@ This project runs MindTape's `gated` preset, which means:
   `review-gate-must-be-mechanical`.
 - `blocked`, `failed` and `cancelled` require a note saying why.
 - A leftover review comment in a task file fails `mt check`.
+- A gate pass covers only the tree it ran against, not whatever lands after
+  it. Run the gate as the last thing before calling work done, after every
+  commit that will be part of it — including a status-flip commit — not
+  before one. Recording a pass and then committing on top of it, trusting the
+  earlier pass to cover the new commit, is how a broken artifact reached
+  `main` on 2026-08-03; the freshness record did not catch it because the
+  file was excluded from its inputs.
+
+`mt` on `PATH` rebuilds the mindtape checkout from source on every
+invocation. When that checkout fails to compile — an uncommitted dependency
+edit was enough on 2026-08-03 — every subcommand exits 101, `mt ls` and
+`mt check` included, and nothing about paogen is at fault. Edit task
+artifacts by hand instead — the format is plain Typst — and validate with
+`speconaut check truth/`; run `scripts/gate-fresh is-fresh` directly for the
+freshness check `mt`'s own `[[on.flip]]` predicate would otherwise run.
 
 `difficulty` scores judgment required, not size: 0–2 mechanical, 3–5 local
 judgment, 6–8 cross-cutting design, 9 the approach itself is the open question.
@@ -255,6 +280,14 @@ paogen change built on a hacked-around dependency is a landmine for the next
 session.
 
 ## Task placement
+
+File a task in the tracker of the project it fixes, not the project the
+symptom surfaced in. `speconaut-mindtape-skew-guard` sat here naming no paogen
+file at all; it was retired and refiled as speconaut's
+`keep-the-embedded-mindtape-in-step-with-the-installed-mt`, with
+`speconaut-mindtape-config-skew` left behind pointing at where it went. A task
+filed against the wrong repo is invisible to whoever can fix it and clutters
+whoever cannot.
 
 One issue per task. Two problems surfaced by one symptom are two tasks.
 
