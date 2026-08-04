@@ -5,7 +5,7 @@
   tags: ("generator", "strictness", "skip"),
   priority: 7,
   difficulty: 5,
-  status: accepted(2026, 8, 2),
+  status: wip(2026, 8, 4)[Dispatched to a worktree agent off 9ee43502.],
 )
 
 == Summary
