@@ -19,6 +19,7 @@ use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\ModelNameLedger;
+use Mlavrinenko\Paogen\Generator\Emit\OperationAnalyzer;
 use Mlavrinenko\Paogen\Generator\Emit\OperationEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\OperationIdAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\QuerySerializationAdvisor;
@@ -155,11 +156,9 @@ final readonly class Generator
             ),
             true,
         );
-        $preScannedSkips = [];
-
-        foreach ($schemaSkips['operations'] as $skip) {
-            $preScannedSkips[$skip->operationId] = $skip->reason;
-        }
+        // Both refusal sources a skip entry has to cover before payload
+        // naming ever sees the operation — see OperationAnalyzer::preScanSkips().
+        $preScannedSkips = OperationAnalyzer::preScanSkips($openApi, $schemaSkips['operations']);
 
         // Payload classes are named before anything is emitted: the model planner emits them, and
         // the operation emitter points its parameters and return types at them (inline-body-and-response-schemas).

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
+use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\Parameter;
 use cebe\openapi\spec\PathItem;
@@ -80,6 +81,67 @@ final readonly class OperationAnalyzer
         }
 
         return "this operation has a parameter outside paogen's supported shapes";
+    }
+
+    /**
+     * Document-wide pass over every operation's path parameters, run before
+     * {@see InlinePayloadPlanner::build()} plans anything — the
+     * path-parameter counterpart to the schema-scan skips {@see SchemaScan}
+     * already supplies. Walks in {@see OperationOrder::inEmissionOrder()},
+     * the same order every other document-wide pass uses, and asks
+     * {@see pathParameters()} the same question {@see OperationEmitter::emit()}
+     * asks at emission time — one predicate, two call sites, so the two
+     * never drift into disagreeing lists of refused operation ids
+     * (path-parameter-skip-leaks-its-payload-model-the-same-way).
+     *
+     * @return list<SkippedOperation>
+     */
+    public static function scanUnresolvablePathParameters(OpenApi $openApi): array
+    {
+        $out = [];
+
+        foreach (OperationOrder::inEmissionOrder($openApi) as [$httpMethod, $pathUri, $operation, $pathItem]) {
+            if (self::pathParameters($operation, $pathItem) !== null) {
+                continue;
+            }
+
+            $out[] = new SkippedOperation(
+                $httpMethod,
+                $pathUri,
+                (string) ($operation->operationId ?? ''),
+                self::describeUnresolvableParameter($operation, $pathItem),
+            );
+        }
+
+        return $out;
+    }
+
+    /**
+     * `Generator::plan()`'s one merged view of every operation refused
+     * before payload naming runs — the document-wide schema-scan skips it
+     * already computed, plus {@see scanUnresolvablePathParameters()}'s. One
+     * map, not two lists computed at two different phases
+     * (path-parameter-skip-leaks-its-payload-model-the-same-way): both
+     * {@see InlinePayloadPlanner::build()} and {@see OperationEmitter::emit()}
+     * read this same result. A schema-scan reason wins a name collision — it
+     * was authoritative before this pass existed.
+     *
+     * @param  list<SkippedOperation> $schemaSkips
+     * @return array<string,string>   raw operationId → reason
+     */
+    public static function preScanSkips(OpenApi $openApi, array $schemaSkips): array
+    {
+        $out = [];
+
+        foreach ($schemaSkips as $skip) {
+            $out[$skip->operationId] = $skip->reason;
+        }
+
+        foreach (self::scanUnresolvablePathParameters($openApi) as $skip) {
+            $out[$skip->operationId] ??= $skip->reason;
+        }
+
+        return $out;
     }
 
     /**

@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: Skipped Operation Unresolvable Path Parameter Fixture
+  version: "1.0.0"
+  description: >
+    path-parameter-skip-leaks-its-payload-model-the-same-way: the sibling of
+    skipped-operation-still-emits-its-payload-model. OperationEmitter can also
+    drop an operation for a path parameter that does not resolve — not a
+    document-wide schema-scan refusal — and that refusal must drop the
+    operation's synthesised payload model the same way a schema-refused
+    operation already does.
+
+    `keepsShared` and `dropsShared` both `$ref` the same
+    `components.requestBodies` entry and are pinned (Profile::$inlineModels)
+    to the same class name, so the shared node is claimed from two places.
+    `dropsShared` also declares an inline-object path parameter — the shape
+    `parameter-shape-gate-3.0.yaml`'s `getWidget` already proves paogen
+    refuses — which gets it refused and skip-covered independent of the body
+    it shares with `keepsShared`. Accepting that skip must drop
+    `dropsShared`'s method without dropping the shared request model
+    `keepsShared` still needs.
+
+    `soleOwner` carries the same unresolvable path parameter, but its own
+    inline request body that no other operation references. Accepting its
+    skip must drop that model too, or the emitted tree carries a class
+    nothing calls, referencing nothing else either.
+paths:
+  /alive:
+    post:
+      operationId: keepsShared
+      requestBody:
+        $ref: '#/components/requestBodies/SharedPayload'
+      responses:
+        '204':
+          description: ok
+  /doomed/{selector}:
+    post:
+      operationId: dropsShared
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+      requestBody:
+        $ref: '#/components/requestBodies/SharedPayload'
+      responses:
+        '204':
+          description: ok
+  /solo/{selector}:
+    post:
+      operationId: soleOwner
+      parameters:
+        - name: selector
+          in: path
+          required: true
+          schema:
+            type: object
+            properties:
+              kind:
+                type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inner:
+                  type: string
+      responses:
+        '204':
+          description: ok
+components:
+  requestBodies:
+    SharedPayload:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              inner:
+                type: string
