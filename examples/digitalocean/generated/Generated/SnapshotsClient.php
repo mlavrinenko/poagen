@@ -45,7 +45,7 @@ final readonly class SnapshotsClient implements SnapshotsClientInterface
                 ->query('page', $page)
                 ->query('resource_type', $resourceType)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class SnapshotsClient implements SnapshotsClientInterface
             Endpoint::get('/v2/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsGet200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SnapshotsGet200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -79,7 +79,7 @@ final readonly class SnapshotsClient implements SnapshotsClientInterface
             Endpoint::delete('/v2/snapshots/{snapshot_id}')
                 ->path('snapshot_id', $snapshotId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

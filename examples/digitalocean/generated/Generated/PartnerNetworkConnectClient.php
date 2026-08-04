@@ -48,7 +48,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -65,7 +65,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::post('/v2/partner_network_connect/attachments')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsCreate202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -82,7 +82,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -99,7 +99,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::delete('/v2/partner_network_connect/attachments/{pa_id}')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsDelete202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsDelete202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -117,7 +117,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsPatch202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PartnerAttachmentsPatch202Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -134,7 +134,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}/bgp_auth_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetBgpAuthKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetBgpAuthKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -156,7 +156,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsListRemoteRoutes200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsListRemoteRoutes200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -173,7 +173,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::get('/v2/partner_network_connect/attachments/{pa_id}/service_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetServiceKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PartnerAttachmentsGetServiceKey200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -190,7 +190,7 @@ final readonly class PartnerNetworkConnectClient implements PartnerNetworkConnec
             Endpoint::post('/v2/partner_network_connect/attachments/{pa_id}/service_key')
                 ->path('pa_id', $paId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

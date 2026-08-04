@@ -66,7 +66,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('name', $name)
                 ->query('type', $type)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsList200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -86,7 +86,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::union(null, new BranchSelector(fields: [
             'droplet' => DropletsCreateResponseSingleDropletResponse::class,
             'droplets' => DropletsCreateResponseMultipleDropletResponse::class,
-        ]), '/components/responses/droplet_create/content/application~1json/schema')], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+        ]), '/components/responses/droplet_create/content/application~1json/schema')], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -103,7 +103,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::delete('/v2/droplets')
                 ->query('tag_name', $tagName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -121,7 +121,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -137,7 +137,7 @@ final readonly class DropletsClient implements DropletsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/v2/droplets/backups/supported_policies')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSupportedBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSupportedBackupPolicies200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -154,7 +154,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::get('/v2/droplets/{droplet_id}')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGet200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -171,7 +171,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::delete('/v2/droplets/{droplet_id}')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -190,7 +190,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackups200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListBackups200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -207,7 +207,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::get('/v2/droplets/{droplet_id}/backups/policy')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGetBackupPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsGetBackupPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -224,7 +224,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::get('/v2/droplets/{droplet_id}/destroy_with_associated_resources')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListAssociatedResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListAssociatedResources200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -242,7 +242,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->path('droplet_id', $dropletId)
                 ->header('X-Dangerous', $xDangerous)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -259,7 +259,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::post('/v2/droplets/{droplet_id}/destroy_with_associated_resources/retry')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -279,7 +279,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -296,7 +296,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::get('/v2/droplets/{droplet_id}/destroy_with_associated_resources/status')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AssociatedResourceStatus::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AssociatedResourceStatus::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -315,7 +315,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListFirewalls200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListFirewalls200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -334,7 +334,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListKernels200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListKernels200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -351,7 +351,7 @@ final readonly class DropletsClient implements DropletsClientInterface
             Endpoint::get('/v2/droplets/{droplet_id}/neighbors')
                 ->path('droplet_id', $dropletId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListNeighbors200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListNeighbors200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -370,7 +370,7 @@ final readonly class DropletsClient implements DropletsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSnapshots200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DropletsListSnapshots200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -386,7 +386,7 @@ final readonly class DropletsClient implements DropletsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/v2/reports/droplet_neighbors_ids')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NeighborIds::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NeighborIds::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

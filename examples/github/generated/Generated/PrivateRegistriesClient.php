@@ -46,7 +46,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesListOrgPrivateRegistries200Content::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesListOrgPrivateRegistries200Content::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
         /** @var Envelope<OrgPrivateRegistryConfigurationWithSelectedRepositories|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/private-registries')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgPrivateRegistryConfigurationWithSelectedRepositories::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgPrivateRegistryConfigurationWithSelectedRepositories::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -76,7 +76,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
         /** @var Envelope<PrivateRegistriesGetOrgPublicKey200Content|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/private-registries/public-key')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesGetOrgPublicKey200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateRegistriesGetOrgPublicKey200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
             Endpoint::get('/orgs/{org}/private-registries/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgPrivateRegistryConfiguration::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgPrivateRegistryConfiguration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -108,7 +108,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
             Endpoint::delete('/orgs/{org}/private-registries/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -128,7 +128,7 @@ final readonly class PrivateRegistriesClient implements PrivateRegistriesClientI
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;

@@ -48,7 +48,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         /** @var Envelope<ConfirmSale200Content|ConfirmSale403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/confirmsale')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ConfirmSale200Content::class)], ['403', ResponseType::object(ConfirmSale403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ConfirmSale200Content::class)], ['403', ResponseType::object(ConfirmSale403Content::class)]])),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         /** @var Envelope<GetDetailingByMove200Content|GetDetailingByMove403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getdetailingbymove')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetDetailingByMove200Content::class)], ['403', ResponseType::object(GetDetailingByMove403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetDetailingByMove200Content::class)], ['403', ResponseType::object(GetDetailingByMove403Content::class)]])),
         );
 
         return $result;
@@ -76,7 +76,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         /** @var Envelope<GetMovesByClient200Content|GetMovesByClient403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getmovesbyclient')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetMovesByClient200Content::class)], ['403', ResponseType::object(GetMovesByClient403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetMovesByClient200Content::class)], ['403', ResponseType::object(GetMovesByClient403Content::class)]])),
         );
 
         return $result;
@@ -90,7 +90,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         /** @var Envelope<ManualAdd200Content|ManualAdd403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/manualadd')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ManualAdd200Content::class)], ['403', ResponseType::object(ManualAdd403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ManualAdd200Content::class)], ['403', ResponseType::object(ManualAdd403Content::class)]])),
         );
 
         return $result;
@@ -104,7 +104,7 @@ final readonly class TransactionsClient implements TransactionsClientInterface
         /** @var Envelope<ProcessSale200Content|ProcessSale403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/processsale')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProcessSale200Content::class)], ['403', ResponseType::object(ProcessSale403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProcessSale200Content::class)], ['403', ResponseType::object(ProcessSale403Content::class)]])),
         );
 
         return $result;

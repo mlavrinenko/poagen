@@ -123,7 +123,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<OrganizationSimple>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/organizations')->query('since', $since)->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', null]])),
         );
 
         return $result;
@@ -137,7 +137,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrganizationFull|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationFull::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -151,7 +151,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<array<string, mixed>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -169,7 +169,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::post('/orgs/{org}/artifacts/metadata/deployment-record')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactDeploymentRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactDeploymentRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -189,7 +189,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('cluster', $cluster)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsSetClusterDeploymentRecords200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsSetClusterDeploymentRecords200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -207,7 +207,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::post('/orgs/{org}/artifacts/metadata/storage-record')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactStorageRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsCreateArtifactStorageRecord200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -223,7 +223,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/artifacts/{subject_digest}/metadata/deployment-records')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactDeploymentRecords200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactDeploymentRecords200Content::class)]])),
         );
 
         return $result;
@@ -239,7 +239,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/artifacts/{subject_digest}/metadata/storage-records')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactStorageRecords200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListArtifactStorageRecords200Content::class)]])),
         );
 
         return $result;
@@ -263,7 +263,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestationsBulk200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestationsBulk200Content::class)]])),
         );
 
         return $result;
@@ -281,7 +281,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::post('/orgs/{org}/attestations/delete-request')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -297,7 +297,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/attestations/digest/{subject_digest}')
                 ->path('org', $org)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -321,7 +321,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgsListAttestationRepositories200ContentItem::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgsListAttestationRepositories200ContentItem::class)]])),
         );
 
         return $result;
@@ -337,7 +337,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/attestations/{attestation_id}')
                 ->path('org', $org)
                 ->path('attestation_id', $attestationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -363,7 +363,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestations200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAttestations200Content::class)]])),
         );
 
         return $result;
@@ -380,7 +380,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -396,7 +396,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/blocks/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -412,7 +412,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/blocks/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -428,7 +428,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/blocks/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -445,7 +445,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -462,7 +462,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -476,7 +476,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrgHook|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/hooks')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -492,7 +492,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/hooks/{hook_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -508,7 +508,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/hooks/{hook_id}')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -525,7 +525,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgHook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -541,7 +541,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/hooks/{hook_id}/config')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -561,7 +561,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -585,7 +585,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -602,7 +602,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -619,7 +619,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -635,7 +635,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::post('/orgs/{org}/hooks/{hook_id}/pings')
                 ->path('org', $org)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -670,7 +670,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('api_route_substring', $apiRouteSubstring),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsRouteStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsRouteStats::class)]])),
         );
 
         return $result;
@@ -701,7 +701,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('subject_name_substring', $subjectNameSubstring),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSubjectStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSubjectStats::class)]])),
         );
 
         return $result;
@@ -721,7 +721,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]])),
         );
 
         return $result;
@@ -743,7 +743,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('user_id', $userId)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]])),
         );
 
         return $result;
@@ -767,7 +767,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('actor_id', $actorId)
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsSummaryStats::class)]])),
         );
 
         return $result;
@@ -789,7 +789,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]])),
         );
 
         return $result;
@@ -813,7 +813,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]])),
         );
 
         return $result;
@@ -839,7 +839,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('min_timestamp', $minTimestamp)
                 ->query('max_timestamp', $maxTimestamp)
                 ->query('timestamp_increment', $timestampIncrement),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsTimeStats::class)]])),
         );
 
         return $result;
@@ -872,7 +872,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('direction', $direction)
                 ->query('sort', $sort)
                 ->query('actor_name_substring', $actorNameSubstring),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsUserStats::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiInsightsUserStats::class)]])),
         );
 
         return $result;
@@ -889,7 +889,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAppInstallations200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListAppInstallations200Content::class)]])),
         );
 
         return $result;
@@ -913,7 +913,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('page', $page)
                 ->query('role', $role)
                 ->query('invitation_source', $invitationSource),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -927,7 +927,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrganizationInvitation|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/invitations')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationInvitation::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationInvitation::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -943,7 +943,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/invitations/{invitation_id}')
                 ->path('org', $org)
                 ->path('invitation_id', $invitationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -965,7 +965,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('invitation_id', $invitationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -979,7 +979,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<IssueField>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/issue-fields')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueField::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueField::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -993,7 +993,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<IssueField|BasicError|ValidationErrorSimple> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/issue-fields')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1009,7 +1009,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/issue-fields/{issue_field_id}')
                 ->path('org', $org)
                 ->path('issue_field_id', $issueFieldId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1026,7 +1026,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('issue_field_id', $issueFieldId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueField::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1040,7 +1040,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<IssueType>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/issue-types')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueType::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueType::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1054,7 +1054,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<IssueType|BasicError|ValidationErrorSimple> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/issue-types')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1071,7 +1071,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('issue_type_id', $issueTypeId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueType::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1087,7 +1087,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/issue-types/{issue_type_id}')
                 ->path('org', $org)
                 ->path('issue_type_id', $issueTypeId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1111,7 +1111,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1127,7 +1127,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['302', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['302', null], ['404', null]])),
         );
 
         return $result;
@@ -1143,7 +1143,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1159,7 +1159,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/memberships/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1179,7 +1179,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1195,7 +1195,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/memberships/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1209,7 +1209,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrgsListOrgRoles200Content|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/organization-roles')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListOrgRoles200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsListOrgRoles200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1225,7 +1225,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/organization-roles/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1242,7 +1242,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('role_id', $roleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null], ['422', null]])),
         );
 
         return $result;
@@ -1259,7 +1259,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('role_id', $roleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1275,7 +1275,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/organization-roles/users/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1292,7 +1292,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('role_id', $roleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null], ['422', null]])),
         );
 
         return $result;
@@ -1309,7 +1309,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('role_id', $roleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1325,7 +1325,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/organization-roles/{role_id}')
                 ->path('org', $org)
                 ->path('role_id', $roleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationRole::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationRole::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1343,7 +1343,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('role_id', $roleId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamRoleAssignment::class)], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamRoleAssignment::class)], ['404', null], ['422', null]])),
         );
 
         return $result;
@@ -1361,7 +1361,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('role_id', $roleId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserRoleAssignment::class)], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserRoleAssignment::class)], ['404', null], ['422', null]])),
         );
 
         return $result;
@@ -1383,7 +1383,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -1403,7 +1403,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['204', ResponseType::nothing()], ['403', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null], ['403', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1419,7 +1419,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/outside_collaborators/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(OrgsRemoveOutsideCollaborator422Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(OrgsRemoveOutsideCollaborator422Content::class)]])),
         );
 
         return $result;
@@ -1457,7 +1457,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('last_used_before', $lastUsedBefore?->format(DateTimeInterface::RFC3339))
                 ->query('last_used_after', $lastUsedAfter?->format(DateTimeInterface::RFC3339))
                 ->query('token_id', $tokenId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrantRequest::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrantRequest::class)]])),
         );
 
         return $result;
@@ -1475,7 +1475,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::post('/orgs/{org}/personal-access-token-requests')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())]])),
         );
 
         return $result;
@@ -1495,7 +1495,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('pat_request_id', $patRequestId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['204', null]])),
         );
 
         return $result;
@@ -1517,7 +1517,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('pat_request_id', $patRequestId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;
@@ -1555,7 +1555,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('last_used_before', $lastUsedBefore?->format(DateTimeInterface::RFC3339))
                 ->query('last_used_after', $lastUsedAfter?->format(DateTimeInterface::RFC3339))
                 ->query('token_id', $tokenId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrant::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(OrganizationProgrammaticAccessGrant::class)]])),
         );
 
         return $result;
@@ -1569,7 +1569,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<BasicError|array<string, mixed>|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/personal-access-tokens')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1586,7 +1586,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('pat_id', $patId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['204', null], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1608,7 +1608,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('pat_id', $patId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['500', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;
@@ -1622,7 +1622,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<CustomProperty>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/properties/schema')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1638,7 +1638,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<CustomProperty>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/properties/schema')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1656,7 +1656,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/properties/schema/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1676,7 +1676,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CustomProperty::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1694,7 +1694,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/properties/schema/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1716,7 +1716,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('repository_query', $repositoryQuery),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgRepoCustomPropertyValues::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgRepoCustomPropertyValues::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1732,7 +1732,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/orgs/{org}/properties/values')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1749,7 +1749,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -1765,7 +1765,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::get('/orgs/{org}/public_members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -1781,7 +1781,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/public_members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1797,7 +1797,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/public_members/{username}')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1819,7 +1819,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('ruleset_id', $rulesetId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1836,7 +1836,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId)
                 ->path('version_id', $versionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1850,7 +1850,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<TeamSimple>> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/security-managers')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamSimple::class)]])),
         );
 
         return $result;
@@ -1866,7 +1866,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/security-managers/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1882,7 +1882,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/security-managers/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1896,7 +1896,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<ImmutableReleasesOrganizationSettings> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/settings/immutable-releases')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImmutableReleasesOrganizationSettings::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImmutableReleasesOrganizationSettings::class)]])),
         );
 
         return $result;
@@ -1914,7 +1914,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/settings/immutable-releases')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1934,7 +1934,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsGetImmutableReleasesSettingsRepositories200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgsGetImmutableReleasesSettingsRepositories200Content::class)]])),
         );
 
         return $result;
@@ -1952,7 +1952,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/settings/immutable-releases/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1970,7 +1970,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::put('/orgs/{org}/settings/immutable-releases/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1988,7 +1988,7 @@ final readonly class OrgsClient implements OrgsClientInterface
             Endpoint::delete('/orgs/{org}/settings/immutable-releases/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2010,7 +2010,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('security_product', $securityProduct)
                 ->path('enablement', $enablement)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', null]])),
         );
 
         return $result;
@@ -2030,7 +2030,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->query('state', $state)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgMembership::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrgMembership::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2044,7 +2044,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrgMembership|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/memberships/orgs/{org}')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2060,7 +2060,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<OrgMembership|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/user/memberships/orgs/{org}')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrgMembership::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2074,7 +2074,7 @@ final readonly class OrgsClient implements OrgsClientInterface
         /** @var Envelope<list<OrganizationSimple>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/orgs')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2091,7 +2091,7 @@ final readonly class OrgsClient implements OrgsClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]])),
         );
 
         return $result;

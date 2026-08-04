@@ -41,7 +41,7 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
         /** @var Envelope<GenerateGiftCard200Content|GenerateGiftCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/generategiftcard')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateGiftCard200Content::class)], ['403', ResponseType::object(GenerateGiftCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateGiftCard200Content::class)], ['403', ResponseType::object(GenerateGiftCard403Content::class)]])),
         );
 
         return $result;
@@ -55,7 +55,7 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
         /** @var Envelope<GetProgramGiftCard200Content|GetProgramGiftCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/load/getprogramgiftcard')->query('h', $this->h),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetProgramGiftCard200Content::class)], ['403', ResponseType::object(GetProgramGiftCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetProgramGiftCard200Content::class)], ['403', ResponseType::object(GetProgramGiftCard403Content::class)]])),
         );
 
         return $result;
@@ -69,7 +69,7 @@ final readonly class GiftCertificatesClient implements GiftCertificatesClientInt
         /** @var Envelope<SearchGiftCard200Content|SearchGiftCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/searchgiftcard')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchGiftCard200Content::class)], ['403', ResponseType::object(SearchGiftCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchGiftCard200Content::class)], ['403', ResponseType::object(SearchGiftCard403Content::class)]])),
         );
 
         return $result;

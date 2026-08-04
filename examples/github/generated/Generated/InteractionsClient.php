@@ -39,7 +39,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForOrgResponseBranch2> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/interaction-limits')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForOrgResponseBranch2::class), '/paths/~1orgs~1{org}~1interaction-limits/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForOrgResponseBranch2::class), '/paths/~1orgs~1{org}~1interaction-limits/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
@@ -53,7 +53,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<InteractionLimitResponse|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/interaction-limits')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -67,7 +67,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/orgs/{org}/interaction-limits')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -83,7 +83,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/interaction-limits')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForRepoResponseBranch2::class), '/paths/~1repos~1{owner}~1{repo}~1interaction-limits/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForRepoResponseBranch2::class), '/paths/~1repos~1{owner}~1{repo}~1interaction-limits/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
@@ -100,7 +100,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['409', null]])),
         );
 
         return $result;
@@ -116,7 +116,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/interaction-limits')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -130,7 +130,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<InteractionLimitResponse|InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/interaction-limits'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2::class), '/paths/~1user~1interaction-limits/get/responses/200/content/application~1json/schema')], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['expires_at' => InteractionLimitResponse::class], empty: InteractionsGetRestrictionsForAuthenticatedUserResponseBranch2::class), '/paths/~1user~1interaction-limits/get/responses/200/content/application~1json/schema')], ['204', null]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<InteractionLimitResponse|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::put('/user/interaction-limits')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(InteractionLimitResponse::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -158,7 +158,7 @@ final readonly class InteractionsClient implements InteractionsClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/interaction-limits'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

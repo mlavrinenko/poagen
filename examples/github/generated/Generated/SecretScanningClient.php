@@ -94,7 +94,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->query('is_publicly_leaked', $isPubliclyLeaked)
                 ->query('is_multi_repo', $isMultiRepo)
                 ->query('hide_secret', $hideSecret),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSecretScanningAlert::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(SecretScanningListAlertsForOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSecretScanningAlert::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(SecretScanningListAlertsForOrg503Content::class)]])),
         );
 
         return $result;
@@ -109,7 +109,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/secret-scanning/pattern-configurations')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPatternConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPatternConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -127,7 +127,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
             Endpoint::patch('/orgs/{org}/secret-scanning/pattern-configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningUpdateOrgPatternConfigs200Content::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningUpdateOrgPatternConfigs200Content::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -179,7 +179,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->query('is_publicly_leaked', $isPubliclyLeaked)
                 ->query('is_multi_repo', $isMultiRepo)
                 ->query('hide_secret', $hideSecret),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningAlert::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningListAlertsForRepo503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningAlert::class)], ['404', null], ['503', ResponseType::object(SecretScanningListAlertsForRepo503Content::class)]])),
         );
 
         return $result;
@@ -201,7 +201,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->query('hide_secret', $hideSecret),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['304', ResponseType::nothing()], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningGetAlert503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['304', null], ['404', null], ['503', ResponseType::object(SecretScanningGetAlert503Content::class)]])),
         );
 
         return $result;
@@ -223,7 +223,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningUpdateAlert503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningAlert::class)], ['400', null], ['404', null], ['422', null], ['503', ResponseType::object(SecretScanningUpdateAlert503Content::class)]])),
         );
 
         return $result;
@@ -247,7 +247,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->path('alert_number', $alertNumber->toScalar())
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningLocation::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningListLocationsForAlert503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SecretScanningLocation::class)], ['404', null], ['503', ResponseType::object(SecretScanningListLocationsForAlert503Content::class)]])),
         );
 
         return $result;
@@ -267,7 +267,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPushProtectionBypass::class)], ['403', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningCreatePushProtectionBypass503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SecretScanningPushProtectionBypass::class)], ['403', null], ['404', null], ['422', null], ['503', ResponseType::object(SecretScanningCreatePushProtectionBypass503Content::class)]])),
         );
 
         return $result;
@@ -283,7 +283,7 @@ final readonly class SecretScanningClient implements SecretScanningClientInterfa
             Endpoint::get('/repos/{owner}/{repo}/secret-scanning/scan-history')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['404', ResponseType::nothing()], ['503', ResponseType::object(SecretScanningGetScanHistory503Content::class)], ['200', ResponseType::object(SecretScanningScanHistory::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['404', null], ['503', ResponseType::object(SecretScanningGetScanHistory503Content::class)], ['200', ResponseType::object(SecretScanningScanHistory::class)]])),
         );
 
         return $result;

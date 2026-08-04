@@ -91,7 +91,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -142,7 +142,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlertWithRepository::class)], ['304', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -159,7 +159,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotRepositoryAccessDetails::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotRepositoryAccessDetails::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -177,7 +177,7 @@ final readonly class DependabotClient implements DependabotClientInterface
             Endpoint::patch('/orgs/{org}/dependabot/repository-access')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -195,7 +195,7 @@ final readonly class DependabotClient implements DependabotClientInterface
             Endpoint::put('/orgs/{org}/dependabot/repository-access/default-level')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -212,7 +212,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListOrgSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListOrgSecrets200Content::class)]])),
         );
 
         return $result;
@@ -226,7 +226,7 @@ final readonly class DependabotClient implements DependabotClientInterface
         /** @var Envelope<DependabotPublicKey> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/dependabot/secrets/public-key')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]])),
         );
 
         return $result;
@@ -242,7 +242,7 @@ final readonly class DependabotClient implements DependabotClientInterface
             Endpoint::get('/orgs/{org}/dependabot/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationDependabotSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationDependabotSecret::class)]])),
         );
 
         return $result;
@@ -262,7 +262,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -278,7 +278,7 @@ final readonly class DependabotClient implements DependabotClientInterface
             Endpoint::delete('/orgs/{org}/dependabot/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -300,7 +300,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListSelectedReposForOrgSecret200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListSelectedReposForOrgSecret200Content::class)]])),
         );
 
         return $result;
@@ -320,7 +320,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -337,7 +337,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -357,7 +357,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -406,7 +406,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlert::class)], ['304', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DependabotAlert::class)], ['304', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -423,7 +423,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -445,7 +445,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -467,7 +467,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListRepoSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotListRepoSecrets200Content::class)]])),
         );
 
         return $result;
@@ -483,7 +483,7 @@ final readonly class DependabotClient implements DependabotClientInterface
             Endpoint::get('/repos/{owner}/{repo}/dependabot/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotPublicKey::class)]])),
         );
 
         return $result;
@@ -500,7 +500,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependabotSecret::class)]])),
         );
 
         return $result;
@@ -522,7 +522,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -539,7 +539,7 @@ final readonly class DependabotClient implements DependabotClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

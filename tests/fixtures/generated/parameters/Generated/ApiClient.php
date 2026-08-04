@@ -40,7 +40,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::post('/inline-body')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -54,7 +54,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::get('/keys/{ssh_key_id}')->path('ssh_key_id', $sshKeyId->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -71,7 +71,7 @@ final readonly class ApiClient implements ApiClientInterface
                 ->query('limit', $limit)
                 ->header('api_key', $apiKey)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)]])),
         );
 
         return $result;
@@ -87,7 +87,7 @@ final readonly class ApiClient implements ApiClientInterface
             Endpoint::post('/order')
                 ->header('Authorization', 'Bearer ' . $this->bearerToken)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)]])),
         );
 
         return $result;
@@ -101,7 +101,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Pet> $result */
         $result = $this->transport->send(
             Endpoint::get('/pet/{petId}')->path('petId', $petId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)]])),
         );
 
         return $result;
@@ -117,7 +117,7 @@ final readonly class ApiClient implements ApiClientInterface
             Endpoint::post('/proxy')
                 ->header('Content-Type', $contentType)
                 ->header('X-Trace-ID', $xTraceId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -133,7 +133,7 @@ final readonly class ApiClient implements ApiClientInterface
             Endpoint::get('/store/{storeId}/items')
                 ->path('storeId', $storeId)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Order::class)], ['404', null]])),
         );
 
         return $result;
@@ -149,7 +149,7 @@ final readonly class ApiClient implements ApiClientInterface
             Endpoint::delete('/store/{storeId}/items')
                 ->path('storeId', $storeId)
                 ->header('X-API-Key', $this->apiKey),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -164,7 +164,7 @@ final readonly class ApiClient implements ApiClientInterface
         $result = $this->transport->send(
             Endpoint::post('/token')
                 ->form(['grantType' => $grantType, 'clientId' => $clientId, 'scope' => $scope]),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

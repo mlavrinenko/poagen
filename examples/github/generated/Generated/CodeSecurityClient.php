@@ -57,7 +57,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -75,7 +75,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::post('/enterprises/{enterprise}/code-security/configurations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -90,7 +90,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations/defaults')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)]])),
         );
 
         return $result;
@@ -108,7 +108,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::get('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::delete('/enterprises/{enterprise}/code-security/configurations/{configuration_id}')
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -164,7 +164,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -184,7 +184,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('enterprise', $enterprise)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterprise200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefaultForEnterprise200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -210,7 +210,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('status', $status),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -234,7 +234,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfiguration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -252,7 +252,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::post('/orgs/{org}/code-security/configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeSecurityConfiguration::class)]])),
         );
 
         return $result;
@@ -267,7 +267,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/code-security/configurations/defaults')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityDefaultConfigurations::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -285,7 +285,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::delete('/orgs/{org}/code-security/configurations/detach')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -301,7 +301,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::get('/orgs/{org}/code-security/configurations/{configuration_id}')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -317,7 +317,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::delete('/orgs/{org}/code-security/configurations/{configuration_id}')
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -337,7 +337,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfiguration::class)], ['204', null]])),
         );
 
         return $result;
@@ -357,7 +357,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())]])),
         );
 
         return $result;
@@ -377,7 +377,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->path('org', $org)
                 ->path('configuration_id', $configurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefault200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecuritySetConfigurationAsDefault200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -403,7 +403,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('status', $status),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeSecurityConfigurationRepositories::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -419,7 +419,7 @@ final readonly class CodeSecurityClient implements CodeSecurityClientInterface
             Endpoint::get('/repos/{owner}/{repo}/code-security-configuration')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfigurationForRepository::class)], ['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeSecurityConfigurationForRepository::class)], ['204', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

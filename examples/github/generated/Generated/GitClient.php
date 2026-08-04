@@ -47,7 +47,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('file_sha', $fileSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Blob::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Blob::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -64,7 +64,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -81,7 +81,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitCommit::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitCommit::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -98,7 +98,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GitRef::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GitRef::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -115,7 +115,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -132,7 +132,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -149,7 +149,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', null], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -167,7 +167,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('repo', $repo)
                 ->path('ref', $ref)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitRef::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -184,7 +184,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTag::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTag::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -201,7 +201,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('tag_sha', $tagSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTag::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTag::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -218,7 +218,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -236,7 +236,7 @@ final readonly class GitClient implements GitClientInterface
                 ->path('repo', $repo)
                 ->path('tree_sha', $treeSha)
                 ->query('recursive', $recursive),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitTree::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

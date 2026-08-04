@@ -62,7 +62,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -79,7 +79,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::post('/v2/monitoring/alerts')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -96,7 +96,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::get('/v2/monitoring/alerts/{alert_uuid}')
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -114,7 +114,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringUpdateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringUpdateAlertPolicy200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -131,7 +131,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::delete('/v2/monitoring/alerts/{alert_uuid}')
                 ->path('alert_uuid', $alertUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -155,7 +155,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -179,7 +179,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -203,7 +203,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -227,7 +227,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -251,7 +251,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -273,7 +273,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -299,7 +299,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -323,7 +323,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -347,7 +347,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -373,7 +373,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -399,7 +399,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -418,7 +418,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -437,7 +437,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -456,7 +456,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -482,7 +482,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -501,7 +501,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -520,7 +520,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -539,7 +539,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -558,7 +558,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -577,7 +577,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -596,7 +596,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -615,7 +615,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -634,7 +634,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -653,7 +653,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -672,7 +672,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -694,7 +694,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -716,7 +716,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -738,7 +738,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -760,7 +760,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -782,7 +782,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -804,7 +804,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -823,7 +823,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -842,7 +842,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -861,7 +861,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -880,7 +880,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -899,7 +899,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -918,7 +918,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -937,7 +937,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -956,7 +956,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -975,7 +975,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -994,7 +994,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1013,7 +1013,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1032,7 +1032,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1051,7 +1051,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1070,7 +1070,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1089,7 +1089,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1108,7 +1108,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1127,7 +1127,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1146,7 +1146,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1165,7 +1165,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1184,7 +1184,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1203,7 +1203,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1222,7 +1222,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1241,7 +1241,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1260,7 +1260,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1279,7 +1279,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1301,7 +1301,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1320,7 +1320,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->query('start', $start)
                 ->query('end', $end)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Metrics::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1337,7 +1337,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::get('/v2/monitoring/sinks')
                 ->query('resource_id', $resourceId?->toScalar())
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListSinks200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListSinks200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1354,7 +1354,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::post('/v2/monitoring/sinks')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1370,7 +1370,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
         $result = $this->transport->send(
             Endpoint::get('/v2/monitoring/sinks/destinations')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListDestinations200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringListDestinations200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1387,7 +1387,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::post('/v2/monitoring/sinks/destinations')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringCreateDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1404,7 +1404,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::get('/v2/monitoring/sinks/destinations/{destination_uuid}')
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetDestination200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1422,7 +1422,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1439,7 +1439,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::delete('/v2/monitoring/sinks/destinations/{destination_uuid}')
                 ->path('destination_uuid', $destinationUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1456,7 +1456,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::get('/v2/monitoring/sinks/{sink_uuid}')
                 ->path('sink_uuid', $sinkUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetSink200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MonitoringGetSink200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -1473,7 +1473,7 @@ final readonly class MonitoringClient implements MonitoringClientInterface
             Endpoint::delete('/v2/monitoring/sinks/{sink_uuid}')
                 ->path('sink_uuid', $sinkUuid)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

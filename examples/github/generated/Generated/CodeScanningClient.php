@@ -112,7 +112,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('sort', $sort)
                 ->query('severity', $severity)
                 ->query('assignees', $assignees),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningOrganizationAlertItems::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningOrganizationAlertItems::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForOrg503Content::class)]])),
         );
 
         return $result;
@@ -156,7 +156,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('state', $state)
                 ->query('severity', $severity)
                 ->query('assignees', $assignees),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertItems::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForRepo503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertItems::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertsForRepo503Content::class)]])),
         );
 
         return $result;
@@ -173,7 +173,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAlert503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAlert503Content::class)]])),
         );
 
         return $result;
@@ -195,7 +195,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateAlert503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAlert::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateAlert503Content::class)]])),
         );
 
         return $result;
@@ -212,7 +212,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAutofix503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAutofix503Content::class)]])),
         );
 
         return $result;
@@ -229,7 +229,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['202', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningCreateAutofix503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAutofix::class)], ['202', ResponseType::object(CodeScanningAutofix::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null], ['503', ResponseType::object(CodeScanningCreateAutofix503Content::class)]])),
         );
 
         return $result;
@@ -251,7 +251,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('repo', $repo)
                 ->path('alert_number', $alertNumber->toScalar())
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningAutofixCommitsResponse::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningCommitAutofix503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningAutofixCommitsResponse::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null], ['503', ResponseType::object(CodeScanningCommitAutofix503Content::class)]])),
         );
 
         return $result;
@@ -279,7 +279,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('per_page', $perPage)
                 ->query('ref', $ref?->toScalar())
                 ->query('pr', $pr),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertInstanceList::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertInstances503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAlertInstanceList::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListAlertInstances503Content::class)]])),
         );
 
         return $result;
@@ -315,7 +315,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->query('sarif_id', $sarifId?->toScalar())
                 ->query('direction', $direction)
                 ->query('sort', $sort),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListRecentAnalyses503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListRecentAnalyses503Content::class)]])),
         );
 
         return $result;
@@ -332,7 +332,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('analysis_id', $analysisId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAnalysis503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysis::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetAnalysis503Content::class)]])),
         );
 
         return $result;
@@ -354,7 +354,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('repo', $repo)
                 ->path('analysis_id', $analysisId)
                 ->query('confirm_delete', $confirmDelete),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysisDeletion::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteAnalysis503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningAnalysisDeletion::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteAnalysis503Content::class)]])),
         );
 
         return $result;
@@ -370,7 +370,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/codeql/databases')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningCodeqlDatabase::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListCodeqlDatabases503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeScanningCodeqlDatabase::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningListCodeqlDatabases503Content::class)]])),
         );
 
         return $result;
@@ -387,7 +387,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('language', $language),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningCodeqlDatabase::class)], ['302', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetCodeqlDatabase503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningCodeqlDatabase::class)], ['302', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetCodeqlDatabase503Content::class)]])),
         );
 
         return $result;
@@ -404,7 +404,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('language', $language),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteCodeqlDatabase503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningDeleteCodeqlDatabase503Content::class)]])),
         );
 
         return $result;
@@ -424,7 +424,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningCreateVariantAnalysis503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningCreateVariantAnalysis503Content::class)]])),
         );
 
         return $result;
@@ -444,7 +444,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('codeql_variant_analysis_id', $codeqlVariantAnalysisId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysis503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysis::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysis503Content::class)]])),
         );
 
         return $result;
@@ -468,7 +468,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('codeql_variant_analysis_id', $codeqlVariantAnalysisId)
                 ->path('repo_owner', $repoOwner)
                 ->path('repo_name', $repoName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysisRepoTask::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysisRepoTask503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningVariantAnalysisRepoTask::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetVariantAnalysisRepoTask503Content::class)]])),
         );
 
         return $result;
@@ -484,7 +484,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
             Endpoint::get('/repos/{owner}/{repo}/code-scanning/default-setup')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningDefaultSetup::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetDefaultSetup503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningDefaultSetup::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningGetDefaultSetup503Content::class)]])),
         );
 
         return $result;
@@ -504,7 +504,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EmptyObject::class)], ['202', ResponseType::object(CodeScanningDefaultSetupUpdateResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateDefaultSetup503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EmptyObject::class)], ['202', ResponseType::object(CodeScanningDefaultSetupUpdateResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodeScanningUpdateDefaultSetup503Content::class)]])),
         );
 
         return $result;
@@ -524,7 +524,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodeScanningSarifsReceipt::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningUploadSarif503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodeScanningSarifsReceipt::class)], ['400', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', null], ['503', ResponseType::object(CodeScanningUploadSarif503Content::class)]])),
         );
 
         return $result;
@@ -541,7 +541,7 @@ final readonly class CodeScanningClient implements CodeScanningClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('sarif_id', $sarifId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningSarifsStatus::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()], ['503', ResponseType::object(CodeScanningGetSarif503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeScanningSarifsStatus::class)], ['403', ResponseType::object(BasicError::class)], ['404', null], ['503', ResponseType::object(CodeScanningGetSarif503Content::class)]])),
         );
 
         return $result;

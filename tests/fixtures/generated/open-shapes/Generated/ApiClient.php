@@ -34,7 +34,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<SaveOpen200Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/open')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveOpen200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveOpen200Content::class)]])),
         );
 
         return $result;

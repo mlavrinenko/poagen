@@ -43,7 +43,7 @@ final readonly class LicensesClient implements LicensesClientInterface
                 ->query('featured', $featured)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(LicenseSimple::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(LicenseSimple::class)], ['304', null]])),
         );
 
         return $result;
@@ -57,7 +57,7 @@ final readonly class LicensesClient implements LicensesClientInterface
         /** @var Envelope<License|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/licenses/{license}')->path('license', $license),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(License::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(License::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -74,7 +74,7 @@ final readonly class LicensesClient implements LicensesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref?->toScalar()),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LicenseContent::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LicenseContent::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

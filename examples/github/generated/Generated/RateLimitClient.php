@@ -34,7 +34,7 @@ final readonly class RateLimitClient implements RateLimitClientInterface
         /** @var Envelope<RateLimitOverview|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/rate_limit'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RateLimitOverview::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RateLimitOverview::class)], ['304', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

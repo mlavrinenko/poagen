@@ -51,7 +51,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/v2/functions/namespaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListNamespaces200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListNamespaces200Content::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -68,7 +68,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
             Endpoint::post('/v2/functions/namespaces')
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -85,7 +85,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
             Endpoint::get('/v2/functions/namespaces/{namespace_id}')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['403', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetNamespace200Content::class)], ['401', ResponseType::object(Error::class)], ['403', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -102,7 +102,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
             Endpoint::delete('/v2/functions/namespaces/{namespace_id}')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -119,7 +119,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
             Endpoint::get('/v2/functions/namespaces/{namespace_id}/keys')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyList200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -137,7 +137,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FunctionsAccessKeyCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FunctionsAccessKeyCreate201Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -159,7 +159,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('key_id', $keyId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyUpdate200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsAccessKeyUpdate200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['409', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -177,7 +177,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('namespace_id', $namespaceId)
                 ->path('key_id', $keyId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -194,7 +194,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
             Endpoint::get('/v2/functions/namespaces/{namespace_id}/triggers')
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListTriggers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsListTriggers200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -212,7 +212,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('namespace_id', $namespaceId)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsCreateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['422', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -230,7 +230,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('namespace_id', $namespaceId)
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetTrigger200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsGetTrigger200Content::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -249,7 +249,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsUpdateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FunctionsUpdateTrigger200Content::class)], ['400', ResponseType::object(Error::class)], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -267,7 +267,7 @@ final readonly class FunctionsClient implements FunctionsClientInterface
                 ->path('namespace_id', $namespaceId)
                 ->path('trigger_name', $triggerName)
                 ->header('Authorization', 'Bearer ' . $this->bearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(Error::class)], ['404', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

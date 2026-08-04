@@ -59,7 +59,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('team_type', $teamType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -73,7 +73,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         /** @var Envelope<TeamFull|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/teams')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(TeamFull::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(TeamFull::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -89,7 +89,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::get('/orgs/{org}/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -105,7 +105,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::delete('/orgs/{org}/teams/{team_slug}')
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', null]])),
         );
 
         return $result;
@@ -122,7 +122,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)], ['422', null]])),
         );
 
         return $result;
@@ -168,7 +168,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -185,7 +185,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', null]])),
         );
 
         return $result;
@@ -207,7 +207,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', null], ['422', null]])),
         );
 
         return $result;
@@ -224,7 +224,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('org', $org)
                 ->path('team_slug', $teamSlug)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', null]])),
         );
 
         return $result;
@@ -246,7 +246,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;
@@ -268,7 +268,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', null], ['404', null]])),
         );
 
         return $result;
@@ -292,7 +292,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -310,7 +310,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -332,7 +332,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_slug', $teamSlug)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)]])),
         );
 
         return $result;
@@ -346,7 +346,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         /** @var Envelope<TeamFull|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/teams/{team_id}')->path('team_id', $teamId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -360,7 +360,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/teams/{team_id}')->path('team_id', $teamId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -374,7 +374,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         /** @var Envelope<TeamFull|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/teams/{team_id}')->path('team_id', $teamId)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamFull::class)], ['201', ResponseType::object(TeamFull::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -391,7 +391,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationInvitation::class)]])),
         );
 
         return $result;
@@ -413,7 +413,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->query('role', $role)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -429,7 +429,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::get('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -445,7 +445,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::put('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null], ['422', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -461,7 +461,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::delete('/teams/{team_id}/members/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -477,7 +477,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::get('/teams/{team_id}/memberships/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -497,7 +497,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', ResponseType::nothing()], ['422', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamMembership::class)], ['403', null], ['422', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -513,7 +513,7 @@ final readonly class TeamsClient implements TeamsClientInterface
             Endpoint::delete('/teams/{team_id}/memberships/{username}')
                 ->path('team_id', $teamId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', null]])),
         );
 
         return $result;
@@ -530,7 +530,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -547,7 +547,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(TeamRepository::class)], ['204', null], ['404', null]])),
         );
 
         return $result;
@@ -569,7 +569,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -586,7 +586,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -603,7 +603,7 @@ final readonly class TeamsClient implements TeamsClientInterface
                 ->path('team_id', $teamId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -617,7 +617,7 @@ final readonly class TeamsClient implements TeamsClientInterface
         /** @var Envelope<list<TeamFull>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/teams')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamFull::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TeamFull::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

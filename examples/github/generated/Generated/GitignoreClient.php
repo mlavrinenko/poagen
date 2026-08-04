@@ -33,7 +33,7 @@ final readonly class GitignoreClient implements GitignoreClientInterface
         /** @var Envelope<list<string>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/gitignore/templates'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['304', null]])),
         );
 
         return $result;
@@ -47,7 +47,7 @@ final readonly class GitignoreClient implements GitignoreClientInterface
         /** @var Envelope<GitignoreTemplate|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/gitignore/templates/{name}')->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitignoreTemplate::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GitignoreTemplate::class)], ['304', null]])),
         );
 
         return $result;

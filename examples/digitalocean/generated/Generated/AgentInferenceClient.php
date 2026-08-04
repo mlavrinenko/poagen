@@ -39,7 +39,7 @@ final readonly class AgentInferenceClient implements AgentInferenceClientInterfa
                 ->query('agent', $agent)
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

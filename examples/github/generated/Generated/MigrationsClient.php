@@ -54,7 +54,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('exclude', $exclude),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)]])),
         );
 
         return $result;
@@ -68,7 +68,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
         /** @var Envelope<Migration|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/migrations')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -86,7 +86,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('org', $org)
                 ->path('migration_id', $migrationId)
                 ->query('exclude', $exclude),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -102,7 +102,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::get('/orgs/{org}/migrations/{migration_id}/archive')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -118,7 +118,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::delete('/orgs/{org}/migrations/{migration_id}/archive')
                 ->path('org', $org)
                 ->path('migration_id', $migrationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -135,7 +135,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('org', $org)
                 ->path('migration_id', $migrationId)
                 ->path('repo_name', $repoName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -157,7 +157,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('migration_id', $migrationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -173,7 +173,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -193,7 +193,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -209,7 +209,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/import')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -229,7 +229,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -246,7 +246,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('since', $since),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterAuthor::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterAuthor::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -268,7 +268,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('repo', $repo)
                 ->path('author_id', $authorId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PorterAuthor::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PorterAuthor::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -284,7 +284,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/import/large_files')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterLargeFile::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PorterLargeFile::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -304,7 +304,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Import::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -318,7 +318,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
         /** @var Envelope<list<Migration>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/migrations')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Migration::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -333,7 +333,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
         /** @var Envelope<Migration|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/migrations')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Migration::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -350,7 +350,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::get('/user/migrations/{migration_id}')
                 ->path('migration_id', $migrationId)
                 ->query('exclude', $exclude),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Migration::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -365,7 +365,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/migrations/{migration_id}/archive')
                 ->path('migration_id', $migrationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -380,7 +380,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/user/migrations/{migration_id}/archive')
                 ->path('migration_id', $migrationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -396,7 +396,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
             Endpoint::delete('/user/migrations/{migration_id}/repos/{repo_name}/lock')
                 ->path('migration_id', $migrationId)
                 ->path('repo_name', $repoName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -416,7 +416,7 @@ final readonly class MigrationsClient implements MigrationsClientInterface
                 ->path('migration_id', $migrationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

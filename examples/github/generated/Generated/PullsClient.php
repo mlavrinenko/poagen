@@ -88,7 +88,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['304', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['304', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -105,7 +105,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequest::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequest::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -133,7 +133,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]])),
         );
 
         return $result;
@@ -150,7 +150,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -167,7 +167,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -189,7 +189,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewComment::class)]])),
         );
 
         return $result;
@@ -206,7 +206,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['406', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsGet503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['406', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsGet503Content::class)]])),
         );
 
         return $result;
@@ -228,7 +228,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequest::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -258,7 +258,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReviewComment::class)]])),
         );
 
         return $result;
@@ -280,7 +280,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -304,7 +304,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestReviewComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -328,7 +328,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)]])),
         );
 
         return $result;
@@ -352,7 +352,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DiffEntry::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsListFiles503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DiffEntry::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(PullsListFiles503Content::class)]])),
         );
 
         return $result;
@@ -369,7 +369,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -387,7 +387,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestMergeResult::class)], ['405', ResponseType::object(PullsMerge405Content::class)], ['409', ResponseType::object(PullsMerge409Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestMergeResult::class)], ['405', ResponseType::object(PullsMerge405Content::class)], ['409', ResponseType::object(PullsMerge409Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -404,7 +404,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewRequest::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReviewRequest::class)]])),
         );
 
         return $result;
@@ -426,7 +426,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestSimple::class)], ['422', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PullRequestSimple::class)], ['422', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -448,7 +448,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestSimple::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestSimple::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -472,7 +472,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReview::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestReview::class)]])),
         );
 
         return $result;
@@ -494,7 +494,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -512,7 +512,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -536,7 +536,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -554,7 +554,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -580,7 +580,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('review_id', $reviewId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReviewComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReviewComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -604,7 +604,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -628,7 +628,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('pull_number', $pullNumber)
                 ->path('review_id', $reviewId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PullRequestReview::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -650,7 +650,7 @@ final readonly class PullsClient implements PullsClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PullsUpdateBranch202Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(PullsUpdateBranch202Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

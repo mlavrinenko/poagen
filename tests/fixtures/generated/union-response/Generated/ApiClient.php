@@ -38,7 +38,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Dog|Cat> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
@@ -52,7 +52,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<list<Dog|Cat>> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/list'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures~1list/get/responses/200/content/application~1json/schema'))]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class, 'meow' => Cat::class]), '/paths/~1creatures~1list/get/responses/200/content/application~1json/schema'))]])),
         );
 
         return $result;
@@ -66,7 +66,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Dog|GetRestrictionsResponseBranch2> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/restrictions'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class], empty: GetRestrictionsResponseBranch2::class), '/paths/~1creatures~1restrictions/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(null, new BranchSelector(fields: ['bark' => Dog::class], empty: GetRestrictionsResponseBranch2::class), '/paths/~1creatures~1restrictions/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
@@ -80,7 +80,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Dog|Cat> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/tagged'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'kind', map: ['canine' => Dog::class, 'feline' => Cat::class], onParent: false), null, '/paths/~1creatures~1tagged/get/responses/200/content/application~1json/schema')]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'kind', map: ['canine' => Dog::class, 'feline' => Cat::class], onParent: false), null, '/paths/~1creatures~1tagged/get/responses/200/content/application~1json/schema')]])),
         );
 
         return $result;
@@ -94,7 +94,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Celsius> $result */
         $result = $this->transport->send(
             Endpoint::get('/creatures/undecidable'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Celsius::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Celsius::class)]])),
         );
 
         return $result;

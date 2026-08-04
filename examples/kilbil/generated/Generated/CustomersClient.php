@@ -54,7 +54,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<AddClient200Content|AddClient403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/addclient')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClient200Content::class)], ['403', ResponseType::object(AddClient403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClient200Content::class)], ['403', ResponseType::object(AddClient403Content::class)]])),
         );
 
         return $result;
@@ -68,7 +68,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<BlockCard200Content|BlockCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/blockcard')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BlockCard200Content::class)], ['403', ResponseType::object(BlockCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BlockCard200Content::class)], ['403', ResponseType::object(BlockCard403Content::class)]])),
         );
 
         return $result;
@@ -82,7 +82,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<GetClientCards200Content|GetClientCards403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getclientcards')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientCards200Content::class)], ['403', ResponseType::object(GetClientCards403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientCards200Content::class)], ['403', ResponseType::object(GetClientCards403Content::class)]])),
         );
 
         return $result;
@@ -96,7 +96,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<list<GetClientFullBalance200ContentItem>|GetClientFullBalance403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getclientfullbalance')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GetClientFullBalance200ContentItem::class)], ['403', ResponseType::object(GetClientFullBalance403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GetClientFullBalance200ContentItem::class)], ['403', ResponseType::object(GetClientFullBalance403Content::class)]])),
         );
 
         return $result;
@@ -110,7 +110,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<GetConfirmationCode200Content|GetConfirmationCode403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getconfirmationcode')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetConfirmationCode200Content::class)], ['403', ResponseType::object(GetConfirmationCode403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetConfirmationCode200Content::class)], ['403', ResponseType::object(GetConfirmationCode403Content::class)]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<ReplaceCard200Content|ReplaceCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/replacecard')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReplaceCard200Content::class)], ['403', ResponseType::object(ReplaceCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReplaceCard200Content::class)], ['403', ResponseType::object(ReplaceCard403Content::class)]])),
         );
 
         return $result;
@@ -138,7 +138,7 @@ final readonly class CustomersClient implements CustomersClientInterface
         /** @var Envelope<SearchClient200Content|SearchClient403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/searchclient')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchClient200Content::class)], ['403', ResponseType::object(SearchClient403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchClient200Content::class)], ['403', ResponseType::object(SearchClient403Content::class)]])),
         );
 
         return $result;

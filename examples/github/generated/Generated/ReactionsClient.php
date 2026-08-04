@@ -57,7 +57,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -79,7 +79,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -101,7 +101,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -127,7 +127,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -149,7 +149,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -171,7 +171,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -197,7 +197,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -219,7 +219,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -237,7 +237,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->path('reaction_id', $reactionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -263,7 +263,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -285,7 +285,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -307,7 +307,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -333,7 +333,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->query('content', $content)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Reaction::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -355,7 +355,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Reaction::class)], ['201', ResponseType::object(Reaction::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -373,7 +373,7 @@ final readonly class ReactionsClient implements ReactionsClientInterface
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->path('reaction_id', $reactionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

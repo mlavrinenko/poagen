@@ -78,7 +78,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInOrganization200Content::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInOrganization200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -94,7 +94,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/codespaces/access')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -112,7 +112,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::post('/orgs/{org}/codespaces/access/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -130,7 +130,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::delete('/orgs/{org}/codespaces/access/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['400', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -147,7 +147,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListOrgSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListOrgSecrets200Content::class)]])),
         );
 
         return $result;
@@ -161,7 +161,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         /** @var Envelope<CodespacesPublicKey> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/codespaces/secrets/public-key')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]])),
         );
 
         return $result;
@@ -177,7 +177,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::get('/orgs/{org}/codespaces/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesOrgSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesOrgSecret::class)]])),
         );
 
         return $result;
@@ -197,7 +197,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -213,7 +213,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::delete('/orgs/{org}/codespaces/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -235,7 +235,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSelectedReposForOrgSecret200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSelectedReposForOrgSecret200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -255,7 +255,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null]])),
         );
 
         return $result;
@@ -272,7 +272,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -292,7 +292,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -314,7 +314,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesGetCodespacesForUserInOrg200Content::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesGetCodespacesForUserInOrg200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -331,7 +331,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -348,7 +348,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('org', $org)
                 ->path('username', $username)
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -370,7 +370,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -390,7 +390,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithRepoForAuthenticatedUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithRepoForAuthenticatedUser503Content::class)]])),
         );
 
         return $result;
@@ -412,7 +412,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListDevcontainersInRepositoryForAuthenticatedUser200Content::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -436,7 +436,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->query('location', $location)
                 ->query('client_ip', $clientIp)
                 ->query('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesRepoMachinesForAuthenticatedUser200Content::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesRepoMachinesForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -458,7 +458,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->query('ref', $ref)
                 ->query('client_ip', $clientIp),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPreFlightWithRepoForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -480,7 +480,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->query('ref', $ref)
                 ->query('devcontainer_path', $devcontainerPath),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPermissionsCheckForDevcontainer::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(CodespacesCheckPermissionsForDevcontainer503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPermissionsCheckForDevcontainer::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(CodespacesCheckPermissionsForDevcontainer503Content::class)]])),
         );
 
         return $result;
@@ -502,7 +502,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepoSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepoSecrets200Content::class)]])),
         );
 
         return $result;
@@ -518,7 +518,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::get('/repos/{owner}/{repo}/codespaces/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesPublicKey::class)]])),
         );
 
         return $result;
@@ -535,7 +535,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepoCodespacesSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepoCodespacesSecret::class)]])),
         );
 
         return $result;
@@ -557,7 +557,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -574,7 +574,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -596,7 +596,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->path('repo', $repo)
                 ->path('pull_number', $pullNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithPrForAuthenticatedUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateWithPrForAuthenticatedUser503Content::class)]])),
         );
 
         return $result;
@@ -616,7 +616,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListForAuthenticatedUser200Content::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -631,7 +631,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         /** @var Envelope<Codespace|BasicError|CodespacesCreateForAuthenticatedUser503Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/codespaces')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateForAuthenticatedUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Codespace::class)], ['202', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CodespacesCreateForAuthenticatedUser503Content::class)]])),
         );
 
         return $result;
@@ -647,7 +647,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::get('/user/codespaces/secrets')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSecretsForAuthenticatedUser200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListSecretsForAuthenticatedUser200Content::class)]])),
         );
 
         return $result;
@@ -661,7 +661,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         /** @var Envelope<CodespacesUserPublicKey> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/public-key'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesUserPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesUserPublicKey::class)]])),
         );
 
         return $result;
@@ -676,7 +676,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesSecret::class)]])),
         );
 
         return $result;
@@ -694,7 +694,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::put('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -709,7 +709,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/user/codespaces/secrets/{secret_name}')
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -724,7 +724,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/codespaces/secrets/{secret_name}/repositories')
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesListRepositoriesForSecretForAuthenticatedUser200Content::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -742,7 +742,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::put('/user/codespaces/secrets/{secret_name}/repositories')
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -760,7 +760,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::put('/user/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -778,7 +778,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::delete('/user/codespaces/secrets/{secret_name}/repositories/{repository_id}')
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -793,7 +793,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -808,7 +808,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -826,7 +826,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::patch('/user/codespaces/{codespace_name}')
                 ->path('codespace_name', $codespaceName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -841,7 +841,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/exports')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodespaceExportDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(CodespaceExportDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -857,7 +857,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::get('/user/codespaces/{codespace_name}/exports/{export_id}')
                 ->path('codespace_name', $codespaceName)
                 ->path('export_id', $exportId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespaceExportDetails::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespaceExportDetails::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -872,7 +872,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/codespaces/{codespace_name}/machines')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUser200Content::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodespacesCodespaceMachinesForAuthenticatedUser200Content::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -890,7 +890,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
             Endpoint::post('/user/codespaces/{codespace_name}/publish')
                 ->path('codespace_name', $codespaceName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodespaceWithFullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CodespaceWithFullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -905,7 +905,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/start')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['402', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['304', null], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['402', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -920,7 +920,7 @@ final readonly class CodespacesClient implements CodespacesClientInterface
         $result = $this->transport->send(
             Endpoint::post('/user/codespaces/{codespace_name}/stop')
                 ->path('codespace_name', $codespaceName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Codespace::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

@@ -90,7 +90,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('sort', $sort),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GlobalAdvisory::class)], ['429', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GlobalAdvisory::class)], ['429', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -104,7 +104,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
         /** @var Envelope<GlobalAdvisory|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/advisories/{ghsa_id}')->path('ghsa_id', $ghsaId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GlobalAdvisory::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GlobalAdvisory::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -132,7 +132,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('after', $after)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -162,7 +162,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->query('after', $after)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryAdvisory::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -182,7 +182,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -202,7 +202,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -219,7 +219,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -241,7 +241,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryAdvisory::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -261,7 +261,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -278,7 +278,7 @@ final readonly class SecurityAdvisoriesClient implements SecurityAdvisoriesClien
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ghsa_id', $ghsaId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

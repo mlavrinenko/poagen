@@ -56,7 +56,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
                 ->query('direction', $direction)
                 ->query('state', $state)
                 ->query('sort', $sort),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsListOrgCampaigns503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsListOrgCampaigns503Content::class)]])),
         );
 
         return $result;
@@ -70,7 +70,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
         /** @var Envelope<CampaignSummary|BasicError|null|CampaignsCreateCampaign503Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/campaigns')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['429', ResponseType::nothing()], ['503', ResponseType::object(CampaignsCreateCampaign503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['429', null], ['503', ResponseType::object(CampaignsCreateCampaign503Content::class)]])),
         );
 
         return $result;
@@ -86,7 +86,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
             Endpoint::get('/orgs/{org}/campaigns/{campaign_number}')
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsGetCampaignSummary503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsGetCampaignSummary503Content::class)]])),
         );
 
         return $result;
@@ -102,7 +102,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
             Endpoint::delete('/orgs/{org}/campaigns/{campaign_number}')
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsDeleteCampaign503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsDeleteCampaign503Content::class)]])),
         );
 
         return $result;
@@ -122,7 +122,7 @@ final readonly class CampaignsClient implements CampaignsClientInterface
                 ->path('org', $org)
                 ->path('campaign_number', $campaignNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsUpdateCampaign503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CampaignSummary::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['503', ResponseType::object(CampaignsUpdateCampaign503Content::class)]])),
         );
 
         return $result;

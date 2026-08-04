@@ -42,7 +42,7 @@ final readonly class PromocodesClient implements PromocodesClientInterface
         /** @var Envelope<GeneratePromocode200Content|GeneratePromocode403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/generate_promocode')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GeneratePromocode200Content::class)], ['403', ResponseType::object(GeneratePromocode403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GeneratePromocode200Content::class)], ['403', ResponseType::object(GeneratePromocode403Content::class)]])),
         );
 
         return $result;
@@ -56,7 +56,7 @@ final readonly class PromocodesClient implements PromocodesClientInterface
         /** @var Envelope<ReservedPromocode200Content|ReservedPromocode403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/reservedpromocode')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedPromocode200Content::class)], ['403', ResponseType::object(ReservedPromocode403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReservedPromocode200Content::class)], ['403', ResponseType::object(ReservedPromocode403Content::class)]])),
         );
 
         return $result;
@@ -70,7 +70,7 @@ final readonly class PromocodesClient implements PromocodesClientInterface
         /** @var Envelope<SearchPromocode200Content|SearchPromocode403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/searchpromocode')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchPromocode200Content::class)], ['403', ResponseType::object(SearchPromocode403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchPromocode200Content::class)], ['403', ResponseType::object(SearchPromocode403Content::class)]])),
         );
 
         return $result;

@@ -33,7 +33,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<User|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/user')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -48,7 +48,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<User|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/createWithList')->jsonList($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -64,7 +64,7 @@ final readonly class UserClient implements UserClientInterface
             Endpoint::get('/user/login')
                 ->query('username', $username)
                 ->query('password', $password),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['400', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -78,7 +78,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/logout'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<User|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(User::class)], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -106,7 +106,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::put('/user/{username}')->path('username', $username)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -120,7 +120,7 @@ final readonly class UserClient implements UserClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;

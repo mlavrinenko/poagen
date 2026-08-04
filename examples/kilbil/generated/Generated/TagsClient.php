@@ -45,7 +45,7 @@ final readonly class TagsClient implements TagsClientInterface
         /** @var Envelope<AddClientTags200Content|AddClientTags403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/addclienttags')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClientTags200Content::class)], ['403', ResponseType::object(AddClientTags403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AddClientTags200Content::class)], ['403', ResponseType::object(AddClientTags403Content::class)]])),
         );
 
         return $result;
@@ -59,7 +59,7 @@ final readonly class TagsClient implements TagsClientInterface
         /** @var Envelope<DeleteClientTags200Content|DeleteClientTags403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/deleteclienttags')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteClientTags200Content::class)], ['403', ResponseType::object(DeleteClientTags403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteClientTags200Content::class)], ['403', ResponseType::object(DeleteClientTags403Content::class)]])),
         );
 
         return $result;
@@ -73,7 +73,7 @@ final readonly class TagsClient implements TagsClientInterface
         /** @var Envelope<GetClientTags200Content|GetClientTags403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getclienttags')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientTags200Content::class)], ['403', ResponseType::object(GetClientTags403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetClientTags200Content::class)], ['403', ResponseType::object(GetClientTags403Content::class)]])),
         );
 
         return $result;
@@ -87,7 +87,7 @@ final readonly class TagsClient implements TagsClientInterface
         /** @var Envelope<GetListTags200Content|GetListTags403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getlisttags')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetListTags200Content::class)], ['403', ResponseType::object(GetListTags403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetListTags200Content::class)], ['403', ResponseType::object(GetListTags403Content::class)]])),
         );
 
         return $result;

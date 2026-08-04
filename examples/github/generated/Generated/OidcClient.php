@@ -39,7 +39,7 @@ final readonly class OidcClient implements OidcClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/oidc/customization/properties/repo')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -57,7 +57,7 @@ final readonly class OidcClient implements OidcClientInterface
             Endpoint::post('/enterprises/{enterprise}/actions/oidc/customization/properties/repo')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', null], ['403', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -75,7 +75,7 @@ final readonly class OidcClient implements OidcClientInterface
             Endpoint::delete('/enterprises/{enterprise}/actions/oidc/customization/properties/repo/{custom_property_name}')
                 ->path('enterprise', $enterprise)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', null], ['403', ResponseType::object(BasicError::class)], ['404', null]])),
         );
 
         return $result;
@@ -90,7 +90,7 @@ final readonly class OidcClient implements OidcClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/oidc/customization/properties/repo')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OidcCustomPropertyInclusion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -108,7 +108,7 @@ final readonly class OidcClient implements OidcClientInterface
             Endpoint::post('/orgs/{org}/actions/oidc/customization/properties/repo')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OidcCustomPropertyInclusion::class)], ['400', null], ['403', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class OidcClient implements OidcClientInterface
             Endpoint::delete('/orgs/{org}/actions/oidc/customization/properties/repo/{custom_property_name}')
                 ->path('org', $org)
                 ->path('custom_property_name', $customPropertyName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', null], ['403', ResponseType::object(BasicError::class)], ['404', null]])),
         );
 
         return $result;
@@ -138,7 +138,7 @@ final readonly class OidcClient implements OidcClientInterface
         /** @var Envelope<OidcCustomSub> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/oidc/customization/sub')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSub::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSub::class)]])),
         );
 
         return $result;
@@ -156,7 +156,7 @@ final readonly class OidcClient implements OidcClientInterface
             Endpoint::put('/orgs/{org}/actions/oidc/customization/sub')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

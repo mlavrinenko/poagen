@@ -32,7 +32,7 @@ final readonly class EmojisClient implements EmojisClientInterface
         /** @var Envelope<array<string, string>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/emojis'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::string())], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::string())], ['304', null]])),
         );
 
         return $result;

@@ -44,7 +44,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise-team', $enterpriseTeam)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -64,7 +64,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -84,7 +84,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -104,7 +104,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SimpleUser::class)]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SimpleUser::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class EnterpriseTeamMembershipsClient implements EnterpriseTeamMe
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

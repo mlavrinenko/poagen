@@ -113,7 +113,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('pulls', $pulls)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -147,7 +147,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -169,7 +169,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -186,7 +186,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('assignee', $assignee),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -228,7 +228,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -245,7 +245,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesCreate503Content::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesCreate503Content::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -273,7 +273,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueComment::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueComment::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -290,7 +290,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -307,7 +307,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -329,7 +329,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -346,7 +346,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueComment::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -363,7 +363,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['503', ResponseType::object(IssuesUnpinComment503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['503', ResponseType::object(IssuesUnpinComment503Content::class)]])),
         );
 
         return $result;
@@ -385,7 +385,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueEvent::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueEvent::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -402,7 +402,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('event_id', $eventId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueEvent::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(IssueEvent::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -419,7 +419,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -441,7 +441,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesUpdate503Content::class)], ['403', ResponseType::object(BasicError::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesUpdate503Content::class)], ['403', ResponseType::object(BasicError::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -463,7 +463,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)]])),
         );
 
         return $result;
@@ -485,7 +485,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)]])),
         );
 
         return $result;
@@ -507,7 +507,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->path('assignee', $assignee),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -533,7 +533,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueComment::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueComment::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -555,7 +555,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(IssueComment::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(IssueComment::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -579,7 +579,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -601,7 +601,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -623,7 +623,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->path('issue_id', $issueId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -647,7 +647,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -671,7 +671,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueEventForIssue::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueEventForIssue::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -695,7 +695,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -719,7 +719,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -736,7 +736,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -754,7 +754,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -776,7 +776,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -793,7 +793,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -810,7 +810,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -832,7 +832,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -856,7 +856,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -878,7 +878,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Issue::class)], ['403', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -900,7 +900,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['503', ResponseType::object(IssuesReprioritizeSubIssue503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Issue::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['503', ResponseType::object(IssuesReprioritizeSubIssue503Content::class)]])),
         );
 
         return $result;
@@ -924,7 +924,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('issue_number', $issueNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TimelineIssueEvents::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(TimelineIssueEvents::class)], ['404', ResponseType::object(BasicError::class)], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -946,7 +946,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -963,7 +963,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Label::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Label::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -980,7 +980,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Label::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Label::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -997,7 +997,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1019,7 +1019,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Label::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Label::class)]])),
         );
 
         return $result;
@@ -1047,7 +1047,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Milestone::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Milestone::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1067,7 +1067,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Milestone::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Milestone::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1084,7 +1084,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('milestone_number', $milestoneNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Milestone::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Milestone::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1101,7 +1101,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('milestone_number', $milestoneNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1123,7 +1123,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repo', $repo)
                 ->path('milestone_number', $milestoneNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Milestone::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Milestone::class)]])),
         );
 
         return $result;
@@ -1147,7 +1147,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('milestone_number', $milestoneNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Label::class)]])),
         );
 
         return $result;
@@ -1167,7 +1167,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repository_id', $repositoryId)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesSetIssueFieldValues503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesSetIssueFieldValues503Content::class)]])),
         );
 
         return $result;
@@ -1187,7 +1187,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repository_id', $repositoryId)
                 ->path('issue_number', $issueNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesAddIssueFieldValues503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IssueFieldValue::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesAddIssueFieldValues503Content::class)]])),
         );
 
         return $result;
@@ -1204,7 +1204,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->path('repository_id', $repositoryId)
                 ->path('issue_number', $issueNumber)
                 ->path('issue_field_id', $issueFieldId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesDeleteIssueFieldValue503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(IssuesDeleteIssueFieldValue503Content::class)]])),
         );
 
         return $result;
@@ -1234,7 +1234,7 @@ final readonly class IssuesClient implements IssuesClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Issue::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;

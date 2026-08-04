@@ -64,7 +64,7 @@ final readonly class PackagesClient implements PackagesClientInterface
         /** @var Envelope<list<Package>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/docker/conflicts')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -88,7 +88,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', null]])),
         );
 
         return $result;
@@ -108,7 +108,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]])),
         );
 
         return $result;
@@ -128,7 +128,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -150,7 +150,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->query('token', $token),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -176,7 +176,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -198,7 +198,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]])),
         );
 
         return $result;
@@ -220,7 +220,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -242,7 +242,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('org', $org)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -256,7 +256,7 @@ final readonly class PackagesClient implements PackagesClientInterface
         /** @var Envelope<list<Package>> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/docker/conflicts'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)]])),
         );
 
         return $result;
@@ -278,7 +278,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['400', null]])),
         );
 
         return $result;
@@ -296,7 +296,7 @@ final readonly class PackagesClient implements PackagesClientInterface
             Endpoint::get('/user/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]])),
         );
 
         return $result;
@@ -314,7 +314,7 @@ final readonly class PackagesClient implements PackagesClientInterface
             Endpoint::delete('/user/packages/{package_type}/{package_name}')
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -334,7 +334,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->query('token', $token),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -358,7 +358,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('state', $state),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -378,7 +378,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]])),
         );
 
         return $result;
@@ -398,7 +398,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -418,7 +418,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -432,7 +432,7 @@ final readonly class PackagesClient implements PackagesClientInterface
         /** @var Envelope<list<Package>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/users/{username}/docker/conflicts')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -456,7 +456,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->query('visibility', $visibility)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Package::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['400', null]])),
         );
 
         return $result;
@@ -476,7 +476,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Package::class)]])),
         );
 
         return $result;
@@ -496,7 +496,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -518,7 +518,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->query('token', $token),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -538,7 +538,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_type', $packageType)
                 ->path('package_name', $packageName)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PackageVersion::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -560,7 +560,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('package_version_id', $packageVersionId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PackageVersion::class)]])),
         );
 
         return $result;
@@ -582,7 +582,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -604,7 +604,7 @@ final readonly class PackagesClient implements PackagesClientInterface
                 ->path('package_name', $packageName)
                 ->path('username', $username)
                 ->path('package_version_id', $packageVersionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

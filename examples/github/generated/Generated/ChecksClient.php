@@ -52,7 +52,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CheckRun::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CheckRun::class)]])),
         );
 
         return $result;
@@ -69,7 +69,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]])),
         );
 
         return $result;
@@ -91,7 +91,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckRun::class)]])),
         );
 
         return $result;
@@ -115,7 +115,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('check_run_id', $checkRunId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CheckAnnotation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CheckAnnotation::class)]])),
         );
 
         return $result;
@@ -132,7 +132,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_run_id', $checkRunId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -149,7 +149,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)], ['201', ResponseType::object(CheckSuite::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)], ['201', ResponseType::object(CheckSuite::class)]])),
         );
 
         return $result;
@@ -169,7 +169,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuitePreference::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuitePreference::class)]])),
         );
 
         return $result;
@@ -186,7 +186,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_suite_id', $checkSuiteId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckSuite::class)]])),
         );
 
         return $result;
@@ -216,7 +216,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForSuite200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForSuite200Content::class)]])),
         );
 
         return $result;
@@ -233,7 +233,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('check_suite_id', $checkSuiteId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -265,7 +265,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('app_id', $appId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForRef200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListForRef200Content::class)]])),
         );
 
         return $result;
@@ -293,7 +293,7 @@ final readonly class ChecksClient implements ChecksClientInterface
                 ->query('check_name', $checkName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListSuitesForRef200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChecksListSuitesForRef200Content::class)]])),
         );
 
         return $result;

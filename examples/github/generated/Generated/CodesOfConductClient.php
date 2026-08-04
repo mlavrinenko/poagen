@@ -34,7 +34,7 @@ final readonly class CodesOfConductClient implements CodesOfConductClientInterfa
         /** @var Envelope<list<CodeOfConduct>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/codes_of_conduct'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeOfConduct::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeOfConduct::class)], ['304', null]])),
         );
 
         return $result;
@@ -48,7 +48,7 @@ final readonly class CodesOfConductClient implements CodesOfConductClientInterfa
         /** @var Envelope<CodeOfConduct|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/codes_of_conduct/{key}')->path('key', $key),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeOfConduct::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeOfConduct::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;

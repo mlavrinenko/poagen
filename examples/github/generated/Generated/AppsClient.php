@@ -63,7 +63,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<Integration> $result */
         $result = $this->transport->send(
             Endpoint::get('/app'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)]])),
         );
 
         return $result;
@@ -77,7 +77,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<AppsCreateFromManifest201Content|BasicError|ValidationErrorSimple> $result */
         $result = $this->transport->send(
             Endpoint::post('/app-manifests/{code}/conversions')->path('code', $code),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AppsCreateFromManifest201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AppsCreateFromManifest201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -91,7 +91,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<WebhookConfig> $result */
         $result = $this->transport->send(
             Endpoint::get('/app/hook/config'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -105,7 +105,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<WebhookConfig> $result */
         $result = $this->transport->send(
             Endpoint::patch('/app/hook/config')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -125,7 +125,7 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -140,7 +140,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/app/hook/deliveries/{delivery_id}')
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -155,7 +155,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::post('/app/hook/deliveries/{delivery_id}/attempts')
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -171,7 +171,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/app/installation-requests')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IntegrationInstallationRequest::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(IntegrationInstallationRequest::class)], ['304', null], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -193,7 +193,7 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('page', $page)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('outdated', $outdated),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Installation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Installation::class)]])),
         );
 
         return $result;
@@ -208,7 +208,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/app/installations/{installation_id}')
                 ->path('installation_id', $installationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -223,7 +223,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/app/installations/{installation_id}')
                 ->path('installation_id', $installationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -241,7 +241,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::post('/app/installations/{installation_id}/access_tokens')
                 ->path('installation_id', $installationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(InstallationToken::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(InstallationToken::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -256,7 +256,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::put('/app/installations/{installation_id}/suspended')
                 ->path('installation_id', $installationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -271,7 +271,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/app/installations/{installation_id}/suspended')
                 ->path('installation_id', $installationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -287,7 +287,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::delete('/applications/{client_id}/grant')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -303,7 +303,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::post('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -319,7 +319,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::delete('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -335,7 +335,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::patch('/applications/{client_id}/token')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -351,7 +351,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::post('/applications/{client_id}/token/scoped')
                 ->path('client_id', $clientId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Authorization::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -365,7 +365,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<Integration|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/apps/{app_slug}')->path('app_slug', $appSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Integration::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -381,7 +381,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/installation/repositories')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListReposAccessibleToInstallation200Content::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListReposAccessibleToInstallation200Content::class)], ['403', ResponseType::object(BasicError::class)], ['304', null], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -395,7 +395,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/installation/token'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -410,7 +410,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/accounts/{account_id}')
                 ->path('account_id', $accountId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -426,7 +426,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/marketplace_listing/plans')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -450,7 +450,7 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -465,7 +465,7 @@ final readonly class AppsClient implements AppsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/marketplace_listing/stubbed/accounts/{account_id}')
                 ->path('account_id', $accountId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MarketplacePurchase::class)], ['404', null], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -481,7 +481,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/marketplace_listing/stubbed/plans')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplaceListingPlan::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -505,7 +505,7 @@ final readonly class AppsClient implements AppsClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MarketplacePurchase::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -519,7 +519,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<Installation> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/installation')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]])),
         );
 
         return $result;
@@ -535,7 +535,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/installation')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -551,7 +551,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/user/installations')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationsForAuthenticatedUser200Content::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationsForAuthenticatedUser200Content::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -571,7 +571,7 @@ final readonly class AppsClient implements AppsClientInterface
                 ->path('installation_id', $installationId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationReposForAuthenticatedUser200Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AppsListInstallationReposForAuthenticatedUser200Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -587,7 +587,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::put('/user/installations/{installation_id}/repositories/{repository_id}')
                 ->path('installation_id', $installationId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -605,7 +605,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::delete('/user/installations/{installation_id}/repositories/{repository_id}')
                 ->path('installation_id', $installationId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -621,7 +621,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/user/marketplace_purchases')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', null], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -639,7 +639,7 @@ final readonly class AppsClient implements AppsClientInterface
             Endpoint::get('/user/marketplace_purchases/stubbed')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', ResponseType::nothing()], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(UserMarketplacePurchase::class)], ['304', null], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -653,7 +653,7 @@ final readonly class AppsClient implements AppsClientInterface
         /** @var Envelope<Installation> $result */
         $result = $this->transport->send(
             Endpoint::get('/users/{username}/installation')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Installation::class)]])),
         );
 
         return $result;

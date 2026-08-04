@@ -43,7 +43,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HostedComputeListNetworkConfigurationsForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HostedComputeListNetworkConfigurationsForOrg200Content::class)]])),
         );
 
         return $result;
@@ -61,7 +61,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
             Endpoint::post('/orgs/{org}/settings/network-configurations')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(NetworkConfiguration::class)]])),
         );
 
         return $result;
@@ -77,7 +77,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
             Endpoint::get('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]])),
         );
 
         return $result;
@@ -95,7 +95,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
             Endpoint::delete('/orgs/{org}/settings/network-configurations/{network_configuration_id}')
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -115,7 +115,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
                 ->path('org', $org)
                 ->path('network_configuration_id', $networkConfigurationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkConfiguration::class)]])),
         );
 
         return $result;
@@ -131,7 +131,7 @@ final readonly class HostedComputeClient implements HostedComputeClientInterface
             Endpoint::get('/orgs/{org}/settings/network-settings/{network_settings_id}')
                 ->path('org', $org)
                 ->path('network_settings_id', $networkSettingsId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkSettings::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(NetworkSettings::class)]])),
         );
 
         return $result;

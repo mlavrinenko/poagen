@@ -44,7 +44,7 @@ final readonly class MiscClient implements MiscClientInterface
         /** @var Envelope<CloseSession200Content|CloseSession403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/closesession')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloseSession200Content::class)], ['403', ResponseType::object(CloseSession403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloseSession200Content::class)], ['403', ResponseType::object(CloseSession403Content::class)]])),
         );
 
         return $result;
@@ -58,7 +58,7 @@ final readonly class MiscClient implements MiscClientInterface
         /** @var Envelope<ExchangePosSettings200Content|ExchangePosSettings403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/exchangepossettings')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ExchangePosSettings200Content::class)], ['403', ResponseType::object(ExchangePosSettings403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ExchangePosSettings200Content::class)], ['403', ResponseType::object(ExchangePosSettings403Content::class)]])),
         );
 
         return $result;
@@ -72,7 +72,7 @@ final readonly class MiscClient implements MiscClientInterface
         /** @var Envelope<GenerateCard200Content|GenerateCard403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/generatecard')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateCard200Content::class)], ['403', ResponseType::object(GenerateCard403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GenerateCard200Content::class)], ['403', ResponseType::object(GenerateCard403Content::class)]])),
         );
 
         return $result;
@@ -86,7 +86,7 @@ final readonly class MiscClient implements MiscClientInterface
         /** @var Envelope<LegalInfo200Content|LegalInfo403Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/load/legal_info')->query('h', $this->h),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LegalInfo200Content::class)], ['403', ResponseType::object(LegalInfo403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(LegalInfo200Content::class)], ['403', ResponseType::object(LegalInfo403Content::class)]])),
         );
 
         return $result;

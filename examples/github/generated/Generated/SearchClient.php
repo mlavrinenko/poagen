@@ -68,7 +68,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCode200Content::class)], ['304', ResponseType::nothing()], ['503', ResponseType::object(SearchCode503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCode200Content::class)], ['304', null], ['503', ResponseType::object(SearchCode503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCommits200Content::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchCommits200Content::class)], ['304', null]])),
         );
 
         return $result;
@@ -120,7 +120,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('page', $page)
                 ->query('advanced_search', $advancedSearch)
                 ->query('search_type', $searchType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchIssuesAndPullRequests200Content::class)], ['503', ResponseType::object(SearchIssuesAndPullRequests503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchIssuesAndPullRequests200Content::class)], ['503', ResponseType::object(SearchIssuesAndPullRequests503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -146,7 +146,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchLabels200Content::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchLabels200Content::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -170,7 +170,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchRepos200Content::class)], ['503', ResponseType::object(SearchRepos503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchRepos200Content::class)], ['503', ResponseType::object(SearchRepos503Content::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null]])),
         );
 
         return $result;
@@ -187,7 +187,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('q', $q)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchTopics200Content::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchTopics200Content::class)], ['304', null]])),
         );
 
         return $result;
@@ -211,7 +211,7 @@ final readonly class SearchClient implements SearchClientInterface
                 ->query('order', $order)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchUsers200Content::class)], ['304', ResponseType::nothing()], ['503', ResponseType::object(SearchUsers503Content::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SearchUsers200Content::class)], ['304', null], ['503', ResponseType::object(SearchUsers503Content::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;

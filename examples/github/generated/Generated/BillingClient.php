@@ -62,7 +62,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('page', $page)
                 ->query('per_page', $perPage)
                 ->query('scope', $scope),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetAllBudgets::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetAllBudgets::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -78,7 +78,7 @@ final readonly class BillingClient implements BillingClientInterface
             Endpoint::get('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetBudgetOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetBudgetOrg503Content::class)]])),
         );
 
         return $result;
@@ -94,7 +94,7 @@ final readonly class BillingClient implements BillingClientInterface
             Endpoint::delete('/organizations/{org}/settings/billing/budgets/{budget_id}')
                 ->path('org', $org)
                 ->path('budget_id', $budgetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingDeleteBudgetOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeleteBudget::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingDeleteBudgetOrg503Content::class)]])),
         );
 
         return $result;
@@ -114,7 +114,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->path('org', $org)
                 ->path('budget_id', $budgetId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUpdateBudgetOrg200Content::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUpdateBudgetOrg200Content::class)], ['400', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -142,7 +142,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('user', $user)
                 ->query('model', $model)
                 ->query('product', $product),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportOrg503Content::class)]])),
         );
 
         return $result;
@@ -164,7 +164,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('year', $year)
                 ->query('month', $month)
                 ->query('day', $day),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReport::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReport::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportOrg503Content::class)]])),
         );
 
         return $result;
@@ -192,7 +192,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('repository', $repository)
                 ->query('product', $product)
                 ->query('sku', $sku),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportOrg503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportOrg::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportOrg503Content::class)]])),
         );
 
         return $result;
@@ -218,7 +218,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('day', $day)
                 ->query('model', $model)
                 ->query('product', $product),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingPremiumRequestUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingPremiumRequestUsageReportUser503Content::class)]])),
         );
 
         return $result;
@@ -240,7 +240,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('year', $year)
                 ->query('month', $month)
                 ->query('day', $day),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageReportUser503Content::class)]])),
         );
 
         return $result;
@@ -268,7 +268,7 @@ final readonly class BillingClient implements BillingClientInterface
                 ->query('repository', $repository)
                 ->query('product', $product)
                 ->query('sku', $sku),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportUser503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BillingUsageSummaryReportUser::class)], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(BillingGetGithubBillingUsageSummaryReportUser503Content::class)]])),
         );
 
         return $result;

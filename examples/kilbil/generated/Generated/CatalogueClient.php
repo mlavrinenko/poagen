@@ -50,7 +50,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Goods200Content::class)], ['403', ResponseType::object(Goods403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Goods200Content::class)], ['403', ResponseType::object(Goods403Content::class)]])),
         );
 
         return $result;
@@ -68,7 +68,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->jsonList($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsList200Content::class)], ['403', ResponseType::object(GoodsList403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsList200Content::class)], ['403', ResponseType::object(GoodsList403Content::class)]])),
         );
 
         return $result;
@@ -86,7 +86,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goodslist', 'goodlist'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsListXml200Content::class)], ['403', ResponseType::object(GoodsListXml403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsListXml200Content::class)], ['403', ResponseType::object(GoodsListXml403Content::class)]])),
         );
 
         return $result;
@@ -105,7 +105,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('id', $id)
                 ->query('h', $this->h)
                 ->xmlList($body, 'goods', 'good'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsXml200Content::class)], ['403', ResponseType::object(GoodsXml403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsXml200Content::class)], ['403', ResponseType::object(GoodsXml403Content::class)]])),
         );
 
         return $result;

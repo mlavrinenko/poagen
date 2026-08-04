@@ -45,7 +45,7 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
             Endpoint::post('/v1/async-invoke')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AsyncInvokeResponse::class)], ['202', ResponseType::object(AsyncInvokeResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AsyncInvokeResponse::class)], ['202', ResponseType::object(AsyncInvokeResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -61,7 +61,7 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
             Endpoint::post('/v1/chat/completions')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ChatCompletionResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -77,7 +77,7 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
             Endpoint::post('/v1/images/generations')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ImagesResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
         $result = $this->transport->send(
             Endpoint::get('/v1/models')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ListModelsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ListModelsResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;
@@ -108,7 +108,7 @@ final readonly class ServerlessInferenceClient implements ServerlessInferenceCli
             Endpoint::post('/v1/responses')
                 ->header('Authorization', 'Bearer ' . $this->inferenceBearerAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CreateResponseResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], ranges: [], default: ResponseType::object(Error::class))),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CreateResponseResponse::class)], ['401', ResponseType::object(Error::class)], ['429', ResponseType::object(Error::class)], ['500', ResponseType::object(Error::class)]], default: ResponseType::object(Error::class))),
         );
 
         return $result;

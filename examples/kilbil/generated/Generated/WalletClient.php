@@ -36,7 +36,7 @@ final readonly class WalletClient implements WalletClientInterface
         /** @var Envelope<GetWalletLink200Content|GetWalletLink403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getwalletlink')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetWalletLink200Content::class)], ['403', ResponseType::object(GetWalletLink403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetWalletLink200Content::class)], ['403', ResponseType::object(GetWalletLink403Content::class)]])),
         );
 
         return $result;

@@ -39,7 +39,7 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
         /** @var Envelope<AskConfirmPhone200Content|AskConfirmPhone403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/askconfirmphone')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AskConfirmPhone200Content::class)], ['403', ResponseType::object(AskConfirmPhone403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(AskConfirmPhone200Content::class)], ['403', ResponseType::object(AskConfirmPhone403Content::class)]])),
         );
 
         return $result;
@@ -53,7 +53,7 @@ final readonly class ConfirmationCodesClient implements ConfirmationCodesClientI
         /** @var Envelope<CheckConfirmPhoneCode200Content|CheckConfirmPhoneCode403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/checkconfirmphonecode')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckConfirmPhoneCode200Content::class)], ['403', ResponseType::object(CheckConfirmPhoneCode403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckConfirmPhoneCode200Content::class)], ['403', ResponseType::object(CheckConfirmPhoneCode403Content::class)]])),
         );
 
         return $result;

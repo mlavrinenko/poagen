@@ -64,7 +64,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -80,7 +80,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
             Endpoint::get('/orgs/{org}/projectsV2/{project_number}')
                 ->path('project_number', $projectNumber)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -100,7 +100,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -161,7 +161,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->path('field_id', $fieldId)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -190,7 +190,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -210,7 +210,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -233,7 +233,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('org', $org)
                 ->path('item_id', $itemId)
                 ->query('fields', $fields),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -250,7 +250,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->path('org', $org)
                 ->path('item_id', $itemId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -272,7 +272,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('org', $org)
                 ->path('item_id', $itemId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -292,7 +292,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('org', $org)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -321,7 +321,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -341,7 +341,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('user_id', $userId)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -361,7 +361,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('user_id', $userId)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2View::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['503', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -385,7 +385,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -401,7 +401,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
             Endpoint::get('/users/{username}/projectsV2/{project_number}')
                 ->path('project_number', $projectNumber)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -425,7 +425,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('per_page', $perPage)
                 ->query('before', $before)
                 ->query('after', $after),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -445,7 +445,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('username', $username)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -462,7 +462,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->path('field_id', $fieldId)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2Field::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -491,7 +491,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('per_page', $perPage)
                 ->query('q', $q)
                 ->query('fields', $fields),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -511,7 +511,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('username', $username)
                 ->path('project_number', $projectNumber)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ProjectsV2ItemSimple::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -534,7 +534,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('username', $username)
                 ->path('item_id', $itemId)
                 ->query('fields', $fields),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -551,7 +551,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('project_number', $projectNumber)
                 ->path('username', $username)
                 ->path('item_id', $itemId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -573,7 +573,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->path('username', $username)
                 ->path('item_id', $itemId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProjectsV2ItemWithContent::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -602,7 +602,7 @@ final readonly class ProjectsClient implements ProjectsClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ProjectsV2ItemWithContent::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

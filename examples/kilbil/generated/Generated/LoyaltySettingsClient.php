@@ -38,7 +38,7 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
         /** @var Envelope<GetActionsList200Content|GetActionsList403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getactionslist')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetActionsList200Content::class)], ['403', ResponseType::object(GetActionsList403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetActionsList200Content::class)], ['403', ResponseType::object(GetActionsList403Content::class)]])),
         );
 
         return $result;
@@ -53,7 +53,7 @@ final readonly class LoyaltySettingsClient implements LoyaltySettingsClientInter
         /** @var Envelope<GetPrograms200Content|GetPrograms403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getprograms')->query('h', $this->h)->jsonRaw($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetPrograms200Content::class)], ['403', ResponseType::object(GetPrograms403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetPrograms200Content::class)], ['403', ResponseType::object(GetPrograms403Content::class)]])),
         );
 
         return $result;

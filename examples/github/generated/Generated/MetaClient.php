@@ -36,7 +36,7 @@ final readonly class MetaClient implements MetaClientInterface
         /** @var Envelope<Root> $result */
         $result = $this->transport->send(
             Endpoint::get('/'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Root::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Root::class)]])),
         );
 
         return $result;
@@ -50,7 +50,7 @@ final readonly class MetaClient implements MetaClientInterface
         /** @var Envelope<ApiOverview|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/meta'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiOverview::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiOverview::class)], ['304', null]])),
         );
 
         return $result;
@@ -64,7 +64,7 @@ final readonly class MetaClient implements MetaClientInterface
         /** @var Envelope<string> $result */
         $result = $this->transport->send(
             Endpoint::get('/octocat')->query('s', $s),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]])),
         );
 
         return $result;
@@ -78,7 +78,7 @@ final readonly class MetaClient implements MetaClientInterface
         /** @var Envelope<list<DateTimeImmutable>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/versions'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::dateTime())], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::dateTime())], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class MetaClient implements MetaClientInterface
         /** @var Envelope<string> $result */
         $result = $this->transport->send(
             Endpoint::get('/zen'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()]])),
         );
 
         return $result;

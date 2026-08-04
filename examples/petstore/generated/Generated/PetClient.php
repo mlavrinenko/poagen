@@ -41,7 +41,7 @@ final readonly class PetClient implements PetClientInterface
             Endpoint::put('/pet')
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', null], ['404', null], ['422', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -58,7 +58,7 @@ final readonly class PetClient implements PetClientInterface
             Endpoint::post('/pet')
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', null], ['422', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -75,7 +75,7 @@ final readonly class PetClient implements PetClientInterface
             Endpoint::get('/pet/findByStatus')
                 ->query('status', $status)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -93,7 +93,7 @@ final readonly class PetClient implements PetClientInterface
             Endpoint::get('/pet/findByTags')
                 ->query('tags', $tags)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Pet::class)], ['400', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -111,7 +111,7 @@ final readonly class PetClient implements PetClientInterface
                 ->path('petId', $petId)
                 ->header('api_key', $this->apiKey)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -130,7 +130,7 @@ final readonly class PetClient implements PetClientInterface
                 ->query('name', $name)
                 ->query('status', $status)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Pet::class)], ['400', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -148,7 +148,7 @@ final readonly class PetClient implements PetClientInterface
                 ->path('petId', $petId)
                 ->header('api_key', $apiKey)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -167,7 +167,7 @@ final readonly class PetClient implements PetClientInterface
                 ->query('additionalMetadata', $additionalMetadata)
                 ->header('Authorization', 'Bearer ' . $this->petstoreAuth)
                 ->binary($body, 'application/octet-stream'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiResponse::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ApiResponse::class)], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;

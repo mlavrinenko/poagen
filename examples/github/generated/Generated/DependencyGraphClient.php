@@ -46,7 +46,7 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
                 ->path('repo', $repo)
                 ->path('basehead', $basehead)
                 ->query('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphDiff::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphDiff::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphSpdxSbom::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DependencyGraphSpdxSbom::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -79,7 +79,7 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('sbom_uuid', $sbomUuid),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['202', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['202', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -95,7 +95,7 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
             Endpoint::get('/repos/{owner}/{repo}/dependency-graph/sbom/generate-report')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphGenerateSbomReport201Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphGenerateSbomReport201Content::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -112,7 +112,7 @@ final readonly class DependencyGraphClient implements DependencyGraphClientInter
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphCreateRepositorySnapshot201Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DependencyGraphCreateRepositorySnapshot201Content::class)]])),
         );
 
         return $result;

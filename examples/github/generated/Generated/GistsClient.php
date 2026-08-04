@@ -48,7 +48,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<GistSimple|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/gists')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -82,7 +82,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -102,7 +102,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -116,7 +116,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<GistSimple|GistsGet403Content|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['403', ResponseType::object(GistsGet403Content::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['403', ResponseType::object(GistsGet403Content::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -130,7 +130,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/gists/{gist_id}')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<GistSimple|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/gists/{gist_id}')->path('gist_id', $gistId)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -161,7 +161,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistComment::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -175,7 +175,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<GistComment|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/gists/{gist_id}/comments')->path('gist_id', $gistId)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistComment::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -191,7 +191,7 @@ final readonly class GistsClient implements GistsClientInterface
             Endpoint::get('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(GistsGetComment403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(GistsGetComment403Content::class)]])),
         );
 
         return $result;
@@ -207,7 +207,7 @@ final readonly class GistsClient implements GistsClientInterface
             Endpoint::delete('/gists/{gist_id}/comments/{comment_id}')
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -227,7 +227,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->path('gist_id', $gistId)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -244,7 +244,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistCommit::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistCommit::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -261,7 +261,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->path('gist_id', $gistId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistSimple::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GistSimple::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -275,7 +275,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<BaseGist|BasicError|ValidationError|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/gists/{gist_id}/forks')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BaseGist::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BaseGist::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -289,7 +289,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<null|array<string, mixed>|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::mapOf(ResponseType::mixed())], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::mapOf(ResponseType::mixed())], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -303,7 +303,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::put('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -317,7 +317,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/gists/{gist_id}/star')->path('gist_id', $gistId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -331,7 +331,7 @@ final readonly class GistsClient implements GistsClientInterface
         /** @var Envelope<GistSimple|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/gists/{gist_id}/{sha}')->path('gist_id', $gistId)->path('sha', $sha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GistSimple::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -353,7 +353,7 @@ final readonly class GistsClient implements GistsClientInterface
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BaseGist::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;

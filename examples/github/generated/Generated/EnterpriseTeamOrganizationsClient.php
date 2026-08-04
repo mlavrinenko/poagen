@@ -43,7 +43,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise-team', $enterpriseTeam)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]])),
         );
 
         return $result;
@@ -63,7 +63,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(OrganizationSimple::class)]])),
         );
 
         return $result;
@@ -83,7 +83,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -103,7 +103,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationSimple::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationSimple::class)], ['404', null]])),
         );
 
         return $result;
@@ -120,7 +120,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(OrganizationSimple::class)]])),
         );
 
         return $result;
@@ -140,7 +140,7 @@ final readonly class EnterpriseTeamOrganizationsClient implements EnterpriseTeam
                 ->path('enterprise', $enterprise)
                 ->path('enterprise-team', $enterpriseTeam)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

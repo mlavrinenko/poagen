@@ -33,7 +33,7 @@ final readonly class MarkdownClient implements MarkdownClientInterface
         /** @var Envelope<string|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/markdown')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', null]])),
         );
 
         return $result;
@@ -47,7 +47,7 @@ final readonly class MarkdownClient implements MarkdownClientInterface
         /** @var Envelope<string|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/markdown/raw')->text($body, 'text/plain'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::string()], ['304', null]])),
         );
 
         return $result;

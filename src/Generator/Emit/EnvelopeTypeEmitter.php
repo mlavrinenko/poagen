@@ -34,23 +34,40 @@ final readonly class EnvelopeTypeEmitter
 {
     public function __construct(private ResponseTypeEmitter $responseTypes = new ResponseTypeEmitter()) {}
 
+    /**
+     * `exact`, `ranges` and `default` are all optional named arguments on
+     * `StatusResponseMap::__construct`, defaulting to `[]`, `[]` and `null`
+     * respectively — an operation that declares no range key and no
+     * `default` (most of them) writes neither argument rather than writing
+     * out the default it would have supplied anyway. Named arguments make
+     * the omission order-independent, so dropping the middle one never
+     * shifts what the surviving ones mean.
+     */
     public function expr(PhpNamespace $namespace, EnvelopeSpec $envelope, string $modelNamespace): string
     {
         $namespace->addUse(ResponseType::class);
         $namespace->addUse(StatusResponseMap::class);
         $type = $namespace->simplifyName(ResponseType::class);
 
-        $default = $envelope->default instanceof ReturnSpec
-            ? $this->responseTypes->expr($namespace, $envelope->default, $modelNamespace)
-            : 'null';
+        $args = [];
+
+        if ($envelope->exact !== []) {
+            $args[] = sprintf('exact: %s', $this->pairs($namespace, $envelope->exact, $modelNamespace));
+        }
+
+        if ($envelope->ranges !== []) {
+            $args[] = sprintf('ranges: %s', $this->pairs($namespace, $envelope->ranges, $modelNamespace));
+        }
+
+        if ($envelope->default instanceof ReturnSpec) {
+            $args[] = sprintf('default: %s', $this->responseTypes->expr($namespace, $envelope->default, $modelNamespace));
+        }
 
         return sprintf(
-            '%s::envelope(new %s(exact: %s, ranges: %s, default: %s))',
+            '%s::envelope(new %s(%s))',
             $type,
             $namespace->simplifyName(StatusResponseMap::class),
-            $this->pairs($namespace, $envelope->exact, $modelNamespace),
-            $this->pairs($namespace, $envelope->ranges, $modelNamespace),
-            $default,
+            implode(', ', $args),
         );
     }
 
@@ -73,6 +90,17 @@ final readonly class EnvelopeTypeEmitter
     }
 
     /**
+     * A status paired with `null` rather than the spelled-out
+     * `ResponseType::nothing()` when its body is `KIND_VOID` — shorter, and
+     * unambiguous only because the pair's presence in the list already says
+     * the status is declared. `StatusResponseMap::__construct` normalises
+     * that `null` back to `ResponseType::nothing()` immediately, so
+     * `StatusResponseMap::match()` never has to know the shorthand exists:
+     * a status this list names always resolves to a real
+     * {@see ResponseType}, and `null`
+     * keeps meaning exactly one thing on that path — the status is not in
+     * the list at all.
+     *
      * @param list<array{0: string, 1: ReturnSpec}> $specs
      */
     private function pairs(PhpNamespace $namespace, array $specs, string $modelNamespace): string
@@ -84,7 +112,10 @@ final readonly class EnvelopeTypeEmitter
         $rows = [];
 
         foreach ($specs as [$status, $spec]) {
-            $rows[] = sprintf('[%s, %s]', var_export($status, true), $this->responseTypes->expr($namespace, $spec, $modelNamespace));
+            $expr = $spec->kind === ReturnSpec::KIND_VOID
+                ? 'null'
+                : $this->responseTypes->expr($namespace, $spec, $modelNamespace);
+            $rows[] = sprintf('[%s, %s]', var_export($status, true), $expr);
         }
 
         return '[' . implode(', ', $rows) . ']';

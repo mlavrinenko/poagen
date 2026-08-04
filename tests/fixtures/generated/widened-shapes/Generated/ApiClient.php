@@ -36,7 +36,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<array<string, Part>> $result */
         $result = $this->transport->send(
             Endpoint::get('/catalogue'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::object(Part::class))]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::object(Part::class))]])),
         );
 
         return $result;
@@ -50,7 +50,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<array<string, list<Part>>> $result */
         $result = $this->transport->send(
             Endpoint::get('/catalogue/lists'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::listOf(Part::class))]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::listOf(Part::class))]])),
         );
 
         return $result;
@@ -64,7 +64,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<array<string, array<string, string>>> $result */
         $result = $this->transport->send(
             Endpoint::get('/catalogue/nested'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mapOf(ResponseType::string()))]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mapOf(ResponseType::string()))]])),
         );
 
         return $result;
@@ -78,7 +78,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<array<string, mixed>> $result */
         $result = $this->transport->send(
             Endpoint::get('/opaque'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::mixed())]])),
         );
 
         return $result;
@@ -92,7 +92,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<SaveProfile200Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/profile')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveProfile200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SaveProfile200Content::class)]])),
         );
 
         return $result;
@@ -106,7 +106,7 @@ final readonly class ApiClient implements ApiClientInterface
         /** @var Envelope<Widget> $result */
         $result = $this->transport->send(
             Endpoint::get('/widget'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Widget::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Widget::class)]])),
         );
 
         return $result;

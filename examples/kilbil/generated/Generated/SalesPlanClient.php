@@ -36,7 +36,7 @@ final readonly class SalesPlanClient implements SalesPlanClientInterface
         /** @var Envelope<GetSalesIndicesSlides200Content|GetSalesIndicesSlides403Content> $result */
         $result = $this->transport->send(
             Endpoint::post('/load/getsalesindicesslides')->query('h', $this->h)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetSalesIndicesSlides200Content::class)], ['403', ResponseType::object(GetSalesIndicesSlides403Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GetSalesIndicesSlides200Content::class)], ['403', ResponseType::object(GetSalesIndicesSlides403Content::class)]])),
         );
 
         return $result;

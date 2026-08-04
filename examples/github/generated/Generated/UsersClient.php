@@ -59,7 +59,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<PrivateUser|PublicUser|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user/get/responses/200/content/application~1json/schema')], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user/get/responses/200/content/application~1json/schema')], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -73,7 +73,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<PrivateUser|null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/user')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateUser::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PrivateUser::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -87,7 +87,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/blocks')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -101,7 +101,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/blocks/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -115,7 +115,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::put('/user/blocks/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -129,7 +129,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/blocks/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -144,7 +144,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<Email>|null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/user/email/visibility')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -158,7 +158,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<Email>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/emails')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -172,7 +172,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/followers')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -186,7 +186,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<SimpleUser>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/following')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -200,7 +200,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/following/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -214,7 +214,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::put('/user/following/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -228,7 +228,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/following/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -242,7 +242,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<GpgKey>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/gpg_keys')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -257,7 +257,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<GpgKey|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/gpg_keys')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GpgKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(GpgKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -271,7 +271,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<GpgKey|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GpgKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GpgKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -285,7 +285,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/gpg_keys/{gpg_key_id}')->path('gpg_key_id', $gpgKeyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -299,7 +299,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<Key>|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/keys')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Key::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Key::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -314,7 +314,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<Key|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/keys')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Key::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Key::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -328,7 +328,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<Key|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/keys/{key_id}')->path('key_id', $keyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Key::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Key::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -342,7 +342,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/keys/{key_id}')->path('key_id', $keyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -358,7 +358,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::get('/user/public_emails')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Email::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -374,7 +374,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::get('/user/social_accounts')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -389,7 +389,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<SocialAccount>|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/social_accounts')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::listOf(SocialAccount::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::listOf(SocialAccount::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -404,7 +404,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<null|ValidationError|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::delete('/user/social_accounts')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -420,7 +420,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::get('/user/ssh_signing_keys')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -435,7 +435,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<SshSigningKey|ValidationError|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/ssh_signing_keys')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SshSigningKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(SshSigningKey::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -450,7 +450,7 @@ final readonly class UsersClient implements UsersClientInterface
         $result = $this->transport->send(
             Endpoint::get('/user/ssh_signing_keys/{ssh_signing_key_id}')
                 ->path('ssh_signing_key_id', $sshSigningKeyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshSigningKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SshSigningKey::class)], ['404', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -465,7 +465,7 @@ final readonly class UsersClient implements UsersClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/user/ssh_signing_keys/{ssh_signing_key_id}')
                 ->path('ssh_signing_key_id', $sshSigningKeyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -479,7 +479,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<PrivateUser|PublicUser|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/user/{account_id}')->path('account_id', $accountId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user~1{account_id}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1user~1{account_id}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -493,7 +493,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<list<SimpleUser>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/users')->query('since', $since)->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['304', null]])),
         );
 
         return $result;
@@ -507,7 +507,7 @@ final readonly class UsersClient implements UsersClientInterface
         /** @var Envelope<PrivateUser|PublicUser|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/users/{username}')->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1users~1{username}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::union(new Discriminator(field: 'user_view_type', map: ['public' => PublicUser::class, 'private' => PrivateUser::class], onParent: false), null, '/paths/~1users~1{username}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -531,7 +531,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestationsBulk200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestationsBulk200Content::class)]])),
         );
 
         return $result;
@@ -549,7 +549,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::post('/users/{username}/attestations/delete-request')
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -565,7 +565,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::delete('/users/{username}/attestations/digest/{subject_digest}')
                 ->path('username', $username)
                 ->path('subject_digest', $subjectDigest),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -581,7 +581,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::delete('/users/{username}/attestations/{attestation_id}')
                 ->path('username', $username)
                 ->path('attestation_id', $attestationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -607,7 +607,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestations200Content::class)], ['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(UsersListAttestations200Content::class)], ['201', ResponseType::object(EmptyObject::class)], ['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -624,7 +624,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -641,7 +641,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -657,7 +657,7 @@ final readonly class UsersClient implements UsersClientInterface
             Endpoint::get('/users/{username}/following/{target_user}')
                 ->path('username', $username)
                 ->path('target_user', $targetUser),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -674,7 +674,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(GpgKey::class)]])),
         );
 
         return $result;
@@ -694,7 +694,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('subject_type', $subjectType)
                 ->query('subject_id', $subjectId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hovercard::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hovercard::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -711,7 +711,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(KeySimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(KeySimple::class)]])),
         );
 
         return $result;
@@ -731,7 +731,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SocialAccount::class)]])),
         );
 
         return $result;
@@ -751,7 +751,7 @@ final readonly class UsersClient implements UsersClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SshSigningKey::class)]])),
         );
 
         return $result;

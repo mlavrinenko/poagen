@@ -35,7 +35,7 @@ final readonly class CredentialsClient implements CredentialsClientInterface
         /** @var Envelope<array<string, mixed>|ValidationErrorSimple|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::post('/credentials/revoke')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['422', ResponseType::object(ValidationErrorSimple::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['422', ResponseType::object(ValidationErrorSimple::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

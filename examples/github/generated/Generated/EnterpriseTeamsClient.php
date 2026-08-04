@@ -39,7 +39,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
                 ->path('enterprise', $enterprise)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -55,7 +55,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
             Endpoint::post('/enterprises/{enterprise}/teams')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EnterpriseTeam::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EnterpriseTeam::class)]])),
         );
 
         return $result;
@@ -71,7 +71,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
             Endpoint::get('/enterprises/{enterprise}/teams/{team_slug}')
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -87,7 +87,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
             Endpoint::delete('/enterprises/{enterprise}/teams/{team_slug}')
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -107,7 +107,7 @@ final readonly class EnterpriseTeamsClient implements EnterpriseTeamsClientInter
                 ->path('enterprise', $enterprise)
                 ->path('team_slug', $teamSlug)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(EnterpriseTeam::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

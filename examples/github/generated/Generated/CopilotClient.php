@@ -60,7 +60,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/enterprise-1-day')
                 ->path('enterprise', $enterprise)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -75,7 +75,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/enterprise-28-day/latest')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -91,7 +91,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/users-1-day')
                 ->path('enterprise', $enterprise)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -106,7 +106,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/copilot/metrics/reports/users-28-day/latest')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -124,7 +124,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::put('/enterprises/{enterprise}/copilot/policies/coding_agent')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -142,7 +142,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::post('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -160,7 +160,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::delete('/enterprises/{enterprise}/copilot/policies/coding_agent/organizations')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -174,7 +174,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         /** @var Envelope<CopilotOrganizationDetails|BasicError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/billing')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -191,7 +191,7 @@ final readonly class CopilotClient implements CopilotClientInterface
                 ->path('org', $org)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotSeats200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotSeats200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -209,7 +209,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::post('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForTeams201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForTeams201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -227,7 +227,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_teams')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeams200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForTeams200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -245,7 +245,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::post('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForUsers201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CopilotAddCopilotSeatsForUsers201Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -263,7 +263,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::delete('/orgs/{org}/copilot/billing/selected_users')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsers200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotCancelCopilotSeatAssignmentForUsers200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -277,7 +277,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         /** @var Envelope<CopilotGetCopilotCodingAgentPermissionsOrganization200Content|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/coding-agent/permissions')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotGetCopilotCodingAgentPermissionsOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -295,7 +295,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -315,7 +315,7 @@ final readonly class CopilotClient implements CopilotClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotListCopilotCodingAgentSelectedRepositoriesForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -333,7 +333,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -351,7 +351,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::put('/orgs/{org}/copilot/coding-agent/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -369,7 +369,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::delete('/orgs/{org}/copilot/coding-agent/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -383,7 +383,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         /** @var Envelope<CopilotOrganizationContentExclusionDetails|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/content_exclusion')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationContentExclusionDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotOrganizationContentExclusionDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -400,7 +400,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::put('/orgs/{org}/copilot/content_exclusion')
                 ->path('org', $org)
                 ->jsonRaw($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSetCopilotContentExclusionForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSetCopilotContentExclusionForOrganization200Content::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['413', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -424,7 +424,7 @@ final readonly class CopilotClient implements CopilotClientInterface
                 ->query('until', $until)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -440,7 +440,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-1-day')
                 ->path('org', $org)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', null], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -455,7 +455,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/metrics/reports/organization-28-day/latest')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -471,7 +471,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-1-day')
                 ->path('org', $org)
                 ->query('day', $day->format('Y-m-d')),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', ResponseType::nothing()], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics1DayReport::class)], ['204', null], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -486,7 +486,7 @@ final readonly class CopilotClient implements CopilotClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/copilot/metrics/reports/users-28-day/latest')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotUsageMetrics28DayReport::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -502,7 +502,7 @@ final readonly class CopilotClient implements CopilotClientInterface
             Endpoint::get('/orgs/{org}/members/{username}/copilot')
                 ->path('org', $org)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSeatDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CopilotSeatDetails::class)], ['500', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', null]])),
         );
 
         return $result;
@@ -528,7 +528,7 @@ final readonly class CopilotClient implements CopilotClientInterface
                 ->query('until', $until)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CopilotUsageMetricsDay::class)], ['500', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;

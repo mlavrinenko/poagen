@@ -57,7 +57,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<list<Event>|null|BasicError|ActivityListPublicEvents503Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/events')->query('per_page', $perPage)->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ActivityListPublicEvents503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ActivityListPublicEvents503Content::class)]])),
         );
 
         return $result;
@@ -71,7 +71,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<Feed> $result */
         $result = $this->transport->send(
             Endpoint::get('/feeds'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Feed::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Feed::class)]])),
         );
 
         return $result;
@@ -93,7 +93,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['301', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['304', null], ['301', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -119,7 +119,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('before', $before?->format(DateTimeInterface::RFC3339))
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -133,7 +133,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<ActivityMarkNotificationsAsRead202Content|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::put('/notifications')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkNotificationsAsRead202Content::class)], ['205', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkNotificationsAsRead202Content::class)], ['205', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -147,7 +147,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<Thread|null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Thread::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Thread::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -161,7 +161,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -175,7 +175,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         /** @var Envelope<null|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::patch('/notifications/threads/{thread_id}')->path('thread_id', $threadId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['205', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['205', null], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -190,7 +190,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         $result = $this->transport->send(
             Endpoint::get('/notifications/threads/{thread_id}/subscription')
                 ->path('thread_id', $threadId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -208,7 +208,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::put('/notifications/threads/{thread_id}/subscription')
                 ->path('thread_id', $threadId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ThreadSubscription::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -223,7 +223,7 @@ final readonly class ActivityClient implements ActivityClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/notifications/threads/{thread_id}/subscription')
                 ->path('thread_id', $threadId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -240,7 +240,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -262,7 +262,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -292,7 +292,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('before', $before?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Thread::class)]])),
         );
 
         return $result;
@@ -312,7 +312,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkRepoNotificationsAsRead202Content::class)], ['205', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActivityMarkRepoNotificationsAsRead202Content::class)], ['205', null]])),
         );
 
         return $result;
@@ -334,7 +334,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['avatar_url' => SimpleUser::class, 'user' => Stargazer::class]), '/paths/~1repos~1{owner}~1{repo}~1stargazers/get/responses/200/content/application~1json/schema'))], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['avatar_url' => SimpleUser::class, 'user' => Stargazer::class]), '/paths/~1repos~1{owner}~1{repo}~1stargazers/get/responses/200/content/application~1json/schema'))], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -356,7 +356,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)]])),
         );
 
         return $result;
@@ -372,7 +372,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::get('/repos/{owner}/{repo}/subscription')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)], ['404', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)], ['404', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -392,7 +392,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositorySubscription::class)]])),
         );
 
         return $result;
@@ -408,7 +408,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/subscription')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -430,7 +430,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -446,7 +446,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::get('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -462,7 +462,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::put('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -478,7 +478,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::delete('/user/starred/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -494,7 +494,7 @@ final readonly class ActivityClient implements ActivityClientInterface
             Endpoint::get('/user/subscriptions')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -514,7 +514,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -536,7 +536,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -556,7 +556,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -576,7 +576,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -596,7 +596,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Event::class)]])),
         );
 
         return $result;
@@ -620,7 +620,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['repo' => StarredRepository::class, 'archive_url' => Repository::class]), '/paths/~1users~1{username}~1starred/get/responses/200/content/application~1json/schema'))]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::union(null, new BranchSelector(fields: ['repo' => StarredRepository::class, 'archive_url' => Repository::class]), '/paths/~1users~1{username}~1starred/get/responses/200/content/application~1json/schema'))]])),
         );
 
         return $result;
@@ -640,7 +640,7 @@ final readonly class ActivityClient implements ActivityClientInterface
                 ->path('username', $username)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;

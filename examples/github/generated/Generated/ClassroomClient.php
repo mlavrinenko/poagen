@@ -39,7 +39,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
         /** @var Envelope<ClassroomAssignment|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/assignments/{assignment_id}')->path('assignment_id', $assignmentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ClassroomAssignment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ClassroomAssignment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -59,7 +59,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
                 ->path('assignment_id', $assignmentId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAcceptedAssignment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAcceptedAssignment::class)]])),
         );
 
         return $result;
@@ -74,7 +74,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
         $result = $this->transport->send(
             Endpoint::get('/assignments/{assignment_id}/grades')
                 ->path('assignment_id', $assignmentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAssignmentGrade::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ClassroomAssignmentGrade::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -88,7 +88,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
         /** @var Envelope<list<SimpleClassroom>> $result */
         $result = $this->transport->send(
             Endpoint::get('/classrooms')->query('page', $page)->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroom::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroom::class)]])),
         );
 
         return $result;
@@ -102,7 +102,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
         /** @var Envelope<Classroom|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/classrooms/{classroom_id}')->path('classroom_id', $classroomId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Classroom::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Classroom::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -122,7 +122,7 @@ final readonly class ClassroomClient implements ClassroomClientInterface
                 ->path('classroom_id', $classroomId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroomAssignment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleClassroomAssignment::class)]])),
         );
 
         return $result;

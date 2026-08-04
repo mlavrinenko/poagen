@@ -210,7 +210,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;
@@ -224,7 +224,7 @@ final readonly class ReposClient implements ReposClientInterface
         /** @var Envelope<FullRepository|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/repos')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -246,7 +246,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('targets', $targets),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -260,7 +260,7 @@ final readonly class ReposClient implements ReposClientInterface
         /** @var Envelope<RepositoryRuleset|BasicError|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/rulesets')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -290,7 +290,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('rule_suite_result', $ruleSuiteResult)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -306,7 +306,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/orgs/{org}/rulesets/rule-suites/{rule_suite_id}')
                 ->path('org', $org)
                 ->path('rule_suite_id', $ruleSuiteId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -322,7 +322,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/orgs/{org}/rulesets/{ruleset_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -342,7 +342,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -358,7 +358,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/orgs/{org}/rulesets/{ruleset_id}')
                 ->path('org', $org)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -372,7 +372,7 @@ final readonly class ReposClient implements ReposClientInterface
         /** @var Envelope<FullRepository|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/repos/{owner}/{repo}')->path('owner', $owner)->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['301', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['301', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -388,7 +388,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(ReposDelete403Content::class)], ['307', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(ReposDelete403Content::class)], ['307', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -405,7 +405,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['307', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FullRepository::class)], ['307', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -439,7 +439,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('actor', $actor)
                 ->query('time_period', $timePeriod)
                 ->query('activity_type', $activityType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Activity::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Activity::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -459,7 +459,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReposCreateAttestation201Content::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReposCreateAttestation201Content::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -487,7 +487,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('before', $before)
                 ->query('after', $after)
                 ->query('predicate_type', $predicateType),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListAttestations200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListAttestations200Content::class)]])),
         );
 
         return $result;
@@ -503,7 +503,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/autolinks')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Autolink::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Autolink::class)]])),
         );
 
         return $result;
@@ -523,7 +523,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Autolink::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Autolink::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -540,7 +540,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('autolink_id', $autolinkId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Autolink::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Autolink::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -557,7 +557,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('autolink_id', $autolinkId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -573,7 +573,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/automated-security-fixes')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckAutomatedSecurityFixes::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckAutomatedSecurityFixes::class)], ['404', null]])),
         );
 
         return $result;
@@ -589,7 +589,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::put('/repos/{owner}/{repo}/automated-security-fixes')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -605,7 +605,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/automated-security-fixes')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -629,7 +629,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('protected', $protected)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ShortBranch::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ShortBranch::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -646,7 +646,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchWithProtection::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchWithProtection::class)], ['301', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -663,7 +663,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchProtection::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchProtection::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -685,7 +685,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranch::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranch::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -702,7 +702,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -719,7 +719,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]])),
         );
 
         return $result;
@@ -736,7 +736,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)]])),
         );
 
         return $result;
@@ -753,7 +753,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -770,7 +770,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)]])),
         );
 
         return $result;
@@ -787,7 +787,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -809,7 +809,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchPullRequestReview::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -826,7 +826,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -843,7 +843,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ProtectedBranchAdminEnforced::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -860,7 +860,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -877,7 +877,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -894,7 +894,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -916,7 +916,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(StatusCheckPolicy::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -933,7 +933,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::scalarListOf(ResponseType::string())], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -950,7 +950,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchRestrictionPolicy::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(BranchRestrictionPolicy::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -967,7 +967,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -984,7 +984,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1006,7 +1006,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1028,7 +1028,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1050,7 +1050,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Integration::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1067,7 +1067,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1084,7 +1084,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('branch', $branch),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1106,7 +1106,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1128,7 +1128,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1150,7 +1150,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(SimpleUser::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1172,7 +1172,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('branch', $branch)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BranchWithProtection::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(BranchWithProtection::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1189,7 +1189,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeownersErrors::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CodeownersErrors::class)], ['404', null]])),
         );
 
         return $result;
@@ -1215,7 +1215,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('permission', $permission)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Collaborator::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Collaborator::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1232,7 +1232,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -1254,7 +1254,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('username', $username)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryInvitation::class)], ['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryInvitation::class)], ['204', null], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1271,7 +1271,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1288,7 +1288,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('username', $username),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryCollaboratorPermission::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryCollaboratorPermission::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1310,7 +1310,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]])),
         );
 
         return $result;
@@ -1327,7 +1327,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1344,7 +1344,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1366,7 +1366,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('comment_id', $commentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1400,7 +1400,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('until', $until?->format(DateTimeInterface::RFC3339))
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Commit::class)], ['500', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1417,7 +1417,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BranchShort::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(BranchShort::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1441,7 +1441,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('commit_sha', $commitSha)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitComment::class)]])),
         );
 
         return $result;
@@ -1463,7 +1463,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('commit_sha', $commitSha)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CommitComment::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(CommitComment::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1487,7 +1487,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('commit_sha', $commitSha)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PullRequestSimple::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1511,7 +1511,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('ref', $ref)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Commit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposGetCommit503Content::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Commit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposGetCommit503Content::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1535,7 +1535,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('ref', $ref)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CombinedCommitStatus::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CombinedCommitStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1559,7 +1559,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('ref', $ref)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Status::class)], ['301', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Status::class)], ['301', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1575,7 +1575,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/community/profile')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommunityProfile::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommunityProfile::class)]])),
         );
 
         return $result;
@@ -1599,7 +1599,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('basehead', $basehead)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComparison::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposCompareCommits503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CommitComparison::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposCompareCommits503Content::class)]])),
         );
 
         return $result;
@@ -1629,7 +1629,7 @@ final readonly class ReposClient implements ReposClientInterface
             'file' => ContentFile::class,
             'symlink' => ContentSymlink::class,
             'submodule' => ContentSubmodule::class,
-        ], onParent: false), null, '/paths/~1repos~1{owner}~1{repo}~1contents~1{path}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['302', ResponseType::nothing()], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+        ], onParent: false), null, '/paths/~1repos~1{owner}~1{repo}~1contents~1{path}/get/responses/200/content/application~1json/schema')], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['302', null], ['304', null]])),
         );
 
         return $result;
@@ -1651,7 +1651,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('path', $path)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FileCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposDeleteFile503Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(FileCommit::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['503', ResponseType::object(ReposDeleteFile503Content::class)]])),
         );
 
         return $result;
@@ -1675,7 +1675,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('anon', $anon)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Contributor::class)], ['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Contributor::class)], ['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1705,7 +1705,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('environment', $environment)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]])),
         );
 
         return $result;
@@ -1725,7 +1725,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Deployment::class)], ['202', ResponseType::object(ReposCreateDeployment202Content::class)], ['409', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Deployment::class)], ['202', ResponseType::object(ReposCreateDeployment202Content::class)], ['409', null], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1742,7 +1742,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Deployment::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Deployment::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1759,7 +1759,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1783,7 +1783,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('deployment_id', $deploymentId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1805,7 +1805,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentStatus::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentStatus::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1823,7 +1823,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('deployment_id', $deploymentId)
                 ->path('status_id', $statusId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1843,7 +1843,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -1865,7 +1865,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllEnvironments200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllEnvironments200Content::class)]])),
         );
 
         return $result;
@@ -1882,7 +1882,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)]])),
         );
 
         return $result;
@@ -1904,7 +1904,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Environment::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1921,7 +1921,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1945,7 +1945,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListDeploymentBranchPolicies200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListDeploymentBranchPolicies200Content::class)]])),
         );
 
         return $result;
@@ -1967,7 +1967,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)], ['404', ResponseType::nothing()], ['303', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)], ['404', null], ['303', null]])),
         );
 
         return $result;
@@ -1989,7 +1989,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]])),
         );
 
         return $result;
@@ -2013,7 +2013,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentBranchPolicy::class)]])),
         );
 
         return $result;
@@ -2035,7 +2035,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('branch_policy_id', $branchPolicyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2055,7 +2055,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('environment_name', $environmentName)
                 ->path('repo', $repo)
                 ->path('owner', $owner),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllDeploymentProtectionRules200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposGetAllDeploymentProtectionRules200Content::class)]])),
         );
 
         return $result;
@@ -2077,7 +2077,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('owner', $owner)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentProtectionRule::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeploymentProtectionRule::class)]])),
         );
 
         return $result;
@@ -2101,7 +2101,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListCustomDeploymentRuleIntegrations200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposListCustomDeploymentRuleIntegrations200Content::class)]])),
         );
 
         return $result;
@@ -2123,7 +2123,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('protection_rule_id', $protectionRuleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentProtectionRule::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeploymentProtectionRule::class)]])),
         );
 
         return $result;
@@ -2145,7 +2145,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('owner', $owner)
                 ->path('protection_rule_id', $protectionRuleId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2169,7 +2169,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('sort', $sort)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['400', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['400', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2186,7 +2186,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(FullRepository::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2204,7 +2204,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Hook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Hook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2221,7 +2221,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2238,7 +2238,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2255,7 +2255,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2277,7 +2277,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Hook::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2294,7 +2294,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -2316,7 +2316,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WebhookConfig::class)]])),
         );
 
         return $result;
@@ -2342,7 +2342,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('per_page', $perPage)
                 ->query('cursor', $cursor)
                 ->query('status', $status),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(HookDeliveryItem::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2360,7 +2360,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(HookDelivery::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2378,7 +2378,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId)
                 ->path('delivery_id', $deliveryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::mapOf(ResponseType::mixed())], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2395,7 +2395,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2412,7 +2412,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('hook_id', $hookId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2428,7 +2428,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/immutable-releases')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckImmutableReleases::class)], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CheckImmutableReleases::class)], ['404', null]])),
         );
 
         return $result;
@@ -2444,7 +2444,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::put('/repos/{owner}/{repo}/immutable-releases')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2460,7 +2460,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/immutable-releases')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2482,7 +2482,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)]])),
         );
 
         return $result;
@@ -2499,7 +2499,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('invitation_id', $invitationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2521,7 +2521,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('invitation_id', $invitationId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryInvitation::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryInvitation::class)]])),
         );
 
         return $result;
@@ -2543,7 +2543,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeployKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(DeployKey::class)]])),
         );
 
         return $result;
@@ -2563,7 +2563,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeployKey::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(DeployKey::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2580,7 +2580,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('key_id', $keyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeployKey::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(DeployKey::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2597,7 +2597,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('key_id', $keyId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2613,7 +2613,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/languages')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Language::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Language::class)]])),
         );
 
         return $result;
@@ -2630,7 +2630,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MergedUpstream::class)], ['409', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(MergedUpstream::class)], ['409', null], ['422', null]])),
         );
 
         return $result;
@@ -2647,7 +2647,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Commit::class)], ['204', ResponseType::nothing()], ['404', ResponseType::nothing()], ['409', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Commit::class)], ['204', null], ['404', null], ['409', null], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2663,7 +2663,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/pages')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Page::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Page::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2683,7 +2683,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2703,7 +2703,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Page::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Page::class)], ['422', ResponseType::object(ValidationError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2719,7 +2719,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/pages')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2741,7 +2741,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PageBuild::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PageBuild::class)]])),
         );
 
         return $result;
@@ -2757,7 +2757,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::post('/repos/{owner}/{repo}/pages/builds')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PageBuildStatus::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(PageBuildStatus::class)]])),
         );
 
         return $result;
@@ -2773,7 +2773,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/pages/builds/latest')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]])),
         );
 
         return $result;
@@ -2790,7 +2790,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('build_id', $buildId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageBuild::class)]])),
         );
 
         return $result;
@@ -2810,7 +2810,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageDeployment::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PageDeployment::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2827,7 +2827,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pages_deployment_id', $pagesDeploymentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesDeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesDeploymentStatus::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2844,7 +2844,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('pages_deployment_id', $pagesDeploymentId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2860,7 +2860,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/pages/health')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesHealthCheck::class)], ['202', ResponseType::object(EmptyObject::class)], ['400', ResponseType::nothing()], ['422', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(PagesHealthCheck::class)], ['202', ResponseType::object(EmptyObject::class)], ['400', null], ['422', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2876,7 +2876,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/private-vulnerability-reporting')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposCheckPrivateVulnerabilityReporting200Content::class)], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReposCheckPrivateVulnerabilityReporting200Content::class)], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2892,7 +2892,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::put('/repos/{owner}/{repo}/private-vulnerability-reporting')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2908,7 +2908,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/private-vulnerability-reporting')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2924,7 +2924,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/properties/values')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomPropertyValue::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CustomPropertyValue::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2944,7 +2944,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2961,7 +2961,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2979,7 +2979,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('dir', $dir)
                 ->query('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ContentFile::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2997,7 +2997,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Release::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3014,7 +3014,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -3031,7 +3031,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)], ['404', ResponseType::object(BasicError::class)], ['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)], ['404', ResponseType::object(BasicError::class)], ['302', null]])),
         );
 
         return $result;
@@ -3048,7 +3048,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3070,7 +3070,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('asset_id', $assetId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseAsset::class)]])),
         );
 
         return $result;
@@ -3090,7 +3090,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseNotesContent::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ReleaseNotesContent::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3106,7 +3106,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/releases/latest')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3123,7 +3123,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('tag', $tag),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3140,7 +3140,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['401', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['401', null]])),
         );
 
         return $result;
@@ -3157,7 +3157,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3179,7 +3179,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('release_id', $releaseId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Release::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3203,7 +3203,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('release_id', $releaseId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReleaseAsset::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReleaseAsset::class)]])),
         );
 
         return $result;
@@ -3229,7 +3229,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('name', $name)
                 ->query('label', $label)
                 ->binary($body, 'application/octet-stream'),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReleaseAsset::class)], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ReleaseAsset::class)], ['422', null]])),
         );
 
         return $result;
@@ -3253,7 +3253,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('branch', $branch)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleDetailed::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleDetailed::class)]])),
         );
 
         return $result;
@@ -3279,7 +3279,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('page', $page)
                 ->query('includes_parents', $includesParents)
                 ->query('targets', $targets),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3299,7 +3299,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3329,7 +3329,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('rule_suite_result', $ruleSuiteResult)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuites::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3346,7 +3346,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('rule_suite_id', $ruleSuiteId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RuleSuite::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3368,7 +3368,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->query('includes_parents', $includesParents),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3390,7 +3390,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RepositoryRuleset::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3407,7 +3407,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3431,7 +3431,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('ruleset_id', $rulesetId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RulesetVersion::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3449,7 +3449,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('ruleset_id', $rulesetId)
                 ->path('version_id', $versionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RulesetVersionWithState::class)], ['404', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3465,7 +3465,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/stats/code_frequency')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null], ['422', null]])),
         );
 
         return $result;
@@ -3481,7 +3481,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/stats/commit_activity')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CommitActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null]])),
         );
 
         return $result;
@@ -3497,7 +3497,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/stats/contributors')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContributorActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContributorActivity::class)], ['202', ResponseType::mapOf(ResponseType::mixed())], ['204', null]])),
         );
 
         return $result;
@@ -3513,7 +3513,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/stats/participation')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ParticipationStats::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ParticipationStats::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3529,7 +3529,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/stats/punch_card')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(CodeFrequencyStat::class)], ['204', null]])),
         );
 
         return $result;
@@ -3551,7 +3551,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->path('sha', $sha)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Status::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(Status::class)]])),
         );
 
         return $result;
@@ -3569,7 +3569,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Tag::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Tag::class)]])),
         );
 
         return $result;
@@ -3586,7 +3586,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
 
         return $result;
@@ -3604,7 +3604,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Team::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3622,7 +3622,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('repo', $repo)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3642,7 +3642,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Topic::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -3659,7 +3659,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per', $per),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloneTraffic::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(CloneTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3675,7 +3675,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/traffic/popular/paths')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContentTraffic::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ContentTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3691,7 +3691,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/traffic/popular/referrers')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReferrerTraffic::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(ReferrerTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3708,7 +3708,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->query('per', $per),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ViewTraffic::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ViewTraffic::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3725,7 +3725,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(MinimalRepository::class)]])),
         );
 
         return $result;
@@ -3741,7 +3741,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', null]])),
         );
 
         return $result;
@@ -3757,7 +3757,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::put('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3773,7 +3773,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::delete('/repos/{owner}/{repo}/vulnerability-alerts')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3790,7 +3790,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
 
         return $result;
@@ -3810,7 +3810,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->path('template_owner', $templateOwner)
                 ->path('template_repo', $templateRepo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)]])),
         );
 
         return $result;
@@ -3824,7 +3824,7 @@ final readonly class ReposClient implements ReposClientInterface
         /** @var Envelope<list<MinimalRepository>|ValidationError|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/repositories')->query('since', $since),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null]])),
         );
 
         return $result;
@@ -3856,7 +3856,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('page', $page)
                 ->query('since', $since?->format(DateTimeInterface::RFC3339))
                 ->query('before', $before?->format(DateTimeInterface::RFC3339)),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Repository::class)], ['422', ResponseType::object(ValidationError::class)], ['304', null], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3870,7 +3870,7 @@ final readonly class ReposClient implements ReposClientInterface
         /** @var Envelope<FullRepository|BasicError|null|ValidationError> $result */
         $result = $this->transport->send(
             Endpoint::post('/user/repos')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(FullRepository::class)], ['401', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)], ['400', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3886,7 +3886,7 @@ final readonly class ReposClient implements ReposClientInterface
             Endpoint::get('/user/repository_invitations')
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RepositoryInvitation::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['401', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3901,7 +3901,7 @@ final readonly class ReposClient implements ReposClientInterface
         $result = $this->transport->send(
             Endpoint::delete('/user/repository_invitations/{invitation_id}')
                 ->path('invitation_id', $invitationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', ResponseType::object(BasicError::class)], ['304', null], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -3916,7 +3916,7 @@ final readonly class ReposClient implements ReposClientInterface
         $result = $this->transport->send(
             Endpoint::patch('/user/repository_invitations/{invitation_id}')
                 ->path('invitation_id', $invitationId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['304', null]])),
         );
 
         return $result;
@@ -3942,7 +3942,7 @@ final readonly class ReposClient implements ReposClientInterface
                 ->query('direction', $direction)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(MinimalRepository::class)]])),
         );
 
         return $result;

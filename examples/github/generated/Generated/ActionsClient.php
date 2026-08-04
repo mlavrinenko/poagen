@@ -170,7 +170,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/cache/retention-limit')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -188,7 +188,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/enterprises/{enterprise}/actions/cache/retention-limit')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -203,7 +203,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/enterprises/{enterprise}/actions/cache/storage-limit')
                 ->path('enterprise', $enterprise),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForEnterprise::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -221,7 +221,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/enterprises/{enterprise}/actions/cache/storage-limit')
                 ->path('enterprise', $enterprise)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -236,7 +236,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/actions/cache/retention-limit')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -254,7 +254,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/organizations/{org}/actions/cache/retention-limit')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -268,7 +268,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsCacheStorageLimitForOrganization|BasicError> $result */
         $result = $this->transport->send(
             Endpoint::get('/organizations/{org}/actions/cache/storage-limit')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForOrganization::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -286,7 +286,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/organizations/{org}/actions/cache/storage-limit')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -300,7 +300,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsCacheUsageOrgEnterprise> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/cache/usage')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageOrgEnterprise::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageOrgEnterprise::class)]])),
         );
 
         return $result;
@@ -320,7 +320,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetActionsCacheUsageByRepoForOrg200Content::class)]])),
         );
 
         return $result;
@@ -337,7 +337,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListHostedRunnersForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListHostedRunnersForOrg200Content::class)]])),
         );
 
         return $result;
@@ -353,7 +353,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsHostedRunner> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/hosted-runners')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsHostedRunner::class)]])),
         );
 
         return $result;
@@ -367,7 +367,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsListCustomImagesForOrg200Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImagesForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImagesForOrg200Content::class)]])),
         );
 
         return $result;
@@ -383,7 +383,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImage::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImage::class)]])),
         );
 
         return $result;
@@ -399,7 +399,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}')
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -415,7 +415,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/custom/{image_definition_id}/versions')
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImageVersionsForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListCustomImageVersionsForOrg200Content::class)]])),
         );
 
         return $result;
@@ -432,7 +432,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('version', $version),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImageVersion::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerCustomImageVersion::class)]])),
         );
 
         return $result;
@@ -452,7 +452,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('image_definition_id', $imageDefinitionId)
                 ->path('version', $version),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -467,7 +467,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/github-owned')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersGithubOwnedImagesForOrg200Content::class)]])),
         );
 
         return $result;
@@ -482,7 +482,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/images/partner')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPartnerImagesForOrg200Content::class)]])),
         );
 
         return $result;
@@ -496,7 +496,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsHostedRunnerLimits> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/limits')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerLimits::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunnerLimits::class)]])),
         );
 
         return $result;
@@ -510,7 +510,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsGetHostedRunnersMachineSpecsForOrg200Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/machine-sizes')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersMachineSpecsForOrg200Content::class)]])),
         );
 
         return $result;
@@ -524,7 +524,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsGetHostedRunnersPlatformsForOrg200Content> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/hosted-runners/platforms')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPlatformsForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetHostedRunnersPlatformsForOrg200Content::class)]])),
         );
 
         return $result;
@@ -540,7 +540,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]])),
         );
 
         return $result;
@@ -556,7 +556,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/hosted-runners/{hosted_runner_id}')
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(ActionsHostedRunner::class)]])),
         );
 
         return $result;
@@ -576,7 +576,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('hosted_runner_id', $hostedRunnerId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsHostedRunner::class)]])),
         );
 
         return $result;
@@ -590,7 +590,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsOrganizationPermissions> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsOrganizationPermissions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsOrganizationPermissions::class)]])),
         );
 
         return $result;
@@ -606,7 +606,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::put('/orgs/{org}/actions/permissions')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -621,7 +621,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/artifact-and-log-retention')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -639,7 +639,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/artifact-and-log-retention')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -654,7 +654,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/fork-pr-contributor-approval')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -672,7 +672,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/fork-pr-contributor-approval')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -687,7 +687,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -705,7 +705,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -725,7 +725,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesEnabledGithubActionsOrganization200Content::class)]])),
         );
 
         return $result;
@@ -743,7 +743,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -759,7 +759,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -777,7 +777,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/permissions/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -791,7 +791,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<SelectedActions> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/selected-actions')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]])),
         );
 
         return $result;
@@ -807,7 +807,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/selected-actions')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -822,7 +822,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/self-hosted-runners')
                 ->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelfHostedRunnersSettings::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelfHostedRunnersSettings::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -840,7 +840,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -860,7 +860,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedRepositoriesSelfHostedRunnersOrganization200Content::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -878,7 +878,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners/repositories')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -896,7 +896,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/self-hosted-runners/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -914,7 +914,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/permissions/self-hosted-runners/repositories/{repository_id}')
                 ->path('org', $org)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)], ['409', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -928,7 +928,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsGetDefaultWorkflowPermissions> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/permissions/workflow')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]])),
         );
 
         return $result;
@@ -946,7 +946,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::put('/orgs/{org}/actions/permissions/workflow')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -968,7 +968,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('visible_to_repository', $visibleToRepository),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnerGroupsForOrg200Content::class)]])),
         );
 
         return $result;
@@ -984,7 +984,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<RunnerGroupsOrg> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runner-groups')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(RunnerGroupsOrg::class)]])),
         );
 
         return $result;
@@ -1000,7 +1000,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/runner-groups/{runner_group_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]])),
         );
 
         return $result;
@@ -1016,7 +1016,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/runner-groups/{runner_group_id}')
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1036,7 +1036,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(RunnerGroupsOrg::class)]])),
         );
 
         return $result;
@@ -1058,7 +1058,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListGithubHostedRunnersInGroupForOrg200Content::class)]])),
         );
 
         return $result;
@@ -1080,7 +1080,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoAccessToSelfHostedRunnerGroupInOrg200Content::class)]])),
         );
 
         return $result;
@@ -1100,7 +1100,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1120,7 +1120,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1140,7 +1140,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1162,7 +1162,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('runner_group_id', $runnerGroupId)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersInGroupForOrg200Content::class)]])),
         );
 
         return $result;
@@ -1182,7 +1182,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1199,7 +1199,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1219,7 +1219,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_group_id', $runnerGroupId)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1241,7 +1241,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForOrg200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForOrg200Content::class)]])),
         );
 
         return $result;
@@ -1255,7 +1255,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<list<RunnerApplication>> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/runners/downloads')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]])),
         );
 
         return $result;
@@ -1273,7 +1273,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::post('/orgs/{org}/actions/runners/generate-jitconfig')
                 ->path('org', $org)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForOrg201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForOrg201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1287,7 +1287,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<AuthenticationToken> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/registration-token')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]])),
         );
 
         return $result;
@@ -1301,7 +1301,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<AuthenticationToken> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/runners/remove-token')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]])),
         );
 
         return $result;
@@ -1317,7 +1317,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]])),
         );
 
         return $result;
@@ -1333,7 +1333,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/runners/{runner_id}')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1349,7 +1349,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1369,7 +1369,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1389,7 +1389,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1405,7 +1405,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/runners/{runner_id}/labels')
                 ->path('org', $org)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1425,7 +1425,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('runner_id', $runnerId)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForOrg200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -1442,7 +1442,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgSecrets200Content::class)]])),
         );
 
         return $result;
@@ -1456,7 +1456,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<ActionsPublicKey> $result */
         $result = $this->transport->send(
             Endpoint::get('/orgs/{org}/actions/secrets/public-key')->path('org', $org),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]])),
         );
 
         return $result;
@@ -1472,7 +1472,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsSecret::class)]])),
         );
 
         return $result;
@@ -1492,7 +1492,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -1508,7 +1508,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/secrets/{secret_name}')
                 ->path('org', $org)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1530,7 +1530,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('secret_name', $secretName)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgSecret200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgSecret200Content::class)]])),
         );
 
         return $result;
@@ -1550,7 +1550,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1567,7 +1567,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -1587,7 +1587,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('secret_name', $secretName)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -1604,7 +1604,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgVariables200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListOrgVariables200Content::class)]])),
         );
 
         return $result;
@@ -1618,7 +1618,7 @@ final readonly class ActionsClient implements ActionsClientInterface
         /** @var Envelope<EmptyObject> $result */
         $result = $this->transport->send(
             Endpoint::post('/orgs/{org}/actions/variables')->path('org', $org)->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -1634,7 +1634,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsVariable::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OrganizationActionsVariable::class)]])),
         );
 
         return $result;
@@ -1650,7 +1650,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::delete('/orgs/{org}/actions/variables/{name}')
                 ->path('org', $org)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1670,7 +1670,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1692,7 +1692,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('name', $name)
                 ->query('page', $page)
                 ->query('per_page', $perPage),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgVariable200Content::class)], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelectedReposForOrgVariable200Content::class)], ['409', null]])),
         );
 
         return $result;
@@ -1712,7 +1712,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -1729,7 +1729,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('name', $name)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -1746,7 +1746,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('org', $org)
                 ->path('name', $name)
                 ->path('repository_id', $repositoryId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -1770,7 +1770,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('per_page', $perPage)
                 ->query('page', $page)
                 ->query('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListArtifactsForRepo200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListArtifactsForRepo200Content::class)]])),
         );
 
         return $result;
@@ -1787,7 +1787,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Artifact::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Artifact::class)]])),
         );
 
         return $result;
@@ -1804,7 +1804,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -1826,7 +1826,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('artifact_id', $artifactId)
                 ->path('archive_format', $archiveFormat),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()], ['410', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null], ['410', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1842,7 +1842,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/retention-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheRetentionLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1862,7 +1862,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1878,7 +1878,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/storage-limit')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheStorageLimitForRepository::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1898,7 +1898,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['400', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -1914,7 +1914,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/cache/usage')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageByRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheUsageByRepository::class)]])),
         );
 
         return $result;
@@ -1944,7 +1944,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('key', $key)
                 ->query('sort', $sort)
                 ->query('direction', $direction),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]])),
         );
 
         return $result;
@@ -1966,7 +1966,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('key', $key)
                 ->query('ref', $ref),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsCacheList::class)]])),
         );
 
         return $result;
@@ -1983,7 +1983,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('cache_id', $cacheId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2000,7 +2000,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('job_id', $jobId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Job::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Job::class)]])),
         );
 
         return $result;
@@ -2017,7 +2017,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('job_id', $jobId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
 
         return $result;
@@ -2039,7 +2039,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('job_id', $jobId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2055,7 +2055,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/oidc/customization/sub')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSubRepo::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(OidcCustomSubRepo::class)], ['400', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2075,7 +2075,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['400', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -2097,7 +2097,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationSecrets200Content::class)]])),
         );
 
         return $result;
@@ -2119,7 +2119,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationVariables200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoOrganizationVariables200Content::class)]])),
         );
 
         return $result;
@@ -2135,7 +2135,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRepositoryPermissions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRepositoryPermissions::class)]])),
         );
 
         return $result;
@@ -2155,7 +2155,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2171,7 +2171,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/access')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsWorkflowAccessToRepository::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsWorkflowAccessToRepository::class)]])),
         );
 
         return $result;
@@ -2191,7 +2191,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2207,7 +2207,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/artifact-and-log-retention')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsArtifactAndLogRetentionResponse::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2227,7 +2227,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2243,7 +2243,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrContributorApproval::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2263,7 +2263,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2279,7 +2279,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/fork-pr-workflows-private-repos')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsForkPrWorkflowsPrivateRepos::class)], ['403', ResponseType::object(BasicError::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2299,7 +2299,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationError::class)]])),
         );
 
         return $result;
@@ -2315,7 +2315,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/selected-actions')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(SelectedActions::class)]])),
         );
 
         return $result;
@@ -2332,7 +2332,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2348,7 +2348,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/permissions/workflow')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsGetDefaultWorkflowPermissions::class)]])),
         );
 
         return $result;
@@ -2368,7 +2368,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['409', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['409', null]])),
         );
 
         return $result;
@@ -2392,7 +2392,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('name', $name)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForRepo200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListSelfHostedRunnersForRepo200Content::class)]])),
         );
 
         return $result;
@@ -2408,7 +2408,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/runners/downloads')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(RunnerApplication::class)]])),
         );
 
         return $result;
@@ -2428,7 +2428,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForRepo201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(ActionsGenerateRunnerJitconfigForRepo201Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2444,7 +2444,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/registration-token')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]])),
         );
 
         return $result;
@@ -2460,7 +2460,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::post('/repos/{owner}/{repo}/actions/runners/remove-token')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(AuthenticationToken::class)]])),
         );
 
         return $result;
@@ -2477,7 +2477,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Runner::class)]])),
         );
 
         return $result;
@@ -2494,7 +2494,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -2511,7 +2511,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2533,7 +2533,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSetCustomLabelsForSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -2555,7 +2555,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsAddCustomLabelsToSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -2575,7 +2575,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveAllCustomLabelsFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2597,7 +2597,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('runner_id', $runnerId)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsRemoveCustomLabelFromSelfHostedRunnerForRepo200Content::class)], ['404', ResponseType::object(BasicError::class)], ['422', ResponseType::object(ValidationErrorSimple::class)]])),
         );
 
         return $result;
@@ -2635,7 +2635,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunsForRepo200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunsForRepo200Content::class)]])),
         );
 
         return $result;
@@ -2657,7 +2657,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->query('exclude_pull_requests', $excludePullRequests),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]])),
         );
 
         return $result;
@@ -2674,7 +2674,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2691,7 +2691,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnvironmentApprovals::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(EnvironmentApprovals::class)]])),
         );
 
         return $result;
@@ -2708,7 +2708,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['404', ResponseType::object(BasicError::class)], ['403', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2736,7 +2736,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('page', $page)
                 ->query('name', $name)
                 ->query('direction', $direction),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunArtifacts200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRunArtifacts200Content::class)]])),
         );
 
         return $result;
@@ -2760,7 +2760,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('run_id', $runId)
                 ->path('attempt_number', $attemptNumber)
                 ->query('exclude_pull_requests', $excludePullRequests),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRun::class)]])),
         );
 
         return $result;
@@ -2786,7 +2786,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('attempt_number', $attemptNumber)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRunAttempt200Content::class)], ['404', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRunAttempt200Content::class)], ['404', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2808,7 +2808,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->path('attempt_number', $attemptNumber),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
 
         return $result;
@@ -2825,7 +2825,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2847,7 +2847,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -2864,7 +2864,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['202', ResponseType::object(EmptyObject::class)], ['409', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2890,7 +2890,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('filter', $filter)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRun200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListJobsForWorkflowRun200Content::class)]])),
         );
 
         return $result;
@@ -2907,7 +2907,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['302', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['302', null]])),
         );
 
         return $result;
@@ -2924,7 +2924,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['403', ResponseType::object(BasicError::class)], ['500', ResponseType::object(BasicError::class)]])),
         );
 
         return $result;
@@ -2941,7 +2941,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PendingDeployment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(PendingDeployment::class)]])),
         );
 
         return $result;
@@ -2963,7 +2963,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::listOf(Deployment::class)]])),
         );
 
         return $result;
@@ -2985,7 +2985,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -3007,7 +3007,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('run_id', $runId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -3024,7 +3024,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('run_id', $runId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRunUsage::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowRunUsage::class)]])),
         );
 
         return $result;
@@ -3046,7 +3046,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoSecrets200Content::class)]])),
         );
 
         return $result;
@@ -3062,7 +3062,7 @@ final readonly class ActionsClient implements ActionsClientInterface
             Endpoint::get('/repos/{owner}/{repo}/actions/secrets/public-key')
                 ->path('owner', $owner)
                 ->path('repo', $repo),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]])),
         );
 
         return $result;
@@ -3079,7 +3079,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]])),
         );
 
         return $result;
@@ -3101,7 +3101,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -3118,7 +3118,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3140,7 +3140,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoVariables200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoVariables200Content::class)]])),
         );
 
         return $result;
@@ -3160,7 +3160,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -3177,7 +3177,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]])),
         );
 
         return $result;
@@ -3194,7 +3194,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3216,7 +3216,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3238,7 +3238,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoWorkflows200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListRepoWorkflows200Content::class)]])),
         );
 
         return $result;
@@ -3255,7 +3255,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Workflow::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Workflow::class)]])),
         );
 
         return $result;
@@ -3272,7 +3272,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3294,7 +3294,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()], ['200', ResponseType::object(WorkflowDispatchResponse::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null], ['200', ResponseType::object(WorkflowDispatchResponse::class)]])),
         );
 
         return $result;
@@ -3311,7 +3311,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3351,7 +3351,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->query('exclude_pull_requests', $excludePullRequests)
                 ->query('check_suite_id', $checkSuiteId)
                 ->query('head_sha', $headSha),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRuns200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListWorkflowRuns200Content::class)]])),
         );
 
         return $result;
@@ -3368,7 +3368,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('workflow_id', $workflowId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowUsage::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(WorkflowUsage::class)]])),
         );
 
         return $result;
@@ -3392,7 +3392,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentSecrets200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentSecrets200Content::class)]])),
         );
 
         return $result;
@@ -3409,7 +3409,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('owner', $owner)
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsPublicKey::class)]])),
         );
 
         return $result;
@@ -3431,7 +3431,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsSecret::class)]])),
         );
 
         return $result;
@@ -3455,7 +3455,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)], ['204', null]])),
         );
 
         return $result;
@@ -3477,7 +3477,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('secret_name', $secretName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3501,7 +3501,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('environment_name', $environmentName)
                 ->query('per_page', $perPage)
                 ->query('page', $page),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentVariables200Content::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsListEnvironmentVariables200Content::class)]])),
         );
 
         return $result;
@@ -3523,7 +3523,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['201', ResponseType::object(EmptyObject::class)]])),
         );
 
         return $result;
@@ -3545,7 +3545,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('environment_name', $environmentName)
                 ->path('name', $name),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(ActionsVariable::class)]])),
         );
 
         return $result;
@@ -3567,7 +3567,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('repo', $repo)
                 ->path('name', $name)
                 ->path('environment_name', $environmentName),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;
@@ -3591,7 +3591,7 @@ final readonly class ActionsClient implements ActionsClientInterface
                 ->path('name', $name)
                 ->path('environment_name', $environmentName)
                 ->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['204', ResponseType::nothing()]], ranges: [], default: null)),
+            ResponseType::envelope(new StatusResponseMap(exact: [['204', null]])),
         );
 
         return $result;

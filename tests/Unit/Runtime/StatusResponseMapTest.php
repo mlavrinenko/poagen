@@ -79,4 +79,33 @@ final class StatusResponseMapTest extends TestCase
     {
         self::assertNull(new StatusResponseMap()->match(200));
     }
+
+    /**
+     * The emitter writes `['400', null]` rather than
+     * `['400', ResponseType::nothing()]` for a declared status with no
+     * body — shorter, and safe only because the pair's presence in `$exact`
+     * or `$ranges` already says the status is declared. `match()` must
+     * still hand back a real `ResponseType`, never the `null` the
+     * constructor was given, so `null` keeps meaning exactly one thing on
+     * this path: the status is not in the map at all.
+     */
+    public function testANullPairMeansDeclaredWithNoBodyAndStillMatchesToARealResponseType(): void
+    {
+        $map = new StatusResponseMap(
+            exact: [['204', null]],
+            ranges: [['5XX', null]],
+        );
+
+        $exact = $map->match(204);
+        self::assertNotNull($exact);
+        self::assertSame(ResponseType::KIND_NOTHING, $exact->kind);
+
+        $range = $map->match(503);
+        self::assertNotNull($range);
+        self::assertSame(ResponseType::KIND_NOTHING, $range->kind);
+
+        // The one status this map was never told about at all — still null,
+        // not the declared-empty ResponseType a `null` pair normalises to.
+        self::assertNull($map->match(200));
+    }
 }

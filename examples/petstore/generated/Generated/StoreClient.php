@@ -34,7 +34,7 @@ final readonly class StoreClient implements StoreClientInterface
         /** @var Envelope<array<string, int>|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/store/inventory')->header('api_key', $this->apiKey),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::int())]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::mapOf(ResponseType::int())]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -48,7 +48,7 @@ final readonly class StoreClient implements StoreClientInterface
         /** @var Envelope<Order|null> $result */
         $result = $this->transport->send(
             Endpoint::post('/store/order')->json($body),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', ResponseType::nothing()], ['422', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', null], ['422', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -62,7 +62,7 @@ final readonly class StoreClient implements StoreClientInterface
         /** @var Envelope<Order|null> $result */
         $result = $this->transport->send(
             Endpoint::get('/store/order/{orderId}')->path('orderId', $orderId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Order::class)], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;
@@ -76,7 +76,7 @@ final readonly class StoreClient implements StoreClientInterface
         /** @var Envelope<null> $result */
         $result = $this->transport->send(
             Endpoint::delete('/store/order/{orderId}')->path('orderId', $orderId),
-            ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::nothing()], ['400', ResponseType::nothing()], ['404', ResponseType::nothing()]], ranges: [], default: ResponseType::nothing())),
+            ResponseType::envelope(new StatusResponseMap(exact: [['200', null], ['400', null], ['404', null]], default: ResponseType::nothing())),
         );
 
         return $result;
