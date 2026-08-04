@@ -137,6 +137,37 @@ domain relationship the document never stated.
   exception hierarchy to express.
 - Changing how a request is built or how a body is marshalled on the way out.
 
+== Implementation plan, settled 2026-08-04
+
+A read-only design pass over the real code raised four questions the ruling does
+not answer. Settled here so the implementation inherits them rather than
+deciding them again, badly.
+
+- Where the envelope lives: \`runtime/src/Contract/\`, not generated per profile.
+  \`ApiException\` is generated because \`error-response-policy\` wanted a
+  vendor-distinguishable throw type. The envelope carries no behaviour, so it
+  follows \`ResponseType\` into the runtime instead.
+- How the body's type narrows: PHP has no native generics, so the native return
+  type is the bare envelope class and the union rides on a \`@return\` doc tag
+  over the annotated intermediate the union path already emits. Duplicate
+  branch types collapse before the union is joined, which is what makes an
+  operation with one declared shape return that shape rather than a union of
+  one, and what lets a profile merge shrink a real union.
+- A status the operation declares whose shape the generator cannot represent:
+  the whole operation is skipped, naming the status. The ruling is silent here
+  and the alternative is dropping that branch quietly, which is the exact
+  shrinkage \`default-deny-on-degradation\` forbids.
+- Range keys are untested by every real document we have. Petstore, github and
+  digitalocean declare exact statuses and \`default\`, and not one \`4XX\` or
+  \`5XX\` key between them. The precedence rule needs a synthetic fixture, or it
+  ships unproven.
+
+Order, so the gate stays green at every step: an additive runtime commit that
+nothing consumes yet; then one commit that switches the generator, regenerates
+all four examples, updates kilbil's wrappers and drops the 2xx throw, because
+byte-for-byte example diffing leaves no safe intermediate state; then the
+decision artifact.
+
 == Files
 
 - \`truth/decisions/\` (a new decision artifact superseding \`error-response-policy\`)
