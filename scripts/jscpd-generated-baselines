@@ -155,7 +155,19 @@ examples/kilbil/generated         1.47
 # it. 41 clones/609 lines (16.4%) are still same-shape models, 11 clones/211
 # lines (5.7%) still enum-to-enum — both unchanged in kind and close in size
 # to before.
-examples/digitalocean/generated   10.94
+#
+# Moved 10.94 -> 10.97 on 2026-08-04 by
+# return-a-binary-2xx-as-the-stream-a-done-task-already-promised, which
+# lifted the binary-response refusal and so un-skipped
+# `invoices_get_pdfByUuid`. That is one new method in a 470-file tree,
+# structurally near-identical to the `invoicesGetCsvByUuid` and
+# `invoicesGetSummaryByUuid` siblings it sits beside, and it moved the tree
+# 10.9341% -> 10.96%. A tree that generates MORE of its document than it did
+# before is the outcome this project wants; the ceiling following it is the
+# same re-measurement the envelope's decision carved out, for the same
+# reason. retighten-the-generated-duplication-ceilings owns bringing all of
+# these back down.
+examples/digitalocean/generated   10.97
 
 # 1431 clones, 24159 duplicated lines over 108267 — up from 1035/20262/98129.
 # Model-to-model duplication is close to unchanged in both count and size —
