@@ -14,12 +14,14 @@ use PHPUnit\Framework\TestCase;
  * even a skip the profile explicitly accepted is still an omission — so a
  * run that skipped or degraded anything must not open by announcing success.
  *
- * Uses tests/fixtures/schemas/response-degradation-3.0.yaml with all four
- * unrepresentable responses accepted via Profile::$skip, so the run
- * completes (exit 0) with a non-empty skippedOperations list. `getPlainText`
- * left that set in represent-non-json-request-and-response-bodies — a
- * `text/*` response over a `type: string` schema is representable — and
- * `getBinaryBlob` took its place.
+ * Uses tests/fixtures/schemas/response-degradation-3.0.yaml with all three
+ * remaining unrepresentable responses accepted via Profile::$skip, so the
+ * run completes (exit 0) with a non-empty skippedOperations list.
+ * `getPlainText` left that set in
+ * represent-non-json-request-and-response-bodies — a `text/*` response over
+ * a `type: string` schema is representable — and `getBinaryBlob` made the
+ * identical move in
+ * return-a-binary-2xx-as-the-stream-a-done-task-already-promised.
  */
 final class SuccessLineSuppressedOnSkipTest extends TestCase
 {
@@ -38,7 +40,7 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
 
         self::assertSame(0, $exit);
         self::assertStringNotContainsString('generated into', $stdout);
-        self::assertStringContainsString('4 operation(s) skipped', $stderr);
+        self::assertStringContainsString('3 operation(s) skipped', $stderr);
     }
 
     /**
@@ -69,7 +71,6 @@ final class SuccessLineSuppressedOnSkipTest extends TestCase
                 output: {$output},
                 namespace: 'Mlavrinenko\\\\Paogen\\\\Tests\\\\Tmp\\\\SuccessLineSuppressed',
                 skip: [
-                    'getBinaryBlob' => 'binary body, no stream return yet',
                     'getXmlLabel' => 'application/xml not decoded',
                     'getBrokenRef' => 'broken \$ref, fix the schema',
                     'listInlineItems' => 'inline array items unsupported',

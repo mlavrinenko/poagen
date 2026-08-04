@@ -50,10 +50,10 @@ final readonly class ResponseRefusal
     }
 
     /**
-     * A response with no `application/json` entry. Text is now decoded, so
-     * reaching here means the remaining content types are XML (refused by
-     * `xml-responses-refused-at-generation-time`), binary, or something whose
-     * schema declares no type at all.
+     * A response with no `application/json` entry. Text and binary are both
+     * decoded now, so reaching here means the remaining content types are
+     * XML (refused by `xml-responses-refused-at-generation-time`) or
+     * something whose schema declares no type at all.
      *
      * @param array<array-key, MediaType> $content
      */
@@ -76,22 +76,12 @@ final readonly class ResponseRefusal
                     self::REMEDY,
                 );
             }
-
-            if (BodyMediaType::isBinary($mediaType, BodyMediaType::schemaOf($content[$mediaType] ?? null))) {
-                return sprintf(
-                    "%s content type '%s' declares a binary body — paogen sends a binary request body as a "
-                        . 'PSR-7 stream but does not yet return one; %s',
-                    $prefix,
-                    $mediaType,
-                    self::REMEDY,
-                );
-            }
         }
 
         return sprintf(
             "%s content type(s) '%s' — paogen decodes application/json responses (\$ref/list<\$ref>, a scalar, "
-                . 'or an additionalProperties map), and returns a text content type over a `type: string` schema '
-                . 'as a string; %s',
+                . 'or an additionalProperties map), returns a text content type over a `type: string` schema as a '
+                . 'string, and returns a `format: binary` body as a PSR-7 stream; %s',
             $prefix,
             $typeList,
             self::REMEDY,

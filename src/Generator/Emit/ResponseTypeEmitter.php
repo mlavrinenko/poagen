@@ -13,6 +13,7 @@ use Mlavrinenko\Paogen\Runtime\Marshal\UnionBranchPicker;
 use Nette\PhpGenerator\Dumper;
 use Nette\PhpGenerator\Literal;
 use Nette\PhpGenerator\PhpNamespace;
+use Psr\Http\Message\StreamInterface;
 
 use function array_map;
 use function assert;
@@ -57,6 +58,7 @@ final readonly class ResponseTypeEmitter
             ReturnSpec::KIND_SCALAR_LIST => 'list<' . $this->docType($return->listItem ?? ReturnSpec::mixed(), $modelNamespace) . '>',
             ReturnSpec::KIND_MAP => 'array<string, ' . $this->docType($return->mapValue ?? ReturnSpec::mixed(), $modelNamespace) . '>',
             ReturnSpec::KIND_UNION => $this->unionDocType($return, $modelNamespace),
+            ReturnSpec::KIND_STREAM => '\\' . StreamInterface::class,
             default => 'mixed',
         };
     }
@@ -93,6 +95,7 @@ final readonly class ResponseTypeEmitter
             ),
             ReturnSpec::KIND_MIXED => sprintf('%s::mixed()', $type),
             ReturnSpec::KIND_UNION => $this->union($namespace, $return, $modelNamespace, $type),
+            ReturnSpec::KIND_STREAM => sprintf('%s::stream()', $type),
             default => sprintf('%s::nothing()', $type),
         };
     }

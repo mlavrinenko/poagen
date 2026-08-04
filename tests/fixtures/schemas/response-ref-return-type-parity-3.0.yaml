@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Response Ref Return Type Parity Fixture
+  version: "1.0.0"
+  description: >
+    response-analyzer-picks-a-2xx-without-resolving-a-ref: the schema-walk
+    side of this parity (a `$ref` response reaching the same schema node an
+    inline one does) is already pinned by
+    tests/fixtures/schemas/response-ref-parity-3.0.yaml and
+    SchemaWalkReferencedResponseTest, both against a binary body that never
+    earns a return type either way. This fixture pins the other half — the
+    *return type* EnvelopeResponsePlanner resolves for the two — with a JSON
+    body so a real Model is on both sides to compare.
+
+    Both operations declare byte-identical `200` content, one inline and one
+    through `#/components/responses/WidgetResponse`, so
+    `ResponseTypeEmitter` must emit the identical `ResponseType::object(...)`
+    expression and `Envelope<...>` doc type for both.
+paths:
+  /inline:
+    get:
+      operationId: inlineWidget
+      responses:
+        '200':
+          description: the widget, declared inline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+  /referenced:
+    get:
+      operationId: referencedWidget
+      responses:
+        '200':
+          $ref: '#/components/responses/WidgetResponse'
+components:
+  schemas:
+    Widget:
+      type: object
+      properties:
+        name:
+          type: string
+  responses:
+    WidgetResponse:
+      description: the widget, declared as a named component
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Widget'

@@ -18,19 +18,21 @@ use const DIRECTORY_SEPARATOR;
  * body already does — not collapse to `ReturnSpec::void()` and silently throw
  * the vendor's body away.
  *
- * Fixture: tests/fixtures/schemas/response-degradation-3.0.yaml carries four
+ * Fixture: tests/fixtures/schemas/response-degradation-3.0.yaml carries three
  * independently unrepresentable responses (application/xml, see
- * xml-responses-refused-at-generation-time; a `format: binary` body; a broken
- * `$ref`; and an array of non-`$ref` items) plus two fully representable
- * operations (`okOperation`, and the `text/plain` `getPlainText`), so a
- * single run proves the generator collects every one of them and that
- * `Profile::$skip` only affects what it names.
+ * xml-responses-refused-at-generation-time; a broken `$ref`; and an array of
+ * non-`$ref` items) plus three fully representable operations (`okOperation`,
+ * the `text/plain` `getPlainText`, and the `format: binary` `getBinaryBlob`),
+ * so a single run proves the generator collects every remaining problem and
+ * that `Profile::$skip` only affects what it names.
  *
  * `getPlainText` moved from the first group to the second in
  * represent-non-json-request-and-response-bodies. The refusal it used to
  * prove was never about decoding — a `text/*` response over a `type: string`
  * schema needs no decoding at all — so the test that asserted it is now the
- * test that it returns a string.
+ * test that it returns a string. `getBinaryBlob` made the identical move in
+ * return-a-binary-2xx-as-the-stream-a-done-task-already-promised: a
+ * `format: binary` body returns the PSR-7 stream now rather than refusing.
  */
 final class ResponseContentTypeDegradationTest extends TestCase
 {
@@ -54,20 +56,15 @@ final class ResponseContentTypeDegradationTest extends TestCase
         self::assertStringContainsString('ResponseType::string()', $sources);
     }
 
-    public function testABinaryResponseStillAbortsBecauseTheReturnContractCannotNameAStream(): void
+    public function testABinaryResponseReturnsTheStreamRatherThanBeingRefused(): void
     {
-        try {
-            $this->plan($this->acceptAllExcept('getBinaryBlob'));
-            self::fail('expected UnrepresentableConstructsException');
-        } catch (UnrepresentableConstructsException $e) {
-            $message = $e->getMessage();
+        $sources = implode("\n", array_values($this->plan($this->acceptAllExcept(''))->writes));
 
-            self::assertStringContainsString('getBinaryBlob', $message);
-            self::assertStringContainsString('binary', $message);
-            // The remedy is real and named, which is what separates a
-            // refusal from a dead end (abort-on-unrepresentable-constructs).
-            self::assertStringContainsString('Profile::$skip', $message);
-        }
+        // A PSR-7 stream, not a decoded value and not a refusal: the schema
+        // said `format: binary` and that is the whole shape, handed back
+        // exactly as the transport produced it.
+        self::assertStringContainsString('function getBinaryBlob(): Envelope', $sources);
+        self::assertStringContainsString('ResponseType::stream()', $sources);
     }
 
     public function testAnXmlResponseAbortsTheRunRatherThanBeingDecodedOrPassedThroughRaw(): void
@@ -113,13 +110,13 @@ final class ResponseContentTypeDegradationTest extends TestCase
         }
     }
 
-    public function testAllFourProblemsAreCollectedInOnePass(): void
+    public function testAllThreeProblemsAreCollectedInOnePass(): void
     {
         try {
             $this->plan([]);
             self::fail('expected UnrepresentableConstructsException');
         } catch (UnrepresentableConstructsException $e) {
-            self::assertStringContainsString('4 problems found', $e->getMessage());
+            self::assertStringContainsString('3 problems found', $e->getMessage());
         }
     }
 
@@ -128,7 +125,6 @@ final class ResponseContentTypeDegradationTest extends TestCase
         try {
             $this->plan([
                 'getXmlLabel' => 'application/xml not decoded',
-                'getBinaryBlob' => 'binary body, no stream return yet',
                 'getBrokenRef' => 'broken $ref, fix the schema',
                 'listInlineItems' => 'inline array items unsupported',
                 // `getPlainText` was genuinely unrepresentable when this
@@ -148,13 +144,13 @@ final class ResponseContentTypeDegradationTest extends TestCase
     {
         $plan = $this->plan($this->acceptAllExcept(''));
 
-        self::assertCount(4, $plan->skippedOperations);
+        self::assertCount(3, $plan->skippedOperations);
 
         $sources = implode("\n", array_values($plan->writes));
         self::assertStringContainsString('function okOperation(', $sources);
         self::assertStringContainsString('function getPlainText(', $sources);
+        self::assertStringContainsString('function getBinaryBlob(', $sources);
         self::assertStringNotContainsString('function getXmlLabel(', $sources);
-        self::assertStringNotContainsString('function getBinaryBlob(', $sources);
         self::assertStringNotContainsString('function getBrokenRef(', $sources);
         self::assertStringNotContainsString('function listInlineItems(', $sources);
     }
@@ -182,7 +178,6 @@ final class ResponseContentTypeDegradationTest extends TestCase
     {
         $all = [
             'getXmlLabel' => 'application/xml not decoded',
-            'getBinaryBlob' => 'binary body, no stream return yet',
             'getBrokenRef' => 'broken $ref, fix the schema',
             'listInlineItems' => 'inline array items unsupported',
         ];

@@ -144,14 +144,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: A response declaring an unsupported content type aborts the run
      * @source truth/specs/operation-generator.feature-260418.typ:89
      *
-     * Given Schema declares Operation GET /labels/{id} with operationId: getLabel whose 200 response content type is application/octet-stream
+     * Given Schema declares Operation GET /labels/{id} with operationId: getLabel whose 200 response content type is application/yaml
      * When Generator runs against unaccepted Profile
      * Then Generator's run fails and emits no Generated File
      *   And Generator's report names the operationId, the unsupported content type, and the remedy
      */
     public function testAResponseDeclaringAnUnsupportedContentTypeAbortsTheRun(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationOctetStream('GET /labels/{id}', 'operationId: getLabel');
+        $this->steps->givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationYaml('GET /labels/{id}', 'operationId: getLabel');
         $this->steps->whenGeneratorRunsAgainstUnacceptedProfile();
         $this->steps->thenGeneratorsRunFailsAndEmitsNoGeneratedFile();
         $this->steps->thenGeneratorsReportNamesTheOperationIdTheUnsupportedContentTypeAndTheRemedy();

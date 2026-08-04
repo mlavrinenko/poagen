@@ -394,11 +394,19 @@ final class OperationGeneratorSteps
     }
 
     /**
-     * A single operation whose 200 response declares `text/plain` and no
-     * `application/json` — default-deny-on-degradation's response-side
+     * A single operation whose 200 response declares `application/yaml` and
+     * no `application/json` — default-deny-on-degradation's response-side
      * counterpart to `writeMultiTagSchema`'s request-body case. Written here
      * because no committed fixture carries a response with a content type
      * other than `application/json`.
+     *
+     * `application/yaml` with no `schema` key mirrors DigitalOcean's real
+     * `kubeconfig` response component exactly (an `example:` under the
+     * content type, nothing else) — paogen has no YAML decoder, and
+     * `return-a-binary-2xx-as-the-stream-a-done-task-already-promised` is
+     * why this scenario no longer uses `application/octet-stream`: that
+     * content type is a binary stream now, representable rather than
+     * refused.
      */
     private function writeResponseContentTypeSchema(): string
     {
@@ -424,10 +432,8 @@ final class OperationGeneratorSteps
                     '200':
                       description: ok
                       content:
-                        application/octet-stream:
-                          schema:
-                            type: string
-                            format: binary
+                        application/yaml:
+                          example: 'label: ok'
             YAML);
 
         return $path;
@@ -1931,7 +1937,7 @@ final class OperationGeneratorSteps
     }
 
 
-    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationOctetStream(
+    public function givenSchemaDeclaresOperationOpWithIdWhose200ResponseContentTypeIsApplicationYaml(
         string $op,
         string $id,
     ): void {
@@ -1945,7 +1951,7 @@ final class OperationGeneratorSteps
             namespace: 'Mlavrinenko\\Paogen\\Tests\\Tmp\\ResponseContentType',
         );
         $this->expectedSkipOperationId = 'getLabel';
-        $this->expectedSkipContentType = 'application/octet-stream';
+        $this->expectedSkipContentType = 'application/yaml';
     }
 
 
