@@ -41,11 +41,17 @@ type-safe, and pleasant on real schemas. The generator emits:
   `ApiClient` constructor arguments; `http basic`, `oauth2`, and
   `openIdConnect` remain placeholders per
   [`no-inheritance-no-protected-regions`](truth/decisions/no-inheritance-no-protected-regions.decision-260418.typ).
-* **Errors** — non-2xx responses throw a generated
-  `Generated\ApiException` with status code, request, response, and a
-  best-effort decoded body narrowable via `instanceof` when an error
-  schema is declared (see
-  [`error-response-policy`](truth/decisions/error-response-policy.decision-260418.typ)).
+* **Responses** — every operation returns an
+  [`Envelope`](runtime/src/Contract/Envelope.php) carrying the HTTP status
+  the wire sent (`->status`), the body hydrated into the shape the document
+  declared for that status (`->body`), and the PSR-7 response that carried
+  both (`->response`). A status the document describes — 2xx or not — is a
+  return value, never a throw; a generated `Generated\ApiException` is
+  raised only for the two cases an envelope cannot honestly represent: a
+  status the document declared no exact, range or `default` response for,
+  or a declared body that failed to hydrate (see
+  [`envelope-supersedes-error-response-policy`](truth/decisions/envelope-supersedes-error-response-policy.decision-260804.typ),
+  which supersedes `error-response-policy`).
 * **Runtime transport** — an emitted operation is one call: it describes
   its request as an
   [`Endpoint`](runtime/src/Contract/Endpoint.php), names the shape it
@@ -72,11 +78,17 @@ type-safe, and pleasant on real schemas. The generator emits:
 Specs and decisions live under [`truth/`](truth/); the release queue is
 in [`ROADMAP.md`](ROADMAP.md) until the `0.1.0` tag.
 
-Known limitation: OpenAPI **3.1** is not yet supported — a 3.1 document works
-only for the subset that overlaps 3.0. See
-[truth/notes/openapi-3.1-gap.md](truth/notes/openapi-3.1-gap.md) and
+OpenAPI **3.1** is supported, parsed through
+[`devizzent/cebe-php-openapi`](https://github.com/DEVizzent/cebe-php-openapi) —
+see
 [`openapi-31-through-a-maintained-parser`](truth/decisions/openapi-31-through-a-maintained-parser.decision-260729.typ),
-which supersedes the earlier `openapi-31-strategy` decision.
+which supersedes the earlier `openapi-31-strategy` decision. A handful of
+JSON Schema 2020-12 keywords have no emitter yet and stop the run by name
+rather than being silently dropped or misread: `const`, `prefixItems`,
+`unevaluatedProperties`, `contentMediaType`. A 3.1 `webhooks` entry is
+refused the same way — it describes a call the vendor makes to the consumer,
+the opposite direction from every client paogen emits — unless named in
+`Profile::$skip`, which generates the `paths` half of the document alone.
 
 ## Installation
 

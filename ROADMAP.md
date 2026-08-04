@@ -120,7 +120,13 @@ All of the above checked, plus:
 - [ ] `just check` green on PHP 8.4 with **zero** deprecation notices.
 - [ ] Petstore golden fixture regenerated and committed after every scope change above.
 - [ ] `speconaut status` shows **no** pending tasks listed in this document.
-- [ ] README "known limitation: OpenAPI 3.1 not yet supported" note kept, linked to `truth/notes/openapi-3.1-gap.md` and `openapi-31-strategy`.
+- [x] README describes OpenAPI 3.1 as supported and names the JSON Schema
+  2020-12 constructs that abort by name (`const`, `prefixItems`,
+  `unevaluatedProperties`, `contentMediaType`, plus a 3.1 `webhooks` entry) —
+  matches `UnsupportedKeywordScanner`, not the old "not yet supported" note.
+  `truth/notes/openapi-3.1-gap.md` is retired rather than kept current;
+  `openapi-31-strategy` was already superseded by
+  `openapi-31-through-a-maintained-parser`.
 - [ ] `CHANGELOG.md` gains a `0.1.0` section.
 - [ ] `composer.json` stability flipped to `stable`.
 
@@ -141,11 +147,13 @@ These are deliberately out of scope for the first tag. They are
 tracked in the truth tree (ADRs / docs) but do **not** belong on
 v0.1's critical path.
 
-- **OpenAPI 3.1 support** — `openapi-31-strategy` (`accepted`) defers the
-  decision; the three options (swap parser, write 3.1→3.0 shim, fork) are
-  catalogued at [`truth/notes/openapi-3.1-gap.md`](truth/notes/openapi-3.1-gap.md).
-  When revisited, produce a prototype task, supersede `openapi-31-strategy`,
-  then remove the README limitation note.
+- ~~**OpenAPI 3.1 support**~~ — resolved: `swap-openapi-parser-for-31-support`
+  landed 3.1 through `devizzent/cebe-php-openapi`, per
+  `openapi-31-through-a-maintained-parser` (supersedes `openapi-31-strategy`).
+  The README limitation note is gone and `truth/notes/openapi-3.1-gap.md` is
+  retired rather than kept current. No longer a post-v0.1 follow-up — this
+  file's intro note already said so. Kept here, struck through, as history
+  rather than deleted — see this file's intro note.
 - ~~**Mutation testing**~~ — resolved 2026-08-02, no longer an open
   follow-up. Task 021 was retired as `done` without wiring infection;
   `wire-mutation-testing` wired it, measured a 7-minute full run against
