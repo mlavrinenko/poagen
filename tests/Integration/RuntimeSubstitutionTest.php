@@ -12,6 +12,7 @@ use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiClient;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
 use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Pet;
+use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\Model\Tag;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Mlavrinenko\Paogen\Tests\Support\RecordingRuntime;
 use Mlavrinenko\Paogen\Tests\Support\RecordingTransport;
@@ -120,6 +121,45 @@ final class RuntimeSubstitutionTest extends TestCase
             '{"name":"Rex","photoUrls":[],"category":null,"id":null,"shipping":null,"status":null,"tags":null}',
             (string) $http->lastRequest->getBody(),
         );
+    }
+
+    /**
+     * thread-the-validated-nested-container-map-into-the-generated-client:
+     * `Endpoint::xmlList()`'s nested-container binding is passed straight
+     * through to whichever `XmlWriterInterface` the transport holds, rather
+     * than a stock writer being quietly swapped in for exactly the calls
+     * that carry one. The substitute here owns a plain `XmlWriter`
+     * internally, so a wrapped `<tags>` in the wire output is only possible
+     * if the binding reached the substitute's own `renderList()` call.
+     */
+    public function testASubstituteXmlWriterRendersAnOperationCarryingANestedContainerBinding(): void
+    {
+        $runtime = new RecordingRuntime();
+        $http = new RecordingClient(new Response(204, [], ''));
+        $factory = new Psr17Factory();
+
+        $transport = new HttpTransport(
+            'https://petstore.example/api/v3',
+            ApiException::class,
+            $http,
+            $factory,
+            $factory,
+            xmlWriter: $runtime,
+        );
+
+        $pet = new Pet(name: 'Rex', photoUrls: [], tags: [new Tag(id: 1, name: 'a'), new Tag(id: 2, name: 'b')]);
+        $transport->send(
+            Endpoint::post('/pets')->xmlList([$pet], 'pets', 'pet', ['tags' => 'tag']),
+            ResponseType::nothing(),
+        );
+
+        // The substitute was the thing that rendered — nothing swapped it
+        // out for a stock writer on this call.
+        self::assertTrue(in_array('renderList', $runtime->calls, true));
+
+        $body = (string) $http->lastRequest?->getBody();
+        self::assertStringContainsString('<tags>', $body);
+        self::assertStringContainsString('<tag>', $body);
     }
 
     public function testAConsumerWhoReplacesNothingWiresNothingBeyondTheAddressAndTheErrorType(): void

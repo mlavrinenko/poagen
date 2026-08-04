@@ -28,9 +28,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A 2xx response whose schema declares `format: binary` returns a PSR-7
   `StreamInterface` instead of aborting generation, mirroring the request
   side's binary body. The stream is never read to produce it.
+- `Endpoint::xmlList()` takes a validated `Profile::$xmlElements`
+  nested-container binding as its own argument, and the generated client now
+  passes it: a consumer gets the vendor's wrapped XML shape straight from the
+  profile, with no second map built by hand against their own `HttpTransport`.
 
 ### Changed
 
+- **Breaking.** `XmlWriterInterface::renderList()` takes a fourth argument,
+  `$nestedContainers`, so a validated nested-container binding reaches
+  whichever writer the transport holds — default or a consumer's own
+  substitute — rather than a stock writer being swapped in only for the
+  calls that carry one. A custom implementation must add the parameter
+  (defaulting it to `[]` costs nothing for a body with no binding).
 - **Breaking.** Every generated operation's return type changes: a method
   now returns [`Envelope`](runtime/src/Contract/Envelope.php) instead of a
   bare model. `->status` carries the HTTP status the wire sent, `->body` is

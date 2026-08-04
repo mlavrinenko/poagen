@@ -11,10 +11,15 @@ use Mlavrinenko\Paogen\Tests\Fixtures\Generated\Petstore\Generated\ApiException;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Contact;
 use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\NoWholeReadStream;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Pet;
+use Mlavrinenko\Paogen\Tests\Unit\Runtime\Fixtures\Tag;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+
+use function preg_replace;
+use function trim;
 
 /**
  * Every body shape a schema declares, encoded once in the runtime.
@@ -87,6 +92,47 @@ final class TransportRequestBodyKindsTest extends TestCase
         self::assertSame(2, substr_count($body, '<contact>'));
     }
 
+    /**
+     * thread-the-validated-nested-container-map-into-the-generated-client:
+     * `Endpoint::xmlList()`'s `$nestedContainers` is enough on its own — no
+     * `XmlWriter` constructed by hand, no substitute transport — to wrap
+     * `tags` in one `<tags>` container instead of OpenAPI's unwrapped
+     * default of repeating it as a sibling per entry.
+     */
+    public function testANestedContainerBindingWrapsThePropertyOnThePlainDefaultTransport(): void
+    {
+        $pet = new Pet(name: 'Rex', tags: [new Tag(id: 1, name: 'a'), new Tag(id: 2, name: 'b')]);
+        $request = $this->send(
+            Endpoint::post('/pets')->xmlList([$pet], 'pets', 'pet', ['tags' => 'tag']),
+        );
+        $body = $this->collapsed((string) $request->getBody());
+
+        self::assertSame(1, substr_count($body, '<tags>'));
+        self::assertSame(2, substr_count($body, '<tag>'));
+        self::assertStringContainsString(
+            '<tags><tag><id>1</id><name>a</name></tag><tag><id>2</id><name>b</name></tag></tags>',
+            $body,
+        );
+    }
+
+    /**
+     * The same payload with no binding: AC3 of the same task — a body with
+     * no nested container renders exactly as it always has, the `tags`
+     * property repeated as a sibling per entry (OpenAPI's unwrapped
+     * default) rather than wrapped in a container.
+     */
+    public function testWithNoNestedContainerBindingTheSamePropertyStaysUnwrapped(): void
+    {
+        $pet = new Pet(name: 'Rex', tags: [new Tag(id: 1, name: 'a'), new Tag(id: 2, name: 'b')]);
+        $request = $this->send(Endpoint::post('/pets')->xmlList([$pet], 'pets', 'pet'));
+        $body = $this->collapsed((string) $request->getBody());
+
+        self::assertSame(2, substr_count($body, '<tags>'));
+        self::assertStringNotContainsString('<tag>', $body);
+        self::assertStringContainsString('<tags><id>1</id><name>a</name></tags>', $body);
+        self::assertStringContainsString('<tags><id>2</id><name>b</name></tags>', $body);
+    }
+
     public function testAFormBodyIsRfc1738EncodedAndDropsTheFieldsTheCallerLeftOut(): void
     {
         $request = $this->send(
@@ -121,6 +167,18 @@ final class TransportRequestBodyKindsTest extends TestCase
         // the client's own chunk size, whatever the file's size is.
         self::assertSame($stream, $request->getBody());
         self::assertSame(0, $request->getBody()->tell());
+    }
+
+    /**
+     * The XML prolog and inter-element whitespace stripped, so a wrapped or
+     * unwrapped shape can be asserted on as one substring rather than
+     * fighting `DOMDocument::formatOutput`'s indentation.
+     */
+    private function collapsed(string $xml): string
+    {
+        $withoutProlog = (string) preg_replace('/^<\?xml[^>]*\?>\s*/', '', $xml);
+
+        return (string) preg_replace('/>\s+</', '><', trim($withoutProlog));
     }
 
     private function send(Endpoint $endpoint): RequestInterface

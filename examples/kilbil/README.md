@@ -100,29 +100,12 @@ holding more items of the same element name. `xmlElements` names that too:
 repeating `inside` itself as a sibling once per entry
 (kilbil-xml-nesting-is-unrepresentable). paogen validates these entries
 against the schema — a property absent from the item schema fails the run —
-but does not wire them into the generated client itself: `Endpoint::xmlList()`
-already takes exactly the root and item names the specification leaves open,
-and nothing between it and the wire changes for a nested property. A
-consumer who calls `goodsXml()`/`goodsListXml()` with a populated `inside`
-and wants the vendor's nested shape builds the runtime's own map — keyed by
-element name (`good`, `goodlist`), not operation id — and passes it when
-constructing their own transport:
-
-```php
-use Acme\Kilbil\Generated\ApiException;
-use Mlavrinenko\Paogen\Runtime\Http\HttpTransport;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
-
-$xmlWriter = new XmlWriter([
-    'good' => ['inside' => 'good'],
-    'goodlist' => ['inside' => 'goodlist'],
-]);
-$transport = new HttpTransport(
-    'https://kilbil.example/api',
-    ApiException::class,
-    xmlWriter: $xmlWriter,
-);
-```
+and wires them onto the generated call itself: `goodsXml()`/`goodsListXml()`
+emit `->xmlList($body, 'goods', 'good', ['inside' => 'good'])` (and the
+`goodlist` equivalent), so a caller who passes a populated `inside` gets the
+vendor's nested shape from the plain client shown above — no `XmlWriter` to
+construct, no map to keep in step with the profile by hand
+(thread-the-validated-nested-container-map-into-the-generated-client).
 
 `tests/Integration/Kilbil/KilbilXmlNestedContainerTest.php` proves the
 emitted XML against both vendor samples, structurally rather than by eye.

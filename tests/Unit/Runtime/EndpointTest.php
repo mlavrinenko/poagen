@@ -157,5 +157,21 @@ final class EndpointTest extends TestCase
         self::assertInstanceOf(EndpointBody::class, $body);
         self::assertSame('goods', $body->rootElement);
         self::assertSame('good', $body->itemElement);
+        // No binding named: the map this task threads through defaults to
+        // empty, which is what keeps an unconfigured body byte-identical.
+        self::assertSame([], $body->nestedContainers);
+    }
+
+    /**
+     * thread-the-validated-nested-container-map-into-the-generated-client:
+     * a nested-container binding travels on the body itself now, rather than
+     * a consumer rebuilding the same map for their own `XmlWriter`.
+     */
+    public function testANestedContainerBindingTravelsWithTheBody(): void
+    {
+        $body = Endpoint::post('/x')->xmlList([new Contact('Grace')], 'goods', 'good', ['inside' => 'good'])->body();
+
+        self::assertInstanceOf(EndpointBody::class, $body);
+        self::assertSame(['inside' => 'good'], $body->nestedContainers);
     }
 }

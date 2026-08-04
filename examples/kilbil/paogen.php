@@ -67,25 +67,14 @@ return new Profile(
      * naming a property absent from the item schema fails the run, the same as
      * a stale root or item entry would (kilbil-xml-nesting-is-unrepresentable).
      *
-     * paogen validates these entries against the schema but does not wire them
-     * anywhere itself: `Endpoint::xmlList()` already takes exactly the root and
-     * item names the specification leaves open, and nothing between it and the
-     * wire changes for a nested property. A consumer who calls `goodsXml()` or
-     * `goodsListXml()` with a populated `inside` and wants the vendor's nested
-     * shape builds the runtime's own map from these entries — keyed by element
-     * name rather than operation id, since `good` and `goodlist` are what the
-     * XmlWriter actually walks — and passes it when constructing their own
-     * `HttpTransport`:
+     * paogen validates these entries against the schema and wires them onto
+     * the generated call: `goodsXml()` and `goodsListXml()` emit
+     * `->xmlList($body, root, item, ['inside' => child])`, so a caller who
+     * passes a populated `inside` gets the vendor's nested shape with no
+     * further wiring — no `XmlWriter` to construct, no map to keep in step by
+     * hand (thread-the-validated-nested-container-map-into-the-generated-client).
      *
-     * ```php
-     * $xmlWriter = new XmlWriter([
-     *     'good' => ['inside' => 'good'],
-     *     'goodlist' => ['inside' => 'goodlist'],
-     * ]);
-     * $transport = new HttpTransport($baseUri, ApiException::class, xmlWriter: $xmlWriter);
-     * ```
-     *
-     * See README.md for the same wiring spelled out for a consumer, and
+     * See README.md, and
      * tests/Integration/Kilbil/KilbilXmlNestedContainerTest.php for the emitted
      * XML compared against these same vendor samples.
      */

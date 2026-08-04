@@ -85,7 +85,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
             Endpoint::post('/load/goodslistxml')
                 ->query('id', $id)
                 ->query('h', $this->h)
-                ->xmlList($body, 'goodslist', 'goodlist'),
+                ->xmlList($body, 'goodslist', 'goodlist', ['inside' => 'goodlist']),
             ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsListXml200Content::class)], ['403', ResponseType::object(GoodsListXml403Content::class)]])),
         );
 
@@ -104,7 +104,7 @@ final readonly class CatalogueClient implements CatalogueClientInterface
                 ->query('partial', $partial)
                 ->query('id', $id)
                 ->query('h', $this->h)
-                ->xmlList($body, 'goods', 'good'),
+                ->xmlList($body, 'goods', 'good', ['inside' => 'good']),
             ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(GoodsXml200Content::class)], ['403', ResponseType::object(GoodsXml403Content::class)]])),
         );
 

@@ -99,11 +99,12 @@ final class RecordingRuntime implements DescriptorParserInterface, HydratorInter
 
     /**
      * @param list<array<string, mixed>> $items
+     * @param array<string,string>       $nestedContainers
      */
-    public function renderList(array $items, string $rootElement, string $itemElement): string
+    public function renderList(array $items, string $rootElement, string $itemElement, array $nestedContainers = []): string
     {
         $this->calls[] = 'renderList';
 
-        return $this->xmlWriter->renderList($items, $rootElement, $itemElement);
+        return $this->xmlWriter->renderList($items, $rootElement, $itemElement, $nestedContainers);
     }
 }

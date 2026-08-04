@@ -15,7 +15,6 @@ use cebe\openapi\spec\RequestBody;
 use DOMDocument;
 use DOMElement;
 use DOMText;
-use Mlavrinenko\Paogen\Runtime\Marshal\XmlWriter;
 use Mlavrinenko\Paogen\Tests\Generated\RecordingClient;
 use PHPUnit\Framework\TestCase;
 
@@ -37,10 +36,10 @@ use function usort;
  *
  * Runs the real generated `CatalogueClient` over the real `HttpTransport`
  * against an in-memory PSR-18 stub ({@see KilbilHttpHarness}) — the same
- * harness `KilbilRequestAndErrorTest` uses — with an `XmlWriter` configured
- * for the nested containers both samples show, which is how a consumer
- * would wire this in practice (see the profile comment above
- * `xmlElements` in `examples/kilbil/paogen.php`, and README.md).
+ * harness `KilbilRequestAndErrorTest` uses, with no custom `XmlWriter` at
+ * all: `goodsXml()`/`goodsListXml()` now carry the nested-container map
+ * themselves (thread-the-validated-nested-container-map-into-the-generated-client),
+ * so the plain default transport a consumer gets from README.md is enough.
  *
  * `/load/goodsxml`'s own sample is not well-formed XML — an unclosed
  * `<SKU>` tag, and a second group missing its own opening `<good>` — so the
@@ -61,7 +60,7 @@ final class KilbilXmlNestedContainerTest extends TestCase
     public function testGoodsXmlNestedInsideMatchesTheVendorSample(): void
     {
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, '{"result_code":"0"}'));
-        $client = KilbilHttpHarness::client($http, xmlWriter: $this->nestedWriter());
+        $client = KilbilHttpHarness::client($http);
 
         $client->catalogue()->goodsXml([new GoodsXmlRequestContentItem(
             code: '1',
@@ -110,7 +109,7 @@ final class KilbilXmlNestedContainerTest extends TestCase
     public function testGoodsListXmlMatchesTheVendorSampleWholesale(): void
     {
         $http = new RecordingClient(KilbilHttpHarness::jsonResponse(200, '{"result_code":"0"}'));
-        $client = KilbilHttpHarness::client($http, xmlWriter: $this->nestedWriter());
+        $client = KilbilHttpHarness::client($http);
 
         $client->catalogue()->goodsListXml([new GoodsListXmlRequestContentItem(
             ID: 393,
@@ -129,14 +128,6 @@ final class KilbilXmlNestedContainerTest extends TestCase
         // just the nested fragment.
         $vendorRoot = $this->vendorSampleRoot('goodslistxml');
         self::assertSame(self::signature($vendorRoot), self::signature($rendered));
-    }
-
-    private function nestedWriter(): XmlWriter
-    {
-        return new XmlWriter([
-            'good' => ['inside' => 'good'],
-            'goodlist' => ['inside' => 'goodlist'],
-        ]);
     }
 
     /**
