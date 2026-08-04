@@ -5,11 +5,7 @@
   tags: ("truth", "speconaut", "process"),
   priority: 6,
   difficulty: 2,
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Owner ruled 2026-08-02: portability of truth/ is not a value this project pays for. The check is not widened; the exemption becomes total and gets a decision recording why.],
+  status: wip(2026, 8, 4)[wave 4 agent dispatched],
 )
 
 == Summary

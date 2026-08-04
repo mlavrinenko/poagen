@@ -5,11 +5,7 @@
   tags: ("examples", "xml", "generator"),
   priority: 7,
   difficulty: 5,
-  status: accepted(
-    2026,
-    8,
-    2,
-  )[Owner ruled 2026-08-02: paogen learns nested XML containers rather than refusing the two operations. Where a document describes a structure, the client carries that structure. Priority raised — this is a wrong request body shipping today, not a missing feature.],
+  status: wip(2026, 8, 4)[wave 4 agent dispatched],
 )
 
 == Summary
