@@ -80,8 +80,14 @@ final readonly class SchemaScan
         $out = [];
 
         foreach ($uris as $pathUri) {
-            foreach ($items[$pathUri]->getOperations() as $httpMethod => $operation) {
-                $reason = self::firstProblemIn(SchemaWalk::operationRoots($operation), $probes);
+            $pathItem = $items[$pathUri];
+
+            foreach ($pathItem->getOperations() as $httpMethod => $operation) {
+                // Pass the enclosing PathItem so a parameter declared once
+                // there and inherited by this operation (rather than
+                // redeclared on it) reaches the probes too
+                // (pathitem-level-parameters-are-invisible-to-the-document-wide-scan).
+                $reason = self::firstProblemIn(SchemaWalk::operationRoots($operation, $pathItem), $probes);
 
                 if ($reason === null) {
                     continue;

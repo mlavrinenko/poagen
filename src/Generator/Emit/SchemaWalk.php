@@ -58,6 +58,11 @@ final readonly class SchemaWalk
                 continue;
             }
 
+            // Shared by every operation beneath it — walked once here.
+            foreach (PathItemParameters::ofPathItem($pathItem) as $schema) {
+                $out[] = $schema;
+            }
+
             foreach ($pathItem->getOperations() as $operation) {
                 $out = [...$out, ...self::operationRoots($operation)];
             }
@@ -68,11 +73,13 @@ final readonly class SchemaWalk
 
     /**
      * Every schema node one operation carries directly: request-body media
-     * types, every response's media types, and every parameter.
+     * types, every response's media types, and every parameter — the
+     * operation's own, merged with what `$pathItem` shares when given
+     * ({@see PathItemParameters}).
      *
      * @return list<Schema>
      */
-    public static function operationRoots(Operation $operation): array
+    public static function operationRoots(Operation $operation, ?PathItem $pathItem = null): array
     {
         $out = [];
 
@@ -80,10 +87,8 @@ final readonly class SchemaWalk
             $out[] = $schema;
         }
 
-        foreach ($operation->parameters ?? [] as $parameter) {
-            if (!$parameter instanceof Reference && $parameter->schema instanceof Schema) {
-                $out[] = $parameter->schema;
-            }
+        foreach (PathItemParameters::ofOperation($operation, $pathItem) as $schema) {
+            $out[] = $schema;
         }
 
         return $out;
