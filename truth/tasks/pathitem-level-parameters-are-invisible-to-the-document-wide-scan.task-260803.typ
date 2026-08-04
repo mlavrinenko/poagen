@@ -5,7 +5,7 @@
   tags: ("generator", "openapi-31"),
   priority: 3,
   difficulty: 2,
-  status: proposed(2026, 8, 3),
+  status: wip(2026, 8, 4)[wave 2 agent dispatched],
 )
 
 == Summary
