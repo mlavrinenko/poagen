@@ -5,7 +5,7 @@
   tags: ("examples", "xml", "generator"),
   priority: 7,
   difficulty: 5,
-  status: wip(2026, 8, 4)[wave 4 agent dispatched],
+  status: done(2026, 8, 4),
 )
 
 == Summary
