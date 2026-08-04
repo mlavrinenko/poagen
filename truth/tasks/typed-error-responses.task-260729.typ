@@ -7,6 +7,7 @@
   difficulty: 8,
   links: (
     depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),
+    related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
   ),
   status: blocked(
     2026,
