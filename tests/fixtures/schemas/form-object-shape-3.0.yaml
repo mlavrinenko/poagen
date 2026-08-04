@@ -1,0 +1,71 @@
+openapi: 3.0.3
+info:
+  title: Form Object Shape Fixture
+  version: "1.0.0"
+  description: >
+    form-urlencoded-body-requires-the-literal-type-object-keyword: an
+    application/x-www-form-urlencoded body's objectness is decided by
+    ObjectShape, not by reading the `type: object` keyword alone.
+    `formWithType` and `formWithoutType` declare the identical property set,
+    differing only in whether the schema also writes `type: object` — both
+    must emit the same form fields. `formNotObject` declares no type, no
+    properties and no additionalProperties value schema, so it still refuses
+    by name: the keyword's absence never widens a shape ObjectShape does not
+    see either.
+paths:
+  /form/with-type:
+    post:
+      operationId: formWithType
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                tag:
+                  type: string
+      responses:
+        '204':
+          description: ok
+  /form/without-type:
+    post:
+      operationId: formWithoutType
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              # No `type: object` keyword — the declared properties alone
+              # say what this node is, exactly as `close-the-three-sites-
+              # that-widen-a-declared-shape` already reads for a component
+              # or an inline JSON body. Before this fixture, only the form
+              # path still refused a schema shaped this way.
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                tag:
+                  type: string
+      responses:
+        '204':
+          description: ok
+  /form/not-object:
+    post:
+      operationId: formNotObject
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            # Genuinely nothing: no type keyword, no properties, no
+            # additionalProperties value schema. ObjectShape says no, same
+            # as SchemaType alone would — this must still refuse by name.
+            schema: {}
+      responses:
+        '204':
+          description: ok

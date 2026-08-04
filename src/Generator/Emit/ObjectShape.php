@@ -28,6 +28,12 @@ use function is_array;
  * not an evasion, and `declared-shapes-become-types` keeps collections as PHP
  * arrays.
  *
+ * {@see RequestBodyAnalyzer}'s `application/x-www-form-urlencoded` branch
+ * asks this same question to decide whether a form body has properties to
+ * flatten — it used to read the keyword alone and refuse a form schema that
+ * declared properties without it, the fourth site of the same root cause the
+ * other three were fixed at.
+ *
  * The keyword itself is still read only by {@see SchemaType}; this class asks
  * it that question and adds the two structural ones.
  *
