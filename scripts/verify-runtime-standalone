@@ -60,7 +60,9 @@ require __DIR__ . '/vendor/autoload.php';
 use Acme\Petstore\Generated\ApiClient;
 use Acme\Petstore\Generated\Model\Pet;
 use Composer\InstalledVersions;
+use Nyholm\Psr7\Response;
 use Poagen\Runtime\Contract\Endpoint;
+use Poagen\Runtime\Contract\Envelope;
 use Poagen\Runtime\Contract\ResponseType;
 use Poagen\Runtime\Contract\TransportInterface;
 
@@ -84,11 +86,27 @@ $transport = new class implements TransportInterface {
             exit(1);
         }
 
-        return new Pet(name: 'Rex', photoUrls: []);
+        return new Envelope(200, new Pet(name: 'Rex', photoUrls: []), new Response());
     }
 };
 
-$pet = new ApiClient($transport)->pet()->getPetById(42);
+// The document declares both an apiKey and an oauth2 scheme for petstore, so
+// the generated client takes a credential for each beside the transport.
+$envelope = new ApiClient($transport, 'scratch-api-key', 'scratch-oauth-token')
+    ->pet()
+    ->getPetById(42);
+
+if ($envelope->status !== 200) {
+    fwrite(STDERR, "FAIL: expected status 200, got {$envelope->status}\n");
+    exit(1);
+}
+
+$pet = $envelope->body;
+
+if (!$pet instanceof Pet) {
+    fwrite(STDERR, "FAIL: expected the envelope body to hydrate into a Pet\n");
+    exit(1);
+}
 
 if ($pet->name !== 'Rex') {
     fwrite(STDERR, "FAIL: expected hydrated Pet named Rex, got {$pet->name}\n");
