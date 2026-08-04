@@ -5,7 +5,7 @@
   tags: ("truth", "speconaut", "process"),
   priority: 6,
   difficulty: 2,
-  status: wip(2026, 8, 4)[wave 4 agent dispatched],
+  status: done(2026, 8, 4),
 )
 
 == Summary

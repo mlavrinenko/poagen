@@ -26,6 +26,20 @@ The work is to rewrite those references in terms of what the generator does rath
 - Every rewritten step still asserts the same behaviour. A step that only made sense as a statement about a file is rewritten to say what a consumer observes, or deleted with its scenario if it asserted nothing observable.
 - The task's own diff shows no scenario silently losing an assertion.
 
+=== Superseded 2026-08-04
+
+The first criterion above is no longer the rule. \`the-code-ref-exemption-becomes-total\`
+reversed it: the owner decided portability across a reimplementation is not
+something paogen pays for, and the \`src/\`, \`bin/\` and \`tests/\` entries went back
+into the allowlist as a total exemption.
+
+The criterion is left standing rather than rewritten, because it was true when
+this task closed and the work it describes did happen. Two things about it are
+worth keeping visible. It read as an absolute the check never actually
+delivered — \`code-refs-blind-to-bare-basenames\` found it missed a bare
+basename entirely, so artifacts could name code the whole time and nothing
+said so. And the absolute is no longer wanted regardless.
+
 == Non-goals
 
 - Removing the exemption for call shapes and attribute forms. Those are the product and stay permitted.
