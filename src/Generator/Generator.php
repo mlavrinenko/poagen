@@ -16,6 +16,7 @@ use Mlavrinenko\Paogen\Generator\Emit\EnumEmitter;
 use Mlavrinenko\Paogen\Generator\Emit\FormatAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\GeneratedFileHeader;
 use Mlavrinenko\Paogen\Generator\Emit\InlineModelGroups;
+use Mlavrinenko\Paogen\Generator\Emit\InlineModelMergeAdvisor;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadCatalog;
 use Mlavrinenko\Paogen\Generator\Emit\InlinePayloadPlanner;
 use Mlavrinenko\Paogen\Generator\Emit\ModelEmitter;
@@ -89,12 +90,10 @@ final readonly class Generator
     {
         $bindings = $this->scanner->scan($profile);
 
-        // Keep $ref nodes as Reference objects so the emitter can resolve them
-        // to typed cross-class references.
+        // Keep $ref nodes as Reference objects so the emitter can resolve them to typed cross-class references.
         $openApi = Reader::readFromYamlFile($profile->schema, OpenApi::class, false);
-        // Populate JSON-pointer document positions — independent of
-        // reference resolution — so diagnostics can point at the exact
-        // schema node responsible.
+        // Populate JSON-pointer document positions, independent of reference resolution, so
+        // diagnostics can point at the exact schema node responsible.
         $openApi->setDocumentContext($openApi, new JsonPointer(''));
 
         // A `security` requirement naming a scheme the document never
@@ -207,6 +206,7 @@ final readonly class Generator
             // left the OpenAPI default to apply — but silently is not the
             // same as visibly, `support-the-parameter-shapes-real-documents-use`.
             ...QuerySerializationAdvisor::notices($openApi),
+            ...InlineModelMergeAdvisor::notices($openApi, $operationIdRegistry, $preScannedSkips),
         ];
         $skippedComponents = [...$components->skipped(), ...$unions->failures(), ...$schemaSkips['components']];
 
