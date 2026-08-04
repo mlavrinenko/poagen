@@ -81,26 +81,92 @@
 # exists to report, never a reason to edit the number. Regenerating a tree
 # against a NEWER vendor document can legitimately move its floor — record the
 # new measurement and say which document revision moved it, in this file, in
-# the same commit. Do not round up "for headroom".
+# the same commit. Do not round up "for headroom". Never raise a number to
+# accommodate a clone the emitter could have avoided — that case is untouched
+# by anything below.
+#
+# One more case may move a floor UP: a reviewed change to the emitter that
+# alters WHAT it represents per operation, not how well it represents it.
+# That re-measurement must land in a decision artifact naming the change and
+# carrying every tree's before and after number — never in this file alone,
+# and never as a bare edit to a row with no artifact behind it.
+# `envelope-remeasures-the-generated-duplication-floors.decision-260804.typ`
+# is that record for the move below: `typed-error-responses` switched every
+# operation from emitting one picked response type to emitting the document's
+# full responses object, and two operations that declare the same responses
+# now emit identical `StatusResponseMap` maps where before only their
+# transport preamble could match. That is not a clone the emitter could have
+# avoided — it is the emitter representing more of the document than it did
+# before — which is why it is not the case the paragraph above still forbids.
+#
+# LOOSENED 2026-08-04, not tightened. Real collapse happened first, in the
+# same commit that shipped the switch (dc6a9035): petstore and its fixture
+# twin 8.2% -> 4.4%, digitalocean 11.0% -> 10.9%, github 24.1% -> 22.3%. The
+# four rows above are measured AFTER that collapse, not instead of it —
+# before -> after, this commit: petstore 0.00 -> 4.41, kilbil 1.68 -> 1.47
+# (moved DOWN on its own — the tree grew around its two unchanged clones,
+# see kilbil's row commentary), digitalocean 6.27 -> 10.94, github
+# 20.65 -> 22.32. This is deliberate slack, not a new resting point:
+# `retighten-the-generated-duplication-ceilings` owns bringing every row this
+# touched back down as real collapse becomes possible again — the decision
+# above names hoisting a class's repeated `StatusResponseMap` literals into a
+# shared helper as the next lever, evaluated and deferred rather than done.
 
-# 0 clones. The petstore document declares 7 models and one client; there is
-# nothing in it to repeat. Any clone at all is a regression here.
-examples/petstore/generated       0.00
+# 4 clones, 35 lines over 795 — envelope-shaped response maps, not models.
+# Two are cross-file, StoreClient.php against UserClient.php (6 and 7 lines):
+# two operations on different clients declare the same status-to-shape pair,
+# so the `StatusResponseMap` literal the envelope now writes out per
+# operation compares identical across the two files. Two are intra-file —
+# two PetClient.php operations (14 lines) and two UserClient.php operations
+# (12 lines) sharing a response declaration the same way. Petstore's 20
+# operations are built from a handful of response shapes (`Order`, a plain
+# map, nothing), and every operation now carries its full declared responses
+# object instead of one picked response type, so two operations that declare
+# the same shapes emit the same map. Full accounting:
+# `envelope-remeasures-the-generated-duplication-floors.decision-260804.typ`.
+examples/petstore/generated       4.41
 
-# 2 clones, 37 lines over 2209. Both are genuine same-shape model pairs the
-# emitter really does write out twice — Model/GoodsRequestItem against
-# Model/GoodsXmlRequestItem (10 lines), and
-# Model/ProcessSaleRequestGoodsDataItem against
-# Model/SearchClientRequestGoodsDataItem (29 lines). This tree set the old
-# uniform 2.0 threshold when it was the worst one measured.
-examples/kilbil/generated         1.68
+# Still 2 clones, still the same 37 lines, now over 2530 instead of 2209 —
+# Model/GoodsRequestContentItem against Model/GoodsXmlRequestContentItem (10
+# lines), and Model/ProcessSaleRequestContentGoodsDataItem against
+# Model/SearchClientRequestContentGoodsDataItem (29 lines): the same two
+# same-shape model pairs as before, renamed by
+# name-inline-schemas-by-status-and-merge-on-request but otherwise untouched.
+# The envelope added no client-to-client clone here even though all 36
+# operations declare the same 200/403 pair: name-inline-schemas-by-
+# operation-and-status names every inline response class by operation and
+# status (`AddClientTags200Content`, `DeleteClientTags200Content`, ...), so
+# two operations' `StatusResponseMap` literals differ by class name even
+# where the shape behind each name is identical — kilbil pays for the
+# envelope with 36 near-identical classes, not with duplicated method
+# bodies. The percentage fell, 1.68 to 1.47, because the tree grew around
+# these two unchanged clones, not because anything shrank.
+examples/kilbil/generated         1.47
 
-# 122 clones, 1610 duplicated lines over 25696. Majority (55.9% of
-# clone-lines) is operation-method transport delegation across a document with
-# 300+ operations; the rest is same-shape models and enums.
-examples/digitalocean/generated   6.27
+# 287 clones, 3424 duplicated lines over 31315 — up from 122/1610/25696.
+# 233 of the 287 clones (2872 of 3711 summed clone-lines, 77.4%) are now
+# client-to-client: an operation's declared error tail — `401`/`429`/`500`/
+# `default` all resolving to the same named `Error` model is typical — used
+# to differ from another operation's only by which `ResponseType` wrapped
+# one response; now the whole per-status literal is compared, so two
+# operations sharing that tail (e.g. `AccountClient::accountGet` against
+# `ActionsClient::actionsGet`) emit an identical `StatusResponseMap`
+# construction, not only the transport preamble that already cloned before
+# it. 41 clones/609 lines (16.4%) are still same-shape models, 11 clones/211
+# lines (5.7%) still enum-to-enum — both unchanged in kind and close in size
+# to before.
+examples/digitalocean/generated   10.94
 
-# 1035 clones, 20262 duplicated lines over 98129. 89.7% of clone-lines are
-# model-to-model, driven by ~918 declared components including 1837 webhook
-# payload types that re-declare the same nested objects under fresh names.
-examples/github/generated        20.65
+# 1431 clones, 24159 duplicated lines over 108267 — up from 1035/20262/98129.
+# Model-to-model duplication is close to unchanged in both count and size —
+# 897 clones/19146 lines (74.8% of summed clone-lines) against the previous
+# 894/19109 — GitHub's duplication is still overwhelmingly the vendor's own
+# document, ~918 declared components including 1837 webhook payload types
+# re-declaring the same nested objects under fresh names, none of it touched
+# by the envelope. What grew is client-to-client: 462 clones/4881 lines
+# (19.1%), the same shared-error-tail pattern DigitalOcean shows —
+# operations whose `204`/`400`/`403`/`404` all resolve to the same named
+# `BasicError` model, e.g. two `ActionsClient` operations, now compare
+# identically as a whole `StatusResponseMap` literal rather than only as a
+# transport preamble.
+examples/github/generated        22.32

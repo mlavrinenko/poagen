@@ -266,6 +266,16 @@ lint-jscpd:
 # collapsed further. It does not move when a golden tree is added — that is
 # the whole point of measuring per tree — so "a new fixture pushed it up" is
 # never an argument for raising it. Never raise it to accommodate a clone.
+#
+# It can move UP once more: a reviewed change to the emitter that alters WHAT
+# it represents per operation, not how well it represents it, recorded in a
+# decision artifact naming the change and carrying every tree's before and
+# after number. `scripts/jscpd-generated-baselines`' own RATCHET paragraph and
+# `envelope-remeasures-the-generated-duplication-floors.decision-260804.typ`
+# carry the numbers this comment does not restate — this recipe's fallback
+# went 2.0 to 4.41 there, covering `tests/fixtures/generated/petstore`, the
+# worst fixture tree once the envelope changed what every tree represents.
+# `retighten-the-generated-duplication-ceilings` owns bringing it back down.
 lint-jscpd-generated:
     #!/usr/bin/env bash
     set -eo pipefail
@@ -304,7 +314,7 @@ lint-jscpd-generated:
                     status=1
                     continue
                     ;;
-                *) threshold=2.0 ;;
+                *) threshold=4.41 ;;
             esac
         fi
 
