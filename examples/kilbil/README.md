@@ -208,6 +208,14 @@ a regeneration renamed `checkConfirmPhoneCode` the wrapper would stop satisfying
 interface and the gate would say so. That is what makes the seam a contract rather
 than a convention.
 
+What `isCodeValid` reads is a `result_code` the vendor puts inside a 200 body, and
+paogen deliberately does nothing with it. The document never marks that property as
+a failure signal — a generator acting on it would be acting on vendor knowledge it
+was never given, and a wrong guess turns a call that succeeded into a thrown
+exception. So the payload envelope stays the consumer's business, and this wrapper
+is the shape that answer takes; see
+`truth/decisions/payload-envelope-stays-the-consumers-business.decision-260804.typ`.
+
 ## Authentication
 
 The document's only security scheme is a query-string `apiKey` named `h`, applied
