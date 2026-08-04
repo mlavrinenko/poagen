@@ -5,7 +5,7 @@
   tags: ("generator", "runtime"),
   priority: 5,
   difficulty: 5,
-  status: proposed(2026, 8, 4),
+  status: wip(2026, 8, 4)[Dispatched to a worktree agent off c68c5ce2.],
 )
 
 == Summary
