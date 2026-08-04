@@ -61,22 +61,41 @@ return new Profile(
      *
      * Both samples nest one level further: a `<good>`/`<goodlist>` item can
      * contain an `<inside>` wrapper holding more `<good>`/`<goodlist>` children,
-     * mirroring the schema's own `inside` array property. That shape is out of
-     * reach of this mapping. `xmlElements` names only a root and one item
-     * element per operation, and the runtime's XmlWriter unwraps a nested array
-     * by repeating the *property's* own name (`inside`) once per entry — it has
-     * no "wrap in a container of named items" mode. So a request that populates
-     * `inside` would serialise as sibling `<inside>` elements holding fields
-     * directly, not the vendor's single `<inside>` wrapping `<good>`/`<goodlist>`
-     * children. The root/item names below are confirmed and cover the outer
-     * envelope only; see README.md for this same limitation spelled out for a
-     * consumer.
+     * mirroring the schema's own `inside` array property — the two
+     * `'<operationId>.item.inside'` entries below name that wrapper's repeated
+     * child the same way `'<operationId>.item'` names the outer one. A binding
+     * naming a property absent from the item schema fails the run, the same as
+     * a stale root or item entry would (kilbil-xml-nesting-is-unrepresentable).
+     *
+     * paogen validates these entries against the schema but does not wire them
+     * anywhere itself: `Endpoint::xmlList()` already takes exactly the root and
+     * item names the specification leaves open, and nothing between it and the
+     * wire changes for a nested property. A consumer who calls `goodsXml()` or
+     * `goodsListXml()` with a populated `inside` and wants the vendor's nested
+     * shape builds the runtime's own map from these entries — keyed by element
+     * name rather than operation id, since `good` and `goodlist` are what the
+     * XmlWriter actually walks — and passes it when constructing their own
+     * `HttpTransport`:
+     *
+     * ```php
+     * $xmlWriter = new XmlWriter([
+     *     'good' => ['inside' => 'good'],
+     *     'goodlist' => ['inside' => 'goodlist'],
+     * ]);
+     * $transport = new HttpTransport($baseUri, ApiException::class, xmlWriter: $xmlWriter);
+     * ```
+     *
+     * See README.md for the same wiring spelled out for a consumer, and
+     * tests/Integration/Kilbil/KilbilXmlNestedContainerTest.php for the emitted
+     * XML compared against these same vendor samples.
      */
     xmlElements: [
         'goodsxml' => 'goods',
         'goodsxml.item' => 'good',
+        'goodsxml.item.inside' => 'good',
         'goodslistxml' => 'goodslist',
         'goodslistxml.item' => 'goodlist',
+        'goodslistxml.item.inside' => 'goodlist',
     ],
 
     tagRenames: [

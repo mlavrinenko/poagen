@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mlavrinenko\Paogen\Generator\Emit;
 
 use cebe\openapi\spec\MediaType;
+use cebe\openapi\spec\OpenApi;
+use cebe\openapi\spec\Operation;
 use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Schema;
 use Mlavrinenko\Paogen\Generator\Naming\InlinePayloadName;
@@ -73,5 +75,35 @@ final readonly class InlineXmlRequestPlanner
         }
 
         return null;
+    }
+
+    /**
+     * The item schema of `$operationId`'s `application/xml` list request body,
+     * or null when the operation, its XML body, or an array-of-objects shape
+     * there does not exist. Shared with {@see XmlNestedContainerValidator},
+     * which needs the same schema {@see plan()} would itself claim a model
+     * from to check a `'<operationId>.item.<property>'` entry of
+     * `Profile::$xmlElements` against — the property a nested-container
+     * binding names lives here, one level below the item class {@see plan()}
+     * already synthesises.
+     */
+    public static function itemSchemaOf(OpenApi $openApi, string $operationId): ?Schema
+    {
+        $operation = InlineModelSiteResolver::operation($openApi, $operationId);
+
+        if (!$operation instanceof Operation) {
+            return null;
+        }
+
+        $body = RequestBodyAnalyzer::resolveBody($operation->requestBody);
+
+        if (!$body instanceof RequestBody) {
+            return null;
+        }
+
+        $xml = $body->content['application/xml'] ?? null;
+        $schema = $xml instanceof MediaType && $xml->schema instanceof Schema ? $xml->schema : null;
+
+        return $schema instanceof Schema ? InlinePayloadPlanner::inlineObjectItemsOf($schema) : null;
     }
 }
