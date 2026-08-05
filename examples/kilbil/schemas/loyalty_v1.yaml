@@ -343,11 +343,12 @@ paths:
                 - top_sales
                 - program_write_off_type
                 - allow_manual_card_spend
-                - _bill_data
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -379,15 +380,20 @@ paths:
                       - 4 - замена карты (донор)\n"
                     example: '1'
                   bonus_percent:
-                    type: string
+                    type:
+                    - string
+                    - 'null'
                     format: double
                     description: процент начисления бонусов клиента с учётом всех
-                      факторов
+                      факторов, null если клиент не найден
                     example: '10.00'
                   discount_percent:
-                    type: string
+                    type:
+                    - string
+                    - 'null'
                     format: double
-                    description: дисконтный процент клиента с учётом всех факторов
+                    description: дисконтный процент клиента с учётом всех факторов,
+                      null если клиент не найден
                     example: '0.00'
                   bonus_balance:
                     type: number
@@ -395,35 +401,49 @@ paths:
                     description: количество бонусов у клиента
                     example: 323.15
                   bonus_out_percent:
-                    type: string
+                    type:
+                    - string
+                    - 'null'
                     format: double
                     description: максимальный процент оплаты бонусами по программе
-                      лояльности с учетом прогрессивной шкалы
+                      лояльности с учетом прогрессивной шкалы, null если клиент не
+                      найден
                     example: '100'
                   program_name:
-                    type: string
-                    description: название программы лояльности
+                    type:
+                    - string
+                    - 'null'
+                    description: название программы лояльности, null если клиент
+                      не найден
                     example: Бонусная 10%
                   program_type:
-                    type: string
+                    type:
+                    - string
+                    - 'null'
                     format: int
                     enum:
+                    - 'null'
                     - '0'
                     - '1'
                     - '2'
                     - '3'
-                    description: "тип программы лояльности \n\n- 0 - бонусная\n- 1\
+                    description: "тип программы лояльности, null если клиент не найден\
+                      \ \n\n- 0 - бонусная\n- 1\
                       \ - дисконтная\n- 2 - дисконтно-бонусная\n- 3 - подарочный сертификат\n"
                     example: '0'
                   max_bill_bonus_out:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: double
                     description: максимальная сумма списания на текущий чек без учета
                       баланса клиента, параметр нужен для дальнейшего использования
                       в processsale
                     example: '328.30'
                   max_bonus_out:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: double
                     description: максимальная сумма списания с учетом баланса клиента,
                       позволяем ввести для списания не больше этого значения для документа
@@ -561,17 +581,24 @@ paths:
                       '
                     example: 1
                   client_email:
-                    type: string
+                    type:
+                    - string
+                    - 'null'
                     format: email
-                    description: адрес электронной почты
+                    description: адрес электронной почты, null если клиент не найден
+                      или не заполнен
                     example: example@email.ru
                   discounted_total:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: double
                     description: сумма чека со скидками
                     example: '328.30'
                   discount:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: double
                     description: сумма скидки по документу
                     example: '0.00'
@@ -605,7 +632,9 @@ paths:
                       - 1 - да\n"
                     example: '0'
                   purchases_sum:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: double
                     description: сумма покупок клиента за всё время
                     example: '14841.24'
@@ -754,20 +783,28 @@ paths:
                       aname: День рождение ребёнка
                       value: null
                   not_to_send_sms:
-                    type: integer
+                    type:
+                    - integer
+                    - 'null'
                     format: int
                     enum:
+                    - null
                     - 0
                     - 1
-                    description: не отправлять рекламные смс (1 - не отправлять)
+                    description: не отправлять рекламные смс (1 - не отправлять),
+                      null если клиент не найден
                     example: 0
                   not_to_send_email:
-                    type: integer
+                    type:
+                    - integer
+                    - 'null'
                     format: int
                     enum:
+                    - null
                     - 0
                     - 1
-                    description: не отправлять рекламные e-mail (1 - не отправлять)
+                    description: не отправлять рекламные e-mail (1 - не отправлять),
+                      null если клиент не найден
                     example: 0
                   tags:
                     type:
@@ -1164,7 +1201,9 @@ paths:
                     description: id клиента в лояльности
                     example: 4004565
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1308,7 +1347,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1423,7 +1464,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1476,7 +1519,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1681,7 +1726,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1748,7 +1795,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -1809,7 +1858,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -2170,7 +2221,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -2559,7 +2612,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -2690,7 +2745,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -2950,7 +3007,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3325,7 +3384,9 @@ paths:
                     description: код выполнения
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3405,7 +3466,9 @@ paths:
                     description: код выполнения
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3452,7 +3515,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3517,7 +3582,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3576,7 +3643,9 @@ paths:
                     description: номер сгенерированного промокода
                     example: '77775610'
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3653,7 +3722,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -3931,7 +4002,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4192,7 +4265,9 @@ paths:
                     description: успешное выполнение
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4387,7 +4462,9 @@ paths:
                     description: успешное выполнение
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4490,7 +4567,9 @@ paths:
                     description: успешное выполнение
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4605,7 +4684,9 @@ paths:
                     description: успешное выполнение
                     example: 1
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4660,7 +4741,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4738,7 +4821,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4825,7 +4910,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -4908,7 +4995,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -5064,7 +5153,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -5130,7 +5221,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
@@ -5292,7 +5385,9 @@ paths:
                 type: object
                 properties:
                   result_code:
-                    type: string
+                    type:
+                    - string
+                    - integer
                     format: int
                     description: код результата, где 0 - успешно
                     example: '0'
