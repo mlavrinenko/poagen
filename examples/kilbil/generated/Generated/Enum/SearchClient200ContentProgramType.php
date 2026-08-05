@@ -13,6 +13,7 @@ namespace Acme\Kilbil\Generated\Enum;
 
 enum SearchClient200ContentProgramType: string
 {
+    case Null = 'null';
     case _0 = '0';
     case _1 = '1';
     case _2 = '2';

@@ -17,7 +17,7 @@ final readonly class GetActionsList200Content
      * @param ?list<GetActionsList200ContentActionsItem> $actions
      */
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?array $actions = null,
         public ?GetActionsList200ContentGoods $goods = null,

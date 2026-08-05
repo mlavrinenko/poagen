@@ -18,7 +18,7 @@ final readonly class GetClientTags200Content
      */
     public function __construct(
         public array $data,
-        public string $result_code,
+        public string|int $result_code,
         public ?string $result_text = null,
     ) {
     }

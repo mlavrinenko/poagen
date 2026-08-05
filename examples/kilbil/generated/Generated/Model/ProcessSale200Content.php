@@ -23,7 +23,7 @@ final readonly class ProcessSale200Content
         public ProcessSale200ContentBillData $_bill_data,
         public ?string $_bill_footer,
         public ?string $_bill_header,
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?array $cashier_messages = null,
         public ?array $coupons_out = null,

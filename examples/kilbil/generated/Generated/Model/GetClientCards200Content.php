@@ -17,7 +17,7 @@ final readonly class GetClientCards200Content
      * @param ?list<GetClientCards200ContentCardsItem> $cards
      */
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public ?array $cards = null,
     ) {
     }

@@ -17,7 +17,7 @@ final readonly class GetMovesByClient200Content
      * @param ?list<GetMovesByClient200ContentClientMovesItem> $client_moves
      */
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public ?array $client_moves = null,
     ) {
     }

@@ -15,7 +15,7 @@ final readonly class AddClient200Content
 {
     public function __construct(
         public int $client_id,
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?int $success = null,
     ) {

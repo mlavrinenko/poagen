@@ -17,7 +17,7 @@ use Poagen\Runtime\Attribute\Format;
 final readonly class GeneratePromocode200Content
 {
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?string $promocode = null,
         #[Format('date')]

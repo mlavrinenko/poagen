@@ -14,7 +14,7 @@ namespace Acme\Kilbil\Generated\Model;
 final readonly class CheckConfirmPhoneCode200Content
 {
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public ?int $success = null,
     ) {
     }
