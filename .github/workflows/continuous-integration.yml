@@ -1,4 +1,15 @@
 # GitHub Actions Documentation: https://docs.github.com/en/actions
+#
+# `runtime/.github/workflows/continuous-integration.yml` mirrors this file's
+# job structure (lint / static-analysis / unit-tests / coverage), scoped to
+# `runtime/` alone and dormant while it lives there — see that file's own
+# comment (`bundle-the-runtime-package-with-its-own-ci-tooling`). This
+# workflow already gates `runtime/src` and `runtime/tests` as part of the
+# jobs below (`composer test`, `composer test:coverage`, etc. all run from
+# the monorepo root, whose `phpunit.xml.dist`/`phpstan.neon.dist`/etc.
+# include both trees), so nothing here needs to change for that package's
+# sake — only the runtime-scoped copy needs to be kept in step if a job
+# here changes shape.
 
 name: "Continuous Integration"
 

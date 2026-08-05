@@ -9,7 +9,6 @@ use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Generator\Tests\Unit\Runtime\ResponseUnionSelectionTest;
 
 use const DIRECTORY_SEPARATOR;
 

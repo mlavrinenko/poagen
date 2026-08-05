@@ -11,6 +11,7 @@ return RectorConfig::configure()
         __DIR__ . '/bin',
         __DIR__ . '/src',
         __DIR__ . '/runtime/src',
+        __DIR__ . '/runtime/tests',
         __DIR__ . '/tests',
     ])
     ->withSkip([

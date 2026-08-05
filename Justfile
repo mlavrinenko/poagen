@@ -169,9 +169,23 @@ lint-linecop:
 # handful of same-shape assertions or test doubles that ARE a test's subject)
 # was left alone on purpose.
 #
-# Measured 2026-08-03, hand-written code alone: 2.82% duplicated lines (1.73%
-# duplicated tokens), 83 clones over 230 files. 3.0% is set just above that:
-# green today, minimal slack, no license to add more duplication.
+# Measured 2026-08-05, hand-written code including `runtime/tests` (see
+# below): 2.96% duplicated lines (1.68% duplicated tokens), 138 clones over
+# 364 files. Up from the 2.82%/83/230 recorded the same way one line above,
+# a real increase, not tool noise:
+# `bundle-the-runtime-package-with-its-own-ci-tooling` moved
+# `tests/Unit/Runtime/` to `runtime/tests/` and added that path to this
+# recipe's scan (it was already inside the old `tests` scan, just nested
+# deeper), and the new fixtures that package's tests needed of their own
+# (`Poagen\Runtime\Tests\Fixtures\ApiException`,
+# `Poagen\Runtime\Tests\Fixtures\RecordingClient`) are the same shape as
+# equivalents already living in `tests/` and `tests/fixtures/generated/`,
+# on purpose — see those classes' own comments for why a real, if small,
+# duplication was the correct trade against depending on the generator's
+# emitted output from inside a package that has to build with the
+# generator absent. 3.0% still holds, with far less room under it than the
+# 2.82% baseline had — the next real clone anywhere in this scan is likely
+# to be the one that tips it over.
 #
 # Every measured figure this comment carried before was stale, and each was
 # true when written: 4.99%/90 and 5.09%/92 predate deduplicate-the-test-suite,
@@ -184,7 +198,7 @@ lint-jscpd:
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
-    paths=(src runtime/src tests examples/*/src)
+    paths=(src runtime/src runtime/tests tests examples/*/src)
     jscpd -c .jscpd.json --threshold 3.0 "${paths[@]}"
 
 # Duplication gate on emitted output, ONE TREE AT A TIME (generated tier;

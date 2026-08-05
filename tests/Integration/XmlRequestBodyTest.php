@@ -9,9 +9,9 @@ use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Generator\Tests\Unit\Runtime\Fixtures\Contact;
 use Poagen\Runtime\Marshal\Marshaller;
 use Poagen\Runtime\Marshal\XmlWriter;
+use Poagen\Runtime\Tests\Fixtures\Contact;
 
 use function json_encode;
 

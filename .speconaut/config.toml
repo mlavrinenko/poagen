@@ -150,7 +150,7 @@ max-lines = 15
 # runtime library's (runtime-ships-as-a-separate-package) — so no scenario
 # this project's own spec scope could ever write would move that number.
 # runtime/src is fully tested, just outside the BDD loop
-# (tests/Unit/Runtime/*, tests/Integration/RuntimeSubstitutionTest.php).
+# (runtime/tests/*, tests/Integration/RuntimeSubstitutionTest.php).
 # Leaving it here would make the untraced-source ratchet
 # (untraced-source-is-a-ratcheted-warning) carry a permanent, un-movable
 # 26-file floor — the same "bar nobody is actually watching" failure mode

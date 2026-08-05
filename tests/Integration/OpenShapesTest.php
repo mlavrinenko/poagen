@@ -8,10 +8,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Generator\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
 use Poagen\Runtime\AdditionalPropertyBag;
 use Poagen\Runtime\Marshal\Hydrator;
 use Poagen\Runtime\Marshal\Marshaller;
+use Poagen\Runtime\Tests\AdditionalPropertiesRoundTripTest;
 use ReflectionClass;
 
 use function substr_count;

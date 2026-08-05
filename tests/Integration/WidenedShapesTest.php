@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Generator\Tests\Unit\Runtime\AdditionalPropertiesRoundTripTest;
+use Poagen\Runtime\Tests\AdditionalPropertiesRoundTripTest;
 
 use const DIRECTORY_SEPARATOR;
 use const SORT_STRING;

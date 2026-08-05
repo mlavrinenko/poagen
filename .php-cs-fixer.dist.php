@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $finder = (new PhpCsFixer\Finder())
-    ->in([__DIR__ . '/src', __DIR__ . '/runtime/src', __DIR__ . '/tests', __DIR__ . '/bin'])
+    ->in([__DIR__ . '/src', __DIR__ . '/runtime/src', __DIR__ . '/runtime/tests', __DIR__ . '/tests', __DIR__ . '/bin'])
     // Generated fixtures are nette/php-generator's canonical output
     // (`quality-gates-at-maximum-strictness`).
     // cs-fixer disagrees with nette on a few stylistic choices (e.g. empty
