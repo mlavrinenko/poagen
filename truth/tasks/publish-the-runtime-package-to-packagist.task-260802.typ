@@ -5,7 +5,10 @@
   tags: ("release",),
   priority: 4,
   difficulty: 3,
-  links: (depends-on("rename-the-vendor-packages-and-namespaces-before-publishing.task-260803.typ"),),
+  links: (
+    depends-on("rename-the-vendor-packages-and-namespaces-before-publishing.task-260803.typ"),
+    depends-on("bundle-the-runtime-package-with-its-own-ci-tooling.task-260805.typ"),
+  ),
   status: accepted(2026, 8, 2),
 )
 
