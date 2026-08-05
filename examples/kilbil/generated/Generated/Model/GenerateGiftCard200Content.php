@@ -21,7 +21,7 @@ final readonly class GenerateGiftCard200Content
         public string $gc_code,
         public GenerateGiftCard200ContentGcState $gc_state,
         public string $gc_state_text,
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
     ) {
     }

@@ -23,7 +23,7 @@ final readonly class SearchGiftCard200Content
         public SearchGiftCard200ContentGcState $gc_state,
         public string $gc_state_text,
         public SearchGiftCard200ContentGcWriteOffType $gc_write_off_type,
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
     ) {
     }

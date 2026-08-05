@@ -234,3 +234,119 @@ operation's own parameters rather than producing a second `?`.
 This was a silent-failure bug until `query-apikey-security-scheme` landed — poagen
 recognised `apiKey` only with `in: header`, so the emitted client took no
 credential, sent no credential, and exited 0. Every call would have come back 403.
+
+## Corrections against the live API
+
+The vendor's document was checked against the real test API for the first time on
+2026-08-05 (`reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends`),
+using a live credential restricted to read-only calls. Two classes of defect
+surfaced, both describing an API the vendor's document does not actually serve.
+Both are corrected in this repository's copy of `schemas/loyalty_v1.yaml` — a
+deliberate, recorded exception to `fixtures-are-unmodified-vendor-documents` —
+rather than reported upstream; see the task file for why. `addclient`,
+`processsale`, `confirmsale`, `askconfirmphone` and `checkconfirmphonecode` could
+not be re-verified live: the credential is read-only-safe calls only, and every
+one of those five mutates state or sends an SMS.
+
+**`result_code`: one field name, two JSON kinds, same document.** Every
+operation's success (`200`) response carries a `result_code` the document
+declared `type: string`. The wire disagrees by operation, observed 2026-08-05:
+
+| Operation | Case | Vendor declares | Wire sends |
+|---|---|---|---|
+| `getprograms` | success | `type: string` | JSON int `0` |
+| `searchclient` | not found | `type: string` | JSON string `"6"` |
+| `searchclient` | found | `type: string` | JSON string `"0"` |
+| `getdetailingbymove` | not found | `type: string` | JSON int `1` |
+| `getdetailingbymove` | found | `type: string` | JSON int `0` |
+
+Three operations disagree with the same declaration three different ways. All 30
+`200`-response occurrences of `result_code` in the document are now
+`type: [string, integer]` — corrected by pattern for the 27 not directly
+exercised, since the same field name is already proven to vary two different
+ways and a wrong type crashes hydration outright rather than degrading. The
+`403` responses' `result_code` (always `type: integer`, 36 occurrences) were left
+alone: never observed to disagree, and every 403 body already agrees with its
+own declaration.
+
+`type: [string, integer]` was chosen over two alternatives considered and
+rejected:
+
+- `anyOf: [{type: string}, {type: integer}]` resolves to the identical PHP type
+  (`string|int`) through a different code path
+  (`CompositionResolver::resolveScalarUnion`), but introduces a second OpenAPI
+  3.1 construct into a document this README already documents as using exactly
+  one (`type: [T, "null"]`, "What makes it a real test" above). No benefit for
+  the extra construct.
+- Dropping `type` entirely resolves to `mixed`, which works but is strictly less
+  precise: it also accepts booleans, arrays and objects the field will never
+  actually hold.
+
+Verified empirically, not assumed: regenerating with `type: [string, integer]`
+emits `public string|int $result_code` (`SchemaType::isScalarUnion()` /
+`unionPhpType()`), and `PropertyTypeResolver::resolveUnion()` treats a union of
+builtins as passthrough — the `Hydrator` never attempts a coercion, so whichever
+JSON kind the wire sends passes straight through to a PHP type that already
+accepts it.
+
+**`searchclient`: required fields the "not found" response omits or nulls.**
+`SearchClient200Content` modelled only the "client found" shape: roughly fifty
+fields declared required and non-nullable. The real "not found" response (HTTP
+200, `search_mode: 0`, a phone with no matching client, observed 2026-08-05)
+disagrees on two different axes:
+
+| Field | Vendor declares | Wire sends |
+|---|---|---|
+| `_bill_data` | required, `type: object` | key omitted entirely |
+| `bonus_percent` | required, `type: string` | key present, JSON `null` |
+| `discount_percent` | required, `type: string` | key present, JSON `null` |
+| `bonus_out_percent` | required, `type: string` | key present, JSON `null` |
+| `program_name` | required, `type: string` | key present, JSON `null` |
+| `program_type` | required, `type: string` (enum) | key present, JSON `null` |
+| `client_email` | required, `type: string` | key present, JSON `null` |
+| `not_to_send_sms` | required, `type: integer` (enum) | key present, JSON `null` |
+| `not_to_send_email` | required, `type: integer` (enum) | key present, JSON `null` |
+
+`_bill_data` is now optional (removed from `required`) rather than nullable —
+poagen's own emission rule already makes an optional property nullable, so no
+`type` change was needed once it left the `required` list. The other eight are
+still required (the key is always present) with `'null'` added to their `type`.
+
+A third, unrelated defect surfaced from the same two recorded calls:
+`discount`, `discounted_total`, `max_bonus_out` and `max_bill_bonus_out` — all
+declared `type: string` — arrive as a bare JSON int `0` when the value is zero,
+in both the "found" and "not found" calls; `purchases_sum`, the same family,
+arrives as JSON int `0` not found and JSON string `"44.00"` found. Fixed the
+same way as `result_code`: `type: [string, integer]`.
+
+**What could not be verified live.** `addclient`, `processsale`, `confirmsale`,
+`askconfirmphone` and `checkconfirmphonecode` were re-read statically for both
+defect classes — breadth bounded by the port map in the consuming project's
+`api-kilbil.md`, per this task's Non-goals — but never called. None show an
+*additional* `result_code`-shaped inconsistency beyond the document-wide fix
+above, and none have an obviously-omittable required field beyond what the
+vendor's own declarations already say (`processsale`'s `_bill_body`/
+`_bill_header`/`_bill_footer` are already `type: [T, "null"]` while required,
+consistent with "always present, sometimes null"). `addclient`'s response
+shares `searchclient`'s general shape (`client_id`, `result_code`, `result_text`
+all required) and could plausibly repeat the same omission on a partial
+failure; recorded here as an open risk rather than guessed at, since chasing it
+needs a mutating call the read-only credential rule forbids.
+
+`getmovesbyclient` and `getdetailingbymove` were called live (both read-only)
+for a real client's history and a bogus move id. Neither declares any field
+required beyond `result_code`/`result_text`, so both were already resilient to
+the "found-shape-only" defect once `result_code` was fixed — no further schema
+change was needed. `getclientfullbalance` remains as clean as the original live
+proof found it: its `200` response is a bare array of balances with no
+`result_code` envelope at all.
+
+Recorded, scrubbed fixtures and the tests that hydrate them:
+`fixtures/responses/getprograms.json` (the int `result_code`),
+`fixtures/responses/searchclient-not-found.json` and
+`fixtures/responses/searchclient-found-live.json` (the omitted/nulled required
+fields and the int-vs-string money fields), all in
+`tests/Integration/Kilbil/KilbilLiveShapeReconciliationTest.php`. Every personal
+field (name, phone, email, birth date, client id) in the found-response fixture
+is the vendor's own placeholder example from `schemas/loyalty_v1.yaml`, not the
+real client's data.

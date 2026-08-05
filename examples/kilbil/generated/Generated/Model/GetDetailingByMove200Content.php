@@ -17,7 +17,7 @@ final readonly class GetDetailingByMove200Content
      * @param ?list<GetDetailingByMove200ContentMoveDetailItem> $move_detail
      */
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?array $move_detail = null,
         public ?GetDetailingByMove200ContentMoveInfo $move_info = null,

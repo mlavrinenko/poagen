@@ -17,7 +17,7 @@ final readonly class GetPrograms200Content
      * @param ?list<GetPrograms200ContentDataItem> $data
      */
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public ?array $data = null,
     ) {
     }

@@ -17,7 +17,7 @@ use Acme\Kilbil\Generated\Enum\ExchangePosSettings200ContentSaveNonbonusMoves;
 final readonly class ExchangePosSettings200Content
 {
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public ?ExchangePosSettings200ContentOsmiCardsAreUsed $osmi_cards_are_used = null,
         public ?ExchangePosSettings200ContentRegistrationFields $registration_fields = null,
         public ?ExchangePosSettings200ContentSaveNonbonusMoves $save_nonbonus_moves = null,

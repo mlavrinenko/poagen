@@ -16,7 +16,7 @@ use Acme\Kilbil\Generated\Enum\AskConfirmPhone200ContentTypeConfirmationCode;
 final readonly class AskConfirmPhone200Content
 {
     public function __construct(
-        public string $result_code,
+        public string|int $result_code,
         public string $result_text,
         public ?int $success = null,
         public ?AskConfirmPhone200ContentTypeConfirmationCode $type_confirmation_code = null,
