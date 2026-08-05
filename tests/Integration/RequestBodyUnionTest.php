@@ -9,9 +9,9 @@ use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Generator\Tests\Unit\Runtime\Fixtures\GadgetByVolume;
-use Poagen\Generator\Tests\Unit\Runtime\Fixtures\GadgetByWeight;
 use Poagen\Runtime\Marshal\Marshaller;
+use Poagen\Runtime\Tests\Fixtures\GadgetByVolume;
+use Poagen\Runtime\Tests\Fixtures\GadgetByWeight;
 
 use const DIRECTORY_SEPARATOR;
 

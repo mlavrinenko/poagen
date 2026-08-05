@@ -57,6 +57,7 @@
     "autoload-dev": {
         "psr-4": {
             "Poagen\\Generator\\Tests\\": "tests/",
+            "Poagen\\Runtime\\Tests\\": "runtime/tests/",
             "Poagen\\Generator\\Tests\\Generated\\": "tests/generated/",
             "Poagen\\Generator\\Tests\\Integration\\": "tests/Integration/",
             "Poagen\\Generator\\Tests\\Fixtures\\ValueObject\\": "tests/fixtures/profiles/value-objects/",

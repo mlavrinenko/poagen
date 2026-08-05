@@ -4,6 +4,24 @@
     <testsuite name="unit-tests">
       <directory>./tests</directory>
     </testsuite>
+    <!--
+        Separate from the `unit-tests` suite above on purpose: `./tests`
+        does not reach outside itself, so `runtime/tests` needs its own
+        entry or the moved suite silently stops running under the root
+        gate — exactly the coverage-floor gap
+        `bundle-the-runtime-package-with-its-own-ci-tooling` exists to
+        close (`runtime/src=92.0` in `Justfile`'s `test-coverage` recipe
+        has nothing to measure without these tests actually executing).
+        `runtime/phpunit.xml.dist` carries the identical
+        `<directory>./tests</directory>` line relative to `runtime/`, for
+        the same suite run standalone once `runtime/` is split off — the
+        two are not one config delegating to the other because a single
+        phpunit.xml cannot be relative to two different roots at once;
+        keep them in sync by hand if this suite's shape ever changes.
+    -->
+    <testsuite name="runtime-tests">
+      <directory>./runtime/tests</directory>
+    </testsuite>
   </testsuites>
   <coverage/>
   <php>
