@@ -5,8 +5,14 @@
   tags: (),
   priority: 8,
   difficulty: 6,
-  status: accepted(2026, 8, 5),
-  links: (related("extract-the-kilbil-client-to-its-own-repository.task-260802.typ"),),
+  status: done(
+    2026,
+    8,
+    5,
+  )[Fixed against the live test API on 2026-08-05. result\_code widened to type: \[string, integer\] across all 30 200-responses (emits string|int, passthrough, no coercion). SearchClient200Content: \_bill\_data made optional, eight fields nullable, five widened to string|int — each from a real recorded response. Three scrubbed fixtures plus a hydration test. All four live calls verified after the fix. Five mutating endpoints could not be live-verified with a read-only credential; addclient shares searchclient's shape and is recorded in the README as an open risk.],
+  links: (
+    related("extract-the-kilbil-client-to-its-own-repository.task-260802.typ"),
+  ),
 )
 
 == Summary
