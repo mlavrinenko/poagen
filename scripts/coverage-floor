@@ -7,6 +7,20 @@ declare(strict_types=1);
  * coverage-floor — read a Clover XML coverage report and enforce a
  * statement-coverage floor per tier (coverage-floor-in-the-gate).
  *
+ * `runtime/scripts/coverage-floor` is a byte-for-byte copy of this file, not
+ * a symlink or a require of it: `git subtree split --prefix=runtime`
+ * (`bundle-the-runtime-package-with-its-own-ci-tooling`) has to hand the
+ * standalone package a working copy on its own, and a symlink pointing
+ * `../../scripts/coverage-floor` would dangle the moment `runtime/` is
+ * checked out anywhere else. The script is already generic over tier and
+ * floor (see the next paragraph) and resolves the repo root from its own
+ * `__DIR__`, so the copy needs no edits to work standalone — only the
+ * `<tier-path>=<floor>` arguments at each call site differ (this repo's
+ * `Justfile` passes two tiers; `runtime/Justfile` passes one). If this
+ * script's logic ever changes, change both copies — there is no include
+ * mechanism a shell script can lean on the way `phpstan.neon`'s `includes:`
+ * can.
+ *
  * This is lint-jscpd's ratchet run backwards: jscpd's `--threshold` caps a
  * percentage that must only fall (duplication); this script floors a
  * percentage that must only rise (coverage). The floor VALUES live where
