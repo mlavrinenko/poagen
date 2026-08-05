@@ -11,6 +11,7 @@ parameters:
     - bin
     - src
     - runtime/src
+    - runtime/tests
     - tests
   excludePaths:
     # Generated code is checked by a separate config so the consumer's
