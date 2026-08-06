@@ -40,7 +40,7 @@ jobs:
         with:
           php-version: "8.4"
           coverage: "none"
-      - uses: "ramsey/composer-install@v3"
+      - uses: "ramsey/composer-install@v4"
       - name: "Check coding style (php-cs-fixer)"
         run: "composer lint:cs-fixer"
       - name: "Check refactorings (rector)"
@@ -55,7 +55,7 @@ jobs:
         with:
           php-version: "8.4"
           coverage: "none"
-      - uses: "ramsey/composer-install@v3"
+      - uses: "ramsey/composer-install@v4"
       - run: "composer lint:phpstan"
 
   unit-tests:
@@ -74,7 +74,7 @@ jobs:
         with:
           php-version: "${{ matrix.php }}"
           coverage: "none"
-      - uses: "ramsey/composer-install@v3"
+      - uses: "ramsey/composer-install@v4"
         with:
           dependency-versions: "${{ matrix.composer-deps }}"
       - run: "composer test"
@@ -99,7 +99,7 @@ jobs:
         with:
           php-version: "8.4"
           coverage: "pcov"
-      - uses: "ramsey/composer-install@v3"
+      - uses: "ramsey/composer-install@v4"
         with:
           dependency-versions: "highest"
       - run: "composer test:coverage"
