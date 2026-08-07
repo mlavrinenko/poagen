@@ -30,6 +30,7 @@ final readonly class Generator
         private SkipListValidator $skipListValidator = new SkipListValidator(),
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
         private PropertyRenameValidator $propertyRenameValidator = new PropertyRenameValidator(),
+        private PhpDocTypeValidator $phpDocTypeValidator = new PhpDocTypeValidator(),
         private UnionGuidanceValidator $unionGuidance = new UnionGuidanceValidator(),
         private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
@@ -150,6 +151,7 @@ final readonly class Generator
             $inlinePayloads->roots(),
             $ledger,
             $profile->propertyRenames,
+            $profile->phpDocTypes,
         );
         $tagRegistry = new Naming\NameRegistry($normaliser);
         $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
@@ -188,6 +190,7 @@ final readonly class Generator
             ...$this->skipListValidator->validate($openApi, $components, $profile->skip, $skipped, $skippedComponents),
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
+            ...$this->phpDocTypeValidator->validate($openApi, $components, $profile->phpDocTypes),
             ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];
 

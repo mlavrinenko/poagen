@@ -124,6 +124,7 @@ final readonly class Profile
      *                                              fails the run, matching `$inlineModels` and `$tagChoice`. A
      *                                              rename that collides with another property already in the
      *                                              same model — renamed or not — fails the run naming both.
+     * @param array<string,string>  $phpDocTypes    Forces a model property's PHPDoc type, keyed like $propertyRenames — the override channel for a narrowing OpenAPI cannot spell (chiefly `numeric-string`), winning over the constraint-derived narrowing {@see Emit\PhpDocTypeRefiner} computes; a stale key fails the run {@see PhpDocTypeValidator} (refined-phpdoc-types).
      * @param array<string,array<string,mixed>> $securitySchemes Declarations for schemes a `security` requirement
      *                                              names and `components.securitySchemes` never declares. Keyed by
      *                                              the requirement name; the value is the `securityScheme` object
@@ -208,6 +209,7 @@ final readonly class Profile
         public array $xmlElements = [],
         public array $inlineModels = [],
         public array $propertyRenames = [],
+        public array $phpDocTypes = [],
         public array $securitySchemes = [],
         public string $source = 'poagen.php',
     ) {}
@@ -245,6 +247,7 @@ final readonly class Profile
             xmlElements: $this->xmlElements,
             inlineModels: $this->inlineModels,
             propertyRenames: $this->propertyRenames,
+            phpDocTypes: $this->phpDocTypes,
             securitySchemes: $this->securitySchemes,
             source: $source ?? $this->source,
         );

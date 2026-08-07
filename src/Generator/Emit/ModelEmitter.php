@@ -64,6 +64,15 @@ final readonly class ModelEmitter
      * @param string                 $rawComponentName the raw `components.schemas` key this model came from, or
      *                                                 `''` for a class {@see ModelPlanner}
      *                                                 synthesised itself
+     * @param array<string,string>   $phpDocTypes      Profile::$phpDocTypes, unsliced — keyed
+     *                                                 `'<RawComponentName>.<wirePropertyName>'` the same way
+     *                                                 $propertyRenames is. Looked up per property as
+     *                                                 `"$rawComponentName.$wireName"`, so a synthesised model
+     *                                                 (`$rawComponentName = ''`) never matches an entry — its
+     *                                                 scalar properties still get the constraint-derived
+     *                                                 narrowing {@see PhpDocTypeRefiner} computes, only not an
+     *                                                 override. {@see PhpDocTypeValidator} rejects a stale key
+     *                                                 before this runs.
      */
     public function emit(
         string $modelNamespace,
@@ -75,6 +84,7 @@ final readonly class ModelEmitter
         array $implements = [],
         array $propertyRenames = [],
         string $rawComponentName = '',
+        array $phpDocTypes = [],
     ): ModelEmission {
         assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         $modelNamespace = trim($modelNamespace, '\\');
@@ -150,6 +160,7 @@ final readonly class ModelEmitter
                 $bindings,
                 $modelNamespace,
                 $registry,
+                $phpDocTypes[$rawComponentName . '.' . $propName] ?? null,
             );
         }
 
@@ -172,6 +183,7 @@ final readonly class ModelEmitter
         Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
+        ?string $docTypeOverride = null,
     ): void {
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
@@ -195,8 +207,21 @@ final readonly class ModelEmitter
         if ($hasDefault) {
             $param->setDefaultValue(null);
         }
-        if ($resolved->phpDoc !== null) {
-            $docType = DocTypeSimplifier::shorten($namespace, $resolved->phpDoc);
+        // A structural doc type (`list<Tag>`, `array<string, mixed>`) wins the
+        // slot and is shortened against the namespace so its class references
+        // print short. Where the resolver left none, a scalar property may
+        // still carry a narrower type than its bare `string` / `int` — from an
+        // OpenAPI constraint, or a profile override OpenAPI cannot spell
+        // (`refined-phpdoc-types`). Those are PHPStan pseudo-types
+        // (`non-empty-string`, `positive-int`, `numeric-string`) with no class
+        // to resolve, so they pass through raw — running them through
+        // `DocTypeSimplifier::shorten()` makes nette read them as class names
+        // and prefix a stray leading backslash.
+        $docType = $resolved->phpDoc !== null
+            ? DocTypeSimplifier::shorten($namespace, $resolved->phpDoc)
+            : PhpDocTypeRefiner::refine($resolved->phpType, $propSchema, $docTypeOverride);
+
+        if ($docType !== null) {
             // Same reason as $spellsOwnNull above: `?string|list<string>` is
             // not a type PHPStan reads as "the whole union, nullable" — a
             // union doc type needs `|null` appended, not `?` prefixed.

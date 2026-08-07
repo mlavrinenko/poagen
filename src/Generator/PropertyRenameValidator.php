@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator;
 
 use cebe\openapi\spec\OpenApi;
-use cebe\openapi\spec\Schema;
-use Poagen\Generator\Generator\Emit\CompositionResolver;
 use Poagen\Generator\Generator\Emit\ModelEmitter;
 
-use function array_keys;
 use function in_array;
-use function is_int;
 use function sprintf;
 use function strrpos;
 use function substr;
@@ -65,7 +61,7 @@ final readonly class PropertyRenameValidator
 
             $rawName = substr($key, 0, $split);
             $wireProp = substr($key, $split + 1);
-            $properties = $this->propertiesOf($openApi, $components, $rawName);
+            $properties = ComponentPropertyNames::of($openApi, $components, $rawName);
 
             if ($properties === null) {
                 $failures[] = sprintf(
@@ -92,7 +88,7 @@ final readonly class PropertyRenameValidator
         }
 
         foreach ($byComponent as $rawName => $renames) {
-            $properties = $this->propertiesOf($openApi, $components, $rawName) ?? [];
+            $properties = ComponentPropertyNames::of($openApi, $components, $rawName) ?? [];
             $failures = [...$failures, ...$this->collisions($rawName, $properties, $renames)];
         }
 
@@ -131,49 +127,5 @@ final readonly class PropertyRenameValidator
         }
 
         return $failures;
-    }
-
-    /**
-     * The wire property names a raw component declares, after the same
-     * `allOf` flattening {@see ModelPlanner}
-     * applies before emission — {@see CompositionResolver::materialiseAllOf}
-     * is the one place that logic lives, so this validator and the real run
-     * always agree on what "the model" contains. Null means the name is not
-     * a component this profile field can target at all: absent from the
-     * document, or a shape with no properties of its own (enum, scalar,
-     * array, union, or an `allOf` with nothing mergeable).
-     *
-     * @return list<string>|null
-     */
-    private function propertiesOf(OpenApi $openApi, Emit\ComponentCatalog $components, string $rawName): ?array
-    {
-        $shape = $components->shapeOf($rawName);
-
-        if (!$shape instanceof Emit\ComponentShape) {
-            return null;
-        }
-
-        $schema = match ($shape->kind) {
-            Emit\ComponentShape::KIND_OBJECT => $shape->schema,
-            Emit\ComponentShape::KIND_ALLOF_OBJECT => $shape->schema instanceof Schema
-                ? CompositionResolver::materialiseAllOf($shape->schema, $openApi)
-                : null,
-            default => null,
-        };
-
-        if (!$schema instanceof Schema) {
-            return null;
-        }
-
-        // YAML parses a purely numeric key as an int; coerce to string the
-        // same way {@see ModelEmitter} does, so a numeric-looking property
-        // name compares correctly against the profile's (string) key.
-        $names = [];
-
-        foreach (array_keys($schema->properties ?? []) as $name) {
-            $names[] = is_int($name) ? (string) $name : $name;
-        }
-
-        return $names;
     }
 }

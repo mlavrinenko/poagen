@@ -43,6 +43,7 @@ final readonly class ModelPlanner
      *                                                    found. They join the same queue as inline children, so nesting
      *                                                    below them is reached by the machinery that was already there.
      * @param array<string,string>   $propertyRenames    Profile::$propertyRenames, unsliced
+     * @param array<string,string>   $phpDocTypes        Profile::$phpDocTypes, unsliced
      */
     public function plan(
         OpenApi $openApi,
@@ -57,6 +58,7 @@ final readonly class ModelPlanner
         array $extraRoots = [],
         ?Emit\ModelNameLedger $ledger = null,
         array $propertyRenames = [],
+        array $phpDocTypes = [],
     ): void {
         $ledger ??= new Emit\ModelNameLedger();
         $rawNames = array_keys($components->all());
@@ -82,7 +84,7 @@ final readonly class ModelPlanner
                 $ledger->claim($shape->phpName, 'components.schemas/' . $rawName);
             }
 
-            $this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending, $propertyRenames);
+            $this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending, $propertyRenames, $phpDocTypes);
         }
 
         $this->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $ledger);
@@ -92,6 +94,7 @@ final readonly class ModelPlanner
      * @param array<string,string>   $writes
      * @param list<Emit\SynthesisedModel> $pending
      * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
+     * @param array<string,string>   $phpDocTypes     Profile::$phpDocTypes, unsliced
      */
     private function emitShape(
         string $rawName,
@@ -106,6 +109,7 @@ final readonly class ModelPlanner
         array &$writes,
         array &$pending,
         array $propertyRenames = [],
+        array $phpDocTypes = [],
     ): void {
         $path = $modelDir . DIRECTORY_SEPARATOR . $shape->phpName . '.php';
 
@@ -116,7 +120,7 @@ final readonly class ModelPlanner
 
             case Emit\ComponentShape::KIND_OBJECT:
                 $effective = $shape->schema ?? throw new LogicException('object shape missing schema');
-                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames);
+                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames, $phpDocTypes);
 
                 return;
 
@@ -127,7 +131,7 @@ final readonly class ModelPlanner
                     return;
                 }
 
-                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames);
+                $this->emitObject($effective, $shape, $modelNamespace, $registry, $bindings, $enums, $components, $rawName, $path, $writes, $pending, $propertyRenames, $phpDocTypes);
 
                 return;
 
@@ -153,6 +157,7 @@ final readonly class ModelPlanner
      * @param array<string,string>   $writes
      * @param list<Emit\SynthesisedModel> $pending
      * @param array<string,string>   $propertyRenames Profile::$propertyRenames, unsliced
+     * @param array<string,string>   $phpDocTypes     Profile::$phpDocTypes, unsliced
      */
     private function emitObject(
         Schema $effective,
@@ -167,6 +172,7 @@ final readonly class ModelPlanner
         array &$writes,
         array &$pending,
         array $propertyRenames = [],
+        array $phpDocTypes = [],
     ): void {
         $emission = $this->emitter->emit(
             $modelNamespace,
@@ -178,6 +184,7 @@ final readonly class ModelPlanner
             $components->interfacesFor($rawName),
             $propertyRenames,
             $rawName,
+            $phpDocTypes,
         );
 
         $writes[$path] = $emission->source;

@@ -1,0 +1,20 @@
+openapi: 3.0.3
+info:
+  title: Refined PHPDoc types, optional narrowed property (synthetic)
+  version: "1.0.0"
+  description: Fixture for refined-phpdoc-types — an optional property that still narrows keeps the nullable doc form.
+paths: {}
+components:
+  schemas:
+    LineItem:
+      type: object
+      required:
+        - sku
+      properties:
+        sku:
+          type: string
+          minLength: 1
+        note:
+          type: string
+          minLength: 1
+          description: Optional (absent from required) yet minLength >= 1 — narrows to ?non-empty-string.

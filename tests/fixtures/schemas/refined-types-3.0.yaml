@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: Refined PHPDoc types (synthetic)
+  version: "1.0.0"
+  description: Fixture exercising refined-phpdoc-types — constraint-derived narrowing and the $phpDocTypes override.
+paths: {}
+components:
+  schemas:
+    LineItem:
+      type: object
+      required:
+        - sku
+        - quantity
+        - amount
+      properties:
+        sku:
+          type: string
+          minLength: 1
+          description: A minLength >= 1 string can never arrive empty — non-empty-string.
+        note:
+          type: string
+          description: An unconstrained string stays a bare string.
+        quantity:
+          type: integer
+          minimum: 1
+          description: An inclusive lower bound of 1 forces positive-int.
+        discount:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: 3.0 exclusive-of-zero also forces positive-int.
+        balance:
+          type: integer
+          minimum: 0
+          description: An inclusive lower bound of 0 admits zero — stays a bare int.
+        amount:
+          type: string
+          description: A decimal carried as a string — OpenAPI cannot say numeric-string, the profile override can.
