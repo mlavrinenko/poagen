@@ -5,7 +5,11 @@
   tags: ("gates", "release"),
   priority: 5,
   difficulty: 3,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[drift caught offline inside just check; network dependency removed],
 )
 
 == Summary

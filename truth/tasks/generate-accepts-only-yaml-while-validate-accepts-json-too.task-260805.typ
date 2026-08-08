@@ -5,7 +5,11 @@
   tags: (),
   priority: 3,
   difficulty: 2,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[SchemaReader is the one reader-selection rule; parity test over a JSON/YAML twin],
 )
 
 == Summary

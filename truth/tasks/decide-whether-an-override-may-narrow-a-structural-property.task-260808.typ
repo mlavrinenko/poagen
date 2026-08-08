@@ -5,7 +5,11 @@
   tags: (),
   priority: 3,
   difficulty: 6,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[ruled scalar-only; decision phpdoctypes-stays-scalar-only, refusal points at it],
   links: (
     related(
       "refuse-a-phpdoctypes-override-the-property-cannot-carry.task-260808.typ",

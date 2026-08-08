@@ -6,7 +6,11 @@
   priority: 4,
   difficulty: 5,
   links: (related("typed-error-responses.task-260729.typ"),),
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[ceilings re-measured and lowered; collapse route re-weighed, still deferred],
 )
 
 == Summary
