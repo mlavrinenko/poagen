@@ -14,7 +14,7 @@
     #scenario("No arguments prints usage and exits 0", stage: "unstable")[
       #when[#the(PoagenCli) is invoked with no arguments]
       #then[#the(PoagenCli)'s stdout should contain "USAGE"]
-      #and_[#the(PoagenCli) should exit with code #p((code: "0"))]
+      #and_[#the(PoagenCli.exitCode) should be #p((code: "0"))]
     ]
 
     #scenario("--help prints usage and exits 0", stage: "unstable")[

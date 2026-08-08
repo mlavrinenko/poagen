@@ -2,6 +2,7 @@
 #import "../domain/schema.context.typ": *
 #import "../domain/guidance.context.typ": *
 #import "../domain/generation.context.typ": *
+#import "../domain/runtime.context.typ": *
 
 #feature(
   "Model Generator",
@@ -135,7 +136,7 @@
       stage: "unstable",
     )[
       #given[#the(Schema) declares components `Dog` and `Cat` and #a(Model) `Pet` with a required property `kind` whose schema is `oneOf: [$ref Dog, $ref Cat]` with `discriminator.propertyName: petType`]
-      #when[#the(Client) call `(new Hydrator())->hydrate(Pet::class, $data)` runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
+      #when[#the(Hydrator) call `(new Hydrator())->hydrate(Pet::class, $data)` runs against a payload whose `kind.petType` is #p((wire: "'Cat'"))]
       #then[#the(Model)'s `$pet->kind` is an instance of `Cat`, independent of whether the payload's keys structurally match `Dog`]
     ]
 
@@ -156,7 +157,7 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` has a property `tags` whose schema is `type: array, items.$ref: #/components/schemas/Tag`]
-      #when[#the(Client)'s runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `tags` is a list of two objects]
+      #when[#the(Hydrator) (attribute-and-phpdoc-driven-serialization) runs against a payload whose `tags` is a list of two objects]
       #then[#the(Model)'s `$pet->tags[0]` is an instance of `Tag`]
       #and_[#the(Model)'s `$pet->tags[1]` is an instance of `Tag`]
     ]
@@ -166,7 +167,7 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` has a property `photoUrls` whose schema is `type: array, items.type: string`]
-      #when[#the(Client)'s runtime `Hydrator` (attribute-and-phpdoc-driven-serialization) runs against a payload whose `photoUrls` is a list of plain strings]
+      #when[#the(Hydrator) (attribute-and-phpdoc-driven-serialization) runs against a payload whose `photoUrls` is a list of plain strings]
       #then[each `$pet->photoUrls[$i]` on #the(Model) is the original string — no object wrapping]
     ]
 
@@ -178,8 +179,8 @@
       #when[#the(Generator) emits `Contact.php` and the runtime `Marshaller` / `Hydrator` (attribute-and-phpdoc-driven-serialization) process a payload containing the wire key `display-name`]
       #then[#the(Model)'s constructor parameter is emitted as `$displayName` (camelCased PHP identifier)]
       #and_[#the(Model)'s property carries `#[WireName('display-name')]`, and the class has no `PROPERTY_MAP` constant]
-      #and_[#the(Client)'s `(new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada'])` populates `$contact->displayName === 'Ada'`]
-      #and_[#the(Client)'s `(new Marshaller())->marshal($contact)` emits the key as `display-name`, not `displayName`]
+      #and_[#the(Hydrator)'s `(new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada'])` populates `$contact->displayName === 'Ada'`]
+      #and_[#the(Marshaller)'s `(new Marshaller())->marshal($contact)` emits the key as `display-name`, not `displayName`]
     ]
 
     #scenario(
@@ -208,7 +209,7 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Sighting` declares a required property `creature` typed `Dog|Cat`, carrying a `#[BranchSelector]` computed from the branches' disjoint required fields]
-      #when[#the(Client)'s runtime `Hydrator` runs against a payload whose `creature` carries neither `bark` nor `meow`]
+      #when[#the(Hydrator) runs against a payload whose `creature` carries neither `bark` nor `meow`]
       #then[#the(Client)'s hydration raises, naming the property and the keys the payload carried]
       #and_[#the(Client)'s hydration also raises when `creature` carries both `bark` and `meow`, naming both branches it matched]
       #and_[#the(Client) never resolves either case by taking the first branch — that is what makes computing the selector safe]
@@ -220,7 +221,7 @@
     )[
       #given[#a(Model) `Habitat` declares a required property `resident` typed `Dog|Cat` and a sibling property `species` enumerating `dog` and `cat`]
       #and_[#the(Profile) maps those two values to the two branches for `Habitat.resident`]
-      #when[#the(Client)'s runtime `Hydrator` runs against a payload whose `species` is #p((wire: "'cat'"))]
+      #when[#the(Hydrator) runs against a payload whose `species` is #p((wire: "'cat'"))]
       #then[#the(Model)'s `resident` parameter carries `#[Discriminator(field: 'species', map: ['cat' => Cat::class, 'dog' => Dog::class], onParent: true)]`]
       #and_[#the(Model)'s `$habitat->resident` is an instance of `Cat`, read from the enclosing payload rather than from the value]
       #and_[#the(Client)'s hydration raises when `species` is absent, and when it carries a value the map does not name]
@@ -231,9 +232,9 @@
       stage: "unstable",
     )[
       #given[#a(Model) `Pet` declares a property `tags` with phpdoc `@param list<Tag>|null $tags`]
-      #and_[#the(Client)'s PHP process is running under `opcache.save_comments=0`, so `ReflectionMethod::getDocComment()` returns `false`]
-      #when[#the(Client)'s `(new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]])` runs]
-      #then[#the(Client)'s runtime re-tokenises `Pet.php` via `token_get_all`, recovers the constructor's doc comment, and `$pet->tags[0]` is an instance of `Tag` — not a raw array]
+      #and_[#the(Hydrator) runs in a PHP process under `opcache.save_comments=0`, so its `ReflectionMethod::getDocComment()` call returns `false`]
+      #when[#the(Hydrator)'s `(new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]])` runs]
+      #then[#the(Hydrator) re-tokenises `Pet.php` via `token_get_all`, recovers the constructor's doc comment, and `$pet->tags[0]` is an instance of `Tag` — not a raw array]
     ]
   ]
 
@@ -256,7 +257,7 @@
       #and_[#a(Model) `Contact` declares a required property `email` with `format: email`]
       #when[`json_encode($contact)` runs against #a(Model) `Contact` whose `email` is an `Email('team@example')`]
       #then[#the(Model)'s emitted JSON contains `"email":"team@example"`, not a nested object]
-      #and_[`(new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...])` produces #a(Model) `Contact` whose `email` is an `Email` instance with `$value === 'team@example'`]
+      #and_[`(new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...])` produces #a(Model) `Contact` whose `email` is an `Email` instance whose #the(ValueObject.value) equals `'team@example'`]
     ]
 
     #scenario(

@@ -6,11 +6,11 @@
 
 [features."Model Generator"]
 spec = "truth/specs/model-generator.feature-260418.typ"
-spec-hash = "sha256:99685ca6f7c9d7b6eb161e22a3115791280ce4fe40aee73dad641206a245a607"
+spec-hash = "sha256:f15302fc7064f688671d4a7a9af1925337eef92fd9b7ff86e7ff6254edef4040"
 
 [features."Model Generator".scenarios."A BindsFormat scalar value object round-trips through ScalarBinding"]
-as-is-hash = "sha256:8be88086af99a2fa6020e333f7de5ed768fedd11639f2cb8d13ee2cb522b8bab"
-as-is = "KLUv/QBY5QsAtphIJCBv1AaDX47HuDG1tZdQGUdWwNIDTHtwUy9CTDXnQH+AECsuAj0APgA9AN+80IR/yTaBzVv9yQg78i/RKlstiFyKKvekPlP6WoBt5d57ZcWEe1YNL/6w4eI3Ts8hMFstOOSP04ebKxLsvbDXGbwlcwxnC/kXCvS6URLwaPU1H7k3p2zUpGeLpzhMU5ySaSQAl1orZ9nYbhfP+qY4HUwmkwlFQRwgAnlmNqWHf3GYbNSEGEkwYTbTPNlJleZVjPC81buzAppkbm1KrOOKb0oR//JQPKNfUu5RZ/m0ssh3POfDtjIQBOVabF4956qYe9QdyuPxuOMD0CV3MGNbz9OkNCDgOM1zjY9lKLyS27Bszj2+3d7RaDyNxnn1DQ6RhbPs1ikhICCCZah8YX1mySCK4VjmWSAkUdQhCTkcFuEvW9pmFZidiPasCxBwBAZXGBjgMGhxXakw2piz+bLL2HF4wYlajoWxP4ASyQEmMem46rYHxZhsHyxhmgE="
+as-is-hash = "sha256:ace1e54d7d1d6f52fcee4d1966a8ee8c650f24cb5bbad17a17dfd664cb6603a3"
+as-is = "KLUv/QBYHQwA9lhJJCBv1AaDX47HuDG1tZdQGUdWwNIDTHtwCxchpppjaH+AECsuAj4APgA+ABDfvNCEf8k2gc1bHcoIO/Iv0SpbLYhciir3pD5T+jqAbeXee2XFhHtWDS/+sOHiN07PITBbLTjkkNOHmysSK9l7Ya8zeEvmGM4W8i8UgdeNksaj1dd85N6cslGTni2e8jRNccrGkQBcaq2cZWO7XTzrm+J0MJlMJhQFcQitU56bTenhX54mGzUhRhJMmN04T3ZSpXkVIzxv9f6shpPMrU2JdVzxTSniXyCKZ/RLyj3qLJ9WFvmO53zYAtywsshHrsXm1XOuirlH/aE8Ho87PiBwyR3M2BYEOSkNBDyP81zjYxkKr+Q6LJtzj2+3dzAMxDDn1Tc4RBbOsgMiICCCZSz0AXG9gNFwLuLBwOxY1rNAS6KIQxJyOCzC72xpyyoQdqLtWREg8AgMrzA8wMGgxbpSdbRxzsZlN2PH8YITajkOxu4ASiQHGMUk4ireHhRjqH2whGkG"
 stage = "unstable"
 
 [features."Model Generator".scenarios."A `$ref` to another component becomes a typed property of that class"]
@@ -39,8 +39,8 @@ as-is = "KLUv/QBYzQ0Axp5QIEBP0wY/m2zRZJuJQuyntamRlJKsUJjIntbLYjO8suYFRwBEAEkADL5
 stage = "unstable"
 
 [features."Model Generator".scenarios."A `oneOf` with a `discriminator.propertyName` picks the branch by wire value"]
-as-is-hash = "sha256:c46151c5a62dfd4ff5812901acc778e9e53f4e8ca1d09628ada4b66de12a85c1"
-as-is = "KLUv/QBYfQoAVtlHIjCtNAcg3USbGwXjaPZzpOwtGLXm+bnl3pGmuqo4WFggcAI/AD0APwAPt5qOmVNuI3bizroIv+HFz4MVymsPvlprBWFjyS2H8Gx7w1oT0NheogUbUkwSn9XixZJJwpNJTGCGYbs8igRmHPYedlAYxJM3RYMZK6qvTF2cEit2ekMH4m2v4PXEDvYeTnmmMIh188kaC0PWt1voyWe5QhHnI7DATnwFi73HwooOSImVY+u5xufVxKOcNZ3mxu0lhR2qtxDD7BUYVwMAjQajsb2WHgNfngyvdcibx/VwXjHYiTfPwr4JFAaxQnsWP2tdcxY5bdX6vGJdtKu9unjCvPmUb54S7dh7eMJ8lLea6DwrDgDsG4V1kVcLdsJB4A0vDQ4QAABLUNNtRW5CHqyJXhe0kZ9ehjTAXMt9u5qAWat9pYmBi/EfRk7F0LnsKlI="
+as-is-hash = "sha256:9230adc27a8fb7188f91e05ad52b9c6baa153f949ee0bc5352c8328c32db6dda"
+as-is = "KLUv/QBYZQoA5lhGIjCrNgfo0URbdsV1dvZz5C7r1L+dv/1+zYZKJSyroKSC4BM9ADsAPgCr+Xg5gxuxEX8aPviPQY4mXinxTfy11kpijiVv8CDad8c9B+C5xWQNe0mZkhi9lkGWUBCeTuIBL449zKdI+HCDcRBT/hIMXqxMfXULskpWsdUfexz+9gluV85g8WGVaMZBrJtP5zQuWf+wpStj85Uizj8wAhvxNsFWLD4UVmYAlayCrkXoGL2aDBm05vPMwEWVcEMVW1qWfcLiS8DBYCyg58KtYfJzi09FBc6vBRtxJ1LYO14aNoyDeKXFxlFr+J5Nz1u1Rq9YFe9rvyBTnDev8s5VMjcWH6Y4PyWuJnOilQk49k7CqsgvBRvREPDHIIYRAABLUNRthW5CJqyJXhe8kZ9ihjTMC2dTEPetbQISrfaVJgYuxn8YORVD57KrSAE="
 stage = "unstable"
 
 [features."Model Generator".scenarios."A branch that closes itself and declares nothing is selected by an empty payload"]
@@ -74,13 +74,13 @@ as-is = "KLUv/QBY9QgAhtQ5IWBL1AFYa5IYIpsHt32SdmvTqPQG1on+eWESza8J4OlZAS8AMAAvAMy
 stage = "unstable"
 
 [features."Model Generator".scenarios."A list-of-Model property hydrates each item into the declared class"]
-as-is-hash = "sha256:50d6a6e4fe75c989209157a8f8cf83456c3b256b538d9cb1ec651181a60abb67"
-as-is = "KLUv/QBYnQgAVpQ6IlBr0wYNiC3RtUjcIWRtE3GD9AHVcoy8m8xwheEBCGZihzUvADEAMgDd+BPmY+kK27GE6rj625p3sPMrHZ6xr6loPeqGz7bnDNUuKMwqzcnO+LLZTjE1Aoq6j7NpAfCFwZYg4IHoWrsv+ER9zp+DK/GRd0XOzfWdb72R4YqQTPgTZI9rVugLNhftArrZF5HssiEripBsSkmrnvUoSk/Bhh7Zui/gbRWOTrZC7axoxWQIV1wNf9KcY8EL7gZKGWf2mPSaNa8PBQ7cXB8ojU/irFiOP+FOCPHYb6TP7O+c6pZF9/zerHnNnRUKDQCgFlXp4DOoZG2L3B6bWSGaXShSlmagaflUvKmjkTCgRC8sRAE="
+as-is-hash = "sha256:cce87350d340679014933b7fb564afad6aea4ded1b29e4842e25384eb3e0c04f"
+as-is = "KLUv/QBYRQgARhM4IUCL2gYGxO8GWtFgSYttR2mbO0jHMEros9+7KTs2hhvsXCwALgAwAMy30BO2WwjTUfW3NQ/Bzit0eMa+lhr1phuybewL0y6cx57mXF982WyniBgBXx7YEgVM0Fxr9wVZ0+f8QVAhPvKqyZm5vvOpNzJcUZIJv4LLcc0a+YLMNeNXAhppH9DNvohclw35KEqypYM2McVO0jvYEUe27hN4W4UrqoZfYa6hYAW3oi6DLFIABAdJF3/sEek1a14fDByYuUY4jSxxDlCNX+FGCOHY76T/2N850+1qjv3erHnMnQMNAKAWVenQMqhkbUvYHhNZoZFdKDCW5ss0dSqy1NFeGPDQCwtm"
 stage = "unstable"
 
 [features."Model Generator".scenarios."A list-of-scalar property hydrates items untouched"]
-as-is-hash = "sha256:27583f07587c6a736715bf2bc31e0d599e82850ea9338f4afdaaa59e84e95372"
-as-is = "KLUv/QBYjQgA9lM7K4BFSQczMAMzBDU355LQGpGk2FKuR3KTJslGBuFfWWMIASY68GcXv6SvwAIuAC8ALwBPTjWsOZkvbrFm/IlyCTHayZwf13i+tlWa9Kb3lu76mjLEx6GnGdURvlBcy0OMeagSnpcg/mRJ3GaDgsZ27YtbTZ/x9riE+MeaIme1D9qalp0tva/h6hRleB4EFR6qGlu3NyfaYudk9gSp2AYAleEenzwIrnKQKiuto6Sda6aB220DX134PbCT2bNAB0viWraRN7qJhl7zAgIMuLLEBVd/qc+ol0BFxMHpW4onZPe85PAnnGhq3aG3MyoWCwBE5IqwCKS13Iil1NiWJ4NRXMwZhIwgNkO4xfHms2Ez"
+as-is-hash = "sha256:faea10a8d2e1554678cbecefb0009495564811ac45a42721b16032ecdb7a091c"
+as-is = "KLUv/QBYHQgA5tI3J5Ap6f///z+/vRYyWiOSDFvK5Uhu0iTZxBT6l+cPYw3371Jx69W5BCwALQAsAA1rTuaLW6wZf6JcQox2MufHNZ6vbZUmvem9pbu+pgzxcehpRvWCLxTX8hAjieFPlsRtHhBobNe+uNX0GW+PS4h/rClyVrugrWnZ2dL7Eq5OUYTnQdDgT04FZ1RMVWPr9uZEW+yczD4gFdsgUBnu8cmD4CoHqbLSOkrauWYauN0G8NWD5wVL4lq2kTe6h4Ze8xIRE1eWuODqL/UZ9Q6oaCA4fUvxhOyelxT+hBNNrTv0FgsAROR6NwTSWi7AUiZsS4vBKAzmTIgR1WYItzjefDZsBg=="
 stage = "unstable"
 
 [features."Model Generator".scenarios."A pattern-gated strategy only handles names matching its pattern and falls through otherwise"]
@@ -89,8 +89,8 @@ as-is = "KLUv/QBYZQoABtY/IjCN2gZMY++xtr4JO6St8sOVFetyGedPA4EeG3U+WFioAQwxADgANgC
 stage = "unstable"
 
 [features."Model Generator".scenarios."A payload matching zero branches, or two, raises rather than picking one"]
-as-is-hash = "sha256:084cc2feedb3091e8ff57e9dce6a7b4a83f3ebfa948915fb6e01d550df03623e"
-as-is = "KLUv/QBY5QsARhpJKpAnSQf///8/92PFRWprRIr8REpCDclNWtqbwDVUbpCq/ylQKTLu2FJRAjwAPwA8AEbANp4ctXqMFY7UHmzjh0bOEscWX6V1Pm2l9WqVNuBinWiDPp2rPIz5BkbO0tlSjAqTphYvWAEt634OAUZfZlHwWEHinic/BEgAwGXkrMmsY8OWAAcIDjD60qyfzNbzuNn8grkYPY1h8HRZn5WcIyNnmxA7ODlCA74rAgdsY4FXnHhOZB32s94y61wxLcqrZ4WU9Zh04laipoCv2B6T1oS9WyLA94TANhQlN8Se4QI15ISntYKJCEeUWvWJUryVFlbzVlpDeBDBq2mIRK2bw9c61isS1Kfzip/XjK7S4nFPC9Sk0C3YBtLmCXSFnCl1NhxaCiAgIEJiCMR81SRLhYC959Z41lKIpzdb2XRQoTE9ncEPONQC7kAxkNWesEIos4HP2+AG/IYA7wjZBiEFuBuPwg2ocKPf2uj61VubCgW+Njpojd/nYmg="
+as-is-hash = "sha256:abb72ec14694b3382152354779d6cb61ab454a39e27f8d1d837f681be51b9d1c"
+as-is = "KLUv/QBYrQsABlpIKpAnSQf///8/92PFRWprTYr8REpCBMlNWtqbwDVUbpCq/ylQKTLu2FJRAjsAPwA7AARs48pRq5ewwpHag2380MhZcozxVVrn01Zar1ZpAy7WiTbo07nKw5hvYOQsna3FqFBpivGCFdCy7ucQ3wSz4LGCxD1XfgiQAIDLyFmTWceGLQEOEBxgdKZZPxNbz+Nm8wwmY/S0BIOny/os5RwZOduE2MHKERrwXWEByZqwd1ME+J4O2MYCvzjxnGQd9rPeMutcMS3Kq2eFlPUS6cStRE0B3xMC21Ck3BB7hgvUkBOe1gsmwihHlFr1SS3eSgureSutITyI4NU0RFLr5vC1jvUKBfXpvOLnNaOrtHjc0wJVKXQLtoG0eYKukLOlzoZDCx4AxCtLVQKybm58m7XUiKe3bOXQAQEZw7Iy+Aw4vAJwB8oGsjJPNpcgWVCDA8MfCLAcoWlzfwUnaxxo3RgMcQp7vca2bsaW98ZGB63G73MZNA=="
 stage = "unstable"
 
 [features."Model Generator".scenarios."A pin naming a site absent from the document fails the run"]
@@ -114,8 +114,8 @@ as-is = "KLUv/QBYtQcAlhAxIUBN2wZM0Wr5adVH/LzUUIZsuWjpB6s+8+lgHLRUdJrgBScAKAApAE2
 stage = "unstable"
 
 [features."Model Generator".scenarios."A property with a non-identifier schema key round-trips via #[WireName]"]
-as-is-hash = "sha256:6858df447921010cbc988e7698550238986543d8b48e0b66f5d9136f141ee42c"
-as-is = "KLUv/QBYzQ0Adp5VIyCP0wbhbLJ9iCQ+8w1JKoedeAF9PD1Ua4Ic12xn4A8QMsFBSgBIAEgAb3WtTHIIF5tcsSILfgZClWtW6Q6UuFb4GQ8Y3QFuMjgA/LLi3HLbWSqx/YQTvwgfxV/MiGzFlY4y/f3ptPjUi41te+QOlnuKSiEOtlTJ7T5mTQYf+CIE3cN7k2OUrdIen/7Se3uaAHdG+GV9i4oFV3wYfkaDfMqpXAUnmGN06kwHNc51TmT2LNyUKHB/Z9yDFK7NKQaUL+STQBidOgg43xc25xcbo9trX9ZK2mZl6rw8Cz8DNy0kNDWvlamvY9B07XdmVGzbG2XZd5HQ5SI7ihW5y1Fstac5Sy8Y3UEzfeM+4QQ3TPR4PCBOq4Az9kFSY+3Nw3IrshzyuMMbDgeDD8RpGsYClTkvrZiQpPUokQlEw0ICAQUhgXKm53vOfJBqPDTLwjDm7qmlkZ8RJCAQRoyUfAUIDaXUTIVFccVJDtzhAdei2SJwHzyHoYdJpdumJwdWYPeWGLTCKP1V88h1DBKLfInjVMagLsCjGKRs5d8EoeMbi/EQ8bzYxtAIcU2YbgeZVmLX8twoGEcK"
+as-is-hash = "sha256:7c3e1c80d110f9767684dccc150c5e36288724577d4b3be1b0f1e149e6be5a5f"
+as-is = "KLUv/QBY5Q0AFt5UIyCP0wbhbLJ9iCQ+8w1JKoedeAE+eThUa4Ic12xn4A8QMsFBSgBIAEcAra6VERzCxSRXrEiDn4FQ5ZpVugMlrhV+xgNGN8FNBgeAX1acW247SyW2n3DiF+Gj+IsZka240lGmvz+dFp96sbFtj9zBck9RKQQtVXK7j1nTwQe+CEH38J7kGGWrtMenv/TenibAnRF+Wd+iosEVH4af0SCfcipXwQnmGJ0600GNc50TmT0LNyUK3N8Z9yCF6wEHlC/kI4AwOjUJON8XNucXG6Pba1/WStpmZeq8PAs/AzctJDQ1r5Wpr2PQdO13ZlRs2xtl2XeR0OUiO4oVuctRbLWnOUvPwRjdpJm+cZ9wghsmejweEKdVwBn7IKmx9uZhuRVZDnnc4Q2Hg8EH4jQNY4HKnJfWo0QkEA0LCQUUhATKmZ7vOfNBqvHQLAvDmLunlkZ+RnNKJyAQRhCUfAUIbaXUT4VdcUUSOfLwoWvX7CgkUGwBdRPwGgY/k0y1jaccWoHhW2LQClJtOCNALY9cxiCpyBc4TmUMygI8ikHKVv5NEDu+ETEeJp6HbUyNEBeF6W6QaSV2Pc+NggGl"
 stage = "unstable"
 
 [features."Model Generator".scenarios."A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar"]
@@ -129,8 +129,8 @@ as-is = "KLUv/QBYXQkAdpQ5IVBrmwMwqIk9S8Lz1MZSSD+EkT/NCeSinCDAP3kEM7HDGjEAMAAxAAw
 stage = "unstable"
 
 [features."Model Generator".scenarios."A tag on the enclosing object selects the branch through #[Discriminator(onParent: true)]"]
-as-is-hash = "sha256:4a112b404d5e6ce129dcbea8a2a302deb0165667a7464b69561c3eb4672c8902"
-as-is = "KLUv/QBYhQ0A1l9UIjCN0wYIYPVq2WTjvdDiJmWXqOvcTUM+VynmxGvuSUMtFAxMAEgASwAJX5dU4XkSiPArbkGsOZ8vx1gz/IqHgXu2v3Te2kKqwGpbYoOLGB0PgCvm0VV9hdIWwo1uHb/RQUD0TCLrQnk/1U89Y33GF8W1PMQQV0n/WFWfHWt+CyO6C0/J+BVtiNF0JrFtr3nyzofoHGYSFwT59pT2tsYEo46ncyb9zkvIt5/0nqPrPN3iE3F7O9/aQpfe1gixXyjKl7QOI3y4a+h7fY2tOayohl/xYHCLkseVNqScUfJkuibm3N6caIyd89mvtm2aJPwa7Hz2rHQersbzlMOvKFiNnE8lrX2+Z5lE11i+Nc+n6Y411rjoPIZYnpKcj9H2qajSVH9PtW2jG3my2y/aGo/oD6U1Jz7tjAcEKiAl44sHRh2MJuULZltoWdoaPzD444tjTSIgIEJilEIfCAm4jGtShe9C+61xhOvVTb5oaDVBkQ2o0BvaGwCm/jQU3PDAkMVormlADtjGOIszynjF5koAMYt8xRflMi2te3dFImSTUj+H4milnBCZuEUH7dQD"
+as-is-hash = "sha256:5fb595fd776d37687adaccf2c3a3272b926d0bd641d985793589d45dc2ff00f6"
+as-is = "KLUv/QBYXQ0AVt9TIjCN0wYIYPVq2WTjvdDiJmWXqOvcTUM+VynmxGvuSUMtFAxLAEgATADrkio8TwIRfsUtiDXn8+UYa4Zf8TBwz/aXzltbSBVYbUtscBGj4wFwxTy6qq9Q2kK40a3jNzoIiJ5JZF0o76f6qWesz/iiuJaHGAI/VtVnx5rfwojuwlMyfkUbYjSdSWzba5688yE6h5nEBUG+PaW9rTHBqOPpnEm/8xLy7Se95+g6T7f4RNzezre20KW3NUIs4QGNHxj88cWx5gtF+ZLWYYQPdw19r6+xNYcV1fArHgxuUfK40oaUM0qeTNfEnNubE42xcz771bZNk4TnKYdfUbAaOZ9KWvt8zzKJq6QD11i+Nc+n6Y411rjoPIZYnpKcj9H2qajOSufhaqSp/p5q20Y38mS3X7Q1HtEfSmtOfNoZDwhUQErGFw+MOhhNyhfMttCytAUhICBCYpRSPggJuIxr8oXvBW6tcTTXq1pz4iJvAqjbGywR8KT+NBfMNzDEYvDKNCAHbGOcxRllfN5z4YN4o73ii+qAVkiurkCEDFLq5FB8rZQSIhO16KBVeg=="
 stage = "unstable"
 
 [features."Model Generator".scenarios."A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`"]
@@ -194,8 +194,8 @@ as-is = "KLUv/QBYXQkAFpU6H1Bt0gbGx+/9LWXJKpokXWEYeQbTbkkM1bYQN2YiJ4Q0ADEAMwDHQRV
 stage = "unstable"
 
 [features."Model Generator".scenarios."Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)"]
-as-is-hash = "sha256:a8484b3c87b5dfbcf8e8c892449177a8a78d8dcd8dd46461b563638fc978c1eb"
-as-is = "KLUv/QBYnQwAth5ZL4CnSQczMAMzBBOG4TtaI5IUe6WNRxJpcu9ijDpsA2/wGx5HsFEPfPymrH896dpZSQBKAFIAX3A9XLNGd/C5dviXRIJcl4vcKE5yVdMovQY7esjtPsS5FSUSls4tt/kIpUuNXRGinLFV+ompBrXz4oQl3CvLvlUVhjss9xSTQxCcHCMsKo3+aKpGe84zY2LbzmBgnJlWzLVwpQP+hZ/rg68VqYLFc40Azbkuub0mAOqknJ/rV3qxsW2/M+6thOqNjC9UrOGKkyzw0Tb+hTXaJx6PB3MMSk6ZKwCoZByOLxTO8HPNOK5gvpUcp5GBQGjRJBKIZRRUhCJ04F+Q10XOulHjPoFYSIxA4+M4ikGNDcqyE64IGjjjKxIUApXbvVNuf2+mZ7CgwZ9rPMKOSa9Z83rn/CPBwc/1omlsB1d6VySmzsyyTtE2K0tHqBVrHaTxgfxy8gY1hEbGGTkVEbBucI+SbA0PALOXMPK1Jzntg+JbMI/b0hyM4F6USR53Q//HsxqpA2vEDBujKAx3LT4oMw=="
+as-is-hash = "sha256:41ec0708db35a1949aeac6942052f3de19fb9b38b07c1a3e364edff4ddd41fe0"
+as-is = "KLUv/QBYjQwAFp5XL4CnSQczMAMzBBOG4TtaI5IUW6SNZxNpcu9ijDpsA2/wG4iBbdQD/vWmrH896dpZSABKAE8AyB6uOaM7+Fw7/EsiwWK3FrlJnKxVTaPyGuzoYW33Ic6dKJFoOre1zUcoXWr6RIhyxlbpJ1UNaufFiSbcp66+VRWGO7r2EpNDVyQsQHByjLCoMjozJt12BgPj91znjParKgX8Cz/XB2csSgWL5xoAmhe75PZaAKgX5fxcv9KLTbf9zrjHEqo3Ms5QacMTJ6vAvwT/kng8HswxKLlkrlBQi3E4vlg4w88147iC+VhynEYGAqFFk0ggKJiIM5MIHfgXZHaRc27UuGfs0hOIAUkJND6OoxRqbEhdnZBF0MC515UDldu9U25/b80zWNDgzzUe0WPKa871vPP6I8HBz/WiaWwHV3lXJFVnZrVTtM2p6Qi1grGDND6Q35q8QQ2hkXFGXokItBvcNwIRALeXMPO1x5x2qMjZ+pqBKdyWczBbmdEGwhdHgB2vakgRiMvV8g8bIyMMF1h8UFE="
 stage = "unstable"
 
 [features."Model Generator".scenarios."Nesting below a synthesised payload is reached by the same queue as nesting below a component"]
@@ -240,7 +240,7 @@ stage = "unstable"
 
 [features."Operation Generator"]
 spec = "truth/specs/operation-generator.feature-260418.typ"
-spec-hash = "sha256:e5dad153edf1d8f1746a27417bde082698768f09576d7d0a74539597124f82c5"
+spec-hash = "sha256:8cb9afc3b8c3da6c51a8f48fe47ca71d8c1a00bacefa91d4510118a786d75130"
 
 [features."Operation Generator".scenarios."A GET operation with a path parameter becomes a typed client method"]
 as-is-hash = "sha256:43736afd1a469a314aab2ae3e0a79b4ba998ee523815566879e89754a4b5cf33"
@@ -253,8 +253,8 @@ as-is = "KLUv/QBYRQsA5tdDISBx0wbMtbjaaKte0iipeYk5V/sZCh9rIZuhlqEJJIJk0TkAPAA5AI4
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A JSON response body is deserialized into the typed Model on the returned Envelope"]
-as-is-hash = "sha256:cfc845c7d0b22cbf9c48f4b03b0c562894c57807e79451aca905ab064d4da163"
-as-is = "KLUv/QBYbQkAltM7JRCPOAdMNm1ys1Oc6DhSCHYuyLfoShz6Jf2M95ot8m8iAIAquAEuADAANgDWO1jtoXtu18dgPVVZf1q/dcz6CtaSwcerI3NFn8SP7lHx0A2QaMEFfh6D6b6iEvDrHgsfFV1CyelpGYX1uyq40b3lyLzurB3YncIS7OVNkhtd5eeT3MheTr12ikMIEVCjaRzo+haELxj9ykYxD8M0HMfDKGMsmsZxrDY3Om5OuxyRJAUTDAg4RBGnKxLrJ1ZK/JUBDP3KRjEM2XEYsrLI1CV7fBOFI/OrlhR/kuzlWd9aBjgOAH1UDOAVQvYTu08P9hIWAFUzwOm1rg3UcUHcSgQt7Lj5Pb48I4Vli1OyvJyNTFNzDRCEp0Q7Ohi1A601QAVOA8tUL2GMYdeMAg=="
+as-is-hash = "sha256:06528c0064c56bbda6ba78ba87f940532dae9cdf0ee5a3a7f37839b8e28e9342"
+as-is = "KLUv/QBYhQkAhtM7JRCPOAdMDPrlZqc40XGkEOxcUG7RlTj0S/oZ73e/iDcTAQBUwQ0uAC8ANQB6B6s9dM/t+hqspy7rT+u3jllfwVoy+Hh1ZL7om/jRPSoe2gEiMdjA0GMw3ZcUX/dY+KjoEkqcnpZZrN9VwY3uLUfmdWcNwe4VpmAzb5Pc6CpDp+RKNnPqtVdcggOO80TXtyJ80ehXNqqBmqbxOKBGWWPhOI9jtbnRcXPa5YhEsuACAoEHKeL0ZWI9xcqJv3ICBgz9ykYxHD0OR1amLpkHHt9kcWR+1bLiTxKbeda3lgGPA0AflwN4hZA9xe4ThM1IRI0XAElIcLXZ2xAO1mBwMXwuAhBFA2kDQ2YwmQJZqJAlxOH5aTc11wBBeEq0o4NRO9BaA1TgNLBM9RLGGHbNKA=="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."A JSON response with `additionalProperties` is decoded onto the Envelope as a typed associative array"]
@@ -388,8 +388,8 @@ as-is = "KLUv/QBY/QwAdpxRLoCnSQczMAMzBBPG97RGpJSfbEnREWJJWmJl/K6DbWkxNkQNiNW1fgc
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An operationId with non-identifier characters is camelCased into a PHP method name"]
-as-is-hash = "sha256:a2be5d3e07742a3a45a89a726a4ed20e931cb59fba1aff8ed32cacf52c087d9a"
-as-is = "KLUv/QBYVQgAltM4IlCL0wGbtfK+JrLZk20oR0gQUQtIsTFgAChaaRYUyUxMEAYtAC8AMAAGjM+6iU5vt1iHznFDN/Z1jp1yzI4Q3HzCgdS0WnRwOkjFPfZInQojFNnlnSbIdDEVMmLyoCwisKNpMG64nd1ynnzQldM4L0GGrXwx3LaMGPHntrGVQ5dOqvaQmQun7yJ0X63zyoEQZYy3Jd5zbhlhZrrHnmc4rxBsZSGR0AKJSBW8oMmiCnnsn8eTAYvPLfE21XE4pp6ISu70KMKG5sna/MLm1XTDlApbCViWBWBBCaoFe8a5nfLmcQUMAJd7A44jptGGs8UDGVzd7eXmjEBsRV5cY2IsroNhiuiJgAY="
+as-is-hash = "sha256:883d18449f540e522f3629f22162638ef660b87973b8e88f37392deaf73af5b3"
+as-is = "KLUv/QBYPQgA1tM4IUCLmwPDeLnQiqwGWYvJJpDI3ukK2F4kSXZgNQZORYcIXC4AMAAvAIwB47NuotHbKdTXNW7oxr7NsUuN2RGCm0cokJpOixKjg1TcY3/UmTBCkV2+aQS63HB50yTx5EHZM2BHg8GY4XZ2qjnyraem4bwDLmzliuG2ZcSIO7cNW/m6NNK0Xw4Ko+/iup/W+eRAiDLG2xLPObeMMDPdY88vnE8ItrJA8KiC1ZosqpDH3nk4iUwXM4vPLfE2tZEcS05EHW7058GG5onavMLm1XRDo0zYSsCyLABqJagW7BfndsmbRxULAHx7A44jp9EGmMHDA6649nI9JohJGHlkuPCzA6InMBo="
 stage = "unstable"
 
 [features."Operation Generator".scenarios."An optional header parameter becomes a nullable typed argument and is attached only when non-null"]
@@ -429,7 +429,7 @@ stage = "unstable"
 
 [features.Profile]
 spec = "truth/specs/profile.feature-260418.typ"
-spec-hash = "sha256:dab158b00eeb6c34a6385284116c359526f1ea75f30d8e5c607c3470f8155163"
+spec-hash = "sha256:653fdaba6f671bad60e4593dbff2d6d7264b90b12f230b10a49f31f9562b0f9f"
 
 [features.Profile.scenarios."A PHP file that does not return a Profile is rejected"]
 as-is-hash = "sha256:cbc94b417ff5894adc94d88daf605f70caf2cd45c7d5c70d920c857f48e5e731"
@@ -437,8 +437,8 @@ as-is = "KLUv/QBYbQUAoosiHmBn1AZrK3u9MtUQNhv6GWnEuERK4f3ar8tCQYcgDgqDpuoTxrxtriQ
 stage = "unstable"
 
 [features.Profile.scenarios."A PHP file that returns a Profile is loaded as that Profile"]
-as-is-hash = "sha256:6e6b52a179e8f5b1cdd03427dd5e5c786adf44eeb9fef588eaaee6c9936b7aba"
-as-is = "KLUv/QBYxQUAIosgG3Bp22C0dpqIETd67ZdKzwX9dGDQtTNIAOgR19ronvu6oVLrcz6rce4Z0LDkR+q9Huc+tc9SDz/SRue0TSwV8SMF8gCijS7B6KQyy7clgjY6gRu8Ec/yUYUf5VpgM3s/koG9/IjxTTbY1lm1VY5ntq9z36j9XCpdMShPfjS1yJJZAhMAXEVyQ8YxpAD5Mno25J1J2KnDjA6NCBKecstFBNSLZBBgRilODE0WtvfM4KhJ12s+AQ=="
+as-is-hash = "sha256:f50b157b47f5c2e0b0f6c505416df9517a24c255636b58d10a265400d1d741f2"
+as-is = "KLUv/QBYtQUAEksgG3Bp22C0dpqIETd67ZdKzwX9dGDQ9daBAfQIa9ronvu6oVLrcz6rce4FDUt+pN7rce5T+yz18CNtdE7bxFIRP1IgByDa6BKMTiqzfFsiaKMLuMEb8SwfVfhRrgU2s/cjGdjLjxjfZINtnVVb5Xhm+zr3jdrPpdIVg/LkR1OLLJklEwBaRbJh3BhSgHwZPRvyziTs1GFGh0YECU+55SIC6kUyCDCjFCeGJgvbe2Zw1KTrNZ8="
 stage = "unstable"
 
 [features.Profile.scenarios."A class outside discoverIn is ignored even if annotated"]
@@ -453,7 +453,7 @@ stage = "unstable"
 
 [features."poagen CLI"]
 spec = "truth/specs/cli.feature-260417.typ"
-spec-hash = "sha256:aa3162a06ca35693dfcd5dfc64225d8812c524abe1b41bc59a662bc2816b58bf"
+spec-hash = "sha256:323c69e1a96e597cee2fb7a34911a07a5c61b1f7f56ee4e6ca6cffb885caa78a"
 
 [features."poagen CLI".scenarios."--diff against a corrupted golden tree prints unified diff and exits 1"]
 as-is-hash = "sha256:120a6c9ce86a0751a8ad9bf03241e8eabbd75802186c61cf3c4321df3ea852b9"
@@ -491,8 +491,8 @@ as-is = "KLUv/QBYHQUAgkogHmBH3AaDJGovq9rbPUKojUbU4RjHFwiKAOKS4EmgBEpxYNoleXFMu+S
 stage = "unstable"
 
 [features."poagen CLI".scenarios."No arguments prints usage and exits 0"]
-as-is-hash = "sha256:fe9ef63a563ff6d1fbf30e3627d12eb69d6e57274e4dcad3f742bce516316fbd"
-as-is = "KLUv/QBYlQQAIoofH2BV0wZjSJiZ3GFUpiBJGioYJVhIPXJbImBbBzlGKQGOZIBrVePJca3qjHDp8iekYFiYBXLNa1315bRt+N12NZ8Fij/pm86BLwRYAc1z/oAgXJHdPldsGH9C53HN2q4gu2b+lJw7I/zSO7Ljdm5N6Dm3YkBj0H0TVzahU1RMBQBkGLQ0Ax4D96RKKrs4mAE="
+as-is-hash = "sha256:c9b0461ad207f6858ef16ad0dd2cbb603bbb37a321052388ebb55f036588ac79"
+as-is = "KLUv/QBYlQQAUkogH1CHqA1jSPRelo8kWsLmTYhSKcoA1QfT8hJrM2ZCxcABSAHXOgBHjg2uXTonJCxVfnUYDgrDOK55ret8QW0ffrddzefB4lf6p7PgCwWWQPOcRySWK7Lb6IpP41cINdes7Qmya+ZXyLlzwi+9Iztu59aUonMrDjQm3VfxZFM6RYcJBABUyfEYjCdVUtnFwQw="
 stage = "unstable"
 
 [features."poagen CLI".scenarios."Unknown command reports on stderr and exits 2"]

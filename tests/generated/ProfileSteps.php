@@ -117,13 +117,6 @@ final class ProfileSteps
     }
 
 
-    public function thenProfilesSchemaResolvesToTheFixturePath(): void
-    {
-        TestCase::assertNotNull($this->loadedProfile);
-        TestCase::assertFileExists($this->loadedProfile->schema);
-    }
-
-
     public function givenPhpFileThatReturnsTheIntegerValueInsteadOfProfile(int $value): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'poagen-bad-profile-') . '.php';
@@ -168,6 +161,13 @@ final class ProfileSteps
     {
         TestCase::assertNotNull($this->bindings);
         TestCase::assertNull($this->bindings->formatType($format));
+    }
+
+
+    public function thenProfileSchemaResolvesToTheFixturePath(): void
+    {
+        TestCase::assertNotNull($this->loadedProfile);
+        TestCase::assertFileExists($this->loadedProfile->schema);
     }
 
 }

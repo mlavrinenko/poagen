@@ -31,14 +31,14 @@ final class ProfileTest extends TestCase
      * Given a PHP file at <profile-path> returns Profile for Schema at <schema-path>
      * When Profile is loaded from that path
      * Then the result is Profile
-     *   And Profile's schema resolves to the fixture path
+     *   And Profile.schema resolves to the fixture path
      */
     public function testAPHPFileThatReturnsAProfileIsLoadedAsThatProfile(): void
     {
         $this->steps->givenPhpFileAtPathReturnsProfileForSchemaAtSchema('<profile-path>', '<schema-path>');
         $this->steps->whenProfileIsLoadedFromThatPath();
         $this->steps->thenResultIsProfile();
-        $this->steps->thenProfilesSchemaResolvesToTheFixturePath();
+        $this->steps->thenProfileSchemaResolvesToTheFixturePath();
     }
 
 

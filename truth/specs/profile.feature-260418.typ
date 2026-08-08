@@ -16,7 +16,7 @@
       #given[a PHP file at #p((path: "<profile-path>")) returns #a(Profile) for #the(Schema) at #p((schema: "<schema-path>"))]
       #when[#the(Profile) is loaded from that path]
       #then[the result is #a(Profile)]
-      #and_[#the(Profile)'s `schema` resolves to the fixture path]
+      #and_[#the(Profile.schema) resolves to the fixture path]
     ]
 
     #scenario(
