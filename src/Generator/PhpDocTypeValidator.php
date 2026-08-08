@@ -27,6 +27,11 @@ use function substr;
  * worse than no guidance, because nothing else surfaces it
  * (abort-on-unrepresentable-constructs).
  *
+ * Only the key is judged here. Whether the *value* is one the property can
+ * carry is a fact about the resolved PHP type, which does not exist yet at
+ * this point in the run — {@see Emit\PhpDocTypeCompatibility} answers that from
+ * inside the emission, and its refusals join these in the same one-pass report.
+ *
  * Component-and-property existence is resolved through
  * {@see ComponentPropertyNames}, the one place that reading lives, so this
  * validator and {@see PropertyRenameValidator} always agree on what "the

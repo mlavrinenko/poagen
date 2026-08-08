@@ -6,6 +6,10 @@ info:
 paths: {}
 components:
   schemas:
+    Currency:
+      type: string
+      minLength: 3
+      description: A scalar component — a property pointing here resolves to a value object, not a string.
     LineItem:
       type: object
       required:
@@ -36,3 +40,10 @@ components:
         amount:
           type: string
           description: A decimal carried as a string — OpenAPI cannot say numeric-string, the profile override can.
+        tags:
+          type: array
+          items:
+            type: string
+          description: A structural property — the resolver owns its PHPDoc slot, so no override can reach it.
+        currency:
+          $ref: '#/components/schemas/Currency'

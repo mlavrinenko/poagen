@@ -20,7 +20,6 @@ use function array_slice;
 use function assert;
 use function in_array;
 use function is_int;
-use function sprintf;
 
 use const SORT_STRING;
 
@@ -124,6 +123,8 @@ final readonly class ModelEmitter
         $children = [];
         /** @var list<string> $phpNames */
         $phpNames = [];
+        /** @var list<string> $failures */
+        $failures = [];
 
         foreach ($ordered as $propName) {
             $propSchema = $properties[$propName];
@@ -148,7 +149,7 @@ final readonly class ModelEmitter
             // while the parameter takes no default. Only an optional property
             // gets a default, which is what keeps every defaulted parameter
             // after every non-defaulted one.
-            $this->addProperty(
+            $failures = [...$failures, ...$this->addProperty(
                 $namespace,
                 $constructor,
                 $propName,
@@ -160,17 +161,21 @@ final readonly class ModelEmitter
                 $bindings,
                 $modelNamespace,
                 $registry,
+                $rawComponentName . '.' . $propName,
                 $phpDocTypes[$rawComponentName . '.' . $propName] ?? null,
-            );
+            )];
         }
 
         // Whatever the schema allowed beyond the declared properties, typed
         // and carried rather than dropped (declared-shapes-become-types).
         $this->additional->apply($namespace, $constructor, $schema, $phpNames, $bindings, $modelNamespace, $registry, $enums);
 
-        return new ModelEmission($this->printer->printFile($file), $children);
+        return new ModelEmission($this->printer->printFile($file), $children, $failures);
     }
 
+    /**
+     * @return list<string> the profile guidance this property could not honour, refused rather than dropped
+     */
     private function addProperty(
         PhpNamespace $namespace,
         Method $constructor,
@@ -183,8 +188,9 @@ final readonly class ModelEmitter
         Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
+        string $docTypeKey = '',
         ?string $docTypeOverride = null,
-    ): void {
+    ): array {
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
 
@@ -207,32 +213,13 @@ final readonly class ModelEmitter
         if ($hasDefault) {
             $param->setDefaultValue(null);
         }
-        // A structural doc type (`list<Tag>`, `array<string, mixed>`) wins the
-        // slot and is shortened against the namespace so its class references
-        // print short. Where the resolver left none, a scalar property may
-        // still carry a narrower type than its bare `string` / `int` — from an
-        // OpenAPI constraint, or a profile override OpenAPI cannot spell
-        // (`refined-phpdoc-types`). Those are PHPStan pseudo-types
-        // (`non-empty-string`, `positive-int`, `numeric-string`) with no class
-        // to resolve, so they pass through raw — running them through
-        // `DocTypeSimplifier::shorten()` makes nette read them as class names
-        // and prefix a stray leading backslash.
-        $docType = $resolved->phpDoc !== null
-            ? DocTypeSimplifier::shorten($namespace, $resolved->phpDoc)
-            : PhpDocTypeRefiner::refine($resolved->phpType, $propSchema, $docTypeOverride);
+        // Which of the three doc-type sources wins this property's slot, and
+        // whether an override that cannot reach it fails the run — see
+        // PropertyDocType.
+        $doc = PropertyDocType::of($namespace, $resolved, $propSchema, $docTypeKey, $docTypeOverride, $isNullable, $phpName);
 
-        if ($docType !== null) {
-            // Same reason as $spellsOwnNull above: `?string|list<string>` is
-            // not a type PHPStan reads as "the whole union, nullable" — a
-            // union doc type needs `|null` appended, not `?` prefixed.
-            $docUnion = DocTypeSimplifier::isTopLevelUnion($docType);
-            $fullDocType = match (true) {
-                !$isNullable => $docType,
-                $docUnion && !str_ends_with($docType, '|null') => $docType . '|null',
-                $docUnion => $docType,
-                default => '?' . $docType,
-            };
-            $constructor->addComment(sprintf('@param %s $%s', $fullDocType, $phpName));
+        if ($doc->comment !== null) {
+            $constructor->addComment($doc->comment);
         }
 
         // Hint use-statements for FQNs so the printed file uses short forms.
@@ -246,6 +233,8 @@ final readonly class ModelEmitter
         }
 
         $this->attributes->apply($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
+
+        return $doc->failure !== null ? [$doc->failure] : [];
     }
 
     /**

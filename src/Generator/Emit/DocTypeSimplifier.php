@@ -45,6 +45,22 @@ final class DocTypeSimplifier
      */
     public static function isTopLevelUnion(string $docType): bool
     {
+        return count(self::topLevelMembers($docType)) > 1;
+    }
+
+    /**
+     * The union's members at bracket depth zero, or the whole string as a
+     * single member when it is not a union. Splitting on a bare `explode('|')`
+     * would tear `array<string, int|null>` in half, so the same depth-aware
+     * reading {@see isTopLevelUnion} needs is the one that yields the parts —
+     * one implementation, two questions.
+     *
+     * @return list<string>
+     */
+    public static function topLevelMembers(string $docType): array
+    {
+        $members = [];
+        $current = '';
         $depth = 0;
 
         foreach (str_split($docType) as $char) {
@@ -55,10 +71,17 @@ final class DocTypeSimplifier
             };
 
             if ($char === '|' && $depth === 0) {
-                return true;
+                $members[] = $current;
+                $current = '';
+
+                continue;
             }
+
+            $current .= $char;
         }
 
-        return false;
+        $members[] = $current;
+
+        return $members;
     }
 }

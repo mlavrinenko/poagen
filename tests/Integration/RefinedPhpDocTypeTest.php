@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Integration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\GenerationPlan;
@@ -90,6 +91,56 @@ final class RefinedPhpDocTypeTest extends TestCase
             self::assertStringContainsString("Profile::\$phpDocTypes['LineItem.no_such_property']", $e->getMessage());
             self::assertStringContainsString("property absent from component 'LineItem'", $e->getMessage());
         }
+    }
+
+    /**
+     * refuse-a-phpdoctypes-override-the-property-cannot-carry: a key that
+     * resolves is not enough — the value has to be one the property can carry,
+     * and each way it cannot fails the run rather than emitting a model PHPStan
+     * rejects, or dropping the override without a word.
+     *
+     * @param array<string,string> $phpDocTypes
+     */
+    #[DataProvider('overridesNoPropertyCanCarry')]
+    public function testAnOverrideThePropertyCannotCarryFailsTheRun(array $phpDocTypes, string $expected): void
+    {
+        try {
+            $this->plan($phpDocTypes);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            self::assertStringContainsString($expected, $e->getMessage());
+        }
+    }
+
+    /**
+     * @return iterable<string,array{array<string,string>,string}>
+     */
+    public static function overridesNoPropertyCanCarry(): iterable
+    {
+        yield 'a string type over a native int' => [
+            ['LineItem.quantity' => 'numeric-string'],
+            'native type is `int`',
+        ];
+
+        yield 'any type over a structural property' => [
+            ['LineItem.tags' => 'list<non-empty-string>'],
+            'structural type `list<string>`',
+        ];
+
+        yield 'a scalar type over a value object' => [
+            ['LineItem.currency' => 'numeric-string'],
+            'not a scalar',
+        ];
+
+        yield 'a type poagen cannot place' => [
+            ['LineItem.amount' => 'Money'],
+            'does not recognise `Money`',
+        ];
+
+        yield 'a nullability the schema already decides' => [
+            ['LineItem.amount' => '?numeric-string'],
+            'spells nullability the schema already decides',
+        ];
     }
 
     public function testAKeyWithNoDotFailsTheRun(): void

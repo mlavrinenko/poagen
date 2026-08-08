@@ -138,7 +138,11 @@ final readonly class Generator
         // See UnionCatalog::merge() for why the response-position half waits for this walk.
         $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());
 
-        $this->modelPlanner->plan(
+        // An override the emitted model could not honour is refused here rather
+        // than dropped — the type it has to agree with only exists once the
+        // property is resolved, so the check rides back out of the emission
+        // (Emit\PhpDocTypeCompatibility) instead of living in a validator.
+        $modelFailures = $this->modelPlanner->plan(
             $openApi,
             $modelNamespace,
             $modelDir,
@@ -191,6 +195,7 @@ final readonly class Generator
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
             ...$this->phpDocTypeValidator->validate($openApi, $components, $profile->phpDocTypes),
+            ...$modelFailures,
             ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];
 
