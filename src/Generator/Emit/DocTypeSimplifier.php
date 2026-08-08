@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator\Emit;
 
 use Nette\PhpGenerator\PhpNamespace;
-use ReflectionClassConstant;
 
 /**
  * Shortens a composite PHPDoc type string (`list<\Foo\Bar>`,
@@ -53,25 +52,18 @@ final class DocTypeSimplifier
      * the one place `shorten()` has to learn the difference between a
      * pseudo-type and a class name it left unqualified.
      *
-     * The vocabulary is {@see PhpDocTypeCompatibility::BASE_OF}'s keys, read
-     * through reflection rather than duplicated here: a second list could
+     * The vocabulary is {@see PhpDocTypeCompatibility::BASE_OF}'s keys,
+     * referenced directly rather than duplicated here: a second list could
      * drift out of step with the one that already exists
-     * (`phpdoctypes-stays-scalar-only`), and `PhpDocTypeCompatibility` itself
-     * is outside this change's file boundary, so reflection is how this
-     * class reaches the existing vocabulary instead of widening its
-     * visibility.
+     * (`phpdoctypes-stays-scalar-only`). `BASE_OF` is `public` for exactly
+     * this reason, so a rename or removal there is a type error here rather
+     * than a silent runtime miss.
      */
     private static function protectPseudoTypes(string $docType): string
     {
-        $names = self::pseudoTypeNames();
-
-        if ($names === []) {
-            return $docType;
-        }
-
         $pattern = '~\\\\(' . implode('|', array_map(
             static fn(string $name): string => preg_quote($name, '~'),
-            $names,
+            self::pseudoTypeNames(),
         )) . ')\b~';
 
         return preg_replace($pattern, '$1', $docType) ?? $docType;
@@ -85,26 +77,7 @@ final class DocTypeSimplifier
         /** @var list<string>|null $names */
         static $names = null;
 
-        if ($names !== null) {
-            return $names;
-        }
-
-        $constant = new ReflectionClassConstant(PhpDocTypeCompatibility::class, 'BASE_OF');
-        $baseOf = $constant->getValue();
-
-        if (!is_array($baseOf)) {
-            return [];
-        }
-
-        $collected = [];
-
-        foreach (array_keys($baseOf) as $key) {
-            if (is_string($key)) {
-                $collected[] = $key;
-            }
-        }
-
-        $names = $collected;
+        $names ??= array_keys(PhpDocTypeCompatibility::BASE_OF);
 
         return $names;
     }

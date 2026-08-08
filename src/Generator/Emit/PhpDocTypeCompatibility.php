@@ -46,8 +46,14 @@ use function trim;
  */
 final readonly class PhpDocTypeCompatibility
 {
-    /** PHPStan pseudo-types, each under the native type it narrows. */
-    private const array BASE_OF = [
+    /**
+     * PHPStan pseudo-types, each under the native type it narrows. Public so
+     * {@see DocTypeSimplifier} can protect the same names from being
+     * misread as class references inside a structural type
+     * (`refine-list-item-types-from-the-item-schema-constraints`) without a
+     * second, driftable copy of this vocabulary.
+     */
+    public const array BASE_OF = [
         'string' => 'string',
         'non-empty-string' => 'string',
         'non-falsy-string' => 'string',
