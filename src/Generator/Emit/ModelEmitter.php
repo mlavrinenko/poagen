@@ -33,6 +33,12 @@ use const SORT_STRING;
  * No I/O — given (name, schema, bindings) returns the printed PHP source
  * wrapped in a {@see ModelEmission} that also lists any synthesised
  * nested-object classes the caller must emit next.
+ *
+ * Also the one place `Profile::$propertyFormats` can be checked against a
+ * model it names, since that field keys on the emitted class name rather
+ * than a document component name — {@see PropertyFormatKeys} does the
+ * checking, this class supplies $className and every wire property name it
+ * declares (bind-a-format-per-property).
  */
 final readonly class ModelEmitter
 {
@@ -129,6 +135,9 @@ final readonly class ModelEmitter
             $isRequired = in_array($propName, $required, true);
             $phpName = $propertyRenames[$rawComponentName . '.' . $propName] ?? self::defaultPropertyName($propName);
             $phpNames[] = $phpName;
+            // Keyed by the emitted class name, not $rawComponentName — see
+            // Profile::$propertyFormats for why the two diverge.
+            $formatScopeKey = $className . '.' . $propName;
 
             $resolved = $this->properties->resolve(
                 $className,
@@ -139,6 +148,7 @@ final readonly class ModelEmitter
                 $bindings,
                 $registry,
                 $enums,
+                $formatScopeKey,
             );
 
             // Two separate facts, and conflating them mis-orders the
@@ -161,12 +171,15 @@ final readonly class ModelEmitter
                 $registry,
                 $rawComponentName . '.' . $propName,
                 $phpDocTypes[$rawComponentName . '.' . $propName] ?? null,
+                $formatScopeKey,
             )];
         }
 
         // Whatever the schema allowed beyond the declared properties, typed
         // and carried rather than dropped (declared-shapes-become-types).
         $this->additional->apply($namespace, $constructor, $schema, $phpNames, $bindings, $modelNamespace, $registry, $enums);
+
+        $failures = [...$failures, ...PropertyFormatKeys::staleEntries($bindings, $className, $ordered)];
 
         return new ModelEmission($this->printer->printFile($file), $children, $failures);
     }

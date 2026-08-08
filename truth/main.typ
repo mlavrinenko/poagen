@@ -165,6 +165,8 @@
 #include "decisions/phpdoctypes-stays-scalar-only.decision-260808.typ"
 #pagebreak()
 #include "decisions/standalone-harness-drift-is-caught-offline.decision-260808.typ"
+#pagebreak()
+#include "decisions/queue-drained-models-swallow-emission-failures.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //

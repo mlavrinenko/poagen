@@ -42,6 +42,11 @@ final readonly class PropertySynthesiser
 {
     /**
      * @param list<SynthesisedModel> $children collects classes the caller must emit next
+     * @param string $formatScopeKey `'<ModelClassName>.<wirePropertyName>'` for this exact property,
+     *                                so a fallthrough to {@see TypeResolver} can honour
+     *                                `Profile::$propertyFormats` (bind-a-format-per-property); not
+     *                                carried into a synthesised child's own resolution, which is a
+     *                                different property of a different, not-yet-named model.
      */
     public function resolve(
         string $ownerClassName,
@@ -52,9 +57,10 @@ final readonly class PropertySynthesiser
         Bindings $bindings,
         NameRegistry $registry,
         ?EnumCatalog $enums,
+        string $formatScopeKey = '',
     ): TypeResolver {
         if (!$propSchema instanceof Schema) {
-            return TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
+            return TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums, $formatScopeKey);
         }
 
         $preferred = $ownerClassName . $this->suffixFor($phpPropName);
@@ -85,7 +91,7 @@ final readonly class PropertySynthesiser
             }
         }
 
-        return TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums);
+        return TypeResolver::resolve($propSchema, $bindings, $modelNamespace, $registry, $enums, $formatScopeKey);
     }
 
     /**

@@ -37,6 +37,7 @@ final readonly class ModelAttributeApplier
         Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
+        string $formatScopeKey = '',
     ): void {
         if ($wireName !== $phpName) {
             $namespace->addUse(WireName::class);
@@ -44,7 +45,7 @@ final readonly class ModelAttributeApplier
         }
 
         if ($propSchema instanceof Schema && is_string($propSchema->format)) {
-            $scalarFormat = $bindings->scalarFormat($propSchema->format);
+            $scalarFormat = $bindings->scalarFormat($propSchema->format, $formatScopeKey);
 
             if ($scalarFormat instanceof ScalarFormat && $scalarFormat->kind === ScalarFormat::KIND_DATE) {
                 $namespace->addUse(Format::class);

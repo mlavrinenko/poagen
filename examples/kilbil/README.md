@@ -118,6 +118,10 @@ poagen built-in. `date time` is a misspelling of `date-time` with a space, and
 ignores an unrecognised format loses 15 timestamps quietly; one that aborts on
 each loses the whole client. This is what `report-unrecognised-formats` is for,
 and `#[BindsFormat('date time')]` is the mechanism a consumer repairs it with.
+The count for `double` still reads 94 after `propertyFormats` binds `Money` to
+two of them — the report counts a *format string*, document-wide, and a
+per-property binding answers for one property without changing what the format
+string means anywhere else; see "What the profile has to say" below.
 
 **Uniform, tiny error surface.** Every operation declares exactly two responses:
 `200` and `403`, both JSON. So the generic `ApiException` is sufficient here and
@@ -175,6 +179,7 @@ to call. What is there, and why:
 | Guidance | Answers |
 |---|---|
 | `discoverIn` + `src/ValueObject/` | Four of the nine format values: `date time`, `data time`, `data`, `phone`. 23 properties gain a real type. |
+| `propertyFormats` (2 entries) | Binds `Money` to `price` alone, on the two models where it is unambiguously money — see below. |
 | `methodRenames` (33 entries) | Operation ids with no word boundary. `getclientfullbalance` becomes `getClientFullBalance` — and so do its models. |
 | `tagRenames` (10 entries) | Russian tag names. `Клиенты` becomes `CustomersClient` rather than `KlientyClient`. |
 | `xmlElements` (6 entries) | The XML root, item, and nested-container elements OpenAPI supplies no default for, confirmed against the vendor's own embedded XML samples (see "Two XML request bodies" above). |
@@ -184,24 +189,34 @@ Three operation ids are deliberately absent from `methodRenames`, and one tag fr
 is a single word, and `Wallet` was already ASCII — listing any of them would hide
 whether the defaults work.
 
-`int` (172 uses) and `double` (94) stay unbound, and unlike the four formats above
-that is not free. A `#[BindsFormat]` binds a format string document-wide — one PHP
-type per format, everywhere it appears — and `double` here covers prices,
+`int` (172 uses) and `double` (94) stay unbound *document-wide*, and unlike the
+four formats above that is not free. A `#[BindsFormat]` binds a format string
+everywhere it appears in the document, and `double` here covers prices,
 quantities, rates and percentages alike: `goods_data/items/properties/price` is
 money, `quantity` on the same object is not, and `bonus_percent`,
 `discount_percent`, `purchases_sum` and the rest are neither. A `Money` bound to
-`double` would type every one of those as money too, with no way to exempt the
-ones that are not — a worse defect than the float price it was meant to fix. `int`
-is the same shape with less at stake, so it is decided the same way.
+`double` that way would type every one of those as money too, with no way to
+exempt the ones that are not — a worse defect than the float price it was meant
+to fix. `int` is the same shape with less at stake, so it is decided the same way
+and stays unbound.
 
-`goods_data/items/properties/price` is the property where that is a real
-limitation, not a shrug: it reaches the consumer as a plain PHP `float`, and money
-in a `float` is a defect, not a style choice. There is no per-property fix while
-`double` still means several other things in this document. A consumer who needs
-`price` money-safe today has to do it after poagen: bind their own value object to
-`double` only if their own document spends that format on money alone, or narrow
-`price` to a `Money` type by hand right after hydration, leaving the rest of the
-document's doubles as floats.
+`price` on `goods_data` no longer pays for that, though. It is unambiguously
+money — the vendor's own description says so ("цена без скидки за единицу
+номенклатуры", "price per unit, before discount") — declared on exactly two
+shapes: the request bodies `searchclient` and `processsale` both accept, which
+poagen synthesises as `SearchClientRequestContentGoodsDataItem` and
+`ProcessSaleRequestContentGoodsDataItem` (`components.schemas` is empty in this
+document, so neither has a raw component name of its own — see "No named
+components at all" above). `propertyFormats` binds `Money` to `price` on both,
+keyed by the class name poagen assigns each rather than by a document name that
+does not exist (`bind-a-format-per-property`), and does so without touching what
+`double` means anywhere else: `quantity` on the same two models,
+`price1`..`price5` on `GoodsRequestContentItem`, and every other `double`-typed
+field in the document are still a plain `float`. Money in a `float` was a defect
+here, not a style choice, and this is the fix rather than a documented shrug —
+inferring which *other* fields are money is a different question this profile
+does not answer, because the vendor did not say and a guess would be exactly the
+kind of inference `cheap-regeneration` forbids.
 
 ## The wrapper, proven rather than described
 

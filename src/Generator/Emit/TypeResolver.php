@@ -26,12 +26,20 @@ final readonly class TypeResolver
         public bool $nullable,
     ) {}
 
+    /**
+     * @param string $formatScopeKey `'<ModelClassName>.<wirePropertyName>'` when `$node` is exactly
+     *                                one model's own declared property, so `Profile::$propertyFormats`
+     *                                can apply — '' everywhere else (an array item, a parameter, an
+     *                                `additionalProperties` value type), which never matches a
+     *                                property-scoped entry (bind-a-format-per-property).
+     */
     public static function resolve(
         Schema|Reference $node,
         Bindings $bindings,
         string $modelNamespace,
         NameRegistry $registry,
         ?EnumCatalog $enums = null,
+        string $formatScopeKey = '',
     ): self {
         if ($node instanceof Reference) {
             $component = ComponentName::rawFromRef($node->getReference());
@@ -49,23 +57,25 @@ final readonly class TypeResolver
         }
 
         $type = SchemaType::of($node);
-        $format = $node->format;
+        $format = is_string($node->format) ? $node->format : '';
         // `nullable: true` is the 3.0 spelling and `type: [T, "null"]` the 3.1
         // one; a document may use either, so honour both.
         $nullable = SchemaType::nullableOf($node);
 
-        if (is_string($format) && $format !== '') {
-            $scalarFormat = $bindings->scalarFormat($format);
+        // Checked even when the schema carries no `format` of its own: a
+        // `$formatScopeKey` match answers for that property outright, the
+        // same way $propertyRenames does not care whether the wire name
+        // needed renaming (bind-a-format-per-property).
+        $scalarFormat = $bindings->scalarFormat($format, $formatScopeKey);
 
-            if ($scalarFormat instanceof ScalarFormat) {
-                return new self($scalarFormat->phpType, null, null, $nullable);
-            }
+        if ($scalarFormat instanceof ScalarFormat) {
+            return new self($scalarFormat->phpType, null, null, $nullable);
+        }
 
-            $bound = $bindings->formatType($format);
+        $bound = $bindings->formatType($format, $formatScopeKey);
 
-            if ($bound !== null) {
-                return new self('\\' . $bound, null, null, $nullable);
-            }
+        if ($bound !== null) {
+            return new self('\\' . $bound, null, null, $nullable);
         }
 
         $union = CompositionResolver::resolveUnion($node, $modelNamespace, $registry);

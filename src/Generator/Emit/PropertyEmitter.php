@@ -33,6 +33,10 @@ final readonly class PropertyEmitter
     ) {}
 
     /**
+     * @param string $formatScopeKey `'<ModelClassName>.<wirePropertyName>'`, forwarded to
+     *                                {@see ModelAttributeApplier} so a `Profile::$propertyFormats`
+     *                                entry can win the `#[Format]` attribute decision the same way it
+     *                                already won this property's PHP type (bind-a-format-per-property)
      * @return list<string> the profile guidance this property could not honour, refused rather than dropped
      */
     public function add(
@@ -49,6 +53,7 @@ final readonly class PropertyEmitter
         NameRegistry $registry,
         string $docTypeKey = '',
         ?string $docTypeOverride = null,
+        string $formatScopeKey = '',
     ): array {
         $type = $resolved->phpType;
         $param = $constructor->addPromotedParameter($phpName)->setPublic();
@@ -91,7 +96,7 @@ final readonly class PropertyEmitter
             $namespace->addUse(ltrim($resolved->phpDocUse, '\\'));
         }
 
-        $this->attributes->apply($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry);
+        $this->attributes->apply($namespace, $param, $wireName, $phpName, $propSchema, $bindings, $modelNamespace, $registry, $formatScopeKey);
 
         return $doc->failure !== null ? [$doc->failure] : [];
     }
