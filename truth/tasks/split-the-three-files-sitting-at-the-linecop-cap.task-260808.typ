@@ -5,7 +5,11 @@
   tags: ("debt",),
   priority: 5,
   difficulty: 3,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[250/236/250 -> 179/177/178 measured; four named units extracted; output byte-identical],
 )
 
 == Summary

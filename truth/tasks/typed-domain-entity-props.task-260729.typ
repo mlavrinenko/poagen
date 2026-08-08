@@ -5,7 +5,11 @@
   tags: ("speconaut", "domain", "debt"),
   priority: 4,
   difficulty: 4,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: done(
+    2026,
+    8,
+    8,
+  )[runtime context added; properties grounded in spec text; opcache misattribution fixed],
 )
 
 == Summary
