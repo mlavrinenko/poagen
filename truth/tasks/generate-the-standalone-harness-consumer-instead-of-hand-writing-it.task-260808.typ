@@ -5,7 +5,11 @@
   tags: ("gates",),
   priority: 4,
   difficulty: 5,
-  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  status: accepted(
+    2026,
+    8,
+    8,
+  )[dispatch aborted on an API session limit before any work started; queued, not in progress],
   links: (
     related(
       "keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ",
