@@ -16,6 +16,12 @@ use Poagen\Generator\Generator\Emit\PhpDocTypeRefiner;
  * narrowings OpenAPI can express, the override that wins over both, and the
  * bounds that legitimately narrow nothing — is pinned here so a change to the
  * predicate is a test change, not a silent shift in emitted types.
+ *
+ * refine-list-item-types-from-the-item-schema-constraints:
+ * {@see PhpDocTypeRefiner::refineListItem()}'s cases live here too — the same
+ * two narrowings read one level into a list's `items`, and every structural
+ * shape (a list of lists, a map of lists, a list of `$ref`s) that is left
+ * alone rather than guessed at.
  */
 final class PhpDocTypeRefinerTest extends TestCase
 {
@@ -127,5 +133,90 @@ final class PhpDocTypeRefinerTest extends TestCase
 
         self::assertNull(PhpDocTypeRefiner::refine('string', $ref, null));
         self::assertSame('numeric-string', PhpDocTypeRefiner::refine('string', $ref, 'numeric-string'));
+    }
+
+    public function testAListOfStringsWithMinLengthOnItemsNarrowsToNonEmptyString(): void
+    {
+        $schema = new Schema([
+            'type' => 'array',
+            'items' => new Schema(['type' => 'string', 'minLength' => 1]),
+        ]);
+
+        self::assertSame('list<non-empty-string>', PhpDocTypeRefiner::refineListItem($schema, 'list<string>'));
+    }
+
+    public function testAListOfIntegersWithAPositiveLowerBoundOnItemsNarrowsToPositiveInt(): void
+    {
+        $schema = new Schema([
+            'type' => 'array',
+            'items' => new Schema(['type' => 'integer', 'minimum' => 1]),
+        ]);
+
+        self::assertSame('list<positive-int>', PhpDocTypeRefiner::refineListItem($schema, 'list<int>'));
+    }
+
+    public function testAListWhoseItemsCarryNoConstraintIsLeftUnrefined(): void
+    {
+        $schema = new Schema([
+            'type' => 'array',
+            'items' => new Schema(['type' => 'string']),
+        ]);
+
+        self::assertNull(PhpDocTypeRefiner::refineListItem($schema, 'list<string>'));
+    }
+
+    /**
+     * A list of lists: the innermost items narrow, but
+     * refine-list-item-types-from-the-item-schema-constraints leaves any
+     * shape but a single-level list-of-scalars alone rather than re-deriving
+     * what TypeResolver already built recursively.
+     */
+    public function testANestedListOfListsIsLeftAloneEvenWhenTheInnermostItemsNarrow(): void
+    {
+        $schema = new Schema([
+            'type' => 'array',
+            'items' => new Schema([
+                'type' => 'array',
+                'items' => new Schema(['type' => 'string', 'minLength' => 1]),
+            ]),
+        ]);
+
+        self::assertNull(PhpDocTypeRefiner::refineListItem($schema, 'list<list<string>>'));
+    }
+
+    /**
+     * A map whose value is a list — InlineObjectResolver::valueMapDoc()'s
+     * `array<string, list<string>>` — is a different structural shape than
+     * the single-level `list<T>` this method recognises, so it is left
+     * alone the same way a list of lists is.
+     */
+    public function testAMapOfListsIsLeftAlone(): void
+    {
+        $schema = new Schema([
+            'type' => 'object',
+            'additionalProperties' => new Schema([
+                'type' => 'array',
+                'items' => new Schema(['type' => 'string', 'minLength' => 1]),
+            ]),
+        ]);
+
+        self::assertNull(PhpDocTypeRefiner::refineListItem($schema, 'array<string, list<string>>'));
+    }
+
+    public function testAListOfReferencesCarriesNoItemsSchemaToRefine(): void
+    {
+        $schema = new Schema([
+            'type' => 'array',
+            'items' => new Reference(['$ref' => '#/components/schemas/Tag']),
+        ]);
+
+        self::assertNull(PhpDocTypeRefiner::refineListItem($schema, 'list<Tag>'));
+    }
+
+    public function testAReferenceSchemaHasNoItemsToReadEither(): void
+    {
+        $ref = new Reference(['$ref' => '#/components/schemas/Whatever']);
+
+        self::assertNull(PhpDocTypeRefiner::refineListItem($ref, 'list<string>'));
     }
 }

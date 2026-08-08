@@ -17,7 +17,10 @@ final readonly class LineItem
      * @param numeric-string $amount
      * @param positive-int $quantity
      * @param non-empty-string $sku
+     * @param ?list<non-empty-string> $codes
      * @param ?positive-int $discount
+     * @param ?list<list<string>> $groups
+     * @param ?list<positive-int> $ranks
      * @param ?list<string> $tags
      */
     public function __construct(
@@ -25,9 +28,12 @@ final readonly class LineItem
         public int $quantity,
         public string $sku,
         public ?int $balance = null,
+        public ?array $codes = null,
         public ?Currency $currency = null,
         public ?int $discount = null,
+        public ?array $groups = null,
         public ?string $note = null,
+        public ?array $ranks = null,
         public ?array $tags = null,
     ) {
     }
