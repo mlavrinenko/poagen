@@ -111,7 +111,11 @@ poagen validate path/to/schema.yaml            # parse + validate only
 ```
 
 Where `poagen.php` returns a typed `Profile` describing the schema, output
-dir, namespace, and any user value objects to wire in.
+dir, namespace, and any user value objects to wire in. `Profile::$schema`
+and `poagen validate` both accept the document as YAML or JSON, chosen by
+the file extension (`.json` reads as JSON; anything else reads as YAML) —
+one reader-selection rule, shared by both commands, so a `.json` document
+generates the same client its `.yaml` equivalent would.
 
 See [`examples/`](examples/) for end-to-end demonstrations on real
 schemas (Petstore passes; DigitalOcean and GitHub are scaffolded as
