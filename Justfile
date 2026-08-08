@@ -289,7 +289,12 @@ lint-jscpd:
 # carry the numbers this comment does not restate — this recipe's fallback
 # went 2.0 to 4.41 there, covering `tests/fixtures/generated/petstore`, the
 # worst fixture tree once the envelope changed what every tree represents.
-# `retighten-the-generated-duplication-ceilings` owns bringing it back down.
+#
+# `retighten-the-generated-duplication-ceilings` re-measured 2026-08-08:
+# `tests/fixtures/generated/petstore` is byte-for-byte unchanged since
+# 08-04 (same 4 clones, same 35/795), so 4.41 is still the measured floor
+# rounded up, not slack nobody re-checked. See
+# `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`.
 lint-jscpd-generated:
     #!/usr/bin/env bash
     set -eo pipefail

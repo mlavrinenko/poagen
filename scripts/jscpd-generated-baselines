@@ -111,6 +111,27 @@
 # touched back down as real collapse becomes possible again — the decision
 # above names hoisting a class's repeated `StatusResponseMap` literals into a
 # shared helper as the next lever, evaluated and deferred rather than done.
+#
+# RETIGHTENED 2026-08-08 by `retighten-the-generated-duplication-ceilings`,
+# recorded in
+# `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`.
+# No emitter change landed between the loosening and this: three of the four
+# trees were regenerated for unrelated reasons (kilbil's schema reconciled,
+# digitalocean and github's PHPDoc emission refined, all four renamed
+# poagen-wide), which moved each ceiling's denominator, not its clones. Every
+# number below is a fresh `just lint-jscpd-generated` reading, taken twice
+# and identical both times: petstore 4.41 -> 4.41 (unchanged, byte-identical
+# tree, already at the measured floor), kilbil 1.47 -> 1.43, digitalocean
+# 10.97 -> 10.92, github 22.32 -> 22.31. The deferred per-class
+# `StatusResponseMap` helper was re-weighed against today's tree rather than
+# assumed still shelved — the decision above has the numbers — and stays
+# deferred: it cannot reach any tree's cross-file clones (worse than known in
+# 08-04: more than half of digitalocean's and nearly half of github's
+# client-to-client duplication is cross-file too, not just petstore's), and
+# what it does reach is the same structural-identity merge the owner ruled
+# out for inline models, one layer up. A cross-class, opt-in collapse is
+# named as the next lever a follow-up task could take up; nothing here
+# implements it.
 
 # 4 clones, 35 lines over 795 — envelope-shaped response maps, not models.
 # Two are cross-file, StoreClient.php against UserClient.php (6 and 7 lines):
@@ -124,61 +145,90 @@
 # object instead of one picked response type, so two operations that declare
 # the same shapes emit the same map. Full accounting:
 # `envelope-remeasures-the-generated-duplication-floors.decision-260804.typ`.
+#
+# Re-measured 2026-08-08: byte-for-byte unchanged, same 4 clones, same
+# 35/795, same two cross-file and two intra-file pairs above. The ceiling
+# was already the measured figure rounded up (4.4025% -> 4.41%), so it does
+# not move — and cannot fall further without collapsing real duplication. A
+# per-class `StatusResponseMap` helper would still only reach the two
+# intra-file clones; the two cross-file ones sit on different client
+# classes and stay out of reach regardless.
+# `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`.
 examples/petstore/generated       4.41
 
-# Still 2 clones, still the same 37 lines, now over 2530 instead of 2209 —
+# Still 2 clones, still the same 37 lines, now over 2605 instead of 2530 —
 # Model/GoodsRequestContentItem against Model/GoodsXmlRequestContentItem (10
 # lines), and Model/ProcessSaleRequestContentGoodsDataItem against
 # Model/SearchClientRequestContentGoodsDataItem (29 lines): the same two
-# same-shape model pairs as before, renamed by
-# name-inline-schemas-by-status-and-merge-on-request but otherwise untouched.
-# The envelope added no client-to-client clone here even though all 36
+# same-shape model pairs as before, untouched since
+# name-inline-schemas-by-status-and-merge-on-request renamed them. The
+# envelope added no client-to-client clone here even though all 36
 # operations declare the same 200/403 pair: name-inline-schemas-by-
 # operation-and-status names every inline response class by operation and
 # status (`AddClientTags200Content`, `DeleteClientTags200Content`, ...), so
 # two operations' `StatusResponseMap` literals differ by class name even
 # where the shape behind each name is identical — kilbil pays for the
 # envelope with 36 near-identical classes, not with duplicated method
-# bodies. The percentage fell, 1.68 to 1.47, because the tree grew around
-# these two unchanged clones, not because anything shrank.
-examples/kilbil/generated         1.47
-
-# 287 clones, 3424 duplicated lines over 31315 — up from 122/1610/25696.
-# 233 of the 287 clones (2872 of 3711 summed clone-lines, 77.4%) are now
-# client-to-client: an operation's declared error tail — `401`/`429`/`500`/
-# `default` all resolving to the same named `Error` model is typical — used
-# to differ from another operation's only by which `ResponseType` wrapped
-# one response; now the whole per-status literal is compared, so two
-# operations sharing that tail (e.g. `AccountClient::accountGet` against
-# `ActionsClient::actionsGet`) emit an identical `StatusResponseMap`
-# construction, not only the transport preamble that already cloned before
-# it. 41 clones/609 lines (16.4%) are still same-shape models, 11 clones/211
-# lines (5.7%) still enum-to-enum — both unchanged in kind and close in size
-# to before.
+# bodies. Kilbil has zero client-to-client clones, so a per-class
+# `StatusResponseMap` helper has nothing to reach here regardless of scope.
 #
-# Moved 10.94 -> 10.97 on 2026-08-04 by
-# return-a-binary-2xx-as-the-stream-a-done-task-already-promised, which
-# lifted the binary-response refusal and so un-skipped
-# `invoices_get_pdfByUuid`. That is one new method in a 470-file tree,
-# structurally near-identical to the `invoicesGetCsvByUuid` and
-# `invoicesGetSummaryByUuid` siblings it sits beside, and it moved the tree
-# 10.9341% -> 10.96%. A tree that generates MORE of its document than it did
-# before is the outcome this project wants; the ceiling following it is the
-# same re-measurement the envelope's decision carved out, for the same
-# reason. retighten-the-generated-duplication-ceilings owns bringing all of
-# these back down.
-examples/digitalocean/generated   10.97
+# Re-measured 2026-08-08: 1.47 -> 1.43, the same shape as 1.68 -> 1.47.
+# `812efad1` regenerated kilbil's golden against its reconciled schema
+# (unrelated to duplication); the tree grew around these same two unchanged
+# clones and the percentage fell on its own.
+examples/kilbil/generated         1.43
 
-# 1431 clones, 24159 duplicated lines over 108267 — up from 1035/20262/98129.
-# Model-to-model duplication is close to unchanged in both count and size —
-# 897 clones/19146 lines (74.8% of summed clone-lines) against the previous
-# 894/19109 — GitHub's duplication is still overwhelmingly the vendor's own
-# document, ~918 declared components including 1837 webhook payload types
-# re-declaring the same nested objects under fresh names, none of it touched
-# by the envelope. What grew is client-to-client: 462 clones/4881 lines
-# (19.1%), the same shared-error-tail pattern DigitalOcean shows —
-# operations whose `204`/`400`/`403`/`404` all resolve to the same named
-# `BasicError` model, e.g. two `ActionsClient` operations, now compare
-# identically as a whole `StatusResponseMap` literal rather than only as a
-# transport preamble.
-examples/github/generated        22.32
+# 288 clones, 3441 duplicated lines over 31511 — up from 287/3424/31315 (the
+# 2026-08-04 measurement) after `2a314707` regenerated digitalocean's golden
+# for refined PHPDoc emission, picking up a handful of additive model
+# properties along the way. Not a new emitter regression: duplicated lines
+# grew by 17 while the tree grew by 196, so the percentage still fell. 236
+# of the 288 clones (2902 of 3729 summed clone-lines, 77.8%) are
+# client-to-client: an operation's declared error tail — `401`/`429`/`500`/
+# `default` all resolving to the same named `Error` model is typical — so
+# two operations sharing that tail (e.g. `AccountClient::accountGet`
+# against `ActionsClient::actionsGet`) emit an identical `StatusResponseMap`
+# construction. 41 clones/616 lines (16.5%) are still same-shape models, 11
+# clones/211 lines (5.7%, byte-identical to every prior measurement) still
+# enum-to-enum.
+#
+# Re-weighed against the per-class `StatusResponseMap` helper
+# (`duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`):
+# of the 236 client-to-client clones, 113 (1614 lines) are same-file and
+# reachable by a per-class helper, but 123 (1288 lines) — including the
+# Account/Actions pair above — are cross-file, on different client classes,
+# out of a per-class helper's reach the same way petstore's two cross-file
+# clones are. The 41 model clones are cross-file by construction (a shared
+# shape is never duplicated within its own file) and outside a per-class
+# helper regardless of scope.
+examples/digitalocean/generated   10.92
+
+# 1431 clones, 24159 duplicated lines over 108290 — clone count and
+# duplicated-line count byte-identical to the 2026-08-04 measurement
+# (1431/24159 over 108267 then). Only the tree's total line count moved,
+# +23, from the same `2a314707` PHPDoc-emission refinement that touched
+# digitalocean, applied here as purely additive documentation lines the
+# `.jscpd.generated.json` ignorePattern already excludes from matching —
+# the ceiling falls by one hundredth purely because the denominator grew
+# under unchanged duplication. GitHub's duplication is still overwhelmingly
+# the vendor's own document, ~918 declared components including 1837
+# webhook payload types re-declaring the same nested objects under fresh
+# names, none of it touched by the envelope. Freshly categorized 2026-08-08
+# (by path, not diffed clone-by-clone against the 08-04 paragraph's
+# estimate): 897 clones/19146 lines (74.8% of summed clone-lines) are
+# model-to-model, 508 clones/5441 lines (21.3%) client-to-client — the same
+# shared-error-tail pattern DigitalOcean shows, operations whose
+# `204`/`400`/`403`/`404` all resolve to the same named `BasicError` model
+# now comparing as a whole `StatusResponseMap` literal — and 26 clones/1003
+# lines (3.9%) enum-to-enum.
+#
+# Re-weighed against the per-class `StatusResponseMap` helper: of the 508
+# client-to-client clones, 292 (3193 lines) are same-file and reachable, but
+# 216 (2248 lines) are cross-file and are not. All 897 model clones are
+# cross-file by construction (verified: 0 are same-file) and outside a
+# per-class helper regardless of scope — most of this tree's floor is the
+# vendor's document restated under many names, not a lever this project can
+# pull without merging on structural identity, which
+# `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`
+# and the 2026-08-02 inline-model ruling it cites both keep out of reach.
+examples/github/generated        22.31
