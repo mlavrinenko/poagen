@@ -67,15 +67,23 @@ stops the run with a message naming the parameter and its type — the same
 applied here to the derivation's own blind spots rather than pretending
 they do not exist.
 
-`getPetById`'s return is read the same way, at the value rather than via
-static reflection: `$result instanceof Envelope` branches to `->status`
-and `->body`; anything else is read directly as the body. Either way the
-result is asserted by name — `$pet instanceof Pet`, `$pet->name === 'Rex'`
-— never by the absence of a crash, so deriving the call shape does not
-cost the result assertion (the trap the task named directly: "a
+`getPetById`'s return is asserted, not derived: `$result instanceof
+Envelope` fails loudly by name if it is anything else, then `->status` and
+`->body` are read and checked — `$pet instanceof Pet`, `$pet->name ===
+'Rex'` — never by the absence of a crash, so deriving the call shape does
+not cost the result assertion (the trap the task named directly: "a
 derivation that reflects the constructor and passes arbitrary strings
 positionally proves LESS than the hand-written version if it stops
-asserting that the call succeeded and returned the right thing").
+asserting that the call succeeded and returned the right thing"). This one
+shape is *not* tolerant of an alternative: every operation returning a
+status-and-body `Envelope` is itself an accepted decision
+(`envelope-supersedes-error-response-policy`, 2026-08-04), not one of two
+live shapes this harness should shrug at — a `getPetById` that stopped
+returning an `Envelope` would mean that decision was reverted, which this
+harness must fail on, not adapt to. An earlier version of this change
+branched on `$result instanceof Envelope` and read a bare value from the
+`else`, which quietly re-opened exactly the drift the deleted test used to
+pin; caught before landing and corrected to a hard assertion.
 
 `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` is
 deleted, not left beside the new derivation as a second, now-redundant
