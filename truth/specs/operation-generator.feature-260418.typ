@@ -61,7 +61,7 @@
     )[
       #given[#the(Client) is constructed with a `TransportInterface` backed by a PSR-18 HTTP client that returns status #p((code: "200")) with JSON body #p((body: "{\"id\":42,\"status\":\"placed\"}"))]
       #when[`getOrderById(42)` is called on #the(Client)]
-      #then[the return value is #an(Envelope) whose `status` is `200` and whose `body` is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
+      #then[the return value is #an(Envelope) whose #the(Envelope.status) is `200` and whose #the(Envelope.body) is #a(Model) `Order` with `id = 42` and `status = 'placed'`]
     ]
 
     #scenario(
@@ -160,7 +160,7 @@
       "An operationId with non-identifier characters is camelCased into a PHP method name",
       stage: "unstable",
     )[
-      #given[#the(Schema) declares #a(Operation) #p((op: "POST /proxy")) with #p((id: "operationId: monitoring_get_foo.yml"))]
+      #given[#the(Schema) declares #a(Operation) #p((op: "POST /proxy")) whose #the(Operation.operationId) is `monitoring_get_foo.yml`]
       #when[#the(Generator) runs against #the(Profile)]
       #then[the emitted #the(Client) has a method `monitoringGetFooYml(...)`]
       #and_[#the(Operation) is *not* silently skipped even though the raw operationId contains a `.`]

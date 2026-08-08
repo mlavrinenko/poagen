@@ -6,7 +6,9 @@
 // resolves a profile and hands off, so `cheap-regeneration` stays one command
 // rather than a procedure.
 //
-// Why this is one of four bounded contexts rather than one: see
+// Why this is one of five bounded contexts rather than one: see
 // "bounded-contexts.md".
 
-#let PoagenCli = entity("poagen CLI", props: ())
+// `exitCode` is the one fact every cli.feature scenario checks — what the
+// process returned to its caller.
+#let PoagenCli = entity("poagen CLI", props: (exitCode: int))

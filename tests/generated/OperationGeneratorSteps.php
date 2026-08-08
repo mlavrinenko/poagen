@@ -856,29 +856,6 @@ final class OperationGeneratorSteps
     }
 
 
-    public function thenReturnValueIsEnvelopeWhoseStatusIs200AndWhoseBodyIsModelOrderWithId42AndStatusPlaced(): void
-    {
-        TestCase::assertNotNull($this->http);
-        TestCase::assertNotNull($this->http->lastRequest);
-        TestCase::assertSame('GET', $this->http->lastRequest->getMethod());
-        TestCase::assertSame(
-            'https://petstore.example/api/v3/store/order/42',
-            (string) $this->http->lastRequest->getUri(),
-        );
-
-        TestCase::assertNotNull($this->orderResult);
-        TestCase::assertSame(200, $this->orderResult->status);
-        $order = $this->orderResult->body;
-        TestCase::assertInstanceOf(Order::class, $order);
-        TestCase::assertSame(42, $order->id);
-        // `Order.status` declares an inline enum, so it hydrates into the
-        // backed enum poagen synthesised for it rather than into the raw
-        // string (inline-body-and-response-schemas).
-        TestCase::assertSame(OrderStatus::Placed, $order->status);
-        TestCase::assertSame('placed', $order->status->value);
-    }
-
-
     public function thenEmittedClientHasAMethodWhoseReturnTypeIsEnvelopeAnnotatedReturnEnvelopeString(): void
     {
         TestCase::assertStringContainsString(
@@ -2095,6 +2072,38 @@ final class OperationGeneratorSteps
         TestCase::assertStringContainsString('createWidget', $stderrContents);
         TestCase::assertStringContainsString('/widgets', $stderrContents);
         TestCase::assertStringContainsString('skipped', $stderrContents);
+    }
+
+
+    public function thenReturnValueIsEnvelopeWhoseEnvelopeStatusIs200AndWhoseEnvelopeBodyIsModelOrderWithId42AndStatusPlaced(
+    ): void {
+        TestCase::assertNotNull($this->http);
+        TestCase::assertNotNull($this->http->lastRequest);
+        TestCase::assertSame('GET', $this->http->lastRequest->getMethod());
+        TestCase::assertSame(
+            'https://petstore.example/api/v3/store/order/42',
+            (string) $this->http->lastRequest->getUri(),
+        );
+
+        TestCase::assertNotNull($this->orderResult);
+        TestCase::assertSame(200, $this->orderResult->status);
+        $order = $this->orderResult->body;
+        TestCase::assertInstanceOf(Order::class, $order);
+        TestCase::assertSame(42, $order->id);
+        // `Order.status` declares an inline enum, so it hydrates into the
+        // backed enum poagen synthesised for it rather than into the raw
+        // string (inline-body-and-response-schemas).
+        TestCase::assertSame(OrderStatus::Placed, $order->status);
+        TestCase::assertSame('placed', $order->status->value);
+    }
+
+
+    public function givenSchemaDeclaresOperationOpWhoseOperationOperationIdIsMonitoringGetFooYml(string $op): void
+    {
+        // The one scenario on the parameters fixture whose operationId contains
+        // a `.` — POST /proxy, normalised to `monitoringGetFooYml`.
+        TestCase::assertSame('POST /proxy', $op);
+        $this->profile = $this->loadProfile('parameters');
     }
 
 }

@@ -383,4 +383,10 @@ final class PoagenCLISteps
         TestCase::assertStringNotContainsString($needle, $this->stderr);
     }
 
+
+    public function thenPoagenCLIExitCodeShouldBeCode(int $code): void
+    {
+        TestCase::assertSame($code, $this->exitCode);
+    }
+
 }

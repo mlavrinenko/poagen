@@ -26,7 +26,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Class emission
      *
      * Scenario: Each named schema component becomes a final readonly class
-     * @source truth/specs/model-generator.feature-260418.typ:17
+     * @source truth/specs/model-generator.feature-260418.typ:18
      *
      * Given Schema declares a component named Pet
      * When Generator runs against Profile
@@ -44,7 +44,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Property types follow OpenAPI scalars and required-ness
-     * @source truth/specs/model-generator.feature-260418.typ:27
+     * @source truth/specs/model-generator.feature-260418.typ:28
      *
      * Given Model with required id: integer and optional name: string
      * When Model is emitted
@@ -62,7 +62,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `$ref` to another component becomes a typed property of that class
-     * @source truth/specs/model-generator.feature-260418.typ:37
+     * @source truth/specs/model-generator.feature-260418.typ:38
      *
      * Given Model Order has a required property pet that $ref #/components/schemas/Pet
      * When Model is emitted
@@ -78,7 +78,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline nested object schema becomes a synthesised typed class
-     * @source truth/specs/model-generator.feature-260418.typ:46
+     * @source truth/specs/model-generator.feature-260418.typ:47
      *
      * Given Model Pet declares an inline property shipping with type: object and nested properties address: string, zip: string
      * When Model is emitted
@@ -98,7 +98,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A schema with enum values becomes a PHP 8.1 backed enum
-     * @source truth/specs/model-generator.feature-260418.typ:57
+     * @source truth/specs/model-generator.feature-260418.typ:58
      *
      * Given Schema declares a named component Status with type: string and [placed, approved, delivered]
      * When Generator runs against Profile
@@ -118,7 +118,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `oneOf` of `$ref`-ed components with a `discriminator` becomes a PHP union type
-     * @source truth/specs/model-generator.feature-260418.typ:68
+     * @source truth/specs/model-generator.feature-260418.typ:69
      *
      * Given Schema declares components Dog and Cat and Model Animal with a required property creature whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
      * When Generator runs against Profile
@@ -134,7 +134,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `oneOf` whose branches share every discriminating field aborts the run, naming both
-     * @source truth/specs/model-generator.feature-260418.typ:77
+     * @source truth/specs/model-generator.feature-260418.typ:78
      *
      * Given Schema declares components Celsius and Fahrenheit that declare the same single optional property and require nothing, and a component Reading with a required property sample whose schema is oneOf: [$ref Celsius, $ref Fahrenheit] with no discriminator
      *   And Profile names no tag on the enclosing object and pins no branch for Reading.sample
@@ -156,7 +156,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `oneOf` whose branches require disjoint fields becomes a PHP union with a computed selector
-     * @source truth/specs/model-generator.feature-260418.typ:89
+     * @source truth/specs/model-generator.feature-260418.typ:90
      *
      * Given Schema declares components Dog (required bark) and Cat (required meow) and a component Sighting with a required property creature whose schema is oneOf: [$ref Dog, $ref Cat] with no discriminator
      *   And Profile names no tag on the enclosing object and pins no branch for Sighting.creature
@@ -178,7 +178,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A branch that closes itself and declares nothing is selected by an empty payload
-     * @source truth/specs/model-generator.feature-260418.typ:101
+     * @source truth/specs/model-generator.feature-260418.typ:102
      *
      * Given Schema declares a component Vacant with additionalProperties: false and no properties, and a component Enclosure with a required property occupant whose schema is oneOf: [$ref Dog, $ref Vacant] with no discriminator
      * When Generator runs against Profile
@@ -196,7 +196,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pinned branch types the property as that single class
-     * @source truth/specs/model-generator.feature-260418.typ:111
+     * @source truth/specs/model-generator.feature-260418.typ:112
      *
      * Given Schema declares a component Reading whose required property sample is an undecidable oneOf: [$ref Celsius, $ref Fahrenheit]
      *   And Profile pins Celsius for Reading.sample with a written reason
@@ -216,7 +216,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A profile-level `discriminators` override resolves an otherwise-undiscriminated `oneOf`
-     * @source truth/specs/model-generator.feature-260418.typ:122
+     * @source truth/specs/model-generator.feature-260418.typ:123
      *
      * Given Schema declares components Dog and Cat and a component Pet with a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with no discriminator
      *   And Profile sets 'Pet.kind' => 'petType'
@@ -236,23 +236,23 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A `oneOf` with a `discriminator.propertyName` picks the branch by wire value
-     * @source truth/specs/model-generator.feature-260418.typ:133
+     * @source truth/specs/model-generator.feature-260418.typ:134
      *
      * Given Schema declares components Dog and Cat and Model Pet with a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
-     * When Client call (new Hydrator())->hydrate(Pet::class, $data) runs against a payload whose kind.petType is 'Cat'
+     * When Hydrator call (new Hydrator())->hydrate(Pet::class, $data) runs against a payload whose kind.petType is 'Cat'
      * Then Model's $pet->kind is an instance of Cat, independent of whether the payload's keys structurally match Dog
      */
     public function testAOneOfWithADiscriminatorPropertyNamePicksTheBranchByWireValue(): void
     {
         $this->steps->givenSchemaDeclaresComponentsDogAndCatAndModelPetWithARequiredPropertyKindWhoseSchemaIsOneOfRefDogRefCatWithDiscriminatorPropertyNamePetType();
-        $this->steps->whenClientCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
+        $this->steps->whenHydratorCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire('\'Cat\'');
         $this->steps->thenModelsPetKindIsAnInstanceOfCatIndependentOfWhetherThePayloadsKeysStructurallyMatchDog();
     }
 
 
     /**
      * Scenario: An `allOf` that merges two object schemas becomes a single Model with the union of properties
-     * @source truth/specs/model-generator.feature-260418.typ:142
+     * @source truth/specs/model-generator.feature-260418.typ:143
      *
      * Given Schema declares components BaseThing (required id: integer) and ExtraThing (required label: string) and Model MergedThing whose schema is allOf: [$ref BaseThing, $ref ExtraThing]
      * When Generator runs against Profile
@@ -272,17 +272,17 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Hydration and serialization contract (attribute-and-phpdoc-driven-serialization)
      *
      * Scenario: A list-of-Model property hydrates each item into the declared class
-     * @source truth/specs/model-generator.feature-260418.typ:154
+     * @source truth/specs/model-generator.feature-260418.typ:155
      *
      * Given Model Pet has a property tags whose schema is type: array, items.$ref: #/components/schemas/Tag
-     * When Client's runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose tags is a list of two objects
+     * When Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose tags is a list of two objects
      * Then Model's $pet->tags[0] is an instance of Tag
      *   And Model's $pet->tags[1] is an instance of Tag
      */
     public function testAListOfModelPropertyHydratesEachItemIntoTheDeclaredClass(): void
     {
         $this->steps->givenModelPetHasAPropertyTagsWhoseSchemaIsTypeArrayItemsRefComponentsSchemasTag();
-        $this->steps->whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects();
+        $this->steps->whenHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects();
         $this->steps->thenModelsPetTags0IsAnInstanceOfTag();
         $this->steps->thenModelsPetTags1IsAnInstanceOfTag();
     }
@@ -290,30 +290,30 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A list-of-scalar property hydrates items untouched
-     * @source truth/specs/model-generator.feature-260418.typ:164
+     * @source truth/specs/model-generator.feature-260418.typ:165
      *
      * Given Model Pet has a property photoUrls whose schema is type: array, items.type: string
-     * When Client's runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose photoUrls is a list of plain strings
+     * When Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose photoUrls is a list of plain strings
      * Then each $pet->photoUrls[$i] on Model is the original string — no object wrapping
      */
     public function testAListOfScalarPropertyHydratesItemsUntouched(): void
     {
         $this->steps->givenModelPetHasAPropertyPhotoUrlsWhoseSchemaIsTypeArrayItemsTypeString();
-        $this->steps->whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings();
+        $this->steps->whenHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings();
         $this->steps->thenEachPetPhotoUrlsIOnModelIsTheOriginalStringNoObjectWrapping();
     }
 
 
     /**
      * Scenario: A property with a non-identifier schema key round-trips via #[WireName]
-     * @source truth/specs/model-generator.feature-260418.typ:173
+     * @source truth/specs/model-generator.feature-260418.typ:174
      *
      * Given Model Contact declares a required property whose schema key is display-name (kebab-case)
      * When Generator emits Contact.php and the runtime Marshaller / Hydrator (attribute-and-phpdoc-driven-serialization) process a payload containing the wire key display-name
      * Then Model's constructor parameter is emitted as $displayName (camelCased PHP identifier)
      *   And Model's property carries #[WireName('display-name')], and the class has no PROPERTY_MAP constant
-     *   And Client's (new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada']) populates $contact->displayName === 'Ada'
-     *   And Client's (new Marshaller())->marshal($contact) emits the key as display-name, not displayName
+     *   And Hydrator's (new Hydrator())->hydrate(Contact::class, ['display-name' => 'Ada']) populates $contact->displayName === 'Ada'
+     *   And Marshaller's (new Marshaller())->marshal($contact) emits the key as display-name, not displayName
      */
     public function testAPropertyWithANonIdentifierSchemaKeyRoundTripsViaWireName(): void
     {
@@ -321,14 +321,14 @@ final class ModelGeneratorTest extends TestCase
         $this->steps->whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorAttributeAndPhpdocDrivenSerializationProcessAPayloadContainingTheWireKeyDisplayName();
         $this->steps->thenModelsConstructorParameterIsEmittedAsDisplayNameCamelCasedPHPIdentifier();
         $this->steps->thenModelsPropertyCarriesWireNameDisplayNameAndTheClassHasNoPROPERTYMAPConstant();
-        $this->steps->thenClientsNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda();
-        $this->steps->thenClientsNewMarshallerMarshalContactEmitsTheKeyAsDisplayNameNotDisplayName();
+        $this->steps->thenHydratorsNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda();
+        $this->steps->thenMarshallersNewMarshallerMarshalContactEmitsTheKeyAsDisplayNameNotDisplayName();
     }
 
 
     /**
      * Scenario: Generated Models carry no PROPERTY_MAP and do not implement JsonSerializable
-     * @source truth/specs/model-generator.feature-260418.typ:185
+     * @source truth/specs/model-generator.feature-260418.typ:186
      *
      * Given Model Order is emitted by Generator under attribute-and-phpdoc-driven-serialization
      * When Generated File Generated/Model/Order.php is read
@@ -348,7 +348,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A discriminated `oneOf` hydrates to the branch named by the wire tag via #[Discriminator]
-     * @source truth/specs/model-generator.feature-260418.typ:196
+     * @source truth/specs/model-generator.feature-260418.typ:197
      *
      * Given Model Pet declares a required property kind whose schema is oneOf: [$ref Dog, $ref Cat] with discriminator.propertyName: petType
      * When Generated File Pet.php is read and the runtime Hydrator (attribute-and-phpdoc-driven-serialization) runs against a payload whose kind.petType is 'Cat'
@@ -366,10 +366,10 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A payload matching zero branches, or two, raises rather than picking one
-     * @source truth/specs/model-generator.feature-260418.typ:206
+     * @source truth/specs/model-generator.feature-260418.typ:207
      *
      * Given Model Sighting declares a required property creature typed Dog|Cat, carrying a #[BranchSelector] computed from the branches' disjoint required fields
-     * When Client's runtime Hydrator runs against a payload whose creature carries neither bark nor meow
+     * When Hydrator runs against a payload whose creature carries neither bark nor meow
      * Then Client's hydration raises, naming the property and the keys the payload carried
      *   And Client's hydration also raises when creature carries both bark and meow, naming both branches it matched
      *   And Client never resolves either case by taking the first branch — that is what makes computing the selector safe
@@ -377,7 +377,7 @@ final class ModelGeneratorTest extends TestCase
     public function testAPayloadMatchingZeroBranchesOrTwoRaisesRatherThanPickingOne(): void
     {
         $this->steps->givenModelSightingDeclaresARequiredPropertyCreatureTypedDogCatCarryingABranchSelectorComputedFromTheBranchesDisjointRequiredFields();
-        $this->steps->whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseCreatureCarriesNeitherBarkNorMeow();
+        $this->steps->whenHydratorRunsAgainstAPayloadWhoseCreatureCarriesNeitherBarkNorMeow();
         $this->steps->thenClientsHydrationRaisesNamingThePropertyAndTheKeysThePayloadCarried();
         $this->steps->thenClientsHydrationAlsoRaisesWhenCreatureCarriesBothBarkAndMeowNamingBothBranchesItMatched();
         $this->steps->thenClientNeverResolvesEitherCaseByTakingTheFirstBranchThatIsWhatMakesComputingTheSelectorSafe();
@@ -386,11 +386,11 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A tag on the enclosing object selects the branch through #[Discriminator(onParent: true)]
-     * @source truth/specs/model-generator.feature-260418.typ:217
+     * @source truth/specs/model-generator.feature-260418.typ:218
      *
      * Given Model Habitat declares a required property resident typed Dog|Cat and a sibling property species enumerating dog and cat
      *   And Profile maps those two values to the two branches for Habitat.resident
-     * When Client's runtime Hydrator runs against a payload whose species is 'cat'
+     * When Hydrator runs against a payload whose species is 'cat'
      * Then Model's resident parameter carries #[Discriminator(field: 'species', map: ['cat' => Cat::class, 'dog' => Dog::class], onParent: true)]
      *   And Model's $habitat->resident is an instance of Cat, read from the enclosing payload rather than from the value
      *   And Client's hydration raises when species is absent, and when it carries a value the map does not name
@@ -399,7 +399,7 @@ final class ModelGeneratorTest extends TestCase
     {
         $this->steps->givenModelHabitatDeclaresARequiredPropertyResidentTypedDogCatAndASiblingPropertySpeciesEnumeratingDogAndCat();
         $this->steps->givenProfileMapsThoseTwoValuesToTheTwoBranchesForHabitatResident();
-        $this->steps->whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseSpeciesIsWire('\'cat\'');
+        $this->steps->whenHydratorRunsAgainstAPayloadWhoseSpeciesIsWire('\'cat\'');
         $this->steps->thenModelsResidentParameterCarriesDiscriminatorFieldSpeciesMapCatCatClassDogDogClassOnParentTrue();
         $this->steps->thenModelsHabitatResidentIsAnInstanceOfCatReadFromTheEnclosingPayloadRatherThanFromTheValue();
         $this->steps->thenClientsHydrationRaisesWhenSpeciesIsAbsentAndWhenItCarriesAValueTheMapDoesNotName();
@@ -408,20 +408,20 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Hydration recovers phpdoc types when opcache strips comments (attribute-and-phpdoc-driven-serialization)
-     * @source truth/specs/model-generator.feature-260418.typ:229
+     * @source truth/specs/model-generator.feature-260418.typ:230
      *
      * Given Model Pet declares a property tags with phpdoc @param list<Tag>|null $tags
-     *   And Client's PHP process is running under opcache.save_comments=0, so ReflectionMethod::getDocComment() returns false
-     * When Client's (new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]]) runs
-     * Then Client's runtime re-tokenises Pet.php via token_get_all, recovers the constructor's doc comment, and $pet->tags[0] is an instance of Tag — not a raw array
+     *   And Hydrator runs in a PHP process under opcache.save_comments=0, so its ReflectionMethod::getDocComment() call returns false
+     * When Hydrator's (new Hydrator())->hydrate(Pet::class, ['tags' => [['id' => 1, 'name' => 'a']]]) runs
+     * Then Hydrator re-tokenises Pet.php via token_get_all, recovers the constructor's doc comment, and $pet->tags[0] is an instance of Tag — not a raw array
      */
     public function testHydrationRecoversPhpdocTypesWhenOpcacheStripsCommentsAttributeAndPhpdocDrivenSerialization(
     ): void
     {
         $this->steps->givenModelPetDeclaresAPropertyTagsWithPhpdocParamListTagNullTags();
-        $this->steps->givenClientsPHPProcessIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse();
-        $this->steps->whenClientsNewHydratorHydratePetClassTagsId1NameARuns();
-        $this->steps->thenClientsRuntimeReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray();
+        $this->steps->givenHydratorRunsInAPHPProcessUnderOpcacheSaveComments0SoItsReflectionMethodGetDocCommentCallReturnsFalse();
+        $this->steps->whenHydratorsNewHydratorHydratePetClassTagsId1NameARuns();
+        $this->steps->thenHydratorReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray();
     }
 
 
@@ -429,7 +429,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: User bindings replace generated types
      *
      * Scenario: A property with a format that has a BindsFormat binding uses the user class
-     * @source truth/specs/model-generator.feature-260418.typ:241
+     * @source truth/specs/model-generator.feature-260418.typ:242
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')]
      *   And Model has a required property contact: string with format: email
@@ -447,13 +447,13 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A BindsFormat scalar value object round-trips through ScalarBinding
-     * @source truth/specs/model-generator.feature-260418.typ:251
+     * @source truth/specs/model-generator.feature-260418.typ:252
      *
      * Given Value Object App\\ValueObject\\Email is annotated with #[BindsFormat('email')] and implements ScalarBinding with a string $value
      *   And Model Contact declares a required property email with format: email
      * When json_encode($contact) runs against Model Contact whose email is an Email('team@example')
      * Then Model's emitted JSON contains "email":"team@example", not a nested object
-     *   And (new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...]) produces Model Contact whose email is an Email instance with $value === 'team@example'
+     *   And (new Hydrator())->hydrate(Contact::class, ['email' => 'team@example', ...]) produces Model Contact whose email is an Email instance whose Value Object.value equals 'team@example'
      */
     public function testABindsFormatScalarValueObjectRoundTripsThroughScalarBinding(): void
     {
@@ -461,13 +461,13 @@ final class ModelGeneratorTest extends TestCase
         $this->steps->givenModelContactDeclaresARequiredPropertyEmailWithFormatEmail();
         $this->steps->whenJsonEncodeContactRunsAgainstModelContactWhoseEmailIsAnEmailTeamExample();
         $this->steps->thenModelsEmittedJSONContainsEmailTeamExampleNotANestedObject();
-        $this->steps->thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample();
+        $this->steps->thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWhoseValueObjectValueEqualsTeamExample();
     }
 
 
     /**
      * Scenario: A `format: date-time` property is emitted as DateTimeImmutable and round-trips through the wire string
-     * @source truth/specs/model-generator.feature-260418.typ:262
+     * @source truth/specs/model-generator.feature-260418.typ:263
      *
      * Given Model Order declares an optional property shipDate with type: string and format: date-time
      *   And no user binding for BindsFormat attribute #[BindsFormat('date-time')] is registered
@@ -491,7 +491,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Component names are normalised through a configurable pipeline (typed-profile-and-colocated-attributes, T-023)
      *
      * Scenario: A kebab-case component name becomes a PascalCase PHP class under the default pipeline
-     * @source truth/specs/model-generator.feature-260418.typ:276
+     * @source truth/specs/model-generator.feature-260418.typ:277
      *
      * Given Schema declares a component named security-advisory-ecosystems
      *   And Profile does not override nameNormaliser
@@ -511,7 +511,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An explicit `renames` entry takes precedence over the auto-sanitiser
-     * @source truth/specs/model-generator.feature-260418.typ:289
+     * @source truth/specs/model-generator.feature-260418.typ:290
      *
      * Given Schema declares a component named version-2
      *   And Profile sets 'version-2' => 'Legacy_V2'
@@ -533,7 +533,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pattern-gated strategy only handles names matching its pattern and falls through otherwise
-     * @source truth/specs/model-generator.feature-260418.typ:301
+     * @source truth/specs/model-generator.feature-260418.typ:302
      *
      * Given Profile's nameNormaliser is CompositeNormaliser([LegacyUppercaser(pattern: /^legacy_/), PascalCaseSanitiser])
      *   And Schema declares components legacy_thing and modern-thing
@@ -553,7 +553,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A custom pipeline that returns null for every name aborts with a pointed diagnostic
-     * @source truth/specs/model-generator.feature-260418.typ:314
+     * @source truth/specs/model-generator.feature-260418.typ:315
      *
      * Given Profile's nameNormaliser is an empty CompositeNormaliser (no strategies)
      *   And Schema declares any component, e.g. anything
@@ -573,7 +573,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two raw component names that normalise to the same PHP class abort the run
-     * @source truth/specs/model-generator.feature-260418.typ:325
+     * @source truth/specs/model-generator.feature-260418.typ:326
      *
      * Given Schema declares components named foo-bar and foo_bar
      *   And Profile does not override nameNormaliser
@@ -595,7 +595,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Top-level components beyond `type: object` (T-026)
      *
      * Scenario: A scalar component emits a `ScalarBinding` VO that round-trips the raw scalar
-     * @source truth/specs/model-generator.feature-260418.typ:338
+     * @source truth/specs/model-generator.feature-260418.typ:339
      *
      * Given Schema declares a component urn with string (no enum, no properties)
      * When Generator runs against Profile
@@ -615,7 +615,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with inline object branches emits an interface and one Model per branch
-     * @source truth/specs/model-generator.feature-260418.typ:349
+     * @source truth/specs/model-generator.feature-260418.typ:350
      *
      * Given Schema declares a component floating_ip_create whose schema is oneOf: [<inline object A with title "Assign to Droplet">, <inline object B with title "Reserve to Region">]
      * When Generator runs against Profile
@@ -635,7 +635,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `oneOf` with `$ref` branches marks the branch Models as `implements <Interface>`
-     * @source truth/specs/model-generator.feature-260418.typ:360
+     * @source truth/specs/model-generator.feature-260418.typ:361
      *
      * Given Schema declares components LabeledIssueEvent and UnlabeledIssueEvent (both type: object) and a component issue_event_for_issue whose schema is anyOf: [$ref LabeledIssueEvent, $ref UnlabeledIssueEvent]
      * When Generator runs against Profile
@@ -653,7 +653,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A top-level `type: array` component emits a typed wrapper class
-     * @source truth/specs/model-generator.feature-260418.typ:370
+     * @source truth/specs/model-generator.feature-260418.typ:371
      *
      * Given Schema declares a component tags_array whose schema is type: array, items.type: string
      * When Generator runs against Profile
@@ -673,7 +673,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Payloads the document declared inline become models too (inline-body-and-response-schemas)
      *
      * Scenario: A document declaring no components still emits a model for every payload
-     * @source truth/specs/model-generator.feature-260418.typ:382
+     * @source truth/specs/model-generator.feature-260418.typ:383
      *
      * Given Schema declares an empty components.schemas and Operation placeOrder whose application/json request body and 2xx response are each an inline type: object with declared properties
      * When Generator runs against Profile
@@ -693,7 +693,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline array of inline objects is typed at both ends
-     * @source truth/specs/model-generator.feature-260418.typ:393
+     * @source truth/specs/model-generator.feature-260418.typ:394
      *
      * Given Operation placeOrdersBulk whose request body and 2xx response are each type: array whose items is an inline type: object with declared properties
      * When Generator runs against Profile
@@ -711,7 +711,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Nesting below a synthesised payload is reached by the same queue as nesting below a component
-     * @source truth/specs/model-generator.feature-260418.typ:403
+     * @source truth/specs/model-generator.feature-260418.typ:404
      *
      * Given Operation placeOrder whose inline response carries an inline object property shipping and an array property lines whose items are an inline object
      * When Generator runs against Profile
@@ -729,7 +729,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline enum inside a payload becomes a backed enum, wherever the payload came from
-     * @source truth/specs/model-generator.feature-260418.typ:413
+     * @source truth/specs/model-generator.feature-260418.typ:414
      *
      * Given Operation placeOrder whose inline request body has a property channel with type: string and enum: [web, phone, store]
      * When Generator runs against Profile
@@ -747,7 +747,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: An inline object the document left unconstrained is passed as a map rather than dropping the operation
-     * @source truth/specs/model-generator.feature-260418.typ:423
+     * @source truth/specs/model-generator.feature-260418.typ:424
      *
      * Given Operation ping whose application/json request body is type: object with no declared properties and no additionalProperties
      * When Generator runs against Profile
@@ -765,7 +765,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: The profile pins the class name for a synthesised payload
-     * @source truth/specs/model-generator.feature-260418.typ:433
+     * @source truth/specs/model-generator.feature-260418.typ:434
      *
      * Given Profile whose inlineModels map carries 'PlacedOrder' => 'placeOrder.200'
      * When Generator runs against Profile
@@ -783,7 +783,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A pin naming a site absent from the document fails the run
-     * @source truth/specs/model-generator.feature-260418.typ:443
+     * @source truth/specs/model-generator.feature-260418.typ:444
      *
      * Given Profile whose inlineModels map carries a value 'noSuchOperation.request'
      * When Generator runs against Profile
@@ -801,7 +801,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Two shapes deriving one class name fail the run rather than overwriting a file
-     * @source truth/specs/model-generator.feature-260418.typ:453
+     * @source truth/specs/model-generator.feature-260418.typ:454
      *
      * Given Schema declares a component named PlaceOrder200Content and Operation placeOrder whose inline response derives that same name
      * When Generator runs against Profile
@@ -821,7 +821,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Re-running the generator is byte-stable
      *
      * Scenario: Running the generator twice with the same inputs produces identical files
-     * @source truth/specs/model-generator.feature-260418.typ:465
+     * @source truth/specs/model-generator.feature-260418.typ:466
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again with the same Schema and Profile
@@ -837,7 +837,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: A component removed from the schema is pruned from Generated/ on the next run
-     * @source truth/specs/model-generator.feature-260418.typ:474
+     * @source truth/specs/model-generator.feature-260418.typ:475
      *
      * Given Generator has produced Generated/Model/Pet.php from a prior schema that declared a Pet component
      * When Generator runs again with a schema from which the Pet component has been removed
@@ -857,7 +857,7 @@ final class ModelGeneratorTest extends TestCase
      * Rule: Every emitted file declares itself generated
      *
      * Scenario: An emitted file opens with a header naming the profile and the command that reproduces it
-     * @source truth/specs/model-generator.feature-260418.typ:486
+     * @source truth/specs/model-generator.feature-260418.typ:487
      *
      * Given Profile was loaded from tests/fixtures/profiles/petstore.php
      * When Generator runs against Profile
@@ -877,7 +877,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: The header carries nothing that moves between runs
-     * @source truth/specs/model-generator.feature-260418.typ:497
+     * @source truth/specs/model-generator.feature-260418.typ:498
      *
      * Given Generator has run once and produced Generated File tree
      * When Generator runs again over same Schema and same Profile
@@ -895,7 +895,7 @@ final class ModelGeneratorTest extends TestCase
 
     /**
      * Scenario: Regenerating over an existing tree replaces it rather than failing on it
-     * @source truth/specs/model-generator.feature-260418.typ:507
+     * @source truth/specs/model-generator.feature-260418.typ:508
      *
      * Given Generator has already written Generated File tree into Profile's output
      * When Generator runs a second time into same Profile's output

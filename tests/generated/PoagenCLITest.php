@@ -30,13 +30,13 @@ final class PoagenCLITest extends TestCase
      *
      * When poagen CLI is invoked with no arguments
      * Then poagen CLI's stdout should contain "USAGE"
-     *   And poagen CLI should exit with code 0
+     *   And poagen CLI.exitCode should be 0
      */
     public function testNoArgumentsPrintsUsageAndExits0(): void
     {
         $this->steps->whenPoagenCLIIsInvokedWithNoArguments();
         $this->steps->thenPoagenCLIsStdoutShouldContainUSAGE();
-        $this->steps->thenPoagenCLIShouldExitWithCodeCode(0);
+        $this->steps->thenPoagenCLIExitCodeShouldBeCode(0);
     }
 
 

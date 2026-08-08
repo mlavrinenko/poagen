@@ -941,20 +941,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function thenClientsNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda(): void
-    {
-        assert($this->hydratedKebabContact !== null);
-        TestCase::assertSame('Ada', $this->hydratedKebabContact->displayName);
-    }
-
-
-    public function thenClientsNewMarshallerMarshalContactEmitsTheKeyAsDisplayNameNotDisplayName(): void
-    {
-        TestCase::assertStringContainsString('"display-name":"Ada"', $this->kebabMarshalled);
-        TestCase::assertStringNotContainsString('"displayName"', $this->kebabMarshalled);
-    }
-
-
     public function whenGeneratedFileGeneratedModelOrderPhpIsRead(): void
     {
         assert($this->profile !== null);
@@ -995,63 +981,6 @@ final class ModelGeneratorSteps
         TestCase::assertInstanceOf(
             Cat::class,
             $this->hydratedDiscriminatedPet->kind,
-        );
-    }
-
-
-    public function givenClientsPHPProcessIsRunningUnderOpcacheSaveComments0SoReflectionMethodGetDocCommentReturnsFalse(
-    ): void {
-        if (!extension_loaded('Zend OPcache')) {
-            TestCase::markTestSkipped('Zend OPcache not loaded in CLI.');
-        }
-    }
-
-
-    public function whenClientsNewHydratorHydratePetClassTagsId1NameARuns(): void
-    {
-        $projectRoot = dirname(__DIR__, 2);
-        $autoload = $projectRoot . '/vendor/autoload.php';
-        $petClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
-        $tagClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
-        // The scenario requires `getDocComment()` to actually return `false`
-        // under opcache. Since the petstore fixture is regenerated in the
-        // given-step, we pass `file_update_protection=0` — without it, opcache
-        // refuses to cache a file younger than 2 seconds (opcache default),
-        // the file is read from disk, and the fallback never fires.
-        $script = sprintf(
-            '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Poagen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
-            var_export($autoload, true),
-            $petClass,
-            $petClass,
-            $tagClass,
-        );
-
-        $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
-
-        if (!is_dir(dirname($scriptPath))) {
-            mkdir(dirname($scriptPath), 0o755, true);
-        }
-        file_put_contents($scriptPath, $script);
-
-        try {
-            $cmd = sprintf(
-                '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
-                escapeshellarg(PHP_BINARY),
-                escapeshellarg($scriptPath),
-            );
-            $this->opcacheSubprocessOutput = trim((string) shell_exec($cmd));
-        } finally {
-            @unlink($scriptPath);
-        }
-    }
-
-
-    public function thenClientsRuntimeReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray(
-    ): void {
-        TestCase::assertSame(
-            'stripped:tag',
-            $this->opcacheSubprocessOutput,
-            "Subprocess output: {$this->opcacheSubprocessOutput}",
         );
     }
 
@@ -1769,31 +1698,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire(
-        string $wire,
-    ): void {
-        $tag = trim($wire, "'\"");
-        // Payload has both `bark` (so a bare structural match would prefer Dog)
-        // and `meow` (Cat's required field) — petType='Cat' must break the tie
-        // and select Cat regardless of the structural overlap.
-        $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
-            \Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
-            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
-        );
-    }
-
-
-    public function thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWithValueTeamExample(
-    ): void {
-        assert($this->hydratedContact instanceof Contact);
-        TestCase::assertInstanceOf(
-            Email::class,
-            $this->hydratedContact->email,
-        );
-        TestCase::assertSame('team@example', $this->hydratedContact->email->value);
-    }
-
-
     public function whenModelIsEmittedAndTheGeneratedNewHydratorHydrateOrderClassRunsAgainstAPayloadWhoseShipDateIsWire(
         string $wire,
     ): void {
@@ -1805,32 +1709,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(
-    ): void {
-        $this->hydratedPet = $this->invokeHydrate(
-            Pet::class,
-            [
-                'name' => 'doggie',
-                'photoUrls' => ['http://example/1.jpg'],
-                'tags' => [
-                    ['id' => 1, 'name' => 'friendly'],
-                    ['id' => 2, 'name' => 'playful'],
-                ],
-            ],
-        );
-    }
-
-
-    public function whenClientsRuntimeHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(
-    ): void {
-        $this->hydratedPet = $this->invokeHydrate(
-            Pet::class,
-            [
-                'name' => 'doggie',
-                'photoUrls' => ['https://example/a.jpg', 'https://example/b.jpg'],
-            ],
-        );
-    }
 
 
     public function whenGeneratorEmitsContactPhpAndTheRuntimeMarshallerHydratorAttributeAndPhpdocDrivenSerializationProcessAPayloadContainingTheWireKeyDisplayName(
@@ -2039,14 +1917,6 @@ final class ModelGeneratorSteps
     }
 
 
-    public function whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseCreatureCarriesNeitherBarkNorMeow(): void
-    {
-        $this->caught = $this->catchHydration(
-            static fn(): object => new Hydrator()->hydrate(Sighting::class, ['creature' => ['scales' => 'green']]),
-        );
-    }
-
-
     public function thenClientsHydrationRaisesNamingThePropertyAndTheKeysThePayloadCarried(): void
     {
         TestCase::assertInstanceOf(UnionBranchException::class, $this->caught);
@@ -2101,15 +1971,6 @@ final class ModelGeneratorSteps
         TestCase::assertIsArray($tag);
         TestCase::assertSame('species', $tag['field']);
         TestCase::assertSame(['cat' => 'Cat', 'dog' => 'Dog'], $tag['map']);
-    }
-
-
-    public function whenClientsRuntimeHydratorRunsAgainstAPayloadWhoseSpeciesIsWire(string $wire): void
-    {
-        $this->habitat = new Hydrator()->hydrate(Habitat::class, [
-            'species' => trim($wire, "'"),
-            'resident' => ['meow' => 'mrrp'],
-        ]);
     }
 
 
@@ -2176,6 +2037,147 @@ final class ModelGeneratorSteps
                 "{$relative} does not print the command that reproduces it",
             );
         }
+    }
+
+
+    public function whenHydratorCallNewHydratorHydratePetClassDataRunsAgainstAPayloadWhoseKindPetTypeIsWire(
+        string $wire,
+    ): void {
+        $tag = trim($wire, "'\"");
+        // Payload has both `bark` (so a bare structural match would prefer Dog)
+        // and `meow` (Cat's required field) — petType='Cat' must break the tie
+        // and select Cat regardless of the structural overlap.
+        $this->hydratedCompositionPet = $this->invokeCompositionHydrate(
+            \Poagen\Generator\Tests\Fixtures\Generated\Composition\Generated\Model\Pet::class,
+            ['kind' => ['petType' => $tag, 'bark' => 'arf', 'meow' => 'purr']],
+        );
+    }
+
+
+    public function whenHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhoseTagsIsAListOfTwoObjects(
+    ): void {
+        $this->hydratedPet = $this->invokeHydrate(
+            Pet::class,
+            [
+                'name' => 'doggie',
+                'photoUrls' => ['http://example/1.jpg'],
+                'tags' => [
+                    ['id' => 1, 'name' => 'friendly'],
+                    ['id' => 2, 'name' => 'playful'],
+                ],
+            ],
+        );
+    }
+
+
+    public function whenHydratorAttributeAndPhpdocDrivenSerializationRunsAgainstAPayloadWhosePhotoUrlsIsAListOfPlainStrings(
+    ): void {
+        $this->hydratedPet = $this->invokeHydrate(
+            Pet::class,
+            [
+                'name' => 'doggie',
+                'photoUrls' => ['https://example/a.jpg', 'https://example/b.jpg'],
+            ],
+        );
+    }
+
+
+    public function thenHydratorsNewHydratorHydrateContactClassDisplayNameAdaPopulatesContactDisplayNameAda(): void
+    {
+        assert($this->hydratedKebabContact !== null);
+        TestCase::assertSame('Ada', $this->hydratedKebabContact->displayName);
+    }
+
+
+    public function thenMarshallersNewMarshallerMarshalContactEmitsTheKeyAsDisplayNameNotDisplayName(): void
+    {
+        TestCase::assertStringContainsString('"display-name":"Ada"', $this->kebabMarshalled);
+        TestCase::assertStringNotContainsString('"displayName"', $this->kebabMarshalled);
+    }
+
+
+    public function whenHydratorRunsAgainstAPayloadWhoseCreatureCarriesNeitherBarkNorMeow(): void
+    {
+        $this->caught = $this->catchHydration(
+            static fn(): object => new Hydrator()->hydrate(Sighting::class, ['creature' => ['scales' => 'green']]),
+        );
+    }
+
+
+    public function whenHydratorRunsAgainstAPayloadWhoseSpeciesIsWire(string $wire): void
+    {
+        $this->habitat = new Hydrator()->hydrate(Habitat::class, [
+            'species' => trim($wire, "'"),
+            'resident' => ['meow' => 'mrrp'],
+        ]);
+    }
+
+
+    public function givenHydratorRunsInAPHPProcessUnderOpcacheSaveComments0SoItsReflectionMethodGetDocCommentCallReturnsFalse(
+    ): void {
+        if (!extension_loaded('Zend OPcache')) {
+            TestCase::markTestSkipped('Zend OPcache not loaded in CLI.');
+        }
+    }
+
+
+    public function whenHydratorsNewHydratorHydratePetClassTagsId1NameARuns(): void
+    {
+        $projectRoot = dirname(__DIR__, 2);
+        $autoload = $projectRoot . '/vendor/autoload.php';
+        $petClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Pet';
+        $tagClass = '\\Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\Generated\\Model\\Tag';
+        // The scenario requires `getDocComment()` to actually return `false`
+        // under opcache. Since the petstore fixture is regenerated in the
+        // given-step, we pass `file_update_protection=0` — without it, opcache
+        // refuses to cache a file younger than 2 seconds (opcache default),
+        // the file is read from disk, and the fallback never fires.
+        $script = sprintf(
+            '<?php require %s; $reflection = new ReflectionMethod(%s::class, "__construct"); $stripped = $reflection->getDocComment() === false; $pet = (new \\Poagen\\Runtime\\Marshal\\Hydrator())->hydrate(%s::class, ["name" => "x", "photoUrls" => [], "tags" => [["id" => 1, "name" => "a"]]]); echo ($stripped ? "stripped" : "keeps-comments"), ":", ($pet->tags[0] instanceof %s ? "tag" : "array");',
+            var_export($autoload, true),
+            $petClass,
+            $petClass,
+            $tagClass,
+        );
+
+        $scriptPath = $projectRoot . '/build/cache/opcache-fallback-' . uniqid() . '.php';
+
+        if (!is_dir(dirname($scriptPath))) {
+            mkdir(dirname($scriptPath), 0o755, true);
+        }
+        file_put_contents($scriptPath, $script);
+
+        try {
+            $cmd = sprintf(
+                '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
+                escapeshellarg(PHP_BINARY),
+                escapeshellarg($scriptPath),
+            );
+            $this->opcacheSubprocessOutput = trim((string) shell_exec($cmd));
+        } finally {
+            @unlink($scriptPath);
+        }
+    }
+
+
+    public function thenHydratorReTokenisesPetPhpViaTokenGetAllRecoversTheConstructorsDocCommentAndPetTags0IsAnInstanceOfTagNotARawArray(
+    ): void {
+        TestCase::assertSame(
+            'stripped:tag',
+            $this->opcacheSubprocessOutput,
+            "Subprocess output: {$this->opcacheSubprocessOutput}",
+        );
+    }
+
+
+    public function thenNewHydratorHydrateContactClassEmailTeamExampleProducesModelContactWhoseEmailIsAnEmailInstanceWhoseValueObjectValueEqualsTeamExample(
+    ): void {
+        assert($this->hydratedContact instanceof Contact);
+        TestCase::assertInstanceOf(
+            Email::class,
+            $this->hydratedContact->email,
+        );
+        TestCase::assertSame('team@example', $this->hydratedContact->email->value);
     }
 
 }

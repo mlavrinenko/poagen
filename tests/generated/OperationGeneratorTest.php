@@ -92,13 +92,13 @@ final class OperationGeneratorTest extends TestCase
      *
      * Given Client is constructed with a TransportInterface backed by a PSR-18 HTTP client that returns status 200 with JSON body {"id":42,"status":"placed"}
      * When getOrderById(42) is called on Client
-     * Then the return value is Envelope whose status is 200 and whose body is Model Order with id = 42 and status = 'placed'
+     * Then the return value is Envelope whose Envelope.status is 200 and whose Envelope.body is Model Order with id = 42 and status = 'placed'
      */
     public function testAJSONResponseBodyIsDeserializedIntoTheTypedModelOnTheReturnedEnvelope(): void
     {
         $this->steps->givenClientIsConstructedWithATransportInterfaceBackedByAPSR18HTTPClientThatReturnsStatusCodeWithJSONBodyBody(200, '{\"id\":42,\"status\":\"placed\"}');
         $this->steps->whenGetorderbyid42IsCalledOnClient();
-        $this->steps->thenReturnValueIsEnvelopeWhoseStatusIs200AndWhoseBodyIsModelOrderWithId42AndStatusPlaced();
+        $this->steps->thenReturnValueIsEnvelopeWhoseEnvelopeStatusIs200AndWhoseEnvelopeBodyIsModelOrderWithId42AndStatusPlaced();
     }
 
 
@@ -261,14 +261,14 @@ final class OperationGeneratorTest extends TestCase
      * Scenario: An operationId with non-identifier characters is camelCased into a PHP method name
      * @source truth/specs/operation-generator.feature-260418.typ:159
      *
-     * Given Schema declares Operation POST /proxy with operationId: monitoring_get_foo.yml
+     * Given Schema declares Operation POST /proxy whose Operation.operationId is monitoring_get_foo.yml
      * When Generator runs against Profile
      * Then the emitted Client has a method monitoringGetFooYml(...)
      *   And Operation is not silently skipped even though the raw operationId contains a .
      */
     public function testAnOperationIdWithNonIdentifierCharactersIsCamelCasedIntoAPHPMethodName(): void
     {
-        $this->steps->givenSchemaDeclaresOperationOpWithId('POST /proxy', 'operationId: monitoring_get_foo.yml');
+        $this->steps->givenSchemaDeclaresOperationOpWhoseOperationOperationIdIsMonitoringGetFooYml('POST /proxy');
         $this->steps->whenGeneratorRunsAgainstProfile();
         $this->steps->thenEmittedClientHasAMethodMonitoringGetFooYml();
         $this->steps->thenOperationIsNotSilentlySkippedEvenThoughTheRawOperationIdContainsA();
