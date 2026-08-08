@@ -165,6 +165,8 @@
 #include "decisions/phpdoctypes-stays-scalar-only.decision-260808.typ"
 #pagebreak()
 #include "decisions/standalone-harness-drift-is-caught-offline.decision-260808.typ"
+#pagebreak()
+#include "decisions/derive-the-standalone-consumer-instead-of-pinning-its-shape.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //

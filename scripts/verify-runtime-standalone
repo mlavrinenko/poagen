@@ -24,6 +24,16 @@
 # below it. `COMPOSER_DISABLE_NETWORK=1` backs that up: if a future dependency
 # is not already vendored locally, this fails fast with a resolution error
 # naming the missing package, rather than silently reaching the network.
+#
+# run.php's consumer call — how it builds an `ApiClient` — is derived from
+# the installed generated tree by reflection, not hand-authored beside it
+# (see `generate-the-standalone-harness-consumer-instead-of-hand-writing-it`
+# and `truth/decisions/derive-the-standalone-consumer-instead-of-pinning-its-
+# shape.decision-260808.typ`). That replaces the offline PHPUnit test that
+# used to pin `ApiClient`'s constructor shape and `getPetById`'s return shape
+# as source text — this script is now the only place either shape is
+# checked, which is unchanged from before that test existed and is why this
+# recipe still stays out of `just check` per that task's own non-goal.
 set -eo pipefail
 
 export COMPOSER_DISABLE_NETWORK=1
@@ -130,7 +140,90 @@ if (!InstalledVersions::isInstalled('poagen/client-runtime')) {
     exit(1);
 }
 
-$transport = new class implements TransportInterface {
+// --- Derive ApiClient's constructor call from the installed class itself ---
+//
+// The old run.php hard-coded `new ApiClient($transport, 'scratch-api-key',
+// 'scratch-oauth-token')`. That is exactly the copy that drifted twice
+// (security-wiring added a parameter, typed-error-responses changed a
+// return shape) while nobody ran this recipe. Reading the constructor via
+// Reflection instead of hard-coding it means there is nothing left here to
+// fall out of step with the generated shape — this loop follows whatever
+// ApiClient::__construct() currently declares, in whatever order.
+//
+// It understands exactly two parameter kinds: a TransportInterface (the
+// transport every generated client needs) and a string (a credential per
+// declared security scheme — apiKey, bearer token, whatever the document
+// names it). A parameter of any other required, undeclared-default kind is
+// a shape this derivation was not taught, so it fails loudly and names the
+// parameter rather than guessing a value that might silently pass.
+$apiClientClass = new ReflectionClass(ApiClient::class);
+$constructor = $apiClientClass->getConstructor();
+
+if ($constructor === null) {
+    fwrite(STDERR, "FAIL: ApiClient has no constructor to derive a call from\n");
+    exit(1);
+}
+
+$namedArgs = [];
+$credentialPlaceholders = [];
+$transportParamName = null;
+
+foreach ($constructor->getParameters() as $param) {
+    $type = $param->getType();
+    $typeName = $type instanceof ReflectionNamedType ? $type->getName() : null;
+
+    if ($typeName === TransportInterface::class) {
+        $transportParamName = $param->getName();
+
+        continue;
+    }
+
+    if ($typeName === 'string') {
+        // A distinct, traceable placeholder per parameter name — not the
+        // real credential a vendor would issue, since the stub transport
+        // below never validates one. It exists so the stub transport can
+        // confirm this exact value reached the outgoing request, which is
+        // the part actually worth proving offline.
+        $placeholder = 'verify-standalone-cred-' . $param->getName();
+        $namedArgs[$param->getName()] = $placeholder;
+        $credentialPlaceholders[$param->getName()] = $placeholder;
+
+        continue;
+    }
+
+    if ($param->isOptional()) {
+        continue;
+    }
+
+    fwrite(
+        STDERR,
+        "FAIL: don't know how to construct ApiClient's required parameter \${$param->getName()} "
+            . 'of type ' . ($typeName ?? '(no declared type)') . ' — this derivation only understands '
+            . "TransportInterface and string; extend scripts/verify-runtime-standalone if a new kind of "
+            . "constructor parameter has appeared\n",
+    );
+    exit(1);
+}
+
+if ($transportParamName === null) {
+    fwrite(STDERR, "FAIL: ApiClient's constructor declares no TransportInterface-typed parameter\n");
+    exit(1);
+}
+
+// Known gap: this proves each credential placeholder reaches the outgoing
+// request *somewhere* (a header value or the URI), not that it reaches the
+// *specific* header or place its own security scheme requires. Two
+// same-typed credentials wired to each other's header — apiKey ending up
+// in the Authorization header and petstoreAuth in api_key — would still
+// pass this check, since both placeholders would still be present, just
+// swapped. Nothing here reads the OpenAPI document to know which header a
+// given scheme is supposed to use.
+$transport = new class($credentialPlaceholders) implements TransportInterface {
+    /** @param array<string, string> $credentialPlaceholders */
+    public function __construct(private readonly array $credentialPlaceholders)
+    {
+    }
+
     public function send(Endpoint $endpoint, ResponseType $expected): mixed
     {
         if ($endpoint->uri() !== '/pet/42') {
@@ -138,25 +231,67 @@ $transport = new class implements TransportInterface {
             exit(1);
         }
 
+        $wire = $endpoint->uri() . '|' . implode('|', $endpoint->headers());
+
+        foreach ($this->credentialPlaceholders as $paramName => $placeholder) {
+            if (!str_contains($wire, $placeholder)) {
+                fwrite(
+                    STDERR,
+                    "FAIL: constructor argument \${$paramName} never reached the request — expected "
+                        . "\"{$placeholder}\" in the URI or a header, got: {$wire}\n",
+                );
+                exit(1);
+            }
+        }
+
         return new Envelope(200, new Pet(name: 'Rex', photoUrls: []), new Response());
     }
 };
 
-// The document declares both an apiKey and an oauth2 scheme for petstore, so
-// the generated client takes a credential for each beside the transport.
-$envelope = new ApiClient($transport, 'scratch-api-key', 'scratch-oauth-token')
-    ->pet()
-    ->getPetById(42);
+$namedArgs[$transportParamName] = $transport;
+$apiClient = $apiClientClass->newInstance(...$namedArgs);
 
-if ($envelope->status !== 200) {
-    fwrite(STDERR, "FAIL: expected status 200, got {$envelope->status}\n");
+// --- The rest stays a named, concrete call ---
+//
+// Which sub-client to fetch and which operation to call is domain
+// knowledge (petstore is the harness's subject on purpose — this task does
+// not generalise to the other examples), so it is still spelled out here
+// rather than derived. A rename of either fails loudly by name below,
+// rather than as a bare "call to undefined method" fatal.
+if (!method_exists($apiClient, 'pet')) {
+    fwrite(STDERR, "FAIL: ApiClient no longer exposes pet() — this harness calls it by name\n");
     exit(1);
 }
 
-$pet = $envelope->body;
+$petClient = $apiClient->pet();
+
+if (!method_exists($petClient, 'getPetById')) {
+    fwrite(STDERR, "FAIL: pet() no longer exposes getPetById() — this harness calls it by name\n");
+    exit(1);
+}
+
+$result = $petClient->getPetById(42);
+
+// Every operation returning a status-and-body Envelope is an accepted
+// decision (envelope-supersedes-error-response-policy, 2026-08-04), not
+// one of two live shapes this harness should tolerate — so this asserts
+// the Envelope wrapping by name rather than falling back to reading
+// $result directly were it ever a bare Pet again. A revert of that
+// decision is exactly the kind of change this harness should go red on.
+if (!$result instanceof Envelope) {
+    fwrite(STDERR, 'FAIL: expected getPetById to return an Envelope, got ' . get_debug_type($result) . "\n");
+    exit(1);
+}
+
+if ($result->status !== 200) {
+    fwrite(STDERR, "FAIL: expected status 200, got {$result->status}\n");
+    exit(1);
+}
+
+$pet = $result->body;
 
 if (!$pet instanceof Pet) {
-    fwrite(STDERR, "FAIL: expected the envelope body to hydrate into a Pet\n");
+    fwrite(STDERR, 'FAIL: expected getPetById to produce a Pet, got ' . get_debug_type($pet) . "\n");
     exit(1);
 }
 

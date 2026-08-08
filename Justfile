@@ -486,12 +486,18 @@ mutate-fast: tmpdir
 # It no longer resolves anything from the network — see the script's own
 # header for how and why that was re-examined and closed.
 #
-# This recipe's own staleness is a separate problem from its network shape,
-# and is not solved here: `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php`
-# pins, offline and inside `just check`, the exact API shape this recipe's
-# hand-written `run.php` depends on, so a change to the generated API that
-# `run.php` does not follow fails the gate on every push rather than
-# waiting on someone remembering this recipe exists.
+# This recipe's own staleness used to be patched around rather than cured:
+# `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` pinned,
+# offline and inside `just check`, the exact two API shapes this recipe's
+# `run.php` depended on, as source text — brittle against a harmless
+# rename or a formatting change, and a second copy of the same expectations
+# to keep in step by hand. `generate-the-standalone-harness-consumer-
+# instead-of-hand-writing-it` removed that pin: `run.php` now derives
+# `ApiClient`'s constructor call from the installed generated tree by
+# reflection instead of hard-coding it, so there is no longer a hand-copy
+# to drift and nothing left for that test to usefully pin. See the script's
+# own header and `truth/decisions/derive-the-standalone-consumer-instead-
+# of-pinning-its-shape.decision-260808.typ`.
 verify-runtime-standalone: tmpdir
     scripts/verify-runtime-standalone
 

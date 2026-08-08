@@ -3,7 +3,7 @@
 
 #show: decision.with(
   title: "The standalone check's staleness is caught inside the offline gate, not by a schedule or a rewrite",
-  status: accepted(2026, 8, 8),
+  status: superseded(2026, 8, 8),
   contexts: (generation-context,),
   goals: (link("../goals/strict-clean-output.goal.typ"),),
   process-only: "governs poagen's own test-gate configuration (how a check outside `just check` stays trustworthy), not what the generator produces or what a reimplementation must do",
@@ -45,20 +45,21 @@ for rejecting the other two:
 
 === Option 3: an offline test pins the shape `run.php` depends on
 
-`tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` regenerates
+`tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` regenerated
 the petstore example from the exact profile (`examples/petstore/poagen.php`)
 `just check-examples` already treats as the source of truth, through
 `Generator::plan()` — in-memory, no network, no disk write, the same
 technique every other test under `tests/Integration/` already uses to pin
-emitted shapes. It asserts the two facts `run.php`'s hand-written call site
-depends on: `ApiClient`'s constructor takes exactly the three positional
-arguments `run.php` passes, in that order (`$transport`, `$apiKey`,
-`$petstoreAuth`), and `getPetById` returns an `Envelope` whose `200` status
-maps to `Pet::class`. It runs as a normal PHPUnit test — `just test`,
+emitted shapes. It asserted the two facts `run.php`'s hand-written call site
+depended on: `ApiClient`'s constructor took exactly the three positional
+arguments `run.php` passed, in that order (`$transport`, `$apiKey`,
+`$petstoreAuth`), and `getPetById` returned an `Envelope` whose `200` status
+mapped to `Pet::class`. It ran as a normal PHPUnit test — `just test`,
 `just test-coverage`, `just check`, and both `unit-tests` and `coverage` in
-`.github/workflows/continuous-integration.yml` already execute
-`tests/Integration/` — so this is not a new recipe or a new CI job, it is a
-new assertion inside machinery every push already runs.
+`.github/workflows/continuous-integration.yml` already executed
+`tests/Integration/` — so it was not a new recipe or a new CI job, it was a
+new assertion inside machinery every push already ran. The file itself no
+longer exists — see `=== Superseded` below.
 
 === Why not option 1 (a schedule)
 
@@ -94,9 +95,9 @@ that stops calling named methods with named fixtures (`pet()->getPetById(42)`
 expecting a pet named `Rex`), which trades the concrete regression test
 this check has always been for a structural-shape check with no behavioural
 content — the non-goal "changing what the check proves" forbids exactly
-that trade. Option 2 remains the better long-term answer and is not closed
-by this decision; it needs its own task, scoped to touch the generator or
-the example.
+that trade. At the time this decision was made, option 2 was believed to
+need its own task, scoped to touch the generator or the example — see
+`=== Superseded` below for how that assumption turned out to be wrong.
 
 === Option 3 composes with option 3 alone here, and that is enough
 
@@ -181,18 +182,19 @@ every dependency installs via `Symlinking from
   repo's own `vendor/` and `runtime/`, never the network — its header
   comment records the re-examination so a future reader does not have to
   re-derive it.
-- `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` runs
+- `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php` ran
   inside `just check` (via `just test-coverage`) and inside CI's
   `unit-tests` and `coverage` jobs, on every push and pull request against
-  `main` — no new recipe, no new workflow.
-- The pin covers exactly the two shapes the two historical breaks changed
+  `main` — no new recipe, no new workflow, while it existed. It does not
+  exist any more — see `=== Superseded` below.
+- The pin covered exactly the two shapes the two historical breaks changed
   — `ApiClient`'s constructor arity/order and `getPetById`'s return
-  shape — not every shape `run.php` depends on. A future drift in a shape
-  this test does not pin (a different endpoint's URI, a header name, the
-  stub transport's status-code handling) would still only be caught by
-  running `just verify-runtime-standalone` by hand. Widening the pin, or
-  moving to option 2 so nothing needs pinning by hand at all, is future
-  work and is not blocked by this decision.
+  shape — not every shape `run.php` depended on. A future drift in a shape
+  the test did not pin (a different endpoint's URI, a header name, the
+  stub transport's status-code handling) would still only have been caught
+  by running `just verify-runtime-standalone` by hand — a gap this
+  decision named as future work and left open. `=== Superseded` below is
+  that future work landing.
 - `just verify-runtime-standalone` itself is unchanged in what it proves —
   a generated client installing and running on `poagen/client-runtime`
   alone, generator absent — and stays outside `just check`, per the task's
@@ -202,3 +204,18 @@ every dependency installs via `Symlinking from
   `composer install` fails with a resolution error naming it, not a
   silent network fallback — `COMPOSER_DISABLE_NETWORK=1` is exported for
   exactly that guarantee.
+
+=== Superseded
+
+This decision was superseded on 2026-08-08 by
+#link("derive-the-standalone-consumer-instead-of-pinning-its-shape.decision-260808.typ")[The standalone harness derives its consumer call by reflection instead of pinning its shape as text],
+which took the option-2 upgrade path this decision named above as future
+work and found it did not need its own task against `src/` or
+`examples/petstore/` after all: `scripts/verify-runtime-standalone` already
+builds a real, installed copy of the generated tree before running
+`run.php` against it, so reading `ApiClient`'s constructor with PHP's own
+`ReflectionClass` on that installed class was enough. `run.php` stopped
+being hand-written, and `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php`
+— the pin this decision chose — was deleted as redundant rather than kept
+beside it. The analysis above is a record of what was known and chosen at
+the time and is left unchanged.
