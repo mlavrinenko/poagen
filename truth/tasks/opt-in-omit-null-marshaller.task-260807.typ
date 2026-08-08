@@ -5,6 +5,7 @@
   tags: (),
   priority: 4,
   difficulty: 3,
+  status: proposed(2026, 8, 7),
   links: (related("reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends.task-260805.typ"),),
 )
 

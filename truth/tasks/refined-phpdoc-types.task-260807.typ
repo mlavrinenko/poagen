@@ -5,6 +5,7 @@
   tags: (),
   priority: 4,
   difficulty: 3,
+  status: proposed(2026, 8, 7),
   links: (related("typed-domain-entity-props.task-260729.typ"),),
 )
 
