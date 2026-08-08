@@ -159,6 +159,8 @@
 #include "decisions/envelope-remeasures-the-generated-duplication-floors.decision-260804.typ"
 #pagebreak()
 #include "decisions/refuse-a-skip-that-leaves-dangling-references.decision-260804.typ"
+#pagebreak()
+#include "decisions/duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //
