@@ -60,6 +60,19 @@ final class PhpDocTypeCompatibilityTest extends TestCase
         self::assertStringContainsString('structural type `list<string>`', $failure);
     }
 
+    /**
+     * decide-whether-an-override-may-narrow-a-structural-property: the
+     * refusal names the decision that settled it, so the next reader lands on
+     * the answer rather than re-deriving it from the code.
+     */
+    public function testTheStructuralRefusalNamesTheDecisionThatSettledIt(): void
+    {
+        $failure = PhpDocTypeCompatibility::reject('LineItem.tags', 'list<non-empty-string>', 'array', 'list<string>');
+
+        self::assertIsString($failure);
+        self::assertStringContainsString('phpdoctypes-stays-scalar-only', $failure);
+    }
+
     public function testAnOverrideOnANonScalarPropertyIsRefused(): void
     {
         $failure = PhpDocTypeCompatibility::reject('LineItem.sku', 'numeric-string', '\\App\\Model\\Sku', null);

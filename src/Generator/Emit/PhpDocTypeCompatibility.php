@@ -32,10 +32,15 @@ use function trim;
  * (abort-on-unrepresentable-constructs). Returns a failure line rather than
  * throwing, so one pass reports every bad entry.
  *
- * The recognised vocabulary is deliberately a list, not a parser: an override
- * poagen cannot place on one side of the scalar divide is refused by name
- * rather than emitted on trust. Widening it is a one-line change here; emitting
- * a `@param` nothing checked is not recoverable downstream.
+ * The structural refusal is not a gap waiting to close — `phpdoctypes-stays-scalar-only`
+ * decided the channel stays scalar-only rather than widen to carry a
+ * structural override, or gain a second key for one, and named why:
+ * a structural override is an open grammar rather than a closed vocabulary,
+ * and poagen cannot fully check what it would print. The recognised scalar
+ * vocabulary below is deliberately a list, not a parser: an override poagen
+ * cannot place on one side of the scalar divide is refused by name rather
+ * than emitted on trust. Widening *that* list is a one-line change here;
+ * emitting a `@param` nothing checked is not recoverable downstream.
  *
  * @internal
  */
@@ -86,7 +91,9 @@ final readonly class PhpDocTypeCompatibility
         if ($structural !== null) {
             return sprintf(
                 '%s names a property whose PHPDoc is already the structural type `%s`, which the override cannot '
-                    . 'displace — it would be silently dropped. Remove this entry, or point it at a scalar property.',
+                    . 'displace — it would be silently dropped. The channel stays scalar-only by decision, not by '
+                    . 'gap: see `phpdoctypes-stays-scalar-only`. Remove this entry, or point it at a scalar '
+                    . 'property.',
                 $entry,
                 $structural,
             );

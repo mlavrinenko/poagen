@@ -143,6 +143,23 @@ final class RefinedPhpDocTypeTest extends TestCase
         ];
     }
 
+    /**
+     * decide-whether-an-override-may-narrow-a-structural-property: the
+     * structural refusal names the decision that settled the channel stays
+     * scalar-only, proven end to end rather than asserted from the unit test
+     * alone.
+     */
+    public function testAnOverrideOnAStructuralPropertyNamesTheDecisionThatSettledIt(): void
+    {
+        try {
+            $this->plan(['LineItem.tags' => 'list<non-empty-string>']);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            self::assertStringContainsString('structural type `list<string>`', $e->getMessage());
+            self::assertStringContainsString('phpdoctypes-stays-scalar-only', $e->getMessage());
+        }
+    }
+
     public function testAKeyWithNoDotFailsTheRun(): void
     {
         try {
