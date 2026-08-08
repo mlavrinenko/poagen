@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator\Emit;
 
 use Poagen\Generator\Exception\ModelNameCollisionException;
+use Poagen\Generator\Generator\ModelPlanner;
 use Poagen\Generator\Generator\Naming\NameRegistry;
 
 /**
@@ -70,5 +71,22 @@ final class ModelNameLedger
         $this->claim($phpName, $origin);
 
         return true;
+    }
+
+    /**
+     * Every PHP class name this run has claimed so far — named component or
+     * synthesised, whichever emitter reached it. Read once
+     * {@see ModelPlanner::plan()} has returned,
+     * this is the complete set a run ever produces, which is what lets
+     * `Profile::$propertyFormats` be checked against a model this run never
+     * emits at all — the one thing a per-model check
+     * ({@see PropertyFormatKeys}) cannot see (bind-a-format-per-property).
+     *
+     * @return array<string,true>
+     */
+    public function claimedNames(): array
+    {
+        /** @var array<string,true> */
+        return array_fill_keys(array_keys($this->claims), true);
     }
 }

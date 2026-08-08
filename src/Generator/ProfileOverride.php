@@ -45,6 +45,7 @@ final readonly class ProfileOverride
             inlineModels: $profile->inlineModels,
             propertyRenames: $profile->propertyRenames,
             phpDocTypes: $profile->phpDocTypes,
+            propertyFormats: $profile->propertyFormats,
             securitySchemes: $profile->securitySchemes,
             source: $source ?? $profile->source,
         );

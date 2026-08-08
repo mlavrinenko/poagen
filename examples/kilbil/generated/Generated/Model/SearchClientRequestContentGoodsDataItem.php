@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Acme\Kilbil\Generated\Model;
 
+use Acme\Kilbil\ValueObject\Money;
+
 final readonly class SearchClientRequestContentGoodsDataItem
 {
     /**
@@ -21,7 +23,7 @@ final readonly class SearchClientRequestContentGoodsDataItem
         public float $discounted_price,
         public float $discounted_total,
         public string $name,
-        public float $price,
+        public Money $price,
         public float $quantity,
         public float $total,
         public string $vendor_code,

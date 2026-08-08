@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: Scoped format (synthetic)
+  version: "1.0.0"
+  description: Tiny fixture used to exercise Profile::$propertyFormats.
+paths:
+  /orders:
+    post:
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                  properties:
+                    price:
+                      type: number
+                      format: double
+                    quantity:
+                      type: number
+                      format: double
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: number
+          format: double
+        name:
+          type: string
+    Invoice:
+      type: object
+      required:
+        - price
+      properties:
+        price:
+          type: number
+          format: double
+        total:
+          type: number
+          format: double

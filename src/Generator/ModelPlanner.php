@@ -48,9 +48,14 @@ final readonly class ModelPlanner
      *                                                    below them is reached by the machinery that was already there.
      * @param  array<string,string>   $propertyRenames    Profile::$propertyRenames, unsliced
      * @param  array<string,string>   $phpDocTypes        Profile::$phpDocTypes, unsliced
-     * @return list<string>                               profile guidance no emitted model could honour; the drain
-     *                                                    contributes none, keyed by no component name an override
-     *                                                    could have named
+     * @return list<string>                               profile guidance no emitted model could honour, from
+     *                                                    both the named-component path and
+     *                                                    {@see Emit\SynthesisQueueDrain}'s queue — the queue
+     *                                                    used to contribute none, keyed by no component name
+     *                                                    an override could have named, until
+     *                                                    `Profile::$propertyFormats` became the first field
+     *                                                    checked per synthesised model too
+     *                                                    (bind-a-format-per-property)
      */
     public function plan(
         OpenApi $openApi,
@@ -96,7 +101,7 @@ final readonly class ModelPlanner
             $failures = [...$failures, ...$this->emitShape($rawName, $shape, $openApi, $modelNamespace, $modelDir, $registry, $bindings, $enums, $components, $writes, $pending, $propertyRenames, $phpDocTypes)];
         }
 
-        $this->drain->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $ledger);
+        $this->drain->drain($pending, $modelNamespace, $modelDir, $registry, $bindings, $enums, $writes, $ledger, $failures);
 
         return $failures;
     }

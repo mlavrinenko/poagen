@@ -31,6 +31,9 @@ final readonly class SynthesisQueueDrain
     /**
      * @param list<SynthesisedModel> $pending
      * @param array<string,string>   $writes
+     * @param list<string>           $failures profile guidance a synthesised model could not honour —
+     *                                         appended to, so a caller collecting failures from the
+     *                                         named-component path too need not distinguish the two
      */
     public function drain(
         array $pending,
@@ -41,6 +44,7 @@ final readonly class SynthesisQueueDrain
         EnumCatalog $enums,
         array &$writes,
         ModelNameLedger $ledger,
+        array &$failures = [],
     ): void {
         while ($pending !== []) {
             usort(
@@ -63,6 +67,7 @@ final readonly class SynthesisQueueDrain
                     $child->implements,
                 );
                 $writes[$modelDir . DIRECTORY_SEPARATOR . $child->name . '.php'] = $emission->source;
+                $failures = [...$failures, ...$emission->failures];
 
                 foreach ($emission->children as $grand) {
                     $pending[] = $grand;

@@ -23,14 +23,37 @@ return new Profile(
      * four that carry meaning: `date time` and `data time` (both `date-time`
      * misspelled), `data` (`date` misspelled), and the invented `phone`.
      *
-     * `int` and `double` are left unbound. A binding is keyed on the format
-     * string document-wide, and `double` here means price, quantity, percentage
-     * and balance alike — a Money bound to it would type every non-money double
-     * as money too. See the README for the full reasoning and what a consumer
-     * can do instead.
+     * `int` and `double` stay unbound document-wide, and for `int` that is the
+     * whole story: a `#[BindsFormat]` binds a format string everywhere it
+     * appears, and `int` here means several unrelated counters. `double` is
+     * mostly the same — price, quantity, percentages and balances alike — but
+     * `propertyFormats` below answers the one place a `double` is
+     * unambiguously money, without touching the rest. `Money` therefore lives
+     * in this same namespace but carries no `#[BindsFormat]` of its own: it
+     * opts in per property, not per format. See the README's "Formats that
+     * are mostly not OpenAPI formats" for the reasoning this replaced.
      */
     discoverIn: [
         'Acme\\Kilbil\\ValueObject',
+    ],
+
+    /*
+     * `goods_data/items/properties/price` — "цена без скидки за единицу
+     * номенклатуры" ("price per unit, before discount") — is unambiguously
+     * money, named as such by the vendor's own description, on the two
+     * inline request-body shapes that carry it. Neither is a named
+     * component (`components.schemas` is empty in this document — "No named
+     * components at all" in the README), so each is keyed by the class name
+     * poagen assigns it rather than by a raw schema key
+     * (bind-a-format-per-property). Every other `double`-typed field in this
+     * document — `price1`..`price5`, `discounted_price`, `bonus_percent`,
+     * `purchases_sum`, the response-side echoes of this same `price` — stays
+     * a plain `float`: the vendor did not say those are money, and guessing
+     * would be exactly the kind of inference `cheap-regeneration` forbids.
+     */
+    propertyFormats: [
+        'SearchClientRequestContentGoodsDataItem.price' => \Acme\Kilbil\ValueObject\Money::class,
+        'ProcessSaleRequestContentGoodsDataItem.price' => \Acme\Kilbil\ValueObject\Money::class,
     ],
 
     /*

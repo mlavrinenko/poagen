@@ -95,6 +95,39 @@ final readonly class Profile
      *                                              with another property already in the same model, fails the
      *                                              run naming both.
      * @param array<string,string>  $phpDocTypes    Forces a model property's PHPDoc type, keyed like $propertyRenames — the override channel for a narrowing OpenAPI cannot spell (chiefly `numeric-string`), winning over the constraint-derived narrowing {@see Emit\PhpDocTypeRefiner} computes; a stale key fails the run {@see PhpDocTypeValidator} (refined-phpdoc-types), and so does a value the property cannot carry — a base type the native one contradicts, a structural or class-typed property, a nullability the schema already decides {@see Emit\PhpDocTypeCompatibility}.
+     * @param array<string,string>  $propertyFormats Binds a value object to one property of one
+     *                                              model — the per-property answer `#[BindsFormat]`
+     *                                              cannot give, because that attribute keys on the
+     *                                              format string alone and applies document-wide: on
+     *                                              kilbil, `double` covers price, quantity and several
+     *                                              percentages, so a `Money` bound to it would type
+     *                                              every one of those as money (`bind-a-format-per-property`).
+     *                                              Values are a class-string, unverified until the run
+     *                                              checks it — same discipline as every other guidance
+     *                                              field here, none of which trusts the profile author
+     *                                              over the document. Keyed
+     *                                              `'<ModelClassName>.<wirePropertyName>'` — the class
+     *                                              name poagen assigns the model, not the raw schema key
+     *                                              $propertyRenames and $phpDocTypes key on. That
+     *                                              departure is deliberate, not stylistic: a document
+     *                                              with no named components — kilbil declares none — has
+     *                                              no raw schema key for their convention to reuse, while
+     *                                              the generated class name is the one identifier every
+     *                                              model carries, named or synthesised, and
+     *                                              {@see Emit\ModelNameLedger} already guarantees it is
+     *                                              unique across the whole tree. The bound class need not
+     *                                              carry `#[BindsFormat]` or live under $discoverIn —
+     *                                              unlike $formats, this entry
+     *                                              takes effect on its own. A stale key naming a
+     *                                              property absent from a model this run does emit
+     *                                              fails naming both {@see Emit\ModelEmitter} and
+     *                                              {@see Emit\PropertyFormatKeys}, named or synthesised
+     *                                              alike; a key naming a model this run never emits at
+     *                                              all fails the same way, checked once the whole plan
+     *                                              has run against every name {@see Emit\ModelNameLedger}
+     *                                              claimed {@see PropertyFormatValidator}
+     *                                              (queue-drained-models-swallow-emission-failures records
+     *                                              why a per-model check alone could not cover this case).
      * @param array<string,array<string,mixed>> $securitySchemes Declarations for schemes a `security` requirement
      *                                              names and `components.securitySchemes` never declares. Keyed
      *                                              by the requirement name; the value is the `securityScheme`
@@ -166,6 +199,7 @@ final readonly class Profile
         public array $inlineModels = [],
         public array $propertyRenames = [],
         public array $phpDocTypes = [],
+        public array $propertyFormats = [],
         public array $securitySchemes = [],
         public string $source = 'poagen.php',
     ) {}

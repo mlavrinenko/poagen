@@ -176,7 +176,19 @@ examples/petstore/generated       4.41
 # `812efad1` regenerated kilbil's golden against its reconciled schema
 # (unrelated to duplication); the tree grew around these same two unchanged
 # clones and the percentage fell on its own.
-examples/kilbil/generated         1.43
+#
+# Re-measured 2026-08-08 again, same day, different change:
+# `bind-a-format-per-property` bound `Money` to `price` on
+# ProcessSaleRequestContentGoodsDataItem and SearchClientRequestContentGoodsDataItem
+# — the exact pair whose clone this row already tracks — adding one
+# `use Acme\Kilbil\ValueObject\Money;` line to each. jscpd's `ignorePattern`
+# already excludes `use` statements from clone matching, so the clone itself
+# is unchanged (still 29 lines, [17:1]-[45:2] in both files, 37 duplicated
+# lines total with the unrelated 10-line GoodsRequestContentItem/
+# GoodsXmlRequestContentItem clone); only the tree's total line count grew
+# by 4 (2605 -> 2609), so the percentage fell on its own: 37/2605 = 1.42034%
+# (rounds to 1.43) -> 37/2609 = 1.41817% (rounds to 1.42).
+examples/kilbil/generated         1.42
 
 # 288 clones, 3441 duplicated lines over 31511 — up from 287/3424/31315 (the
 # 2026-08-04 measurement) after `2a314707` regenerated digitalocean's golden

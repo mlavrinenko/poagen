@@ -17,7 +17,11 @@ use const DIRECTORY_SEPARATOR;
 
 /**
  * Walks PSR-4 directories that overlap with the Profile's `discoverIn`
- * namespaces, reflects each class, and collects user-declared bindings.
+ * namespaces, reflects each class, and collects user-declared bindings —
+ * both the document-wide `#[BindsFormat]` attributes discovered this way and
+ * `Profile::$propertyFormats`, which needs no discovery at all: it names its
+ * class directly, so it rides straight through onto {@see Bindings}
+ * (bind-a-format-per-property).
  */
 final readonly class AttributeScanner
 {
@@ -37,7 +41,7 @@ final readonly class AttributeScanner
             }
         }
 
-        return new Bindings($formats);
+        return new Bindings($formats, $profile->propertyFormats);
     }
 
     /**
