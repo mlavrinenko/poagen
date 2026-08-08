@@ -17,6 +17,12 @@ use Acme\DigitalOcean\Generated\Enum\RedisAdvancedConfigRedisPersistence;
 
 final readonly class RedisAdvancedConfig
 {
+    /**
+     * @param ?positive-int $redis_io_threads
+     * @param ?positive-int $redis_lfu_decay_time
+     * @param ?positive-int $redis_number_of_databases
+     * @param ?positive-int $redis_pubsub_client_output_buffer_limit
+     */
     public function __construct(
         public ?RedisAdvancedConfigRedisAclChannelsDefault $redis_acl_channels_default = null,
         public ?int $redis_io_threads = null,

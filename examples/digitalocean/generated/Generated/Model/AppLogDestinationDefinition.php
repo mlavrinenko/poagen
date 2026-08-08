@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppLogDestinationDefinition
 {
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
         public string $name,
         public ?AppLogDestinationDatadogSpec $datadog = null,

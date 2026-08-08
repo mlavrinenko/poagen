@@ -17,7 +17,9 @@ use DateTimeImmutable;
 final readonly class CampaignsUpdateCampaignRequestContent
 {
     /**
+     * @param ?non-empty-string $description
      * @param ?list<string> $managers
+     * @param ?non-empty-string $name
      * @param ?list<string> $team_managers
      */
     public function __construct(

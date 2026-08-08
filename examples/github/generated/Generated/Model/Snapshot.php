@@ -16,6 +16,7 @@ use DateTimeImmutable;
 final readonly class Snapshot
 {
     /**
+     * @param non-empty-string $sha
      * @param ?array<string, Manifest> $manifests
      */
     public function __construct(

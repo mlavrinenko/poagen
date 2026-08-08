@@ -17,8 +17,13 @@ use Acme\GitHub\Generated\Enum\OrgsCreateArtifactDeploymentRecordRequestContentS
 final readonly class OrgsCreateArtifactDeploymentRecordRequestContent
 {
     /**
+     * @param non-empty-string $digest
+     * @param non-empty-string $logical_environment
+     * @param non-empty-string $name
+     * @param ?non-empty-string $github_repository
      * @param ?list<OrgsCreateArtifactDeploymentRecordRequestContentRuntimeRisksItem> $runtime_risks
      * @param ?array<string, string> $tags
+     * @param ?non-empty-string $version
      */
     public function __construct(
         public string $deployment_name,

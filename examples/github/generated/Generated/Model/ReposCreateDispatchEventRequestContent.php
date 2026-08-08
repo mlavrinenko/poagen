@@ -14,6 +14,7 @@ namespace Acme\GitHub\Generated\Model;
 final readonly class ReposCreateDispatchEventRequestContent
 {
     /**
+     * @param non-empty-string $event_type
      * @param ?array<string, mixed> $client_payload
      */
     public function __construct(

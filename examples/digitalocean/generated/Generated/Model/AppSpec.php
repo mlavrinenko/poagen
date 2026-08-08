@@ -16,6 +16,7 @@ use Acme\DigitalOcean\Generated\Enum\AppSpecRegion;
 final readonly class AppSpec
 {
     /**
+     * @param non-empty-string $name
      * @param ?list<AppDatabaseSpec> $databases
      * @param ?list<AppDomainSpec> $domains
      * @param ?list<AppFunctionsSpec> $functions

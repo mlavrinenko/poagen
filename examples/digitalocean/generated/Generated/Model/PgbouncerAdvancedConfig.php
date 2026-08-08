@@ -18,6 +18,7 @@ final readonly class PgbouncerAdvancedConfig
 {
     /**
      * @param ?list<PgbouncerAdvancedConfigIgnoreStartupParametersItem> $ignore_startup_parameters
+     * @param ?positive-int $server_lifetime
      */
     public function __construct(
         public ?int $autodb_idle_timeout = null,

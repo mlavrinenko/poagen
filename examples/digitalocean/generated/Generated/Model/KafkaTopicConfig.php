@@ -18,6 +18,11 @@ use Acme\DigitalOcean\Generated\Enum\KafkaTopicConfigMessageTimestampType;
 
 final readonly class KafkaTopicConfig
 {
+    /**
+     * @param ?positive-int $min_insync_replicas
+     * @param ?positive-int $segment_bytes
+     * @param ?positive-int $segment_ms
+     */
     public function __construct(
         public ?KafkaTopicConfigCleanupPolicy $cleanup_policy = null,
         public ?KafkaTopicConfigCompressionType $compression_type = null,

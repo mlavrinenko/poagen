@@ -16,6 +16,7 @@ final readonly class AppComponentBase
     /**
      * @param ?list<AppVariableDefinition> $envs
      * @param ?list<AppLogDestinationDefinition> $log_destinations
+     * @param ?non-empty-string $name
      */
     public function __construct(
         public ?AppsBitbucketSourceSpec $bitbucket = null,

@@ -13,6 +13,9 @@ namespace Acme\GitHub\Generated\Model;
 
 final readonly class RepositoryRuleMaxFileSizeParameters
 {
+    /**
+     * @param positive-int $max_file_size
+     */
     public function __construct(
         public int $max_file_size,
     ) {

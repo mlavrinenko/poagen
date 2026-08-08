@@ -13,6 +13,9 @@ namespace Acme\GitHub\Generated\Model;
 
 final readonly class GitRefObject
 {
+    /**
+     * @param non-empty-string $sha
+     */
     public function __construct(
         public string $sha,
         public string $type,

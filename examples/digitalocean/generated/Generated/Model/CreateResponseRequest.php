@@ -14,6 +14,7 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class CreateResponseRequest
 {
     /**
+     * @param ?positive-int $max_output_tokens
      * @param ?array<string, string> $metadata
      * @param string|list<string>|null $stop
      * @param ?list<CreateResponseRequestToolsItem> $tools

@@ -18,7 +18,9 @@ final readonly class ChatCompletionRequest
     /**
      * @param list<ChatMessage> $messages
      * @param ?array<string, int> $logit_bias
+     * @param ?positive-int $max_completion_tokens
      * @param ?array<string, string> $metadata
+     * @param ?positive-int $n
      * @param string|list<string>|null $stop
      * @param ?list<ChatCompletionTool> $tools
      */

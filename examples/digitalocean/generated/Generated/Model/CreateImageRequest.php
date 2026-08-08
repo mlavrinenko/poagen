@@ -15,6 +15,10 @@ use Acme\DigitalOcean\Generated\Enum\CreateImageRequestSize;
 
 final readonly class CreateImageRequest
 {
+    /**
+     * @param positive-int $n
+     * @param non-empty-string $prompt
+     */
     public function __construct(
         public string $model,
         public int $n,

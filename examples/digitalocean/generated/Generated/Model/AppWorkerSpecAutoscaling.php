@@ -13,6 +13,10 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppWorkerSpecAutoscaling
 {
+    /**
+     * @param ?positive-int $max_instance_count
+     * @param ?positive-int $min_instance_count
+     */
     public function __construct(
         public ?int $max_instance_count = null,
         public ?AppWorkerSpecAutoscalingMetrics $metrics = null,

@@ -13,6 +13,11 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppsStringMatch
 {
+    /**
+     * @param ?non-empty-string $exact
+     * @param ?non-empty-string $prefix
+     * @param ?non-empty-string $regex
+     */
     public function __construct(
         public ?string $exact = null,
         public ?string $prefix = null,

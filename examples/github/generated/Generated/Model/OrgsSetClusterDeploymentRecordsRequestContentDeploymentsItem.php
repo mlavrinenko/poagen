@@ -17,6 +17,9 @@ use Acme\GitHub\Generated\Enum\OrgsSetClusterDeploymentRecordsRequestContentDepl
 final readonly class OrgsSetClusterDeploymentRecordsRequestContentDeploymentsItem
 {
     /**
+     * @param non-empty-string $deployment_name
+     * @param non-empty-string $digest
+     * @param non-empty-string $name
      * @param ?list<OrgsSetClusterDeploymentRecordsRequestContentDeploymentsItemRuntimeRisksItem> $runtime_risks
      * @param ?array<string, string> $tags
      */

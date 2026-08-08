@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppJobSpecTermination
 {
+    /**
+     * @param ?positive-int $grace_period_seconds
+     */
     public function __construct(
         public ?int $grace_period_seconds = null,
     ) {

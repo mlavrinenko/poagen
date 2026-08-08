@@ -17,6 +17,13 @@ use Acme\DigitalOcean\Generated\Enum\ValkeyAdvancedConfigValkeyPersistence;
 
 final readonly class ValkeyAdvancedConfig
 {
+    /**
+     * @param ?positive-int $valkey_active_expire_effort
+     * @param ?positive-int $valkey_io_threads
+     * @param ?positive-int $valkey_lfu_decay_time
+     * @param ?positive-int $valkey_number_of_databases
+     * @param ?positive-int $valkey_pubsub_client_output_buffer_limit
+     */
     public function __construct(
         public ?bool $frequent_snapshots = null,
         public ?ValkeyAdvancedConfigValkeyAclChannelsDefault $valkey_acl_channels_default = null,

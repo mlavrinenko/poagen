@@ -16,6 +16,9 @@ use Acme\GitHub\Generated\Enum\RepositoryRuleMergeQueueParametersMergeMethod;
 
 final readonly class RepositoryRuleMergeQueueParameters
 {
+    /**
+     * @param positive-int $check_response_timeout_minutes
+     */
     public function __construct(
         public int $check_response_timeout_minutes,
         public RepositoryRuleMergeQueueParametersGroupingStrategy $grouping_strategy,

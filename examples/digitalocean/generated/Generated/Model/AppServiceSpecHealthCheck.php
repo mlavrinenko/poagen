@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppServiceSpecHealthCheck
 {
+    /**
+     * @param ?positive-int $port
+     */
     public function __construct(
         public ?int $failure_threshold = null,
         public ?string $http_path = null,

@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppComponentInstanceBase
 {
+    /**
+     * @param ?positive-int $instance_count
+     */
     public function __construct(
         public ?AppComponentInstanceBaseAutoscaling $autoscaling = null,
         public ?int $instance_count = null,

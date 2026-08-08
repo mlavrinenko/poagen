@@ -13,6 +13,10 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppServiceSpecTermination
 {
+    /**
+     * @param ?positive-int $drain_seconds
+     * @param ?positive-int $grace_period_seconds
+     */
     public function __construct(
         public ?int $drain_seconds = null,
         public ?int $grace_period_seconds = null,

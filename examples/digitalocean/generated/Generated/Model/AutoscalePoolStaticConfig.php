@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AutoscalePoolStaticConfig
 {
+    /**
+     * @param positive-int $target_number_instances
+     */
     public function __construct(
         public int $target_number_instances,
     ) {

@@ -15,6 +15,7 @@ final readonly class OrgsSetClusterDeploymentRecordsRequestContent
 {
     /**
      * @param list<OrgsSetClusterDeploymentRecordsRequestContentDeploymentsItem> $deployments
+     * @param non-empty-string $logical_environment
      */
     public function __construct(
         public array $deployments,

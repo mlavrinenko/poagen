@@ -15,6 +15,13 @@ use Acme\GitHub\Generated\Enum\OrgsCreateArtifactStorageRecordRequestContentStat
 
 final readonly class OrgsCreateArtifactStorageRecordRequestContent
 {
+    /**
+     * @param non-empty-string $digest
+     * @param non-empty-string $name
+     * @param non-empty-string $registry_url
+     * @param ?non-empty-string $github_repository
+     * @param ?non-empty-string $version
+     */
     public function __construct(
         public string $digest,
         public string $name,

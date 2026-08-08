@@ -14,6 +14,7 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class AppFunctionsSpec
 {
     /**
+     * @param non-empty-string $name
      * @param ?list<AppAlertSpec> $alerts
      * @param ?list<AppVariableDefinition> $envs
      * @param ?list<AppLogDestinationDefinition> $log_destinations

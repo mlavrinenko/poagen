@@ -16,6 +16,9 @@ use Acme\DigitalOcean\Generated\Enum\AppDomainSpecType;
 
 final readonly class AppDomainSpec
 {
+    /**
+     * @param non-empty-string $domain
+     */
     public function __construct(
         public string $domain,
         public ?AppDomainSpecMinimumTlsVersion $minimum_tls_version = null,

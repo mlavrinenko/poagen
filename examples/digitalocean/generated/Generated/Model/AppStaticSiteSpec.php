@@ -14,6 +14,7 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class AppStaticSiteSpec
 {
     /**
+     * @param non-empty-string $name
      * @param ?list<AppVariableDefinition> $envs
      * @param ?list<AppLogDestinationDefinition> $log_destinations
      * @param ?list<AppRouteSpec> $routes

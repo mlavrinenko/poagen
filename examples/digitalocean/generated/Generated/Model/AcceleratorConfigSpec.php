@@ -15,6 +15,9 @@ use Acme\DigitalOcean\Generated\Enum\AcceleratorConfigSpecStatus;
 
 final readonly class AcceleratorConfigSpec
 {
+    /**
+     * @param positive-int $scale
+     */
     public function __construct(
         public string $accelerator_slug,
         public int $scale,

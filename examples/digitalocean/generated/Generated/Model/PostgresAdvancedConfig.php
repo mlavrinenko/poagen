@@ -23,6 +23,28 @@ use Poagen\Runtime\Attribute\WireName;
 
 final readonly class PostgresAdvancedConfig
 {
+    /**
+     * @param ?positive-int $autovacuum_freeze_max_age
+     * @param ?positive-int $autovacuum_max_workers
+     * @param ?positive-int $bgwriter_delay
+     * @param ?positive-int $deadlock_timeout
+     * @param ?positive-int $max_connections
+     * @param ?positive-int $max_failover_replication_time_lag
+     * @param ?positive-int $max_files_per_process
+     * @param ?positive-int $max_locks_per_transaction
+     * @param ?positive-int $max_logical_replication_workers
+     * @param ?positive-int $max_pred_locks_per_transaction
+     * @param ?positive-int $max_replication_slots
+     * @param ?positive-int $max_stack_depth
+     * @param ?positive-int $max_standby_archive_delay
+     * @param ?positive-int $max_standby_streaming_delay
+     * @param ?positive-int $max_wal_senders
+     * @param ?positive-int $max_worker_processes
+     * @param ?positive-int $pgPartmanBgwInterval
+     * @param ?positive-int $track_activity_query_size
+     * @param ?positive-int $wal_writer_delay
+     * @param ?positive-int $work_mem
+     */
     public function __construct(
         public ?float $autovacuum_analyze_scale_factor = null,
         public ?int $autovacuum_analyze_threshold = null,

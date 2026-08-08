@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class TimescaledbAdvancedConfig
 {
+    /**
+     * @param ?positive-int $max_background_workers
+     */
     public function __construct(
         public ?int $max_background_workers = null,
     ) {

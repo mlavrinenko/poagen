@@ -15,6 +15,9 @@ use Acme\DigitalOcean\Generated\Enum\AppDatabaseSpecEngine;
 
 final readonly class AppDatabaseSpec
 {
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
         public string $name,
         public ?string $cluster_name = null,

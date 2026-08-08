@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppComponentInstanceBaseAutoscalingMetricsCpu
 {
+    /**
+     * @param ?positive-int $percent
+     */
     public function __construct(
         public ?int $percent = null,
     ) {

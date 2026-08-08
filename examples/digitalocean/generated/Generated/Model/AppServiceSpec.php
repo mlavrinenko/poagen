@@ -16,7 +16,10 @@ use Acme\DigitalOcean\Generated\Enum\AppServiceSpecProtocol;
 final readonly class AppServiceSpec
 {
     /**
+     * @param non-empty-string $name
      * @param ?list<AppVariableDefinition> $envs
+     * @param ?positive-int $http_port
+     * @param ?positive-int $instance_count
      * @param ?list<int> $internal_ports
      * @param ?list<AppLogDestinationDefinition> $log_destinations
      * @param ?list<AppRouteSpec> $routes

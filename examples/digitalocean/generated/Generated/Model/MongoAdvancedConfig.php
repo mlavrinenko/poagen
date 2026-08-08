@@ -15,6 +15,9 @@ use Acme\DigitalOcean\Generated\Enum\MongoAdvancedConfigDefaultReadConcern;
 
 final readonly class MongoAdvancedConfig
 {
+    /**
+     * @param ?positive-int $transaction_lifetime_limit_seconds
+     */
     public function __construct(
         public ?MongoAdvancedConfigDefaultReadConcern $default_read_concern = null,
         public ?string $default_write_concern = null,

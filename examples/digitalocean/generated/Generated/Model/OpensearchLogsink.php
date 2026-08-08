@@ -13,6 +13,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class OpensearchLogsink
 {
+    /**
+     * @param ?positive-int $index_days_max
+     */
     public function __construct(
         public string $index_prefix,
         public string $url,

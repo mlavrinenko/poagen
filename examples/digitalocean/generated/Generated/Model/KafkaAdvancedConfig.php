@@ -17,6 +17,26 @@ use Acme\DigitalOcean\Generated\Enum\KafkaAdvancedConfigLogMessageTimestampType;
 
 final readonly class KafkaAdvancedConfig
 {
+    /**
+     * @param ?positive-int $connections_max_idle_ms
+     * @param ?positive-int $default_replication_factor
+     * @param ?positive-int $log_cleaner_max_compaction_lag_ms
+     * @param ?positive-int $log_flush_interval_messages
+     * @param ?positive-int $log_index_size_max_bytes
+     * @param ?positive-int $log_roll_ms
+     * @param ?positive-int $log_segment_bytes
+     * @param ?positive-int $max_connections_per_ip
+     * @param ?positive-int $max_incremental_fetch_session_cache_slots
+     * @param ?positive-int $min_insync_replicas
+     * @param ?positive-int $num_partitions
+     * @param ?positive-int $offsets_retention_minutes
+     * @param ?positive-int $producer_purgatory_purge_interval_requests
+     * @param ?positive-int $replica_fetch_max_bytes
+     * @param ?positive-int $replica_fetch_response_max_bytes
+     * @param ?positive-int $socket_request_max_bytes
+     * @param ?positive-int $transaction_remove_expired_transaction_cleanup_interval_ms
+     * @param ?positive-int $transaction_state_log_segment_bytes
+     */
     public function __construct(
         public ?bool $auto_create_topics_enable = null,
         public ?KafkaAdvancedConfigCompressionType $compression_type = null,

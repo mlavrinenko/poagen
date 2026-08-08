@@ -14,7 +14,9 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class AppWorkerSpec
 {
     /**
+     * @param non-empty-string $name
      * @param ?list<AppVariableDefinition> $envs
+     * @param ?positive-int $instance_count
      * @param ?list<AppLogDestinationDefinition> $log_destinations
      */
     public function __construct(

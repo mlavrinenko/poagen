@@ -13,6 +13,11 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AutoscalePoolDynamicConfig
 {
+    /**
+     * @param positive-int $max_instances
+     * @param positive-int $min_instances
+     * @param ?positive-int $cooldown_minutes
+     */
     public function __construct(
         public int $max_instances,
         public int $min_instances,

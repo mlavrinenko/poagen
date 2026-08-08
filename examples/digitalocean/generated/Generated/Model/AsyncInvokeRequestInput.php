@@ -16,6 +16,11 @@ use Poagen\Runtime\Attribute\AdditionalProperties;
 
 final readonly class AsyncInvokeRequestInput
 {
+    /**
+     * @param ?positive-int $num_images
+     * @param ?positive-int $num_inference_steps
+     * @param ?positive-int $seconds_total
+     */
     public function __construct(
         public ?bool $enable_safety_checker = null,
         public ?float $guidance_scale = null,

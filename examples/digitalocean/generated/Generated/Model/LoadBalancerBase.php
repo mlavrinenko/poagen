@@ -25,6 +25,8 @@ final readonly class LoadBalancerBase
     /**
      * @param list<ForwardingRule> $forwarding_rules
      * @param ?list<Domains> $domains
+     * @param ?positive-int $http_idle_timeout_seconds
+     * @param ?positive-int $size_unit
      * @param ?list<string> $target_load_balancer_ids
      */
     public function __construct(

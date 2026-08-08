@@ -14,6 +14,7 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class Size
 {
     /**
+     * @param positive-int $memory
      * @param list<string> $regions
      * @param ?list<DiskInfo> $disk_info
      */

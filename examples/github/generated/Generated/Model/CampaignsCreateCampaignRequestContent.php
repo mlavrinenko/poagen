@@ -16,6 +16,8 @@ use DateTimeImmutable;
 final readonly class CampaignsCreateCampaignRequestContent
 {
     /**
+     * @param non-empty-string $description
+     * @param non-empty-string $name
      * @param ?list<CampaignsCreateCampaignRequestContentCodeScanningAlertsItem> $code_scanning_alerts
      * @param ?list<string> $managers
      * @param ?list<string> $team_managers

@@ -13,6 +13,10 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class DatabaseStorageAutoscaleParams
 {
+    /**
+     * @param ?positive-int $increment_gib
+     * @param ?positive-int $threshold_percent
+     */
     public function __construct(
         public bool $enabled,
         public ?int $increment_gib = null,

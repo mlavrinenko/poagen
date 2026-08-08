@@ -13,6 +13,13 @@ namespace Acme\DigitalOcean\Generated\Model;
 
 final readonly class AppHealthCheckSpec
 {
+    /**
+     * @param ?positive-int $failure_threshold
+     * @param ?positive-int $period_seconds
+     * @param ?positive-int $port
+     * @param ?positive-int $success_threshold
+     * @param ?positive-int $timeout_seconds
+     */
     public function __construct(
         public ?int $failure_threshold = null,
         public ?string $http_path = null,

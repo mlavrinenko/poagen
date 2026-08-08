@@ -14,7 +14,36 @@ namespace Acme\DigitalOcean\Generated\Model;
 final readonly class OpensearchAdvancedConfig
 {
     /**
+     * @param ?positive-int $cluster_max_shards_per_node
+     * @param ?positive-int $cluster_routing_allocation_node_concurrent_recoveries
+     * @param ?positive-int $http_max_content_length_bytes
+     * @param ?positive-int $http_max_header_size_bytes
+     * @param ?positive-int $http_max_initial_line_length_bytes
+     * @param ?positive-int $indices_fielddata_cache_size_percentage
+     * @param ?positive-int $indices_memory_index_buffer_size_percentage
+     * @param ?positive-int $indices_memory_max_index_buffer_size_mb
+     * @param ?positive-int $indices_memory_min_index_buffer_size_mb
+     * @param ?positive-int $indices_queries_cache_size_percentage
+     * @param ?positive-int $indices_query_bool_max_clause_count
+     * @param ?positive-int $indices_recovery_max_concurrent_file_chunks
+     * @param ?positive-int $indices_recovery_max_mb_per_sec
+     * @param ?positive-int $ism_history_max_age_hours
+     * @param ?positive-int $ism_history_max_docs
+     * @param ?positive-int $ism_history_rollover_check_period_hours
+     * @param ?positive-int $ism_history_rollover_retention_period_days
      * @param ?list<string> $reindex_remote_whitelist
+     * @param ?positive-int $search_max_buckets
+     * @param ?positive-int $thread_pool_analyze_queue_size
+     * @param ?positive-int $thread_pool_analyze_size
+     * @param ?positive-int $thread_pool_force_merge_size
+     * @param ?positive-int $thread_pool_get_queue_size
+     * @param ?positive-int $thread_pool_get_size
+     * @param ?positive-int $thread_pool_search_queue_size
+     * @param ?positive-int $thread_pool_search_size
+     * @param ?positive-int $thread_pool_search_throttled_queue_size
+     * @param ?positive-int $thread_pool_search_throttled_size
+     * @param ?positive-int $thread_pool_write_queue_size
+     * @param ?positive-int $thread_pool_write_size
      */
     public function __construct(
         public ?bool $action_auto_create_index_enabled = null,

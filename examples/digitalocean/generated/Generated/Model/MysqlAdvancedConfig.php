@@ -17,6 +17,26 @@ use Acme\DigitalOcean\Generated\Enum\MysqlAdvancedConfigLogOutput;
 
 final readonly class MysqlAdvancedConfig
 {
+    /**
+     * @param ?positive-int $connect_timeout
+     * @param ?non-empty-string $default_time_zone
+     * @param ?positive-int $group_concat_max_len
+     * @param ?positive-int $information_schema_stats_expiry
+     * @param ?positive-int $innodb_lock_wait_timeout
+     * @param ?positive-int $innodb_log_buffer_size
+     * @param ?positive-int $innodb_online_alter_log_max_size
+     * @param ?positive-int $innodb_read_io_threads
+     * @param ?positive-int $innodb_write_io_threads
+     * @param ?positive-int $interactive_timeout
+     * @param ?positive-int $max_allowed_packet
+     * @param ?positive-int $max_heap_table_size
+     * @param ?positive-int $net_buffer_length
+     * @param ?positive-int $net_read_timeout
+     * @param ?positive-int $net_write_timeout
+     * @param ?positive-int $sort_buffer_size
+     * @param ?positive-int $tmp_table_size
+     * @param ?positive-int $wait_timeout
+     */
     public function __construct(
         public ?int $backup_hour = null,
         public ?int $backup_minute = null,

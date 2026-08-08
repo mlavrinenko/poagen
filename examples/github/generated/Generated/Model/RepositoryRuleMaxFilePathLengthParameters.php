@@ -13,6 +13,9 @@ namespace Acme\GitHub\Generated\Model;
 
 final readonly class RepositoryRuleMaxFilePathLengthParameters
 {
+    /**
+     * @param positive-int $max_file_path_length
+     */
     public function __construct(
         public int $max_file_path_length,
     ) {
