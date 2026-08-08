@@ -5,7 +5,11 @@
   tags: (),
   priority: 6,
   difficulty: 4,
-  status: wip(2026, 8, 8),
+  status: done(
+    2026,
+    8,
+    8,
+  )[Refusals proven end to end; full gate green on the merged tree],
   links: (related("refined-phpdoc-types.task-260807.typ"),),
 )
 

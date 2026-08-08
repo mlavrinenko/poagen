@@ -5,7 +5,11 @@
   tags: (),
   priority: 4,
   difficulty: 3,
-  status: proposed(2026, 8, 7),
+  status: done(
+    2026,
+    8,
+    8,
+  )[Shipped in ec601bd9 + 2a314707; status was never flipped because mt was unavailable that session],
   links: (related("typed-domain-entity-props.task-260729.typ"),),
 )
 

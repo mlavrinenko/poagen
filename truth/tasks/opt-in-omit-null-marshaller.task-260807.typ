@@ -5,8 +5,16 @@
   tags: (),
   priority: 4,
   difficulty: 3,
-  status: proposed(2026, 8, 7),
-  links: (related("reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends.task-260805.typ"),),
+  status: done(
+    2026,
+    8,
+    8,
+  )[Shipped in 6f068d73; status was never flipped because mt was unavailable that session],
+  links: (
+    related(
+      "reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends.task-260805.typ",
+    ),
+  ),
 )
 
 == Summary
