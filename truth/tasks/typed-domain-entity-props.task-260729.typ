@@ -5,7 +5,7 @@
   tags: ("speconaut", "domain", "debt"),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 7, 29),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
 )
 
 == Summary
