@@ -5,11 +5,7 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: accepted(
-    2026,
-    8,
-    8,
-  )[dispatch aborted on an API session limit before any work started; queued, not in progress],
+  status: wip(2026, 8, 8),
   links: (
     related(
       "decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ",

@@ -5,11 +5,7 @@
   tags: ("gates",),
   priority: 4,
   difficulty: 5,
-  status: accepted(
-    2026,
-    8,
-    8,
-  )[dispatch aborted on an API session limit before any work started; queued, not in progress],
+  status: wip(2026, 8, 8),
   links: (
     related(
       "keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ",

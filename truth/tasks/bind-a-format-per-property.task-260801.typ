@@ -5,11 +5,7 @@
   tags: ("generator", "dx", "naming"),
   priority: 4,
   difficulty: 6,
-  status: accepted(
-    2026,
-    8,
-    8,
-  )[dispatch aborted on an API session limit before any work started; queued, not in progress],
+  status: wip(2026, 8, 8),
 )
 
 == Summary
