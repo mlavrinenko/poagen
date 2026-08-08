@@ -1,16 +1,31 @@
 # Roadmap — poagen v0.1
 
-> **This is a release checklist, not the work queue.** The queue is
-> MindTape: run `mt ls`. Where the two disagree, `mt` wins. This file
-> records what has to be true before a `0.1.0` tag, and retires on that
-> tag. Closing it out is tracked as `v01-release-exit-criteria`.
+> **Retired 2026-08-08.** This was a release checklist, never the work
+> queue — MindTape (`mt ls`) always was, and remains the only one now.
+> `v01-release-exit-criteria` closed this file out: every exit criterion
+> in the section below is ticked, rewritten or dropped, with the reason
+> written next to it rather than left in that task's commit message
+> alone. The two open backlog items this file was still carrying with no
+> MindTape task behind them — a built-in binding for `format: uuid` /
+> `format: binary`, and coloured / path-filtered `--diff` output — are
+> now `built-in-uuid-and-binary-format-bindings` and
+> `coloured-and-path-filtered-diff-output`; see "Post-v0.1 follow-ups"
+> below. This file's own closing rule (bottom of the file) says to create
+> `ROADMAP-v0.2.md` and prune the backlog into it; that step is skipped
+> on purpose, because the backlog already lives entirely in MindTape and
+> a second copy of it in a new markdown file would be one more place to
+> keep in sync. Kept in place rather than deleted, as the historical
+> record of what v0.1 required and how each requirement was actually
+> closed — `AGENT.md` and `README.md` both still point readers here for
+> that history.
 >
-> Three things below are now out of date and left in place as history
-> rather than silently rewritten. OpenAPI 3.1 is no longer a post-v0.1
-> follow-up — the `openapi-31-through-a-maintained-parser` decision
-> supersedes that, because every schema worth generating against is 3.1.
-> Mutation testing is no longer an open follow-up either — it is wired,
-> measured, and deliberately kept out of `just check`; see
+> Three things below were already out of date before this retirement and
+> are left in place as history rather than silently rewritten. OpenAPI
+> 3.1 is no longer a post-v0.1 follow-up — the
+> `openapi-31-through-a-maintained-parser` decision supersedes that,
+> because every schema worth generating against is 3.1. Mutation testing
+> is no longer an open follow-up either — it is wired, measured, and
+> deliberately kept out of `just check`; see
 > `mutation-testing-stays-out-of-the-gate.decision-260802.typ` for the
 > numbers behind that. And the `T-NNN` identifiers predate the move to
 > task slugs; the corresponding artifacts are
@@ -115,20 +130,62 @@ explicitly deprioritised — see
 
 ## v0.1 exit criteria
 
-All of the above checked, plus:
+All of the above checked, plus — reconciled 2026-08-08 by
+`v01-release-exit-criteria` against the tree as it actually stood, not the
+2026-08-03 preliminary reading that task started from:
 
-- [ ] `just check` green on PHP 8.4 with **zero** deprecation notices.
-- [ ] Petstore golden fixture regenerated and committed after every scope change above.
-- [ ] `speconaut status` shows **no** pending tasks listed in this document.
+- [x] `just check` green on PHP 8.4 with **zero** deprecation notices.
+  Verified 2026-08-08, not inferred from the exit status: ran `just check`
+  in full (linecop, jscpd, cs-fixer, phpstan, rector, every `examples/*/`
+  analysis, phpunit, the coverage floor, and all three `speconaut` steps),
+  captured the complete output, and grepped it for `deprecat`
+  case-insensitively. Zero matches. Exit status was also `0`, but that was
+  never the claim this bullet makes — the grep is.
+- [x] Petstore golden fixture regenerated and committed after every scope
+  change above. Enforced, not remembered:
+  `tests/Integration/ByteStabilityTest::testPetstoreGeneratorRunsAreByteIdenticalToEachOtherAndToTheGoldenTree`
+  runs the generator twice against the Petstore profile and fails
+  `just check`'s phpunit step the moment either run drifts from the
+  committed golden tree or from each other (T-022).
+- [x] *Rewritten.* Was: "`speconaut status` shows no pending tasks listed in
+  this document." Task status never lived in `speconaut` — MindTape does,
+  and the `T-NNN` → `truth/tasks/NNN-*.typ` mapping the original wording
+  depended on predates the move to task slugs (see this file's intro note).
+  Replaced by: no task any phase above names is open in `mt ls`. Verified
+  2026-08-08: `mt ls ''` shows every task cited by number in Phases 1–4
+  (004, 007–014, 016, 019, 020) and by number in Phases 5–7 (022–031) as
+  `done`; every checkbox in Phases 1–7 above is already `[x]` and none of
+  them regressed.
 - [x] README describes OpenAPI 3.1 as supported and names the JSON Schema
   2020-12 constructs that abort by name (`const`, `prefixItems`,
   `unevaluatedProperties`, `contentMediaType`, plus a 3.1 `webhooks` entry) —
   matches `UnsupportedKeywordScanner`, not the old "not yet supported" note.
   `truth/notes/openapi-3.1-gap.md` is retired rather than kept current;
   `openapi-31-strategy` was already superseded by
-  `openapi-31-through-a-maintained-parser`.
-- [ ] `CHANGELOG.md` gains a `0.1.0` section.
-- [ ] `composer.json` stability flipped to `stable`.
+  `openapi-31-through-a-maintained-parser`. Re-confirmed 2026-08-08: the
+  four keywords and the README's wording still match
+  `src/Generator/Emit/UnsupportedKeywordScanner.php`'s `KEYWORDS` constant
+  exactly, `openapi-31-strategy.decision-260419.typ` still reads
+  `status: superseded(2026, 7, 29)`, and `truth/notes/openapi-3.1-gap.md`
+  is absent from the tree with no `#link` to it left in `truth/main.typ`.
+- [x] `CHANGELOG.md` gains a `0.1.0` section. Done closing this file: the
+  `[Unreleased]` section — everything shipped since `0.1.0` was last
+  drafted, including the vendor rename, the `Envelope` return type, the
+  parser swap, and the recursive `allOf` merge — is folded into
+  `[0.1.0] - TBD`, reconciled against `git log` and `mt ls ''`'s closed
+  tasks rather than against memory. See `CHANGELOG.md`.
+- ~~`composer.json` stability flipped to `stable`.~~ *Dropped.*
+  `minimum-stability: stable` already sat in both `composer.json` and
+  `runtime/composer.json` before this bullet was ever reconciled — it
+  governs composer's own dependency resolution, not paogen's maturity, so
+  it was satisfied by accident rather than by intent and proves nothing
+  about release readiness. The only reading that would mean something —
+  tagging paogen `0.1.0` — has no target: paogen stays off Packagist on
+  purpose (see `v01-release-exit-criteria`'s non-goals), and the runtime's
+  own version is `publish-the-runtime-package-to-packagist`'s criterion,
+  not this file's. A criterion that is either already true by coincidence
+  or means nothing for the package it names is worse than no criterion —
+  dropped rather than kept as a check that always trivially passes.
 
 ## Phase 7 — T-026 downstream residual (emerged 2026-04-20)
 
@@ -161,15 +218,27 @@ v0.1's critical path.
   `mutation-testing-stays-out-of-the-gate.decision-260802.typ`. Kept here,
   struck through, as history rather than deleted — see this file's intro
   note.
-- **Validation-tier fixtures** — `schema-fixture-policy` calls out DigitalOcean and
-  the GitHub 3.0 bundled variant. Land post-v0.1 once the generator
-  is proven on Petstore plus the items above.
-- **`format: uuid`, `format: binary`** — file as a follow-up once a
-  fixture needs them (see T-010 out-of-scope).
-- **Coloured / filtered diff output** for `--diff` — see T-019
-  out-of-scope.
+- ~~**Validation-tier fixtures**~~ — resolved: Phase 5's T-024 landed the
+  `examples/digitalocean` and `examples/github` scaffolds this bullet asked
+  for, and `clear-example-expected-failures` (done 2026-08-03) cleared both
+  `.expected-failure` markers. Both examples generate cleanly with a
+  committed `generated/` tree, re-confirmed 2026-08-08: no
+  `.expected-failure` file remains under `examples/`, and `just check`'s
+  `lint-phpstan-generated` step analyses both trees clean. No longer a
+  post-v0.1 follow-up — kept here, struck through, as history rather than
+  deleted, per this file's own convention above.
+- **`format: uuid`, `format: binary`** — still open. Filed 2026-08-08 as
+  `built-in-uuid-and-binary-format-bindings.task-260808.typ` while retiring
+  this file, per T-010's own out-of-scope note.
+- **Coloured / filtered diff output** for `--diff` — still open. Filed
+  2026-08-08 as `coloured-and-path-filtered-diff-output.task-260808.typ`
+  while retiring this file, per T-019's own out-of-scope note.
 
 ## How to follow this roadmap
+
+*Historical.* This file is retired — see the note at the top. The two
+sections below describe how it worked while it was live; `mt ls` is the
+queue now, not this.
 
 When picking up work in poagen:
 
@@ -209,6 +278,12 @@ This file is a *working* document. It changes often. Rules:
 - **Changes to this file are always commits, never worktree-only
   edits.** Conventional commit prefix: `docs(roadmap):`.
 
-This file retires on the `0.1.0` tag. At that point create
-`ROADMAP-v0.2.md` (or similar) and prune `post-v0.1` items into the
-new file's backlog.
+This file said it would retire on the `0.1.0` tag and create
+`ROADMAP-v0.2.md` to hold the pruned backlog. It retired 2026-08-08
+instead, closed by `v01-release-exit-criteria` against the exit criteria
+above rather than against the tag event, and no `ROADMAP-v0.2.md` was
+created — the backlog already lives entirely in MindTape (`mt ls`), and a
+second copy of it here would be one more place to keep in sync. See the
+retirement note at the top of this file. Nothing below this point is a
+work queue any more, and this file does not get updated further; it stays
+as the record of what v0.1 required and how each requirement closed.
