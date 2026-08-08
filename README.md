@@ -23,8 +23,8 @@ poagen reads an OpenAPI 3.0 or 3.1 schema and emits a PHP 8.4 HTTP client:
 
 ## Status
 
-First consumable release (v0.1): OpenAPI 3.0 pipeline is correct,
-type-safe, and pleasant on real schemas. The generator emits:
+First consumable release (v0.1): the OpenAPI 3.0 and 3.1 pipeline is
+correct, type-safe, and pleasant on real schemas. The generator emits:
 
 * **Models** — typed `readonly` classes for `components.schemas`, PHP 8.1
   backed enums for `enum`, synthesised classes for inline `type: object`
@@ -75,8 +75,10 @@ type-safe, and pleasant on real schemas. The generator emits:
   own hydrator, marshaller, XML writer, descriptor parser or error policy —
   or your own transport for all of it — without editing a generated file.
 
-Specs and decisions live under [`truth/`](truth/); the release queue is
-in [`ROADMAP.md`](ROADMAP.md) until the `0.1.0` tag.
+Specs and decisions live under [`truth/`](truth/); the work queue is
+MindTape (`mt ls`). [`ROADMAP.md`](ROADMAP.md) is the retired v0.1 release
+checklist, kept as the record of what the first release required and how
+each requirement closed.
 
 OpenAPI **3.1** is supported, parsed through
 [`devizzent/cebe-php-openapi`](https://github.com/DEVizzent/cebe-php-openapi) —
@@ -118,10 +120,10 @@ one reader-selection rule, shared by both commands, so a `.json` document
 generates the same client its `.yaml` equivalent would.
 
 See [`examples/`](examples/) for end-to-end demonstrations on real
-schemas (Petstore passes; DigitalOcean and GitHub are scaffolded as
-tracked follow-ups — see [ROADMAP.md](ROADMAP.md)). The example
-profiles and committed `generated/` trees are the shortest path to
-"what does poagen's output look like on *my* kind of schema?".
+schemas — Petstore, kilbil's loyalty API, DigitalOcean, and GitHub all
+pass. The example profiles and committed `generated/` trees are the
+shortest path to "what does poagen's output look like on *my* kind of
+schema?".
 
 A minimal sample profile also lives at
 [`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).
