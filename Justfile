@@ -479,8 +479,19 @@ mutate-fast: tmpdir
 
 # Prove a generated client installs and runs on poagen/client-runtime
 # alone, with the generator absent (runtime-package-split). Builds a scratch
-# composer project under build/ — not part of `just check`: it resolves
-# nyholm/psr7 from the network/cache, which the offline gate does not assume.
+# composer project under build/ — not part of `just check`: that scratch
+# project is a heavier, slower shape than anything else the offline gate
+# does, which is a deliberate call this recipe's staying out does not
+# revisit (keep-the-standalone-runtime-check-from-rotting-outside-the-gate).
+# It no longer resolves anything from the network — see the script's own
+# header for how and why that was re-examined and closed.
+#
+# This recipe's own staleness is a separate problem from its network shape,
+# and is not solved here: `tests/Integration/StandaloneHarnessTracksGeneratedApiTest.php`
+# pins, offline and inside `just check`, the exact API shape this recipe's
+# hand-written `run.php` depends on, so a change to the generated API that
+# `run.php` does not follow fails the gate on every push rather than
+# waiting on someone remembering this recipe exists.
 verify-runtime-standalone: tmpdir
     scripts/verify-runtime-standalone
 

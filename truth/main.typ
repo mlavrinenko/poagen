@@ -163,6 +163,8 @@
 #include "decisions/duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ"
 #pagebreak()
 #include "decisions/phpdoctypes-stays-scalar-only.decision-260808.typ"
+#pagebreak()
+#include "decisions/standalone-harness-drift-is-caught-offline.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //
