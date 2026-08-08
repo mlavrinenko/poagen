@@ -7,9 +7,26 @@
 # Builds a scratch composer project under build/ (git-ignored) that requires
 # only poagen-runtime and a PSR-7 implementation, drops in a copy of the
 # committed petstore example's generated tree, and drives one real operation
-# through a stub transport. Not part of `just check`: composer resolves
-# nyholm/psr7 from the network/cache, which the offline gate does not assume.
+# through a stub transport.
+#
+# Not part of `just check` regardless (see `keep-the-standalone-runtime-check-
+# from-rotting-outside-the-gate`): it builds a second, throwaway composer
+# project under build/ on every run, which is a heavier and slower shape than
+# anything else the offline gate does. That used to be paired with a real
+# network dependency — composer resolving nyholm/psr7 from packagist — which
+# was the original, and by 2026-08 the only remaining, reason this recipe sat
+# outside `just check`. Re-examined and closed: every package this scratch
+# project needs (nyholm/psr7 and its own transitive requirements) is already
+# sitting in this repo's own root vendor/, installed the same way `just check`
+# requires before it can run at all. The repositories below point straight at
+# that vendor/ tree — and at runtime/ the same way the root project's own
+# composer.json does — instead of packagist.org, which is explicitly disabled
+# below it. `COMPOSER_DISABLE_NETWORK=1` backs that up: if a future dependency
+# is not already vendored locally, this fails fast with a resolution error
+# naming the missing package, rather than silently reaching the network.
 set -eo pipefail
+
+export COMPOSER_DISABLE_NETWORK=1
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 scratch="$root/build/verify-runtime-standalone"
@@ -17,6 +34,30 @@ scratch="$root/build/verify-runtime-standalone"
 rm -rf "$scratch"
 mkdir -p "$scratch/client"
 cp -r "$root/examples/petstore/generated/Generated" "$scratch/client/Generated"
+
+# vendor/*/* below has no version-control metadata of its own to detect a
+# version from — it is a plain subdirectory of this checkout, not a nested
+# git repository — so composer's path-repository fallback would otherwise
+# guess this checkout's own branch name for every package it matches, and
+# that guess cannot satisfy a real constraint like nyholm/psr7's ^1.8. Force
+# the correct version per package instead, read straight out of the root
+# lockfile that already pins them for the rest of the gate (composer.lock is
+# committed and only ever moves via `composer install` — see CONTRIBUTING.md)
+# so this has nothing of its own to fall out of step. poagen/client-runtime
+# is deliberately excluded: it already has its own dedicated path repository
+# below with the "@dev" constraint the root project itself uses, and forcing
+# a second, lock-derived version for the same directory here would just
+# offer composer two conflicting versions of one package.
+versions_json="$(php -r '
+$lock = json_decode(file_get_contents($argv[1]), true, flags: JSON_THROW_ON_ERROR);
+$versions = [];
+foreach ([...$lock["packages"], ...$lock["packages-dev"]] as $package) {
+    if ($package["name"] !== "poagen/client-runtime") {
+        $versions[$package["name"]] = $package["version"];
+    }
+}
+echo json_encode($versions, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+' "$root/composer.lock")"
 
 cat > "$scratch/composer.json" <<JSON
 {
@@ -33,6 +74,17 @@ cat > "$scratch/composer.json" <<JSON
             "type": "path",
             "url": "$root/runtime",
             "options": {"symlink": true}
+        },
+        {
+            "type": "path",
+            "url": "$root/vendor/*/*",
+            "options": {
+                "symlink": true,
+                "versions": $versions_json
+            }
+        },
+        {
+            "packagist.org": false
         }
     ],
     "autoload": {

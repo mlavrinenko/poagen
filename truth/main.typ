@@ -159,6 +159,8 @@
 #include "decisions/envelope-remeasures-the-generated-duplication-floors.decision-260804.typ"
 #pagebreak()
 #include "decisions/refuse-a-skip-that-leaves-dangling-references.decision-260804.typ"
+#pagebreak()
+#include "decisions/standalone-harness-drift-is-caught-offline.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //
