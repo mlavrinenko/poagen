@@ -5,9 +5,11 @@
   tags: ("gates",),
   priority: 4,
   difficulty: 5,
-  status: proposed(2026, 8, 8),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
   links: (
-    related("keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ"),
+    related(
+      "keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ",
+    ),
   ),
 )
 

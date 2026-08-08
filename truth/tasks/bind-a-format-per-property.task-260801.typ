@@ -5,7 +5,7 @@
   tags: ("generator", "dx", "naming"),
   priority: 4,
   difficulty: 6,
-  status: proposed(2026, 8, 1),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
 )
 
 == Summary

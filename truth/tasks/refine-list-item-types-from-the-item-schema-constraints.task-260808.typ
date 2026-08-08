@@ -5,9 +5,11 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: proposed(2026, 8, 8),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
   links: (
-    related("decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ"),
+    related(
+      "decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ",
+    ),
     related("refined-phpdoc-types.task-260807.typ"),
   ),
 )
