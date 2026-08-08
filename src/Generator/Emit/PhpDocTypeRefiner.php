@@ -35,6 +35,11 @@ use function is_int;
  * property's `@param`. Returns null when nothing narrows the type, which is
  * the common case and leaves the emitter's existing PHPDoc untouched.
  *
+ * {@see self::refineListItem()} reads the identical constraints one level
+ * into a list property's own `items` schema, since `'Order.tags' =>
+ * 'list<non-empty-string>'` is not missing from the document — it is missing
+ * from the reader (`refine-list-item-types-from-the-item-schema-constraints`).
+ *
  * @internal
  */
 final readonly class PhpDocTypeRefiner
@@ -65,6 +70,55 @@ final readonly class PhpDocTypeRefiner
             'int' => self::positiveInt($schema),
             default => null,
         };
+    }
+
+    /**
+     * Narrows a plain, single-level list's already-resolved structural
+     * PHPDoc — `list<string>` or `list<int>`, the only two forms
+     * {@see TypeResolver} produces for a scalar item with no format binding
+     * — by reading the same `minLength` / `minimum` constraints
+     * {@see nonEmptyString} and {@see positiveInt} already read on a bare
+     * scalar property, one level into the property's own `items` schema.
+     *
+     * Any other structural shape comes back null and $structural is left
+     * exactly as {@see TypeResolver} built it: a list of `$ref`s or inline
+     * objects already prints its own name and carries nothing to narrow; a
+     * list of lists (`list<list<string>>`) or a map whose value is a list
+     * (`array<string, list<string>>`, {@see InlineObjectResolver::valueMapDoc()})
+     * would need re-deriving what TypeResolver already computed recursively
+     * for the nested node, and TypeResolver is out of this change's file
+     * boundary — reconstructing that by hand here risks printing a string
+     * that disagrees with what TypeResolver's own construction would say for
+     * the same schema, so nested containers are deliberately left alone
+     * rather than guessed at.
+     *
+     * @param  Schema|Reference $schema     the property's own schema node
+     * @param  string           $structural the structural PHPDoc TypeResolver already resolved
+     * @return string|null                  the refined structural type, or null to leave $structural as-is
+     */
+    public static function refineListItem(Schema|Reference $schema, string $structural): ?string
+    {
+        if (!$schema instanceof Schema) {
+            return null;
+        }
+
+        /** @var Schema|Reference|null $items */
+        $items = $schema->items;
+
+        if (!$items instanceof Schema) {
+            return null;
+        }
+
+        return match ($structural) {
+            'list<string>' => self::wrapList(self::nonEmptyString($items)),
+            'list<int>' => self::wrapList(self::positiveInt($items)),
+            default => null,
+        };
+    }
+
+    private static function wrapList(?string $itemDocType): ?string
+    {
+        return $itemDocType === null ? null : 'list<' . $itemDocType . '>';
     }
 
     private static function nonEmptyString(Schema $schema): ?string

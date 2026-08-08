@@ -45,5 +45,25 @@ components:
           items:
             type: string
           description: A structural property — the resolver owns its PHPDoc slot, so no override can reach it.
+        codes:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: items.minLength >= 1 narrows the list itself — list<non-empty-string>, no profile entry needed.
+        ranks:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          description: items.minimum forces positive — list<positive-int>, the same reading a scalar property gets.
+        groups:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          description: A list of lists — nested items are left alone even though the innermost items narrow.
         currency:
           $ref: '#/components/schemas/Currency'

@@ -22,6 +22,12 @@ use function array_values;
  * Asserts the printed source rather than a runtime round trip on purpose: the
  * refinement is a static-analysis fact (`non-empty-string` is `string` at
  * runtime), so the emitted PHPDoc is exactly what there is to check.
+ *
+ * refine-list-item-types-from-the-item-schema-constraints extends this to a
+ * list's own `items` — `codes` and `ranks` prove the two narrowings reach one
+ * level in with no profile entry, `groups` proves a nested list of lists is
+ * left alone, and `tags` (unconstrained items) proves the refinement is
+ * additive rather than a rewrite of every list.
  */
 final class RefinedPhpDocTypeTest extends TestCase
 {
@@ -69,6 +75,42 @@ final class RefinedPhpDocTypeTest extends TestCase
         $source = $this->emitLineItem([], self::SCHEMA_WITH_OPTIONAL_NOTE);
 
         self::assertStringContainsString('@param ?non-empty-string $note', $source);
+    }
+
+    /**
+     * refine-list-item-types-from-the-item-schema-constraints end to end:
+     * `items.minLength` / `items.minimum` narrow the list's own PHPDoc with
+     * no profile entry, the same reading a bare scalar property already got.
+     */
+    public function testAListPropertyNarrowsFromItsOwnItemsConstraints(): void
+    {
+        $source = $this->emitLineItem([]);
+
+        self::assertStringContainsString('@param ?list<non-empty-string> $codes', $source);
+        self::assertStringContainsString('@param ?list<positive-int> $ranks', $source);
+    }
+
+    /**
+     * A list of lists: `groups`' innermost items carry `minLength: 1`, but
+     * only a single-level list of scalars is refined — nested containers are
+     * left exactly as TypeResolver already built them.
+     */
+    public function testANestedListOfListsStaysUnrefinedEvenThoughInnerItemsNarrow(): void
+    {
+        $source = $this->emitLineItem([]);
+
+        self::assertStringContainsString('@param ?list<list<string>> $groups', $source);
+    }
+
+    /**
+     * `tags`' items carry no constraint, so it stays exactly `list<string>` —
+     * proves the refinement is additive rather than a rewrite of every list.
+     */
+    public function testAListWhoseItemsNarrowNothingStaysBareListOfString(): void
+    {
+        $source = $this->emitLineItem([]);
+
+        self::assertStringContainsString('@param ?list<string> $tags', $source);
     }
 
     public function testAKeyNamingAComponentAbsentFromTheDocumentFailsTheRun(): void
@@ -125,6 +167,11 @@ final class RefinedPhpDocTypeTest extends TestCase
         yield 'any type over a structural property' => [
             ['LineItem.tags' => 'list<non-empty-string>'],
             'structural type `list<string>`',
+        ];
+
+        yield 'any type over a refined list property names the refined type' => [
+            ['LineItem.codes' => 'list<non-empty-string>'],
+            'structural type `list<non-empty-string>`',
         ];
 
         yield 'a scalar type over a value object' => [

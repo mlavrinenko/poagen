@@ -16,6 +16,15 @@ use Nette\PhpGenerator\PhpNamespace;
  * comment is an opaque string to nette's printer (T-260730), so an emitter
  * has to call it by hand before the type reaches {@see addComment()}.
  *
+ * `simplifyType()` treats any bareword it does not recognise as a PHP
+ * builtin as an unqualified class name and makes it absolute, which is
+ * correct for a real FQN missing its leading backslash but wrong for a
+ * PHPStan pseudo-type (`non-empty-string`, `positive-int`, ...) sitting
+ * inside a structural type — a pseudo-type is not a class and never carried
+ * a backslash to begin with. {@see self::protectPseudoTypes()} undoes that
+ * one case after `simplifyType()` runs, so a class reference beside a
+ * pseudo-type in the same structural type still shortens correctly.
+ *
  * @internal
  */
 final class DocTypeSimplifier
@@ -32,7 +41,45 @@ final class DocTypeSimplifier
             $docType,
         );
 
-        return $namespace->simplifyType($docType);
+        return self::protectPseudoTypes($namespace->simplifyType($docType));
+    }
+
+    /**
+     * Strips the stray leading backslash `simplifyType()` just added to a
+     * name on the closed PHPStan pseudo-type vocabulary — `list<non-empty-string>`
+     * puts a pseudo-type inside the structural slot for the first time
+     * (`refine-list-item-types-from-the-item-schema-constraints`), so this is
+     * the one place `shorten()` has to learn the difference between a
+     * pseudo-type and a class name it left unqualified.
+     *
+     * The vocabulary is {@see PhpDocTypeCompatibility::BASE_OF}'s keys,
+     * referenced directly rather than duplicated here: a second list could
+     * drift out of step with the one that already exists
+     * (`phpdoctypes-stays-scalar-only`). `BASE_OF` is `public` for exactly
+     * this reason, so a rename or removal there is a type error here rather
+     * than a silent runtime miss.
+     */
+    private static function protectPseudoTypes(string $docType): string
+    {
+        $pattern = '~\\\\(' . implode('|', array_map(
+            static fn(string $name): string => preg_quote($name, '~'),
+            self::pseudoTypeNames(),
+        )) . ')\b~';
+
+        return preg_replace($pattern, '$1', $docType) ?? $docType;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function pseudoTypeNames(): array
+    {
+        /** @var list<string>|null $names */
+        static $names = null;
+
+        $names ??= array_keys(PhpDocTypeCompatibility::BASE_OF);
+
+        return $names;
     }
 
     /**
