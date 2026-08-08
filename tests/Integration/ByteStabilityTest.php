@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Integration;
 
-use FilesystemIterator;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 use Poagen\Generator\Tests\Support\PetstoreFixture;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use SplFileInfo;
 
 use function dirname;
-use function strlen;
 
 /**
  * T-022: independent byte-stability check against the Petstore golden tree.
@@ -82,7 +77,7 @@ final class ByteStabilityTest extends TestCase
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,
         ));
-        $firstSnapshot = $this->snapshot($firstOutputDir);
+        $firstSnapshot = self::snapshotPhpTree($firstOutputDir);
 
         $generator->generate(new Profile(
             schema: $schema,
@@ -93,7 +88,7 @@ final class ByteStabilityTest extends TestCase
             securitySchemes: PetstoreFixture::SECURITY_SCHEMES,
             source: self::PETSTORE_PROFILE,
         ));
-        $secondSnapshot = $this->snapshot($secondOutputDir);
+        $secondSnapshot = self::snapshotPhpTree($secondOutputDir);
 
         self::assertNotEmpty($firstSnapshot, 'first generator run produced no files');
         self::assertSame(
@@ -102,39 +97,11 @@ final class ByteStabilityTest extends TestCase
             'two Petstore generator runs must produce byte-identical output (profile-driven-generation byte-stability)',
         );
 
-        $goldenSnapshot = $this->snapshot($goldenDir);
+        $goldenSnapshot = self::snapshotPhpTree($goldenDir);
         self::assertSame(
             $goldenSnapshot,
             $firstSnapshot,
             'generator output must match the committed Petstore golden tree',
         );
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    private function snapshot(string $dir): array
-    {
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-        );
-
-        $out = [];
-
-        /** @var SplFileInfo $file */
-        foreach ($iterator as $file) {
-            if (!$file->isFile()) {
-                continue;
-            }
-            if ($file->getExtension() !== 'php') {
-                continue;
-            }
-            $relative = substr($file->getPathname(), strlen($dir) + 1);
-            $out[$relative] = (string) file_get_contents($file->getPathname());
-        }
-
-        ksort($out);
-
-        return $out;
     }
 }

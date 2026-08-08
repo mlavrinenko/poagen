@@ -10,6 +10,11 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
+use function file_get_contents;
+use function ksort;
+use function strlen;
+use function substr;
+
 /**
  * The scratch directories a generating test writes into, and taking them
  * away again afterwards.
@@ -18,7 +23,8 @@ use SplFileInfo;
  * site changed: a test still writes one `use GeneratedTreeSandbox;` and
  * reaches every helper. The split is the linecop 250-line cap on PHP, and
  * this is the half of that trait with no opinion about generators, plans or
- * emitted classes — it makes a directory, remembers it, and deletes it.
+ * emitted classes — it makes a directory, remembers it, deletes it, and (via
+ * {@see snapshotPhpTree}) reads back what landed in it.
  */
 trait SandboxDirectories
 {
@@ -73,5 +79,40 @@ trait SandboxDirectories
         }
 
         rmdir($dir);
+    }
+
+    /**
+     * Every `.php` file under `$dir`, keyed by its path relative to `$dir`
+     * and holding its full text — a comparable snapshot of a generated
+     * tree. {@see ByteStabilityTest} and {@see JsonSchemaParityTest} both
+     * want this: "did two runs (or two input forms) write the same bytes?"
+     * is a diff over this map, not over the filesystem directly.
+     *
+     * @return array<string,string>
+     */
+    private static function snapshotPhpTree(string $dir): array
+    {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        );
+
+        $out = [];
+
+        /** @var SplFileInfo $file */
+        foreach ($iterator as $file) {
+            if (!$file->isFile()) {
+                continue;
+            }
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $relative = substr($file->getPathname(), strlen($dir) + 1);
+            $out[$relative] = (string) file_get_contents($file->getPathname());
+        }
+
+        ksort($out);
+
+        return $out;
     }
 }

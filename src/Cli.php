@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Poagen\Generator;
 
-use cebe\openapi\Reader;
-use cebe\openapi\spec\OpenApi;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use OutOfBoundsException;
@@ -131,9 +129,7 @@ final class Cli
         }
 
         try {
-            $openApi = str_ends_with(strtolower($absolutePath), '.json')
-                ? Reader::readFromJsonFile($absolutePath, OpenApi::class, false)
-                : Reader::readFromYamlFile($absolutePath, OpenApi::class, false);
+            $openApi = SchemaReader::read($absolutePath);
         } catch (Throwable $e) {
             fwrite($stderr, "poagen validate: parse error: {$e->getMessage()}\n");
             return 1;

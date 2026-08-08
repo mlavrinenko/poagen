@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator;
 
 use cebe\openapi\json\JsonPointer;
-use cebe\openapi\Reader;
 use cebe\openapi\spec\OpenApi;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\Emit\DanglingReferenceScanner;
 use Poagen\Generator\Generator\Emit\OperationAnalyzer;
 use Poagen\Generator\Generator\Emit\UnionCatalog;
+use Poagen\Generator\SchemaReader;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -63,7 +63,9 @@ final readonly class Generator
         $bindings = $this->scanner->scan($profile);
 
         // Keep $ref nodes as Reference objects so the emitter can resolve them to typed cross-class references.
-        $openApi = Reader::readFromYamlFile($profile->schema, OpenApi::class, false);
+        // Reader choice (YAML vs JSON, by extension) is centralised in SchemaReader — see
+        // generate-accepts-only-yaml-while-validate-accepts-json-too.
+        $openApi = SchemaReader::read($profile->schema);
         // Populate JSON-pointer document positions, independent of reference resolution, so
         // diagnostics can point at the exact schema node responsible.
         $openApi->setDocumentContext($openApi, new JsonPointer(''));
