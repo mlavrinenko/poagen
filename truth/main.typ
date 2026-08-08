@@ -167,6 +167,8 @@
 #include "decisions/standalone-harness-drift-is-caught-offline.decision-260808.typ"
 #pagebreak()
 #include "decisions/queue-drained-models-swallow-emission-failures.decision-260808.typ"
+#pagebreak()
+#include "decisions/synthesised-model-failures-reach-the-run-report.decision-260808.typ"
 
 // --- Supplementary artefacts ---
 //

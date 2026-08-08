@@ -5,7 +5,7 @@
 
 #show: decision.with(
   title: "Profile::$propertyFormats keys on the emitted class name; its stale-key check does not yet reach a synthesised model",
-  status: accepted(2026, 8, 8),
+  status: superseded(2026, 8, 8),
   contexts: (generation-context, guidance-context, schema-context),
   goals: (
     link("../goals/guidance-cannot-mislead.goal.typ"),
@@ -128,3 +128,16 @@ would otherwise have reported in the same pass.
   `$propertyRenames` and `$phpDocTypes` keep keying on the raw document
   name, unable to reach a synthesised model exactly as before; this
   decision changes nothing about them.
+
+=== Superseded
+
+This decision was superseded on 2026-08-08, the same day, by
+#link("synthesised-model-failures-reach-the-run-report.decision-260808.typ")[A synthesised model's emission failures reach the run's report, closing the queue-drain gap].
+The boundary named in "Why this is not closed here" above was widened the
+same day once the two sibling tasks that had owned `Generator.php` and
+`ModelPlanner.php` finished without touching them, and the gap recorded here
+was closed rather than left as a documented limitation. The analysis above —
+the two verified failure modes, the reasoning for why the boundary blocked a
+fix, and the explicit refusal to route around it with an early `throw` — is
+left unchanged as a record of what was known and why, the same discipline
+`error-response-policy` used when it was superseded.

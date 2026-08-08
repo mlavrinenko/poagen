@@ -120,10 +120,14 @@ final readonly class Profile
      *                                              unlike $formats, this entry
      *                                              takes effect on its own. A stale key naming a
      *                                              property absent from a model this run does emit
-     *                                              fails naming both {@see Emit\ModelEmitter}; a key
-     *                                              naming a model this run never emits at all is not
-     *                                              caught the same way — see
-     *                                              `queue-drained-models-swallow-emission-failures`.
+     *                                              fails naming both {@see Emit\ModelEmitter} and
+     *                                              {@see Emit\PropertyFormatKeys}, named or synthesised
+     *                                              alike; a key naming a model this run never emits at
+     *                                              all fails the same way, checked once the whole plan
+     *                                              has run against every name {@see Emit\ModelNameLedger}
+     *                                              claimed {@see PropertyFormatValidator}
+     *                                              (queue-drained-models-swallow-emission-failures records
+     *                                              why a per-model check alone could not cover this case).
      * @param array<string,array<string,mixed>> $securitySchemes Declarations for schemes a `security` requirement
      *                                              names and `components.securitySchemes` never declares. Keyed
      *                                              by the requirement name; the value is the `securityScheme`

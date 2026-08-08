@@ -15,9 +15,10 @@ use function substr;
 
 /**
  * Cross-checks `Profile::$propertyFormats` entries scoped to one
- * already-emitted model against what that model actually declares — the one
- * check {@see ModelEmitter} can make about a key it did not invent
- * (bind-a-format-per-property).
+ * already-emitted model against what that model actually declares — the
+ * per-model half of that field's stale-key check
+ * (bind-a-format-per-property). `PropertyFormatValidator` is the other
+ * half, for a key whose model this run never emits at all.
  *
  * Keyed by the emitted class name rather than a raw document component name,
  * unlike `Profile::$propertyRenames` / `$phpDocTypes` and their validators —
@@ -25,10 +26,13 @@ use function substr;
  * pre-emission document to check this against the way
  * `ComponentPropertyNames` lets those two validators check theirs: a
  * synthesised model's name only exists once this class has already produced
- * it. This runs per emitted model instead, catching a key naming a real
- * property poagen renamed or dropped since the profile was written; a key
- * naming a model this run never emits at all is not caught the same way —
- * see `queue-drained-models-swallow-emission-failures`.
+ * it, which is why this runs per emitted model instead, from inside
+ * {@see ModelEmitter}, catching a key naming a real property poagen renamed
+ * or dropped since the profile was written. Its failures reach the run's
+ * final report through the ordinary `ModelEmission::$failures` channel for
+ * a named component and, since `queue-drained-models-swallow-emission-failures`
+ * closed, through {@see SynthesisQueueDrain}'s own `$failures` parameter for
+ * a synthesised one too.
  *
  * @internal
  */

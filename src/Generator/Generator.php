@@ -31,6 +31,7 @@ final readonly class Generator
         private ProfileTargetValidator $profileTargets = new ProfileTargetValidator(),
         private PropertyRenameValidator $propertyRenameValidator = new PropertyRenameValidator(),
         private PhpDocTypeValidator $phpDocTypeValidator = new PhpDocTypeValidator(),
+        private PropertyFormatValidator $propertyFormatValidator = new PropertyFormatValidator(),
         private UnionGuidanceValidator $unionGuidance = new UnionGuidanceValidator(),
         private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
@@ -197,6 +198,11 @@ final readonly class Generator
             ...$this->profileTargets->validate($openApi, $profile->inlineModels, $profile->methodRenames, $profile),
             ...$this->propertyRenameValidator->validate($openApi, $components, $profile->propertyRenames),
             ...$this->phpDocTypeValidator->validate($openApi, $components, $profile->phpDocTypes),
+            // Reads $ledger only now: it is not fully populated until
+            // $this->modelPlanner->plan() above has returned, since that is
+            // what claims every synthesised model's name, not just the
+            // named-component ones claimed before it runs.
+            ...$this->propertyFormatValidator->validate($profile->propertyFormats, $ledger->claimedNames()),
             ...$modelFailures,
             ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];

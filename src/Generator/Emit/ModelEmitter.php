@@ -34,11 +34,12 @@ use const SORT_STRING;
  * wrapped in a {@see ModelEmission} that also lists any synthesised
  * nested-object classes the caller must emit next.
  *
- * Also the one place `Profile::$propertyFormats` can be checked against a
- * model it names, since that field keys on the emitted class name rather
- * than a document component name — {@see PropertyFormatKeys} does the
- * checking, this class supplies $className and every wire property name it
- * declares (bind-a-format-per-property).
+ * Also the one place a `Profile::$propertyFormats` entry can be checked
+ * against the model it names, since that field keys on the emitted class
+ * name rather than a document component name — {@see PropertyFormatKeys}
+ * does the checking, this class supplies $className and every wire property
+ * name it declares. `PropertyFormatValidator` covers the other half, a key
+ * naming a model no call here ever names at all (bind-a-format-per-property).
  */
 final readonly class ModelEmitter
 {

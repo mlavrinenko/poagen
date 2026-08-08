@@ -6,9 +6,8 @@ namespace Poagen\Generator\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
-use Poagen\Generator\Generator\Emit\ModelEmission;
-use Poagen\Generator\Generator\Emit\ModelEmitter;
 use Poagen\Generator\Generator\GenerationPlan;
+use Poagen\Generator\Generator\ModelPlanner;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Fixtures\ValueObject\Money;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
@@ -128,19 +127,39 @@ final class PropertyFormatTest extends TestCase
     }
 
     /**
-     * Recorded rather than hidden: a key naming a model this run never
-     * emits at all is not refused today. `ModelPlanner`'s queue-drain
-     * discards {@see ModelEmission::$failures} for every synthesised model,
-     * and the only other check {@see ModelEmitter} can make runs solely for
-     * a model this run actually produces — there is no name to compare a
-     * stale entry against otherwise. See
-     * `queue-drained-models-swallow-emission-failures`.
+     * `Emit\PropertyFormatKeys` only ever runs inside one model's own
+     * emission, so a property-absent key on a *synthesised* model needed its
+     * failure to survive `Emit\SynthesisQueueDrain`'s queue too, not just
+     * the named-component path {@see self::testAKeyNamingAPropertyAbsentFromThatModelFailsTheRun}
+     * already exercises.
      */
-    public function testAKeyNamingAModelThisRunNeverEmitsIsNotCaughtYet(): void
+    public function testAKeyNamingAPropertyAbsentFromASynthesisedModelFailsTheRun(): void
     {
-        $plan = $this->plan(['NoSuchModel.price' => Money::class]);
+        try {
+            $this->plan(['CreateOrderRequestContentItem.no_such_property' => Money::class]);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            self::assertStringContainsString("Profile::\$propertyFormats['CreateOrderRequestContentItem.no_such_property']", $e->getMessage());
+            self::assertStringContainsString("property absent from model 'CreateOrderRequestContentItem'", $e->getMessage());
+        }
+    }
 
-        self::assertNotSame([], $plan->writes);
+    /**
+     * `PropertyFormatValidator` is the whole-run half: `Emit\PropertyFormatKeys`
+     * can only judge a key against a model it was actually called for, so a
+     * key naming a class name this run never produces at all — named or
+     * synthesised — needed `Emit\ModelNameLedger`'s full claim set, read
+     * after {@see ModelPlanner::plan()} returns.
+     */
+    public function testAKeyNamingAModelThisRunNeverEmitsFailsTheRun(): void
+    {
+        try {
+            $this->plan(['NoSuchModel.price' => Money::class]);
+            self::fail('expected UnrepresentableConstructsException');
+        } catch (UnrepresentableConstructsException $e) {
+            self::assertStringContainsString("Profile::\$propertyFormats['NoSuchModel.price']", $e->getMessage());
+            self::assertStringContainsString("model 'NoSuchModel' this run does not emit", $e->getMessage());
+        }
     }
 
     /**
