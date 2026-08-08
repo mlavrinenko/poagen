@@ -5,7 +5,7 @@
   tags: ("gates", "release"),
   priority: 5,
   difficulty: 3,
-  status: proposed(2026, 8, 5),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
 )
 
 == Summary

@@ -5,8 +5,12 @@
   tags: (),
   priority: 3,
   difficulty: 6,
-  status: proposed(2026, 8, 8),
-  links: (related("refuse-a-phpdoctypes-override-the-property-cannot-carry.task-260808.typ"),),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
+  links: (
+    related(
+      "refuse-a-phpdoctypes-override-the-property-cannot-carry.task-260808.typ",
+    ),
+  ),
 )
 
 == Summary

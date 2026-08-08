@@ -6,7 +6,7 @@
   priority: 4,
   difficulty: 5,
   links: (related("typed-error-responses.task-260729.typ"),),
-  status: proposed(2026, 8, 4),
+  status: wip(2026, 8, 8)[dispatched to a worktree agent],
 )
 
 == Summary
