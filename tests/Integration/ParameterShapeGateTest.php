@@ -7,9 +7,8 @@ namespace Poagen\Generator\Tests\Integration;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\Emit\ParameterShape;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\SkipPlanFixture;
 
 /**
  * path-parameters-run-through-no-shape-gate-at-all: the path position was
@@ -36,6 +35,7 @@ use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 final class ParameterShapeGateTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use SkipPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/parameter-shape-gate-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\ParameterShapeGate';
@@ -224,18 +224,5 @@ final class ParameterShapeGateTest extends TestCase
         }
 
         self::fail('expected UnrepresentableConstructsException');
-    }
-
-    /**
-     * @param array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-parameter-shape-gate-'),
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
     }
 }

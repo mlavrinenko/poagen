@@ -132,6 +132,19 @@
 # out for inline models, one layer up. A cross-class, opt-in collapse is
 # named as the next lever a follow-up task could take up; nothing here
 # implements it.
+#
+# RE-CONFIRMED 2026-08-09 by `heal-the-duplication-gate-margins`, recorded in
+# `generated-tier-ceilings-cannot-fall-further.decision-260809.typ`. Every
+# clone count and duplicated-line count below is byte-identical to the 08-08
+# reading; only kilbil (1.43 -> 1.42) and digitalocean (10.92 unchanged after
+# rounding) moved at all, and both moved by the same tree-grows-around-
+# unchanged-clones mechanism as every prior fall, from `4e565a71`'s unrelated
+# regeneration for the `format: byte` binding. None of the four rows needed a
+# numeric change. This is the second time the deferred per-class
+# `StatusResponseMap` helper was checked against the live tree and found to
+# leave a majority of every tree's client-to-client clones (and all of its
+# model-to-model clones) cross-file and unreachable — see the decision above
+# for why that is now settled rather than open.
 
 # 4 clones, 35 lines over 795 — envelope-shaped response maps, not models.
 # Two are cross-file, StoreClient.php against UserClient.php (6 and 7 lines):
@@ -154,6 +167,9 @@
 # intra-file clones; the two cross-file ones sit on different client
 # classes and stay out of reach regardless.
 # `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`.
+#
+# Re-measured 2026-08-09: byte-for-byte unchanged again, same 4 clones, same
+# 35/795. `generated-tier-ceilings-cannot-fall-further.decision-260809.typ`.
 examples/petstore/generated       4.41
 
 # Still 2 clones, still the same 37 lines, now over 2605 instead of 2530 —
@@ -188,6 +204,10 @@ examples/petstore/generated       4.41
 # GoodsXmlRequestContentItem clone); only the tree's total line count grew
 # by 4 (2605 -> 2609), so the percentage fell on its own: 37/2605 = 1.42034%
 # (rounds to 1.43) -> 37/2609 = 1.41817% (rounds to 1.42).
+#
+# Re-measured 2026-08-09: still the same 2 clones, still the same 37 lines,
+# still over 2609 — unchanged since the move above. Ceiling stays 1.42.
+# `generated-tier-ceilings-cannot-fall-further.decision-260809.typ`.
 examples/kilbil/generated         1.42
 
 # 288 clones, 3441 duplicated lines over 31511 — up from 287/3424/31315 (the
@@ -213,6 +233,12 @@ examples/kilbil/generated         1.42
 # clones are. The 41 model clones are cross-file by construction (a shared
 # shape is never duplicated within its own file) and outside a per-class
 # helper regardless of scope.
+#
+# Re-measured 2026-08-09: same 288 clones, same 3441 duplicated lines, tree
+# grew 31511 -> 31516 (+5, `4e565a71` regenerating for the `format: byte`
+# built-in binding — unrelated to duplication). 10.919996% -> 10.918264%,
+# both round to 10.92; the ceiling does not move.
+# `generated-tier-ceilings-cannot-fall-further.decision-260809.typ`.
 examples/digitalocean/generated   10.92
 
 # 1431 clones, 24159 duplicated lines over 108290 — clone count and
@@ -243,4 +269,7 @@ examples/digitalocean/generated   10.92
 # pull without merging on structural identity, which
 # `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`
 # and the 2026-08-02 inline-model ruling it cites both keep out of reach.
+#
+# Re-measured 2026-08-09: byte-for-byte unchanged again, same 1431 clones,
+# same 24159/108290. `generated-tier-ceilings-cannot-fall-further.decision-260809.typ`.
 examples/github/generated        22.31

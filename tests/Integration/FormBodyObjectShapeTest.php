@@ -5,15 +5,10 @@ declare(strict_types=1);
 namespace Poagen\Generator\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\Emit\ObjectShape;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\ApiClientSourceFixture;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-
-use function str_ends_with;
-
-use const DIRECTORY_SEPARATOR;
+use Poagen\Generator\Tests\Support\RefusalPlanFixture;
 
 /**
  * form-urlencoded-body-requires-the-literal-type-object-keyword:
@@ -27,7 +22,9 @@ use const DIRECTORY_SEPARATOR;
  */
 final class FormBodyObjectShapeTest extends TestCase
 {
+    use ApiClientSourceFixture;
     use GeneratedTreeSandbox;
+    use RefusalPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/form-object-shape-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\FormObjectShape';
@@ -90,44 +87,5 @@ final class FormBodyObjectShapeTest extends TestCase
 
         self::assertCount(1, $plan->skippedOperations);
         self::assertSame('formNotObject', $plan->skippedOperations[0]->operationId);
-    }
-
-    /**
-     * @param array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-form-object-shape-'),
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
-    }
-
-    /**
-     * @param array<string,string> $skip every refusal except the one under
-     *                                    test — left unlisted so it surfaces
-     *                                    in the exception
-     */
-    private function refusalMessage(array $skip): string
-    {
-        try {
-            $this->plan($skip);
-            self::fail('expected UnrepresentableConstructsException');
-        } catch (UnrepresentableConstructsException $e) {
-            return $e->getMessage();
-        }
-    }
-
-    private function clientSource(GenerationPlan $plan): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
-            }
-        }
-
-        self::fail('the plan wrote no ApiClient.php');
     }
 }

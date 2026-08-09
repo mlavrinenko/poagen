@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Poagen\Generator\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Poagen\Generator\Exception\UnrepresentableConstructsException;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\ApiClientSourceFixture;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-
-use const DIRECTORY_SEPARATOR;
+use Poagen\Generator\Tests\Support\ModelSourceFixture;
+use Poagen\Generator\Tests\Support\RefusalPlanFixture;
 
 /**
  * merge-allof-members-into-one-model: `allOf` resolves by merging,
@@ -28,7 +26,10 @@ use const DIRECTORY_SEPARATOR;
  */
 final class AllOfMergeTest extends TestCase
 {
+    use ApiClientSourceFixture;
     use GeneratedTreeSandbox;
+    use ModelSourceFixture;
+    use RefusalPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/allof-merge-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\AllOfMerge';
@@ -158,56 +159,5 @@ final class AllOfMergeTest extends TestCase
         self::assertStringContainsString("requires 'warehouse'", $message);
         self::assertStringContainsString('members searched', $message);
         self::assertStringContainsString('widget_core', $message);
-    }
-
-    /**
-     * @param array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        $output = self::makeSandboxDir('poagen-allof-');
-
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: $output,
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
-    }
-
-    /**
-     * @param array<string,string> $skip every refusal except the one under test —
-     *                                    left unlisted so it surfaces in the exception
-     */
-    private function refusalMessage(array $skip): string
-    {
-        try {
-            $this->plan($skip);
-            self::fail('expected UnrepresentableConstructsException');
-        } catch (UnrepresentableConstructsException $e) {
-            return $e->getMessage();
-        }
-    }
-
-    private function clientSource(GenerationPlan $plan): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
-            }
-        }
-
-        self::fail('the plan wrote no ApiClient.php');
-    }
-
-    private function modelSource(GenerationPlan $plan, string $className): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . $className . '.php')) {
-                return $source;
-            }
-        }
-
-        self::fail("the plan wrote no {$className}.php");
     }
 }

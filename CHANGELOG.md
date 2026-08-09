@@ -212,6 +212,15 @@ Mutation testing is wired and measured but deliberately stays outside
   generated tier, each with its own ceiling that ratchets down as
   duplication is cut (`adopt-jscpd-duplication-gate`,
   `jscpd-as-a-real-gate`).
+- Both `jscpd` recipes print the measured percentage against the ceiling
+  they gated on (`scripts/jscpd-margin`), so an exit-0 run is legible as
+  a pass with a stated margin, not indistinguishable from a gate that
+  failed open. The hand-written tier's margin was restored from ~12
+  lines to ~196 by factoring nine tests' repeated fixture-plan helpers
+  into shared `tests/Support/` traits, not by moving the 3.0% threshold;
+  the generated tier's four ceilings stay at their measured floor on
+  purpose (`generated-tier-ceilings-cannot-fall-further.decision-260809`,
+  `heal-the-duplication-gate-margins`).
 - `infection/infection` wired as a real, pinned dev dependency; `just
   mutate` / `just mutate-fast` run it against `src/` and `runtime/src/`
   (measured ~87.7% MSI on a full run). Deliberately not part of `just
