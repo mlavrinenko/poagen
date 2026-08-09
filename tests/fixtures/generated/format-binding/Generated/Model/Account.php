@@ -11,15 +11,27 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Fixtures\Generated\FormatBinding\Generated\Model;
 
-use Poagen\Runtime\Format\RamseyUuid;
+use Poagen\Runtime\Attribute\Format;
+use Poagen\Runtime\Format\Base64Codec;
+use Poagen\Runtime\Format\RamseyUuidCodec;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class Account
 {
+    /**
+     * @param ?list<UuidInterface> $previousIds
+     */
     public function __construct(
-        public RamseyUuid $id,
+        #[Format(format: 'uuid', codec: RamseyUuidCodec::class)]
+        public UuidInterface $id,
         public ?string $avatar = null,
+        #[Format(format: 'byte', codec: Base64Codec::class)]
+        public ?string $avatarBytes = null,
         public ?string $contact = null,
-        public ?RamseyUuid $ownerId = null,
+        #[Format(format: 'uuid', codec: RamseyUuidCodec::class)]
+        public ?UuidInterface $ownerId = null,
+        #[Format(format: 'uuid', codec: RamseyUuidCodec::class)]
+        public ?array $previousIds = null,
     ) {
     }
 }

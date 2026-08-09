@@ -26,16 +26,38 @@ Mutation testing is wired and measured but deliberately stays outside
   `toScalar()` / `fromScalar()` on both send and receive paths (T-004).
 - Built-in `\DateTimeImmutable` mapping for `format: date-time` and
   `format: date` — no user binding required (T-010).
-- `Profile::$formats` binds a value object to every site carrying one
-  `format`, document-wide, without the class needing a `#[BindsFormat]`
+- `Profile::$formats` binds a value object or a codec to every site carrying
+  one `format`, document-wide, without the class needing a `#[BindsFormat]`
   attribute or a namespace under `$discoverIn`. Most specific route wins:
   `$propertyFormats`, then `$formats`, then a discovered `#[BindsFormat]`,
-  then a built-in. `poagen/client-runtime` ships `Format\RamseyUuid` and
-  `Format\SymfonyUuid` for `format: uuid`, both libraries `suggest` rather
-  than `require`, and neither applies until the profile names one — PHP has
-  no core UUID type, so poagen picks none. `format: binary` on a plain
-  property stays advisory on purpose
+  then a built-in. `poagen/client-runtime` ships `Format\RamseyUuidCodec` and
+  `Format\SymfonyUuidCodec` for `format: uuid`, both libraries `suggest`
+  rather than `require`, and neither applies until the profile names one —
+  PHP has no core UUID type, so poagen picks none. `format: binary` on a
+  plain property stays advisory on purpose
   (`binary-on-a-property-stays-advisory.decision-260809`).
+- `Poagen\Runtime\Codec` interface: a second binding shape for a `format`
+  whose type poagen does not control — a class from a third-party library
+  that cannot be made to implement `ScalarBinding`. A `ScalarBinding` types
+  the property as the binding itself; a `Codec` types it as its own
+  `targetType()` — `public UuidInterface $id`, never a wrapper — and
+  `Marshal\Hydrator`/`Marshaller`/`Http\ResponseDecoder` route conversion
+  through the codec's `decode()`/`encode()` instead. Covers a nullable,
+  list, and map property carrying a codec-bound format, not only a bare
+  scalar one. `Format\RamseyUuidCodec` and `Format\SymfonyUuidCodec` are
+  this interface's first consumers, re-expressed from the `ScalarBinding`
+  wrappers `built-in-uuid-and-binary-format-bindings` shipped
+  (`codec-bindings-for-foreign-value-types`,
+  `reexpress-the-uuid-bindings-as-codecs.decision-260809`).
+- `format: byte` — OpenAPI's spelling for base64-encoded bytes inside a JSON
+  string — binds to `Runtime\Format\Base64Codec` with no `Profile::$formats`
+  entry required: both directions are `base64_decode()` (strict mode) /
+  `base64_encode()`, PHP core, so unlike `uuid` this one costs nobody a
+  dependency and poagen picks it by default, the same way `date-time`
+  already is. A payload that fails strict decoding is refused naming the
+  property. Still overridable through `$propertyFormats`, `$formats` or a
+  discovered `#[BindsFormat('byte')]`, like any other built-in
+  (`base64-binding-for-format-byte`).
 - OpenAPI `enum` components emit as PHP 8.1 backed enums under
   `Generated/Enum/` and replace their references in model properties
   (T-009).

@@ -133,9 +133,15 @@ A minimal sample profile also lives at
 ### Binding a `format` to a value object
 
 `format: date-time` and `format: date` resolve to `DateTimeImmutable` on
-their own. Every other `format` keeps its base type and poagen prints a
-notice naming it, because guessing a type for a vendor's annotation is worse
-than saying it went unread.
+their own, and `format: byte` — OpenAPI's spelling for base64-encoded bytes
+inside a JSON string — resolves to a plain `string` holding the *decoded*
+bytes, via `Poagen\Runtime\Format\Base64Codec`: `base64_decode()` in strict
+mode on the way in, `base64_encode()` on the way out, both PHP core, so
+this one costs no dependency either and applies with no profile line.
+A payload that is not valid base64 fails naming the property. Every other
+`format` keeps its base type and poagen prints a notice naming it, because
+guessing a type for a vendor's annotation is worse than saying it went
+unread.
 
 `uuid` is the one poagen ships bindings for. It does not apply one by
 default: PHP has no core UUID type, so any binding is a dependency decision,
@@ -143,19 +149,21 @@ and a consumer who already has `symfony/uid` should not be handed
 `ramsey/uuid`. Pick one in the profile:
 
 ```php
-use Poagen\Runtime\Format\RamseyUuid;   // needs ramsey/uuid
-use Poagen\Runtime\Format\SymfonyUuid;  // needs symfony/uid
+use Poagen\Runtime\Format\RamseyUuidCodec;   // needs ramsey/uuid
+use Poagen\Runtime\Format\SymfonyUuidCodec;  // needs symfony/uid
 
 return new Profile(
     // ...
-    formats: ['uuid' => RamseyUuid::class],
+    formats: ['uuid' => RamseyUuidCodec::class],
 );
 ```
 
 Every property and parameter carrying that format now takes the binding, and
 `composer require ramsey/uuid` is the other half — it is a `suggest` of
-`poagen/client-runtime`, never a `require`. The library value is one hop in
-(`$account->id->value`), or `(string) $account->id` for the canonical form.
+`poagen/client-runtime`, never a `require`. The emitted property is the
+library's own `UuidInterface` directly — `public UuidInterface $id` — with no
+wrapper and no `->value` hop, because `RamseyUuidCodec` converts on its
+behalf rather than boxing it.
 
 Any value object of your own goes in the same map, and needs nothing but
 `Poagen\Runtime\ScalarBinding`:
@@ -171,7 +179,22 @@ final readonly class Ulid implements ScalarBinding
 }
 ```
 
-Three ways to attach one, most specific first:
+A type you do not own — a class from a library, which cannot be made to
+implement `ScalarBinding` — binds through `Poagen\Runtime\Codec` instead. The
+property is declared as the codec's own target type, never a wrapper:
+
+```php
+final readonly class MoneyCodec implements Codec
+{
+    public static function targetType(): string { return Money::class; }
+
+    public static function decode(mixed $wire): Money { /* parse */ }
+
+    public static function encode(mixed $value): mixed { /* format */ }
+}
+```
+
+Three ways to attach either shape, most specific first:
 
 | Route | Reach |
 | --- | --- |

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator;
 
 use Poagen\Generator\Generator\Emit\WebhookSkipKey;
+use Poagen\Runtime\Codec;
 use Poagen\Runtime\ScalarBinding;
 
 /**
@@ -96,16 +97,21 @@ final readonly class Profile
      *                                              with another property already in the same model, fails the
      *                                              run naming both.
      * @param array<string,string>  $phpDocTypes    Forces a model property's PHPDoc type, keyed like $propertyRenames — the override channel for a narrowing OpenAPI cannot spell (chiefly `numeric-string`), winning over the constraint-derived narrowing {@see Emit\PhpDocTypeRefiner} computes; a stale key fails the run {@see PhpDocTypeValidator} (refined-phpdoc-types), and so does a value the property cannot carry — a base type the native one contradicts, a structural or class-typed property, a nullability the schema already decides {@see Emit\PhpDocTypeCompatibility}.
-     * @param array<string,string>  $formats        Binds a value object to every property carrying one
-     *                                              `format`, document-wide — the same reach
-     *                                              `#[BindsFormat]` has, said in the profile instead of
-     *                                              on a class the consumer had to write first. That
-     *                                              distinction is the whole point for a format poagen
-     *                                              already ships a binding for: `'uuid' =>
-     *                                              Runtime\Format\RamseyUuid::class` is one line against
-     *                                              a value object per project, and swapping libraries is
-     *                                              editing that line. Values are a class-string
-     *                                              implementing {@see ScalarBinding};
+     * @param array<string,string>  $formats        Binds a value object or a codec to every property
+     *                                              carrying one `format`, document-wide — the same
+     *                                              reach `#[BindsFormat]` has, said in the profile
+     *                                              instead of on a class the consumer had to write
+     *                                              first. That distinction is the whole point for a
+     *                                              format poagen already ships a binding for: `'uuid' =>
+     *                                              Runtime\Format\RamseyUuidCodec::class` is one line
+     *                                              against a value object per project, and swapping
+     *                                              libraries is editing that line. Values are a
+     *                                              class-string implementing {@see ScalarBinding} — the
+     *                                              property is typed as the binding itself — or
+     *                                              {@see Codec} — the property is typed
+     *                                              as the codec's own target type instead, for a
+     *                                              foreign type poagen cannot make implement
+     *                                              `ScalarBinding` (`codec-bindings-for-foreign-value-types`);
      *                                              unlike $propertyFormats, whose key cannot be judged
      *                                              until the run has named every model, a key here is a
      *                                              bare format string, so {@see FormatBindingValidator}
@@ -114,8 +120,8 @@ final readonly class Profile
      *                                              $propertyFormats entry covering the same property,
      *                                              and beats a discovered `#[BindsFormat]` on the same
      *                                              format: explicit guidance over discovery.
-     * @param array<string,string>  $propertyFormats Binds a value object to one property of one
-     *                                              model — the per-property answer `#[BindsFormat]`
+     * @param array<string,string>  $propertyFormats Binds a value object or a codec to one property of
+     *                                              one model — the per-property answer `#[BindsFormat]`
      *                                              cannot give, because that attribute keys on the
      *                                              format string alone and applies document-wide: on
      *                                              kilbil, `double` covers price, quantity and several
