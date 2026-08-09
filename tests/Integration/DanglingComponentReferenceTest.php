@@ -6,9 +6,8 @@ namespace Poagen\Generator\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\SkipPlanFixture;
 
 /**
  * a-skipped-component-leaves-dangling-references-behind-it: skipping a
@@ -32,6 +31,7 @@ use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 final class DanglingComponentReferenceTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use SkipPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/dangling-component-reference-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\DanglingComponentReference';
@@ -147,18 +147,5 @@ final class DanglingComponentReferenceTest extends TestCase
             self::assertStringContainsString("Profile::\$skip['ping']", $message);
             self::assertStringContainsString('stale', $message);
         }
-    }
-
-    /**
-     * @param array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-dangling-component-'),
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
     }
 }

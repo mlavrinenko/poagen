@@ -7,6 +7,7 @@ namespace Poagen\Generator\Tests\Integration;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
+use Poagen\Generator\Tests\Support\ApiClientSourceFixture;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 
 use const DIRECTORY_SEPARATOR;
@@ -26,6 +27,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class SkippedOperationPayloadReachabilityTest extends TestCase
 {
+    use ApiClientSourceFixture;
     use GeneratedTreeSandbox;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/skipped-operation-shared-payload-3.1.yaml';
@@ -84,16 +86,5 @@ final class SkippedOperationPayloadReachabilityTest extends TestCase
         }
 
         return $out;
-    }
-
-    private function clientSource(GenerationPlan $plan): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, DIRECTORY_SEPARATOR . 'ApiClient.php')) {
-                return $source;
-            }
-        }
-
-        self::fail('the plan wrote no ApiClient.php');
     }
 }

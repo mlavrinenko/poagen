@@ -8,9 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\Emit\SkippedWebhook;
 use Poagen\Generator\Generator\Emit\WebhookSkipKey;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\SkipPlanFixture;
 
 /**
  * webhooks-refuse-with-no-opt-out: a webhook can be named in
@@ -29,6 +28,7 @@ use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
 final class WebhookSkipTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use SkipPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/webhooks-3.1.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\WebhookSkip';
@@ -111,18 +111,5 @@ final class WebhookSkipTest extends TestCase
             self::assertStringContainsString("Profile::\$skip['doesNotExist.webhook']", $message);
             self::assertStringContainsString('absent from the schema', $message);
         }
-    }
-
-    /**
-     * @param  array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-webhook-skip-'),
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
     }
 }

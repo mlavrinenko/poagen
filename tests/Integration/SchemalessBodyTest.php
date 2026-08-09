@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Poagen\Generator\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Poagen\Generator\Exception\UnrepresentableConstructsException;
-use Poagen\Generator\Generator\GenerationPlan;
-use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\RefusalPlanFixture;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -26,6 +24,7 @@ use const DIRECTORY_SEPARATOR;
 final class SchemalessBodyTest extends TestCase
 {
     use GeneratedTreeSandbox;
+    use RefusalPlanFixture;
 
     private const string SCHEMA = __DIR__ . '/../fixtures/schemas/schemaless-body-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\SchemalessBody';
@@ -86,33 +85,6 @@ final class SchemalessBodyTest extends TestCase
 
         self::assertCount(1, $plan->skippedOperations);
         self::assertSame('postUnrepresentable', $plan->skippedOperations[0]->operationId);
-    }
-
-    /**
-     * @param array<string,string> $skip
-     */
-    private function plan(array $skip): GenerationPlan
-    {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-schemaless-body-'),
-            namespace: self::NAMESPACE,
-            skip: $skip,
-        ));
-    }
-
-    /**
-     * @param array<string,string> $skip every refusal except the one under test —
-     *                                    left unlisted so it surfaces in the exception
-     */
-    private function refusalMessage(array $skip): string
-    {
-        try {
-            $this->plan($skip);
-            self::fail('expected UnrepresentableConstructsException');
-        } catch (UnrepresentableConstructsException $e) {
-            return $e->getMessage();
-        }
     }
 
     private function clientSource(): string
