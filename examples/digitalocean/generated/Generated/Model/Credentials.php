@@ -12,12 +12,17 @@ declare(strict_types=1);
 namespace Acme\DigitalOcean\Generated\Model;
 
 use DateTimeImmutable;
+use Poagen\Runtime\Attribute\Format;
+use Poagen\Runtime\Format\Base64Codec;
 
 final readonly class Credentials
 {
     public function __construct(
+        #[Format(format: 'byte', codec: Base64Codec::class)]
         public ?string $certificate_authority_data = null,
+        #[Format(format: 'byte', codec: Base64Codec::class)]
         public ?string $client_certificate_data = null,
+        #[Format(format: 'byte', codec: Base64Codec::class)]
         public ?string $client_key_data = null,
         public ?DateTimeImmutable $expires_at = null,
         public ?string $server = null,
