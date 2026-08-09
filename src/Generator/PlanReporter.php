@@ -52,8 +52,14 @@ final class PlanReporter
     /**
      * Render unified diffs between each planned write / prune and the
      * current file on disk. Returns an empty string when nothing differs.
+     *
+     * $filter, when given, drops any write/prune {@see DiffPathFilter}
+     * rejects before it is even read off disk. $color, when true, runs each
+     * rendered diff through {@see DiffColorizer}. Both are additive over the
+     * plain call this method used to be: a bare `diff($plan)` renders
+     * everything, uncoloured, exactly as before.
      */
-    public function diff(GenerationPlan $plan): string
+    public function diff(GenerationPlan $plan, ?DiffPathFilter $filter = null, bool $color = false): string
     {
         $out = '';
 
@@ -61,36 +67,45 @@ final class PlanReporter
         ksort($writes, SORT_STRING);
 
         foreach ($writes as $path => $new) {
+            if ($filter instanceof DiffPathFilter && !$filter->matches($path)) {
+                continue;
+            }
+
             $current = is_file($path) ? (string) file_get_contents($path) : '';
 
             if ($current === $new) {
                 continue;
             }
 
-            $out .= $this->unified($path, $current, $new);
+            $out .= $this->unified($path, $current, $new, $color);
         }
 
         $prunes = $plan->prunes;
         sort($prunes, SORT_STRING);
 
         foreach ($prunes as $path) {
+            if ($filter instanceof DiffPathFilter && !$filter->matches($path)) {
+                continue;
+            }
+
             $current = is_file($path) ? (string) file_get_contents($path) : '';
 
             if ($current === '') {
                 continue;
             }
 
-            $out .= $this->unified($path, $current, '');
+            $out .= $this->unified($path, $current, '', $color);
         }
 
         return $out;
     }
 
-    private function unified(string $path, string $from, string $to): string
+    private function unified(string $path, string $from, string $to, bool $color): string
     {
         $header = "--- a/{$path}\n+++ b/{$path}\n";
         $differ = new Differ(new UnifiedDiffOutputBuilder($header, false));
+        $rendered = $differ->diff($from, $to);
 
-        return $differ->diff($from, $to);
+        return $color ? DiffColorizer::apply($rendered) : $rendered;
     }
 }

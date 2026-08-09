@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet — `0.1.0` below is the current tip.
+### Added
+
+#### DX
+
+- `poagen generate --diff` grows two more flags, the pair T-019 named as
+  explicit non-goals and carried forward as a post-v0.1 follow-up:
+  - `--diff=<glob>` scopes the diff to a subtree of the generated output,
+    matched relative to the output directory (or the raw path, when it
+    falls outside that directory). `**` crosses `/`, `*` does not, `?`
+    matches one non-`/` character; a glob with no wildcard matches that
+    path or anything beneath it, so `Generated/Model` and
+    `Generated/Model/**` scope to the same subtree.
+  - `--color=auto|always|never` (default `auto`) colours additions green,
+    deletions red, and hunk headers cyan. `auto` colours iff stdout is a
+    TTY, `NO_COLOR` is unset, and `TERM` is not `dumb`.
+  Both are additive: bare `--diff` still renders the whole plan, plain,
+  exactly as before.
 
 ## 0.1.0 - TBD
 

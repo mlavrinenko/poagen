@@ -42,6 +42,13 @@ final class Cli
                                 files; write nothing; exit 0.
             --diff              Print a unified diff between each planned write and the file on disk.
                                 Exit 0 if no diffs, 1 if any, 2 on usage error.
+            --diff=<glob>       Scope --diff to paths under <glob>, matched relative to the output
+                                directory (or absolute if a path falls outside it). `**` crosses `/`,
+                                `*` does not, `?` matches one non-`/` character; a glob with no
+                                wildcard matches that path or anything beneath it, so both
+                                `Generated/Model` and `Generated/Model/**` scope to the same subtree.
+            --color=<when>      Colour --diff's output: `auto` (default, colour iff stdout is a TTY
+                                and NO_COLOR is unset and TERM is not dumb), `always`, or `never`.
 
         GLOBAL OPTIONS
             -h, --help          Print help for a command
