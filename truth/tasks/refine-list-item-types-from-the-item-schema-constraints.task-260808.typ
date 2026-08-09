@@ -5,7 +5,7 @@
   tags: ("generator",),
   priority: 4,
   difficulty: 4,
-  status: wip(2026, 8, 8),
+  status: done(2026, 8, 9),
   links: (
     related(
       "decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ",
