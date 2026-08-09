@@ -6,6 +6,7 @@ namespace Poagen\Generator\Generator;
 
 use Poagen\Generator\Generator\Emit\DiscriminatorEnforcer;
 use Poagen\Runtime\Codec;
+use Poagen\Runtime\Format\Base64Codec;
 use Poagen\Runtime\ScalarBinding;
 
 /**
@@ -104,11 +105,15 @@ final readonly class Bindings
      * Resolve a `format` to a scalar-boundary binding: a per-property override
      * if `$scopeKey` names one, else a document-wide user VO implementing
      * {@see ScalarBinding} if one is registered, else a document-wide
-     * {@see Codec} if one is, otherwise a poagen built-in (currently
-     * `date-time` and `date` → `\DateTimeImmutable`). A `ScalarBinding` wins
-     * over a `Codec` on the same format because it needs nothing further
-     * from the emitter — the property is typed as the binding itself — while
-     * both win over a built-in so consumers can swap in Carbon, Chronos, etc.
+     * {@see Codec} if one is, otherwise a poagen built-in (`date-time` and
+     * `date` → `\DateTimeImmutable`, `byte` → `Format\Base64Codec` —
+     * `base64-binding-for-format-byte`; `byte` is a built-in rather than a
+     * ready-made candidate like `uuid` because both directions are PHP core
+     * and cost nobody a dependency, the same reason `date-time` is one). A
+     * `ScalarBinding` wins over a `Codec` on the same format because it
+     * needs nothing further from the emitter — the property is typed as the
+     * binding itself — while both win over a built-in so consumers can swap
+     * in Carbon, Chronos, or their own base64 handling.
      */
     public function scalarFormat(string $format, string $scopeKey = ''): ?ScalarFormat
     {
@@ -134,6 +139,7 @@ final readonly class Bindings
         return match ($format) {
             'date-time' => ScalarFormat::dateTime(),
             'date' => ScalarFormat::date(),
+            'byte' => ScalarFormat::codec(Base64Codec::class, Base64Codec::targetType()),
             default => null,
         };
     }

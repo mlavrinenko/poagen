@@ -133,9 +133,15 @@ A minimal sample profile also lives at
 ### Binding a `format` to a value object
 
 `format: date-time` and `format: date` resolve to `DateTimeImmutable` on
-their own. Every other `format` keeps its base type and poagen prints a
-notice naming it, because guessing a type for a vendor's annotation is worse
-than saying it went unread.
+their own, and `format: byte` — OpenAPI's spelling for base64-encoded bytes
+inside a JSON string — resolves to a plain `string` holding the *decoded*
+bytes, via `Poagen\Runtime\Format\Base64Codec`: `base64_decode()` in strict
+mode on the way in, `base64_encode()` on the way out, both PHP core, so
+this one costs no dependency either and applies with no profile line.
+A payload that is not valid base64 fails naming the property. Every other
+`format` keeps its base type and poagen prints a notice naming it, because
+guessing a type for a vendor's annotation is worse than saying it went
+unread.
 
 `uuid` is the one poagen ships bindings for. It does not apply one by
 default: PHP has no core UUID type, so any binding is a dependency decision,

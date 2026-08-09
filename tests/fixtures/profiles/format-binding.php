@@ -27,6 +27,11 @@
  * `truth/decisions/binary-on-a-property-stays-advisory.decision-260809.typ`
  * — and `email` is here so the golden shows an unbound format sitting next
  * to a bound one rather than a tree where everything is bound.
+ *
+ * `avatarBytes` (`format: byte`) needs no entry in `$formats` at all:
+ * `base64-binding-for-format-byte` binds it as a poagen built-in, the same
+ * way `date-time` already is, since both directions are PHP core and cost
+ * nobody a dependency.
  */
 
 declare(strict_types=1);

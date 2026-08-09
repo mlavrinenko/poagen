@@ -9,13 +9,12 @@ use Poagen\Generator\Exception\UnrepresentableConstructsException;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Fixtures\ValueObject\Slug;
-use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
+use Poagen\Generator\Tests\Support\FormatBindingFixture;
 use Poagen\Runtime\Format\RamseyUuidCodec;
 use Poagen\Runtime\Marshal\Hydrator;
 use Poagen\Runtime\Marshal\Marshaller;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use ReflectionClass;
 
 use function str_contains;
 
@@ -36,12 +35,14 @@ use function str_contains;
  * `format-binding-3.0.yaml` spends `uuid` on five sites — a required
  * property, an optional one, a list of them, a second component, and a path
  * parameter — and carries `binary` and `email` unbound alongside them.
+ * `format: byte`'s own coverage — a poagen built-in needing no profile line
+ * at all — is {@see FormatBindingByteTest}, split off to keep this file
+ * under linecop (`quality-gates-at-maximum-strictness`).
  */
 final class FormatBindingTest extends TestCase
 {
-    use GeneratedTreeSandbox;
+    use FormatBindingFixture;
 
-    private const string SCHEMA = __DIR__ . '/../fixtures/schemas/format-binding-3.0.yaml';
     private const string NAMESPACE = 'Poagen\\Generator\\Tests\\Tmp\\FormatBinding';
     private const string VALUE_OBJECTS = 'Poagen\\Generator\\Tests\\Fixtures\\ValueObject';
 
@@ -53,7 +54,7 @@ final class FormatBindingTest extends TestCase
     public function testOneEntryReachesEveryPropertyCarryingThatFormat(): void
     {
         $plan = $this->plan(['uuid' => RamseyUuidCodec::class]);
-        $account = $this->modelSource($plan, 'Account');
+        $account = $this->formatBindingModelSource($plan, 'Account');
 
         // Required, optional, a list of them, and a property on a second
         // component — one entry, four sites, no per-property key anywhere.
@@ -63,7 +64,7 @@ final class FormatBindingTest extends TestCase
         self::assertStringContainsString('public UuidInterface $id,', $account);
         self::assertStringContainsString('public ?UuidInterface $ownerId = null,', $account);
         self::assertStringContainsString('@param ?list<UuidInterface> $previousIds', $account);
-        self::assertStringContainsString('public UuidInterface $token,', $this->modelSource($plan, 'Session'));
+        self::assertStringContainsString('public UuidInterface $token,', $this->formatBindingModelSource($plan, 'Session'));
     }
 
     /**
@@ -77,7 +78,7 @@ final class FormatBindingTest extends TestCase
      */
     public function testTheBindingReachesAnOperationParameterAndUnwrapsItOnTheWire(): void
     {
-        $source = $this->clientSource($this->plan(['uuid' => RamseyUuidCodec::class]));
+        $source = $this->formatBindingClientSource($this->plan(['uuid' => RamseyUuidCodec::class]));
 
         self::assertStringContainsString('public function getAccount(UuidInterface $accountId)', $source);
         self::assertStringContainsString("->path('accountId', RamseyUuidCodec::encode(\$accountId))", $source);
@@ -85,7 +86,7 @@ final class FormatBindingTest extends TestCase
 
     public function testAnEmptyMapLeavesEveryFormatAtItsBaseType(): void
     {
-        $source = $this->modelSource($this->plan([]), 'Account');
+        $source = $this->formatBindingModelSource($this->plan([]), 'Account');
 
         self::assertStringContainsString('public string $id,', $source);
         self::assertFalse(str_contains($source, 'UuidInterface'));
@@ -101,14 +102,14 @@ final class FormatBindingTest extends TestCase
     {
         $plan = $this->plan(['uuid' => RamseyUuidCodec::class]);
 
-        self::assertStringContainsString('public ?string $avatar = null,', $this->modelSource($plan, 'Account'));
-        self::assertNotNull($this->noticeFor($plan, 'binary'));
+        self::assertStringContainsString('public ?string $avatar = null,', $this->formatBindingModelSource($plan, 'Account'));
+        self::assertNotNull($this->formatBindingNoticeFor($plan, 'binary'));
     }
 
     public function testABoundFormatStopsBeingReportedAsUnrecognised(): void
     {
-        self::assertNotNull($this->noticeFor($this->plan([]), 'uuid'));
-        self::assertNull($this->noticeFor($this->plan(['uuid' => RamseyUuidCodec::class]), 'uuid'));
+        self::assertNotNull($this->formatBindingNoticeFor($this->plan([]), 'uuid'));
+        self::assertNull($this->formatBindingNoticeFor($this->plan(['uuid' => RamseyUuidCodec::class]), 'uuid'));
     }
 
     /**
@@ -118,7 +119,7 @@ final class FormatBindingTest extends TestCase
      */
     public function testTheNoticeForAnUnboundUuidNamesTheReadyMadeBindings(): void
     {
-        $notice = $this->noticeFor($this->plan([]), 'uuid');
+        $notice = $this->formatBindingNoticeFor($this->plan([]), 'uuid');
 
         self::assertNotNull($notice);
         self::assertStringContainsString('poagen ships a binding for it', $notice);
@@ -133,7 +134,7 @@ final class FormatBindingTest extends TestCase
      */
     public function testTheNoticeForAFormatWithNoReadyMadeBindingKeepsTheGenericAdvice(): void
     {
-        $notice = $this->noticeFor($this->plan([]), 'email');
+        $notice = $this->formatBindingNoticeFor($this->plan([]), 'email');
 
         self::assertNotNull($notice);
         self::assertStringContainsString("['email' => YourValueObject::class]", $notice);
@@ -147,21 +148,21 @@ final class FormatBindingTest extends TestCase
         // won rather than the two agreeing.
         $plan = $this->plan(['email' => Slug::class], discoverIn: [self::VALUE_OBJECTS]);
 
-        self::assertStringContainsString('public ?Slug $contact = null,', $this->modelSource($plan, 'Account'));
+        self::assertStringContainsString('public ?Slug $contact = null,', $this->formatBindingModelSource($plan, 'Account'));
     }
 
     public function testADiscoveredBindsFormatStillAppliesToAFormatTheProfileSaysNothingAbout(): void
     {
         $plan = $this->plan(['uuid' => RamseyUuidCodec::class], discoverIn: [self::VALUE_OBJECTS]);
 
-        self::assertStringContainsString('public ?Email $contact = null,', $this->modelSource($plan, 'Account'));
+        self::assertStringContainsString('public ?Email $contact = null,', $this->formatBindingModelSource($plan, 'Account'));
     }
 
     public function testAProfileEntryBeatsABuiltIn(): void
     {
         $plan = $this->plan(['date-time' => Slug::class]);
 
-        self::assertStringContainsString('public ?Slug $createdAt = null,', $this->modelSource($plan, 'Session'));
+        self::assertStringContainsString('public ?Slug $createdAt = null,', $this->formatBindingModelSource($plan, 'Session'));
     }
 
     public function testAPerPropertyEntryBeatsAProfileEntryOnTheSameProperty(): void
@@ -170,7 +171,7 @@ final class FormatBindingTest extends TestCase
             ['uuid' => RamseyUuidCodec::class],
             propertyFormats: ['Account.id' => Slug::class],
         );
-        $source = $this->modelSource($plan, 'Account');
+        $source = $this->formatBindingModelSource($plan, 'Account');
 
         // The scoped key answers for its one property; the document-wide
         // entry still answers for every other site.
@@ -208,23 +209,10 @@ final class FormatBindingTest extends TestCase
      */
     public function testABoundUuidRoundTripsHydrationAndMarshalling(): void
     {
-        $output = self::makeSandboxDir('poagen-format-binding-');
-        self::generator()->generate(new Profile(
-            schema: self::SCHEMA,
-            output: $output,
-            namespace: self::NAMESPACE,
-            formats: ['uuid' => RamseyUuidCodec::class],
-        ));
-
-        $path = $output . '/Generated/Model/Account.php';
-        self::assertFileExists($path);
-        require $path;
-
-        $class = self::declaredClassEnding(self::NAMESPACE . '\\Generated\\Model\\Account');
-        $reflection = new ReflectionClass($class);
+        $reflection = $this->formatBindingRequireAccount(self::NAMESPACE, ['uuid' => RamseyUuidCodec::class]);
         $raw = '2b1a7f60-4c2c-4a5b-9c6e-6a2f0d1e3b44';
 
-        $hydrated = new Hydrator()->hydrate($class, ['id' => $raw]);
+        $hydrated = new Hydrator()->hydrate($reflection->getName(), ['id' => $raw]);
         $id = $reflection->getProperty('id')->getValue($hydrated);
 
         self::assertInstanceOf(UuidInterface::class, $id);
@@ -239,45 +227,6 @@ final class FormatBindingTest extends TestCase
      */
     private function plan(array $formats, array $discoverIn = [], array $propertyFormats = []): GenerationPlan
     {
-        return self::generator()->plan(new Profile(
-            schema: self::SCHEMA,
-            output: self::makeSandboxDir('poagen-format-binding-'),
-            namespace: self::NAMESPACE,
-            discoverIn: $discoverIn,
-            formats: $formats,
-            propertyFormats: $propertyFormats,
-        ));
-    }
-
-    private function modelSource(GenerationPlan $plan, string $className): string
-    {
-        return $this->writeEndingIn($plan, '/Model/' . $className . '.php');
-    }
-
-    private function clientSource(GenerationPlan $plan): string
-    {
-        return $this->writeEndingIn($plan, '/Generated/ApiClient.php');
-    }
-
-    private function writeEndingIn(GenerationPlan $plan, string $suffix): string
-    {
-        foreach ($plan->writes as $path => $source) {
-            if (str_ends_with($path, $suffix)) {
-                return $source;
-            }
-        }
-
-        self::fail("no write found ending in '{$suffix}'");
-    }
-
-    private function noticeFor(GenerationPlan $plan, string $format): ?string
-    {
-        foreach ($plan->notices as $notice) {
-            if (str_contains($notice, "format '{$format}' is not one poagen recognises")) {
-                return $notice;
-            }
-        }
-
-        return null;
+        return $this->formatBindingPlan(self::NAMESPACE, $formats, $discoverIn, $propertyFormats);
     }
 }

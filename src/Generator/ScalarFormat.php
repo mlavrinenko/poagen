@@ -22,8 +22,11 @@ use function ltrim;
  *     not require to implement anything, and conversion runs through the
  *     codec instead of through the property's own type
  *     (`codec-bindings-for-foreign-value-types`);
- *   - poagen-shipped built-ins like `date-time` / `date` → `\DateTimeImmutable`
- *     — the generator hard-codes the marshal/unmarshal expressions.
+ *   - poagen-shipped built-ins: `date-time` / `date` → `\DateTimeImmutable`,
+ *     and `byte` → `Format\Base64Codec` (`base64-binding-for-format-byte`) —
+ *     a built-in codec rather than a hard-coded marshal expression, since
+ *     `byte` is dependency-free but still needs the codec machinery a
+ *     hand-picked user codec does.
  *
  * A built-in is overridden by a user binding on the same format, so library
  * consumers remain free to swap `\DateTimeImmutable` for Carbon.

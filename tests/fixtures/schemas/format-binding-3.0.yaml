@@ -11,7 +11,10 @@ info:
     a `list<T>` item, not only a bare scalar property.
     `binary` and `email` are here as controls: neither is bound by the golden
     profile, and `binary` on a plain property is the case poagen deliberately
-    leaves as a bare string.
+    leaves as a bare string. `avatarBytes` (`format: byte`) is bound with no
+    profile entry at all — `base64-binding-for-format-byte`'s whole point —
+    so the golden shows a built-in codec sitting next to a profile-selected
+    one and an unbound control.
 paths:
   /accounts/{accountId}:
     get:
@@ -67,6 +70,9 @@ components:
         avatar:
           type: string
           format: binary
+        avatarBytes:
+          type: string
+          format: byte
         contact:
           type: string
           format: email

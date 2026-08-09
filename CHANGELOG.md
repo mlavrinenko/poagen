@@ -49,6 +49,15 @@ Mutation testing is wired and measured but deliberately stays outside
   wrappers `built-in-uuid-and-binary-format-bindings` shipped
   (`codec-bindings-for-foreign-value-types`,
   `reexpress-the-uuid-bindings-as-codecs.decision-260809`).
+- `format: byte` — OpenAPI's spelling for base64-encoded bytes inside a JSON
+  string — binds to `Runtime\Format\Base64Codec` with no `Profile::$formats`
+  entry required: both directions are `base64_decode()` (strict mode) /
+  `base64_encode()`, PHP core, so unlike `uuid` this one costs nobody a
+  dependency and poagen picks it by default, the same way `date-time`
+  already is. A payload that fails strict decoding is refused naming the
+  property. Still overridable through `$propertyFormats`, `$formats` or a
+  discovered `#[BindsFormat('byte')]`, like any other built-in
+  (`base64-binding-for-format-byte`).
 - OpenAPI `enum` components emit as PHP 8.1 backed enums under
   `Generated/Enum/` and replace their references in model properties
   (T-009).
