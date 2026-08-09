@@ -266,6 +266,12 @@ Mutation testing is wired and measured but deliberately stays outside
   this audit (T-027).
 - `composer.json` `minimum-stability` is `stable`; all deps are already
   stable releases.
+- `symfony/yaml` resolves to 8.1.2, closing CVE-2026-45304, CVE-2026-45305
+  and CVE-2026-45133 — three ways a hostile YAML document exhausts the
+  process. It reaches poagen transitively through
+  `devizzent/cebe-php-openapi` and is what parses the OpenAPI document you
+  pass `poagen generate`, so this is on the production path rather than a
+  dev one. Lock-only: nothing was added to `composer.json`.
 - CLI version string resolves from `Composer\InstalledVersions` so
   Packagist installs report the tagged release and in-repo runs report
   `dev-<branch>`; the `dev` fallback is regression-tested (T-017).
