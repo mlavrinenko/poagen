@@ -73,6 +73,7 @@ final readonly class OperationEmitter
         private EnvelopeTypeEmitter $envelopeTypes = new EnvelopeTypeEmitter(),
         private InlinePayloadCatalog $inlinePayloads = new InlinePayloadCatalog(),
         private array $preScannedSkips = [],
+        private SharedResponseMapPlan $sharedResponseMaps = new SharedResponseMapPlan(),
     ) {
         assert($registry instanceof NameRegistry, 'NameRegistry is required (T-023).');
         assert($operationIdRegistry instanceof NameRegistry, 'operationIdRegistry is required (T-025).');
@@ -213,11 +214,12 @@ final readonly class OperationEmitter
             $bindings,
             $activeSchemes,
         );
-        $method->setBody($this->callBody(
-            $segments,
-            $this->envelopeTypes->expr($namespace, $envelope, $this->modelNamespace),
-            $envelopeDoc,
-        ));
+        // A group the consumer declared replaces this operation's own map
+        // literal with a call to the one shared declaration; every operation
+        // no group named emits the literal exactly as it always has.
+        $responseType = $this->sharedResponseMaps->expressionFor($namespace, $rawOperationId)
+            ?? $this->envelopeTypes->expr($namespace, $envelope, $this->modelNamespace);
+        $method->setBody($this->callBody($segments, $responseType, $envelopeDoc));
 
         return EmitOutcome::emitted();
     }

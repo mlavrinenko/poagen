@@ -81,6 +81,7 @@ final readonly class Profile
      *                                              document fails the run, as does a merge whose sites do not
      *                                              all emit the identical shape, naming the two sites that
      *                                              differ and the property they differ on.
+     * @param array<string, list<string>> $responseMaps Names the operations whose response map is ONE shared declaration, keyed by the PHP method poagen emits for it on `Generated\ResponseMaps` — the emitter then writes that map once and every named operation calls it, instead of each spelling out its own `StatusResponseMap` literal. Sharing is stated, never inferred: two operations that happen to declare identical responses stay separate unless a group names them, because structural identity is not identity of meaning (the 2026-08-02 ruling on inline models, one layer up). A malformed group fails before the document is read {@see ResponseMapGroups}; a group naming an operation the document does not carry, an operation this run refuses, or operations whose maps are not in fact identical fails naming the entry and the two members that differ {@see Emit\SharedResponseMapPlan}. Declaring none costs nothing — no file is emitted and every other byte is unchanged.
      * @param array<string,string>  $propertyRenames Map of `'<RawComponentName>.<wirePropertyName>'` → desired
      *                                              PHP property name, for a vendor spelling not worth reading on
      *                                              every access (`result_code`, `client_id`, `goods_data`) — the
@@ -222,6 +223,7 @@ final readonly class Profile
         public array $tagChoice = [],
         public array $xmlElements = [],
         public array $inlineModels = [],
+        public array $responseMaps = [],
         public array $propertyRenames = [],
         public array $phpDocTypes = [],
         public array $formats = [],
