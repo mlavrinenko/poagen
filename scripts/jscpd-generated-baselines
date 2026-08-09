@@ -145,6 +145,31 @@
 # leave a majority of every tree's client-to-client clones (and all of its
 # model-to-model clones) cross-file and unreachable — see the decision above
 # for why that is now settled rather than open.
+#
+# RE-MEASURED 2026-08-09 by `opt-in-collapse-for-repeated-response-maps`,
+# recorded in `a-shared-response-map-is-named-not-inferred.decision-260809.typ`.
+# The cross-class, opt-in collapse the two decisions above each named and
+# neither filed now exists: `Profile::$responseMaps` names the operations
+# whose response map is one shared declaration, and the emitter writes it once
+# onto `Generated\ResponseMaps`. No number below moves, because no profile in
+# this repository declares a group — every row measures byte-identical to the
+# 08-09 reading above (petstore 4.40% / 4 clones / 35 of 795, kilbil 1.42% / 2
+# / 37 of 2609, digitalocean 10.92% / 288 / 3441 of 31516, github 22.31% /
+# 1431 / 24159 of 108290).
+#
+# What the lever is worth was measured rather than projected, by regenerating
+# each tree twice into scratch directories — once with no group, once with
+# every group whose operations already emit a byte-identical map — and reading
+# jscpd's JSON reporter on both. The no-group runs reproduce the four rows
+# below exactly, which is what makes the pair comparable: petstore 4.402516%
+# -> 0.000000%, kilbil 1.418168% -> unchanged (it has no two operations
+# sharing a literal at all), digitalocean 10.918264% -> 7.484342%, github
+# 22.309539% -> 19.659980%. None of that is committed, and the decision above
+# says why: those groups were derived by matching shapes, which is the move
+# the 2026-08-02 inline-model ruling forbids, so pasting them into
+# `examples/*/poagen.php` would launder a heuristic through a profile rather
+# than record a consumer's judgement. Any future fall in a row below is a
+# consumer opting in, not an emitter change.
 
 # 4 clones, 35 lines over 795 — envelope-shaped response maps, not models.
 # Two are cross-file, StoreClient.php against UserClient.php (6 and 7 lines):
