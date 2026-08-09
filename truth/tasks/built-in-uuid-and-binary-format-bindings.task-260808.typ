@@ -5,7 +5,7 @@
   tags: ("generator", "runtime", "dx"),
   priority: 2,
   difficulty: 3,
-  status: proposed(2026, 8, 8),
+  status: done(2026, 8, 9),
   links: (
     related("codec-bindings-for-foreign-value-types.task-260809.typ"),
     related("base64-binding-for-format-byte.task-260809.typ"),
