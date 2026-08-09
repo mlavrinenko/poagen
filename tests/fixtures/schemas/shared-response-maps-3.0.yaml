@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: Shared response maps
+  version: 1.0.0
+  description: >
+    Three operations across two tags declare the identical response map, and a
+    fourth declares a different one. Nothing about that is visible to the
+    generator without a `Profile::$responseMaps` entry naming the three: a
+    document where two unrelated operations happen to agree is still two
+    operations, per the ruling that structural identity is not identity of
+    meaning.
+paths:
+  /invoices/{invoiceId}:
+    delete:
+      operationId: deleteInvoice
+      tags: [billing]
+      summary: Delete an invoice
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: No such invoice
+        default:
+          description: Anything else the gateway returns
+  /invoices/{invoiceId}/void:
+    post:
+      operationId: voidInvoice
+      tags: [billing]
+      summary: Void an invoice
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Voided
+        '404':
+          description: No such invoice
+        default:
+          description: Anything else the gateway returns
+  /customers/{customerId}:
+    get:
+      operationId: getCustomer
+      tags: [customers]
+      summary: Read one customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: No such customer
+        default:
+          description: Anything else the gateway returns
+    delete:
+      operationId: deleteCustomer
+      tags: [customers]
+      summary: Delete a customer
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: No such customer
+        default:
+          description: Anything else the gateway returns
+components:
+  schemas:
+    Customer:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string

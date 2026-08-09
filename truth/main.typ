@@ -177,6 +177,8 @@
 #include "decisions/reexpress-the-uuid-bindings-as-codecs.decision-260809.typ"
 #pagebreak()
 #include "decisions/generated-tier-ceilings-cannot-fall-further.decision-260809.typ"
+#pagebreak()
+#include "decisions/a-shared-response-map-is-named-not-inferred.decision-260809.typ"
 
 // --- Supplementary artefacts ---
 //

@@ -62,6 +62,9 @@ final readonly class Generator
      */
     public function plan(Profile $profile): GenerationPlan
     {
+        // Answerable from the profile alone, so answered before the document is
+        // read — ResponseMapGroups says why this one does not wait to be collected.
+        ResponseMapGroups::assertWellFormed($profile->responseMaps);
         $bindings = $this->scanner->scan($profile);
 
         // Keep $ref nodes as Reference objects so the emitter can resolve them to typed cross-class references.
@@ -142,6 +145,9 @@ final readonly class Generator
         // See UnionCatalog::merge() for why the response-position half waits for this walk.
         $unions = UnionCatalog::merge($unions, $inlinePayloads->responseUnions());
 
+        // Waits for the same walk: a group's members are compared by the envelope each resolved to.
+        $shared = Emit\SharedResponseMapPlan::build($profile->responseMaps, $openApi, $inlinePayloads, $rootNamespace, $modelNamespace);
+
         // An override the emitted model could not honour is refused here rather
         // than dropped — the type it has to agree with only exists once the
         // property is resolved, so the check rides back out of the emission
@@ -162,8 +168,9 @@ final readonly class Generator
             $profile->phpDocTypes,
         );
         $tagRegistry = new Naming\NameRegistry($normaliser);
-        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $writes);
+        $skipped = $this->emitClient($openApi, $rootNamespace, $rootDir, $modelNamespace, $registry, $operationIdRegistry, $normaliser, $bindings, $enums, $components, $inlinePayloads, $preScannedSkips, $profile, $tagRegistry, $shared, $writes);
         $this->apiExceptionEmitter->emitInto($rootNamespace, $rootDir, $writes);
+        new Emit\SharedResponseMapEmitter()->emitInto($shared, $rootNamespace, $rootDir, $modelNamespace, $writes);
         $this->enumEmitter->emitAllInto($enums, $enumDir, $writes);
 
         $prunes = $this->prunePlanner->plan($rootDir, $writes);
@@ -207,6 +214,9 @@ final readonly class Generator
             // Answerable from the class alone, so unlike its per-property
             // sibling above this one needs neither the document nor the ledger.
             ...$this->formatBindingValidator->validate($profile->formats),
+            // The half of $responseMaps only the document can answer; the rest
+            // already failed before it was read (ResponseMapGroups).
+            ...$shared->failures,
             ...$modelFailures,
             ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];
@@ -246,6 +256,7 @@ final readonly class Generator
         array $preScannedSkips,
         Profile $profile,
         Naming\NameRegistry $tagRegistry,
+        Emit\SharedResponseMapPlan $shared,
         array &$writes,
     ): array {
         if ($openApi->paths === null) {
@@ -261,6 +272,7 @@ final readonly class Generator
             components: $components,
             inlinePayloads: $inlinePayloads,
             preScannedSkips: $preScannedSkips,
+            sharedResponseMaps: $shared,
         ));
         $emitter->emit($rootNamespace, $rootDir, $openApi, $bindings, $profile, $tagRegistry, $writes);
 

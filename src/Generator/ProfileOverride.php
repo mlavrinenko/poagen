@@ -43,6 +43,7 @@ final readonly class ProfileOverride
             tagChoice: $profile->tagChoice,
             xmlElements: $profile->xmlElements,
             inlineModels: $profile->inlineModels,
+            responseMaps: $profile->responseMaps,
             propertyRenames: $profile->propertyRenames,
             phpDocTypes: $profile->phpDocTypes,
             formats: $profile->formats,

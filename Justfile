@@ -220,6 +220,16 @@ lint-linecop:
 # moves down, it is not a mandate to move down *immediately* every time
 # real duplication falls.
 #
+# Re-measured 2026-08-09 after `opt-in-collapse-for-repeated-response-maps`
+# added four files under src/ and three test files: 2.65% duplicated lines,
+# 145 clones over 436 files — about 192 lines of margin, essentially the same
+# as the 2.63%/142/426 above. The three clones the new files take part in are
+# all the class-docblock-header family that ten other test pairs in this tree
+# already form (`UuidFormatBindingTest` against `FormatBindingValidatorTest`,
+# `SchemaWalkReferencedResponseTest` against `SchemaWalkTest`, and so on):
+# accepted here on the same terms as those, not a new category. The threshold
+# does not move.
+#
 # Every measured figure this comment carried before 2026-08-09 was stale,
 # and each was true when written: 4.99%/90 and 5.09%/92 predate
 # deduplicate-the-test-suite, a "5.5%" threshold outlived its own recipe
@@ -356,6 +366,19 @@ lint-jscpd: tmpdir
 # already ruled out. The margin is deliberately zero, not an oversight —
 # see `generated-tier-ceilings-cannot-fall-further.decision-260809.typ` for
 # the full accounting, clone by clone.
+#
+# `opt-in-collapse-for-repeated-response-maps` built the one lever both of
+# those decisions named and neither filed — `Profile::$responseMaps`, a
+# consumer naming the operations whose response map is one shared
+# declaration, emitted once onto `Generated\ResponseMaps`. Every row below
+# is byte-identical after it, because no profile here declares a group; what
+# the lever measures out at when one does (petstore 4.40 -> 0.00,
+# digitalocean 10.92 -> 7.48, github 22.31 -> 19.66, kilbil unmoved) is in
+# `a-shared-response-map-is-named-not-inferred.decision-260809.typ`, along
+# with why deriving those groups from matching shapes is not poagen's to
+# commit on a vendor's document. The tier also gains one fixture tree,
+# `tests/fixtures/generated/shared-response-maps`, at 0.00% under the 4.41
+# fallback below.
 lint-jscpd-generated: tmpdir
     #!/usr/bin/env bash
     set -eo pipefail
