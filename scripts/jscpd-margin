@@ -1,0 +1,58 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/*
+ * jscpd-margin — read one jscpd JSON report and print the measured
+ * duplication percentage against the ceiling the recipe just gated on.
+ *
+ * Before `heal-the-duplication-gate-margins`, `lint-jscpd` and
+ * `lint-jscpd-generated` printed only jscpd's own "Found N clones." line,
+ * which prints on a PASSING run too — so a reader watching `just check`
+ * scroll past it on an exit-0 run could not tell a pass with margin from a
+ * gate that failed open. This closes that gap by printing the number the
+ * gate actually decided on.
+ *
+ * This script never decides pass or fail. `--threshold`'s own exit code —
+ * already captured by the recipe before this runs — is the gate, per the
+ * Justfile's `lint-jscpd` comment on why `--exit-code` must never be added
+ * alongside it. This only formats a line for the human reading the log, so
+ * it always exits 0: a report this script cannot parse must not mask (by
+ * exiting 0 silently) or manufacture (by exiting nonzero) a gate result the
+ * jscpd invocation already settled.
+ *
+ * Usage:
+ *   scripts/jscpd-margin <label> <jscpd-report.json> <ceiling>
+ */
+
+$args = array_slice($argv, 1);
+
+if (count($args) !== 3) {
+    fwrite(STDERR, "usage: jscpd-margin <label> <jscpd-report.json> <ceiling>\n");
+    exit(0);
+}
+
+[$label, $reportPath, $ceilingArg] = $args;
+
+if (!is_numeric($ceilingArg)) {
+    fwrite(STDERR, "jscpd-margin: ceiling '{$ceilingArg}' is not numeric — nothing printed\n");
+    exit(0);
+}
+$ceiling = (float) $ceilingArg;
+
+if (!is_file($reportPath)) {
+    fwrite(STDERR, "jscpd-margin: no report at {$reportPath} — nothing printed\n");
+    exit(0);
+}
+
+$report = json_decode((string) file_get_contents($reportPath), true);
+if (!is_array($report) || !isset($report['statistics']['total']['percentage'])) {
+    fwrite(STDERR, "jscpd-margin: {$reportPath} has no statistics.total.percentage — nothing printed\n");
+    exit(0);
+}
+
+$measured = (float) $report['statistics']['total']['percentage'];
+$margin = $ceiling - $measured;
+
+printf("%s: %.2f%% against ceiling %.2f%% (margin %.2f)\n", $label, $measured, $ceiling, $margin);

@@ -169,37 +169,78 @@ lint-linecop:
 # handful of same-shape assertions or test doubles that ARE a test's subject)
 # was left alone on purpose.
 #
-# Measured 2026-08-05, hand-written code including `runtime/tests` (see
-# below): 2.96% duplicated lines (1.68% duplicated tokens), 138 clones over
-# 364 files. Up from the 2.82%/83/230 recorded the same way one line above,
-# a real increase, not tool noise:
-# `bundle-the-runtime-package-with-its-own-ci-tooling` moved
-# `tests/Unit/Runtime/` to `runtime/tests/` and added that path to this
-# recipe's scan (it was already inside the old `tests` scan, just nested
-# deeper), and the new fixtures that package's tests needed of their own
-# (`Poagen\Runtime\Tests\Fixtures\ApiException`,
-# `Poagen\Runtime\Tests\Fixtures\RecordingClient`) are the same shape as
-# equivalents already living in `tests/` and `tests/fixtures/generated/`,
-# on purpose — see those classes' own comments for why a real, if small,
-# duplication was the correct trade against depending on the generator's
-# emitted output from inside a package that has to build with the
-# generator absent. 3.0% still holds, with far less room under it than the
-# 2.82% baseline had — the next real clone anywhere in this scan is likely
-# to be the one that tips it over.
+# Measured 2026-08-05, hand-written code including `runtime/tests`: 2.96%
+# duplicated lines, 138 clones over 364 files — historical now, folded into
+# the "every figure before" paragraph below.
 #
-# Every measured figure this comment carried before was stale, and each was
-# true when written: 4.99%/90 and 5.09%/92 predate deduplicate-the-test-suite,
-# a "5.5%" threshold outlived its own recipe (the argument had read 3.5 for
-# two days), and the 3.36%/76 recorded on 2026-08-01 measured 3.20%/92 on the
-# tree that replaced it. Re-measure before you cite one.
+# `heal-the-duplication-gate-margins` found the ratchet nearly tripwired:
+# measured 2026-08-09 at this task's base commit, 2.98% against this 3.0%
+# threshold (157 clones, 422 files) — about 12 lines of slack, essentially
+# none. The fix came from the tree, not the number: jscpd's own JSON
+# reporter (`--reporters json`, read via `statistics.total.percentage`
+# rather than eyeballed off the console table) named the largest single
+# clone family as nine tests/Integration/ files carrying a byte-identical
+# copy of a `plan(array $skip): GenerationPlan` /
+# `refusalMessage(array $skip): string` / `clientSource(GenerationPlan
+# $plan): string` / `modelSource(GenerationPlan $plan, string $className):
+# string` quartet — the same "does this schema construct get accepted or
+# refused" scaffolding `deduplicate-the-test-suite` already collapsed once
+# for a different family, just not this one. Four new traits under
+# tests/Support/ replaced the per-file copies: SkipPlanFixture (the
+# `plan()` all nine shared, sandbox prefix now derived from the class name
+# instead of a per-file literal), RefusalPlanFixture (composes it, adds
+# `refusalMessage()` for the four files that also assert on a caught
+# `UnrepresentableConstructsException`), and ApiClientSourceFixture /
+# ModelSourceFixture for the smaller `clientSource()` / `modelSource()`
+# families. Every call site still reads `$this->plan(...)`,
+# `$this->refusalMessage(...)`, unchanged — what each test asserts did not
+# move, only where the plumbing lives.
+#
+# Measured again the same day, after the traits: 2.63% duplicated lines,
+# 142 clones over 426 files (the four new trait files count too) — about
+# 196 lines of margin against this 3.0% threshold, up from about 12. What
+# is left splits, by the same JSON report, into: hand-written source clones
+# that are genuine duplicated logic, not scaffolding
+# (`src/Generator/ProfileTargetValidator.php` against
+# `src/Generator/SkipListValidator.php`, 28 lines, plus a long tail of
+# smaller `Generator/Emit/*` pairs); fixture-schema YAML pairs that are
+# deliberately-similar but distinct test documents, not preamble
+# (`fixtures/schemas/nullable-idiom-3.0.yaml` against its `3.1` sibling, 28
+# lines); and test-double pairs already ruled "left alone on purpose" two
+# paragraphs up, because the shape IS what the test proves
+# (`examples/petstore/src/CachingStoreClient.php` against
+# `tests/generated/CachingStoreClient.php`, ~67 raw lines across three
+# clone entries). None of that remainder is the repeated-text-saying-
+# nothing the import-block `ignorePattern` above targets, so none of it
+# gets one.
+#
+# The threshold stays 3.0. Shrinking the duplicated-line count and then
+# re-tightening the threshold to hug the new figure would recreate the
+# exact zero-slack tripwire this task exists to fix — a RATCHET only ever
+# moves down, it is not a mandate to move down *immediately* every time
+# real duplication falls.
+#
+# Every measured figure this comment carried before 2026-08-09 was stale,
+# and each was true when written: 4.99%/90 and 5.09%/92 predate
+# deduplicate-the-test-suite, a "5.5%" threshold outlived its own recipe
+# (the argument had read 3.5 for two days), the 3.36%/76 recorded on
+# 2026-08-01 measured 3.20%/92 on the tree that replaced it, and
+# 2.96%/138/364 (above) predates this task's own trait extraction.
+# Re-measure before you cite one.
 #
 # RATCHET: this number only ever moves DOWN. Never raise it to admit a clone.
-lint-jscpd:
+lint-jscpd: tmpdir
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
     paths=(src runtime/src runtime/tests tests examples/*/src)
-    jscpd -c .jscpd.json --threshold 3.0 "${paths[@]}"
+    reportdir="$TMPDIR/jscpd-source"
+    rm -rf "$reportdir"
+    mkdir -p "$reportdir"
+    status=0
+    jscpd -c .jscpd.json --threshold 3.0 --reporters console,json --output "$reportdir" "${paths[@]}" || status=$?
+    scripts/jscpd-margin "source tree" "$reportdir/jscpd-report.json" 3.0
+    exit $status
 
 # Duplication gate on emitted output, ONE TREE AT A TIME (generated tier;
 # generated-tier-duplication-ratchet-blocks-new-golden-trees)
@@ -274,7 +315,10 @@ lint-jscpd:
 # clones, 37 lines. Every other tree — including both goldens added that day —
 # measures 0.00%. 2.0% is set just above the worst: 44 lines at kilbil's size,
 # so about 7 lines of slack, less than one `minTokens: 50` clone. Green today,
-# minimal slack, no license to add more duplication.
+# minimal slack, no license to add more duplication. Historical: this 2.0%
+# fallback and the mechanism it illustrates (worst tree sets the ceiling) are
+# what the paragraphs below moved on from — see `4.41`, not `2.0`, for the
+# fallback this recipe actually uses now.
 #
 # RATCHET: this number only ever moves DOWN as emitted duplication is
 # collapsed further. It does not move when a golden tree is added — that is
@@ -295,7 +339,24 @@ lint-jscpd:
 # 08-04 (same 4 clones, same 35/795), so 4.41 is still the measured floor
 # rounded up, not slack nobody re-checked. See
 # `duplication-ceilings-follow-regeneration-not-collapse.decision-260808.typ`.
-lint-jscpd-generated:
+#
+# `heal-the-duplication-gate-margins` found all four `examples/*/generated`
+# rows sitting at, or a fraction of a line under, their ceiling — three pass
+# only by equality (measured rounds to exactly the threshold) and the
+# fourth, digitalocean, by about half a line. Re-measured 2026-08-09: every
+# tree's clone count and duplicated-line count is unchanged or byte-identical
+# to the 08-08 reading (kilbil and digitalocean's percentages drifted a
+# hundredth from an unrelated regeneration growing the tree around the same
+# clones — see `scripts/jscpd-generated-baselines`). This is not an
+# unmeasured gap: the deferred per-class `StatusResponseMap` helper was
+# re-checked against today's tree and still leaves a majority of every
+# tree's client-to-client clones, and all of its model-to-model clones,
+# cross-file and unreachable, and reaching the rest would repeat the
+# structural-identity merge `name-inline-schemas-by-operation-and-status`
+# already ruled out. The margin is deliberately zero, not an oversight —
+# see `generated-tier-ceilings-cannot-fall-further.decision-260809.typ` for
+# the full accounting, clone by clone.
+lint-jscpd-generated: tmpdir
     #!/usr/bin/env bash
     set -eo pipefail
     shopt -s nullglob
@@ -338,7 +399,11 @@ lint-jscpd-generated:
         fi
 
         echo "== $tree (ceiling ${threshold}%) =="
-        jscpd -c .jscpd.generated.json --threshold "$threshold" "$tree" || status=1
+        reportdir="$TMPDIR/jscpd-generated/$(echo "$tree" | tr '/' '_')"
+        rm -rf "$reportdir"
+        mkdir -p "$reportdir"
+        jscpd -c .jscpd.generated.json --threshold "$threshold" --reporters console,json --output "$reportdir" "$tree" || status=1
+        scripts/jscpd-margin "$tree" "$reportdir/jscpd-report.json" "$threshold"
     done
     exit $status
 
