@@ -5,7 +5,7 @@
   tags: ("generator", "gates"),
   priority: 2,
   difficulty: 7,
-  status: proposed(2026, 8, 9),
+  status: done(2026, 8, 9),
   links: (
     related("heal-the-duplication-gate-margins.task-260809.typ"),
     related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
