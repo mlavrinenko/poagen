@@ -5,7 +5,11 @@
   tags: ("generator", "runtime"),
   priority: 2,
   difficulty: 4,
-  status: proposed(2026, 8, 9),
+  status: done(
+    2026,
+    8,
+    9,
+  )[Codec contract shipped; uuid wrappers re-expressed as codecs rather than kept boxed (decision-260809)],
   links: (related("built-in-uuid-and-binary-format-bindings.task-260808.typ"),),
 )
 

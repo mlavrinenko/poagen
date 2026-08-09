@@ -5,7 +5,11 @@
   tags: ("generator", "runtime"),
   priority: 2,
   difficulty: 2,
-  status: proposed(2026, 8, 9),
+  status: done(
+    2026,
+    8,
+    9,
+  )[Base64Codec is a default built-in; digitalocean's three byte sites adopted it in their own commit],
   links: (related("built-in-uuid-and-binary-format-bindings.task-260808.typ"),),
 )
 
