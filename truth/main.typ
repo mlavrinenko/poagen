@@ -171,6 +171,8 @@
 #include "decisions/queue-drained-models-swallow-emission-failures.decision-260808.typ"
 #pagebreak()
 #include "decisions/synthesised-model-failures-reach-the-run-report.decision-260808.typ"
+#pagebreak()
+#include "decisions/binary-on-a-property-stays-advisory.decision-260809.typ"
 
 // --- Supplementary artefacts ---
 //

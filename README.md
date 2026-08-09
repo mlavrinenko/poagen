@@ -128,6 +128,62 @@ schema?".
 A minimal sample profile also lives at
 [`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).
 
+### Binding a `format` to a value object
+
+`format: date-time` and `format: date` resolve to `DateTimeImmutable` on
+their own. Every other `format` keeps its base type and poagen prints a
+notice naming it, because guessing a type for a vendor's annotation is worse
+than saying it went unread.
+
+`uuid` is the one poagen ships bindings for. It does not apply one by
+default: PHP has no core UUID type, so any binding is a dependency decision,
+and a consumer who already has `symfony/uid` should not be handed
+`ramsey/uuid`. Pick one in the profile:
+
+```php
+use Poagen\Runtime\Format\RamseyUuid;   // needs ramsey/uuid
+use Poagen\Runtime\Format\SymfonyUuid;  // needs symfony/uid
+
+return new Profile(
+    // ...
+    formats: ['uuid' => RamseyUuid::class],
+);
+```
+
+Every property and parameter carrying that format now takes the binding, and
+`composer require ramsey/uuid` is the other half — it is a `suggest` of
+`poagen/client-runtime`, never a `require`. The library value is one hop in
+(`$account->id->value`), or `(string) $account->id` for the canonical form.
+
+Any value object of your own goes in the same map, and needs nothing but
+`Poagen\Runtime\ScalarBinding`:
+
+```php
+final readonly class Ulid implements ScalarBinding
+{
+    public function __construct(public string $value) {}
+
+    public static function fromScalar(mixed $raw): self { /* validate */ }
+
+    public function toScalar(): string { return $this->value; }
+}
+```
+
+Three ways to attach one, most specific first:
+
+| Route | Reach |
+| --- | --- |
+| `Profile::$propertyFormats` | one property of one model, keyed `'<ModelClass>.<wireName>'` |
+| `Profile::$formats` | every site carrying that format, document-wide |
+| `#[BindsFormat('uuid')]` + `Profile::$discoverIn` | same reach, discovered by scanning your namespaces |
+
+All three beat a built-in, so swapping `DateTimeImmutable` for Carbon is one
+entry. See
+[`tests/fixtures/profiles/format-binding.php`](tests/fixtures/profiles/format-binding.php)
+and its committed
+[`generated/`](tests/fixtures/generated/format-binding) tree for the emitted
+shape.
+
 ## Development
 
 ```bash

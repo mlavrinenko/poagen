@@ -7,6 +7,7 @@ namespace Poagen\Generator\Generator\Emit;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Schema;
 use Poagen\Generator\Generator\Bindings;
+use Poagen\Generator\Generator\ReadyMadeBindings;
 use Poagen\Generator\Generator\ScalarFormat;
 
 use function is_string;
@@ -83,17 +84,47 @@ final readonly class FormatAdvisor
         foreach ($formats as $format) {
             $notices[] = sprintf(
                 "format '%s' is not one poagen recognises — %d use(s), first at %s. The property keeps its base "
-                    . "type. To give it a type of your own, put #[BindsFormat('%s')] on a value object in a "
-                    . 'namespace listed in Profile::$discoverIn; implement Runtime\\ScalarBinding on it and poagen '
-                    . 'round-trips it as the underlying scalar at the wire boundary.',
+                    . 'type. %s',
                 $format,
                 $counts[$format],
                 $firstSeen[$format],
-                $format,
+                self::advice($format),
             );
         }
 
         return $notices;
+    }
+
+    /**
+     * What to do about it. Two answers, because for a format poagen already
+     * ships a binding for, telling the consumer to go write a value object is
+     * advice that costs them an afternoon poagen could have saved
+     * (`ship-ready-made-uuid-bindings`). Naming the package alongside the
+     * class is deliberate: selecting a binding whose library is not installed
+     * fails at run time with a class-not-found, and this is the line that
+     * could have said so first.
+     */
+    private static function advice(string $format): string
+    {
+        $candidates = ReadyMadeBindings::candidatesFor($format);
+
+        if ($candidates !== null) {
+            return sprintf(
+                "poagen ships a binding for it: put ['%s' => <one of %s>] in Profile::\$formats and require that "
+                    . 'package. A value object of your own goes in the same map.',
+                $format,
+                $candidates,
+            );
+        }
+
+        return sprintf(
+            'To give it a type of your own, implement Runtime\\ScalarBinding on a value object and either name '
+                . "it in Profile::\$formats as ['%s' => YourValueObject::class], or put #[BindsFormat('%s')] on "
+                . 'it in a namespace listed in Profile::$discoverIn; poagen round-trips it as the underlying '
+                . 'scalar at the wire boundary.',
+            $format,
+            $format,
+        );
     }
 
     /**

@@ -32,6 +32,7 @@ final readonly class Generator
         private PropertyRenameValidator $propertyRenameValidator = new PropertyRenameValidator(),
         private PhpDocTypeValidator $phpDocTypeValidator = new PhpDocTypeValidator(),
         private PropertyFormatValidator $propertyFormatValidator = new PropertyFormatValidator(),
+        private FormatBindingValidator $formatBindingValidator = new FormatBindingValidator(),
         private UnionGuidanceValidator $unionGuidance = new UnionGuidanceValidator(),
         private PrunePlanner $prunePlanner = new PrunePlanner(),
     ) {
@@ -203,6 +204,9 @@ final readonly class Generator
             // what claims every synthesised model's name, not just the
             // named-component ones claimed before it runs.
             ...$this->propertyFormatValidator->validate($profile->propertyFormats, $ledger->claimedNames()),
+            // Answerable from the class alone, so unlike its per-property
+            // sibling above this one needs neither the document nor the ledger.
+            ...$this->formatBindingValidator->validate($profile->formats),
             ...$modelFailures,
             ...$this->unionGuidance->validate($openApi, $profile, $unions, $operationIdRegistry),
         ];

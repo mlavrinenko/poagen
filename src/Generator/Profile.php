@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator;
 
 use Poagen\Generator\Generator\Emit\WebhookSkipKey;
+use Poagen\Runtime\ScalarBinding;
 
 /**
  * User-supplied generation guidance. See `profile-driven-generation` /
@@ -95,6 +96,24 @@ final readonly class Profile
      *                                              with another property already in the same model, fails the
      *                                              run naming both.
      * @param array<string,string>  $phpDocTypes    Forces a model property's PHPDoc type, keyed like $propertyRenames — the override channel for a narrowing OpenAPI cannot spell (chiefly `numeric-string`), winning over the constraint-derived narrowing {@see Emit\PhpDocTypeRefiner} computes; a stale key fails the run {@see PhpDocTypeValidator} (refined-phpdoc-types), and so does a value the property cannot carry — a base type the native one contradicts, a structural or class-typed property, a nullability the schema already decides {@see Emit\PhpDocTypeCompatibility}.
+     * @param array<string,string>  $formats        Binds a value object to every property carrying one
+     *                                              `format`, document-wide — the same reach
+     *                                              `#[BindsFormat]` has, said in the profile instead of
+     *                                              on a class the consumer had to write first. That
+     *                                              distinction is the whole point for a format poagen
+     *                                              already ships a binding for: `'uuid' =>
+     *                                              Runtime\Format\RamseyUuid::class` is one line against
+     *                                              a value object per project, and swapping libraries is
+     *                                              editing that line. Values are a class-string
+     *                                              implementing {@see ScalarBinding};
+     *                                              unlike $propertyFormats, whose key cannot be judged
+     *                                              until the run has named every model, a key here is a
+     *                                              bare format string, so {@see FormatBindingValidator}
+     *                                              checks both halves before the document is read and
+     *                                              fails naming the format and the class. Loses to a
+     *                                              $propertyFormats entry covering the same property,
+     *                                              and beats a discovered `#[BindsFormat]` on the same
+     *                                              format: explicit guidance over discovery.
      * @param array<string,string>  $propertyFormats Binds a value object to one property of one
      *                                              model — the per-property answer `#[BindsFormat]`
      *                                              cannot give, because that attribute keys on the
@@ -117,7 +136,7 @@ final readonly class Profile
      *                                              {@see Emit\ModelNameLedger} already guarantees it is
      *                                              unique across the whole tree. The bound class need not
      *                                              carry `#[BindsFormat]` or live under $discoverIn —
-     *                                              unlike $formats, this entry
+     *                                              unlike a discovered binding, this entry
      *                                              takes effect on its own. A stale key naming a
      *                                              property absent from a model this run does emit
      *                                              fails naming both {@see Emit\ModelEmitter} and
@@ -199,6 +218,7 @@ final readonly class Profile
         public array $inlineModels = [],
         public array $propertyRenames = [],
         public array $phpDocTypes = [],
+        public array $formats = [],
         public array $propertyFormats = [],
         public array $securitySchemes = [],
         public string $source = 'poagen.php',

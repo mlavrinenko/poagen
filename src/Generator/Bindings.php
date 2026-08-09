@@ -31,6 +31,15 @@ final readonly class Bindings
      *                                             applying document-wide wherever that format appears.
      *                                             Scanner-verified: every entry came off a real
      *                                             {@see ReflectionClass}, never a hand-typed string.
+     * @param array<string,string> $profileFormats Profile::$formats — the same document-wide reach as
+     *                                             $formats, declared in the profile rather than
+     *                                             discovered on a class, and consulted ahead of it so
+     *                                             that naming a binding explicitly overrides whatever
+     *                                             the scan happened to find for that format. Verified
+     *                                             before the run starts {@see FormatBindingValidator},
+     *                                             so unlike $propertyFormats every entry here is known
+     *                                             to name a real ScalarBinding by the time an emitter
+     *                                             reads it.
      * @param array<string,string> $propertyFormats Profile::$propertyFormats, unsliced and not yet
      *                                             checked — keyed `'<ModelClassName>.<wirePropertyName>'`.
      *                                             Consulted first, ahead of $formats, whenever a caller
@@ -45,6 +54,7 @@ final readonly class Bindings
      */
     public function __construct(
         public array $formats,
+        public array $profileFormats = [],
         public array $propertyFormats = [],
         public Emit\UnionCatalog $unions = new Emit\UnionCatalog(),
     ) {}
@@ -57,7 +67,7 @@ final readonly class Bindings
      */
     public function withUnions(Emit\UnionCatalog $unions): self
     {
-        return new self($this->formats, $this->propertyFormats, $unions);
+        return new self($this->formats, $this->profileFormats, $this->propertyFormats, $unions);
     }
 
     public function formatType(string $format, string $scopeKey = ''): ?string
@@ -118,11 +128,14 @@ final readonly class Bindings
     }
 
     /**
-     * `$propertyFormats[$scopeKey]` wins over `$formats[$format]` whenever
-     * `$scopeKey` is non-empty and matches — a scoped entry answers for its
-     * one property regardless of what the document-wide map says about the
-     * same format string, which is the entire point of scoping one
-     * (bind-a-format-per-property).
+     * Most specific answer wins. `$propertyFormats[$scopeKey]` beats both
+     * document-wide maps whenever `$scopeKey` is non-empty and matches — a
+     * scoped entry answers for its one property regardless of what either map
+     * says about the same format string, which is the entire point of scoping
+     * one (bind-a-format-per-property). Between the two document-wide maps,
+     * `$profileFormats` beats `$formats`: the profile named that class on
+     * purpose, while a `#[BindsFormat]` under `$discoverIn` was found by a
+     * scan the consumer may not have had this format in mind for.
      */
     private function boundType(string $format, string $scopeKey): ?string
     {
@@ -130,6 +143,10 @@ final readonly class Bindings
             return $this->propertyFormats[$scopeKey];
         }
 
-        return $format === '' ? null : ($this->formats[$format] ?? null);
+        if ($format === '') {
+            return null;
+        }
+
+        return $this->profileFormats[$format] ?? $this->formats[$format] ?? null;
     }
 }

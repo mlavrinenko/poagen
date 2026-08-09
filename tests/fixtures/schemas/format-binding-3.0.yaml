@@ -1,0 +1,76 @@
+openapi: 3.0.3
+info:
+  title: Format binding (synthetic)
+  version: "1.0.0"
+  description: >-
+    Tiny fixture used to exercise Profile::$formats — a binding declared once
+    in the profile and applied wherever its format appears. `uuid` covers a
+    required property, an optional one, a second component and a path
+    parameter, so a document-wide binding has four distinct sites to reach.
+    `binary` and `email` are here as controls: neither is bound by the golden
+    profile, and `binary` on a plain property is the case poagen deliberately
+    leaves as a bare string.
+paths:
+  /accounts/{accountId}:
+    get:
+      operationId: getAccount
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+  /sessions:
+    post:
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+components:
+  schemas:
+    Account:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+        avatar:
+          type: string
+          format: binary
+        contact:
+          type: string
+          format: email
+    Session:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time

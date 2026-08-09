@@ -34,8 +34,10 @@
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.1",
+        "ramsey/uuid": "^4.7",
         "rector/rector": "^2.3",
-        "shipmonk/dead-code-detector": "^1.0"
+        "shipmonk/dead-code-detector": "^1.0",
+        "symfony/uid": "^7.0"
     },
     "repositories": [
         {
@@ -65,6 +67,7 @@
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Petstore\\": "tests/fixtures/generated/petstore/",
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Contact\\": "tests/fixtures/generated/contact/",
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Composition\\": "tests/fixtures/generated/composition/",
+            "Poagen\\Generator\\Tests\\Fixtures\\Generated\\FormatBinding\\": "tests/fixtures/generated/format-binding/",
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\Parameters\\": "tests/fixtures/generated/parameters/",
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\UnionSelection\\": "tests/fixtures/generated/union-selection/",
             "Poagen\\Generator\\Tests\\Fixtures\\Generated\\UnionResponse\\": "tests/fixtures/generated/union-response/"

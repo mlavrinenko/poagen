@@ -26,6 +26,16 @@ Mutation testing is wired and measured but deliberately stays outside
   `toScalar()` / `fromScalar()` on both send and receive paths (T-004).
 - Built-in `\DateTimeImmutable` mapping for `format: date-time` and
   `format: date` — no user binding required (T-010).
+- `Profile::$formats` binds a value object to every site carrying one
+  `format`, document-wide, without the class needing a `#[BindsFormat]`
+  attribute or a namespace under `$discoverIn`. Most specific route wins:
+  `$propertyFormats`, then `$formats`, then a discovered `#[BindsFormat]`,
+  then a built-in. `poagen/client-runtime` ships `Format\RamseyUuid` and
+  `Format\SymfonyUuid` for `format: uuid`, both libraries `suggest` rather
+  than `require`, and neither applies until the profile names one — PHP has
+  no core UUID type, so poagen picks none. `format: binary` on a plain
+  property stays advisory on purpose
+  (`binary-on-a-property-stays-advisory.decision-260809`).
 - OpenAPI `enum` components emit as PHP 8.1 backed enums under
   `Generated/Enum/` and replace their references in model properties
   (T-009).
