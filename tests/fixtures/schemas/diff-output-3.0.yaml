@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Diff Output Fixture
+  version: "1.0.0"
+  description: >
+    coloured-and-path-filtered-diff-output: deliberately small — one
+    operation, one component — but enough to give `poagen generate --diff`
+    both a Generated/Model file and an always-emitted top-level Generated/
+    file, so a `--diff=<glob>` test has a matching path and a non-matching
+    one to prove the filter actually narrows the rendered diff.
+paths:
+  /widgets/{id}:
+    get:
+      operationId: getWidget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+components:
+  schemas:
+    Widget:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

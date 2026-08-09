@@ -6,6 +6,8 @@ namespace Poagen\Generator;
 
 use Composer\Autoload\ClassLoader;
 use Poagen\Generator\Generator\AttributeScanner;
+use Poagen\Generator\Generator\DiffColorizer;
+use Poagen\Generator\Generator\DiffPathFilter;
 use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Generator;
 use Poagen\Generator\Generator\PlanReporter;
@@ -13,6 +15,7 @@ use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Generator\ProfileLoader;
 
 use function count;
+use function in_array;
 
 /**
  * `poagen generate` command handler.
@@ -34,6 +37,8 @@ final class GenerateCommand
         $output = null;
         $dryRun = false;
         $diff = false;
+        $diffGlob = null;
+        $color = 'auto';
 
         foreach ($args as $arg) {
             if ($arg === '--dry-run') {
@@ -44,8 +49,17 @@ final class GenerateCommand
                 $diff = true;
                 continue;
             }
+            if (str_starts_with($arg, '--diff=')) {
+                $diff = true;
+                $diffGlob = substr($arg, 7);
+                continue;
+            }
             if (str_starts_with($arg, '--output=')) {
                 $output = substr($arg, 9);
+                continue;
+            }
+            if (str_starts_with($arg, '--color=')) {
+                $color = substr($arg, 8);
                 continue;
             }
             if (str_starts_with($arg, '--')) {
@@ -67,6 +81,16 @@ final class GenerateCommand
 
         if ($output !== null && $output === '') {
             fwrite($stderr, "poagen generate: --output requires a non-empty value.\n");
+            return 2;
+        }
+
+        if ($diffGlob !== null && $diffGlob === '') {
+            fwrite($stderr, "poagen generate: --diff requires a non-empty value.\n");
+            return 2;
+        }
+
+        if (!in_array($color, ['auto', 'always', 'never'], true)) {
+            fwrite($stderr, "poagen generate: --color must be one of auto, always, never.\n");
             return 2;
         }
 
@@ -93,7 +117,9 @@ final class GenerateCommand
 
             if ($diff) {
                 $plan = $generator->plan($profile);
-                $rendered = new PlanReporter()->diff($plan);
+                $filter = $diffGlob !== null ? new DiffPathFilter($diffGlob, $profile->output) : null;
+                $useColor = DiffColorizer::shouldColor($color, $stdout);
+                $rendered = new PlanReporter()->diff($plan, $filter, $useColor);
                 self::reportSkipped($plan, $stderr);
 
                 if ($rendered === '') {

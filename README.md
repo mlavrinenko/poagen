@@ -108,6 +108,8 @@ composer install
 poagen generate path/to/poagen.php
 poagen generate path/to/poagen.php --dry-run   # preview writes / deletes
 poagen generate path/to/poagen.php --diff      # unified diff vs disk
+poagen generate path/to/poagen.php --diff=Generated/Model/**  # scope the diff to a subtree
+poagen generate path/to/poagen.php --diff --color=always      # force colour even when piped
 poagen generate path/to/poagen.php --output=/tmp/out
 poagen validate path/to/schema.yaml            # parse + validate only
 ```
