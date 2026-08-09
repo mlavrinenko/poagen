@@ -10,29 +10,32 @@ use Poagen\Generator\Generator\GenerationPlan;
 use Poagen\Generator\Generator\Profile;
 use Poagen\Generator\Tests\Fixtures\ValueObject\Slug;
 use Poagen\Generator\Tests\Support\GeneratedTreeSandbox;
-use Poagen\Runtime\Format\RamseyUuid;
+use Poagen\Runtime\Format\RamseyUuidCodec;
 use Poagen\Runtime\Marshal\Hydrator;
 use Poagen\Runtime\Marshal\Marshaller;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
 
 use function str_contains;
 
 /**
  * `built-in-uuid-and-binary-format-bindings`: `Profile::$formats` binds a
- * value object to every property carrying one format, document-wide — the
- * reach `#[BindsFormat]` has, said in the profile instead of on a class the
+ * value object — or, since `codec-bindings-for-foreign-value-types`, a codec
+ * — to every property carrying one format, document-wide — the reach
+ * `#[BindsFormat]` has, said in the profile instead of on a class the
  * consumer had to write first.
  *
  * That distinction is the whole point for `uuid`. Unlike `date-time`, which
  * PHP core already has a type for, any UUID type is a dependency decision, so
  * poagen ships bindings for the libraries people already use and binds none
  * of them by default. One profile line turns one on; editing that line swaps
- * libraries.
+ * libraries. `uuid` is bound to `RamseyUuidCodec`: the emitted property is
+ * `ramsey/uuid`'s own `UuidInterface`, never a wrapper around it.
  *
- * `format-binding-3.0.yaml` spends `uuid` on four sites — a required
- * property, an optional one, a second component, and a path parameter — and
- * carries `binary` and `email` unbound alongside them.
+ * `format-binding-3.0.yaml` spends `uuid` on five sites — a required
+ * property, an optional one, a list of them, a second component, and a path
+ * parameter — and carries `binary` and `email` unbound alongside them.
  */
 final class FormatBindingTest extends TestCase
 {
@@ -49,28 +52,35 @@ final class FormatBindingTest extends TestCase
 
     public function testOneEntryReachesEveryPropertyCarryingThatFormat(): void
     {
-        $plan = $this->plan(['uuid' => RamseyUuid::class]);
+        $plan = $this->plan(['uuid' => RamseyUuidCodec::class]);
+        $account = $this->modelSource($plan, 'Account');
 
-        // Required, optional, and a property on a second component — one
-        // entry, three sites, no per-property key anywhere.
-        self::assertStringContainsString('public RamseyUuid $id,', $this->modelSource($plan, 'Account'));
-        self::assertStringContainsString('public ?RamseyUuid $ownerId = null,', $this->modelSource($plan, 'Account'));
-        self::assertStringContainsString('public RamseyUuid $token,', $this->modelSource($plan, 'Session'));
+        // Required, optional, a list of them, and a property on a second
+        // component — one entry, four sites, no per-property key anywhere.
+        // The property is typed as the library's own `UuidInterface`
+        // directly, never a wrapper around it.
+        self::assertStringContainsString("#[Format(format: 'uuid', codec: RamseyUuidCodec::class)]", $account);
+        self::assertStringContainsString('public UuidInterface $id,', $account);
+        self::assertStringContainsString('public ?UuidInterface $ownerId = null,', $account);
+        self::assertStringContainsString('@param ?list<UuidInterface> $previousIds', $account);
+        self::assertStringContainsString('public UuidInterface $token,', $this->modelSource($plan, 'Session'));
     }
 
     /**
-     * The fourth site, and the one a per-property binding could never reach:
+     * The fifth site, and the one a per-property binding could never reach:
      * an operation parameter belongs to no model, so `$propertyFormats` has
      * no key to name it by. It is also the site that proves the binding is
      * carried through the wire boundary rather than only into a type — the
-     * emitted call has to unwrap it.
+     * emitted call routes the value through the codec's static `encode()`
+     * rather than through a method on the value itself, since
+     * `UuidInterface` has no `toScalar()` of its own.
      */
     public function testTheBindingReachesAnOperationParameterAndUnwrapsItOnTheWire(): void
     {
-        $source = $this->clientSource($this->plan(['uuid' => RamseyUuid::class]));
+        $source = $this->clientSource($this->plan(['uuid' => RamseyUuidCodec::class]));
 
-        self::assertStringContainsString('public function getAccount(RamseyUuid $accountId)', $source);
-        self::assertStringContainsString("->path('accountId', \$accountId->toScalar())", $source);
+        self::assertStringContainsString('public function getAccount(UuidInterface $accountId)', $source);
+        self::assertStringContainsString("->path('accountId', RamseyUuidCodec::encode(\$accountId))", $source);
     }
 
     public function testAnEmptyMapLeavesEveryFormatAtItsBaseType(): void
@@ -78,7 +88,7 @@ final class FormatBindingTest extends TestCase
         $source = $this->modelSource($this->plan([]), 'Account');
 
         self::assertStringContainsString('public string $id,', $source);
-        self::assertFalse(str_contains($source, 'RamseyUuid'));
+        self::assertFalse(str_contains($source, 'UuidInterface'));
     }
 
     /**
@@ -89,7 +99,7 @@ final class FormatBindingTest extends TestCase
      */
     public function testBinaryOnAPlainPropertyStaysAStringAndStaysAdvisory(): void
     {
-        $plan = $this->plan(['uuid' => RamseyUuid::class]);
+        $plan = $this->plan(['uuid' => RamseyUuidCodec::class]);
 
         self::assertStringContainsString('public ?string $avatar = null,', $this->modelSource($plan, 'Account'));
         self::assertNotNull($this->noticeFor($plan, 'binary'));
@@ -98,7 +108,7 @@ final class FormatBindingTest extends TestCase
     public function testABoundFormatStopsBeingReportedAsUnrecognised(): void
     {
         self::assertNotNull($this->noticeFor($this->plan([]), 'uuid'));
-        self::assertNull($this->noticeFor($this->plan(['uuid' => RamseyUuid::class]), 'uuid'));
+        self::assertNull($this->noticeFor($this->plan(['uuid' => RamseyUuidCodec::class]), 'uuid'));
     }
 
     /**
@@ -112,8 +122,8 @@ final class FormatBindingTest extends TestCase
 
         self::assertNotNull($notice);
         self::assertStringContainsString('poagen ships a binding for it', $notice);
-        self::assertStringContainsString('\\Poagen\\Runtime\\Format\\RamseyUuid::class (ramsey/uuid)', $notice);
-        self::assertStringContainsString('\\Poagen\\Runtime\\Format\\SymfonyUuid::class (symfony/uid)', $notice);
+        self::assertStringContainsString('\\Poagen\\Runtime\\Format\\RamseyUuidCodec::class (ramsey/uuid)', $notice);
+        self::assertStringContainsString('\\Poagen\\Runtime\\Format\\SymfonyUuidCodec::class (symfony/uid)', $notice);
         self::assertStringContainsString('Profile::$formats', $notice);
     }
 
@@ -142,7 +152,7 @@ final class FormatBindingTest extends TestCase
 
     public function testADiscoveredBindsFormatStillAppliesToAFormatTheProfileSaysNothingAbout(): void
     {
-        $plan = $this->plan(['uuid' => RamseyUuid::class], discoverIn: [self::VALUE_OBJECTS]);
+        $plan = $this->plan(['uuid' => RamseyUuidCodec::class], discoverIn: [self::VALUE_OBJECTS]);
 
         self::assertStringContainsString('public ?Email $contact = null,', $this->modelSource($plan, 'Account'));
     }
@@ -157,7 +167,7 @@ final class FormatBindingTest extends TestCase
     public function testAPerPropertyEntryBeatsAProfileEntryOnTheSameProperty(): void
     {
         $plan = $this->plan(
-            ['uuid' => RamseyUuid::class],
+            ['uuid' => RamseyUuidCodec::class],
             propertyFormats: ['Account.id' => Slug::class],
         );
         $source = $this->modelSource($plan, 'Account');
@@ -165,7 +175,7 @@ final class FormatBindingTest extends TestCase
         // The scoped key answers for its one property; the document-wide
         // entry still answers for every other site.
         self::assertStringContainsString('public Slug $id,', $source);
-        self::assertStringContainsString('public ?RamseyUuid $ownerId = null,', $source);
+        self::assertStringContainsString('public ?UuidInterface $ownerId = null,', $source);
     }
 
     public function testAnEntryNamingAClassThatDoesNotExistFailsTheRun(): void
@@ -179,7 +189,7 @@ final class FormatBindingTest extends TestCase
         }
     }
 
-    public function testAnEntryNamingAClassThatIsNotAScalarBindingFailsTheRun(): void
+    public function testAnEntryNamingAClassThatIsNeitherContractFailsTheRun(): void
     {
         try {
             $this->plan(['uuid' => Profile::class]);
@@ -192,8 +202,9 @@ final class FormatBindingTest extends TestCase
 
     /**
      * The wire boundary, end to end: the payload carries the canonical
-     * string, the model carries the library's own UUID one hop in, and
-     * marshalling puts the string back.
+     * string, the model carries the library's own `UuidInterface` directly —
+     * no wrapper hop — and marshalling routes it back through the codec's
+     * `encode()`.
      */
     public function testABoundUuidRoundTripsHydrationAndMarshalling(): void
     {
@@ -202,7 +213,7 @@ final class FormatBindingTest extends TestCase
             schema: self::SCHEMA,
             output: $output,
             namespace: self::NAMESPACE,
-            formats: ['uuid' => RamseyUuid::class],
+            formats: ['uuid' => RamseyUuidCodec::class],
         ));
 
         $path = $output . '/Generated/Model/Account.php';
@@ -216,8 +227,8 @@ final class FormatBindingTest extends TestCase
         $hydrated = new Hydrator()->hydrate($class, ['id' => $raw]);
         $id = $reflection->getProperty('id')->getValue($hydrated);
 
-        self::assertInstanceOf(RamseyUuid::class, $id);
-        self::assertTrue($id->value->equals(Uuid::fromString($raw)));
+        self::assertInstanceOf(UuidInterface::class, $id);
+        self::assertTrue($id->equals(Uuid::fromString($raw)));
         self::assertSame($raw, new Marshaller()->marshal($hydrated)['id']);
     }
 

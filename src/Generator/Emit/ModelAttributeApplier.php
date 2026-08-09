@@ -17,6 +17,7 @@ use Poagen\Runtime\Attribute\BranchSelector;
 use Poagen\Runtime\Attribute\Format;
 use Poagen\Runtime\Attribute\WireName;
 
+use function assert;
 use function is_string;
 
 /**
@@ -44,16 +45,90 @@ final readonly class ModelAttributeApplier
             $param->addAttribute(WireName::class, [$wireName]);
         }
 
-        if ($propSchema instanceof Schema && is_string($propSchema->format)) {
-            $scalarFormat = $bindings->scalarFormat($propSchema->format, $formatScopeKey);
+        $this->applyFormat($namespace, $param, $propSchema, $bindings, $formatScopeKey);
+        $this->applyUnion($namespace, $param, $propSchema, $bindings, $modelNamespace, $registry);
+    }
 
-            if ($scalarFormat instanceof ScalarFormat && $scalarFormat->kind === ScalarFormat::KIND_DATE) {
-                $namespace->addUse(Format::class);
-                $param->addAttribute(Format::class, [$propSchema->format]);
-            }
+    /**
+     * `#[Format]` is emitted for two kinds, never for `KIND_SCALAR` or
+     * `KIND_DATETIME`: `KIND_DATE` because `\DateTimeImmutable` cannot tell
+     * `date` from `date-time` on its own and {@see DescriptorParser} needs
+     * the format string to pick the right one; `KIND_CODEC` because the
+     * property is typed as the codec's foreign target, so
+     * {@see PropertyTypeResolver} has no structural way to find the codec at
+     * all without it named on the attribute. `KIND_SCALAR` needs neither —
+     * the property is already typed as the binding, which
+     * `PropertyTypeResolver` recognises by reflection alone.
+     *
+     * Read off {@see formatBearingSchema()} rather than `$propSchema->format`
+     * directly, so a `list<T>`/`array<string,T>` property whose *item*
+     * schema carries the format gets the attribute too — the same one
+     * `TypeResolver` already used to type every item as the codec's target.
+     */
+    private function applyFormat(
+        PhpNamespace $namespace,
+        PromotedParameter $param,
+        Schema|Reference $propSchema,
+        Bindings $bindings,
+        string $formatScopeKey,
+    ): void {
+        $formatSchema = $this->formatBearingSchema($propSchema);
+
+        if (!$formatSchema instanceof Schema || !is_string($formatSchema->format)) {
+            return;
         }
 
-        $this->applyUnion($namespace, $param, $propSchema, $bindings, $modelNamespace, $registry);
+        $scalarFormat = $bindings->scalarFormat($formatSchema->format, $formatScopeKey);
+
+        if (!$scalarFormat instanceof ScalarFormat) {
+            return;
+        }
+
+        if ($scalarFormat->kind === ScalarFormat::KIND_DATE) {
+            $namespace->addUse(Format::class);
+            $param->addAttribute(Format::class, [$formatSchema->format]);
+
+            return;
+        }
+
+        if ($scalarFormat->kind === ScalarFormat::KIND_CODEC) {
+            $codecClass = $scalarFormat->codecClass;
+            assert($codecClass !== null);
+            $namespace->addUse(Format::class);
+            $param->addAttribute(Format::class, [
+                'format' => $formatSchema->format,
+                'codec' => $this->classLiteral($namespace, $codecClass),
+            ]);
+        }
+    }
+
+    /**
+     * The schema that carries `format`, for a property that may itself be
+     * scalar, a list of scalars, or a string-keyed map of scalars. One
+     * `format` governs the whole property in all three shapes
+     * (`codec-bindings-for-foreign-value-types`), so a list/map property's
+     * *item* schema answers here exactly as the property's own schema would
+     * for a plain scalar one.
+     */
+    private function formatBearingSchema(Schema|Reference $propSchema): ?Schema
+    {
+        if (!$propSchema instanceof Schema) {
+            return null;
+        }
+
+        if (is_string($propSchema->format)) {
+            return $propSchema;
+        }
+
+        $items = $propSchema->items;
+
+        if ($items instanceof Schema && is_string($items->format)) {
+            return $items;
+        }
+
+        $additional = $propSchema->additionalProperties;
+
+        return $additional instanceof Schema && is_string($additional->format) ? $additional : null;
     }
 
     /**

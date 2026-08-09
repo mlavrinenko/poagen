@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Generator;
 
-use Poagen\Runtime\Format\RamseyUuid;
-use Poagen\Runtime\Format\SymfonyUuid;
+use Poagen\Runtime\Format\RamseyUuidCodec;
+use Poagen\Runtime\Format\SymfonyUuidCodec;
 
 use function implode;
 use function sprintf;
@@ -35,8 +35,8 @@ final readonly class ReadyMadeBindings
     /** @var array<string,array<string,class-string>> */
     private const array BY_FORMAT = [
         'uuid' => [
-            'ramsey/uuid' => RamseyUuid::class,
-            'symfony/uid' => SymfonyUuid::class,
+            'ramsey/uuid' => RamseyUuidCodec::class,
+            'symfony/uid' => SymfonyUuidCodec::class,
         ],
     ];
 

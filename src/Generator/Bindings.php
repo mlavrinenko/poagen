@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Poagen\Generator\Generator;
 
 use Poagen\Generator\Generator\Emit\DiscriminatorEnforcer;
+use Poagen\Runtime\Codec;
 use Poagen\Runtime\ScalarBinding;
 
 /**
@@ -102,9 +103,12 @@ final readonly class Bindings
     /**
      * Resolve a `format` to a scalar-boundary binding: a per-property override
      * if `$scopeKey` names one, else a document-wide user VO implementing
-     * {@see ScalarBinding} if one is registered, otherwise a poagen built-in
-     * (currently `date-time` and `date` → `\DateTimeImmutable`). Bindings
-     * always win over a built-in so consumers can swap in Carbon, Chronos, etc.
+     * {@see ScalarBinding} if one is registered, else a document-wide
+     * {@see Codec} if one is, otherwise a poagen built-in (currently
+     * `date-time` and `date` → `\DateTimeImmutable`). A `ScalarBinding` wins
+     * over a `Codec` on the same format because it needs nothing further
+     * from the emitter — the property is typed as the binding itself — while
+     * both win over a built-in so consumers can swap in Carbon, Chronos, etc.
      */
     public function scalarFormat(string $format, string $scopeKey = ''): ?ScalarFormat
     {
@@ -114,8 +118,15 @@ final readonly class Bindings
             return ScalarFormat::userScalar($userBinding);
         }
 
-        // A binding exists (scoped or document-wide) but is not a
-        // ScalarBinding — a whole-object binding, stays off the scalar path.
+        $codec = $this->codecType($format, $scopeKey);
+
+        if ($codec !== null) {
+            return ScalarFormat::codec($codec, $codec::targetType());
+        }
+
+        // A binding exists (scoped or document-wide) but is neither a
+        // ScalarBinding nor a Codec — a whole-object binding, stays off the
+        // scalar path.
         if ($this->boundType($format, $scopeKey) !== null) {
             return null;
         }
@@ -125,6 +136,31 @@ final readonly class Bindings
             'date' => ScalarFormat::date(),
             default => null,
         };
+    }
+
+    /**
+     * Return the bound FQCN for `$format` only when it implements
+     * {@see Codec} — the foreign-type sibling of {@see scalarBindingType()}.
+     * A class satisfying both interfaces is unreachable here in practice
+     * (nothing ships one), but if it ever happened `scalarFormat()` still
+     * prefers `ScalarBinding`, checked first.
+     *
+     * @return class-string<Codec>|null
+     */
+    public function codecType(string $format, string $scopeKey = ''): ?string
+    {
+        $fqcn = $this->boundType($format, $scopeKey);
+
+        if ($fqcn === null) {
+            return null;
+        }
+
+        if (!is_a($fqcn, Codec::class, true)) {
+            return null;
+        }
+
+        /** @var class-string<Codec> $fqcn */
+        return $fqcn;
     }
 
     /**

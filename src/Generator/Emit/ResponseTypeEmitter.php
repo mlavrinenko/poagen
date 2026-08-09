@@ -10,6 +10,7 @@ use Nette\PhpGenerator\PhpNamespace;
 use Poagen\Generator\Generator\ScalarFormat;
 use Poagen\Runtime\Attribute\BranchSelector;
 use Poagen\Runtime\Attribute\Discriminator;
+use Poagen\Runtime\Codec;
 use Poagen\Runtime\Contract\ResponseType;
 use Poagen\Runtime\Http\ResponseDecoder;
 use Poagen\Runtime\Marshal\UnionBranchPicker;
@@ -107,8 +108,9 @@ final readonly class ResponseTypeEmitter
      * (`ResponseType::string()`); a bound one names the binding instead, so
      * `{type: string, format: date}` decodes to the same
      * `\DateTimeImmutable` a model property with that format hydrates to, and
-     * a consumer's own `#[BindsFormat]` value object wins over the built-in
-     * exactly as it does on a property.
+     * a consumer's own `#[BindsFormat]` value object — or registered
+     * {@see Codec} — wins over the built-in exactly as it
+     * does on a property.
      */
     private function scalar(PhpNamespace $namespace, ReturnSpec $return, string $type): string
     {
@@ -122,6 +124,14 @@ final readonly class ResponseTypeEmitter
             $namespace->addUse(ltrim($format->phpType, '\\'));
 
             return sprintf('%s::binding(%s::class)', $type, $namespace->simplifyName($format->phpType));
+        }
+
+        if ($format->kind === ScalarFormat::KIND_CODEC) {
+            $codec = $format->codecClass;
+            assert($codec !== null);
+            $namespace->addUse(ltrim($codec, '\\'));
+
+            return sprintf('%s::codec(%s::class)', $type, $namespace->simplifyName($codec));
         }
 
         return sprintf('%s::dateTime()', $type);

@@ -12,12 +12,15 @@ declare(strict_types=1);
 namespace Poagen\Generator\Tests\Fixtures\Generated\FormatBinding\Generated\Model;
 
 use DateTimeImmutable;
-use Poagen\Runtime\Format\RamseyUuid;
+use Poagen\Runtime\Attribute\Format;
+use Poagen\Runtime\Format\RamseyUuidCodec;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class Session
 {
     public function __construct(
-        public RamseyUuid $token,
+        #[Format(format: 'uuid', codec: RamseyUuidCodec::class)]
+        public UuidInterface $token,
         public ?DateTimeImmutable $createdAt = null,
     ) {
     }

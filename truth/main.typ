@@ -173,6 +173,8 @@
 #include "decisions/synthesised-model-failures-reach-the-run-report.decision-260808.typ"
 #pagebreak()
 #include "decisions/binary-on-a-property-stays-advisory.decision-260809.typ"
+#pagebreak()
+#include "decisions/reexpress-the-uuid-bindings-as-codecs.decision-260809.typ"
 
 // --- Supplementary artefacts ---
 //

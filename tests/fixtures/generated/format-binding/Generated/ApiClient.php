@@ -18,7 +18,8 @@ use Poagen\Runtime\Contract\Envelope;
 use Poagen\Runtime\Contract\ResponseType;
 use Poagen\Runtime\Contract\StatusResponseMap;
 use Poagen\Runtime\Contract\TransportInterface;
-use Poagen\Runtime\Format\RamseyUuid;
+use Poagen\Runtime\Format\RamseyUuidCodec;
+use Ramsey\Uuid\UuidInterface;
 
 final readonly class ApiClient implements ApiClientInterface
 {
@@ -30,11 +31,12 @@ final readonly class ApiClient implements ApiClientInterface
     /**
      * @return Envelope<Account>
      */
-    public function getAccount(RamseyUuid $accountId): Envelope
+    public function getAccount(UuidInterface $accountId): Envelope
     {
         /** @var Envelope<Account> $result */
         $result = $this->transport->send(
-            Endpoint::get('/accounts/{accountId}')->path('accountId', $accountId->toScalar()),
+            Endpoint::get('/accounts/{accountId}')
+                ->path('accountId', RamseyUuidCodec::encode($accountId)),
             ResponseType::envelope(new StatusResponseMap(exact: [['200', ResponseType::object(Account::class)]])),
         );
 

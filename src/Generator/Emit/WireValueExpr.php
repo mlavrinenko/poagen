@@ -10,8 +10,11 @@ use Nette\PhpGenerator\PhpNamespace;
 use Poagen\Generator\Generator\Bindings;
 use Poagen\Generator\Generator\ScalarFormat;
 
+use function assert;
 use function is_array;
 use function is_string;
+use function ltrim;
+use function sprintf;
 
 /**
  * The expression an emitted operation hands to {@see Endpoint} for one
@@ -54,6 +57,14 @@ final readonly class WireValueExpr
         }
 
         $schema = $node instanceof Schema ? $node : null;
+        $codecCall = $this->codecCall($schema, $bindings, $namespace);
+
+        if ($codecCall !== null) {
+            return $required
+                ? sprintf('%s(%s)', $codecCall, $var)
+                : sprintf('%s === null ? null : %s(%s)', $var, $codecCall, $var);
+        }
+
         $format = $this->formatCall($schema, $bindings, $namespace);
 
         return $format === null ? $var : $var . $arrow . $format;
@@ -70,7 +81,10 @@ final readonly class WireValueExpr
             return false;
         }
 
-        return $this->formatCall($node instanceof Schema ? $node : null, $bindings, $namespace) === null;
+        $schema = $node instanceof Schema ? $node : null;
+
+        return $this->codecCall($schema, $bindings, $namespace) === null
+            && $this->formatCall($schema, $bindings, $namespace) === null;
     }
 
     /**
@@ -99,6 +113,12 @@ final readonly class WireValueExpr
         }
 
         $schema = $node instanceof Schema ? $node : null;
+        $codecCall = $this->codecCall($schema, $bindings, $namespace);
+
+        if ($codecCall !== null) {
+            return sprintf('%s(%s)', $codecCall, $var);
+        }
+
         $format = $this->formatCall($schema, $bindings, $namespace);
 
         if ($format === null) {
@@ -112,7 +132,10 @@ final readonly class WireValueExpr
 
     /**
      * The `format(...)` or `toScalar()` call a bound format needs, or null
-     * when the value goes to the wire untouched.
+     * when the value goes to the wire untouched. Never answers for a codec
+     * binding — {@see codecCall()} does, because a codec converts by a
+     * static call on the codec class rather than a method call on the
+     * value, which needs a different expression shape at every caller.
      */
     private function formatCall(?Schema $schema, Bindings $bindings, PhpNamespace $namespace): ?string
     {
@@ -136,6 +159,32 @@ final readonly class WireValueExpr
             ScalarFormat::KIND_SCALAR => 'toScalar()',
             default => null,
         };
+    }
+
+    /**
+     * `CodecClass::encode` — a bare callable expression, deliberately with no
+     * trailing `(...)` of its own, so every caller appends the argument list
+     * that fits its own shape: `Codec::encode($var)` for a required scalar,
+     * a ternary wrapping the same call for an optional one, or the call
+     * inside a list's `array_map()` closure.
+     */
+    private function codecCall(?Schema $schema, Bindings $bindings, PhpNamespace $namespace): ?string
+    {
+        if (!$schema instanceof Schema || !is_string($schema->format)) {
+            return null;
+        }
+
+        $scalarFormat = $bindings->scalarFormat($schema->format);
+
+        if (!$scalarFormat instanceof ScalarFormat || $scalarFormat->kind !== ScalarFormat::KIND_CODEC) {
+            return null;
+        }
+
+        $codec = $scalarFormat->codecClass;
+        assert($codec !== null);
+        $namespace->addUse(ltrim($codec, '\\'));
+
+        return $namespace->simplifyName($codec) . '::encode';
     }
 
     private function refsScalarVo(Schema|Reference|null $node): bool

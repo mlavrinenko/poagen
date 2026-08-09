@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Generator;
 
+use Poagen\Runtime\Codec;
 use Poagen\Runtime\ScalarBinding;
 
 use function class_exists;
@@ -12,7 +13,7 @@ use function sprintf;
 
 /**
  * Checks every `Profile::$formats` entry names a class that exists and opts
- * into the scalar round-trip contract.
+ * into one of the two contracts a format binding can satisfy.
  *
  * The check runs before the document is read, which none of the other
  * guidance validators here can manage. `$propertyRenames`, `$phpDocTypes` and
@@ -23,14 +24,14 @@ use function sprintf;
  * to be stale against — the entry either names a usable binding or it does
  * not, and both halves of that are answerable from the class alone.
  *
- * Both halves are checked, not just existence. A class that exists but does
- * not implement {@see ScalarBinding} would otherwise reach
- * {@see Bindings::scalarFormat()}, which reads a non-ScalarBinding binding as
- * a deliberate whole-object binding and quietly leaves the scalar path — so
- * the property would emit as an object the payload never carries, with
- * nothing said. That is the silent-degradation shape `default-deny-on-degradation`
- * refuses, and it is why the interface is named in the failure line rather
- * than only implied.
+ * Both halves are checked, not just existence. A class that exists but
+ * implements neither {@see ScalarBinding} nor {@see Codec} would otherwise
+ * reach {@see Bindings::scalarFormat()}, which reads it as a deliberate
+ * whole-object binding and quietly leaves the scalar path — so the property
+ * would emit as an object the payload never carries, with nothing said. That
+ * is the silent-degradation shape `default-deny-on-degradation` refuses, and
+ * it is why both interfaces are named in the failure line rather than only
+ * implied.
  *
  * Returns failure lines rather than throwing, so a run reports every problem
  * it found in one pass, same as every other profile-guidance validator here
@@ -58,13 +59,15 @@ final readonly class FormatBindingValidator
                 continue;
             }
 
-            if (!is_a($fqcn, ScalarBinding::class, true)) {
+            if (!is_a($fqcn, ScalarBinding::class, true) && !is_a($fqcn, Codec::class, true)) {
                 $failures[] = sprintf(
-                    "Profile::\$formats['%s'] names '%s', which does not implement %s — a format binding "
-                        . 'round-trips as the underlying scalar, so the class has to declare how.',
+                    "Profile::\$formats['%s'] names '%s', which does not implement %s or %s — a format binding "
+                        . 'round-trips as the underlying scalar, itself or through a codec, so the class has to '
+                        . 'declare how.',
                     $format,
                     $fqcn,
                     ScalarBinding::class,
+                    Codec::class,
                 );
             }
         }

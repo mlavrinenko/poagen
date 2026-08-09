@@ -14,7 +14,7 @@ namespace Poagen\Generator\Tests\Fixtures\Generated\FormatBinding\Generated;
 use Poagen\Generator\Tests\Fixtures\Generated\FormatBinding\Generated\Model\Account;
 use Poagen\Generator\Tests\Fixtures\Generated\FormatBinding\Generated\Model\Session;
 use Poagen\Runtime\Contract\Envelope;
-use Poagen\Runtime\Format\RamseyUuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * The composition root's contract: one accessor per tag, plus whatever the document left untagged.
@@ -26,7 +26,7 @@ interface ApiClientInterface
     /**
      * @return Envelope<Account>
      */
-    public function getAccount(RamseyUuid $accountId): Envelope;
+    public function getAccount(UuidInterface $accountId): Envelope;
 
     /**
      * @return Envelope<Session>

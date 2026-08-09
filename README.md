@@ -143,19 +143,21 @@ and a consumer who already has `symfony/uid` should not be handed
 `ramsey/uuid`. Pick one in the profile:
 
 ```php
-use Poagen\Runtime\Format\RamseyUuid;   // needs ramsey/uuid
-use Poagen\Runtime\Format\SymfonyUuid;  // needs symfony/uid
+use Poagen\Runtime\Format\RamseyUuidCodec;   // needs ramsey/uuid
+use Poagen\Runtime\Format\SymfonyUuidCodec;  // needs symfony/uid
 
 return new Profile(
     // ...
-    formats: ['uuid' => RamseyUuid::class],
+    formats: ['uuid' => RamseyUuidCodec::class],
 );
 ```
 
 Every property and parameter carrying that format now takes the binding, and
 `composer require ramsey/uuid` is the other half — it is a `suggest` of
-`poagen/client-runtime`, never a `require`. The library value is one hop in
-(`$account->id->value`), or `(string) $account->id` for the canonical form.
+`poagen/client-runtime`, never a `require`. The emitted property is the
+library's own `UuidInterface` directly — `public UuidInterface $id` — with no
+wrapper and no `->value` hop, because `RamseyUuidCodec` converts on its
+behalf rather than boxing it.
 
 Any value object of your own goes in the same map, and needs nothing but
 `Poagen\Runtime\ScalarBinding`:
@@ -171,7 +173,22 @@ final readonly class Ulid implements ScalarBinding
 }
 ```
 
-Three ways to attach one, most specific first:
+A type you do not own — a class from a library, which cannot be made to
+implement `ScalarBinding` — binds through `Poagen\Runtime\Codec` instead. The
+property is declared as the codec's own target type, never a wrapper:
+
+```php
+final readonly class MoneyCodec implements Codec
+{
+    public static function targetType(): string { return Money::class; }
+
+    public static function decode(mixed $wire): Money { /* parse */ }
+
+    public static function encode(mixed $value): mixed { /* format */ }
+}
+```
+
+Three ways to attach either shape, most specific first:
 
 | Route | Reach |
 | --- | --- |
