@@ -7,23 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-#### DX
-
-- `poagen generate --diff` grows two more flags, the pair T-019 named as
-  explicit non-goals and carried forward as a post-v0.1 follow-up:
-  - `--diff=<glob>` scopes the diff to a subtree of the generated output,
-    matched relative to the output directory (or the raw path, when it
-    falls outside that directory). `**` crosses `/`, `*` does not, `?`
-    matches one non-`/` character; a glob with no wildcard matches that
-    path or anything beneath it, so `Generated/Model` and
-    `Generated/Model/**` scope to the same subtree.
-  - `--color=auto|always|never` (default `auto`) colours additions green,
-    deletions red, and hunk headers cyan. `auto` colours iff stdout is a
-    TTY, `NO_COLOR` is unset, and `TERM` is not `dumb`.
-  Both are additive: bare `--diff` still renders the whole plan, plain,
-  exactly as before.
+Nothing yet — `0.1.0` below is the current tip.
 
 ## 0.1.0 - TBD
 
@@ -223,6 +207,18 @@ Mutation testing is wired and measured but deliberately stays outside
   - `--diff` prints a unified diff (via `sebastian/diff`) for every
     would-be-written file against the copy on disk; exits 1 when any
     diff is non-empty.
+- `--diff` then grew the two extensions T-019 had named as explicit
+  non-goals. Both are additive — a bare `--diff` still renders the whole
+  plan, plain, exactly as before:
+  - `--diff=<glob>` scopes the diff to a subtree of the generated output,
+    matched relative to the output directory (or the raw path, when it
+    falls outside that directory). `**` crosses `/`, `*` does not, `?`
+    matches one non-`/` character; a glob with no wildcard matches that
+    path or anything beneath it, so `Generated/Model` and
+    `Generated/Model/**` scope to the same subtree.
+  - `--color=auto|always|never` (default `auto`) colours additions green,
+    deletions red, and hunk headers cyan. `auto` colours iff stdout is a
+    TTY, `NO_COLOR` is unset, and `TERM` is not `dumb`.
 - `poagen validate <schema>` subcommand: parses a YAML or JSON OpenAPI
   document, runs `OpenApi::validate()`, and reports parse / validation
   / usage errors on stderr (T-018, `plain-getopt-for-the-cli`).
