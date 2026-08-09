@@ -5,7 +5,11 @@
   tags: ("gates",),
   priority: 5,
   difficulty: 1,
-  status: proposed(2026, 8, 9),
+  status: done(
+    2026,
+    8,
+    9,
+  )[symfony/yaml 8.1.2 on the lock; composer audit clean in both package roots; all four goldens byte-identical],
   links: (related("v01-release-exit-criteria.task-260728.typ"),),
 )
 

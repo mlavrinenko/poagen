@@ -5,7 +5,11 @@
   tags: ("gates",),
   priority: 4,
   difficulty: 1,
-  status: proposed(2026, 8, 9),
+  status: done(
+    2026,
+    8,
+    9,
+  )[both bumps landed with dependabot authorship and task trailers; runtime CI mirror carried along],
   links: (related("v01-release-exit-criteria.task-260728.typ"),),
 )
 
@@ -57,3 +61,25 @@ history as much as about CI — this task is the trailer they will name.
 == Files
 
 - `.github/workflows/continuous-integration.yml`
+- `runtime/.github/workflows/continuous-integration.yml`
+
+== Outcome
+
+Both bumps are on `main` as `401c1a38` and `1d53fc4a`, dependabot's
+authorship preserved, each carrying this task's trailer. `9a2cb2d1` carried
+the same two bumps into `runtime/.github/workflows/continuous-integration.yml`,
+which dependabot never saw: that mirror is dormant where it sits and only
+wakes up when the runtime package is extracted, so nothing would have failed
+— it would simply have started that package's CI three majors behind.
+
+The two remote branches stay for now. `main` is unpushed, so deleting them
+today would leave the bumps on no remote at all; they go once `main` lands
+on `origin`, which is that decision's own moment.
+
+Checked rather than merged blind: `ramsey/composer-install@v4` still
+declares the `dependency-versions` input the `lowest`/`highest` matrix leg
+passes through, now defaulting to `locked` so the two jobs that call it
+bare are unchanged; `actions/checkout@v5` moved to node24 and requires
+runner v2.327.1, which both hosted runners exceed, and v7's one behaviour
+change blocks fork checkouts under `pull_request_target` / `workflow_run`,
+neither of which this workflow triggers on.
