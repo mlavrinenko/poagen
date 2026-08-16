@@ -197,6 +197,12 @@ final readonly class Profile
      *                                              bare id or component. The default stays a refusal; a
      *                                              partly-skipped set still refuses naming the rest
      *                                              (webhooks-refuse-with-no-opt-out).
+     * @param string|null           $dateTimeZone   The zone an offset-free `date-time` means, when the vendor
+     *                                              fixed one for every installation. Emitted as
+     *                                              `ApiClient::NAIVE_TIMEZONE` for the consumer to hand to a
+     *                                              `Runtime\BindingContext`; an installation that differs states
+     *                                              its own there instead, and wins. An identifier PHP's timezone
+     *                                              database does not know fails the run.
      * @param string                $source         How this profile is named in the header of every file it
      *                                              produces, and in the regenerate command that header prints.
      *                                              {@see ProfileLoader} fills it with the path the run was
@@ -229,6 +235,7 @@ final readonly class Profile
         public array $formats = [],
         public array $propertyFormats = [],
         public array $securitySchemes = [],
+        public ?string $dateTimeZone = null,
         public string $source = 'poagen.php',
     ) {}
 

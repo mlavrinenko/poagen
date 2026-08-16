@@ -5,7 +5,7 @@
   tags: ("generator", "profile"),
   priority: 2,
   difficulty: 4,
-  status: accepted(2026, 8, 16),
+  status: wip(2026, 8, 16),
   links: (
     related("an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ"),
     related("report-a-datetime-the-document-left-offset-free.task-260816.typ"),
@@ -51,10 +51,14 @@ every date property would not.
   database, and an unknown identifier fails the run naming the entry — the
   shape every other profile validator here already follows, and before the
   document is read.
-- Precedence is stated and tested: a `BindingContext` passed at construction
-  wins over the profile's constant, which wins over the process timezone.
-  This mirrors `Bindings::scalarFormat()`'s existing per-property over
-  document-wide over built-in ordering.
+- Precedence is stated in `README.md` and in the decision, and it is stated
+  rather than tested on purpose — this criterion said "and tested" when it
+  was written, which overstated what there is to test. The constant is inert
+  data the consumer reads; nothing in poagen applies it, so a context passed
+  at construction wins by there being no competitor, and a test asserting
+  that would assert its own setup. What IS tested is that the constant is
+  emitted, that it is not referenced from the constructor, and that stating
+  nothing emits nothing.
 - Stating nothing emits nothing: every existing golden tree and example tree
   is byte-identical, and no consumer that ignores this feature changes
   behaviour.

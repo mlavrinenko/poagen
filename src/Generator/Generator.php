@@ -63,8 +63,8 @@ final readonly class Generator
     public function plan(Profile $profile): GenerationPlan
     {
         // Answerable from the profile alone, so answered before the document is
-        // read — ResponseMapGroups says why this one does not wait to be collected.
-        ResponseMapGroups::assertWellFormed($profile->responseMaps);
+        // read — ProfilePreflight says why these do not wait to be collected.
+        ProfilePreflight::assert($profile);
         $bindings = $this->scanner->scan($profile);
 
         // Keep $ref nodes as Reference objects so the emitter can resolve them to typed cross-class references.

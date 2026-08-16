@@ -95,7 +95,7 @@ final class ClientEmitter
 
         $servers = ServerCatalog::resolve($openApi);
 
-        return $written + $this->emitRoot($clientNamespace, $rootDir, $rootGroup, $live, $bindings, $securityCatalog, $servers, $writes);
+        return $written + $this->emitRoot($clientNamespace, $rootDir, $rootGroup, $live, $bindings, $securityCatalog, $servers, $profile->dateTimeZone, $writes);
     }
 
     /**
@@ -125,6 +125,7 @@ final class ClientEmitter
         Bindings $bindings,
         SecuritySchemeCatalog $securityCatalog,
         array $servers,
+        ?string $dateTimeZone,
         array &$writes,
     ): int {
         // With no tags and nothing untagged there is no client to emit at all.
@@ -140,6 +141,7 @@ final class ClientEmitter
             $securityCatalog,
         );
         ServerConstantEmitter::addTo($class, $servers);
+        TimezoneConstantEmitter::addTo($class, $dateTimeZone);
 
         $outcome = $this->subClients->addOperations($class, $namespace, $group, $bindings, $securityCatalog);
         $this->skipped = [...$this->skipped, ...$outcome['skipped']];
