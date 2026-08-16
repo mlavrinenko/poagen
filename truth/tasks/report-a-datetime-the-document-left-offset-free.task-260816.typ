@@ -5,7 +5,7 @@
   tags: ("generator", "reporting"),
   priority: 3,
   difficulty: 3,
-  status: wip(2026, 8, 16),
+  status: done(2026, 8, 16),
   links: (
     related("an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ"),
     related("a-profile-states-the-documents-timezone.task-260816.typ"),
