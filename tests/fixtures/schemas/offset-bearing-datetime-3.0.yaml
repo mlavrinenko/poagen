@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: Offset-Bearing Date-Time Fixture
+  version: 1.0.0
+  description: >
+    The same shape as `offset-free-datetime-3.0.yaml` with the offsets the
+    spec asks for — one explicit, one `Z`. A document that says what it means
+    hears nothing back, which is what makes the sibling fixture's notice worth
+    reading.
+
+servers:
+  - url: https://offset-bearing.example/api/v1
+
+paths:
+  /shifts:
+    get:
+      operationId: listShifts
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shift'
+
+components:
+  schemas:
+    Shift:
+      type: object
+      properties:
+        startsAt:
+          type: string
+          format: date-time
+          example: '2026-08-14T12:51:17+03:00'
+        endsAt:
+          type: string
+          format: date-time
+          example: '2026-08-14T17:00:00Z'

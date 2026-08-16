@@ -5,7 +5,7 @@
   tags: ("generator", "reporting"),
   priority: 3,
   difficulty: 3,
-  status: accepted(2026, 8, 16),
+  status: wip(2026, 8, 16),
   links: (
     related("an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ"),
     related("a-profile-states-the-documents-timezone.task-260816.typ"),
@@ -44,10 +44,16 @@ what the value means — is worth one line on stderr.
   so this is advisory exactly as the existing report is.
 - A document whose examples carry offsets prints nothing. Neither does a
   document with no `date-time` at all.
-- Silence is not bought by a missing example: a document that declares
-  `format: date-time` and gives no example anywhere is reported too, since
-  poagen cannot tell a compliant one from an off-spec one and saying so is
-  cheaper than a wrong instant.
+- REVERSED while building this. The criterion here said a `date-time` with no
+  example anywhere should be reported too, on the reasoning that poagen
+  cannot tell a compliant one from an off-spec one and that saying so is
+  cheaper than a wrong instant. It is not: most documents carry no
+  per-property examples at all, so that rule fires on nearly every run, and
+  an advisory that always fires is one readers learn to skip — which would
+  cost the case it exists for. Evidence is now required: a property is
+  reported only when its own `example` or `default` shows a timestamp with no
+  offset, the document convicting itself. `silence-means-success` only means
+  something while silence is earned.
 - Covered by a test over a fixture document of each kind.
 - `just check` green.
 
@@ -60,6 +66,9 @@ what the value means — is worth one line on stderr.
 - Reporting anything about a `ScalarBinding` a consumer bound to the format.
   A consumer who wrote the value object has already been told the format
   exists — that is what binding it means.
+- Reporting `format: date`. A date-only value carries no offset by its own
+  definition, so a rule covering it would fire on every document that has a
+  date at all and report a fact rather than a defect.
 
 == Files
 
