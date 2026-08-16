@@ -49,6 +49,7 @@ final readonly class ProfileOverride
             formats: $profile->formats,
             propertyFormats: $profile->propertyFormats,
             securitySchemes: $profile->securitySchemes,
+            dateTimeZone: $profile->dateTimeZone,
             source: $source ?? $profile->source,
         );
     }

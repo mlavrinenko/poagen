@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: Offset-Free Date-Time Fixture
+  version: 1.0.0
+  description: >
+    A `date-time` whose own example carries no UTC offset — the document
+    convicting itself. RFC 3339 requires the offset, so this value is
+    off-spec, and poagen resolves it against the process timezone: the same
+    payload means a different instant on a developer's machine and in a UTC
+    container. Modelled on the kilbil loyalty API, whose timestamps arrive
+    exactly like this and read three hours late.
+
+servers:
+  - url: https://offset-free.example/api/v1
+
+paths:
+  /shifts:
+    get:
+      operationId: listShifts
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shift'
+
+components:
+  schemas:
+    Shift:
+      type: object
+      properties:
+        startsAt:
+          type: string
+          format: date-time
+          example: '2026-08-14 12:51:17'
+        endsAt:
+          type: string
+          format: date-time
+          default: '2026-08-14 20:00:00'
+        label:
+          type: string
+          example: 'night'

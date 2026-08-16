@@ -209,6 +209,38 @@ and its committed
 [`generated/`](tests/fixtures/generated/format-binding) tree for the emitted
 shape.
 
+### A `date-time` with no offset
+
+RFC 3339 requires an offset, and real documents omit it. PHP resolves such a
+value against the process timezone, so the same payload means different
+instants on your laptop and in a UTC container — silently, with the right
+type and the wrong value. Say which zone it means:
+
+```php
+$transport = new HttpTransport(
+    ApiClient::SERVER_1,
+    ApiException::class,
+    context: new BindingContext(naiveZone: new DateTimeZone('Europe/Moscow')),
+);
+```
+
+The zone applies only where the vendor sent no offset — a value carrying
+`+05:00` keeps it — so one statement is safe on a document that mixes both.
+It reaches `\DateTimeImmutable` properties and any value object implementing
+`ContextualScalarBinding`; a plain `ScalarBinding` is untouched.
+
+Two places to say it, and which one depends on whose fact it is:
+
+| Route | Use when |
+| --- | --- |
+| `BindingContext` at construction | the zone is a property of the INSTALLATION — one document, many tenants, possibly different zones |
+| `Profile::$dateTimeZone` | the vendor fixed one zone for the DOCUMENT; emitted as `ApiClient::NAIVE_TIMEZONE` for you to pass to the context above |
+
+The profile's constant is a value you read, never wiring the client applies
+to itself: the transport is yours to construct, so poagen has nothing to
+apply it to. A context passed at construction therefore always wins, and
+saying nothing anywhere keeps the process timezone.
+
 ## Development
 
 ```bash

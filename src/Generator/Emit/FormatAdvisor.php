@@ -15,8 +15,15 @@ use function spl_object_id;
 use function sprintf;
 
 /**
- * Names every `format` annotation the generator does not recognise, with a
- * count and one place it appeared, and says what binds it.
+ * The document's `format` report, in two halves.
+ *
+ * The first, and the bulk of this file: every `format` annotation the
+ * generator does not recognise, with a count and one place it appeared, and
+ * what binds it. The second is {@see OffsetFreeDateTimeAdvisor}, appended by
+ * {@see notices()} — a `date-time` poagen recognises perfectly well and whose
+ * VALUE the document shows off-spec. Both are things a consumer would want to
+ * know about the formats in front of them, so they arrive together rather
+ * than as two reports a reader has to notice are related.
  *
  * An unknown format falls through to the base type. That is the right fallback —
  * the base type does carry the value — but done silently it loses the one thing
@@ -70,8 +77,10 @@ final readonly class FormatAdvisor
             self::walk($schema, $bindings, $bodyMediaTypes, $counts, $firstSeen);
         }
 
+        $offsetFree = OffsetFreeDateTimeAdvisor::notices($openApi);
+
         if ($counts === []) {
-            return [];
+            return $offsetFree;
         }
 
         // Sort by count descending, then by name, so the order is a fact about
@@ -92,7 +101,7 @@ final readonly class FormatAdvisor
             );
         }
 
-        return $notices;
+        return [...$notices, ...$offsetFree];
     }
 
     /**

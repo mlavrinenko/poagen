@@ -179,6 +179,10 @@
 #include "decisions/generated-tier-ceilings-cannot-fall-further.decision-260809.typ"
 #pagebreak()
 #include "decisions/a-shared-response-map-is-named-not-inferred.decision-260809.typ"
+#pagebreak()
+#include "decisions/the-consumer-states-the-zone-a-document-left-out.decision-260816.typ"
+#pagebreak()
+#include "decisions/a-fixed-document-zone-is-a-constant-not-wiring.decision-260816.typ"
 
 // --- Supplementary artefacts ---
 //
