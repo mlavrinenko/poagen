@@ -297,6 +297,3 @@ actions = [
   { run = 'scripts/gate-fresh is-fresh', gate = true, message = "the project gate has not passed against this worktree since your last change — run `scripts/gated-check` (wraps `just check`) and flip again" },
   { run = 'scripts/gate-fresh is-valid', gate = true, message = "truth/ does not parse (`speconaut check truth/` failed) — a task artifact or another truth file is malformed; fix it and flip again" },
 ]
-
-[ls.columns.file]
-when = "true"
