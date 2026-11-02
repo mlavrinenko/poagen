@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Nothing yet — `0.1.0` below is the current tip.
 
-## 0.1.0 - TBD
+## 0.1.0 - 2026-11-03
 
 First consumable release. The OpenAPI 3.0 *and* 3.1 pipeline is correct,
 type-safe, and pleasant to use on real schemas (Petstore, DigitalOcean,
