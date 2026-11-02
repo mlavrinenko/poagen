@@ -21,7 +21,7 @@
     "require": {
         "php": "^8.4",
         "devizzent/cebe-php-openapi": "^1.1",
-        "poagen/client-runtime": "*@dev",
+        "poagen/client-runtime": "^0.1",
         "nette/php-generator": "^4.2",
         "psr/http-message": "^2.0",
         "sebastian/diff": "^6.0 || ^7.0"
@@ -44,13 +44,18 @@
             "type": "path",
             "url": "runtime",
             "options": {
-                "symlink": true
+                "symlink": true,
+                "versions": {
+                    "poagen/client-runtime": "0.1.0"
+                }
             }
         }
     ],
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["bin/poagen"],
+    "bin": [
+        "bin/poagen"
+    ],
     "autoload": {
         "psr-4": {
             "Poagen\\Generator\\": "src/"
