@@ -1,5 +1,7 @@
 set dotenv-load := false
 
+mod docs '.just/docs.just'
+
 # Rector, and PHPStan when no `tmpDir` is configured, compile a DI container
 # into $TMPDIR and key it by config hash — not by checkout. The default is a
 # machine-wide /tmp path, so containers built by one worktree are reused by

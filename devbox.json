@@ -8,7 +8,12 @@
     "parallel@latest",
     "github:mlavrinenko/linecop/v0.2.0",
     "github:mlavrinenko/qahq#jscpd",
-    "github:mlavrinenko/qahq#mindtape"
+    "github:mlavrinenko/qahq#mindtape",
+    "typst@latest",
+    "tinymist@latest",
+    "typstyle@latest",
+    "jq@latest",
+    "github:tola-rs/tola-ssg/v0.7.1"
   ],
   "env": {
     "PATH": "$PWD/bin:$PWD/vendor/bin:$PATH"

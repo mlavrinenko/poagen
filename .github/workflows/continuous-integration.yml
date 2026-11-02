@@ -79,6 +79,16 @@ jobs:
           dependency-versions: "${{ matrix.composer-deps }}"
       - run: "composer test"
 
+  docs:
+    name: "Docs"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v7"
+      - uses: "jetify-com/devbox-install-action@v0.15.0"
+        with:
+          enable-cache: "true"
+      - run: "devbox run -- just docs check"
+
   # Runs the suite once, with coverage, and enforces the per-tier floor
   # (coverage-floor-in-the-gate). Deliberately one job, not a `coverage:
   # "pcov"` leg added to the unit-tests matrix above: the floor is a
