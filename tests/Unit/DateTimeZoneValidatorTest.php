@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Poagen\Generator\Tests\Unit;
 
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Poagen\Generator\Generator\DateTimeZoneValidator;
+
+use function array_diff;
+use function array_values;
 
 /**
  * `Profile::$dateTimeZone` is answerable from the profile alone, so like
@@ -34,11 +38,23 @@ final class DateTimeZoneValidatorTest extends TestCase
     /**
      * A deprecated identifier still resolves in PHP, and a document pinned to
      * one is still telling the truth about what its vendor sends — refusing
-     * it would refuse a fact.
+     * it would refuse a fact. Pick the identifier from the system's own list:
+     * some tzdata builds strip the backward-compatible links entirely, and a
+     * hardcoded `US/Eastern` would then fail for a reason unrelated to the
+     * validator.
      */
     public function testADeprecatedIdentifierStillPasses(): void
     {
-        self::assertSame([], new DateTimeZoneValidator()->validate('US/Eastern'));
+        $deprecated = array_values(array_diff(
+            DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC),
+            DateTimeZone::listIdentifiers(DateTimeZone::ALL),
+        ));
+
+        if ($deprecated === []) {
+            self::markTestSkipped('this tzdata build carries no deprecated identifiers');
+        }
+
+        self::assertSame([], new DateTimeZoneValidator()->validate($deprecated[0]));
     }
 
     public function testAnAbbreviationIsNotAZone(): void
