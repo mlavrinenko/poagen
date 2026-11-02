@@ -47,6 +47,8 @@ use function assert;
 use function bin2hex;
 use function count;
 use function dirname;
+use function end;
+use function explode;
 use function extension_loaded;
 use function is_array;
 use function random_bytes;
@@ -2155,11 +2157,16 @@ final class ModelGeneratorSteps
 
         try {
             $cmd = sprintf(
-                '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
+                '%s -d opcache.enable_cli=1 -d opcache.save_comments=0 -d opcache.jit=disable -d opcache.validate_timestamps=0 -d opcache.revalidate_freq=0 -d opcache.file_update_protection=0 %s 2>&1',
                 escapeshellarg(PHP_BINARY),
                 escapeshellarg($scriptPath),
             );
-            $this->opcacheSubprocessOutput = trim((string) shell_exec($cmd));
+            $output = trim((string) shell_exec($cmd));
+            // CI enables JIT by default, and JIT plus PCOV prints a warning
+            // before the script runs. The script's own answer is the last
+            // line; keep the warning out of the assertion.
+            $lines = explode("\n", $output);
+            $this->opcacheSubprocessOutput = trim((string) end($lines));
         } finally {
             @unlink($scriptPath);
         }

@@ -9,9 +9,10 @@ use PHPUnit\Framework\TestCase;
 use Poagen\Generator\SchemaReader;
 use Poagen\Generator\Tests\Integration\JsonSchemaParityTest;
 
+use function bin2hex;
 use function copy;
-use function strlen;
-use function substr;
+use function random_bytes;
+use function sys_get_temp_dir;
 use function unlink;
 
 /**
@@ -48,12 +49,10 @@ final class SchemaReaderTest extends TestCase
 
     public function testTheExtensionCheckIsCaseInsensitive(): void
     {
-        $upper = self::JSON_SCHEMA;
-        $upper = substr($upper, 0, -strlen('.json')) . '.JSON';
-
-        // No fixture actually sits at the upper-cased path; copy the JSON
-        // document there for the length of this test rather than committing
-        // a second fixture whose only distinction is its case.
+        // A temp file, not a fixture. On a case-insensitive filesystem a
+        // sibling `contact-3.0.JSON` is the same file as `contact-3.0.json`,
+        // and the cleanup would delete the fixture the next test needs.
+        $upper = sys_get_temp_dir() . '/contact-' . bin2hex(random_bytes(8)) . '.JSON';
         copy(self::JSON_SCHEMA, $upper);
 
         try {
