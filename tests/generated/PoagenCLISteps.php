@@ -12,9 +12,11 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 
 use function assert;
+use function bin2hex;
 use function dirname;
 use function is_array;
 use function is_resource;
+use function random_bytes;
 use function strlen;
 
 use const DIRECTORY_SEPARATOR;
@@ -172,9 +174,12 @@ final class PoagenCLISteps
 
     private function makeScratchDir(string $prefix): string
     {
-        $path = (string) tempnam(sys_get_temp_dir(), $prefix);
-        unlink($path);
-        mkdir($path, 0o755, true);
+        $path = sys_get_temp_dir() . '/' . $prefix . bin2hex(random_bytes(8));
+
+        if (!mkdir($path, 0o755, true) && !is_dir($path)) {
+            TestCase::fail("failed to create temporary directory: {$path}");
+        }
+
         return $path;
     }
 

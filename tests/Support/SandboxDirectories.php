@@ -10,8 +10,10 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
+use function bin2hex;
 use function file_get_contents;
 use function ksort;
+use function random_bytes;
 use function strlen;
 use function substr;
 
@@ -37,8 +39,7 @@ trait SandboxDirectories
      */
     private static function makeSandboxDir(string $prefix): string
     {
-        $path = (string) tempnam(sys_get_temp_dir(), $prefix);
-        unlink($path);
+        $path = sys_get_temp_dir() . '/' . $prefix . bin2hex(random_bytes(8));
 
         if (!mkdir($path, 0o755, true) && !is_dir($path)) {
             Assert::fail("failed to create temporary directory: {$path}");

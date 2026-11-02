@@ -39,6 +39,7 @@ use ReflectionParameter;
 
 use function dirname;
 use function is_array;
+use function random_bytes;
 use function strlen;
 
 /**
@@ -441,9 +442,11 @@ final class OperationGeneratorSteps
 
     private function makeScratchOutputDir(string $prefix): string
     {
-        $base = (string) tempnam(sys_get_temp_dir(), $prefix);
-        unlink($base);
-        assert(mkdir($base, 0o755, true));
+        $base = sys_get_temp_dir() . '/' . $prefix . bin2hex(random_bytes(8));
+
+        if (!mkdir($base, 0o755, true) && !is_dir($base)) {
+            TestCase::fail("failed to create temporary directory: {$base}");
+        }
 
         return $base;
     }

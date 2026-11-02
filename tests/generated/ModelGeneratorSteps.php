@@ -44,10 +44,12 @@ use SplFileInfo;
 use Throwable;
 
 use function assert;
+use function bin2hex;
 use function count;
 use function dirname;
 use function extension_loaded;
 use function is_array;
+use function random_bytes;
 use function sprintf;
 use function strlen;
 
@@ -310,9 +312,11 @@ final class ModelGeneratorSteps
 
     private function makeScratchOutputDir(string $prefix): string
     {
-        $base = (string) tempnam(sys_get_temp_dir(), $prefix);
-        unlink($base);
-        assert(mkdir($base, 0o755, true));
+        $base = sys_get_temp_dir() . '/' . $prefix . bin2hex(random_bytes(8));
+
+        if (!mkdir($base, 0o755, true) && !is_dir($base)) {
+            TestCase::fail("failed to create temporary directory: {$base}");
+        }
 
         return $base;
     }
@@ -359,9 +363,11 @@ final class ModelGeneratorSteps
 
     public function givenGeneratorHasProducedGeneratedModelPetPhpFromAPriorSchemaThatDeclaredAPetComponent(): void
     {
-        $tempBase = (string) tempnam(sys_get_temp_dir(), 'poagen-prune-');
-        unlink($tempBase);
-        assert(mkdir($tempBase, 0o755, true));
+        $tempBase = sys_get_temp_dir() . '/poagen-prune-' . bin2hex(random_bytes(8));
+
+        if (!mkdir($tempBase, 0o755, true) && !is_dir($tempBase)) {
+            TestCase::fail("failed to create temporary directory: {$tempBase}");
+        }
 
         $profile = new Profile(
             schema: dirname(__DIR__, 2) . '/tests/fixtures/schemas/petstore-3.0.yaml',
