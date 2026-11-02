@@ -6,11 +6,9 @@
   priority: 4,
   difficulty: 5,
   status: done(2026, 8, 9),
-  links: (
-    related(
-      "keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ",
-    ),
-  ),
+  links: related(
+    "keep-the-standalone-runtime-check-from-rotting-outside-the-gate.task-260805.typ",
+  )[this task replaces the hand-written harness that task pinned],
 )
 
 == Summary

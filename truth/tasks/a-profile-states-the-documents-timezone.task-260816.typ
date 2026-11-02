@@ -6,10 +6,12 @@
   priority: 2,
   difficulty: 4,
   status: done(2026, 8, 16),
-  links: (
-    related("an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ"),
-    related("report-a-datetime-the-document-left-offset-free.task-260816.typ"),
-  ),
+  links: related(
+    "an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ",
+  )[this profile setting is the document-wide case of that per-client zone]
+    + related(
+      "report-a-datetime-the-document-left-offset-free.task-260816.typ",
+    )[that report tells a consumer the profile's zone is missing],
 )
 
 == Summary

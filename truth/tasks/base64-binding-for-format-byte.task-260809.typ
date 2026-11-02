@@ -10,7 +10,9 @@
     8,
     9,
   )[Base64Codec is a default built-in; digitalocean's three byte sites adopted it in their own commit],
-  links: (related("built-in-uuid-and-binary-format-bindings.task-260808.typ"),),
+  links: related(
+    "built-in-uuid-and-binary-format-bindings.task-260808.typ",
+  )[this binding extends the built-in format bindings that task shipped],
 )
 
 == Summary

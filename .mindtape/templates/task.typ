@@ -1,7 +1,11 @@
 #import "@local/mindtape:0.2.0": *
 
 #show: task.with(
-  title: slot("title", prompt: "Task title"),
+  title: slot(
+    "title",
+    prompt: "Task title",
+    example: "Test that a deleted output voids its record",
+  ),
   tags: slot("tags", kind: "list", default: ()),
   priority: slot("priority", kind: "int", default: 5),
   difficulty: slot("difficulty", kind: "int", default: 4),

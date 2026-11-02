@@ -10,7 +10,9 @@
     8,
     9,
   )[symfony/yaml 8.1.2 on the lock; composer audit clean in both package roots; all four goldens byte-identical],
-  links: (related("v01-release-exit-criteria.task-260728.typ"),),
+  links: related(
+    "v01-release-exit-criteria.task-260728.typ",
+  )[the advisories block the 0.1.0 release exit criteria],
 )
 
 == Summary

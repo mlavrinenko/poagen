@@ -10,7 +10,9 @@
     8,
     5,
   )[Verified independently of the agent's own run: git subtree split --prefix=runtime, cloned to a scratch dir with no path repositories, composer install clean, 78 tests pass, and lint:phpstan (level max), lint:cs-fixer and lint:rector all pass with the generator absent. Root gate green at 558 tests, both floors unchanged. Two considered exceptions, both documented in-file: ResponseUnionSelectionTest and UnionBranchSelectionTest stay in tests/Integration/ because they are cross-package pins between emitted output and runtime rules, and the runtime's own coverage floor is 87.0 rather than the root's 92.0 for the same tree — runtime/tests alone reaches 87.10%, the rest of that 94.81% comes from generator-side integration tests.],
-  links: (related("publish-the-runtime-package-to-packagist.task-260802.typ"),),
+  links: related(
+    "publish-the-runtime-package-to-packagist.task-260802.typ",
+  )[the package this task makes self-contained is the one publish ships],
 )
 
 == Summary

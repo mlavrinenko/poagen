@@ -6,12 +6,12 @@
   priority: 4,
   difficulty: 4,
   status: done(2026, 8, 9),
-  links: (
-    related(
-      "decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ",
-    ),
-    related("refined-phpdoc-types.task-260807.typ"),
-  ),
+  links: related(
+    "decide-whether-an-override-may-narrow-a-structural-property.task-260808.typ",
+  )[the override this task refines is the one that task ruled scalar-only]
+    + related(
+      "refined-phpdoc-types.task-260807.typ",
+    )[this task extends that scalar refiner to list items],
 )
 
 == Summary

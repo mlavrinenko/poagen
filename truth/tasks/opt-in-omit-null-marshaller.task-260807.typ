@@ -10,11 +10,9 @@
     8,
     8,
   )[Shipped in 6f068d73; status was never flipped because mt was unavailable that session],
-  links: (
-    related(
-      "reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends.task-260805.typ",
-    ),
-  ),
+  links: related(
+    "reconcile-the-kilbil-schema-with-what-the-live-api-actually-sends.task-260805.typ",
+  )[the null rejection was found while reconciling kilbil against the live API],
 )
 
 == Summary

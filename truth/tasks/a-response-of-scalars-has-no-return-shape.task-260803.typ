@@ -5,12 +5,12 @@
   tags: ("generator", "runtime", "strictness"),
   priority: 5,
   difficulty: 4,
-  links: (
-    related("typed-error-responses.task-260729.typ"),
-    related(
+  links: related(
+    "typed-error-responses.task-260729.typ",
+  )[the scalar response shape depends on the envelope this task returns]
+    + related(
       "synthesise-a-model-for-inline-array-item-responses.task-260802.typ",
-    ),
-  ),
+    )[split out of this task when the items turned out to be scalars, not inline objects],
   status: done(
     2026,
     8,

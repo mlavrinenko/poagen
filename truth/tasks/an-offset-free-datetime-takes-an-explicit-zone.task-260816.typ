@@ -6,10 +6,12 @@
   priority: 3,
   difficulty: 6,
   status: done(2026, 8, 16),
-  links: (
-    related("a-profile-states-the-documents-timezone.task-260816.typ"),
-    related("report-a-datetime-the-document-left-offset-free.task-260816.typ"),
-  ),
+  links: related(
+    "a-profile-states-the-documents-timezone.task-260816.typ",
+  )[the profile timezone is the document-wide alternative to this per-client setting]
+    + related(
+      "report-a-datetime-the-document-left-offset-free.task-260816.typ",
+    )[that task reports the values this one lets a consumer interpret],
 )
 
 == Summary

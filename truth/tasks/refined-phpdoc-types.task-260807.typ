@@ -10,7 +10,9 @@
     8,
     8,
   )[Shipped in ec601bd9 + 2a314707; status was never flipped because mt was unavailable that session],
-  links: (related("typed-domain-entity-props.task-260729.typ"),),
+  links: related(
+    "typed-domain-entity-props.task-260729.typ",
+  )[the typed domain properties are what the PHPDoc refiner narrows],
 )
 
 == Summary

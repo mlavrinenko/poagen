@@ -10,7 +10,9 @@
     8,
     9,
   )[Codec contract shipped; uuid wrappers re-expressed as codecs rather than kept boxed (decision-260809)],
-  links: (related("built-in-uuid-and-binary-format-bindings.task-260808.typ"),),
+  links: related(
+    "built-in-uuid-and-binary-format-bindings.task-260808.typ",
+  )[this task re-expresses those uuid bindings as codecs],
 )
 
 == Summary

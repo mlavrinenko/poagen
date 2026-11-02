@@ -6,10 +6,12 @@
   priority: 2,
   difficulty: 7,
   status: done(2026, 8, 9),
-  links: (
-    related("heal-the-duplication-gate-margins.task-260809.typ"),
-    related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
-  ),
+  links: related(
+    "heal-the-duplication-gate-margins.task-260809.typ",
+  )[that task makes the zero margins these maps sit on visible]
+    + related(
+      "retighten-the-generated-duplication-ceilings.task-260804.typ",
+    )[this collapse route is re-weighed against the ceilings that task owns],
 )
 
 == Summary

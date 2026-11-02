@@ -13,6 +13,10 @@
       "last_modified": "2026-07-04T21:36:45Z",
       "resolved": "github:mlavrinenko/qahq/dfe4a39138da502fd7430ee57d710b61d7f1dd18?lastModified=1783201005&narHash=sha256-qeWkoEzs3stn2KrwHp1MmQUrHXthZKGJvcFB31VX9eg%3D#jscpd"
     },
+    "github:mlavrinenko/qahq#mindtape": {
+      "last_modified": "2026-11-02T17:54:58Z",
+      "resolved": "github:mlavrinenko/qahq/06c0ac6269c3698057637915da53efc83859ca19?lastModified=1793642098&narHash=sha256-e%2BPC7dJWe0c416DRtLIZRSFBE5sCOY5cj7kF0gNFNR8%3D#mindtape"
+    },
     "just@latest": {
       "last_modified": "2026-04-06T08:39:25Z",
       "resolved": "github:NixOS/nixpkgs/83e29f2b8791f6dec20804382fcd9a666d744c07#just",

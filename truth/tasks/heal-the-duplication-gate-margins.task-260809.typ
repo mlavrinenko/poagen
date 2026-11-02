@@ -10,10 +10,12 @@
     8,
     9,
   )[source tier 2.99% to 2.63% by factoring nine tests' scaffolding; generated tier's zero margin re-measured and recorded as deliberate (decision-260809); both recipes now print measured against ceiling],
-  links: (
-    related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
-    related("adopt-jscpd-duplication-gate.task-260730.typ"),
-  ),
+  links: related(
+    "retighten-the-generated-duplication-ceilings.task-260804.typ",
+  )[it measures the margins this task must widen]
+    + related(
+      "adopt-jscpd-duplication-gate.task-260730.typ",
+    )[it repairs the gate that task introduced],
 )
 
 == Summary

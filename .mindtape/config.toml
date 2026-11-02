@@ -299,4 +299,4 @@ actions = [
 ]
 
 [ls.columns.file]
-visibility = "visible"
+when = "true"

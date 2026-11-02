@@ -10,7 +10,9 @@
     8,
     9,
   )[both bumps landed with dependabot authorship and task trailers; runtime CI mirror carried along],
-  links: (related("v01-release-exit-criteria.task-260728.typ"),),
+  links: related(
+    "v01-release-exit-criteria.task-260728.typ",
+  )[the bumps are release-checklist items],
 )
 
 == Summary

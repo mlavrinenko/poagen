@@ -10,9 +10,9 @@
     8,
     3,
   )[Landed as b7435ff, merged 92b6b5b. Re-scoped 2026-08-03: the object-item case already worked, so what this delivers is the missing regression test for a profile pin against a list-typed response. The three GitHub operations turned out to declare scalar items and moved to a-response-of-scalars-has-no-return-shape, which waits on the envelope.],
-  links: (
-    related("a-response-of-scalars-has-no-return-shape.task-260803.typ"),
-  ),
+  links: related(
+    "a-response-of-scalars-has-no-return-shape.task-260803.typ",
+  )[the scalar-item operations that task owns were split out of this one],
 )
 
 == Summary

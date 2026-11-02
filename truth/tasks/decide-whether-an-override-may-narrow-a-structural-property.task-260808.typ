@@ -10,11 +10,9 @@
     8,
     8,
   )[ruled scalar-only; decision phpdoctypes-stays-scalar-only, refusal points at it],
-  links: (
-    related(
-      "refuse-a-phpdoctypes-override-the-property-cannot-carry.task-260808.typ",
-    ),
-  ),
+  links: related(
+    "refuse-a-phpdoctypes-override-the-property-cannot-carry.task-260808.typ",
+  )[that task implements the refusal this decision asks for],
 )
 
 == Summary

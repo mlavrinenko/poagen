@@ -197,13 +197,15 @@ This project runs MindTape's `gated` preset, which means:
   `main` on 2026-08-03; the freshness record did not catch it because the
   file was excluded from its inputs.
 
-`mt` on `PATH` rebuilds the mindtape checkout from source on every
-invocation. When that checkout fails to compile — an uncommitted dependency
-edit was enough on 2026-08-03 — every subcommand exits 101, `mt ls` and
-`mt check` included, and nothing about poagen is at fault. Edit task
-artifacts by hand instead — the format is plain Typst — and validate with
-`speconaut check truth/`; run `scripts/gate-fresh is-fresh` directly for the
-freshness check `mt`'s own `[[on.flip]]` predicate would otherwise run.
+`mt` comes from the dev shell, not the host: `devbox.json` takes
+`github:mlavrinenko/qahq#mindtape`, so the version is whatever `qahq`'s
+`flake.lock` pins. When it cannot load `.mindtape/config.toml`, the pinned
+mindtape and the config disagree; bump the `mindtape` input in `qahq` and the
+devbox lock, not the config down to the older schema. If the binary itself
+will not start, edit task artifacts by hand — the format is plain Typst — and
+validate with `speconaut check truth/`; run `scripts/gate-fresh is-fresh`
+directly for the freshness check `mt`'s own `[[on.flip]]` predicate would
+otherwise run.
 
 `difficulty` scores judgment required, not size: 0–2 mechanical, 3–5 local
 judgment, 6–8 cross-cutting design, 9 the approach itself is the open question.

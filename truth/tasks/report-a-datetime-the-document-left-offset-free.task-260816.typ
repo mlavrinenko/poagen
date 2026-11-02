@@ -6,10 +6,12 @@
   priority: 3,
   difficulty: 3,
   status: done(2026, 8, 16),
-  links: (
-    related("an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ"),
-    related("a-profile-states-the-documents-timezone.task-260816.typ"),
-  ),
+  links: related(
+    "an-offset-free-datetime-takes-an-explicit-zone.task-260816.typ",
+  )[that task gives the consumer a way to state the zone this report warns about]
+    + related(
+      "a-profile-states-the-documents-timezone.task-260816.typ",
+    )[that task states the zone document-wide, which this report points at],
 )
 
 == Summary

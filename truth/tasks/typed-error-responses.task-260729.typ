@@ -5,10 +5,12 @@
   tags: ("errors", "dx", "generator"),
   priority: 8,
   difficulty: 8,
-  links: (
-    depends-on("name-inline-schemas-by-operation-and-status.task-260802.typ"),
-    related("retighten-the-generated-duplication-ceilings.task-260804.typ"),
-  ),
+  links: depends-on(
+    "name-inline-schemas-by-operation-and-status.task-260802.typ",
+  )
+    + related(
+      "retighten-the-generated-duplication-ceilings.task-260804.typ",
+    )[the envelope this task adds is what raised the generated duplication ceilings],
   status: done(
     2026,
     8,

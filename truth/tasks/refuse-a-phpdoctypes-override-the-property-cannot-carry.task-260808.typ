@@ -10,7 +10,9 @@
     8,
     8,
   )[Refusals proven end to end; full gate green on the merged tree],
-  links: (related("refined-phpdoc-types.task-260807.typ"),),
+  links: related(
+    "refined-phpdoc-types.task-260807.typ",
+  )[the override this task refuses is the narrowing that task introduced],
 )
 
 == Summary
