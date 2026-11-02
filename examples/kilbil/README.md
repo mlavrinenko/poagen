@@ -9,6 +9,11 @@ This example exists because it is hard in the specific ways real documents are
 hard, and poagen's claim to work is measured against it rather than against
 Petstore.
 
+The client this example generates is published as
+[`maximaster/kilbil-client`](https://github.com/maximaster/kilbil-client).
+This directory remains the acceptance target — that is what the example is for
+— and this repository's gates regenerate and check it.
+
 ## What makes it a real test
 
 **Declares OpenAPI 3.1 and uses exactly one 3.1 construct, 87 times.** The

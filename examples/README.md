@@ -43,6 +43,9 @@ Packagist round-trip. `composer generate` is a one-line alias for
   than against Petstore: it is what surfaced the transport collapse,
   the sub-client split, and the XML request-body work. See
   `kilbil/README.md` for the day-to-day list of what makes it hard.
+  The client extracted from this example is published as
+  [`maximaster/kilbil-client`](https://github.com/maximaster/kilbil-client);
+  this directory remains the generator's acceptance target.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
   (2.7 MB, 722 components). `.expected-failure`: a ref-only `oneOf`
   without `discriminator` trips `attribute-and-phpdoc-driven-serialization`'s

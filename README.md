@@ -125,7 +125,8 @@ See [`examples/`](examples/) for end-to-end demonstrations on real
 schemas — Petstore, kilbil's loyalty API, DigitalOcean, and GitHub all
 pass. The example profiles and committed `generated/` trees are the
 shortest path to "what does poagen's output look like on *my* kind of
-schema?".
+schema?". The kilbil client is also published as
+[`maximaster/kilbil-client`](https://github.com/maximaster/kilbil-client).
 
 A minimal sample profile also lives at
 [`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).
