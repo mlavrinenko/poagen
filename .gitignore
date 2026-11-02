@@ -16,3 +16,9 @@
 
 # Ad-hoc scratch scripts (debug / one-off analysis)
 /tmp_*.php
+
+# Generated docs site
+/www/public/
+
+# Tola package cache
+/www/.tola/

@@ -13,8 +13,8 @@ fans out into every example's `check` (see `lint-phpstan-generated`).
 examples/
 ├── petstore/          ✅ passes — small textbook schema
 ├── kilbil/            ✅ passes — the real vendor schema poagen is proven against
-├── digitalocean/      ⚠️  expected-failure (T-030) — no generated/ tree
-└── github/            ⚠️  expected-failure (T-030) — no generated/ tree
+├── digitalocean/      ✅ passes — 2.7 MB public API bundle
+└── github/            ✅ passes — 8.8 MB REST bundle
 ```
 
 ## Running an example
@@ -47,15 +47,11 @@ Packagist round-trip. `composer generate` is a one-line alias for
   [`maximaster/kilbil-client`](https://github.com/maximaster/kilbil-client);
   this directory remains the generator's acceptance target.
 - **`digitalocean/`** — the DigitalOcean public API 3.0.0 bundle
-  (2.7 MB, 722 components). `.expected-failure`: a ref-only `oneOf`
-  without `discriminator` trips `attribute-and-phpdoc-driven-serialization`'s
-  generator-time error
-  ([T-030](../truth/tasks/030-undiscriminated-oneof-generator-time-error.task-260420.typ)).
-  No `generated/` tree is committed for it — see "`just check-examples`"
-  below.
+  (2.7 MB, 722 components). It exercises composition-heavy schemas, unions
+  and a large component catalogue, and its `generated/` tree is committed.
 - **`github/`** — the GitHub REST API 3.0.3 bundle (8.8 MB, ~918
-  components, ~1000 endpoints). Same `.expected-failure` reason
-  (T-030), same absence of a `generated/` tree.
+  components, ~1000 endpoints). The widest parameter surface of the four,
+  and its `generated/` tree is committed.
 
 ## `just check-examples`
 
@@ -69,13 +65,15 @@ The recipe walks every `examples/*/poagen.php`, invokes the
 generator, and summarises:
 
 - Directory without `.expected-failure` → generation must succeed
-  with no drift vs the committed `generated/` tree.
+  with no drift vs the committed `generated/` tree. Every example is in
+  this state today.
 - Directory with `.expected-failure` → generation is *expected* to
   fail, and the directory carries no `generated/` tree — the marker
   and a committed tree can't both be true. An unexpected success is
   flagged so the marker doesn't go stale; an `.expected-failure`
   directory that still has a `generated/` tree is flagged the same
-  way, naming the example.
+  way, naming the example. No example currently uses the marker; it
+  stays supported for a document that reaches a construct worth tracking.
 
 `check-examples` is deliberately **not** part of `just check`. Broken
 examples are committed on purpose — they are the dashboard for what

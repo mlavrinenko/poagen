@@ -1,0 +1,44 @@
+# Tola configuration for the poagen docs site.
+# Authored in Typst, the same medium the project's specs and tasks use.
+
+[site.info]
+title = "poagen"
+author = "Maxim Lavrinenko"
+description = "OpenAPI-driven PHP client generator producing typed, extensible clients."
+url = "https://mlavrinenko.github.io/poagen"
+language = "en"
+copyright = "MIT"
+
+[site.seo]
+auto_og = false
+
+[site.seo.feed]
+enable = false
+
+[site.seo.sitemap]
+enable = true
+path = "sitemap.xml"
+
+[site.header]
+no_fouc = true
+styles = []
+scripts = []
+elements = []
+
+[build.assets]
+nested = ["assets"]
+flatten = []
+
+[serve]
+interface = "127.0.0.1"
+port = 5278
+watch = true
+respect_prefix = true
+
+[validate.pages]
+enable = true
+level = "error"
+
+[validate.assets]
+enable = true
+level = "error"

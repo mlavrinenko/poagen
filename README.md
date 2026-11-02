@@ -1,261 +1,91 @@
+<!-- Generated from docs/src/readme.typ by `just docs md`. Do not edit; edit the source. -->
+
 <h1 align="center">poagen</h1>
 
-<p align="center">
-    <strong>OpenAPI-driven PHP client generator producing typed, extensible clients.</strong>
-</p>
+<h4 align="center">OpenAPI-driven PHP client generator producing typed, extensible clients.</h4>
 
-<p align="center">
-    <em>⚠️ Pre-alpha. API and CLI are unstable. Not yet on Packagist.</em>
-</p>
+<h4 align="center"><a href="https://mlavrinenko.github.io/poagen/">Documentation</a> · <a href="https://mlavrinenko.github.io/poagen/quickstart/">Quickstart</a></h4>
 
-## About
+---
 
-poagen reads an OpenAPI 3.0 or 3.1 schema and emits a PHP 8.4 HTTP client:
+poagen reads an OpenAPI 3.0 or 3.1 document and emits a PHP 8.4 HTTP client. The generated tree is disposable: every run rewrites it whole, and your own code lives beside it. The output is deterministic, so a diff after regeneration shows only real changes.
 
-* **Typed** — exhaustive PHPStan annotations (`@var non-empty-string`, etc.)
-* **Extensible** — your customisations live in a typed `Profile` and in
-  attributes on your own value objects, never in the generated tree
-  (see `truth/decisions/profile-driven-generation.decision-260418.typ`)
-* **PSR-aligned** — generated runtime depends on
-  [PSR-18](https://www.php-fig.org/psr/psr-18/) / PSR-17 / PSR-7,
-  so you can plug in Guzzle, Symfony HTTP Client, etc.
-* **Lean** — CLI has zero runtime deps on heavy frameworks
+## Why poagen
 
-## Status
+- **Typed.** Exhaustive PHPStan annotations, backed enums, readonly models, and one method per operation.
+- **Extensible.** Guidance lives in a typed `Profile` and in attributes on your own value objects, never in an edit to generated code.
+- **PSR-aligned.** The emitted client depends on PSR-18, PSR-17 and PSR-7, so Guzzle, Symfony HTTP Client, or anything else that implements them plugs in.
+- **Fail loud.** An unsupported construct stops the run by name. poagen never drops an operation and calls the result a success.
+- **Proven on real documents.** Petstore, DigitalOcean, GitHub, and kilbil’s loyalty API all generate and pass their own gates.
 
-First consumable release (v0.1): the OpenAPI 3.0 and 3.1 pipeline is
-correct, type-safe, and pleasant on real schemas. The generator emits:
+## Install
 
-* **Models** — typed `readonly` classes for `components.schemas`, PHP 8.1
-  backed enums for `enum`, synthesised classes for inline `type: object`
-  properties, PHP union types for `oneOf` / `anyOf` (driven by
-  `discriminator.propertyName`), merged models for `allOf`. Top-level
-  composition components become marker interfaces their branches
-  implement.
-* **`ApiClient`** — one method per operation, typed path / query / header
-  / cookie parameters, `application/json` and
-  `application/x-www-form-urlencoded` request bodies. `multipart/form-data`
-  and `application/octet-stream` methods are emitted with a `: never`
-  return type that throws until a full story ships.
-* **Security** — `apiKey` (header) and `http bearer` become required
-  `ApiClient` constructor arguments; `http basic`, `oauth2`, and
-  `openIdConnect` remain placeholders per
-  [`no-inheritance-no-protected-regions`](truth/decisions/no-inheritance-no-protected-regions.decision-260418.typ).
-* **Responses** — every operation returns an
-  [`Envelope`](runtime/src/Contract/Envelope.php) carrying the HTTP status
-  the wire sent (`->status`), the body hydrated into the shape the document
-  declared for that status (`->body`), and the PSR-7 response that carried
-  both (`->response`). A status the document describes — 2xx or not — is a
-  return value, never a throw; a generated `Generated\ApiException` is
-  raised only for the two cases an envelope cannot honestly represent: a
-  status the document declared no exact, range or `default` response for,
-  or a declared body that failed to hydrate (see
-  [`envelope-supersedes-error-response-policy`](truth/decisions/envelope-supersedes-error-response-policy.decision-260804.typ),
-  which supersedes `error-response-policy`).
-* **Runtime transport** — an emitted operation is one call: it describes
-  its request as an
-  [`Endpoint`](runtime/src/Contract/Endpoint.php), names the shape it
-  expects back as a
-  [`ResponseType`](runtime/src/Contract/ResponseType.php), and hands both
-  to the injected
-  [`TransportInterface`](runtime/src/Contract/TransportInterface.php).
-  A client takes that transport plus whatever credentials the schema
-  declares, and nothing else.
-* **Runtime (de)serialisation** — a shared
-  [`Marshaller`](runtime/src/Marshal/Marshaller.php) /
-  [`Hydrator`](runtime/src/Marshal/Hydrator.php) pair drives every
-  (de)serialisation via phpdoc types and a small set of runtime
-  attributes (`#[WireName]`, `#[Discriminator]`, …). Model classes carry
-  no generator boilerplate (see
-  [`attribute-and-phpdoc-driven-serialization`](truth/decisions/attribute-and-phpdoc-driven-serialization.decision-260420.typ)).
-* **Replaceable** — every runtime collaborator a generated file names is
-  an interface under
-  [`runtime/src/Contract/`](runtime/src/Contract/), and the emitted
-  type-hints point at those rather than at implementations. Supply your
-  own hydrator, marshaller, XML writer, descriptor parser or error policy —
-  or your own transport for all of it — without editing a generated file.
-
-Specs and decisions live under [`truth/`](truth/); the work queue is
-MindTape (`mt ls`). [`ROADMAP.md`](ROADMAP.md) is the retired v0.1 release
-checklist, kept as the record of what the first release required and how
-each requirement closed.
-
-OpenAPI **3.1** is supported, parsed through
-[`devizzent/cebe-php-openapi`](https://github.com/DEVizzent/cebe-php-openapi) —
-see
-[`openapi-31-through-a-maintained-parser`](truth/decisions/openapi-31-through-a-maintained-parser.decision-260729.typ),
-which supersedes the earlier `openapi-31-strategy` decision. A handful of
-JSON Schema 2020-12 keywords have no emitter yet and stop the run by name
-rather than being silently dropped or misread: `const`, `prefixItems`,
-`unevaluatedProperties`, `contentMediaType`. A 3.1 `webhooks` entry is
-refused the same way — it describes a call the vendor makes to the consumer,
-the opposite direction from every client poagen emits — unless named in
-`Profile::$skip`, which generates the `paths` half of the document alone.
-
-## Installation
-
-Not on Packagist yet. Clone and install locally:
+The runtime goes in `require`, because generated code runs in production. The generator goes in `require-dev`, because it only runs while you generate:
 
 ```bash
-git clone https://github.com/mlavrinenko/poagen.git
-cd poagen
-composer install
+composer require poagen/client-runtime
+composer require --dev poagen/client-generator
 ```
 
-## Usage
+## Quickstart
 
-```bash
-poagen generate path/to/poagen.php
-poagen generate path/to/poagen.php --dry-run   # preview writes / deletes
-poagen generate path/to/poagen.php --diff      # unified diff vs disk
-poagen generate path/to/poagen.php --diff=Generated/Model/**  # scope the diff to a subtree
-poagen generate path/to/poagen.php --diff --color=always      # force colour even when piped
-poagen generate path/to/poagen.php --output=/tmp/out
-poagen validate path/to/schema.yaml            # parse + validate only
-```
-
-Where `poagen.php` returns a typed `Profile` describing the schema, output
-dir, namespace, and any user value objects to wire in. `Profile::$schema`
-and `poagen validate` both accept the document as YAML or JSON, chosen by
-the file extension (`.json` reads as JSON; anything else reads as YAML) —
-one reader-selection rule, shared by both commands, so a `.json` document
-generates the same client its `.yaml` equivalent would.
-
-See [`examples/`](examples/) for end-to-end demonstrations on real
-schemas — Petstore, kilbil's loyalty API, DigitalOcean, and GitHub all
-pass. The example profiles and committed `generated/` trees are the
-shortest path to "what does poagen's output look like on *my* kind of
-schema?". The kilbil client is also published as
-[`maximaster/kilbil-client`](https://github.com/maximaster/kilbil-client).
-
-A minimal sample profile also lives at
-[`tests/fixtures/profiles/petstore.php`](tests/fixtures/profiles/petstore.php).
-
-### Binding a `format` to a value object
-
-`format: date-time` and `format: date` resolve to `DateTimeImmutable` on
-their own, and `format: byte` — OpenAPI's spelling for base64-encoded bytes
-inside a JSON string — resolves to a plain `string` holding the *decoded*
-bytes, via `Poagen\Runtime\Format\Base64Codec`: `base64_decode()` in strict
-mode on the way in, `base64_encode()` on the way out, both PHP core, so
-this one costs no dependency either and applies with no profile line.
-A payload that is not valid base64 fails naming the property. Every other
-`format` keeps its base type and poagen prints a notice naming it, because
-guessing a type for a vendor's annotation is worse than saying it went
-unread.
-
-`uuid` is the one poagen ships bindings for. It does not apply one by
-default: PHP has no core UUID type, so any binding is a dependency decision,
-and a consumer who already has `symfony/uid` should not be handed
-`ramsey/uuid`. Pick one in the profile:
+Write a profile:
 
 ```php
-use Poagen\Runtime\Format\RamseyUuidCodec;   // needs ramsey/uuid
-use Poagen\Runtime\Format\SymfonyUuidCodec;  // needs symfony/uid
+<?php
+
+declare(strict_types=1);
+
+use Poagen\Generator\Generator\Profile;
 
 return new Profile(
-    // ...
-    formats: ['uuid' => RamseyUuidCodec::class],
+    schema: __DIR__ . '/schemas/petstore-3.0.yaml',
+    output: __DIR__ . '/generated',
+    namespace: 'App\\Petstore',
 );
 ```
 
-Every property and parameter carrying that format now takes the binding, and
-`composer require ramsey/uuid` is the other half — it is a `suggest` of
-`poagen/client-runtime`, never a `require`. The emitted property is the
-library's own `UuidInterface` directly — `public UuidInterface $id` — with no
-wrapper and no `->value` hop, because `RamseyUuidCodec` converts on its
-behalf rather than boxing it.
-
-Any value object of your own goes in the same map, and needs nothing but
-`Poagen\Runtime\ScalarBinding`:
-
-```php
-final readonly class Ulid implements ScalarBinding
-{
-    public function __construct(public string $value) {}
-
-    public static function fromScalar(mixed $raw): self { /* validate */ }
-
-    public function toScalar(): string { return $this->value; }
-}
-```
-
-A type you do not own — a class from a library, which cannot be made to
-implement `ScalarBinding` — binds through `Poagen\Runtime\Codec` instead. The
-property is declared as the codec's own target type, never a wrapper:
-
-```php
-final readonly class MoneyCodec implements Codec
-{
-    public static function targetType(): string { return Money::class; }
-
-    public static function decode(mixed $wire): Money { /* parse */ }
-
-    public static function encode(mixed $value): mixed { /* format */ }
-}
-```
-
-Three ways to attach either shape, most specific first:
-
-| Route | Reach |
-| --- | --- |
-| `Profile::$propertyFormats` | one property of one model, keyed `'<ModelClass>.<wireName>'` |
-| `Profile::$formats` | every site carrying that format, document-wide |
-| `#[BindsFormat('uuid')]` + `Profile::$discoverIn` | same reach, discovered by scanning your namespaces |
-
-All three beat a built-in, so swapping `DateTimeImmutable` for Carbon is one
-entry. See
-[`tests/fixtures/profiles/format-binding.php`](tests/fixtures/profiles/format-binding.php)
-and its committed
-[`generated/`](tests/fixtures/generated/format-binding) tree for the emitted
-shape.
-
-### A `date-time` with no offset
-
-RFC 3339 requires an offset, and real documents omit it. PHP resolves such a
-value against the process timezone, so the same payload means different
-instants on your laptop and in a UTC container — silently, with the right
-type and the wrong value. Say which zone it means:
-
-```php
-$transport = new HttpTransport(
-    ApiClient::SERVER_1,
-    ApiException::class,
-    context: new BindingContext(naiveZone: new DateTimeZone('Europe/Moscow')),
-);
-```
-
-The zone applies only where the vendor sent no offset — a value carrying
-`+05:00` keeps it — so one statement is safe on a document that mixes both.
-It reaches `\DateTimeImmutable` properties and any value object implementing
-`ContextualScalarBinding`; a plain `ScalarBinding` is untouched.
-
-Two places to say it, and which one depends on whose fact it is:
-
-| Route | Use when |
-| --- | --- |
-| `BindingContext` at construction | the zone is a property of the INSTALLATION — one document, many tenants, possibly different zones |
-| `Profile::$dateTimeZone` | the vendor fixed one zone for the DOCUMENT; emitted as `ApiClient::NAIVE_TIMEZONE` for you to pass to the context above |
-
-The profile's constant is a value you read, never wiring the client applies
-to itself: the transport is yours to construct, so poagen has nothing to
-apply it to. A context passed at construction therefore always wins, and
-saying nothing anywhere keeps the process timezone.
-
-## Development
+Generate:
 
 ```bash
-# Pinned tooling via devbox + direnv (optional)
-devbox shell
-
-composer install
-just check            # lint + test + check-specs (release gate)
-just check-examples   # exercise examples/*/ against the current generator
-just format           # auto-fix code style
+vendor/bin/poagen generate poagen.php
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Use the client:
+
+```php
+use App\Petstore\Generated\ApiClient;
+use App\Petstore\Generated\ApiException;
+use Poagen\Runtime\Http\HttpTransport;
+
+$client = new ApiClient(
+    new HttpTransport(ApiClient::SERVER_1, ApiException::class),
+    apiKey: $apiKey,
+    petstoreAuth: $token,
+);
+
+$response = $client->pet()->getPetById(1);
+
+echo $response->body?->name;
+```
+
+Every operation returns an `Envelope` carrying `->status`, `->body` and the PSR-7 `->response`. A declared non-2xx status is a value to inspect, not an exception.
+
+## Documentation
+
+- [Quickstart](https://mlavrinenko.github.io/poagen/quickstart/) takes you from an empty project to a first response.
+- [Installation](https://mlavrinenko.github.io/poagen/installation/) covers requirements and versions.
+- [Profile](https://mlavrinenko.github.io/poagen/profile/) is the configuration reference.
+- [Generated code](https://mlavrinenko.github.io/poagen/generated-code/) explains models, enums, clients and envelopes.
+- [Formats](https://mlavrinenko.github.io/poagen/formats/) covers value objects, codecs and date-time zones.
+- [CLI](https://mlavrinenko.github.io/poagen/cli/) covers generate, validate, dry runs and diffs.
+- [Examples](https://mlavrinenko.github.io/poagen/examples/) shows the four real documents.
+- [Status](https://mlavrinenko.github.io/poagen/status/) lists what poagen refuses by name.
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/mlavrinenko/poagen/blob/main/CONTRIBUTING.md). The project’s decisions and specs live under `truth/`, next to the code they describe.
 
 ## License
 
-MIT © [Maxim Lavrinenko](mailto:maxim@lavrinenko.xyz). See [LICENSE](LICENSE).
+MIT.
