@@ -8,6 +8,8 @@ use DateTimeZone;
 
 use function in_array;
 use function sprintf;
+use function str_contains;
+use function timezone_open;
 
 /**
  * Checks `Profile::$dateTimeZone` against PHP's own timezone database.
@@ -39,7 +41,17 @@ final readonly class DateTimeZoneValidator
         // ALL_WITH_BC rather than ALL: a document pinned to a deprecated
         // identifier is still telling the truth about what its vendor sends,
         // and PHP still resolves it. Refusing it would refuse a fact.
+        //
+        // The list is not enough on every build. Some distributions strip
+        // the backward-compatible links from tzdata, so `US/Eastern` resolves
+        // through `timezone_open()` but is missing from `listIdentifiers()`.
+        // A named zone is one with a slash; abbreviations such as `MSK` and
+        // offsets such as `UTC+3` still fail the list and are still refused.
         if (in_array($zone, DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC), true)) {
+            return [];
+        }
+
+        if (str_contains($zone, '/') && @timezone_open($zone) !== false) {
             return [];
         }
 
