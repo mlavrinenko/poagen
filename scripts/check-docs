@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# The docs gate: README source is current, the site builds, and every link
+# resolves.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+bash scripts/check-docs-md
+(cd www && tola build --clean)
+bash www/generate-md.sh
+(cd www && tola validate)

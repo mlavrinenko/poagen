@@ -19,8 +19,7 @@ md-check:
 
 [doc("Build the site, render Markdown copies and llms.txt")]
 build:
-    cd www && tola build --clean
-    bash www/generate-md.sh
+    bash scripts/build-docs
 
 [doc("Serve the site locally")]
 serve:
@@ -28,7 +27,5 @@ serve:
 
 [doc("Build, render and validate the docs")]
 [group("gate")]
-check: md-check
-    cd www && tola build --clean
-    bash www/generate-md.sh
-    cd www && tola validate
+check:
+    bash scripts/check-docs

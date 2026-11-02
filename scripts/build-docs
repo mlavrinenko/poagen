@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Build the docs site and write its Markdown copies. The caller supplies
+# tola and typlite on PATH; the devbox shell does that locally, and CI
+# installs the pinned prebuilt binaries.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+(cd www && tola build --clean)
+bash www/generate-md.sh
